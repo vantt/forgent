@@ -1,0 +1,1136 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 17,
+  "entries": [
+    {
+      "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "blobSha": "de10278a05a8bbc7d67ee11bd3a87aa93a318564",
+      "blobSize": 42310,
+      "sourceDigest": "a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6",
+      "sourceId": "src_824c3c87a198eaa2b337d3e966b07c4c",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Runtime Identity And Activation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runtime Identity And Activation",
+          "anchor": "runtime-identity-and-activation"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/scope-map.md",
+      "blobSha": "599e7368b9682820c97e9af179316628093aac33",
+      "blobSize": 11217,
+      "sourceDigest": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "sourceId": "src_2e331a3c34057e34d578687e8d98bf50",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Packaging Distribution Scope Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Packaging Distribution Scope Map",
+          "anchor": "packaging-distribution-scope-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "blobSha": "23b407d86769f35f2e343f758a6ef61bd7d4337d",
+      "blobSize": 1244,
+      "sourceDigest": "f1ec0201b237d5b5b6e7f38f5f1e756daeed2d436824ea19c966390031db018a",
+      "sourceId": "src_15d4efa165e20cab89677e7d4cf88805",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Workspace Runtime Model",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Runtime Model",
+          "anchor": "workspace-runtime-model"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/architecture-advisory-panel.md",
+      "blobSha": "9bb16cb08aef516e20efd07e896890f7eb7b3e1f",
+      "blobSize": 31566,
+      "sourceDigest": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766",
+      "sourceId": "src_68c788d7d54d8f3af3c5b2dbef9b3209",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Architecture Advisory Panel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Panel",
+          "anchor": "architecture-advisory-panel"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/component-authority-boundary-map.md",
+      "blobSha": "2f1d0c94a40f1426c0d6b221abb35b379deb9ba7",
+      "blobSize": 49963,
+      "sourceDigest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "sourceId": "src_735b2549ee67cabc02bae3c190fa5afa",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Component Authority Boundary Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Component Authority Boundary Map",
+          "anchor": "component-authority-boundary-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/coordination-capability-envelope.md",
+      "blobSha": "d4ac1a3f53574846f15b7a46a6062f0080a0e4e6",
+      "blobSize": 28280,
+      "sourceDigest": "98788f9d29c5cc9215a492a95513abfee6f22c5a95fda0c3c9136f9750676492",
+      "sourceId": "src_fa09c19d5ed4cfab86f26af79c9a7738",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "anchor": "agent-coordination-capability-envelope-và-coordinator-owned-deliberation"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/coordination-dispatch-contract.md",
+      "blobSha": "80c315d884fdf211c752f0c53d43a459d4935092",
+      "blobSize": 14403,
+      "sourceDigest": "e31ab35e8bdd5aafae298955519bfaa205dda2ea53f1e604e1e22e32276939d0",
+      "sourceId": "src_33345c0b85f45f42350a5fa478a8cf71",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coordination ↔ Dispatch & Execution Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination ↔ Dispatch & Execution Contract",
+          "anchor": "coordination-dispatch-execution-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+      "blobSha": "4dab0986384d5f813e8a502e817c9b78cd5ba716",
+      "blobSize": 10532,
+      "sourceDigest": "676bc6b9b123411fd38aa75f022213035332048547ebca3bd805a82f3b8b5336",
+      "sourceId": "src_3a0c8aebf73d779dd760b13aba0ce933",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coordination Envelope — Minimal Probe Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Minimal Probe Contract",
+          "anchor": "coordination-envelope-minimal-probe-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/coordination-envelope-progress.md",
+      "blobSha": "40132546e70e23fed654bf5d4cc84ea86ac3cd2b",
+      "blobSize": 10640,
+      "sourceDigest": "e79eebfe721cd7797fbda8ce7edb5611b4fe72ceef8bca15034f422e0852e2a7",
+      "sourceId": "src_0ad98badbc23b669d4a74f31bff4f79b",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coordination Envelope — Chat Progress and Next Work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Chat Progress and Next Work",
+          "anchor": "coordination-envelope-chat-progress-and-next-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+      "blobSha": "fae58710ab56c7e418f472c6cd318d27eb8e2258",
+      "blobSize": 13423,
+      "sourceDigest": "73266b42990980ecedc53ff3b950f65ab470264de03d66cafcf57ddb1336967d",
+      "sourceId": "src_a3b13d03008e86b503e98cad54298fec",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coordination Envelope — Worker, Provider, and Control Boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Worker, Provider, and Control Boundary",
+          "anchor": "coordination-envelope-worker-provider-and-control-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/group-thinking-plan-loop.md",
+      "blobSha": "4df6e977ab05371234ac550da29fa3d8da553f2a",
+      "blobSize": 16137,
+      "sourceDigest": "77584e332c450e0314825295cf019787bb5c9f3a127521434eac282b36bc38d5",
+      "sourceId": "src_4ebacdec6cd714a383e57103692b20c8",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Group-Thinking Plan Loop — Design Proposal",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Group-Thinking Plan Loop — Design Proposal",
+          "anchor": "group-thinking-plan-loop-design-proposal"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/README.md",
+      "blobSha": "48a80d339a1f676a56153bac6677895e0d4eb377",
+      "blobSize": 1516,
+      "sourceDigest": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "sourceId": "src_7e9d05f411781449164f02186cfb6cbd",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Architect-Level Proposals",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect-Level Proposals",
+          "anchor": "architect-level-proposals"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "blobSha": "0fe7e01a53cbed52b8557571136450f8533aeaea",
+      "blobSize": 30684,
+      "sourceDigest": "c1dc2a2a03dc76402b83dc4cdacbf51f3693b17b8c3b9a8a8c9c286dfc3f9035",
+      "sourceId": "src_37cb99db06dce5ab9b74c6916b460d0c",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Step 09 - Group Thinking Substrate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 09 - Group Thinking Substrate",
+          "anchor": "step-09---group-thinking-substrate"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "blobSha": "fd6e47f8aa7a75c77a37fb3ef1b5ae0593a90a70",
+      "blobSize": 7380,
+      "sourceDigest": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "sourceId": "src_dfb282b502532a8a1d208f1f6059d51e",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Step 09 / Step 10 Replan Handoff Prompt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 09 / Step 10 Replan Handoff Prompt",
+          "anchor": "step-09-step-10-replan-handoff-prompt"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "blobSha": "e233f9878ae84ae8b23455171d80f9f4ec0acdcb",
+      "blobSize": 23073,
+      "sourceDigest": "37a786733e0e9937cfb2584bdd332ec5b4eb6f7109fabf60d4979ad14f30c884",
+      "sourceId": "src_99a714f541cf7aeadb4b1ec197bd651e",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Step 10 A0 - Coding Domain Boundary And Facade Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 10 A0 - Coding Domain Boundary And Facade Plan",
+          "anchor": "step-10-a0---coding-domain-boundary-and-facade-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "blobSha": "211d40d63ddc4e5e5cc1a7661c3d4f234189904b",
+      "blobSize": 53003,
+      "sourceDigest": "cca8c3ce96f36e9485078ed21d67999904b333774e9093ab2e403d15ab9c51d3",
+      "sourceId": "src_9383cf2c7ca639bd9f738c89a5f59371",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "anchor": "step-10---coding-domain-adoption-of-the-coordination-foundation"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "blobSha": "0669c4440662d98e207e676b76eb0ba70387be44",
+      "blobSize": 67568,
+      "sourceDigest": "9c45a9383a65bd4ee40738dfb6c7de39549e4d5efe079525e8e20dfd55b2c4ec",
+      "sourceId": "src_abbd355393f1af67bd94f26f66d9a5d5",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
+          "anchor": "visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/README.md",
+      "blobSha": "454d688de0c306679b0f3ed2b5b51c0c7c82dc9f",
+      "blobSize": 2829,
+      "sourceDigest": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "sourceId": "src_e8f258103a5bb5489d524037644c5f88",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Architect-Level Design",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect-Level Design",
+          "anchor": "architect-level-design"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/roadmap.md",
+      "blobSha": "9f457e6a5bc4dfe7da05a6f7dec7c14aa5dc44a3",
+      "blobSize": 23435,
+      "sourceDigest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "sourceId": "src_3ab6119c1c5ec0ec60ac551c5e8f396c",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Architect Roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect Roadmap",
+          "anchor": "architect-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "blobSha": "473dd8f1f28f4573194c47ca787973c52cc65756",
+      "blobSize": 5279,
+      "sourceDigest": "fe46bff47d74696f8f3784a340707738978f1e723e0911ecbe8e319fa0d6e4a1",
+      "sourceId": "src_2357a2728f3a49e3409840b3081de03d",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "System Vision: Trong Mem Ngoai Cung",
+      "headings": [
+        {
+          "level": 1,
+          "text": "System Vision: Trong Mem Ngoai Cung",
+          "anchor": "system-vision-trong-mem-ngoai-cung"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/workspace-topology-audit.md",
+      "blobSha": "024cac1f17203b20d4fcfdf95d1672c17fd4e5a5",
+      "blobSize": 11759,
+      "sourceDigest": "3d510bc773875ebfb6116894d3156304f2bc0710b827e01fb31bd7feefcb3ce7",
+      "sourceId": "src_0cd5decf2bfb96e965529a42c40f26e8",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Workspace Topology Codebase Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Codebase Audit",
+          "anchor": "workspace-topology-codebase-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/workspace-topology-roadmap.md",
+      "blobSha": "17fefba5747976105b7797be9e99e7dfc9bed510",
+      "blobSize": 5752,
+      "sourceDigest": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "sourceId": "src_921b9b54094f024e56f9bea4af99c9c5",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Workspace Topology Roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Roadmap",
+          "anchor": "workspace-topology-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/workspace-topology.md",
+      "blobSha": "0513cd70c080c546bb009a253adab60dbb5d43f1",
+      "blobSize": 18073,
+      "sourceDigest": "3445b580bca9da4f1e2db827f48b1cec5d68cb5953c9fefa3590fae44c846ced",
+      "sourceId": "src_39fef666e4a7b88cfddc9728761e507f",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Workspace Topology Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Architecture",
+          "anchor": "workspace-topology-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "blobSha": "2ff043edb33c5b65a861aa89804c948148ccd58c",
+      "blobSize": 12490,
+      "sourceDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "sourceId": "src_d103858983b2e62ade276d1a9b958984",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architecture-map.md",
+      "blobSha": "01f2a21eebba99c2b237be650b631168232bcd5e",
+      "blobSize": 54465,
+      "sourceDigest": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "sourceId": "src_99dd85cb0914e8c583f0b9d6c46381f1",
+      "area": "root:docs/architecture-map.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "anchor": "bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký"
+        }
+      ]
+    },
+    {
+      "path": "docs/backlog.md",
+      "blobSha": "5063fd3e2481e1a39bbf33c07a7c9e92deb19043",
+      "blobSize": 126374,
+      "sourceDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+      "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+      "area": "root:docs/backlog.md",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": "docs/backlog.md",
+      "gap": false,
+      "firstHeading": "Product Backlog",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Product Backlog",
+          "anchor": "product-backlog"
+        }
+      ]
+    },
+    {
+      "path": "docs/coexistence.md",
+      "blobSha": "02c1d74e9e954e222170adb757d21ad054d3ba21",
+      "blobSize": 7298,
+      "sourceDigest": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+      "sourceId": "src_e50cbdcee4987c2224c4ad60d9faba6b",
+      "area": "root:docs/coexistence.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coexistence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coexistence",
+          "anchor": "coexistence"
+        }
+      ]
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+      "blobSize": 34956,
+      "sourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "sourceId": "src_8a16411fc0683b8e9584e5a1012e6fc0",
+      "area": "Platform contracts (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/decisions/index.md",
+      "blobSha": "98ec28db4e5b5534c705813a76edbd676c29723f",
+      "blobSize": 23765,
+      "sourceDigest": "1b8b979b7b5903b6bf03404213f7ca05120e4c0f906aee3e9bdd55ca068f2722",
+      "sourceId": "src_4ffa57965cd1634bc1da3d1f066a6b35",
+      "area": "Decision records (generated projection, tsk-1lv-4)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Decisions index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Decisions index",
+          "anchor": "decisions-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/comparison-matrix.md",
+      "blobSha": "c3ea2c36d73d653aaa89a0cb6e414f265c094014",
+      "blobSize": 55038,
+      "sourceDigest": "65a00a1f6665a05b0e7a464bc45722f5505b88f289f706930216e1cb99c19238",
+      "sourceId": "src_f0ca58be66b0f8bcb46bc95eebf87d61",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Feature Comparison Matrix",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Feature Comparison Matrix",
+          "anchor": "feature-comparison-matrix"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/compound-engineering.md",
+      "blobSha": "67809df7232304ca5537cc4a3b92b7bf159043cd",
+      "blobSize": 24688,
+      "sourceDigest": "b5bbae8416fc493086433b713f47463b960948a9487828998231969b204d3af0",
+      "sourceId": "src_d45fb095d53d2dcb84672e24a4e7e546",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: compound-engineering",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: compound-engineering",
+          "anchor": "deep-dive-compound-engineering"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+      "blobSha": "f996e2d32cb824d68d31853b6cd24020249396ea",
+      "blobSize": 13273,
+      "sourceDigest": "6f24641a70e266b92cdce646063998e9235be69068223addb06b00dcecc99909",
+      "sourceId": "src_86ff1e6baf88577889ac5590ed04ea1d",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: fgOS's 4 capture gaps vs beehive's state design",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: fgOS's 4 capture gaps vs beehive's state design",
+          "anchor": "deep-dive-fgoss-4-capture-gaps-vs-beehives-state-design"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/fgos-harness-architecture.md",
+      "blobSha": "106dff68556710714b84e6c79db8b72281c03f84",
+      "blobSize": 11820,
+      "sourceDigest": "865e114218ad578c2c256f65b8d40d011d8fe75a2bbd7f9d6f8805d4df408b64",
+      "sourceId": "src_1d851e7e77c5f1b4c55089478144c26a",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: Kiến trúc harness fgOS — bài học cho forgent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: Kiến trúc harness fgOS — bài học cho forgent",
+          "anchor": "deep-dive-kiến-trúc-harness-fgos-bài-học-cho-forgent"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "blobSha": "ca2998afa1ea40e728ccad6713d8724e299505a9",
+      "blobSize": 13686,
+      "sourceDigest": "f06785382f7b585826c92d7192e9ad89d8e9af5dde2cf95824f596de3780de6c",
+      "sourceId": "src_d016e33e3988b9b3cf863c561e81fc4e",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr vs the tmux observation cockpit — is herd hơn không?",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr vs the tmux observation cockpit — is herd hơn không?",
+          "anchor": "herdr-vs-the-tmux-observation-cockpit-is-herd-hơn-không"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/how-to-use-herdr.md",
+      "blobSha": "bbd47c7d17c23db7c7d3ea553aec48865d5662a6",
+      "blobSize": 51768,
+      "sourceDigest": "95d1591943f5448d7338f60bfe7c8433466bbe5b97490629a762f79be0978715",
+      "sourceId": "src_2ba80f92ff5f25d24901b823c41e52e7",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to use herdr (deeply)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to use herdr (deeply)",
+          "anchor": "how-to-use-herdr-deeply"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "blobSha": "5f59ff42c859de5b0d4b288b47fdbdcb12745c4d",
+      "blobSize": 24652,
+      "sourceDigest": "ff64302e08910767ca3d5077c2ae9de767fcae93ed04349f97291638ea1e9ad3",
+      "sourceId": "src_a085753731a236e6f2c7eb36ed332ec7",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: chia task con song song + tránh xung đột footprint + hợp nhất cha/con",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: chia task con song song + tránh xung đột footprint + hợp nhất cha/con",
+          "anchor": "deep-dive-chia-task-con-song-song-tránh-xung-đột-footprint-hợp-nhất-chacon"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/routing.md",
+      "blobSha": "f35012ef7c25cffbb0a1204b35c9e185afc9699a",
+      "blobSize": 32929,
+      "sourceDigest": "23edc70609c0b10665a484ee29597789ef5427fe5d71d067328a2ebf9e89224b",
+      "sourceId": "src_00c25cc7fba805ecce5f7cab0ac6b846",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: routing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: routing",
+          "anchor": "deep-dive-routing"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/state.md",
+      "blobSha": "27a0eda3d048bdc9b484d04d640f072540bdaa02",
+      "blobSize": 32057,
+      "sourceDigest": "3b08ea78882838907ac9e5226593fafe8aae7981ffa37343540ca1e7ffb9e420",
+      "sourceId": "src_085be54afd13d0743b02df0164be7dcf",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: state",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: state",
+          "anchor": "deep-dive-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/tool-registry.md",
+      "blobSha": "8efb476d2cd20eba833dfebbc8a6458ee1847e43",
+      "blobSize": 28461,
+      "sourceDigest": "ea6e1402bd3675f3461532eea8625e79b76dd6909162a3beb1e53d40ef6640ed",
+      "sourceId": "src_d7f7a24ee5000100d903fbda079d134d",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: tool-registry",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: tool-registry",
+          "anchor": "deep-dive-tool-registry"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/work-item-management.md",
+      "blobSha": "73cca8bf7ee28800d5ec606542329a69a8b2b7bc",
+      "blobSize": 72025,
+      "sourceDigest": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+      "sourceId": "src_19a62bc9fe85cb5977470c44657cfda3",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: quản lý work-item — JSONL-in-git, triage, chọn việc, xếp việc, planning, điều phối agent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: quản lý work-item — JSONL-in-git, triage, chọn việc, xếp việc, planning, điều phối agent",
+          "anchor": "deep-dive-quản-lý-work-item-jsonl-in-git-triage-chọn-việc-xếp-việc-planning-điều-phối-agent"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/deep-dives/work-item-schema-and-io-contracts.md",
+      "blobSha": "7f83bb8df20e9f9bd19b94ad7e76c17fcf053ea9",
+      "blobSize": 39617,
+      "sourceDigest": "0939f1910803cbad6e05d4a1390cf89d9face4e22fa5d0f7fad8bdfcd165c405",
+      "sourceId": "src_a484c42c1e2b88da2446b4cca6a1c206",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deep-dive: cấu trúc dữ liệu work-item & hợp đồng I/O (schema, envelope, contract)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deep-dive: cấu trúc dữ liệu work-item & hợp đồng I/O (schema, envelope, contract)",
+          "anchor": "deep-dive-cấu-trúc-dữ-liệu-work-item-hợp-đồng-io-schema-envelope-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/intake.md",
+      "blobSha": "f8ee00f85ed0abd22701d544a9b492403835d01c",
+      "blobSize": 509,
+      "sourceDigest": "d7b612984651f866654b56c2bfa7d38183cdb6453d4c410d82c2a82f170a4e05",
+      "sourceId": "src_419357b500bf9c6e8805d06e1160ec97",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Intake Queue",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Intake Queue",
+          "anchor": "intake-queue"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/porting-log.md",
+      "blobSha": "83434248cca03fba8c96c5b6869611039e0ac639",
+      "blobSize": 99149,
+      "sourceDigest": "8da134d2d32563db0a20532ce282b3bb35707699be07ad2b5c980b6269150b2d",
+      "sourceId": "src_b0cdf342c8e6c480f399a8a1b77b24fa",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Porting Log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Porting Log",
+          "anchor": "porting-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+      "blobSha": "57e00b8873aa53742afb20e2c77805604a6d9806",
+      "blobSize": 38198,
+      "sourceDigest": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+      "sourceId": "src_6cbc7c56f7ecbd047d85695df98644ca",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Bee Skill Set Inventory Report",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bee Skill Set Inventory Report",
+          "anchor": "bee-skill-set-inventory-report"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+      "blobSha": "7bc7b5d1c47c1b06d0c9090392225057eaa6a2b3",
+      "blobSize": 82163,
+      "sourceDigest": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+      "sourceId": "src_3b4cff43723e3127a490f09a60a0b716",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "bee inventory — group A (mechanical extraction)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "bee inventory — group A (mechanical extraction)",
+          "anchor": "bee-inventory-group-a-mechanical-extraction"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+      "blobSha": "3837422d86083e183916717c35d15eda570fec16",
+      "blobSize": 117745,
+      "sourceDigest": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+      "sourceId": "src_08c9f54cc9eb5600829127a8f5ba17f0",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "distill — bee inventory, group B (2026-07-28)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "distill — bee inventory, group B (2026-07-28)",
+          "anchor": "distill-bee-inventory-group-b-2026-07-28"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+      "blobSha": "e688e3a9e7a99549ba3d7179f254dd76a043d812",
+      "blobSize": 69968,
+      "sourceDigest": "b70260067ae69bbdfd6d364090cd084951b33b05c31884c29929671e48cd11e0",
+      "sourceId": "src_e9194960e8ed9409b7a333beca991a33",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28",
+      "headings": [
+        {
+          "level": 1,
+          "text": "distill — bee inventory (group C), snapshot v1.18.3, 2026-07-28",
+          "anchor": "distill-bee-inventory-group-c-snapshot-v1183-2026-07-28"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-beegog-herding-design-2026-09-06.md",
+      "blobSha": "9c33e56e0953b4593c2aa4e1ac931c5eacb534b7",
+      "blobSize": 23530,
+      "sourceDigest": "44aa6a63587fcecdb26cbc430dfe00ca9f395308767274dd43e824c7051628a4",
+      "sourceId": "src_051639e085418dfeae61388845681eaf",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Upstream Beegog Herding Design Distillation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Upstream Beegog Herding Design Distillation",
+          "anchor": "upstream-beegog-herding-design-distillation"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-beegog-herding-rust-2026-09-06.md",
+      "blobSha": "217892b9c62dc743a4cce0c92f179eb049bb06ab",
+      "blobSize": 17560,
+      "sourceDigest": "3bcf4f01732b8d163b6ef1691e966476cb609c2797eb92ad5f0e9845880dc501",
+      "sourceId": "src_bb6e12d5c9818bf1697cc575cd76040f",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Upstream Beegog Herding Mechanism — Rust Implementation Distillation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Upstream Beegog Herding Mechanism — Rust Implementation Distillation",
+          "anchor": "upstream-beegog-herding-mechanism-rust-implementation-distillation"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+      "blobSha": "d8b9c20ec7dbf5d42e11429ed3f199898566c857",
+      "blobSize": 56239,
+      "sourceDigest": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+      "sourceId": "src_b664b7a61f0f887bb7b811af0549bd97",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr inventory — distill extraction report",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr inventory — distill extraction report",
+          "anchor": "herdr-inventory-distill-extraction-report"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/reports/scout-herdr-0.8.2-control-surface-2026-09-06.md",
+      "blobSha": "6c15c302dfe5a3377c8b15ec5d5c709044564074",
+      "blobSize": 10913,
+      "sourceDigest": "98d74e5116bc102ee658fd284e53505c2c8c4b4dd5d5c71cc3f144778600b1eb",
+      "sourceId": "src_96a5bb589a5bed718b710a9d48da1803",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr Control Surface & fgOS Plugin Inventory",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr Control Surface & fgOS Plugin Inventory",
+          "anchor": "herdr-control-surface-fgos-plugin-inventory"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/beads-rust.md",
+      "blobSha": "590dd697ea00e19b4774bca3c84e045af04f0b81",
+      "blobSize": 37140,
+      "sourceDigest": "222f8a3919f80ef3afd8db1004c0b966f52b4279bd71e6d47650e0d1a1f6a677",
+      "sourceId": "src_c0da6da38547cdcd0d066803c6689b23",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "beads-rust (br) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "beads-rust (br) — Feature Index",
+          "anchor": "beads-rust-br-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/beads-viewer-rust.md",
+      "blobSha": "2edcdacaebf1e852ec87afe67958230f03968b3e",
+      "blobSize": 24589,
+      "sourceDigest": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+      "sourceId": "src_7637294af992bafcb297292a04494cfc",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "beads-viewer-rust (bvr) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "beads-viewer-rust (bvr) — Feature Index",
+          "anchor": "beads-viewer-rust-bvr-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/beads.md",
+      "blobSha": "3d2b0086a85cf78e0101707be05e6f2efae057f0",
+      "blobSize": 17591,
+      "sourceDigest": "557c950dd4eac874e2016f40b706a5c55d644b329631782ca4710a2dc7796f07",
+      "sourceId": "src_703a7fbec6f18156161bcb5270ffb027",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Beads (bd) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Beads (bd) — Feature Index",
+          "anchor": "beads-bd-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/beehive.md",
+      "blobSha": "cfa1d2f2328e3fe7067560c404ff1cd7bbc9e5fb",
+      "blobSize": 188784,
+      "sourceDigest": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+      "sourceId": "src_83f187cee48f5ef9d0fe129f9e283fd0",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Beehive — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Beehive — Feature Index",
+          "anchor": "beehive-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/claudekit-engineer.md",
+      "blobSha": "2c08f6d29027a626b8b2c121e32c9cc82bde3041",
+      "blobSize": 45103,
+      "sourceDigest": "3ff1bf8450b8fca06f58b61b58f5f4f55bf1ddbc11bb493e99a1df9e739c917e",
+      "sourceId": "src_ec821e36b1b5c451d6ced690c709c875",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "claudekit-engineer — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "claudekit-engineer — Feature Index",
+          "anchor": "claudekit-engineer-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/compound-engineering-plugin.md",
+      "blobSha": "8283b3cead12f05dfad1994ae349a665faa5a944",
+      "blobSize": 38809,
+      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
+      "sourceId": "src_870fa74b78854e20265b14d726445855",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "compound-engineering-plugin — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "compound-engineering-plugin — Feature Index",
+          "anchor": "compound-engineering-plugin-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/council-of-high-intelligence.md",
+      "blobSha": "3af785a2f1623cf90a185b70571664d059654c2c",
+      "blobSize": 12170,
+      "sourceDigest": "130279ae0d6e756a4d8684853ad52f77742c34ae9da3f902b4607a09421fe56f",
+      "sourceId": "src_cfd653f8da98b32454fcf0b061c92d82",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "council-of-high-intelligence (0xNyk) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "council-of-high-intelligence (0xNyk) — Feature Index",
+          "anchor": "council-of-high-intelligence-0xnyk-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/herdr.md",
+      "blobSha": "d3634742628030373ce22bb2979508a609a88d35",
+      "blobSize": 60623,
+      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
+      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr — Feature Index",
+          "anchor": "herdr-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/learn-harness-engineering.md",
+      "blobSha": "e319d67be75626d49f13456b20be62c6e04fdced",
+      "blobSize": 337,
+      "sourceDigest": "374bba5cecdd59ecdbd9e48c6d3fd4b64ca4206dbdc3cde3567efc00f3b759ea",
+      "sourceId": "src_cd96865464b346432aed149f0d855dec",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "learn-harness-engineering — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "learn-harness-engineering — Feature Index",
+          "anchor": "learn-harness-engineering-feature-index"
+        }
+      ]
+    }
+  ]
+}

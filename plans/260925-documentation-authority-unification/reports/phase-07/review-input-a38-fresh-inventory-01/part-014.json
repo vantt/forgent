@@ -1,0 +1,920 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 14,
+  "entries": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/dispatch-plan.json",
+      "blobSha": "19558808a0c7f9dfe22c1b80078bdadcd4ea83e2",
+      "blobSize": 592,
+      "sourceDigest": "10ff02a5639eb8bf3a459cc51b6e7bc1a2eddedc7835d82c7e28c89620cd20d4",
+      "sourceId": "src_e2314e1867f8dc5017bb3c4a66361f38",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/evidence.json",
+      "blobSha": "9b915764186ab3565457be5a646d46ec6eb3b1c0",
+      "blobSize": 690,
+      "sourceDigest": "9dc4be6f5fb73a3065fce287b0d6b1110f4598771298c57ede1c48ef9c3a16d4",
+      "sourceId": "src_d52d354516320257be32789dc1fec492",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/exit.json",
+      "blobSha": "911a0d656409afcb3c992fe023bade6fa335ab46",
+      "blobSize": 125,
+      "sourceDigest": "d7511b7ea226dba404734a5171215c033e3678dd58c61616754f22603eecc3ff",
+      "sourceId": "src_997b6b62674976d43579a2c147eb14fa",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/result.json",
+      "blobSha": "c8b547e12d512d4362b66ec7f50fdf0ea6ba11fd",
+      "blobSize": 2642,
+      "sourceDigest": "26dc162eb8677f7d9ce6a4de37b1a01e4b8f92fc59fd00366f516cf8691e982a",
+      "sourceId": "src_b6b88857f2289117a30cf797ecf0ba86",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/run.json",
+      "blobSha": "07e55feec9c10941b2a4afcbbebb5ecb0aa695ce",
+      "blobSize": 421,
+      "sourceDigest": "34eef273d17b5161bc60dd9742b3e9ae49b90475965e84f93bb55e516e799c2e",
+      "sourceId": "src_37910a40dc5d2bc56fb3040d75094590",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_6b28326e10bc8d80abeab74f641930f6",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stdout.log",
+      "blobSha": "35f2dab316e600a56cd5c32352822e6b318156bc",
+      "blobSize": 259,
+      "sourceDigest": "d6e40e06b22a55a19588f68251d5b9a2d3de59d08e47ccf980deb3f64408d6d3",
+      "sourceId": "src_e201aa56bae393f55e0bce75e6987fb9",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/assignment.json",
+      "blobSha": "8ad1db33ed76e7e4773f6a8067b10c72936b24e0",
+      "blobSize": 1751,
+      "sourceDigest": "77699db0ea13e6a5e26a94c09cd6b06ce474e4aca571773ee4af2ed5d7a333b2",
+      "sourceId": "src_22c786a77a5a9b25fe786c0960de6c1b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_8d55cfcc484b35337109cd05c8866e60",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/agent-report.md",
+      "blobSha": "487b87046777bedba7ca530150314e98359c6256",
+      "blobSize": 544,
+      "sourceDigest": "5bdb2c8169962c65c17ff265fdb980e9aa43fce9710fc6b32da08752ccddc4ec",
+      "sourceId": "src_815edf2eecb06432246333c6f5dc92aa",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cargo package check",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cargo package check",
+          "anchor": "cargo-package-check"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/agent-result.json",
+      "blobSha": "6941a4a0481eec10ce11e37ca49edf7e0a306e4a",
+      "blobSize": 563,
+      "sourceDigest": "5787d357bfe4477e82d197089b9450335e8c6cea245324671f9de3aa13f34694",
+      "sourceId": "src_30ddd6d88c3d09dfd6c117092b043cac",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/dispatch-plan.json",
+      "blobSha": "d2aa80b0edb4f30a8a2f5a13585f3cfb2f408900",
+      "blobSize": 592,
+      "sourceDigest": "643f67200bba7e77e7e844d749a0de2593ac47155b3d073ed04d429d0ae01b7e",
+      "sourceId": "src_57c497af3b0f773445b49c8f8966b423",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/evidence.json",
+      "blobSha": "218b7214ea10a2e59ce81558451962e4bbc50da8",
+      "blobSize": 690,
+      "sourceDigest": "ce375b112952a5a487a741fcc02194f78b2e40eb50547fe2b00b90cf9efa5a34",
+      "sourceId": "src_cf7ec0b48c6d0ba5a80feb9051e5c2b4",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/exit.json",
+      "blobSha": "e203cf2d8d531b57c24983c21a76a0088bb987ec",
+      "blobSize": 125,
+      "sourceDigest": "433d56a2260979399494a8aa0510a36606264f175a36df395154bc55abac3139",
+      "sourceId": "src_01d72a052a39e2dad094f29c541b2f29",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/result.json",
+      "blobSha": "2f4ce1c1a3606790e4ee839c051de6068d526ffa",
+      "blobSize": 2656,
+      "sourceDigest": "6428cb2ffd78954686147a423b89931d5a506dccd82d626429261fabee55a842",
+      "sourceId": "src_558e5e8867361ed249365340c35e9194",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/run.json",
+      "blobSha": "3de2cdd078ba6197744e10540140e7a1eff04fb7",
+      "blobSize": 421,
+      "sourceDigest": "3c44b4c456390f77f2bc9264066ef1b0582cb5dea90339b3fd66f8bfd3bed342",
+      "sourceId": "src_75e4b0aec770a53dfff6f723191fa28f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_e207344b4daad8a5a57498fc02514c4a",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stdout.log",
+      "blobSha": "24a2db2b615a1f0a56d5608acc6c983dfb8c8529",
+      "blobSize": 466,
+      "sourceDigest": "4742d2dd7eb423c33d5c38f6becbf0101636e132b6ff6934ecfca1d831fad45b",
+      "sourceId": "src_dbfc1d4ba98cd1a2507511959f57a248",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/assignment.json",
+      "blobSha": "134d783f3f5f27fea044e240de544c23edee1427",
+      "blobSize": 1967,
+      "sourceDigest": "106a013eb214ae1f066f1e1a12741ae8433d30521ff6e07bdaf0e2efde2f03e4",
+      "sourceId": "src_d03a92e3ffd9904f386aeb1679aa1eb4",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_5c0d761c3d8af703d7398d48a859b164",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/agent-report.md",
+      "blobSha": "8aebd7cf19de23ff29c674d2f1f19f730f455bab",
+      "blobSize": 531,
+      "sourceDigest": "efce2b4a3d7d7b1efb0b1af221fd19dd783c71ed326f1220c6240ae21079fc90",
+      "sourceId": "src_0647a8c113e5de5dd592bab373848c12",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cargo.toml name/version verification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cargo.toml name/version verification",
+          "anchor": "cargotoml-nameversion-verification"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/agent-result.json",
+      "blobSha": "7b41fefbe1b0ca6f58982d727fabb6440ce7fae9",
+      "blobSize": 458,
+      "sourceDigest": "2f9ba79582cfe4efd405edcfca703634edd38abe728d18cbf82dd1571c943e23",
+      "sourceId": "src_f412e4dbd4be4858f1126464aa0a9dc9",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/dispatch-plan.json",
+      "blobSha": "d9863e8f7fc9d969f602acb47e523e960e65718b",
+      "blobSize": 592,
+      "sourceDigest": "00af5d799a86a77ee466c6f5bc73ab0bb0f2a891099e4c9bb914f89d741f9ffa",
+      "sourceId": "src_5db891995f5bde4aaa531de818a6d9b7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/evidence.json",
+      "blobSha": "63d11491be4c2f3a10dd5dae1e7737c393361228",
+      "blobSize": 690,
+      "sourceDigest": "62edcc8738f74a84b88da59c58cc03fd4ea116bb17c856a63c6f9301a93e2937",
+      "sourceId": "src_4c46ac54177f3623f8bf1f70a7a288b4",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/exit.json",
+      "blobSha": "7b3339d21b20a0108940d4934e252c6b326b2fb0",
+      "blobSize": 125,
+      "sourceDigest": "04c7549bb781d917848faabd4f9e0e2fcf93c559cbd2a66723ac0dd7682a61eb",
+      "sourceId": "src_e21711895602301976f651b193fef139",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/result.json",
+      "blobSha": "4963cf2b92eddd80f979217864e51e415805d679",
+      "blobSize": 2657,
+      "sourceDigest": "fdaa8ecfb0eb0fe87fa33064849b11a8e53a9daa55ca7af98d650caea9b49973",
+      "sourceId": "src_4622ef9e0f4cbd6526de36e48785fa2e",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/run.json",
+      "blobSha": "ed45881dccd34c6798db57d542d25b1dd5d21d3c",
+      "blobSize": 421,
+      "sourceDigest": "2adaf9e66bd78d72f49e1e36d415b47eb3c901d1164c9e77994f869ebeb374e5",
+      "sourceId": "src_c0cce18ce9a51413f5292b3d26392b3a",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_cc40aeb9ce5b99afcd8a2aa5a5a7d23d",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stdout.log",
+      "blobSha": "07d37b5d15a2e2efebe4e504df4824adb88f2b60",
+      "blobSize": 266,
+      "sourceDigest": "7bdda6cb8042e82b562d99e6b304956995a9bad9aa44f28e4cc4948f50d40507",
+      "sourceId": "src_0b45cda9d3ccaa8fa2367a4be2236868",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpxa8e_mkugxx/events.jsonl",
+      "blobSha": "42c3f0d7c0ad451283363636dd41de4668648233",
+      "blobSize": 960,
+      "sourceDigest": "33914d7e05c06c848174a96433845b7f9629a922c1c14ff985575ffd1f867cb4",
+      "sourceId": "src_f7b88cec4e1d17428622b21506e9772b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpxa8e_mkugxx/session.json",
+      "blobSha": "78b67561239babdc58700b3890884ac7608d52a9",
+      "blobSize": 724,
+      "sourceDigest": "1d8adc8d275bf9eaf91f28263952866688b5a6bc29e551aaa0cf0a3cdd208d78",
+      "sourceId": "src_03e30ff834f03eff8c4f0e933b501939",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpxa8e_mkugxx/tasks/986a1b7135f49861.json",
+      "blobSha": "fbd7b81f7aa54fd75f6a68a243a1f9b443fee998",
+      "blobSize": 136,
+      "sourceDigest": "f92ec11019898eb50049ef8cfcf2d5e225033897784d27285ebac46657e4cc82",
+      "sourceId": "src_83134ae18c54fca00cab9a9a3cb98b4b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/events.jsonl",
+      "blobSha": "690725d98663dff4da53e66ae4d3a78bacd0e1da",
+      "blobSize": 1695,
+      "sourceDigest": "0939cfb9c5124830b07680d8ef56622b9aff1012bbc261c2c443adfcd1ad3090",
+      "sourceId": "src_5ebca9863aba27d99133a3d5f1c9f864",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/session.json",
+      "blobSha": "8e17a0f3c18ecf1d78b5ae6ee2c3689a6e5bf29c",
+      "blobSize": 939,
+      "sourceDigest": "26e0a5a8552de87861945fd3a4e1b5d4707fc8344dc80301390bb9317dee152c",
+      "sourceId": "src_d69b97b6c204756bbc47f184334c9235",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/tasks/0c22306f98876eb2.json",
+      "blobSha": "741227da2b05920bdd6ae320e92aeaceb82c9b83",
+      "blobSize": 161,
+      "sourceDigest": "fe065c3865de97e596f550c859933414b30c469348aafb0fd11a032e622bf58f",
+      "sourceId": "src_0fb97a9506d18d060d57ccabe7bb2850",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/tasks/3fb7c5ee55657db5.json",
+      "blobSha": "e12d4e1ad6dd76da8e0af31f29d70a9a90897ea7",
+      "blobSize": 153,
+      "sourceDigest": "f488d26aa73981e38816e02db84c415a06f4a01632443cf11e56d58655914f6b",
+      "sourceId": "src_2ce932cdcc71fa4aaf9a31c096955c9d",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/mdview-git-status-after.txt",
+      "blobSha": "d16f8145cf31571497145b4276bd89273d4f4561",
+      "blobSize": 8425,
+      "sourceDigest": "20d3c13f945196d53269aedb140f094eb5cba0e4dd4e87dc0ec1810c7b387e50",
+      "sourceId": "src_2b6d1cb6d4383e57b2bfc249649c39c2",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/mdview-git-status-before.txt",
+      "blobSha": "97faae8dcdd3079c5997644d51f4902a221eee8f",
+      "blobSize": 8394,
+      "sourceDigest": "7a14a7bd8bd414fdd326b03589f0eb803b9aa2482bb65bb2fd60f22530948fe5",
+      "sourceId": "src_adaba4106a2c4345b70f1bbaf1fe64b7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/r6-driver.sh",
+      "blobSha": "692f9772ed83e2482561de2982c4f71907c98b2a",
+      "blobSize": 5858,
+      "sourceDigest": "daa779832aad3622da9db329454d5f7e916e125a0850948df02ff527661486bb",
+      "sourceId": "src_f717aa51d43cf8ddbbd42faa14329972",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "blobSha": "c6d6114741a15c86138321c06135f0738d9fbbc3",
+      "blobSize": 11292,
+      "sourceDigest": "d1565201149417659be6d82a7297d047896973acddccd20bc4741f1b217e6577",
+      "sourceId": "src_f36a9be01891e9254af2e1f6b2a2be04",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell",
+          "anchor": "current-cell"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "blobSha": "9ee79ddebc7739341f2d4dfe4e790a04b98c2fa4",
+      "blobSize": 40184,
+      "sourceDigest": "5a49c8665a1eac9d782ce604e452bbbe84109eed54e3c1718b4d5bfa7d129865",
+      "sourceId": "src_7f92069b20e9c533a1be3b12bb117e61",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Track: step-09-group-thinking-mvp1-mvp2",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: step-09-group-thinking-mvp1-mvp2",
+          "anchor": "track-step-09-group-thinking-mvp1-mvp2"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+      "blobSha": "7af380b5852a8350a3f247f924d37ecfa7715a06",
+      "blobSize": 53523,
+      "sourceDigest": "6864f4712053105fa152f771bb922eacae66d464d5e12900a700d4a21420309a",
+      "sourceId": "src_bb866d65a2b64b1d3fa28c5c3798d730",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P00.1 — Phase 00 R1-R4 (Promote minimal contract deltas)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.1 — Phase 00 R1-R4 (Promote minimal contract deltas)",
+          "anchor": "cell-p001-phase-00-r1-r4-promote-minimal-contract-deltas"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md",
+      "blobSha": "138d76557a68fce2a473c9096539db3ea1660739",
+      "blobSize": 42757,
+      "sourceDigest": "fcef0240cef533e4653be729dc8ce628fd5cdc4ce13355f0aeca36a3a4eaf66f",
+      "sourceId": "src_dbacfe19c5f7524378e4e3ada8d2d5e7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P01.1 — Phase 01 R1-R6 (Master Coordination fixture skeleton)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.1 — Phase 01 R1-R6 (Master Coordination fixture skeleton)",
+          "anchor": "cell-p011-phase-01-r1-r6-master-coordination-fixture-skeleton"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+      "blobSha": "0ac2610a76d510015f5daa930bbb3da2bcc1daa2",
+      "blobSize": 85099,
+      "sourceDigest": "d7057b28ed3b05e78045f5eb3015edeea3c5f18bc2da3db957f0a190f8a9c465",
+      "sourceId": "src_2772497cdaa37c221a6d778b3e9dccde",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P02.1 — Phase 02 R1-R4 (Driver authorization: schema + event + gate)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.1 — Phase 02 R1-R4 (Driver authorization: schema + event + gate)",
+          "anchor": "cell-p021-phase-02-r1-r4-driver-authorization-schema-event-gate"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md",
+      "blobSha": "e4a1d42981f440de2ea745a3ea5b2f473618ad2b",
+      "blobSize": 51006,
+      "sourceDigest": "b806b4f9e37d32f7beb281a81688116d43bb3501b42b4ec2dc2fc1d61eda18b5",
+      "sourceId": "src_ec62c9eeb47e18c2179444a1e2dec935",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P02.2 — Phase 02 R5-R8 (Idempotency, context grant, bounds, driver authority — closes Phase 02)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.2 — Phase 02 R5-R8 (Idempotency, context grant, bounds, driver authority — closes Phase 02)",
+          "anchor": "cell-p022-phase-02-r5-r8-idempotency-context-grant-bounds-driver-authority-closes-phase-02"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md",
+      "blobSha": "84dcddef30ba9b6a29546aae43f053537d14fdfe",
+      "blobSize": 46657,
+      "sourceDigest": "762072819cfa08c1211e518c7d632a920a396384bc593b73e1e2746b26b7d776",
+      "sourceId": "src_fd4fa7b188946decdb2080c357a142c1",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P03.1 — Phase 03 R1-R4 (Artifact refs, recheck-as-new-Assignment, driver disposition, replay reconstruction)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — Phase 03 R1-R4 (Artifact refs, recheck-as-new-Assignment, driver disposition, replay reconstruction)",
+          "anchor": "cell-p031-phase-03-r1-r4-artifact-refs-recheck-as-new-assignment-driver-disposition-replay-reconstruction"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md",
+      "blobSha": "cacfa8da156332fac126c6b8e6b20534d668e5aa",
+      "blobSize": 54740,
+      "sourceDigest": "969ce23a11aac755a2946618a4ca8142a4df27663f2279c5ac13cdeb0130806a",
+      "sourceId": "src_990f8395323d1e68ca77696f2e682ee5",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Cell P03.2 — Phase 03 R5-R7 (Live CLI no-Work proof, negative-proof battery, surface readiness)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.2 — Phase 03 R5-R7 (Live CLI no-Work proof, negative-proof battery, surface readiness)",
+          "anchor": "cell-p032-phase-03-r5-r7-live-cli-no-work-proof-negative-proof-battery-surface-readiness"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+      "blobSha": "35fac275486eb478c213b9db59b3f41a6fe17fdb",
+      "blobSize": 777878,
+      "sourceDigest": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
+      "sourceId": "src_fc4cc25064b2287fd25235532da9f8d0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md",
+      "blobSha": "f01f64c1fce38f10ff5844ac5ee68b3b569878ef",
+      "blobSize": 6233,
+      "sourceDigest": "0315896a6dd7d4af230e5b687e908f40a31ea6b2e996edecc750f07d98b0f26b",
+      "sourceId": "src_2e60ec64cf21351b98772d3bf619d615",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Thin Launcher Surface Readiness (Phase 03 R7)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Thin Launcher Surface Readiness (Phase 03 R7)",
+          "anchor": "thin-launcher-surface-readiness-phase-03-r7"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
+      "blobSha": "500f389ccf4fe8ee9fe149a66917372da4f69510",
+      "blobSize": 496,
+      "sourceDigest": "67a5b4801cdf690a19deb42e7780109a09f03c43351993a744f93d96c7f3a499",
+      "sourceId": "src_dd7927b4c546fb8195e90252054f7284",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell",
+          "anchor": "current-cell"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
+      "blobSha": "5890fef32a7a5e449e1501076269f6175b6d5499",
+      "blobSize": 22179,
+      "sourceDigest": "f5cad6b1e3a53caca2ba7209dd1d78e9b8b836c551caeb3e1e7144ca96ab6600",
+      "sourceId": "src_e2de4698b4cbad1c710f6790ebfee483",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Track: step-09-mvp3-to-mvp5",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: step-09-mvp3-to-mvp5",
+          "anchor": "track-step-09-mvp3-to-mvp5"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md",
+      "blobSha": "dd263f765fd0a45598c6e4f9c46d8318c0836c8e",
+      "blobSize": 52593,
+      "sourceDigest": "dbc7dd524ae46a9471191cd0c15afefb5b4ae5dc0c1e926c1e4892152d8baf5f",
+      "sourceId": "src_ab46ab122065ab82ebac681c404ab5de",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P00.1 — Consume MVP1/MVP2 Handoff And Freeze Scope",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P00.1 — Consume MVP1/MVP2 Handoff And Freeze Scope",
+          "anchor": "p001-consume-mvp1mvp2-handoff-and-freeze-scope"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md",
+      "blobSha": "bdde69b7020377ced6103e4729412fa78914be82",
+      "blobSize": 43816,
+      "sourceDigest": "ae980dd046bb1128c26664c54649f1f8c9c007edd35807870f83f08cac9fd8b9",
+      "sourceId": "src_5d3725dbc966824616db100b0cbf858f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P01.1 — Phase 01 R1-R8 (MVP3 recheck lineage and driver disposition)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P01.1 — Phase 01 R1-R8 (MVP3 recheck lineage and driver disposition)",
+          "anchor": "p011-phase-01-r1-r8-mvp3-recheck-lineage-and-driver-disposition"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+      "blobSha": "c0b882c8f67dd31b893725500e02abe9de9804fd",
+      "blobSize": 36852,
+      "sourceDigest": "149b1a320395a55fb690628c4d3f633acad361c93d2d549d54bcafaf14671260",
+      "sourceId": "src_9491004a5d990af1e34ef8317b46012f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P02.1 — MVP4 Thin Surface Launcher Core (R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02.1 — MVP4 Thin Surface Launcher Core (R1-R4)",
+          "anchor": "p021-mvp4-thin-surface-launcher-core-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md",
+      "blobSha": "cf4735d80071b8a30cc6281cad3b9cf52770c1a6",
+      "blobSize": 27710,
+      "sourceDigest": "42e03413e29428798c8db4e8090bfc88fae6ca3cb5422d23b8a2fb4584678a95",
+      "sourceId": "src_93e3eeb9d90785ef78c34550f1fd79ab",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P02.2 — MVP4 Thin Surface Launcher Show/Resume + Setup (R5-R6, closes Phase 02)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02.2 — MVP4 Thin Surface Launcher Show/Resume + Setup (R5-R6, closes Phase 02)",
+          "anchor": "p022-mvp4-thin-surface-launcher-showresume-setup-r5-r6-closes-phase-02"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md",
+      "blobSha": "dc2db1e131b36450808f7c84542f17923b9e85ad",
+      "blobSize": 41543,
+      "sourceDigest": "129119c7729e8a6cae0b8df337dc62ab7c07c98430146542dd54d862b48ef8cf",
+      "sourceId": "src_da75e91b309d6f33657706982e0a3ada",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P03.1 — Role Execution Policy Readiness (Phase 03, R1-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03.1 — Role Execution Policy Readiness (Phase 03, R1-R8)",
+          "anchor": "p031-role-execution-policy-readiness-phase-03-r1-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md",
+      "blobSha": "d9126455f49f98adc3f881a9e5a14062ff2afe6e",
+      "blobSize": 70533,
+      "sourceDigest": "b220ba60997b34df13ff0d1b6678f561182ad84de09f1f94d4d1c61b1489a6e9",
+      "sourceId": "src_ea4d585713ac6b9bed03048999eea569",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P04.1 — Phase 04 (MVP5): Usable Standalone Live Proof, R1-R7",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P04.1 — Phase 04 (MVP5): Usable Standalone Live Proof, R1-R7",
+          "anchor": "p041-phase-04-mvp5-usable-standalone-live-proof-r1-r7"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md",
+      "blobSha": "b27bc7796a25101db712fde29cd816b51c37cc53",
+      "blobSize": 43817,
+      "sourceDigest": "63809e8cc702720befcd72733ef4eb20b28106c5137a606f648b5a303fd0d4a3",
+      "sourceId": "src_571cda466c5df3936d824b001cb8492d",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P04.2 — Phase 04 (MVP5): R8 Dogfood Handoff (closes Phase 04 and the plan)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P04.2 — Phase 04 (MVP5): R8 Dogfood Handoff (closes Phase 04 and the plan)",
+          "anchor": "p042-phase-04-mvp5-r8-dogfood-handoff-closes-phase-04-and-the-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
+      "blobSha": "340cf293e7963a41ada54803259e1c47981b48e4",
+      "blobSize": 844,
+      "sourceDigest": "ce8e285152aeec56d3a85c3fd0ffbe2ac43ea22e3925d80c4a2f82610c94ee2f",
+      "sourceId": "src_152d3fa420bea35a5ed6788a4e5aff70",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell: none — TRACK CLOSED (P10.10 was the final cell)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: none — TRACK CLOSED (P10.10 was the final cell)",
+          "anchor": "current-cell-none-track-closed-p1010-was-the-final-cell"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+      "blobSha": "4f7b122f6301c86315d261eff8594b78d2906042",
+      "blobSize": 86481,
+      "sourceDigest": "1bfba148b178533605bf6996be8982b4e5cfe745df71ccf77e270a6f28bec6e4",
+      "sourceId": "src_f822f6a2cf337502b9a78cbc9c86ebaa",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Track: step-09-mvp6-to-mvp9",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: step-09-mvp6-to-mvp9",
+          "anchor": "track-step-09-mvp6-to-mvp9"
+        }
+      ]
+    }
+  ]
+}

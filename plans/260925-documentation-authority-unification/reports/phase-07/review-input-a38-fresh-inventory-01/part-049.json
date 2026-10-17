@@ -1,0 +1,1088 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 49,
+  "entries": [
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+      "blobSha": "a201a7e89a6eecce0f57b00379b9b80e1fa89460",
+      "blobSize": 6160,
+      "sourceDigest": "2dd5e30d0e1d0857fe89aba1e841f54659592c5ae2f59af2b95584c23d4cdbc1",
+      "sourceId": "src_db2f24ecbb84c13e462711d0c5e2f7ff",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Example family: final decision, and a genuine defer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Example family: final decision, and a genuine defer",
+          "anchor": "example-family-final-decision-and-a-genuine-defer"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+      "blobSha": "57e2b3d4484bbfeb81e9a71eee18722815845520",
+      "blobSize": 10039,
+      "sourceDigest": "3a24d99141ef2e073181a87943c118f2df843f3a2bb227ac86536f5cf8fa08eb",
+      "sourceId": "src_c6bde86f3cdf88445ebff2a9a258673e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Example family: heterogeneous roster, and the homogeneous fallback",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Example family: heterogeneous roster, and the homogeneous fallback",
+          "anchor": "example-family-heterogeneous-roster-and-the-homogeneous-fallback"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+      "blobSha": "9cada95fec154c85ca57f44c51f8fd1ec62cb614",
+      "blobSize": 8542,
+      "sourceDigest": "0255e7a9f986eae96b953cab6a1b3dc18caecfae15ddc071301a1e8a45866335",
+      "sourceId": "src_69636cb23507d048f8ba477717dcfec0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Example family: material-context reopen",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Example family: material-context reopen",
+          "anchor": "example-family-material-context-reopen"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-request.json",
+      "blobSha": "85fa4a40d81d10e4647208bc347fbde141072be4",
+      "blobSize": 1792,
+      "sourceDigest": "03383ab6193604f43294c1e5def2f7cd4d9672248e0cfeeb58a6263877c8e7c1",
+      "sourceId": "src_0eea73fdf9f44a44bb503a47049afb00",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+      "blobSha": "42485329f6484c514f0aab32b2530776997e5d91",
+      "blobSize": 6532,
+      "sourceDigest": "89fc17ee00a7ccc254a6d3c10d26a137894e51340b34671ba45ec55ab860ba49",
+      "sourceId": "src_409c0b1a3b1718b6455133e76451c109",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Example family: unclear start (vnflow)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Example family: unclear start (vnflow)",
+          "anchor": "example-family-unclear-start-vnflow"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/coordination-examples/dag-read-only-request.json",
+      "blobSha": "8a0b8d469ef37572348b973aedd02faa39a8d7f5",
+      "blobSize": 1895,
+      "sourceDigest": "b28aea06a1ae6f94d6885912ff96e8def1cfa6b3765fa803b40cdae46b7bedae",
+      "sourceId": "src_1d35c44f031c5f4ff23df275ad8a6175",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/declared-consult-request.json",
+      "blobSha": "683be47a9f9bbce0c3a6bfa4883b87d07d232e1a",
+      "blobSize": 1239,
+      "sourceDigest": "dcf1f968a7326ad6a9de8139139f7ec4ca0602a7003678d5f04b94db8fc75155",
+      "sourceId": "src_5ff329889830818a3b44aea01230b801",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-cognition-framework-request.json",
+      "blobSha": "3d765859c5fe1a959bfa145373e3c84246fc46c5",
+      "blobSize": 5496,
+      "sourceDigest": "5f76b8f7cdd5f4e049274cfe7bb0babee201346f7abbeae4fdb20e2c5e44d95a",
+      "sourceId": "src_f127be1d01edcc781b189b2f7f8cb017",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-thinking-delphi-feedback-lite-request.json",
+      "blobSha": "75647d645574741b155fb97502ddb12684bfdee9",
+      "blobSize": 2753,
+      "sourceDigest": "eae2a5384419898f41a5189f060b5b4e4d6f07ec09944775d655e673cf4eefd3",
+      "sourceId": "src_d93c0fdc52b57e9d63e8eb1c1bcdfbc0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-thinking-nominal-group-lite-request.json",
+      "blobSha": "392858143d3bf283975899add309b426e8b6f97f",
+      "blobSize": 2148,
+      "sourceDigest": "79ce2cc642ea0fefaf64d7fa08c10bfe32bac158787f7f4590c9961183d537cf",
+      "sourceId": "src_9bb2d26ebfef192de7916a6d81bbcfb3",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-thinking-nominal-group-lite-resume-request.json",
+      "blobSha": "cce80db113fbe78d18dca3648df25d8269281518",
+      "blobSize": 2695,
+      "sourceDigest": "ce740bc44755a1e456f581a7b721eb1ca00ac6d13b5f4da3498e057521f225f9",
+      "sourceId": "src_42efd7e0f2bcc047a7ea99175eb8abd6",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-thinking-rfc-review-lite-request.json",
+      "blobSha": "35f72ce98a8a02fdf1bec9d074f1e80394f8393c",
+      "blobSize": 2480,
+      "sourceDigest": "6f19716c50b73d0986432f9a1ab7df9a33235a0eed68da92eca7a404866ca2b4",
+      "sourceId": "src_c895e5a949837d530289f232d93b361a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/group-thinking-rfc-review-lite-resume-request.json",
+      "blobSha": "01608da02967565ea52cf0f0b29bb22d511fd313",
+      "blobSize": 1784,
+      "sourceDigest": "561fd5bf691c7821d9a8edee69e57c03941eb2e11467482178e92302fc74f3e0",
+      "sourceId": "src_59e749493e1b0f6986315317ebd539b9",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/coordination-examples/research-protocol-request.json",
+      "blobSha": "ca248135a3aad92fb39a75530de63790c6b772ee",
+      "blobSize": 2244,
+      "sourceDigest": "9d139249bd33abc9d6f21de4327460198f4d99a18ef543d293c60ca349a3c531",
+      "sourceId": "src_a03998ba8e270e1f13f155bf8a162744",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "blobSha": "f7f3db1091933eed250a59e4e381a811195cb618",
+      "blobSize": 3296,
+      "sourceDigest": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+      "sourceId": "src_da68d06ce6610a7fbca919b3c32bcd40",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fix a `bare-citation` finding",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fix a `bare-citation` finding",
+          "anchor": "fix-a-bare-citation-finding"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/fix-d-local-outside-home-findings.md",
+      "blobSha": "95f2c45c59ec94ca2dfbe3f1d70d629fe5cca1c0",
+      "blobSize": 3093,
+      "sourceDigest": "f67e2ab41492c01c8b52301cd000a0431b107f3bc588b5673c4c1843ea4df194",
+      "sourceId": "src_86e7538418469264fc74d0763467b805",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fix a `d-local-outside-home` finding",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fix a `d-local-outside-home` finding",
+          "anchor": "fix-a-d-local-outside-home-finding"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "blobSha": "c59345de8b74b4abd7f2cff5dc10d719bb675e82",
+      "blobSize": 3065,
+      "sourceDigest": "e79b3b4afcc54de275cae77c6b73c964af152c1fb43c6e0c0f57efd255b61d1b",
+      "sourceId": "src_78e22243018e64ef46c00b7d5849fb56",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Handle a worktree-guard refusal of the dispatch Step B command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Handle a worktree-guard refusal of the dispatch Step B command",
+          "anchor": "handle-a-worktree-guard-refusal-of-the-dispatch-step-b-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "blobSha": "77977baa92e0a769ce15075d2cf39109aa131c62",
+      "blobSize": 42899,
+      "sourceDigest": "13858c07af0a32cc88d64648b5c7e0e04b5856338e1ec14882b4b87713ca009d",
+      "sourceId": "src_e6b2d5ec93f293be0042c80d7bc8333b",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to install fgOS in a project and use fgos doctor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to install fgOS in a project and use fgos doctor",
+          "anchor": "how-to-install-fgos-in-a-project-and-use-fgos-doctor"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/measure-a-real-case.md",
+      "blobSha": "17687434a499cd43d936e8c905108edfd2f222f5",
+      "blobSize": 5678,
+      "sourceDigest": "fa704a98abf7699c4aae3775a5866dc8c5a5b4ee78d762d4e3ccc167fb527a1f",
+      "sourceId": "src_e83065098948fe72ffcd18dbe4ecce50",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How-To: Measure a Real Case with Observe Metrics",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How-To: Measure a Real Case with Observe Metrics",
+          "anchor": "how-to-measure-a-real-case-with-observe-metrics"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+      "blobSha": "a57df36a4a8c6d0ba2a6a5d5f9b3eabb80e85135",
+      "blobSize": 2515,
+      "sourceDigest": "3f102116a22128a9edbc3ae4d64140a56637e8b666ab82ffd75694a5085e3135",
+      "sourceId": "src_a38ff82f7c173461d54a611bb79e39ca",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Operate Dispatch Runtime Inspection And Reconciliation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Operate Dispatch Runtime Inspection And Reconciliation",
+          "anchor": "operate-dispatch-runtime-inspection-and-reconciliation"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/run-a-coordination-session.md",
+      "blobSha": "4a4e6de82a723e799e38bbde465439d92ff413ee",
+      "blobSize": 13470,
+      "sourceDigest": "af2dcfe5c5bc2b3386caf1fd2a6c93e255969c97653a28d447255ed1375bf04d",
+      "sourceId": "src_4e79fa70b65590529d5cb3c94a67a427",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to run a coordination session with `fgos coordination`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to run a coordination session with `fgos coordination`",
+          "anchor": "how-to-run-a-coordination-session-with-fgos-coordination"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/use-fast-test-feedback-commands.md",
+      "blobSha": "db4c4c8b02f3bd2bdc911227962f2612de4efa9b",
+      "blobSize": 2987,
+      "sourceDigest": "38bee7492d4b0401d52705c02c5d5d8da7ab3ae4234a0584d79a1af2413571f6",
+      "sourceId": "src_0d96fad8210e6ecf4fe86211952117f6",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Use The Fast Test-Feedback Commands",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Use The Fast Test-Feedback Commands",
+          "anchor": "use-the-fast-test-feedback-commands"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/use-fgos-architecture-panel.md",
+      "blobSha": "eff3e78ba96a2c0a219364781fb8634748157fde",
+      "blobSize": 18057,
+      "sourceDigest": "9494cd9bb1854187bc6a54540394264d91ccdedc503d0187b7ea7f98f7f34c2a",
+      "sourceId": "src_4eed628c78bb710787ee8a846d6aa9bd",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to use the `fgos-architecture-panel` skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to use the `fgos-architecture-panel` skill",
+          "anchor": "how-to-use-the-fgos-architecture-panel-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/use-fgos-group-thinking.md",
+      "blobSha": "909b514394cfd1356226949445e90ef35e077168",
+      "blobSize": 10278,
+      "sourceDigest": "bb8c4fb60e2cf26f0188437473b44ba4a212087762f7f56a762d343a3373601b",
+      "sourceId": "src_3cbda934bb7fa37c014a46179965cfa5",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to use group thinking",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to use group thinking",
+          "anchor": "how-to-use-group-thinking"
+        }
+      ]
+    },
+    {
+      "path": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
+      "blobSha": "16bddbc7ce821e96b5d7e902295111b627eeaf44",
+      "blobSize": 2147,
+      "sourceDigest": "20cba3fb25374d9a50dc5860aef1fb29f0626bbd38254ad13fb134c9d59b309b",
+      "sourceId": "src_0a51d9dfb48f7734f65afac924bfd9cf",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Use `scripts/write-wrapper-script.mjs` instead of hand-authoring a wrapper file",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Use `scripts/write-wrapper-script.mjs` instead of hand-authoring a wrapper file",
+          "anchor": "use-scriptswrite-wrapper-scriptmjs-instead-of-hand-authoring-a-wrapper-file"
+        }
+      ]
+    },
+    {
+      "path": "docs/id-systems-audit.md",
+      "blobSha": "bc8f97705e2d38452b8d08faa8eaeaf3d7ee630b",
+      "blobSize": 13697,
+      "sourceDigest": "c8d2d797b10ff41d841ef7234c49bed93744abd62b950f650ddb4cde58e20687",
+      "sourceId": "src_16291aaab10cce5c5c0fdfc4da461234",
+      "area": "root:docs/id-systems-audit.md",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": "docs/id-systems-audit.md",
+      "gap": false,
+      "firstHeading": "Audit: loại-hình công việc + hệ đặt tên/đánh mã",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Audit: loại-hình công việc + hệ đặt tên/đánh mã",
+          "anchor": "audit-loại-hình-công-việc-hệ-đặt-tênđánh-mã"
+        }
+      ]
+    },
+    {
+      "path": "docs/io-contract.md",
+      "blobSha": "71a4934a35f0f25769b914250849c70ccbf3232b",
+      "blobSize": 14699,
+      "sourceDigest": "bf227cc516b22f8fa4af84bb83429dec615e82bcd5efdb1c54c1656eac7b5616",
+      "sourceId": "src_ec14972117d4dbb0e43ef96aef54eee8",
+      "area": "root:docs/io-contract.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "anchor": "hợp-đồng-io-của-fgos-cửa-cli-bề-mặt-stdout-của-fgos-runner"
+        }
+      ]
+    },
+    {
+      "path": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "blobSha": "e0b5e290a9d2caf0e46a00d685610ea1a48f20a3",
+      "blobSize": 5409,
+      "sourceDigest": "7508fdea83ec973896ae33e141ec0c0b29c075fe8b07e197328f04f802ab314a",
+      "sourceId": "src_c655270e4aaaeefe69ba70424a215ec9",
+      "area": "History/evidence (journals)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Claim-Port & str46-io-contract: Parallel Work Collides at Merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Claim-Port & str46-io-contract: Parallel Work Collides at Merge",
+          "anchor": "claim-port-str46-io-contract-parallel-work-collides-at-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/journals/260728-2130-hook-reachability-tsk-3w8.md",
+      "blobSha": "2406b9370556ec8d180f3a52703319adc11d713d",
+      "blobSize": 6432,
+      "sourceDigest": "3c459f3a785dbb8759a54f8145fe370439cd32e6de08fb989c2c9c6829931070",
+      "sourceId": "src_df626c9bc2c000241c5004e6c3843fde",
+      "area": "History/evidence (journals)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Git Index Clobbering in approve(): Existing Solution Was Built But Silent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Git Index Clobbering in approve(): Existing Solution Was Built But Silent",
+          "anchor": "git-index-clobbering-in-approve-existing-solution-was-built-but-silent"
+        }
+      ]
+    },
+    {
+      "path": "docs/journals/260728-2211-worktree-reclaim-data-loss-tsk-1os.md",
+      "blobSha": "071c99fc85cd91430bbb74c14f6cc4fc63f2526c",
+      "blobSize": 6141,
+      "sourceDigest": "7d3db6ae30f949f68882d847c0aea2d0d54959dcb06b6eba407890d7caa493a2",
+      "sourceId": "src_c4cf5ed66d41212ce94d09ddff66d10c",
+      "area": "History/evidence (journals)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Worktree Reclaim: Silent Data Loss Risk, Fixed But Exposed fgOS State Machine Gap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worktree Reclaim: Silent Data Loss Risk, Fixed But Exposed fgOS State Machine Gap",
+          "anchor": "worktree-reclaim-silent-data-loss-risk-fixed-but-exposed-fgos-state-machine-gap"
+        }
+      ]
+    },
+    {
+      "path": "docs/journals/260728-2245-lifecycle-sync-gates-three-latent-bugs.md",
+      "blobSha": "c5c2c0d21a500275bbd5a9703a121ef677de8781",
+      "blobSize": 8619,
+      "sourceDigest": "4c25f6d05de28199001d181b31f4ec7b318b3be5bcb362d5035af692b8393e46",
+      "sourceId": "src_97e0cee93a5572977a767e4f063f447e",
+      "area": "History/evidence (journals)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Lifecycle Sync Exercise: Three Silent Gate Failures, All Triggered by Walking Real Items End-to-End",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Lifecycle Sync Exercise: Three Silent Gate Failures, All Triggered by Walking Real Items End-to-End",
+          "anchor": "lifecycle-sync-exercise-three-silent-gate-failures-all-triggered-by-walking-real-items-end-to-end"
+        }
+      ]
+    },
+    {
+      "path": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+      "blobSha": "060045fbc1c37485d6666ca1c49b577d700e2efd",
+      "blobSize": 2948,
+      "sourceDigest": "992a3da95a615ff1e043d7d390b8dd96c13fcb0ced658e203553f4b271900cb8",
+      "sourceId": "src_8fdcc2c2b6d1440e70549a6cea83977f",
+      "area": "History/evidence (journals)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Main Checkout Checked Out Directly Onto a Work Branch Instead of a Worktree",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Main Checkout Checked Out Directly Onto a Work Branch Instead of a Worktree",
+          "anchor": "main-checkout-checked-out-directly-onto-a-work-branch-instead-of-a-worktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "blobSha": "22ee45dccbc9d5d410b02071c833f98a92aac4a9",
+      "blobSize": 8766,
+      "sourceDigest": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "sourceId": "src_0a225f133e3e81b211d0cb541cc691ae",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A decision doc can be superseded twice — superseded_by becomes a list",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A decision doc can be superseded twice — superseded_by becomes a list",
+          "anchor": "a-decision-doc-can-be-superseded-twice-superseded_by-becomes-a-list"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md",
+      "blobSha": "b0ee3743ba8c9fb5929140e2e2f0d9ee4aa977ad",
+      "blobSize": 4258,
+      "sourceDigest": "3f2ad8b5a060d1fb57abc5f304547000f1e8c5a5422e3ebb758178cb031a522c",
+      "sourceId": "src_55bc4f280c6cb8dae90825743431811a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Add a new npm dependency to forgent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Add a new npm dependency to forgent",
+          "anchor": "add-a-new-npm-dependency-to-forgent"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "blobSha": "52a83d17ed14843e6e6a38b4da3ba60ad84b233a",
+      "blobSize": 6341,
+      "sourceDigest": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "sourceId": "src_01980c95a42ef9be9a53d5b461e3c787",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Add a read-only fgOS verb and its plugin skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Add a read-only fgOS verb and its plugin skill",
+          "anchor": "add-a-read-only-fgos-verb-and-its-plugin-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+      "blobSha": "b6af853a3ce63aef5574c0f7f191645a0132cf66",
+      "blobSize": 5757,
+      "sourceDigest": "eda77f8baa9850ddb947320702905e36c00130a22e242a0707baee975b305845",
+      "sourceId": "src_d630552ca2128ded92d36c085fe9df66",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Add a single-item `--id` filter to an existing `list`-style verb",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Add a single-item `--id` filter to an existing `list`-style verb",
+          "anchor": "add-a-single-item---id-filter-to-an-existing-list-style-verb"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "blobSha": "ddccbfb07e4970ac378546cf630eabd4f78f2604",
+      "blobSize": 7106,
+      "sourceDigest": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "sourceId": "src_19bd641802d70a71a75433682b7a8e89",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Add a stateful fgOS verb-group with a local status overlay",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Add a stateful fgOS verb-group with a local status overlay",
+          "anchor": "add-a-stateful-fgos-verb-group-with-a-local-status-overlay"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+      "blobSha": "f91bf11a96ea1a8590d84020ac8cb860c1407804",
+      "blobSize": 11630,
+      "sourceDigest": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+      "sourceId": "src_8a385d84d0a9ee6a4a2ee4f4f79f8c93",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Auto-decompose can drop a locked decision from every child's footprint",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Auto-decompose can drop a locked decision from every child's footprint",
+          "anchor": "auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+      "blobSha": "4130b441070dcfd198cd990ef69110edec20fe47",
+      "blobSize": 9614,
+      "sourceDigest": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+      "sourceId": "src_0c2d55283714603d086bc3841bd3515f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Avoid a vacuous pass from `node --test --test-name-pattern`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Avoid a vacuous pass from `node --test --test-name-pattern`",
+          "anchor": "avoid-a-vacuous-pass-from-node---test---test-name-pattern"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+      "blobSha": "ef660b9bfabba763b885f16c7dd8413a17a39af6",
+      "blobSize": 12013,
+      "sourceDigest": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+      "sourceId": "src_a9ca73d437cadf2aeaf9f6d74aea4ce0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Close out a decomposed root item after all its children are done",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Close out a decomposed root item after all its children are done",
+          "anchor": "close-out-a-decomposed-root-item-after-all-its-children-are-done"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "blobSha": "ae6dd1d52c2b4191d6ba58afa1e3ed32f81299a8",
+      "blobSize": 15135,
+      "sourceDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "sourceId": "src_6ef02e0c3e8bd6270c90ef17b92d361b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the coding domain has a role/holder axis and a task-spec ontology",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the coding domain has a role/holder axis and a task-spec ontology",
+          "anchor": "why-the-coding-domain-has-a-roleholder-axis-and-a-task-spec-ontology"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/decisions-index/decision-record.md",
+      "blobSha": "d3fb03281c199a4a238788a56a322d5a2cb5e017",
+      "blobSize": 16921,
+      "sourceDigest": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+      "sourceId": "src_28b33eae29277d26bc31f29a1087895d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Decisions index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Decisions index",
+          "anchor": "decisions-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+      "blobSha": "774dade7722c88dc295483778da785f1db132153",
+      "blobSize": 4380,
+      "sourceDigest": "18682781553fc550066b2cf0eec054250d311f2b4a7009e3aa317c409b4174be",
+      "sourceId": "src_6c0c07b1cedcaa4f5e5a2de049b9f6e6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering",
+          "anchor": "design-safeguards-in-fgoss-runner-anti-loop-breakers-model-judgment-fail-safes-and-guard-ordering"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+      "blobSha": "3ecd784d41d9e637fb724ab29ef9b3c80ae987af",
+      "blobSize": 4035,
+      "sourceDigest": "c1008d24d135992a872a9fcdb9d9d7aebb882009f4f80cd313ec5fc567bd46ec",
+      "sourceId": "src_79cdab36ed575b5c0c45bdca52537609",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`driftStatus`'s real return shape",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`driftStatus`'s real return shape",
+          "anchor": "driftstatuss-real-return-shape"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md",
+      "blobSha": "22fefabc79953a7e24190b382d57f131aff9b84b",
+      "blobSize": 2845,
+      "sourceDigest": "2f278010e89e49d329fdc8638a6557dac600428ca4ad2f6466a64691320b531d",
+      "sourceId": "src_d45cd675026ea774cbcfc0a2c806fe88",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "executor cross-provider governance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "executor cross-provider governance",
+          "anchor": "executor-cross-provider-governance"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md",
+      "blobSha": "546501ebdb3bd04feb3e9ceca4a61ecee7f7b7ba",
+      "blobSize": 2634,
+      "sourceDigest": "afc3d630c50e3ccfca5e4be969b370709bba69d4739dbb2646eec627e7ec3e6f",
+      "sourceId": "src_1123c4c8ab298abac9f0dffc48e635b9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased",
+          "anchor": "explanation-fgos-return-runs-verify-as-a-literal-shell-command-a-placeholder-string-is-not-special-cased"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md",
+      "blobSha": "7d6595870d18251b1ad3c6e60533c103060a1b64",
+      "blobSize": 2925,
+      "sourceDigest": "677eb12c09115ee46be340a0e9beaee81840b85caf295f1964d6c586f231ec4c",
+      "sourceId": "src_10d94be3f1b6b7f0b60a53f49ea1106e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Explanation: when the engine's own auto-generated verify is wrong",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Explanation: when the engine's own auto-generated verify is wrong",
+          "anchor": "explanation-when-the-engines-own-auto-generated-verify-is-wrong"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+      "blobSha": "884ffc1c203b6d050ffcb90647939f7b580dcf33",
+      "blobSize": 3371,
+      "sourceDigest": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "sourceId": "src_9c96cc8186e4de53a305a127c2096f46",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Explanatory prose can outlive the locked decision that superseded it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Explanatory prose can outlive the locked decision that superseded it",
+          "anchor": "explanatory-prose-can-outlive-the-locked-decision-that-superseded-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+      "blobSha": "2301bbafa02deab87e4f95c432fedc1824d04ec8",
+      "blobSize": 4478,
+      "sourceDigest": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "sourceId": "src_53fe448763f8ef47356dbe0faad9e05e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos approve`'s \"verify-only\" mode checks the current cwd, not the item's real branch",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos approve`'s \"verify-only\" mode checks the current cwd, not the item's real branch",
+          "anchor": "fgos-approves-verify-only-mode-checks-the-current-cwd-not-the-items-real-branch"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+      "blobSha": "ef073037829856449966d2b0581b91db6533fd84",
+      "blobSize": 2792,
+      "sourceDigest": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "sourceId": "src_cf4dfba3d698e7aba3360d0f8116f9ba",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS choke-point survey — ranked priority table",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS choke-point survey — ranked priority table",
+          "anchor": "fgos-choke-point-survey-ranked-priority-table"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+      "blobSha": "64eb5ccbf33451d6b8e8f9979a95166d5da2d84d",
+      "blobSize": 5111,
+      "sourceDigest": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "sourceId": "src_0ca7392d546820a541bce03109f3d751",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `/fgOS:cook` claims a worktree before driving instead of dirtying the main checkout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `/fgOS:cook` claims a worktree before driving instead of dirtying the main checkout",
+          "anchor": "why-fgoscook-claims-a-worktree-before-driving-instead-of-dirtying-the-main-checkout"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+      "blobSha": "8c3778583c124c44b0402766b5bc0a45cb2350c8",
+      "blobSize": 3724,
+      "sourceDigest": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "sourceId": "src_4a3e39cee05b9bb17a3a10dc35fac7d3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `/fgOS:discover` claims via `fgos pick` instead of `fgos take`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `/fgOS:discover` claims via `fgos pick` instead of `fgos take`",
+          "anchor": "why-fgosdiscover-claims-via-fgos-pick-instead-of-fgos-take"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md",
+      "blobSha": "569cee2740dfec6231d69dcaba9ba286050b2a18",
+      "blobSize": 3183,
+      "sourceDigest": "b81c14502c5931d4ad54721fd6610092180870f936b9d7d967e3fcff784f77a8",
+      "sourceId": "src_defab2a5170153965bea735a1f9e6e4a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos list`'s side-log scoping",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos list`'s side-log scoping",
+          "anchor": "fgos-lists-side-log-scoping"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "blobSha": "75c06534e59767ec3205f9f3ddd19ce04ea4cdae",
+      "blobSize": 14047,
+      "sourceDigest": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "sourceId": "src_22e369827806909e111139a77fbdac96",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS participant contract — what it takes to be a full participant in any language",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS participant contract — what it takes to be a full participant in any language",
+          "anchor": "fgos-participant-contract-what-it-takes-to-be-a-full-participant-in-any-language"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+      "blobSha": "9bfc401fd79fbc5ff371ca7fc156d8a111d647d3",
+      "blobSize": 3983,
+      "sourceDigest": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+      "sourceId": "src_588863482493302ef5f8fd1e43abfdb5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-researching's D2 fan-out rule, verified live on a real dogfood run",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-researching's D2 fan-out rule, verified live on a real dogfood run",
+          "anchor": "fgos-researchings-d2-fan-out-rule-verified-live-on-a-real-dogfood-run"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+      "blobSha": "b13e7cefef987d0f99e647200f75200d7eeea979",
+      "blobSize": 5081,
+      "sourceDigest": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "sourceId": "src_54cf265df747c19bf6091cc48cc2cc21",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS's layered architecture is a live, tested invariant — not a diagram",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS's layered architecture is a live, tested invariant — not a diagram",
+          "anchor": "fgoss-layered-architecture-is-a-live-tested-invariant-not-a-diagram"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+      "blobSha": "bf9bf8eb7dd9fe851cfd055df397fd342b0e05e7",
+      "blobSize": 2680,
+      "sourceDigest": "4051d614d62b3c5a5114df1d4524cfc30635db05abdbdda5fcb5b315be753fed",
+      "sourceId": "src_de5fd35018483908a714138c3fa59a38",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos show <id>` output fields",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos show <id>` output fields",
+          "anchor": "fgos-show-output-fields"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+      "blobSha": "d26d6abdd88f8c894ad93526d15242e3bb6c4150",
+      "blobSize": 4248,
+      "sourceDigest": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "sourceId": "src_fd4e0b2d1888283c4f0a4f20bdf4499d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos slots` verb output fields",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos slots` verb output fields",
+          "anchor": "fgos-slots-verb-output-fields"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+      "blobSha": "e5e77f1c72d0faa15a179c4c3e7507a8fa912e54",
+      "blobSize": 5119,
+      "sourceDigest": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "sourceId": "src_771dd4ef250cc3722d92c112161fb488",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos sync-root`'s real guards and outcome shape",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos sync-root`'s real guards and outcome shape",
+          "anchor": "fgos-sync-roots-real-guards-and-outcome-shape"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+      "blobSha": "c029534e18cf81d30e94ead7224c4f350a818548",
+      "blobSize": 3075,
+      "sourceDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+      "sourceId": "src_d44fc6afa7cf8fafdec0396de987378c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`/fgOS:triage` table columns",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`/fgOS:triage` table columns",
+          "anchor": "fgostriage-table-columns"
+        }
+      ]
+    }
+  ]
+}

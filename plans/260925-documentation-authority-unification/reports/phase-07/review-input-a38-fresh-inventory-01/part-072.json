@@ -1,0 +1,1136 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 72,
+  "entries": [
+    {
+      "path": "docs/platform/claude-plugin/spec.md",
+      "blobSha": "15531a604319a44392f299570ae86a065f958046",
+      "blobSize": 11817,
+      "sourceDigest": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "sourceId": "src_ed643f72e93e773d7d37c7b34da08b43",
+      "area": "Claude plugin surface",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: fgOS Plugin (Claude Code slash-command surface)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "anchor": "spec-fgos-plugin-claude-code-slash-command-surface"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/coexistence/spec.md",
+      "blobSha": "0ef6f19d079c5ed8417624e42539b37b91b2dbcb",
+      "blobSize": 8043,
+      "sourceDigest": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+      "sourceId": "src_0a1d897bf548fdc6d258c87b4b71fe82",
+      "area": "Coexistence",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Coexistence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coexistence",
+          "anchor": "coexistence"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "blobSha": "4b81d48a3c1322076b2d942ab8dac044937a943c",
+      "blobSize": 88217,
+      "sourceDigest": "a6229b3b37eb2820ca9b3f1a9372f9865c32f74adf2bddf7df2aea2e9ad3f079",
+      "sourceId": "src_37ba5f3ee47d4c57e61d58af514cb3c8",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Component Boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Component Boundary",
+          "anchor": "component-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/contracts/architecture-manifest.json",
+      "blobSha": "2ff043edb33c5b65a861aa89804c948148ccd58c",
+      "blobSize": 12490,
+      "sourceDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "sourceId": "src_694573f60aefd8b32f528bb6ece84c6e",
+      "area": "Platform contracts",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/contracts/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "blobSha": "455ff5c564401f3b1a10f769d2d80c422202514d",
+      "blobSize": 26208,
+      "sourceDigest": "17dceaa007bfb1e1223cdb3cf7bfdad214a251b066bb464950e9ba925f06467b",
+      "sourceId": "src_03fe741f5e47fa8e23189e3aab709daf",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Convention Component Specification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Convention Component Specification",
+          "anchor": "convention-component-specification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/README.md",
+      "blobSha": "8098019a1c8167cb6878ba1896cd8f3e356c1dff",
+      "blobSize": 1799,
+      "sourceDigest": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "sourceId": "src_a24a810406e4ab789d58a0dbad1cb219",
+      "area": "Decision citation drift",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "decision-citation-drift candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "decision-citation-drift candidate area",
+          "anchor": "decision-citation-drift-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "blobSha": "f56ac99830dc993c8eb97db2ebb4e39235ae01d5",
+      "blobSize": 7339,
+      "sourceDigest": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "sourceId": "src_a067e4dff2e3ca337d4060b4dcc978dd",
+      "area": "Decision citation drift",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Decision Citation Drift Check",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Decision Citation Drift Check",
+          "anchor": "spec-decision-citation-drift-check"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/distillery/README.md",
+      "blobSha": "f0e6b358ff6d83765bf6be2249b6fd8079dacb58",
+      "blobSize": 1760,
+      "sourceDigest": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "sourceId": "src_0b06f99458bd7e8a36d00bab82b23bf5",
+      "area": "Distillery / reference learning",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "distillery candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "distillery candidate area",
+          "anchor": "distillery-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/distillery/spec.md",
+      "blobSha": "fcf5c05529f12732b822ff79083456cb78dc5dab",
+      "blobSize": 8286,
+      "sourceDigest": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+      "sourceId": "src_e28746343c8a6b36847076dfb6259223",
+      "area": "Distillery / reference learning",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Distillery — Porting Lifecycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Distillery — Porting Lifecycle",
+          "anchor": "distillery-porting-lifecycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "blobSha": "c323b676788113edd42e3b46a927535b6a08f2f4",
+      "blobSize": 20398,
+      "sourceDigest": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+      "sourceId": "src_1fbe380d1a1289a0de27fcdf73b383ec",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Documentation System Design",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation System Design",
+          "anchor": "documentation-system-design"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/id-systems-audit.md",
+      "blobSha": "5d1227f1b8d195300345a9b7ea05c94602735727",
+      "blobSize": 14455,
+      "sourceDigest": "50a036a1cafbca9862192a0ba11927cc60aa9f5e35a26667e15175ff487e0161",
+      "sourceId": "src_47cd9b9c35530df8bcb1f043ca7ec14e",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Audit: loại-hình công việc + hệ đặt tên/đánh mã",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Audit: loại-hình công việc + hệ đặt tên/đánh mã",
+          "anchor": "audit-loại-hình-công-việc-hệ-đặt-tênđánh-mã"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "blobSha": "79aaa559f86174c7004505ffb9bd10b0fc7555f0",
+      "blobSize": 63603,
+      "sourceDigest": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+      "sourceId": "src_25d942f2d5f6ea2ea167daee559ad014",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Documentation System Discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation System Discussion",
+          "anchor": "documentation-system-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/architecture.md",
+      "blobSha": "b736983efd44eb7fd49d660e90de050e0f093446",
+      "blobSize": 2315,
+      "sourceDigest": "500c3ac7b8fd82ffeaa106ca32aa26680533b858efdad70fadd7d3c8e3e6f7f6",
+      "sourceId": "src_99edc78a31c0e59c125269943b3e42cd",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Architecture Topic>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Architecture Topic>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/area-readme.md",
+      "blobSha": "415be150bc37f44a67f6514c1d00957b894bd84a",
+      "blobSize": 4629,
+      "sourceDigest": "24a1a1b9a6dd2b7c4fbda242eeeffbfa6471040bc30010589d47199e870ef035",
+      "sourceId": "src_feb56c6c1a5aedc752d8f2ce25747784",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Area Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Area Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/contract.md",
+      "blobSha": "55e0d9d3fa6ebd31489eaaef24bd66fa9e1e2d71",
+      "blobSize": 2017,
+      "sourceDigest": "6cd3b2bd82763b02bcba0eaaa7eaa3da4c7e263a15f34947930c3d4bb39e80d6",
+      "sourceId": "src_16e42af903427e9b9ae1c8a8b36e09ed",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Contract: <Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: <Name>",
+          "anchor": "contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/decision.md",
+      "blobSha": "e84be6d8818bbe2b265af3d03c97fbf5f78c5bba",
+      "blobSize": 1635,
+      "sourceDigest": "dde490a25e8a16f00ccf97addbfa0bed07a7388db6fc0bd437a617a733bcc8fd",
+      "sourceId": "src_71cea7a82e89d10f9adc3d5c3c8b2f1c",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Decision: <Title>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Decision: <Title>",
+          "anchor": "decision"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/discussion.md",
+      "blobSha": "e87fc362078036a040235165a384e02309138bf8",
+      "blobSize": 1578,
+      "sourceDigest": "ec55d4b8104b30c412b07ac1ea49a092972313bf78f08702b8a97d89fa91b906",
+      "sourceId": "src_3f62499632030ee8ea7e3f752ea3e4f0",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Topic> Discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Topic> Discussion",
+          "anchor": "discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/generated.md",
+      "blobSha": "a96fdf25f51d1fd728c7cf0da2c609f1063b5421",
+      "blobSize": 1398,
+      "sourceDigest": "381cbb52c73b4aea17cadacba120f422f21199d65e257c97ecb612c49c1ad913",
+      "sourceId": "src_197aca964f1f696c9c5481bf58a2c51d",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Generated Artifact Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Generated Artifact Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "blobSha": "1aaa74ac1e050743494f82c39ea94c2a39335cdc",
+      "blobSize": 2693,
+      "sourceDigest": "ac84ad0bbf0dc4fbcb25595c0443a509e2c5b24b08e8e668c4cad8c34f1f1835",
+      "sourceId": "src_485474f481d83f4111e26058f8528cf2",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Area> Intent Preservation Ledger",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Area> Intent Preservation Ledger",
+          "anchor": "intent-preservation-ledger"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "blobSha": "809201f46a5ef10e0d839edbf75f707abc7c4f3b",
+      "blobSize": 2502,
+      "sourceDigest": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "sourceId": "src_b8c32cb7be588b58055f1374ce14edc5",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Historical Authoring Templates",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical Authoring Templates",
+          "anchor": "historical-authoring-templates"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/spec.md",
+      "blobSha": "55c2470ca380380344fd9355f37aa33f923a5d1d",
+      "blobSize": 2219,
+      "sourceDigest": "d55f536a4f3df59ffc1e21235f864a9fe15cf7a00222bfb45f1ca9aa5396f900",
+      "sourceId": "src_f295aa928095b46fc235dac40c5b2457",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: <Area Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: <Area Name>",
+          "anchor": "spec"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "blobSha": "451f1c2609a25828550e42e17845ad2d082856b8",
+      "blobSize": 3338,
+      "sourceDigest": "e3ebd0038ae629ff900dfd45099b8311861b5c33d4f2c64690ed41b47e643d5e",
+      "sourceId": "src_ccb880c14efce4ea8add747ec644ac3c",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "<Subcomponent Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Subcomponent Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/verification.md",
+      "blobSha": "9320d524bbfff2da7300d7ee6da6200ff4c3211d",
+      "blobSize": 1615,
+      "sourceDigest": "4326b0fab45e9677cc59afe4572c62fa70522820035822ae6469ec7ae097e089",
+      "sourceId": "src_21d07b22352215ec96bf6fa3dfdec853",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Verification: <Claim>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: <Claim>",
+          "anchor": "verification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/vision.md",
+      "blobSha": "655f4dde97bcda93e85a5cdd3fa52576466ee252",
+      "blobSize": 2012,
+      "sourceDigest": "3b1371f3ea56ce3a14db1d1330f1b1bee1053fc1278550983e6be831524be591",
+      "sourceId": "src_8a1f5f6192702a09c4d7cf5b82e7198d",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Vision: <Area>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Vision: <Area>",
+          "anchor": "vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "blobSha": "bce97dad2759d55a9c70a1b7d536b8680dd4bbb7",
+      "blobSize": 3088,
+      "sourceDigest": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "sourceId": "src_926fce984094aa63b80b4d8a0e2cc47f",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS Documentation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Documentation",
+          "anchor": "fgos-documentation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/documentation/switchboard.md",
+      "blobSha": "783b795968092bc2ad6cc021f906378c9748ddee",
+      "blobSize": 13993,
+      "sourceDigest": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "sourceId": "src_77758d8a9e1dd482832dc3d3bfe8c59d",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Transitional Documentation Authority Switchboard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Transitional Documentation Authority Switchboard",
+          "anchor": "transitional-documentation-authority-switchboard"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/domainization/architecture/domainization.md",
+      "blobSha": "6dacf5b13e98437f381198428f8faa937b28dada",
+      "blobSize": 12153,
+      "sourceDigest": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+      "sourceId": "src_8621927452765738a79feafb44a12dd9",
+      "area": "Skills and domainization",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS Domainization Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Domainization Architecture",
+          "anchor": "fgos-domainization-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "blobSha": "cb37701a82bc67cec4cf575f67e106374ee29519",
+      "blobSize": 19443,
+      "sourceDigest": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "sourceId": "src_7c76cf8e29d91045de8488e23f9b997d",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Documentation Governance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation Governance",
+          "anchor": "documentation-governance"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+      "blobSize": 34956,
+      "sourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "sourceId": "src_c91669cbd41a280e7c900a1f5018f1f9",
+      "area": "Herdr gateway and web dashboard",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "blobSha": "630c0c25cfd36c775e6ef7c2023f06fb42b813ca",
+      "blobSize": 4227,
+      "sourceDigest": "1e6946675c09f08237ac65c65c4525b822ca219cd2fae6fcb99c72f3d63d105e",
+      "sourceId": "src_1aa83aedc9ea01572199ed0d6ebbd952",
+      "area": "Herdr gateway and web dashboard",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Operator runbook — herdr cockpit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Operator runbook — herdr cockpit",
+          "anchor": "operator-runbook-herdr-cockpit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "blobSha": "19979055c12bfc750542f7fffacbe68a92261767",
+      "blobSize": 1928,
+      "sourceDigest": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "sourceId": "src_52007274efda00893deefd346a19563b",
+      "area": "Herdr gateway and web dashboard",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-web-dashboard candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-web-dashboard candidate area",
+          "anchor": "herdr-web-dashboard-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "blobSha": "52a3056a3eb5c4fbf3e0f9e81fbf7dfa0604e0e8",
+      "blobSize": 22973,
+      "sourceDigest": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "sourceId": "src_0c97ac073ca8b7786b11fd27fc33886c",
+      "area": "Herdr gateway and web dashboard",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "anchor": "spec-herdr-web-dashboard-browser-surface-for-fgos-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/history/documentation-authority-unification/README.md",
+      "blobSha": "0261c17199653e9c0dc2ed493fd4e5622c1be1c8",
+      "blobSize": 2406,
+      "sourceDigest": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "sourceId": "src_719d6995dfd616799f81d023b9fc7257",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Documentation authority unification evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation authority unification evidence",
+          "anchor": "documentation-authority-unification-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "blobSha": "2b448999a4cda575693f1a4c63b07f59896e18a6",
+      "blobSize": 13564,
+      "sourceDigest": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+      "sourceId": "src_be6808dc5f6a519a007f3169e04872a9",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: External Provider Protocol",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: External Provider Protocol",
+          "anchor": "architecture-external-provider-protocol"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "blobSha": "41ea637b72327274d71306495a778e9d9addafd6",
+      "blobSize": 4511,
+      "sourceDigest": "37b1e321aebb3862b0d578f7063a58b255c9ab18bd0eafe71c4f90d891ae88bc",
+      "sourceId": "src_c9a1cfdefb0075659ac34e30271a208d",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Host Use Cases",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Host Use Cases",
+          "anchor": "architecture-host-use-cases"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "blobSha": "1343afdf9549a25ea9bc945285e1333e1cc09cf9",
+      "blobSize": 4386,
+      "sourceDigest": "389412c0eca0db5c2acd67a6d54ad368d05e44ed4075ef131f00e48cd008785b",
+      "sourceId": "src_d671ef888f7636cf3569d7239f736ab9",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Invocation Kernel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Invocation Kernel",
+          "anchor": "architecture-invocation-kernel"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "blobSha": "16698a6b475afdd0d0a5cd670129d5e22df0a258",
+      "blobSize": 17758,
+      "sourceDigest": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+      "sourceId": "src_68c37c7bc113448a8e928d6bc8475f46",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Legacy CLI Transition",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Legacy CLI Transition",
+          "anchor": "architecture-legacy-cli-transition"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "blobSha": "ab1e17b3d78372b2cffb8eb738d6e27627cf8cc8",
+      "blobSize": 23764,
+      "sourceDigest": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+      "sourceId": "src_79ffa8530c5cb472b187aa60d12f51df",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Node To Rust Migration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Node To Rust Migration",
+          "anchor": "architecture-node-to-rust-migration"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "blobSha": "b7bdd84f81f210c7fd64b4ea55bb7ca3b8723498",
+      "blobSize": 4798,
+      "sourceDigest": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+      "sourceId": "src_e8578678384c00d31d14afb8de126a3b",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Provider Routing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Provider Routing",
+          "anchor": "architecture-provider-routing"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/README.md",
+      "blobSha": "9e67b4474ac002111fa803deb677286480fad3d4",
+      "blobSize": 2985,
+      "sourceDigest": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "sourceId": "src_fcc505bab27da12ef7f41bc4e2d09ec4",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Architecture",
+          "anchor": "host-invocation-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "blobSha": "5f9949df5edc1a99800f4c691512136c2a77a328",
+      "blobSize": 15339,
+      "sourceDigest": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+      "sourceId": "src_0f929c0996b8b3e29bccd6349335775e",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Architecture: Release Boundaries",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture: Release Boundaries",
+          "anchor": "architecture-release-boundaries"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+      "blobSha": "8a4c5ed47ba65e534c3b72668196b21336789119",
+      "blobSize": 3587,
+      "sourceDigest": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+      "sourceId": "src_3deb5577b036fa86e757551f31821e70",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Command Route Descriptor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Command Route Descriptor",
+          "anchor": "contract-command-route-descriptor"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "blobSha": "0da2bdf6606491f1899f1d634736597de6b30387",
+      "blobSize": 17761,
+      "sourceDigest": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+      "sourceId": "src_0129e148213fb0da30c841513d9b5ce2",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Component Protocol",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Component Protocol",
+          "anchor": "contract-component-protocol"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "blobSha": "b59190bf890a714f99bd00e52fab530f3f8262d0",
+      "blobSize": 3235,
+      "sourceDigest": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+      "sourceId": "src_eb451cb65a828702ca4a673d9687735a",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: External Provider Manifest",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: External Provider Manifest",
+          "anchor": "contract-external-provider-manifest"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "blobSha": "7db359072f824d4f77176f64a477232b66dc6adc",
+      "blobSize": 3777,
+      "sourceDigest": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+      "sourceId": "src_dd3af88a23fd49a8a064bb262802946a",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Legacy Payload",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Legacy Payload",
+          "anchor": "contract-legacy-payload"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "blobSha": "343e7551c138574b14a419a6e5ca720dd996e369",
+      "blobSize": 3300,
+      "sourceDigest": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+      "sourceId": "src_a1f4fb27600bb97b3cd9fe38e8dfe637",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Operation Catalog",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Operation Catalog",
+          "anchor": "contract-operation-catalog"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "blobSha": "39a1d22ccb265388455011c6c5ce84ad0382bfb4",
+      "blobSize": 3338,
+      "sourceDigest": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+      "sourceId": "src_2b4a45aa3c0b274b979448e1645f6ef6",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Operation Provider",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Operation Provider",
+          "anchor": "contract-operation-provider"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "blobSha": "9e1180b273620f82844ce8e88c12f533a7fd5244",
+      "blobSize": 4029,
+      "sourceDigest": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a",
+      "sourceId": "src_3ef75b861069c17f7620b61d10024d46",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Operation Request And Outcome",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Operation Request And Outcome",
+          "anchor": "contract-operation-request-and-outcome"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/README.md",
+      "blobSha": "9376672762df13f840134ffaad9ea2bd6a15d822",
+      "blobSize": 2910,
+      "sourceDigest": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "sourceId": "src_8ca81d8b086cd746d0d26fc105abd8c1",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Contracts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Contracts",
+          "anchor": "host-invocation-contracts"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/decisions/README.md",
+      "blobSha": "4b017ba055f0b3b442b54a591fc29a7f124a67ba",
+      "blobSize": 3237,
+      "sourceDigest": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "sourceId": "src_47af4a8155b329480612684b85bc8968",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Decisions",
+          "anchor": "host-invocation-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "blobSha": "bb6bc98d87e2e05b01f0dc19e1f5752a8fdefa33",
+      "blobSize": 22496,
+      "sourceDigest": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca",
+      "sourceId": "src_f3a35e188217b5b58b6ec8d753306bc6",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Retired Documentation Migration Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired Documentation Migration Plan",
+          "anchor": "retired-documentation-migration-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "blobSha": "9ef0bb8051ea2543cb315da40a2a6f3b1a51f840",
+      "blobSize": 2648,
+      "sourceDigest": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+      "sourceId": "src_80bfa98b19869c43a9492f0667b296fa",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Baseline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Baseline",
+          "anchor": "host-invocation-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+      "blobSha": "7fe2c1f14a17336d535c2946a2a48a439105a33d",
+      "blobSize": 5623,
+      "sourceDigest": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+      "sourceId": "src_6174a4c74e4697634e305a8605d294c9",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Source Inventory",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Source Inventory",
+          "anchor": "host-invocation-source-inventory"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "blobSha": "75688f00799acb355fe0d52d5fff8a315694b2c1",
+      "blobSize": 34308,
+      "sourceDigest": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+      "sourceId": "src_be0805eea78ee93a2c3414831102536e",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Intent Preservation Ledger",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Intent Preservation Ledger",
+          "anchor": "host-invocation-intent-preservation-ledger"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+      "blobSha": "f7ec0c89391c2e4d7b4529c10b70caa85eca700f",
+      "blobSize": 1399,
+      "sourceDigest": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+      "sourceId": "src_0c900adc3f9b19f94ac0c7224a9b1f92",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "R2 External Process Provider Rollout Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "R2 External Process Provider Rollout Plan",
+          "anchor": "r2-external-process-provider-rollout-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+      "blobSha": "8aa8aa0954a15131760c2cdbdd1cd8c3816c7213",
+      "blobSize": 1360,
+      "sourceDigest": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27",
+      "sourceId": "src_4e88d3343ab8857939097abbcf0ed767",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "R3 Remote Peer Rollout Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "R3 Remote Peer Rollout Plan",
+          "anchor": "r3-remote-peer-rollout-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "blobSha": "6700fb7e02c7fd35450ecfa149cc3ba49bb7e6dd",
+      "blobSize": 11785,
+      "sourceDigest": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "sourceId": "src_850dbf939b748fd2326717abb2161e7c",
+      "area": "Host invocation routing",
+      "authorityStatus": "promoted",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation",
+          "anchor": "host-invocation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "blobSha": "50a68660a7c29789331a8d0ce4097022e6fbd238",
+      "blobSize": 52227,
+      "sourceDigest": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "sourceId": "src_14eca45e64f1df4b20b2099a85109cc9",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Routing Roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Routing Roadmap",
+          "anchor": "host-invocation-routing-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "blobSha": "fbdc9846e0cfb72ee999a2d4edf2081fa292bde9",
+      "blobSize": 32766,
+      "sourceDigest": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+      "sourceId": "src_7a3e0effec5acd6e67d704a24d0afa50",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Spec: Host Invocation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Host Invocation",
+          "anchor": "spec-host-invocation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "blobSha": "2f7773d262fec1d0012dc06bf674cfe2915acfed",
+      "blobSize": 7254,
+      "sourceDigest": "4cd3b4a66ad636ace987474315e5575a202391e35b9925285a032e8b307a4ce2",
+      "sourceId": "src_1653c0e28729de284b5216bb6d532de4",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Verification: Compatibility Harness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: Compatibility Harness",
+          "anchor": "verification-compatibility-harness"
+        }
+      ]
+    }
+  ]
+}

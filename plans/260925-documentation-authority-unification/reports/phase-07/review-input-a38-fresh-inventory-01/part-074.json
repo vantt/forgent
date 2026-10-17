@@ -1,0 +1,1136 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 74,
+  "entries": [
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "blobSha": "e65c10e77997885921e3a5ea9e04fae5352f3ee0",
+      "blobSize": 92457,
+      "sourceDigest": "177ce0c3218f2e9df96b0a29e782f6f387c10228420e6d32276ad011063e73a4",
+      "sourceId": "src_e0653ef8b428b7c8609cc2ef55fff427",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Behaviors & Operations",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Behaviors & Operations",
+          "anchor": "added-in-candidate-runner-behaviors-operations"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "blobSha": "fe571c7f9b387a3a088781d72eb973c12e42da3c",
+      "blobSize": 5612,
+      "sourceDigest": "5f6c334a23962f7963eff2f61f1ce1f2a768bf5739c3df36ac48ad44a6cf8896",
+      "sourceId": "src_6c435a33567677f9f35d97dff39424e8",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Runner candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runner candidate area",
+          "anchor": "runner-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "blobSha": "a6d757d3836fe437ca43bdceb883957373baa421",
+      "blobSize": 78097,
+      "sourceDigest": "afefc6dc31cf1e4de2f25fb165e74ebafa14e8962000726f8dfa5c4fb8a15a14",
+      "sourceId": "src_7ae956f89ba60f77c2f0777f24fa165f",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Runner (vòng tự hành)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Runner (vòng tự hành)",
+          "anchor": "spec-runner-vòng-tự-hành"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "blobSha": "238c9140925e29e88556f4c9fbe9a27e9a67b55f",
+      "blobSize": 15890,
+      "sourceDigest": "9e962ffb591b13247736df9a62938cbced70ba9c5c8cc5314d9a6bdd21632171",
+      "sourceId": "src_21c09742ba03677bfa098e8771a13b75",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Data Dictionary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Data Dictionary",
+          "anchor": "added-in-candidate-runner-data-dictionary"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "blobSha": "d3676974dab90888b30199f7cc9170786760ca3e",
+      "blobSize": 13341,
+      "sourceDigest": "0487ede5df0d6595249f6d0ed08695d838ad4af153e8f9da348b8cfe5e4d0331",
+      "sourceId": "src_a38f3c59bf948bd00f0c557517c125ec",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Open Gaps",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Open Gaps",
+          "anchor": "added-in-candidate-runner-open-gaps"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "blobSha": "d31dab18ad07c66e7f89a5417260700cdf50a80c",
+      "blobSize": 18424,
+      "sourceDigest": "908ab50e89188b13254d00ef9e131cd40c675ac92a61d529e68b7f1d6d82abd9",
+      "sourceId": "src_6c36ebe8f707131942ed06dfe7b2b3d5",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Edge Cases Settled",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Edge Cases Settled",
+          "anchor": "added-in-candidate-runner-edge-cases-settled"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "blobSha": "f9850d73c0604f8561ad48d00f5d364931566961",
+      "blobSize": 173813,
+      "sourceDigest": "463ff6d0b88d2dba4cad8276d82378bbff23b47097aff42e9b866c758bd81ec3",
+      "sourceId": "src_f4975a2a408c9c703030746cb6ffc89f",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Business Rules",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Business Rules",
+          "anchor": "added-in-candidate-runner-business-rules"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "blobSha": "5b2e8ba8786d2df2c43ccce5321eb10b6d830707",
+      "blobSize": 2070,
+      "sourceDigest": "619385c230714647ef060afb7f8140d4747ac4b0ee67c289b0bf8bc9e1150491",
+      "sourceId": "src_196ec9d6277db957c7781b380486feaa",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Actors & Access",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Actors & Access",
+          "anchor": "added-in-candidate-runner-actors-access"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "blobSha": "dce320bb8b0f85d5bcb197c3ad71e98551366ba7",
+      "blobSize": 5734,
+      "sourceDigest": "6bec68a01a54dc4f38b332e709ca9d75d00495697d914239407fd6dddc227a87",
+      "sourceId": "src_ad2cd3f4caf7e82d90a9ed0cbc46c549",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Entry Points & Triggers",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Entry Points & Triggers",
+          "anchor": "added-in-candidate-runner-entry-points-triggers"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "blobSha": "e670a94b2e71609a191b4a0d8fd7288545d37111",
+      "blobSize": 1320,
+      "sourceDigest": "903d758e17bc17334daa6eb161ea88746efcf5056c96ab11106d7fc9b24bb543",
+      "sourceId": "src_c2b37d3a86a41ee09f8ae77dc41d2982",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Visuals",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Visuals",
+          "anchor": "added-in-candidate-runner-visuals"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "blobSha": "349fd3db8fe1785ef75186d0787c0b7c075981f7",
+      "blobSize": 44954,
+      "sourceDigest": "40eb99dc193dcf7c81a39452ec9ca8255a4b0911df4cb7f969176a3606df7283",
+      "sourceId": "src_181ede40e786ee71390e00d35fce1c5b",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Pointers (implementation)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Pointers (implementation)",
+          "anchor": "added-in-candidate-runner-pointers-implementation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/session-identity/spec.md",
+      "blobSha": "4b1b531d7d1e6128e7992aab03c927032c488902",
+      "blobSize": 6880,
+      "sourceDigest": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+      "sourceId": "src_e32a08b83d659db4ff5e3c2771b9b6cf",
+      "area": "Session Identity",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/session-identity/spec.md",
+      "gap": false,
+      "firstHeading": "Session Identity Component Specification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Session Identity Component Specification",
+          "anchor": "session-identity-component-specification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "blobSha": "94a4fab6237c2e0369fd3f817cf28f2a28dae453",
+      "blobSize": 39684,
+      "sourceDigest": "988b824a980a3c2e57e348ebc3d026f21d6c71c7d83b82eabec0cbaf6f9417fe",
+      "sourceId": "src_27fd1006905eb57469f60195487adc2d",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Architecture Intent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Intent",
+          "anchor": "architecture-intent"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "blobSha": "f6a6ba9b392229a1103b2dff913f68387533562a",
+      "blobSize": 24670,
+      "sourceDigest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "sourceId": "src_0405b8fa1116031b6c8c540558c6225e",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Architect Roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect Roadmap",
+          "anchor": "architect-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "blobSha": "ca5348222462ce67cbc98c1080b818f8fb79b41c",
+      "blobSize": 6621,
+      "sourceDigest": "50099b7a34e0f160bb9d5a8bb56527531ef747a31cca021302eae981d9e05a99",
+      "sourceId": "src_3ef6f580e184b1ba694d8778cd452702",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "System Vision: Trong Mem Ngoai Cung",
+      "headings": [
+        {
+          "level": 1,
+          "text": "System Vision: Trong Mem Ngoai Cung",
+          "anchor": "system-vision-trong-mem-ngoai-cung"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "blobSha": "8cc7e8c3fb6c378c4af876ebf3b9e866ba8f6e34",
+      "blobSize": 13062,
+      "sourceDigest": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "sourceId": "src_8170ffbe8c7f803912c761d92f89f12c",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Workspace Topology Codebase Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Codebase Audit",
+          "anchor": "workspace-topology-codebase-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "blobSha": "a7538f39a974e019d920692c657be70a6f56f364",
+      "blobSize": 7063,
+      "sourceDigest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "sourceId": "src_7a74dd2fa918974eced4f09ee88536fc",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Workspace Topology Roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Roadmap",
+          "anchor": "workspace-topology-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "blobSha": "5f6c31870ae34fb3201d574a186e1b07f1270ee2",
+      "blobSize": 19352,
+      "sourceDigest": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "sourceId": "src_d04b1b4bd04d551fa9c37eed05fbfbb4",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Workspace Topology Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workspace Topology Architecture",
+          "anchor": "workspace-topology-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "blobSha": "a48c61785552e54d7276854a1bd597e9907a8d01",
+      "blobSize": 4417,
+      "sourceDigest": "c5f844433fb08effcc472c7e251e8389f6edc3022fc9e1daf4a8011be08c903b",
+      "sourceId": "src_ec43cfda3efb0c9581baa59a3096f3c3",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Architect README Source Carriage",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect README Source Carriage",
+          "anchor": "architect-readme-source-carriage"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "blobSha": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020",
+      "blobSize": 19993,
+      "sourceDigest": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "sourceId": "src_f3eb11cddb845b0e33182ed260f60dc2",
+      "area": "System overview",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: System Overview",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: System Overview",
+          "anchor": "spec-system-overview"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "blobSha": "d60fcc9d8f43cf8364718ef870e75366c96fed43",
+      "blobSize": 3354,
+      "sourceDigest": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988",
+      "sourceId": "src_457e50dd6305e470a6c06498aec3d433",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "C01 — Item card (status pill + quick actions)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "C01 — Item card (status pill + quick actions)",
+          "anchor": "c01-item-card-status-pill-quick-actions"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "blobSha": "aa8f67f522a036950a0ea63f4ee39bd7f932317a",
+      "blobSize": 4929,
+      "sourceDigest": "ebd9cab58f559b5052bfdc73328dd398d3b8940826eb1a49503bf71508a7bdbf",
+      "sourceId": "src_1e7ada80169e4809c16b4369231e6c43",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M01 — Answer a parked question",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M01 — Answer a parked question",
+          "anchor": "m01-answer-a-parked-question"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "blobSha": "10d3c5d09a5f11deafc095daf131920e361433dd",
+      "blobSize": 4764,
+      "sourceDigest": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+      "sourceId": "src_cee1089957f0cda04c2180f44c9e9338",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M02 — Approve a merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M02 — Approve a merge",
+          "anchor": "m02-approve-a-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "blobSha": "26ef37bee233c64ae293a2c706c5c9fe6c0294ba",
+      "blobSize": 4549,
+      "sourceDigest": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+      "sourceId": "src_cbbba4262851fcc2ac41993f7ede1e1a",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M03 — Add or edit a work item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M03 — Add or edit a work item",
+          "anchor": "m03-add-or-edit-a-work-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "blobSha": "2753a3323f19f41f9b75d7554356341676740c75",
+      "blobSize": 4353,
+      "sourceDigest": "5942bed6b8819ac41f02afcf5d1a7978f30078c5e602a6e1fb9307669d82968a",
+      "sourceId": "src_e25907a860526664e30cffa4d6b009a6",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S01 — Sign in",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S01 — Sign in",
+          "anchor": "s01-sign-in"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "blobSha": "616c68b8d12c0964fd8c1071b06643bdf83ce427",
+      "blobSize": 12444,
+      "sourceDigest": "66c29168cf76703b4d80e331b134233e2c6585a77a942cd0689eee6881e5deaa",
+      "sourceId": "src_8f0e197ece38a4cb2c166e2aab85a530",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S02 — Taskboard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S02 — Taskboard",
+          "anchor": "s02-taskboard"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "blobSha": "49554372d6f0aa78c4b4f11e86b65474735fbf4f",
+      "blobSize": 12388,
+      "sourceDigest": "7d6b64b8f5572c88fd034272101c35f9f4824008bacbcae94f9bd72ef2b55cf9",
+      "sourceId": "src_508ba024ad756581ec83aaea984fd368",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S03 — Task detail",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S03 — Task detail",
+          "anchor": "s03-task-detail"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "blobSha": "4fc3f77adbf9660f9315889abef1820273fa303c",
+      "blobSize": 5718,
+      "sourceDigest": "4b3ffdbdb28fba7323c9361ac0b7f61646fc2f67a3a504dce7cbdddcdc59caf1",
+      "sourceId": "src_92ae4926b8961827ddd1d462f5473c20",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S04 — Questions needing answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S04 — Questions needing answer",
+          "anchor": "s04-questions-needing-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "blobSha": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "blobSize": 509,
+      "sourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "sourceId": "src_bf4a7c601b6de03e5c32f0672ed15e3f",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+      "blobSha": "27175172851645cdc1c4c68a023118a42fd796cb",
+      "blobSize": 1328,
+      "sourceDigest": "ca2059fa23dd34e2e1f5bd373ba7aab56842bba3e4d6a7cb2cc2221e7b78d7c9",
+      "sourceId": "src_d6a65317e4418dace89a39e5e533d701",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Provenance for spec.config.yaml",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Provenance for spec.config.yaml",
+          "anchor": "added-in-candidate-provenance-for-specconfigyaml"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "blobSha": "97f11068fe3428a684e829440e87636bddbb42ed",
+      "blobSize": 3000,
+      "sourceDigest": "85044a1bcbeea7c3687205669a62bcce0aaa8550c1eabb526abb304f12904e59",
+      "sourceId": "src_f0818cd458d2affd72b08d67c7577d62",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "System events",
+      "headings": [
+        {
+          "level": 1,
+          "text": "System events",
+          "anchor": "system-events"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "blobSha": "ae7e8b32de8feef80ee04add494a05d01e11c50e",
+      "blobSize": 4189,
+      "sourceDigest": "adadb49a002cad09d4df9541f9907cab8bb0a28655ac25eea7389c76e2636e1f",
+      "sourceId": "src_5d00b0055e70eb66cdc25bc0923de32a",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Domain rules",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Domain rules",
+          "anchor": "domain-rules"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "blobSha": "b1ae9c3e3093e30d745b309edcab7156c9eeacf7",
+      "blobSize": 3263,
+      "sourceDigest": "ba00ae2b6fabb389308c763efe779c577d33532afee5bea1c693cba5517c2f04",
+      "sourceId": "src_67581a17ecf2f82fbd472a5d23960531",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "States and errors",
+      "headings": [
+        {
+          "level": 1,
+          "text": "States and errors",
+          "anchor": "states-and-errors"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "blobSha": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "blobSize": 4084,
+      "sourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "sourceId": "src_aab174cec5d324122e56dd4b57ef4378",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+      "blobSha": "90c1994ebb0c3139351f5aaea11820e6428a1571",
+      "blobSize": 1374,
+      "sourceDigest": "6425d6ca8812db6da84b9d8ed9f60f599d8dc3c091e1c3f66882dc50f1a14d6e",
+      "sourceId": "src_3eb500825e16717360fd4324245de871",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Provenance for surface-contract.schema.json",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Provenance for surface-contract.schema.json",
+          "anchor": "added-in-candidate-provenance-for-surface-contractschemajson"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "blobSha": "e160b3310fc5951544a1e03530ffba77a116f5b3",
+      "blobSize": 3632,
+      "sourceDigest": "961ac9ca0a055a4d389c1454d0b184132231222a7f72bef86ebe3da747af7b13",
+      "sourceId": "src_e7b0bc3e36a46fe4bd70bc3f71a786e6",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "F01 — Answer a parked question, end to end",
+      "headings": [
+        {
+          "level": 1,
+          "text": "F01 — Answer a parked question, end to end",
+          "anchor": "f01-answer-a-parked-question-end-to-end"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "blobSha": "0cfd07e4ae8132fe327947cd934f5e1a4efb5883",
+      "blobSize": 3260,
+      "sourceDigest": "f21c7e948d0a6223c351316c38515db1daf89f28388c1c6bb5b3d92360f9937b",
+      "sourceId": "src_87ed290cc96471537961912dd027e4a1",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "F02 — Approve a merge, end to end",
+      "headings": [
+        {
+          "level": 1,
+          "text": "F02 — Approve a merge, end to end",
+          "anchor": "f02-approve-a-merge-end-to-end"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "blobSha": "0ce5bac987edff1eb1e02a724d4edf4c74f97f3b",
+      "blobSize": 3693,
+      "sourceDigest": "c2782ee6a0952a96b18abf419fb872e35cf1cb3aab98de251c67f363885f3d34",
+      "sourceId": "src_975961f2cc021843a2c3d67b353696c4",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "ui-spec candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ui-spec candidate area",
+          "anchor": "ui-spec-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/spec.md",
+      "blobSha": "208ddd3131813b4aa04ccc57d0b39b6fa823d72f",
+      "blobSize": 4950,
+      "sourceDigest": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6",
+      "sourceId": "src_850c611e4824ae068c579be4048e7e8e",
+      "area": "UI specification",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr web dashboard — UI spec overview",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr web dashboard — UI spec overview",
+          "anchor": "herdr-web-dashboard-ui-spec-overview"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/vision.md",
+      "blobSha": "ea8f843e3997e35f1b0417c1967ec2e332a6d5ad",
+      "blobSize": 10544,
+      "sourceDigest": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+      "sourceId": "src_34bf1bebd46340c8069e82182b8a9272",
+      "area": "Platform vision and work lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/vision.md",
+      "gap": false,
+      "firstHeading": "Platform Vision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Platform Vision",
+          "anchor": "platform-vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "blobSha": "cd9d35f738673fc88a400ad72eec2906a887c6ed",
+      "blobSize": 25347,
+      "sourceDigest": "5b8b4d25f4b5526f3228d36433d426eb99f5ba5717e427207bac17b65f9bd244",
+      "sourceId": "src_fb23d9ea3e6541bf1ce22fcf76147402",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Work State Implementation Pointers",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work State Implementation Pointers",
+          "anchor": "work-state-implementation-pointers"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "blobSha": "7513d7e151c219ca353f13f868fd87ee96a2ea6e",
+      "blobSize": 31773,
+      "sourceDigest": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+      "sourceId": "src_57f6c3be5015bae0f88ed59ca80826e6",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CLI I/O Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CLI I/O Contract",
+          "anchor": "cli-io-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "blobSha": "5639613d01d978a9de2b95bf98018df5cf246f65",
+      "blobSize": 66707,
+      "sourceDigest": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "sourceId": "src_f4170f3a063d72d9fd0146cab58a22a5",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Retired Decision History: Work State",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired Decision History: Work State",
+          "anchor": "retired-decision-history-work-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "blobSha": "d8b6ec0b0664575296c2f104631c36366a7ca512",
+      "blobSize": 5375,
+      "sourceDigest": "d434c42e3baae4705783125cfb2d91f34f66cb1573e36f8da6d72fb596dee2e7",
+      "sourceId": "src_9572473e39a90e8899a55ece3e50606c",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Multi-Role Harness Distill Record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Multi-Role Harness Distill Record",
+          "anchor": "multi-role-harness-distill-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "blobSha": "4c97ed18bb2be048fb1e28e599f49a9b914b2e43",
+      "blobSize": 4445,
+      "sourceDigest": "e8a20f75d1f5b625bb78842bf80dc804af65d1458468e46d579a28c50de2afb7",
+      "sourceId": "src_f7d1178b6e3401fb3620f6484ac4b1b0",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Work State",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work State",
+          "anchor": "work-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "blobSha": "fb8b2ef044de00787c6cbaa8a050cab7e4eca089",
+      "blobSize": 217845,
+      "sourceDigest": "bb00e9d755a3f69a8c7cf411337c644bc7193a80b254481b65ab19df96ea8caf",
+      "sourceId": "src_9bc833c3e0cd6017ac56245e824dcc04",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Work State Specification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work State Specification",
+          "anchor": "work-state-specification"
+        }
+      ]
+    },
+    {
+      "path": "docs/reading-map.md",
+      "blobSha": "9a05cec51220717320d6b8fea2bd4ae33599f085",
+      "blobSize": 35359,
+      "sourceDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "sourceId": "src_3f36d3a7317153cf0d576f82c498f47b",
+      "area": "root:docs/reading-map.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Documentation Reading Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation Reading Map",
+          "anchor": "documentation-reading-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/README.md",
+      "blobSha": "8132e9724bdc44501e465cb970ffdeaaf0301ce4",
+      "blobSize": 2195,
+      "sourceDigest": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "sourceId": "src_3412bb5763cda6c9e4fbe54eb3af6a8f",
+      "area": "root:docs/README.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/README.md",
+      "gap": false,
+      "firstHeading": "fgOS Documentation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Documentation",
+          "anchor": "fgos-documentation"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/claude-named-executor.md",
+      "blobSha": "daaeef3c736a7f3c783e76a53c033e319cf5ff98",
+      "blobSize": 3076,
+      "sourceDigest": "40c17a51b0de65d1ee9867587be900ff2b082f6ebe2687e2c6736b5b8dcd042c",
+      "sourceId": "src_6c0139e0c830e74ec90f72556d2a13ba",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`runner.executors.claude` — why it's a pure naming change, not new behavior",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`runner.executors.claude` — why it's a pure naming change, not new behavior",
+          "anchor": "runnerexecutorsclaude-why-its-a-pure-naming-change-not-new-behavior"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "blobSha": "3026861bd4ca2378a3075bfc910bd200ddc78c7e",
+      "blobSize": 4982,
+      "sourceDigest": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "sourceId": "src_49c9950da34c62ea51eae1bdfbc3f7f1",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Codebase scatter consolidation roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Codebase scatter consolidation roadmap",
+          "anchor": "codebase-scatter-consolidation-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/coding-worker-contract-shape.md",
+      "blobSha": "02daede172c227e08d89c7bc80284f9fbc45cba8",
+      "blobSize": 4448,
+      "sourceDigest": "03c68ea5ffbd57348f328221b46c8ef7a31c51b47fdaaf627be95ebc5427da4f",
+      "sourceId": "src_47ef38f9df0eea223f6ca691120162b0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`coding-worker-contract.md` — shape and what proved it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`coding-worker-contract.md` — shape and what proved it",
+          "anchor": "coding-worker-contractmd-shape-and-what-proved-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/discussion-quality-rubric.md",
+      "blobSha": "20479bd08e35400e3cfe69b5ae79d94dfad99d0d",
+      "blobSize": 4039,
+      "sourceDigest": "65b2ca24c4362589f8d1f920dc674ac4625f0bd273816a264fe8b87c86e9c1fe",
+      "sourceId": "src_57b72a82c7e5e8a78385ce46cbd91890",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Discussion quality rubric",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Discussion quality rubric",
+          "anchor": "discussion-quality-rubric"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/dispatch-module-boundaries.md",
+      "blobSha": "28e356a5962b97f7d6226c6970ddadd5822471b9",
+      "blobSize": 4229,
+      "sourceDigest": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+      "sourceId": "src_f9ba6757eb829b4f801ff266ada46b15",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`src/runner/dispatch` module boundaries",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`src/runner/dispatch` module boundaries",
+          "anchor": "srcrunnerdispatch-module-boundaries"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/fgos-faults-read-surface.md",
+      "blobSha": "9943c976ab83df8e7ced9230f309d506e0392ff3",
+      "blobSize": 2640,
+      "sourceDigest": "f01faa2900f6af30470838f79a719459d7731a02f07c6797c5c1ed06200c5590",
+      "sourceId": "src_e6688b4e225c3ee0d550ead9b4638da0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos faults` — reading the invocation-fault side log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos faults` — reading the invocation-fault side log",
+          "anchor": "fgos-faults-reading-the-invocation-fault-side-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/reference/runner-capabilities-advise-execute-slots.md",
+      "blobSha": "cf8a3b4e3798e1dd420deaec102ff83f17c0841c",
+      "blobSize": 3507,
+      "sourceDigest": "12bacdc1b6771d8ba7d5df22cb357900eb8572144fe9bfc27af34511cf9738ad",
+      "sourceId": "src_00359b2460ae4e2d5d2e35c4322de6cf",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`runner.capabilities`'s `advise`/`execute` slots",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`runner.capabilities`'s `advise`/`execute` slots",
+          "anchor": "runnercapabilitiess-adviseexecute-slots"
+        }
+      ]
+    },
+    {
+      "path": "docs/routing-handoff-contract.md",
+      "blobSha": "81d1636affe063073efbe17d2ceec39f6db6e9f0",
+      "blobSize": 7045,
+      "sourceDigest": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "sourceId": "src_f33d20ad5a04b7c4905d10a4b6ddcbda",
+      "area": "root:docs/routing-handoff-contract.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Routing Handoff Contract — fgos-runner",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Routing Handoff Contract — fgos-runner",
+          "anchor": "routing-handoff-contract-fgos-runner"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "blobSha": "a7446e2f0afe5ba08fd216c4d6f938163f9beada",
+      "blobSize": 95378,
+      "sourceDigest": "98f10ba191b729edbe2bfbec7a6ade8047466146ef470345688e6f9f6b9456d6",
+      "sourceId": "src_cd36c432480163866f615da0aad279bd",
+      "area": "Agent confinement",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Agent Confinement Authority",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Agent Confinement Authority",
+          "anchor": "spec-agent-confinement-authority"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/decision-citation-drift.md",
+      "blobSha": "ee00ac178d1aa7aea151c08877222ee228923853",
+      "blobSize": 6045,
+      "sourceDigest": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "sourceId": "src_0645f64d72ac11913ffc04bba805925e",
+      "area": "Decision citation drift",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Decision Citation Drift Check",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Decision Citation Drift Check",
+          "anchor": "spec-decision-citation-drift-check"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/distillery.md",
+      "blobSha": "358eff4235102db17f166551dc1d51199f3c4abc",
+      "blobSize": 7355,
+      "sourceDigest": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "sourceId": "src_21d35d65de8753f66f696890cd2ba33f",
+      "area": "Distillery / reference learning",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Distillery — Porting Lifecycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Distillery — Porting Lifecycle",
+          "anchor": "distillery-porting-lifecycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "blobSha": "f8b24c64b1a5899b2e62c0a81d0db23de09ab469",
+      "blobSize": 62475,
+      "sourceDigest": "2edf4befb296c5ca466f7905bc18da5bbc7ed047f86b25b0682cc6fa833e617a",
+      "sourceId": "src_a0f7c4e71962f48f785ddae8f1176b49",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Spec: Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Distribution",
+          "anchor": "spec-distribution"
+        }
+      ]
+    }
+  ]
+}

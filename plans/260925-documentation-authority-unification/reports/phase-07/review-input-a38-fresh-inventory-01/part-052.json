@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 52,
+  "entries": [
+    {
+      "path": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "blobSha": "4609c5efd1490987c7c9831c1ee908fcfad6b772",
+      "blobSize": 5393,
+      "sourceDigest": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "sourceId": "src_6d3b6ae43cfac7c07c29297212dd766e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why plugin-only installs could not reach fgOS's coding-domain dev-skills",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why plugin-only installs could not reach fgOS's coding-domain dev-skills",
+          "anchor": "why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+      "blobSha": "2a4789bac2f804675b55c2f509225df268d2f895",
+      "blobSize": 8456,
+      "sourceDigest": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+      "sourceId": "src_ca56612ed1217f8ac84f82e385600b0c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a retired stage name sometimes keeps a drain-only alias",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a retired stage name sometimes keeps a drain-only alias",
+          "anchor": "why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+      "blobSha": "64f53ec6f7a7666f6eb021e0978f55764b881fe7",
+      "blobSize": 5788,
+      "sourceDigest": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+      "sourceId": "src_b6514674e39582c3a323a8f5dc8cfde6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `createDetachedMergeWorktree` crashed for roots a live session dispatched",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `createDetachedMergeWorktree` crashed for roots a live session dispatched",
+          "anchor": "why-createdetachedmergeworktree-crashed-for-roots-a-live-session-dispatched"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+      "blobSha": "399e09bdc24163593b811109f7f503ee09086f91",
+      "blobSize": 21804,
+      "sourceDigest": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+      "sourceId": "src_e340fb6137ef157d7cb140138d2873c2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a single `done` status split into delivered → retrospective → cleanup → done",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a single `done` status split into delivered → retrospective → cleanup → done",
+          "anchor": "why-a-single-done-status-split-into-delivered-retrospective-cleanup-done"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+      "blobSha": "e17a84ee0aba7963b2a5112a24238c7b1b567c90",
+      "blobSize": 3467,
+      "sourceDigest": "ef29ee5e6427f7d3107e7f490c5ac9bed704362316c1fd8bd1d38d8db607fc9b",
+      "sourceId": "src_6050117127371f272d6a165909fa5d55",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a `verify` command cannot itself mutate live work state",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a `verify` command cannot itself mutate live work state",
+          "anchor": "why-a-verify-command-cannot-itself-mutate-live-work-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+      "blobSha": "2732be3235dd9bc99909b07bab206e4619b31ccd",
+      "blobSize": 6162,
+      "sourceDigest": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+      "sourceId": "src_f72f6b4a394b21f2aa57b6fca7998e97",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a work branch must never be `git checkout`'d directly on the main checkout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a work branch must never be `git checkout`'d directly on the main checkout",
+          "anchor": "why-a-work-branch-must-never-be-git-checkoutd-directly-on-the-main-checkout"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md",
+      "blobSha": "2cc4b7b76e0f9ab7884860b9f1c906f4d4b191f5",
+      "blobSize": 2357,
+      "sourceDigest": "5d54f8d39e320a3780bba4f57234812c47216aca8e3af3f5fa0fecce5f1d6009",
+      "sourceId": "src_ed939b1c5913e8d07bfbd88d526d8dff",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a work item's id is TSK<hash>, not a bare hash",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a work item's id is TSK<hash>, not a bare hash",
+          "anchor": "why-a-work-items-id-is-tsk-not-a-bare-hash"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "blobSha": "28dda9a486d70bb801c80383542c3eee3f28f27f",
+      "blobSize": 6262,
+      "sourceDigest": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "sourceId": "src_23ae34b53c7baefe46a2b74cfb4cc471",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
+          "anchor": "why-a-work-item-titles-object-action-scope-rule-lives-in-the-submitting-skills-not-just-the-decompose-prompt"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation/pure-fgos-state-items-cannot-close-through-return.md",
+      "blobSha": "ff5725bbda358f7691649e54e8d736bc488a9b6f",
+      "blobSize": 5174,
+      "sourceDigest": "724412d7392c1d52d2f9d128a834c9d070d0766350261d1bc5f6507fc64cb6c9",
+      "sourceId": "src_326b0abc8a771dfbf0d6893d5e0627c3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a work item whose whole content is a `.fgos/` state mutation can't close through `fgos return`/`approve`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a work item whose whole content is a `.fgos/` state mutation can't close through `fgos return`/`approve`",
+          "anchor": "why-a-work-item-whose-whole-content-is-a-fgos-state-mutation-cant-close-through-fgos-returnapprove"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
+      "blobSha": "6ff4688a5b33eb904c4c2fa299a872ce80ed3cf8",
+      "blobSize": 3667,
+      "sourceDigest": "212fcce91bd528a59f4c6bfb36ada8c0a3cb3f613c0746e281ddb7f0fa0083ef",
+      "sourceId": "src_f93e9d5dc2514627ff37602691c7bbea",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting",
+          "anchor": "why-abortmergeifpossible-checks-merge_head-before-aborting"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md",
+      "blobSha": "0c4e634fa4403f2265ea3d0cef297f6e777ffca6",
+      "blobSize": 4466,
+      "sourceDigest": "b49242c1729bb54bae6575bd84808d4115142ead671f8bde31818884f21822b1",
+      "sourceId": "src_e46aa27c1933a18db38f4c15c3c695f4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default",
+          "anchor": "why-acquiremaincheckoutlocks-release-on-exit-is-opt-in-never-the-default"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+      "blobSha": "fb9bffd8142c93a7be2e59d3f4e50f9bd822f16f",
+      "blobSize": 3053,
+      "sourceDigest": "25c9c71ad8e08fb4802dd4d08695cfcb5c6035f577a6aac89bbd6eb3a8baea98",
+      "sourceId": "src_719977b59336b1419245141843764013",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why an `is-ancestor-of-main` verify check can never pass through `fgos approve`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why an `is-ancestor-of-main` verify check can never pass through `fgos approve`",
+          "anchor": "why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+      "blobSha": "4f386a161004e0a6843809d37c98abb8b21b4002",
+      "blobSize": 3992,
+      "sourceDigest": "929e1506c0ce1d718a7861a33c1898534f5873e0429bd3ee90df074ed5703b78",
+      "sourceId": "src_4af962a9efaae6eee5e3a28df75a5cea",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `approve` blocks closing a milestone with drifted targets",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `approve` blocks closing a milestone with drifted targets",
+          "anchor": "why-approve-blocks-closing-a-milestone-with-drifted-targets"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+      "blobSha": "0ac388bf78b0dd98da5e55e7395b0cda78df2ba5",
+      "blobSize": 5664,
+      "sourceDigest": "4d103acc94e31bfe9e86025d7ff94669782986340388a8ab35c08b06715fab33",
+      "sourceId": "src_08724a51d65bb5ef1712647de06098b9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `approve` checks acceptance evidence before merging, not after",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `approve` checks acceptance evidence before merging, not after",
+          "anchor": "why-approve-checks-acceptance-evidence-before-merging-not-after"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-approve-logs-post-success-movework-faults-outside-events/why-approve-logs-post-success-movework-faults-outside-events-lock.md",
+      "blobSha": "1c5bb610a13948556ba67591eb3c29e6067d1c79",
+      "blobSize": 5261,
+      "sourceDigest": "e2e74587011c2a1e2d9555705c00913a1932d873facde78a10fce2a0486be517",
+      "sourceId": "src_b69e43786a9586925e65ad0ea9bde7fa",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `approve` logs post-success `moveWork` faults outside `events.lock`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `approve` logs post-success `moveWork` faults outside `events.lock`",
+          "anchor": "why-approve-logs-post-success-movework-faults-outside-eventslock"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+      "blobSha": "fe3def75b61e1f62c94743c70451c128dd818eda",
+      "blobSize": 4672,
+      "sourceDigest": "195ebb770516a102d0051ebde7e2072fc37bc2aff5325d0fc344e73562f86268",
+      "sourceId": "src_9754e5ca8ac3b4b453be5c989bb1699a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `approve`'s Iron Law gate scopes `changedFiles` to the leaf's own root",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `approve`'s Iron Law gate scopes `changedFiles` to the leaf's own root",
+          "anchor": "why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+      "blobSha": "9c48921e5aa33f4dcd245e83373a8a7f8dc8f83e",
+      "blobSize": 6966,
+      "sourceDigest": "f83d8b7bc19780105fbee3d13c87115b7baf96d9b44fe5ef0f4cadd48adf0787",
+      "sourceId": "src_bf1f16441631999fb3d9da2d6fc39462",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why auto-decompose children now carry `action` + `read_first` directive prose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why auto-decompose children now carry `action` + `read_first` directive prose",
+          "anchor": "why-auto-decompose-children-now-carry-action-read_first-directive-prose"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+      "blobSha": "700c21a3c85810cad9a4ec19dae49546af588b80",
+      "blobSize": 9132,
+      "sourceDigest": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+      "sourceId": "src_f98327aa5ad441a55c843f1dee39db61",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones",
+          "anchor": "why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude-unlike-person-triggered-ones"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-awaiting-approval-became-an-overridable-ceiling-not-a-ha/why-awaiting-approval-became-an-overridable-ceiling.md",
+      "blobSha": "b8a9882137de5a85a9206bab2d8bc101c334cb78",
+      "blobSize": 4028,
+      "sourceDigest": "7ea5d48e028cdbe58f7d829d81cfe2eaf598af2e4f5aac4a7b11ad643e7ea318",
+      "sourceId": "src_a0b570da1577c63f8aa883a572b9b420",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `awaiting-approval` became an overridable ceiling, not a hard stop",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `awaiting-approval` became an overridable ceiling, not a hard stop",
+          "anchor": "why-awaiting-approval-became-an-overridable-ceiling-not-a-hard-stop"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-backlog-is-a-new-global-status-before-todo-not-a-domain/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md",
+      "blobSha": "e3955741e1d9ff65c7f108a06ddc996ec362b4c8",
+      "blobSize": 6208,
+      "sourceDigest": "d419ae152cb37d678e78d59a1606757ccb0f6a71e6260d40ced07c51623fc2fb",
+      "sourceId": "src_2346ca161cbd4966c5a5cdf6cc15aca5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `backlog` is a new global status before `todo`, not a domain relabel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `backlog` is a new global status before `todo`, not a domain relabel",
+          "anchor": "why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+      "blobSha": "15a9c45b1c9cda3545e415352af93b2cd5b4a2f6",
+      "blobSize": 5027,
+      "sourceDigest": "c2992e44ed10dfe403beedcb77001594c6863b82c8e841e6a58ae47d448ce0cb",
+      "sourceId": "src_8fa232507c6e2e84ecadd17e68cc110b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)",
+          "anchor": "why-bee_-prefixed-identifiers-became-fgos_-prefixed-and-some-didnt"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+      "blobSha": "4d48df23c0e0a2ac615115501fe4a203ebf9511d",
+      "blobSize": 18137,
+      "sourceDigest": "1125cb274a451615e583b9607186cf6345e9297553907ea863eaa4b26a06772c",
+      "sourceId": "src_2958f3c675630b2c2532f8cef4ebbf8e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `checkMergeStillResolves` can false-positive after a root branch prune",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `checkMergeStillResolves` can false-positive after a root branch prune",
+          "anchor": "why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+      "blobSha": "c0daf1f3b9ef1c6ba2b82da45c8c13188bf9b90a",
+      "blobSize": 7886,
+      "sourceDigest": "addb9073214616efb359f7f9d7a77c789dc3b71cb21c2a2fd7691fff2302a02c",
+      "sourceId": "src_24ef6be753ea43238c3304f1bbc0c0f0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the retrospective content gate checked the wrong fields",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the retrospective content gate checked the wrong fields",
+          "anchor": "why-the-retrospective-content-gate-checked-the-wrong-fields"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "blobSha": "d546f04689a55d016698d3a5e59fc85e631a742a",
+      "blobSize": 4562,
+      "sourceDigest": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+      "sourceId": "src_b6c3dae63d0b13b9477d6b6a674369d2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `claimWork`'s CAS reread stays while its one redundant full-log read was deduped",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `claimWork`'s CAS reread stays while its one redundant full-log read was deduped",
+          "anchor": "why-claimworks-cas-reread-stays-while-its-one-redundant-full-log-read-was-deduped"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+      "blobSha": "71c00b05266fe39f417407457031a60ca58004f7",
+      "blobSize": 26122,
+      "sourceDigest": "b06349f25aa7eaf60e75331ba1d9f67eebc85e438f41f467e7b5dab15834363b",
+      "sourceId": "src_a8c0a5b0efee63da485942dabc98eec4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+          "anchor": "why-clarify-split-into-clarify-discovery-and-exploring"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+      "blobSha": "d19f7231a3179807f0b209b22b0fa26a53b6d1b3",
+      "blobSize": 4880,
+      "sourceDigest": "d0d0e9abb38e307f9aca90f86488e37b6f9e4a691a558a17ba732a9f17922f73",
+      "sourceId": "src_61163ba8c0dbd399ade15ec3db85bd38",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `cleanup-loop` has no iteration cap, unlike `discover-loop`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `cleanup-loop` has no iteration cap, unlike `discover-loop`",
+          "anchor": "why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+      "blobSha": "7215154ac3ba76924b2f7c36d1eb6c84ce2fe07b",
+      "blobSize": 4900,
+      "sourceDigest": "15b709ea8f430507be6c62d3893548694ceb94621c6740f5997d1384ba8200b4",
+      "sourceId": "src_3b0357a2d373a0af3531915e0b989f7d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why CONTEXT.md enforcement is scoped to (b) OR (c), and why it's hard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why CONTEXT.md enforcement is scoped to (b) OR (c), and why it's hard",
+          "anchor": "why-contextmd-enforcement-is-scoped-to-b-or-c-and-why-its-hard"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-drivi/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md",
+      "blobSha": "84c68faa4aa9623eca635795f2de1d07e317c7b2",
+      "blobSize": 3620,
+      "sourceDigest": "ad8e7272357724becb45fc3cdd9351557d1cfec0cef8d685660a1477eb7ccdab",
+      "sourceId": "src_7e4e68b4fd4ca1d4ca7ba6c1cbc15f2f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `cook` and `pick` were retrofitted to call `fgos-coding-driving`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `cook` and `pick` were retrofitted to call `fgos-coding-driving`",
+          "anchor": "why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md",
+      "blobSha": "ce97a20d22421fb973cdec22df5249a53b3af8eb",
+      "blobSize": 4478,
+      "sourceDigest": "e50bec7d471413db4661758e61078ba444108d1f81923b69b72ab3fe1e4b0916",
+      "sourceId": "src_29f46b34eae181218fb228d748bf5f8a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why cook's \"never auto-approve\" prose lost to gate-bypass",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why cook's \"never auto-approve\" prose lost to gate-bypass",
+          "anchor": "why-cooks-never-auto-approve-prose-lost-to-gate-bypass"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+      "blobSha": "64b626d3b93332c9739114f3ffd3c3fbfb2c6835",
+      "blobSize": 2948,
+      "sourceDigest": "03fc5d0b05633d7d730ddbcc730c209bacd17a23d46c592f7bc15166fbe40a60",
+      "sourceId": "src_602a1268d2cc998ab4a6eb6d0ceb8e74",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why capacity `for`/`capability` fields were unified, and MCP tools get a hand-back",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why capacity `for`/`capability` fields were unified, and MCP tools get a hand-back",
+          "anchor": "why-capacity-forcapability-fields-were-unified-and-mcp-tools-get-a-hand-back"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+      "blobSha": "2b9263130635888450a033165faa7baa3be23242",
+      "blobSize": 2933,
+      "sourceDigest": "51855521f9c2d11a4f50d8dd9ac9bc3a9cf00bd17ab1f11d6b10c32ced9becd9",
+      "sourceId": "src_375ed8d8153c9ed8673eca021c5cd847",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge",
+          "anchor": "why-decisions-already-locked-and-approved-by-a-person-still-had-to-be-restated-to-the-engines-own-clarify-judge"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+      "blobSha": "9b9e3788309dbd73ac86b416ffec0f231a576b72",
+      "blobSize": 7375,
+      "sourceDigest": "c9a802661b09e00aa8b6eabdec333866f3f8c57c251c0677798394e674cc966c",
+      "sourceId": "src_3986b1938fe94ddefb154d5a67f36b70",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `decompose` checks footprint overlap before creating children",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `decompose` checks footprint overlap before creating children",
+          "anchor": "why-decompose-checks-footprint-overlap-before-creating-children"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-decompose-s-skip-and-advance-is-narrower-than-discovery/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md",
+      "blobSha": "ad8500a94f070d91dfb3106176647a6398b0d932",
+      "blobSize": 7769,
+      "sourceDigest": "87d7c0bf65e09c2b90ee706a149093b7ac6122da797d9486cab8f1e31df7d132",
+      "sourceId": "src_86d9bf99e2fbbffd37e4952c1e0e663e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `decompose`'s skip-and-advance is narrower than `discovery`'s",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `decompose`'s skip-and-advance is narrower than `discovery`'s",
+          "anchor": "why-decomposes-skip-and-advance-is-narrower-than-discoverys"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+      "blobSha": "d2cd78b1cee999d56196f68f2d7c6963926c76d8",
+      "blobSize": 13377,
+      "sourceDigest": "e9df4a30d1c6072041c8c7d8598380e5ab19e3e7cc5f943a31b02092c8037d23",
+      "sourceId": "src_f6a7408ca18c599a82f78d07102ebd59",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why discover-loop's pool ordering and stop rules diverge from merge-loop's",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why discover-loop's pool ordering and stop rules diverge from merge-loop's",
+          "anchor": "why-discover-loops-pool-ordering-and-stop-rules-diverge-from-merge-loops"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-discover-was-rewritten-as-a-clean-enrich-self-research-r/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md",
+      "blobSha": "3d725b51bde1b18284e080139d1c8e8cdacc0603",
+      "blobSize": 6559,
+      "sourceDigest": "87de7f83cbd024480eddda66c426a831b7f24ef92a168cce01ce335bb2dd3f82",
+      "sourceId": "src_2a46d58db324413603d2e70ba209eaeb",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `discover` was rewritten as a clean/enrich/self-research recipe",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `discover` was rewritten as a clean/enrich/self-research recipe",
+          "anchor": "why-discover-was-rewritten-as-a-cleanenrichself-research-recipe"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+      "blobSha": "30a06131bcd8eaad1939b80d7fb250e3de0885e3",
+      "blobSize": 9020,
+      "sourceDigest": "e56c40506ac92875f41cd7363169d4ca3bdb83545969641eac23be3a9db508b0",
+      "sourceId": "src_5c84282f97dbc24d64def226c5de9687",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why dispatch binding moved from name-keying to needs/for capability declaration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why dispatch binding moved from name-keying to needs/for capability declaration",
+          "anchor": "why-dispatch-binding-moved-from-name-keying-to-needsfor-capability-declaration"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md",
+      "blobSha": "0d981d7510194158bbd5502314af5354da8c757b",
+      "blobSize": 3611,
+      "sourceDigest": "836f2dfbe6c2587b3fb90e189501799be5ed213cf9627a91678c280e6e7178d0",
+      "sourceId": "src_44f8c135eff69c6a116151c3c9a3b8c4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why disposable worktrees need their own dependency install",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why disposable worktrees need their own dependency install",
+          "anchor": "why-disposable-worktrees-need-their-own-dependency-install"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "blobSha": "5376848c85c8e6753826ee3b124c2c85d1d82d73",
+      "blobSize": 4854,
+      "sourceDigest": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "sourceId": "src_93ef8ed80f80b1c1300130e326530a22",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill",
+          "anchor": "why-docsenduser-docs-indexjson-needed-a-doctor-check-not-just-a-regenerate-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+      "blobSha": "27774cd177ca56da7960fb515a60747e6ac7ef11",
+      "blobSize": 5350,
+      "sourceDigest": "1398a9ed7ab46acc59df087c4a2f812f7f14a7c989463c2941f479a424b63118",
+      "sourceId": "src_b872123640f396b57eca0f3ed6df526d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `docs-index` preserves a doc's prior id when the store is unreachable",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `docs-index` preserves a doc's prior id when the store is unreachable",
+          "anchor": "why-docs-index-preserves-a-docs-prior-id-when-the-store-is-unreachable"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+      "blobSha": "689bd2e158d2a67e9de0b32682b574b951f4d034",
+      "blobSize": 3461,
+      "sourceDigest": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+      "sourceId": "src_476cdeac7291e0edcdda155d2b7a077b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why doctor checks are documented as an open registry, not a fixed list",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why doctor checks are documented as an open registry, not a fixed list",
+          "anchor": "why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "blobSha": "9309a82980138df36e5dd0771b85b15b3d13714e",
+      "blobSize": 27023,
+      "sourceDigest": "56135aa57f25197aaad2b7ed475d9dce4133398b638c57967c95e0fade029974",
+      "sourceId": "src_5d058afadbe7a7b6c7942c42057be097",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `dispatch decide` is a hard, hook-enforced gate, not a convention",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `dispatch decide` is a hard, hook-enforced gate, not a convention",
+          "anchor": "why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+      "blobSha": "1f0664fb1ce60291d482326b94f7ad6190388b0c",
+      "blobSize": 20444,
+      "sourceDigest": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+      "sourceId": "src_82de630c0a3daa4b269156d1bdc7a27f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point",
+          "anchor": "why-execution-fan-out-reuses-computeschedule-not-selectwave-and-stays-a-capability-not-an-entry-point"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+      "blobSha": "b90e2bc8cfaccf13ae11a128bf56ba88f84adc22",
+      "blobSize": 5832,
+      "sourceDigest": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+      "sourceId": "src_8d1568aa6daf649512776ea99706b2a7",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why executor-aware backend dispatch exists",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why executor-aware backend dispatch exists",
+          "anchor": "why-executor-aware-backend-dispatch-exists"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-executor-dispatch-audits-record-command-alongside-provid/executor-dispatch-audit-records-command-not-just-provider-label.md",
+      "blobSha": "34db3a93ab6750cf21bd7868a87c17e61ba190db",
+      "blobSize": 3237,
+      "sourceDigest": "120bb9acae663329948e27ede2a3a31dbb9c2a4df3f4db0e0f0b71d4e4f16065",
+      "sourceId": "src_2d771324567b3c5441fdf5caea1fe82b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why executor.dispatch audits record command alongside provider",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why executor.dispatch audits record command alongside provider",
+          "anchor": "why-executordispatch-audits-record-command-alongside-provider"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+      "blobSha": "5759f821854c313a59abcffad50299a340067481",
+      "blobSize": 8150,
+      "sourceDigest": "1e88735e9f48698b791c52b92782efa8d822fa87658a4ec90b7d719b0216919d",
+      "sourceId": "src_d43921ca4f1353878ab3114d4a3f85fb",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos add` items landed permanently at stage `executing`, with no path back",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos add` items landed permanently at stage `executing`, with no path back",
+          "anchor": "why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+      "blobSha": "a7f0637b23ed1ae1b046c179c33154c75b97aee6",
+      "blobSize": 7218,
+      "sourceDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+      "sourceId": "src_a73670ca6aa05f80148801d3c264113f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos add` now caps a work item's id at 30 characters",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos add` now caps a work item's id at 30 characters",
+          "anchor": "why-fgos-add-now-caps-a-work-items-id-at-30-characters"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+      "blobSha": "8e23183f854b14a98c5d9ef087e8fa347424a176",
+      "blobSize": 4492,
+      "sourceDigest": "55298648a721aaf29424c1ed37243455fd1a2714d4831aae14bbd8b1f0e2dcb1",
+      "sourceId": "src_a86bbad5634dedf730b25dbea4f5bc6d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why fgOS refuses a staged `.fgos` deletion at commit time",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why fgOS refuses a staged `.fgos` deletion at commit time",
+          "anchor": "why-fgos-refuses-a-staged-fgos-deletion-at-commit-time"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+      "blobSha": "5db4d8d0ece1e0665ef7369978fe9830c308a040",
+      "blobSize": 13596,
+      "sourceDigest": "9810993cbb98167500aaa7dd870d934cfb1bf56f6e520d42a007b2261907942f",
+      "sourceId": "src_3cd1e457f4f12fe700ccd969cbed5dd6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why fgOS added `sync-root` and drift detection",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why fgOS added `sync-root` and drift detection",
+          "anchor": "why-fgos-added-sync-root-and-drift-detection"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+      "blobSha": "a93aff24c21acf8f0e9e7914c677c56c418266de",
+      "blobSize": 2443,
+      "sourceDigest": "2a1f3f7f0f747bb16f545835568f913e3941e2cb27c93cc658519a3123645a27",
+      "sourceId": "src_76bf5c0538d259fa6175dd36cb9ddac2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos answer` resumes to `statusAtAsk`, not always `todo`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos answer` resumes to `statusAtAsk`, not always `todo`",
+          "anchor": "why-fgos-answer-resumes-to-statusatask-not-always-todo"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+      "blobSha": "b1ba7c9aaad8f62e754bf53007d8394da9994b43",
+      "blobSize": 6810,
+      "sourceDigest": "315fbbff1e4ed3cbf6fbc28f6054434d696afcfb26e7620ceb468b84820be86c",
+      "sourceId": "src_272edc612f84141f600565335497c00e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos approve` distinguishes a pre-existing `MERGE_HEAD` from its own conflict",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos approve` distinguishes a pre-existing `MERGE_HEAD` from its own conflict",
+          "anchor": "why-fgos-approve-distinguishes-a-pre-existing-merge_head-from-its-own-conflict"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md",
+      "blobSha": "4ef33227ce83b58bb182eb411232fa6e84e710ab",
+      "blobSize": 5464,
+      "sourceDigest": "feb3435857be9af0e12347bc582ce936ef81480d6bdc907d85a5c49c248a7e41",
+      "sourceId": "src_d2ea71f34c02fde7f5879821895e46b0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos approve` refuses a leaf merging into an already-resolved root",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos approve` refuses a leaf merging into an already-resolved root",
+          "anchor": "why-fgos-approve-refuses-a-leaf-merging-into-an-already-resolved-root"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+      "blobSha": "32d029e15c1c03d28683a15145960fb2f634ba38",
+      "blobSize": 4345,
+      "sourceDigest": "60d866c141b7646df6aa9694e9d6e3e091f9c5b42bd264150c12fd2b4a97d55c",
+      "sourceId": "src_be62575e916bece44c1b684ff64e87f2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos catchup` needed its own already-caught-up guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos catchup` needed its own already-caught-up guard",
+          "anchor": "why-fgos-catchup-needed-its-own-already-caught-up-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+      "blobSha": "885d70e2e6d740a4792aff911c610c8840ed5ca7",
+      "blobSize": 5237,
+      "sourceDigest": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+      "sourceId": "src_77a62b27929bb65c6fb0ec6671f797ab",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite",
+          "anchor": "why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-running-the-full-test-suite"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+      "blobSha": "2a1d6c619f1e6e19d66a8c15ae71fb5bbac11a37",
+      "blobSize": 3411,
+      "sourceDigest": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+      "sourceId": "src_b8b359c9f4a7c16f97ad9bd7fd48cb16",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `/fgOS:cleanup-next` keeps exit-code classification instead of a driver call",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `/fgOS:cleanup-next` keeps exit-code classification instead of a driver call",
+          "anchor": "why-fgoscleanup-next-keeps-exit-code-classification-instead-of-a-driver-call"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+      "blobSha": "a22e50046bd9336f784301ee1a06034cc86082f7",
+      "blobSize": 8466,
+      "sourceDigest": "7c9080a62f324c2aec08d513edd55eafb2535d5877dd5cedc98f9251425ef48f",
+      "sourceId": "src_c5acad834d7ad3e3216143bcb3c3908e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set",
+          "anchor": "why-fgos-coding-compounding-refuses-to-commit-when-merge_head-is-set"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "blobSha": "3f78638b02fd8e5a5ddb4044299aead5b57c9141",
+      "blobSize": 4062,
+      "sourceDigest": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "sourceId": "src_dc418d7aa06c49cb770c4b77e28cf770",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why skill prose had to match the worktree-isolated environment it runs in",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why skill prose had to match the worktree-isolated environment it runs in",
+          "anchor": "why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+      "blobSha": "69a027542b6a418f2ad6764b0f9e7d4a3d90dfc8",
+      "blobSize": 4055,
+      "sourceDigest": "8d326be618ca82e9b096c102df4317a148f7ea34458c4a744983fd3552d124f0",
+      "sourceId": "src_887b611082e4da53e0393e0dea3ca358",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos-coding-driving`'s title/description print lives in one shared place",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos-coding-driving`'s title/description print lives in one shared place",
+          "anchor": "why-fgos-coding-drivings-titledescription-print-lives-in-one-shared-place"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+      "blobSha": "84180234c32b50dfd920885e852c16402d8ddade",
+      "blobSize": 17206,
+      "sourceDigest": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+      "sourceId": "src_c06d8e123457165b3a765602fa313b71",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why planning and validating collapsed into one co-adjustment gate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why planning and validating collapsed into one co-adjustment gate",
+          "anchor": "why-planning-and-validating-collapsed-into-one-co-adjustment-gate"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+      "blobSha": "766d7c172946b0213c379bda3b163d283448d71c",
+      "blobSize": 12532,
+      "sourceDigest": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+      "sourceId": "src_fbe35b54b8452304aca1865a34764c72",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why fgos-coding-planning's mode gate moved to fgos-routing, and gate traceability stayed inline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why fgos-coding-planning's mode gate moved to fgos-routing, and gate traceability stayed inline",
+          "anchor": "why-fgos-coding-plannings-mode-gate-moved-to-fgos-routing-and-gate-traceability-stayed-inline"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "blobSha": "6da122309fac46d914271c88d9a896318ae08b26",
+      "blobSize": 3535,
+      "sourceDigest": "5cdead6fdbfdda5df9d5f2e0c86236dec2cb78ce8d0d267ad420e8ae57e5f49c",
+      "sourceId": "src_259e736a75614047a4bd012d96d521dd",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why fgos-coding-planning writes `docsRef` when it self-creates a feature dir",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why fgos-coding-planning writes `docsRef` when it self-creates a feature dir",
+          "anchor": "why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir"
+        }
+      ]
+    }
+  ]
+}

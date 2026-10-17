@@ -405,6 +405,18 @@ Phase 7 unit to Phase 9 for later accounting.
    reaches awaiting-owner-review only with zero open Critical/High findings, zero
    unresolved authority conflict and all mechanical boundaries proven.
 
+**Closing re-entry rule (N1):** if the closing red-team, truth sample or changed-row
+review finds a candidate-content defect after the native carry, return to item 1, fix
+the defect, re-carry only the changed units, obtain a bounded independent re-review of
+those units, then rerun D/E and the unchanged comparator. Ledger/report-only review
+rework does not change identity-scope bytes and needs no re-carry. If the repaired bytes
+affect a reader answer or route, invalidate the sealed key and repeat the reader gate.
+
+**Deferred-main reader staleness (N2):** when item 1 merges deferred main after the
+reader gate, compare the merge's main parent for `docs/platform/**` changes. Any such
+change triggers a reader-evidence staleness check; if it changes a reader route, cited
+anchor or answer, invalidate the key and repeat Steps 7-8 before close.
+
 Final proof commands use explicit HEAD inputs and decision scopes:
 
 ```bash
@@ -438,6 +450,10 @@ env -u CLAUDE_CODE_SESSION_ID npm test
 git diff --check
 ```
 
+The retirement command intentionally has no `--decisions` flag. Its result is a
+recorded dry-run delta only; the absent flag is not a stop and does not weaken D/E,
+which receive both decision directories explicitly.
+
 | Proof | Expected result |
 |---|---|
 | A/B/C/G/H/I and protected-boundary proof | green; only an authenticated closing-main import may appear in the final protected diff |
@@ -453,8 +469,10 @@ git diff --check
   unexplained D/E/comparator difference; CTR010 unresolved; strict reader failure;
   sensitivity miss; failed real test; Phase 8/9 action performed early; or a protected
   Phase 7-authored change.
-- **Effort:** 1-2 Doer sessions plus changed-row review, one red-team/checkpoint and one
-  truth-sample review; high resource and false-closure risk.
+- **Effort (N3 re-estimate):** 2-4 Doer sessions plus changed-row review, one
+  red-team/checkpoint and one truth-sample review; add one bounded re-entry session if
+  N1 fires. The native carry, D/E/comparator and full test are serial on this host;
+  high resource and false-closure risk.
 
 ## Success Criteria
 

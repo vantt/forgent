@@ -1,0 +1,1118 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 18,
+  "entries": [
+    {
+      "path": "docs/distillery/sources/marketing-cockpit.md",
+      "blobSha": "7b6df75a02f38001702cf7ad82e1093b0c83948e",
+      "blobSize": 21897,
+      "sourceDigest": "2c6979a47d518a71c427f76ac322e825fccb17e8c1d231e669c3c994ef8aa421",
+      "sourceId": "src_7a889ce20cefea6799de63d5f85fbb33",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Marketing Cockpit (fgOS) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Marketing Cockpit (fgOS) — Feature Index",
+          "anchor": "marketing-cockpit-fgos-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/okf.md",
+      "blobSha": "8fe927dcc08ed7899ac73c9732429e652893d0a7",
+      "blobSize": 10994,
+      "sourceDigest": "c4e6d0f82cfc3c9535e18527366c560f97c6a5798745b9717d5a609af116fa3e",
+      "sourceId": "src_d0a345bbc95f16192ab2cfa5372ed84d",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Open Knowledge Format (OKF) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Open Knowledge Format (OKF) — Feature Index",
+          "anchor": "open-knowledge-format-okf-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/pi.md",
+      "blobSha": "96581a104f3f5007b3c1c0983360217e5340072b",
+      "blobSize": 52999,
+      "sourceDigest": "a02e65a539a7809b64c6577c748b76f4fe5ec8df19016a531d978a43a50c4ea7",
+      "sourceId": "src_90ba9500f952a83a58e4d2098207053a",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "pi — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "pi — Feature Index",
+          "anchor": "pi-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/repository-harness.md",
+      "blobSha": "74708cc40aa78334dc18443a215946b9dd0ec609",
+      "blobSize": 45085,
+      "sourceDigest": "66de008f2a3f01731312a944e9decff2a64d84d6487f1e1883a81cf3deadf87f",
+      "sourceId": "src_219e6767ce3897f9f34218aa954bb0c8",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Repository Harness — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Repository Harness — Feature Index",
+          "anchor": "repository-harness-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/superpowers.md",
+      "blobSha": "16109bed63addb38c5396f7f4705fd3dbca36860",
+      "blobSize": 75131,
+      "sourceDigest": "4a1c70d9c7975b83fe12d62fbf323557abef773e4b1197d603a4c37a7b1d744b",
+      "sourceId": "src_bc696dcce9e750f748b92494549086b1",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "superpowers (obra) — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "superpowers (obra) — Feature Index",
+          "anchor": "superpowers-obra-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/sources/symphony.md",
+      "blobSha": "f114bdfb2603f4d11cfde0089a0a5c96c91d5879",
+      "blobSize": 17911,
+      "sourceDigest": "ec16bffdb69d6056b30eff80b0dcab2469e4c1a5625d11c973e1bfae097c2f34",
+      "sourceId": "src_e6aacb3ee139a947c4081555e82d9264",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Symphony — Feature Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Symphony — Feature Index",
+          "anchor": "symphony-feature-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/distillery/state/porting/events.jsonl",
+      "blobSha": "7034049cbc1e50253ebaa64a74703e26466e4b54",
+      "blobSize": 14149,
+      "sourceDigest": "4e36dfeccf2c0e2b4c75669428d9240311c4ab5a9f7f6a913dd0887084265069",
+      "sourceId": "src_60be02ffae556b70817211fe82ea290b",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/distillery/state/porting/state.json",
+      "blobSha": "a18f61b9e584e797164442f0657b9088e9a1cb82",
+      "blobSize": 9175,
+      "sourceDigest": "9912b8e63381ba4cb9a8d7d72d3a951daf616ca03f79cea2c8bb288c5f430027",
+      "sourceId": "src_f1d0b9245c4d591d2b9936d7e2399464",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/distillery/taxonomy.txt",
+      "blobSha": "436070c0921ca0dc984247c5c6f5a3a1fe6f31a1",
+      "blobSize": 380,
+      "sourceDigest": "a3486149487951d238e93b263c396298e46097493b6254d1ee9d64ec1fb610e3",
+      "sourceId": "src_4da6086105b6a47281bae987baac8351",
+      "area": "Distillery reference-learning (consumer-project corpus)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/distribution-vision.md",
+      "blobSha": "b24b90aa815edd12d362d306eedf1da0759b38ae",
+      "blobSize": 13072,
+      "sourceDigest": "8d99a9a9b60331f1100fa1aa314e0149411f29ace7c30d9c52837fbf16d084c1",
+      "sourceId": "src_19f4078130e0afa45b928b9945180db1",
+      "area": "root:docs/distribution-vision.md",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng",
+          "anchor": "cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng"
+        }
+      ]
+    },
+    {
+      "path": "docs/doc-governance.md",
+      "blobSha": "3128ffca5a4a0eb2d0cba9d591c6a78f5a714b42",
+      "blobSize": 18420,
+      "sourceDigest": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "sourceId": "src_5ec9bd266c6cffbc433881a1fe80c353",
+      "area": "root:docs/doc-governance.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Documentation Governance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation Governance",
+          "anchor": "documentation-governance"
+        }
+      ]
+    },
+    {
+      "path": "docs/doc-registry.json",
+      "blobSha": "345d9f48f88b93ef7cb46c2baaf08456fc69e1f4",
+      "blobSize": 665762,
+      "sourceDigest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "sourceId": "src_9b362da4bda69a3c8c1976c8c5285ea5",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/doc-registry.md",
+      "blobSha": "145274870c92bbc354e6494aeae22c0370a40133",
+      "blobSize": 291671,
+      "sourceDigest": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+      "sourceId": "src_6940b5677883b4530718b59ddbace809",
+      "area": "root:docs/doc-registry.md",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Knowledge Registry Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Knowledge Registry Index",
+          "anchor": "knowledge-registry-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/enduser-docs-index.json",
+      "blobSha": "28339cde67d0b9a0437201e299b940221c108339",
+      "blobSize": 289110,
+      "sourceDigest": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+      "sourceId": "src_e0141e20d01d1f023b32c9be567fadbb",
+      "area": "End-user knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/explanation/agy-permission-denylist-not-allowlist.md",
+      "blobSha": "db74deca2979b1124188065e335560d82024d98f",
+      "blobSize": 5558,
+      "sourceDigest": "0f01d2b339153b6310f13904db892343760dc925e775917f6c67f0c63b4d5b38",
+      "sourceId": "src_fcc7e1db61d3dd1ee6da0487310eee60",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `agy` dispatch ended up with a denylist, not the allowlist it set out to build",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `agy` dispatch ended up with a denylist, not the allowlist it set out to build",
+          "anchor": "why-agy-dispatch-ended-up-with-a-denylist-not-the-allowlist-it-set-out-to-build"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/approve-cas-mismatch-block.md",
+      "blobSha": "1f3a33a9c48c194fd0312efdb689d35a60bf6712",
+      "blobSize": 3801,
+      "sourceDigest": "c604ddf45f9210d711b612179009dba01d6e93eead851941a6254a4bef4a99ea",
+      "sourceId": "src_dc341a63ea86936576fcf62a302c57ce",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos approve` stopped crashing when the item it was about to block had already moved",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos approve` stopped crashing when the item it was about to block had already moved",
+          "anchor": "fgos-approve-stopped-crashing-when-the-item-it-was-about-to-block-had-already-moved"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/approve-lock-lost-mid-merge-guard.md",
+      "blobSha": "746be07653527a63e9f63c387a12e5d79ad2e792",
+      "blobSize": 2917,
+      "sourceDigest": "dfe63832c235e55161879332fc06a4833cfde75ac9cfb6cc692a1295c70a6b8a",
+      "sourceId": "src_b13efba17b16e21fb6a922cf17897380",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos approve` now detects a lost lock mid-merge instead of failing with a raw git error",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos approve` now detects a lost lock mid-merge instead of failing with a raw git error",
+          "anchor": "fgos-approve-now-detects-a-lost-lock-mid-merge-instead-of-failing-with-a-raw-git-error"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/approve-owns-self-recovery-merge-loop-thin-caller.md",
+      "blobSha": "9c2bbb25f9c7c5b5f267554054f5d28a913c9c3c",
+      "blobSize": 2861,
+      "sourceDigest": "928eb1047d955ff7337948f39d71a723be8880b29435955c61b9ce1358be5500",
+      "sourceId": "src_8bbfb1dbeefde4574d1bdce509bbda39",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Self-recovery moved from `merge-loop` into `approve` itself",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Self-recovery moved from `merge-loop` into `approve` itself",
+          "anchor": "self-recovery-moved-from-merge-loop-into-approve-itself"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+      "blobSha": "30c4e88761bbb4d9f2345b60645ef8662a9eac53",
+      "blobSize": 4637,
+      "sourceDigest": "9ac6ea7c59eb18dcb291c2cd2386f5bbc0edec49e8d2f2b2b63967955317a6a0",
+      "sourceId": "src_78dd9df68d6876bbd2e81ad983769085",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A heavy-risk item with no branch of its own had no path to `delivered`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A heavy-risk item with no branch of its own had no path to `delivered`",
+          "anchor": "a-heavy-risk-item-with-no-branch-of-its-own-had-no-path-to-delivered"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+      "blobSha": "f82632edd06e5e95170851c250e679a03c00c6b0",
+      "blobSize": 3728,
+      "sourceDigest": "4b60c91ab0897fb3f262c9563e9b387bda35fc4b7e6e288c55d7deaaff58ac35",
+      "sourceId": "src_8919b8ec3f81a85ee8d07ff5e2d1c096",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The check the previous two syntheses had to work around, finally fixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The check the previous two syntheses had to work around, finally fixed",
+          "anchor": "the-check-the-previous-two-syntheses-had-to-work-around-finally-fixed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "blobSha": "ba3b00992a84c91615430e2390a2a97d05f9b560",
+      "blobSize": 1580,
+      "sourceDigest": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "sourceId": "src_bc6bf3627ae159ab076ba9e64b832de4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`npm run build:skills` now auto-syncs `plugins/fgOS/skills`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`npm run build:skills` now auto-syncs `plugins/fgOS/skills`",
+          "anchor": "npm-run-buildskills-now-auto-syncs-pluginsfgosskills"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+      "blobSha": "c9ae2943e794b69d9675c08cf5be1c38671c93b7",
+      "blobSize": 3146,
+      "sourceDigest": "4c22f36c63cb8e97f1af8208a7a8e726ec763b54439f282b155cd028b168bfe3",
+      "sourceId": "src_407ff5a4d21778d4e7f728aa141fdcea",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `capabilities.<name>.prefer` no longer requires a matching `for` on the executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `capabilities.<name>.prefer` no longer requires a matching `for` on the executor",
+          "anchor": "why-capabilitiesprefer-no-longer-requires-a-matching-for-on-the-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/catchup-manual-merge-fgos-write-rejected-deadlock.md",
+      "blobSha": "44e876018bbe9af50c3cb6639bc1f0fe595813ec",
+      "blobSize": 10164,
+      "sourceDigest": "8cade27e052769b34b74f83e8efb837b884198f2f7d3e39b62548cb716f2210d",
+      "sourceId": "src_39c3b7f601e49848d81c5fe1fbf91323",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all",
+          "anchor": "a-real-structural-deadlock-two-guards-required-two-different-fgos-values-satisfiable-by-no-snapshot-at-all"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/catchup-movework-reopens-fgos-divergence.md",
+      "blobSha": "9400e038866f66d7fd25079f7938a3c9f0a828d3",
+      "blobSize": 3640,
+      "sourceDigest": "5344ca7827aa43f8ea9022bd078fef18bcb8d0abf6e4d3f9050907f6ad3b2490",
+      "sourceId": "src_4145a7de6a304727c16f01bb03aa033a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A merge that manufactured its own next conflict",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A merge that manufactured its own next conflict",
+          "anchor": "a-merge-that-manufactured-its-own-next-conflict"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/catchup-self-recovery-shared-reference.md",
+      "blobSha": "fc9476077e5ec63bb42be12376b1ead4bfb5e9da",
+      "blobSize": 2917,
+      "sourceDigest": "a3ed7ecff6a9ab5bfd6cb519e654cf45d2a8912e58e9ae9c9b1eca2452b636b2",
+      "sourceId": "src_b876947ec44e18dea16c8690c904f7ca",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Three items each fixed self-recovery in one skill file — none of them shared it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Three items each fixed self-recovery in one skill file — none of them shared it",
+          "anchor": "three-items-each-fixed-self-recovery-in-one-skill-file-none-of-them-shared-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+      "blobSha": "585dc17a76a6ee96d979fa2a1544057b51f67a9e",
+      "blobSize": 5842,
+      "sourceDigest": "59a5a98c2815585fb5af956203bc6492f0fcf31e501ddf2c4072721e8e7509b9",
+      "sourceId": "src_a11fd9dc3908ad28c55adbc44d2fbe09",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A merge refusal git explained clearly, that the code still mishandled",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A merge refusal git explained clearly, that the code still mishandled",
+          "anchor": "a-merge-refusal-git-explained-clearly-that-the-code-still-mishandled"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/checkpoint-commit-self-collides-own-lock-holder.md",
+      "blobSha": "d5dd0916c7f5d31bc574eb101b4b1d787550fd3f",
+      "blobSize": 5698,
+      "sourceDigest": "a1831066bf651f8b4568b27ba7f1ce638766efba761249bd0caa99c600415c04",
+      "sourceId": "src_dc861f55cc0a1894f4f817c527397275",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The checkpoint commit didn't recognize its own caller as the lock holder — so it staged and silently failed, poisoning the next real merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The checkpoint commit didn't recognize its own caller as the lock holder — so it staged and silently failed, poisoning the next real merge",
+          "anchor": "the-checkpoint-commit-didnt-recognize-its-own-caller-as-the-lock-holder-so-it-staged-and-silently-failed-poisoning-the-next-real-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+      "blobSha": "5000088005fdf37e48d9229a3709a089cdc84443",
+      "blobSize": 3828,
+      "sourceDigest": "412f376096ecf490e19dc8eef685e18181a4aa35162e0095030bd159e769a94b",
+      "sourceId": "src_9b3aa53fd711ddddcd74fc28b52f103e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Scoping a 1788-finding cleanup backlog: the calibration-slice lesson",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Scoping a 1788-finding cleanup backlog: the calibration-slice lesson",
+          "anchor": "scoping-a-1788-finding-cleanup-backlog-the-calibration-slice-lesson"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md",
+      "blobSha": "6668a3492116201522bef96d538b1b71ca96506a",
+      "blobSize": 2956,
+      "sourceDigest": "d37229fa17df43f9c92e446413478c8c65c8e344f2f353f0d69c58e47eda7bc5",
+      "sourceId": "src_b26ddf9f0a5b94a533ced0053c821f4c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Splitting the remaining citation-drift backlog: two disjoint scopes, two different fix rules",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Splitting the remaining citation-drift backlog: two disjoint scopes, two different fix rules",
+          "anchor": "splitting-the-remaining-citation-drift-backlog-two-disjoint-scopes-two-different-fix-rules"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/citation-drift-remaining-docs-cleanup.md",
+      "blobSha": "4136c572b8503f9d1e86b37e76ddda0d2b6dab75",
+      "blobSize": 1029,
+      "sourceDigest": "583ffd81d4182c6b2d29937a98ed169b593768a0aad2e953d744ac735ae646a8",
+      "sourceId": "src_58107a263d94de14d1d57f5def74ce71",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Citation-format cleanup: the remaining `docs/*.md` files",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Citation-format cleanup: the remaining `docs/*.md` files",
+          "anchor": "citation-format-cleanup-the-remaining-docsmd-files"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/citation-drift-runner-md-cleanup.md",
+      "blobSha": "f5aa7b868bcf5372567be7f3f856ed74cc5df030",
+      "blobSize": 1121,
+      "sourceDigest": "77af26bebee60e5ace5ff9cb551565bf7e46233c6c5513a8908c71ad61cbee62",
+      "sourceId": "src_14a2f3ab7b7d3514ddcf7cc6e6991d24",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`docs/specs/runner.md`'s citation-format cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`docs/specs/runner.md`'s citation-format cleanup",
+          "anchor": "docsspecsrunnermds-citation-format-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/claim-ambiguous-lock-inline-self-heal.md",
+      "blobSha": "97e1eaf665d8f656dbe42f12ff28c684fc70fb99",
+      "blobSize": 4176,
+      "sourceDigest": "327b81b547fa2f9430e63ef3ed4f8828b81fd4f37c497c6d4a26d73b0665894f",
+      "sourceId": "src_edc1e59049209b622ed8c38617c7ea49",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The one remaining lock state that still needed a human — closed with a one-line retry, not a new mechanism",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The one remaining lock state that still needed a human — closed with a one-line retry, not a new mechanism",
+          "anchor": "the-one-remaining-lock-state-that-still-needed-a-human-closed-with-a-one-line-retry-not-a-new-mechanism"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/claude-executor-d4-proof-test-red.md",
+      "blobSha": "7da07eb6f801271f944a1993d119e9d09289e203",
+      "blobSize": 1617,
+      "sourceDigest": "31e5b91f40e5dee9203f74def3b517f3039da343aef7cd13c2fd7a49b99448d0",
+      "sourceId": "src_14fd8fbe56b548bdee758f1d612b6c16",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`tsk-1jt`: the named `claude` executor's first D4 proof-test came back RED",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`tsk-1jt`: the named `claude` executor's first D4 proof-test came back RED",
+          "anchor": "tsk-1jt-the-named-claude-executors-first-d4-proof-test-came-back-red"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/claude-executor-rtk-hook-root-cause.md",
+      "blobSha": "20b5c18cb49c1d1a5d86172ea7e636726f57e78a",
+      "blobSize": 1839,
+      "sourceDigest": "6daf14133128a3576397925f5e40ed8f9e260f1f3f19edd75783c1f651a5c437",
+      "sourceId": "src_757dca9ac3b8c8a455692a451a1c80e0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`tsk-1dsr`: `tsk-1jt`'s RED finding was environment-local, not a `claude`/config defect",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`tsk-1dsr`: `tsk-1jt`'s RED finding was environment-local, not a `claude`/config defect",
+          "anchor": "tsk-1dsr-tsk-1jts-red-finding-was-environment-local-not-a-claudeconfig-defect"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/cleanup-harness-checkmerge-blind-spots.md",
+      "blobSha": "4122e0da465419caf2669440ed95a7760248a5ad",
+      "blobSize": 4397,
+      "sourceDigest": "1d150d9aa45b660cbbbf479f13c6c9d320bf5044669eb4bfaaf1cad54f489c80",
+      "sourceId": "src_ef39d7e5cfba4ad1a7a3e8c0047038c4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Two confirmed blind spots in `checkMergeStillResolves`, each with a real living reproduction case",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Two confirmed blind spots in `checkMergeStillResolves`, each with a real living reproduction case",
+          "anchor": "two-confirmed-blind-spots-in-checkmergestillresolves-each-with-a-real-living-reproduction-case"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/codex-bypass-executor.md",
+      "blobSha": "e173d3cd57ad97d24c222ebe1a6353d808899631",
+      "blobSize": 3665,
+      "sourceDigest": "30002dafe887df1443c292c0cac3ebbdc3f26dfe413f6cd74b60165dd72d1b3b",
+      "sourceId": "src_fb909a185c8eb48ae1dcc2647e891425",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `codex` was wired as a bypass-all executor, not a sandboxed one",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `codex` was wired as a bypass-all executor, not a sandboxed one",
+          "anchor": "why-codex-was-wired-as-a-bypass-all-executor-not-a-sandboxed-one"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/compound-learn-artifact-registry.md",
+      "blobSha": "499367bbfdfa85e45200945f97509813fc02bd5d",
+      "blobSize": 26324,
+      "sourceDigest": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+      "sourceId": "src_92e34fcfc010208240822ff884949fc1",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The registry this session's own retrospective synthesis runs on, decided here",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The registry this session's own retrospective synthesis runs on, decided here",
+          "anchor": "the-registry-this-sessions-own-retrospective-synthesis-runs-on-decided-here"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/core-foundation-domain-boundary.md",
+      "blobSha": "a315579bca7f793d1f8f3e198fee043fe62389c9",
+      "blobSize": 6974,
+      "sourceDigest": "50c095583b425cce2cf861fde67698edef4b04c1969abf71cd4f859ed8e1b608",
+      "sourceId": "src_ad1b0c6beb11a2b55b88bf984fdf6bbf",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`core/` vs `domains/<name>/` — fgOS's own architecture boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`core/` vs `domains/<name>/` — fgOS's own architecture boundary",
+          "anchor": "core-vs-domains-fgoss-own-architecture-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/cross-provider-egress-governance.md",
+      "blobSha": "c62d424cdee01a7eaad59ae81205102ed6c42f5a",
+      "blobSize": 3593,
+      "sourceDigest": "0fab25a1e46c8a24d7153d80039a624062f4d485c98473dcc3da080ae85d153a",
+      "sourceId": "src_35d8b5534ef7dd29ff0c678e03c65b4f",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The gate checked the command name, not where the data actually went",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The gate checked the command name, not where the data actually went",
+          "anchor": "the-gate-checked-the-command-name-not-where-the-data-actually-went"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+      "blobSha": "7fdabc701c9b16e45ba132a758533ee4cf93fbb4",
+      "blobSize": 6969,
+      "sourceDigest": "5166bedd0980842a46fabdebf95b64a0f2278068fc7eecb79c144bb1165f3244",
+      "sourceId": "src_856f37998a62deb470f495f778ca2cb5",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A doc's own opening paragraph contradicted its own table two screens down",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A doc's own opening paragraph contradicted its own table two screens down",
+          "anchor": "a-docs-own-opening-paragraph-contradicted-its-own-table-two-screens-down"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+      "blobSha": "fa0c670223361b8e289811435dca1576a9893466",
+      "blobSize": 3381,
+      "sourceDigest": "791dff01958326399c04dd402fdf43f63a93b5359e5fdddac4d2f45be197a7ad",
+      "sourceId": "src_84a2c5b06ad1023d3d5831a0dda23d0a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "D3's rationale outlived its own citation, and pointed to the wrong threat model anyway",
+      "headings": [
+        {
+          "level": 1,
+          "text": "D3's rationale outlived its own citation, and pointed to the wrong threat model anyway",
+          "anchor": "d3s-rationale-outlived-its-own-citation-and-pointed-to-the-wrong-threat-model-anyway"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/decide-for-prefer-fix-and-dispatchplan-minimal.md",
+      "blobSha": "f711bd90bcb433ef212dfb6d3480f1c6c0216ad6",
+      "blobSize": 4924,
+      "sourceDigest": "4876f2b1d912b38e9f1b0143bb9cad17439f29e02513de33620065aea5461dc4",
+      "sourceId": "src_0b01f3d4682cd2a28674045fc2179efa",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`decide --for` ignored the exact config field it was supposed to read",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`decide --for` ignored the exact config field it was supposed to read",
+          "anchor": "decide---for-ignored-the-exact-config-field-it-was-supposed-to-read"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/discover-stage-graph-post-audit-cleanup.md",
+      "blobSha": "17a13de8a193014a58e6c5e8f35bf45fb03ac332",
+      "blobSize": 6888,
+      "sourceDigest": "179572e1320c5a095dcb1af51cb251d898cfcff67082064e8401da236203d071",
+      "sourceId": "src_d908c998387fac79b4deca65a282e995",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Closing the edge gaps a post-merge audit found after the clarify→discovery redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Closing the edge gaps a post-merge audit found after the clarify→discovery redesign",
+          "anchor": "closing-the-edge-gaps-a-post-merge-audit-found-after-the-clarifydiscovery-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/discovered-work-risk-kind-vocabulary-coercion.md",
+      "blobSha": "b9d39f5f14b9a3f0a539b474faf83116f5994fa7",
+      "blobSize": 2845,
+      "sourceDigest": "9db433bb17bdbd51a079df7baf91961044be6e44672173c1b763d29fbe85bd9e",
+      "sourceId": "src_8a048d627f1144613e392c928bdfeeb6",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A real discovered-work item silently vanished from an out-of-vocabulary `risk` value",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A real discovered-work item silently vanished from an out-of-vocabulary `risk` value",
+          "anchor": "a-real-discovered-work-item-silently-vanished-from-an-out-of-vocabulary-risk-value"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-activation-and-handoff-redesign.md",
+      "blobSha": "e327364de90353d356709ea04d9a2faa01b26c16",
+      "blobSize": 9635,
+      "sourceDigest": "494c8fbec619c48b2da3406a8806a9ec9c68a572b51ddb561244ceabfa51c84c",
+      "sourceId": "src_e672b8cbacbe5ae09634e05eac4a5c05",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why dispatch activation and handoff got redesigned (tsk-2uf)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why dispatch activation and handoff got redesigned (tsk-2uf)",
+          "anchor": "why-dispatch-activation-and-handoff-got-redesigned-tsk-2uf"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-attestation-level-2-enforcement-halt.md",
+      "blobSha": "ed4df1da95e72f1f665385559b57a8045853ab7f",
+      "blobSize": 4623,
+      "sourceDigest": "2f8438f9d32135ac5c96332f5379235fde4c94c15ee8a74c49256875c411cdf5",
+      "sourceId": "src_157607279121f5f3fd1c3a0840af5e68",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "From advisory-only to a real halt — closing the gap a wrongly-spawned worker exposed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "From advisory-only to a real halt — closing the gap a wrongly-spawned worker exposed",
+          "anchor": "from-advisory-only-to-a-real-halt-closing-the-gap-a-wrongly-spawned-worker-exposed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "blobSha": "a9d9440af4ad079258ebdc4bcde518a73af10472",
+      "blobSize": 2545,
+      "sourceDigest": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "sourceId": "src_5b4c2dadd4b73b7c45dbae3fbfd635c3",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "An out-of-process worker's prompt now points at `plan.md`/`CONTEXT.md` automatically",
+      "headings": [
+        {
+          "level": 1,
+          "text": "An out-of-process worker's prompt now points at `plan.md`/`CONTEXT.md` automatically",
+          "anchor": "an-out-of-process-workers-prompt-now-points-at-planmdcontextmd-automatically"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+      "blobSha": "53c8de2fe6b3c4dabdacd1c4a5f964273f039d87",
+      "blobSize": 4960,
+      "sourceDigest": "29c6f79df795d445d9265e97fcbbb420d9fc984d52ce9fe66863bad2ccd4cc77",
+      "sourceId": "src_e4a2735ce9e4e6c9e5395a0e7fcc7d16",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A caching proposal whose motivating scenario the target architecture cannot support",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A caching proposal whose motivating scenario the target architecture cannot support",
+          "anchor": "a-caching-proposal-whose-motivating-scenario-the-target-architecture-cannot-support"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-concurrency-guard.md",
+      "blobSha": "bdaff910eda65d6c50befca13a37598a28d61770",
+      "blobSize": 3278,
+      "sourceDigest": "558331b692a0a996fc75c8b266a1182c40f60d6fc90f2327233944bd6af64118",
+      "sourceId": "src_f7728d6a0436ab7d96920eb4c0aa4135",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `dispatch.mjs execute` needed a per-item concurrency guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `dispatch.mjs execute` needed a per-item concurrency guard",
+          "anchor": "why-dispatchmjs-execute-needed-a-per-item-concurrency-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md",
+      "blobSha": "a2d8f51f277b8de4bf4d988573e3bd56e2d4911b",
+      "blobSize": 3805,
+      "sourceDigest": "36272fb9135213bb721be5f1d86d447d7fbbb66088f2847beb4d5b39f3913642",
+      "sourceId": "src_3decefaa2bfc5c7c4ac45d9f925636a0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "An out-of-process dispatch could silently wipe the driver's own uncommitted edits — now detected and warned, not prevented",
+      "headings": [
+        {
+          "level": 1,
+          "text": "An out-of-process dispatch could silently wipe the driver's own uncommitted edits — now detected and warned, not prevented",
+          "anchor": "an-out-of-process-dispatch-could-silently-wipe-the-drivers-own-uncommitted-edits-now-detected-and-warned-not-prevented"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "blobSha": "83ce015d26b1ab2c49a62abfae618f2193317e31",
+      "blobSize": 2719,
+      "sourceDigest": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "sourceId": "src_335d0771c589838c2502bbc6b3b8fb38",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`dispatch execute --prompt-file` closes the shell-round-trip friction directly",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`dispatch execute --prompt-file` closes the shell-round-trip friction directly",
+          "anchor": "dispatch-execute---prompt-file-closes-the-shell-round-trip-friction-directly"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-repo-root-cwd-separation.md",
+      "blobSha": "ffb44864c523cef7adb14df955e04a30e1ea6a3b",
+      "blobSize": 7573,
+      "sourceDigest": "5aeb004fd876228d2cd5bd088d64ccf4d48a29664a1f142e6dba84b669a34086",
+      "sourceId": "src_1461fa7df09d7a887cafd8c526df0b91",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`dispatch execute` had one `cwd` for two different jobs — now it has two",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`dispatch execute` had one `cwd` for two different jobs — now it has two",
+          "anchor": "dispatch-execute-had-one-cwd-for-two-different-jobs-now-it-has-two"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-unsignaled-outcome.md",
+      "blobSha": "f94de8da889ec0c07b956147396c0352c0eb414d",
+      "blobSize": 3361,
+      "sourceDigest": "38936ce390f01a56fd3529df345908fe3beb702b48c830403347624d3c3983de",
+      "sourceId": "src_dde8456a64e67cf387bd79b6824b52c8",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`dispatch execute` now flags a worker that never signaled `[DONE]`/`[BLOCKED]`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`dispatch execute` now flags a worker that never signaled `[DONE]`/`[BLOCKED]`",
+          "anchor": "dispatch-execute-now-flags-a-worker-that-never-signaled-doneblocked"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-plan-protocol-redesign.md",
+      "blobSha": "804225d3ea093d04e4200edd4df5d6f0f541fdd9",
+      "blobSize": 8271,
+      "sourceDigest": "6d9397691d0afbbddead52cfc5cb43afe939a8fbccd4074a29074335553a5edd",
+      "sourceId": "src_7b234ace5805e349bbfb74620d19a17c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "An 8-phase redesign, deliberately cut to 3 shippable pieces before any code landed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "An 8-phase redesign, deliberately cut to 3 shippable pieces before any code landed",
+          "anchor": "an-8-phase-redesign-deliberately-cut-to-3-shippable-pieces-before-any-code-landed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-redesign-batch-final-verify.md",
+      "blobSha": "775d82119b401315c77863c6aef85b503b6c6d0b",
+      "blobSize": 3907,
+      "sourceDigest": "ed5b729ff4bb8e3ba3f2e0d08025ca47ca6a28e8025d0ad46bc33bff9d17e496",
+      "sourceId": "src_7eb5d7cc33aafdffcdb2bcf236bed1f4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Final verify pass on the dispatch-redesign batch: one bug fixed, one gap disclosed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Final verify pass on the dispatch-redesign batch: one bug fixed, one gap disclosed",
+          "anchor": "final-verify-pass-on-the-dispatch-redesign-batch-one-bug-fixed-one-gap-disclosed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-result-confidence-reader.md",
+      "blobSha": "0796f260bcc267e301eb6cce4836d216f0f664d6",
+      "blobSize": 3440,
+      "sourceDigest": "aea009e42084c87a310ea324377a1005556a6caa2ac26bcd7d812375a6870aed",
+      "sourceId": "src_86221df52f5ecd5d4bee43aa0dfd30d0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Reading dispatch result confidence before writing a telemetry field for it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Reading dispatch result confidence before writing a telemetry field for it",
+          "anchor": "reading-dispatch-result-confidence-before-writing-a-telemetry-field-for-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-result-normalization-ladder-extraction.md",
+      "blobSha": "d034a0883e099471efb09dec65f917601ea3a593",
+      "blobSize": 3461,
+      "sourceDigest": "5aa3b0687c4e4c7a34e631d7b1f1d921b59b6070e494b6107c5abe7699f35427",
+      "sourceId": "src_043e05f49bfb57c24127d96c20c72a31",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The result-confidence ladder had no seams — now it does",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The result-confidence ladder had no seams — now it does",
+          "anchor": "the-result-confidence-ladder-had-no-seams-now-it-does"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-verify-run-once-cadence.md",
+      "blobSha": "dc5a1015abbd9e35319ed809ccc701b42459ee95",
+      "blobSize": 3789,
+      "sourceDigest": "7e52ddc7bc2b5b5909839731ca257ef561e81db73f81c3bc089eb04609688f79",
+      "sourceId": "src_3b5c5adca4cf670c3e6f07a78b3e9dd0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Verify should run once, near the end — a textual gap closed, root cause not fully confirmed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verify should run once, near the end — a textual gap closed, root cause not fully confirmed",
+          "anchor": "verify-should-run-once-near-the-end-a-textual-gap-closed-root-cause-not-fully-confirmed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/dispatch-waiting-rule-end-turn-no-tool-call.md",
+      "blobSha": "75111a4f1f436d5096cccab32ae551bb257ed67d",
+      "blobSize": 3226,
+      "sourceDigest": "d2e290f67c3cd57f2eaf2bb262cf5f71c2e77484c5f790c99f7aa4cc3cf4eebc",
+      "sourceId": "src_6eb608ccfb1a29e44e1f5aff9a4a54a7",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The waiting-rule fix needed to say \"end the turn,\" not just \"don't call `ScheduleWakeup`\"",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The waiting-rule fix needed to say \"end the turn,\" not just \"don't call `ScheduleWakeup`\"",
+          "anchor": "the-waiting-rule-fix-needed-to-say-end-the-turn-not-just-dont-call-schedulewakeup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/driving-loop-worktree-resync-on-reentry.md",
+      "blobSha": "9b514899ea02382f206b1ac06209ab5c1aee7c5f",
+      "blobSize": 2018,
+      "sourceDigest": "47d041935413449a7a429dd3a240f75f6ab33c4e33dcf9dc19281ab284d7f811",
+      "sourceId": "src_40aa0129e3902ca4260e3020ae630b67",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The driving loop now resyncs a re-entered worktree instead of trusting it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The driving loop now resyncs a re-entered worktree instead of trusting it",
+          "anchor": "the-driving-loop-now-resyncs-a-re-entered-worktree-instead-of-trusting-it"
+        }
+      ]
+    }
+  ]
+}

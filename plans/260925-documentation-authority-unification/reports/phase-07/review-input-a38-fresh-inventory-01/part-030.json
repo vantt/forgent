@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 30,
+  "entries": [
+    {
+      "path": "docs/history/long-work-item-ids/CONTEXT.md",
+      "blobSha": "10cb975afe6ae37b29492ea8a90e58058675204f",
+      "blobSize": 4909,
+      "sourceDigest": "7f13f41c35e5e611ed5fb9ca1c5611a88eb67d7a0481ea8cdd769d92b3c10eae",
+      "sourceId": "src_8c3920aefcc5dbc26bcd5026a458b38f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: long-work-item-ids (tsk-3tk)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: long-work-item-ids (tsk-3tk)",
+          "anchor": "context-long-work-item-ids-tsk-3tk"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/long-work-item-ids/plan.md",
+      "blobSha": "560f682b4399fabcc7eb6d728a2ec82e1e540fb5",
+      "blobSize": 4971,
+      "sourceDigest": "c9c4da9da8752ec27a5307cf2b44d10c9a69aa84a2e168127e5755ddec3e7c0c",
+      "sourceId": "src_a9492d0c793470b3206ffc9da1625442",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: long-work-item-ids (tsk-3tk)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: long-work-item-ids (tsk-3tk)",
+          "anchor": "plan-long-work-item-ids-tsk-3tk"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+      "blobSha": "685ef26f695f403e0658b4536bf5f4edec26dcb6",
+      "blobSize": 9076,
+      "sourceDigest": "3109bddd8e1b2702e61d934a38d29ea5e6d926f852756d5143da9a0e51e470dd",
+      "sourceId": "src_fe7156350844edd5127f050f92f8dea9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3au — Safety net for `git reset --hard` on the shared main checkout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3au — Safety net for `git reset --hard` on the shared main checkout",
+          "anchor": "tsk-3au-safety-net-for-git-reset---hard-on-the-shared-main-checkout"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-destructive-git-safety-net/iron-law-evidence.md",
+      "blobSha": "d188130d96cc515a489c5c8ce6f821017f9b2afa",
+      "blobSize": 2397,
+      "sourceDigest": "a3a00dfd46bffbe68c3704690cd4fcba97e42dcb480b1d78f8c924f38c8710d7",
+      "sourceId": "src_ff080f639d721d7504ba1516f26eb088",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3au — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3au — Iron Law evidence",
+          "anchor": "tsk-3au-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-destructive-git-safety-net/plan.md",
+      "blobSha": "acb66eafbb50d73c3194a429a2b191e721d8fde5",
+      "blobSize": 6915,
+      "sourceDigest": "51d4b072f73d89d49f1c480d08454538c187d873c4d00c77e0ed6ad7a86dd4b2",
+      "sourceId": "src_5877b4c29fa9a3c4ec9bc7105f4e6b5b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3au — Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3au — Plan",
+          "anchor": "tsk-3au-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-hook-wired-absolute-path/CONTEXT.md",
+      "blobSha": "682fd3fa33d424ad9b972c31478de495626caf25",
+      "blobSize": 7906,
+      "sourceDigest": "a35282abf9c69a51526e9fa17e38e9a44ed6f947fcc339cf2a596bf39b06a53c",
+      "sourceId": "src_3adac18f4aa75cb54eba50bf6f4a17ce",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "main-checkout-hook-wired false negative on absolute core.hooksPath",
+      "headings": [
+        {
+          "level": 1,
+          "text": "main-checkout-hook-wired false negative on absolute core.hooksPath",
+          "anchor": "main-checkout-hook-wired-false-negative-on-absolute-corehookspath"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-hook-wired-absolute-path/plan.md",
+      "blobSha": "b01e363bc4bc13fae0f4a3cb4612c238e4f8811b",
+      "blobSize": 5463,
+      "sourceDigest": "7299826d8ca4afa0177cff15b515aaa1a2b4b58c749480a1155a7b8b5978cf65",
+      "sourceId": "src_293b1e388182f02db6a191476156b897",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: main-checkout-hook-wired false negative on absolute core.hooksPath",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: main-checkout-hook-wired false negative on absolute core.hooksPath",
+          "anchor": "plan-main-checkout-hook-wired-false-negative-on-absolute-corehookspath"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-fanout-self-recognition-gap/CONTEXT.md",
+      "blobSha": "f264501e1edd629ee4f00f58fcf0957224616f06",
+      "blobSize": 9392,
+      "sourceDigest": "786872c6b9ebcb50fa3568cd6c9cec41ec3d31505edbbd4c1a1578a963c670c1",
+      "sourceId": "src_ba1a04f4b123e040400bccf08298b1fb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-70l — main-checkout-lock self-recognition sibling gap on the root→main merge path",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-70l — main-checkout-lock self-recognition sibling gap on the root→main merge path",
+          "anchor": "tsk-70l-main-checkout-lock-self-recognition-sibling-gap-on-the-rootmain-merge-path"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-fanout-self-recognition-gap/iron-law-evidence.md",
+      "blobSha": "33619008fd5fca5f64e6250e152fd052ca520871",
+      "blobSize": 5416,
+      "sourceDigest": "b70c57dc1f0963e24d93517c507f4ded74786ff2832b71e1400088f8ff94ad02",
+      "sourceId": "src_28e3d5b6cb8f796ca798a088b5960449",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-70l — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-70l — Iron Law evidence",
+          "anchor": "tsk-70l-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-fanout-self-recognition-gap/plan.md",
+      "blobSha": "1adbe98f405a7dafdb00d10f2c2ac84f0c484e6e",
+      "blobSize": 8500,
+      "sourceDigest": "7974c9111d57453157a89266ac8cb27b3af4655726d892ddfb469faf87f276dd",
+      "sourceId": "src_d15793114d9af6660f46af844ed7ee37",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-70l — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-70l — plan",
+          "anchor": "tsk-70l-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-toctou-race/CONTEXT.md",
+      "blobSha": "b2620f21322bfade7806f9dbd4da47e0d68e2c1c",
+      "blobSize": 4920,
+      "sourceDigest": "074d691b9b5aae04d3ed38d81e97a43d17dd78160dca18df1e4556e4cc7def88",
+      "sourceId": "src_101e4a11627939ca6cdbb8f736a747f7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "main-checkout-lock TOCTOU race — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "main-checkout-lock TOCTOU race — locked decisions",
+          "anchor": "main-checkout-lock-toctou-race-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-toctou-race/iron-law-evidence.md",
+      "blobSha": "9055e85874a4bc0f9e455ffc62ba63650538c950",
+      "blobSize": 5028,
+      "sourceDigest": "aa71525558134cdf344d816a97c5f91a5f9160b48df1a0a98b8bc6210dc5cd8a",
+      "sourceId": "src_1b1b460c447f0ea2eb19994f62602dad",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-2tm",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-2tm",
+          "anchor": "iron-law-evidence-tsk-2tm"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-toctou-race/plan.md",
+      "blobSha": "ebc8e6e0cd3d954919c9b20567ca0f464c7af18c",
+      "blobSize": 7814,
+      "sourceDigest": "e27e85ec82f2d66c550f2943e7a349b62613ee2205913914d661ea8306efa89d",
+      "sourceId": "src_fdcc38feb9b9f09615bd943aa2745631",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "main-checkout-lock TOCTOU race — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "main-checkout-lock TOCTOU race — plan",
+          "anchor": "main-checkout-lock-toctou-race-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/CONTEXT.md",
+      "blobSha": "2c6d8c8e4fae7f1a723d31370871f9281f461386",
+      "blobSize": 6942,
+      "sourceDigest": "c9be8662b2cb89c061616b3b7d8aab38d7bf2e9fca216bbf41e3f5847cfbd73e",
+      "sourceId": "src_55eeb09c8e6040008dab9b4b503ff439",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: decouple explicit `--wait` from the remainingTtlMs snapshot (tsk-2rf)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: decouple explicit `--wait` from the remainingTtlMs snapshot (tsk-2rf)",
+          "anchor": "context-decouple-explicit---wait-from-the-remainingttlms-snapshot-tsk-2rf"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/iron-law-evidence.md",
+      "blobSha": "4c5fab37fdb4eb5edca0f6ee54e36a7008dda696",
+      "blobSize": 2363,
+      "sourceDigest": "cc11a4ddf66f74aec1ca46d473463ec147e2075ec34d7dd497c6c2852bc0a48c",
+      "sourceId": "src_0cb8d79c9e0a1da0e8a211a778623664",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-2rf",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-2rf",
+          "anchor": "iron-law-evidence-tsk-2rf"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/plan.md",
+      "blobSha": "ba5b2d1c7415feb4fd2a09f768bc3c6e9f5f2985",
+      "blobSize": 5260,
+      "sourceDigest": "3cc1beaad686284003ad64847fa40d3919cd955cc8742a58af2a6db8ccc77abf",
+      "sourceId": "src_077a5b715fc87077a278cf75c61ef77d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan: decouple explicit `--wait` from the remainingTtlMs snapshot (tsk-2rf)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan: decouple explicit `--wait` from the remainingTtlMs snapshot (tsk-2rf)",
+          "anchor": "plan-decouple-explicit---wait-from-the-remainingttlms-snapshot-tsk-2rf"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+      "blobSha": "86ef777e747735c783eed64aac26bf1d443797b1",
+      "blobSize": 12372,
+      "sourceDigest": "5454b7b04a188428566cc5a7dedf0fc086e1e4e5554b8f2aa7aa10c7843a0ecd",
+      "sourceId": "src_81449a0b7e7cb1f5b859e2a1f2b95bcc",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-sir — main-checkout-lock áp lên worktree git commit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-sir — main-checkout-lock áp lên worktree git commit",
+          "anchor": "tsk-sir-main-checkout-lock-áp-lên-worktree-git-commit"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-worktree-commit-scope/DISCUSSION.md",
+      "blobSha": "5b3f2669db733c4093ecde9522b0fcc90ecb153d",
+      "blobSize": 13992,
+      "sourceDigest": "7194317ecb966db2668bf360c87a30ce5c7948718b5a397cc83a3dbb44e9c3f9",
+      "sourceId": "src_34c3755c43463a7d8604eb36c2e95c22",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "main-checkout-lock-worktree-commit-scope — DISCUSSION",
+      "headings": [
+        {
+          "level": 1,
+          "text": "main-checkout-lock-worktree-commit-scope — DISCUSSION",
+          "anchor": "main-checkout-lock-worktree-commit-scope-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-lock-worktree-commit-scope/plan.md",
+      "blobSha": "4c5b423c6f0a5eefbee43c9b843982c6c0324e66",
+      "blobSize": 6799,
+      "sourceDigest": "75d6a13943e6cfaf472c2cdd378f08af2f8cf0675c6dbcf1519fc35d09c14a7c",
+      "sourceId": "src_fbf97ad4fafb40c76a69015990a7176d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-sir — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-sir — plan",
+          "anchor": "tsk-sir-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-reset-ancestor-check-guard/iron-law-evidence.md",
+      "blobSha": "94db674cc33781419af6cd12e6dff3aba1520239",
+      "blobSize": 2875,
+      "sourceDigest": "c48e9160c9e84a09f92f40093d730d9ce4d9665a5c127624f93d48a7654edae9",
+      "sourceId": "src_3f11887272dd6677727a44aa821585f3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law Evidence — main-checkout-reset-ancestor-check-guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law Evidence — main-checkout-reset-ancestor-check-guard",
+          "anchor": "iron-law-evidence-main-checkout-reset-ancestor-check-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-reset-ancestor-check-guard/plan.md",
+      "blobSha": "bd54497b895349b4dedb7aa2c36a7e6e6f2fb1c4",
+      "blobSize": 9137,
+      "sourceDigest": "29542fe777f5129ae08301cd69e59f943ae23767d3910c451ac4afd53a905e0d",
+      "sourceId": "src_49ebf3eccd55182c63a1c52f82055ac3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1ck — Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1ck — Plan",
+          "anchor": "tsk-1ck-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/main-checkout-reset-ancestor-check-guard/RESEARCH.md",
+      "blobSha": "cdaa31d6de9423d0ffe7fd9a474ca8e7976ccd58",
+      "blobSize": 4509,
+      "sourceDigest": "7f73f5e01dd672a115f498f9a02d1f09d75a4d068837a7b489d4033093ec9530",
+      "sourceId": "src_a787674b3790d35fca2dc7080efe7dc1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1ck — Research",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1ck — Research",
+          "anchor": "tsk-1ck-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-already-merged-idempotent/CONTEXT.md",
+      "blobSha": "30dc5c5f4e77ab45637027be9a83c3b5356539d9",
+      "blobSize": 6971,
+      "sourceDigest": "e505eb33cc06c502e22eff71871ec4c39e29d6d2fdd31d759383afd326bf83db",
+      "sourceId": "src_4c7ff5b55e7e440956e34fbd954b47ce",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3yl: mergeRunnerItem idempotent on already-merged branch",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3yl: mergeRunnerItem idempotent on already-merged branch",
+          "anchor": "tsk-3yl-mergerunneritem-idempotent-on-already-merged-branch"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-already-merged-idempotent/plan.md",
+      "blobSha": "7058f20a61df7cfc1e3e5ef6ec315cae47d86454",
+      "blobSize": 7151,
+      "sourceDigest": "4a74009567e82c8bde2ae74e35f222fd26ee2f28940ee9f28c0d16f039bfb3d9",
+      "sourceId": "src_689bf71508165183f598a83307e2c986",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3yl: plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3yl: plan",
+          "anchor": "tsk-3yl-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-approve-inline-confirm/plan.md",
+      "blobSha": "80da2b2ea8115b29bd8b1adec36ccabace9c6f49",
+      "blobSize": 4265,
+      "sourceDigest": "1dd5019955d25c4820e3c1f341bf0dce6466b89a381aae40d840c34e04911dae",
+      "sourceId": "src_c41c6faf1c97be0c69bcf9dad44d1456",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — merge-approve-inline-confirm (tsk-ut6)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — merge-approve-inline-confirm (tsk-ut6)",
+          "anchor": "planmd-merge-approve-inline-confirm-tsk-ut6"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-approve-inline-confirm/RESEARCH.md",
+      "blobSha": "58d57702a556d240cbba3442a505bea7b7f2e77e",
+      "blobSize": 5624,
+      "sourceDigest": "85cbcbb711dd86d6ff21591b3ea624705afec2c6a85d9b222790f898d778c5f7",
+      "sourceId": "src_f58bf0814de3567dc32c90d05b7ef8e5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — merge-approve-inline-confirm (tsk-ut6)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — merge-approve-inline-confirm (tsk-ut6)",
+          "anchor": "research-merge-approve-inline-confirm-tsk-ut6"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-approve-self-recovery-consolidation/plan.md",
+      "blobSha": "19291f0e2037ba55302d91279977a8d214e559f4",
+      "blobSize": 15803,
+      "sourceDigest": "f7e86eb9ff6d8bf14f00be9abdf54aa0fbc3ef7196185f3f39cbff83e4b5064a",
+      "sourceId": "src_003c28758428d1c6b01c1007dab4c81f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — merge-approve-self-recovery-consolidation (tsk-6av, reconciled with tsk-c5u)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — merge-approve-self-recovery-consolidation (tsk-6av, reconciled with tsk-c5u)",
+          "anchor": "plan-merge-approve-self-recovery-consolidation-tsk-6av-reconciled-with-tsk-c5u"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-approve-self-recovery-consolidation/RESEARCH.md",
+      "blobSha": "9fe1debf2043100b3e17c89aca8d4d18af4aa19f",
+      "blobSize": 16611,
+      "sourceDigest": "3e94896853ea12cedb858e3bd7dd9490566c3cedfc801649a5ade45eb3ae9a65",
+      "sourceId": "src_efdbcdd573a499e5d765b7d8695ca17a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research — merge-approve-self-recovery-consolidation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research — merge-approve-self-recovery-consolidation",
+          "anchor": "research-merge-approve-self-recovery-consolidation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/CONTEXT.md",
+      "blobSha": "006ea49369c1d5ddc6d2acec87d62c8b54403edf",
+      "blobSize": 8017,
+      "sourceDigest": "c1386a1b2a7f1029c5e4f6f041b638240acc99a5fcfc3f15e255538220aec95a",
+      "sourceId": "src_e24454c380a75d1f09dff23b58796f98",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: tsk-51m — Merge Conductor (throughput + giải phóng người)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: tsk-51m — Merge Conductor (throughput + giải phóng người)",
+          "anchor": "context-tsk-51m-merge-conductor-throughput-giải-phóng-người"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "blobSha": "07e03760ddde936fcdace89f87d854dd56073450",
+      "blobSize": 31884,
+      "sourceDigest": "1f929d603bfadc6c454c7d793abf26b6b47016c357a88a3ba8452b8694b8ed28",
+      "sourceId": "src_3a32569195648392d3954440143f8d1f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Merge Conductor: gỡ nghẽn throughput + giải phóng người khỏi việc canh merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Merge Conductor: gỡ nghẽn throughput + giải phóng người khỏi việc canh merge",
+          "anchor": "merge-conductor-gỡ-nghẽn-throughput-giải-phóng-người-khỏi-việc-canh-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/iron-law-evidence-tsk-2ypd.md",
+      "blobSha": "7ccb69ad565394acc5f24d4cfb3e03fba9ffff06",
+      "blobSize": 5936,
+      "sourceDigest": "6db23ee3a10437599d40cc944ceeb36dbb233d55be0a1665daae80ff6834cd67",
+      "sourceId": "src_7066d1c7d94b0fc58179d15ef057b123",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-2ypd",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-2ypd",
+          "anchor": "iron-law-evidence-tsk-2ypd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/iron-law-evidence-tsk-51m-root.md",
+      "blobSha": "988f669a9c1633ead953da6ede5a095151e37409",
+      "blobSize": 6405,
+      "sourceDigest": "dc7c2175627105db8153134a847505fa8b272e1b80441c02c4703ea113f4bf33",
+      "sourceId": "src_a2163c85d00353e3ef2f0479d9c4ea13",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-51m (root → main)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-51m (root → main)",
+          "anchor": "iron-law-evidence-tsk-51m-root-main"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/plan-tsk-2ypd.md",
+      "blobSha": "2e255350373e07e3dc613577a88d24fbf5c2c3e4",
+      "blobSize": 9948,
+      "sourceDigest": "2984c001a6cd89466403b95c48431a575103319bcf200fdcd82d3e3e1f18ca7c",
+      "sourceId": "src_67aa1b915489ac45eaf6e90b338acd7c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan-tsk-2ypd.md — Phát hiện lệch sau khi land bằng giao đường dẫn thật",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan-tsk-2ypd.md — Phát hiện lệch sau khi land bằng giao đường dẫn thật",
+          "anchor": "plan-tsk-2ypdmd-phát-hiện-lệch-sau-khi-land-bằng-giao-đường-dẫn-thật"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/plan-tsk-4xq.md",
+      "blobSha": "6c99ac00176de64300d6e2c31517387d5a7b14e6",
+      "blobSize": 15246,
+      "sourceDigest": "1f3f52b29fa17118b58df0a943cf99a3f76442c1be4169e942940b8927bebe1c",
+      "sourceId": "src_7d0bdccaadadd4acb1c8cc61453226b3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan-tsk-4xq.md — Playbook cho ba block reason còn lại + thu stop rule",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan-tsk-4xq.md — Playbook cho ba block reason còn lại + thu stop rule",
+          "anchor": "plan-tsk-4xqmd-playbook-cho-ba-block-reason-còn-lại-thu-stop-rule"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-conductor-throughput-and-human-release/plan.md",
+      "blobSha": "361d6197410356104967dc665d0f2349b2b2aa17",
+      "blobSize": 11225,
+      "sourceDigest": "6b4a4861989ac434ba7eabf9d9ebe14927a144b994329d1e2f2324c466ad6697",
+      "sourceId": "src_869626e5146179496194111eab778980",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-51m: Merge Conductor (throughput + giải phóng người)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-51m: Merge Conductor (throughput + giải phóng người)",
+          "anchor": "planmd-tsk-51m-merge-conductor-throughput-giải-phóng-người"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+      "blobSha": "1e4f4510d1d9a4ed1f3c86ccc57c13851cb37015",
+      "blobSize": 6069,
+      "sourceDigest": "e2134d2e5efbdca6e2d1c6a56de73a0ad48ef0177db309549f2cfc956c995456",
+      "sourceId": "src_2d41c823809416c29e6cc2a21607cbf1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fast-forward race in withMergeEphemeralWorktree's final branch -f",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fast-forward race in withMergeEphemeralWorktree's final branch -f",
+          "anchor": "fast-forward-race-in-withmergeephemeralworktrees-final-branch--f"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-ephemeral-branch-force-race/plan.md",
+      "blobSha": "096712e222cff8a15413d3e86720f340aa622200",
+      "blobSize": 7125,
+      "sourceDigest": "52e188de27c813d5c6b1dc0c0450d5b54622b35693989c5f72c828bd1c781c07",
+      "sourceId": "src_c528bd0f0f8caed66abe7b6bfbcf6b74",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: fix branch -f race in withMergeEphemeralWorktree",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: fix branch -f race in withMergeEphemeralWorktree",
+          "anchor": "plan-fix-branch--f-race-in-withmergeephemeralworktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md",
+      "blobSha": "074f2ea97ea236dec57eda82f167c3f7cec09db1",
+      "blobSize": 8841,
+      "sourceDigest": "8eca8423db85411b5e7e8277738f6ce58fe2202cea7cb7020642cfdc0ef662ec",
+      "sourceId": "src_8c30bd0b15c03763afa799c1e9c4d771",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT.md — tsk-3cs: merge-list tree view + bottleneck-priority merge order",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT.md — tsk-3cs: merge-list tree view + bottleneck-priority merge order",
+          "anchor": "contextmd-tsk-3cs-merge-list-tree-view-bottleneck-priority-merge-order"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md",
+      "blobSha": "2f22706bea24e08d380c1fea4aa1adfaac2bf2fa",
+      "blobSize": 21005,
+      "sourceDigest": "cb1050962ad140fa8541675de1ab472884cdba87299195ce197886a0b7cc0d73",
+      "sourceId": "src_4900f4913096e1c276bfa30110e29057",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Merge-list tree view + bottleneck-priority merge order",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Merge-list tree view + bottleneck-priority merge order",
+          "anchor": "merge-list-tree-view-bottleneck-priority-merge-order"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-list-tree-bottleneck-priority/plan.md",
+      "blobSha": "f0243e1af59a20a361b79c1624ed4748404c233d",
+      "blobSize": 13905,
+      "sourceDigest": "df1559eaa5ce68f01987350799a72ad85edbfe734fd3089ead5e2848fda1e3ee",
+      "sourceId": "src_0e4f0dbed0962415c796ced9ee985a7a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3cs: merge-list tree view + bottleneck-priority merge order",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3cs: merge-list tree view + bottleneck-priority merge order",
+          "anchor": "planmd-tsk-3cs-merge-list-tree-view-bottleneck-priority-merge-order"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-blocked-recovery-status-fix/plan.md",
+      "blobSha": "e8b10f9414777ae2f9573ad05b0592fbe2c17bdb",
+      "blobSize": 3289,
+      "sourceDigest": "10e325e7f65f4be320571b2aebedf1ad379a802e449045d2c610e8aebabcb517",
+      "sourceId": "src_bc73205f777bccd8e17625d7fdc8377a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan — tsk-3q8",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan — tsk-3q8",
+          "anchor": "plan-tsk-3q8"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-blocked-recovery-status-fix/RESEARCH.md",
+      "blobSha": "bc515327911b358245cca5e645e385a07c207845",
+      "blobSize": 3065,
+      "sourceDigest": "a5c40e02ba6e562fc8db0d65d0be9fb5cf66f5d22595a8cd1a16c98331135ede",
+      "sourceId": "src_9d0e6988bf29cc8d8fe59ec37061139c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — tsk-3q8",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — tsk-3q8",
+          "anchor": "research-tsk-3q8"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-continuation-fix/plan.md",
+      "blobSha": "6cbe3366410b4144a6b3fee23c34460e49126518",
+      "blobSize": 5957,
+      "sourceDigest": "b684fd725c56602a72792c7ae4036750bc4df6b8958608d24301b08539410fcf",
+      "sourceId": "src_aad2e1fca8f4208dcba03514eb4bddb8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan: fix /fgOS:merge-loop stopping after 1 item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan: fix /fgOS:merge-loop stopping after 1 item",
+          "anchor": "plan-fix-fgosmerge-loop-stopping-after-1-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-continuation-fix/RESEARCH.md",
+      "blobSha": "ded8063eae3c12eb164a2e9b88293be8c3f10b75",
+      "blobSize": 7163,
+      "sourceDigest": "aecbacda4c3cdf81ea0d9bef5771c051197413787d62c0b6ec17dcb3602f2232",
+      "sourceId": "src_be68b27f3848ec9b045fda3760aa60de",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH: /fgOS:merge-loop stops after 1 item instead of continuing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH: /fgOS:merge-loop stops after 1 item instead of continuing",
+          "anchor": "research-fgosmerge-loop-stops-after-1-item-instead-of-continuing"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-skill/CONTEXT.md",
+      "blobSha": "e5c89c809f542159b2fcacf5a297825a86750a96",
+      "blobSize": 5910,
+      "sourceDigest": "2339501713eadd6bdd5bbdde3ad31f39bc8e1f24ad35438fcee9a50ad8163c32",
+      "sourceId": "src_07c8596ef00457bdad3dc518581fce9d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: /fgOS:merge-loop skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: /fgOS:merge-loop skill",
+          "anchor": "context-fgosmerge-loop-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-loop-skill/plan.md",
+      "blobSha": "d217f6375d458e3b324cb4b7848d17093bd27b3b",
+      "blobSize": 8191,
+      "sourceDigest": "a5ccdb2d8667f4862d6b611354118101279a2a96a39a410529bc4bf2adee92d2",
+      "sourceId": "src_36b37e886e4d8e975db21dbc3e41e929",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: /fgOS:merge-loop skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: /fgOS:merge-loop skill",
+          "anchor": "plan-fgosmerge-loop-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-next-auto-sync-root/CONTEXT.md",
+      "blobSha": "92a4e83ee821cbd8459ec4f841ad5d2b6d3966be",
+      "blobSize": 7415,
+      "sourceDigest": "a415b47bd8f32caa8def472043672f53c7d661987d17baecee0bb8471ff58162",
+      "sourceId": "src_571b1e566adde37f3a7bfb39e1649a49",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: tsk-173 — merge-next silently skips blockedOnSync roots",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: tsk-173 — merge-next silently skips blockedOnSync roots",
+          "anchor": "context-tsk-173-merge-next-silently-skips-blockedonsync-roots"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-next-auto-sync-root/plan.md",
+      "blobSha": "3a134030175c78b35d7837ab6b51c06b7555c60d",
+      "blobSize": 10973,
+      "sourceDigest": "3222526d4a7e313d3ed3fb5f7b56dc966553012adac38ab35e7dfae322dcc01c",
+      "sourceId": "src_b328e7da47274d77732f24efd4b6704c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: tsk-173 — merge-next auto sync-root on blockedOnSync",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: tsk-173 — merge-next auto sync-root on blockedOnSync",
+          "anchor": "plan-tsk-173-merge-next-auto-sync-root-on-blockedonsync"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-next-loop-wait-passthrough/CONTEXT.md",
+      "blobSha": "3a15b1ec9696d4c541580e11be5c52e8398a8b30",
+      "blobSize": 5918,
+      "sourceDigest": "8fc90513a7456738fd07089e4ae810ff8eb0544f60d0393e982709da791e5ef9",
+      "sourceId": "src_cdbaaa83a835ffbc0a2b3d7b304d884c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-328 — merge-next/merge-loop lock-wait passthrough",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-328 — merge-next/merge-loop lock-wait passthrough",
+          "anchor": "tsk-328-merge-nextmerge-loop-lock-wait-passthrough"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-next-loop-wait-passthrough/plan.md",
+      "blobSha": "d9493e67b30fb1d34d9f9033b5736a0c991f7c2d",
+      "blobSize": 5211,
+      "sourceDigest": "1786c27f62969137a7b2b6e3f42f2dbea63427d22176407c41784ea6feecd9eb",
+      "sourceId": "src_48cdee11b4a25fbc345f186b2cb5d415",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-328 — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-328 — plan.md",
+          "anchor": "tsk-328-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-next-loop-wait-passthrough/RESEARCH.md",
+      "blobSha": "755ab261e840e87ce01140bbf3dc80b84cf520f3",
+      "blobSize": 2592,
+      "sourceDigest": "9c3cd26d949a84da4e0b8826a22b587456386b7fb1d0676986ded5bf9f48d50a",
+      "sourceId": "src_16bb7233636f001d8b5517b6aeeea158",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-328 — Research log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-328 — Research log",
+          "anchor": "tsk-328-research-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-requires-existing-store/CONTEXT.md",
+      "blobSha": "661e45291d181136405be7287a8e459bf41313f2",
+      "blobSize": 7568,
+      "sourceDigest": "54931779c5e3b75612fff3de9d16881772dbe6eda4612259cbc5eca86a618f43",
+      "sourceId": "src_dba154dbd40b4355cebf8e33f16955b6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-66x — `fgos merge` false negative from inside a git worktree",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-66x — `fgos merge` false negative from inside a git worktree",
+          "anchor": "tsk-66x-fgos-merge-false-negative-from-inside-a-git-worktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-requires-existing-store/plan.md",
+      "blobSha": "c64d7c42960159d0aea0a04be228c99e843223ce",
+      "blobSize": 7775,
+      "sourceDigest": "d75388a89d6a985d1f54bd256756789aa492706f764ff5020b1d0586423fe682",
+      "sourceId": "src_a973c0d5f14bc878b702976d678722a2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-66x — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-66x — plan",
+          "anchor": "tsk-66x-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-standardization/CONTEXT.md",
+      "blobSha": "50c5721e7fbd090813e17b4aec14f7cfbde361c1",
+      "blobSize": 10010,
+      "sourceDigest": "5b07409fa5cab0c218a0a78238c6234026ef45350dd48cfa542daff98e720b30",
+      "sourceId": "src_1cd609e9b6e5b16eb9364b2b41536e25",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "merge-standardization — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "merge-standardization — CONTEXT",
+          "anchor": "merge-standardization-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-standardization/plan.md",
+      "blobSha": "f47ca949a64a9b7a6558bc3b59ab398dd12ecb4c",
+      "blobSize": 5987,
+      "sourceDigest": "2f8045a2d2d730c6fc2e6f9dba4c0b41751503cff7903cc9c3ccd81dce4ef44e",
+      "sourceId": "src_d606cf73a4ad396f38fedb5716c0f234",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "merge-standardization — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "merge-standardization — plan",
+          "anchor": "merge-standardization-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-verify-only-false-done/CONTEXT.md",
+      "blobSha": "86886c583a23c2fbc28d765660d5eeb460f11ece",
+      "blobSize": 5387,
+      "sourceDigest": "3c642c40756cec943d34d4507f717b17804b89cf3eec4eb2a39c65576ae364d4",
+      "sourceId": "src_7ed9e510856a75f73e0035bc9ee6377c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-15k — verify-only merge short-circuit can mark done without real merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-15k — verify-only merge short-circuit can mark done without real merge",
+          "anchor": "tsk-15k-verify-only-merge-short-circuit-can-mark-done-without-real-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-verify-only-false-done/plan.md",
+      "blobSha": "26b1e25f89e14ab24e7c3eaf9bbff9a3e8cf30db",
+      "blobSize": 11807,
+      "sourceDigest": "0953808e713104b369e4bd9eb7d5de4db399facb296e9a48f33669aee2ae8f64",
+      "sourceId": "src_d389c461aa119e27461d35a607475f9e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-15k — plan: fix verify-only merge short-circuit false-done",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-15k — plan: fix verify-only merge short-circuit false-done",
+          "anchor": "tsk-15k-plan-fix-verify-only-merge-short-circuit-false-done"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+      "blobSha": "df6ccb0d894f5f0da2d3118e21e9cdea457ca59f",
+      "blobSize": 7011,
+      "sourceDigest": "7405924536fc9ac12313dbe13708a5ef1571c60578d1301b8526b964a106dfb7",
+      "sourceId": "src_f5bb525a66983155782b4692b3c49449",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Merge's ephemeral-worktree reuse clobbers a kept-open worktree on the same branch",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Merge's ephemeral-worktree reuse clobbers a kept-open worktree on the same branch",
+          "anchor": "merges-ephemeral-worktree-reuse-clobbers-a-kept-open-worktree-on-the-same-branch"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/plan.md",
+      "blobSha": "b9eaebbd5f8a9638a8ed49250580404f4060f289",
+      "blobSize": 7252,
+      "sourceDigest": "390d80fd649eff518157aeae31c4d6a247e11bc36f461382ea8e44a44afb7310",
+      "sourceId": "src_c873d8ee99ebaa1a320fcd4c47289314",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: stop merge's ephemeral-worktree reuse from clobbering a kept-open checkout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: stop merge's ephemeral-worktree reuse from clobbering a kept-open checkout",
+          "anchor": "plan-stop-merges-ephemeral-worktree-reuse-from-clobbering-a-kept-open-checkout"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/move-verb-answer-flag-wontfix-reachability/plan.md",
+      "blobSha": "3f78b8fff62e80984bba351657118203cc053a1e",
+      "blobSize": 2647,
+      "sourceDigest": "89fd9ac26186644671ad44502b719a3ac94062d5d8acc834c0dc0f3dd6f6adef",
+      "sourceId": "src_b66c2db417d928fe91e66c2822fb89e3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-2lc: move never forwards --answer, awaiting-human -> wontfix unreachable",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-2lc: move never forwards --answer, awaiting-human -> wontfix unreachable",
+          "anchor": "planmd-tsk-2lc-move-never-forwards---answer-awaiting-human---wontfix-unreachable"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,878 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 59,
+  "entries": [
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/alternative-shaper.md",
+      "blobSha": "d182ad72349242d46f8144ce203ce71f1e73579b",
+      "blobSize": 14695,
+      "sourceDigest": "ab1479baf82cc17e9929193d216bf6c7fcf5a7dcca31d87af81ade7fc64df7ca",
+      "sourceId": "src_c89dce366703e9d64a900ade993b84eb",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "4. Alternative Shaper",
+      "headings": [
+        {
+          "level": 2,
+          "text": "4. Alternative Shaper",
+          "anchor": "4-alternative-shaper"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/architecture-critic.md",
+      "blobSha": "1dfdd1aad4d1145e9e9a90d40e1e4ccf8faaba84",
+      "blobSize": 24621,
+      "sourceDigest": "8690c96ebe011c25531330b246431ba95b6e5a241a3d790ab084a6d3568898af",
+      "sourceId": "src_051de943ae6d7f34b7cc4e0756f29426",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "6. Architecture Critic",
+      "headings": [
+        {
+          "level": 2,
+          "text": "6. Architecture Critic",
+          "anchor": "6-architecture-critic"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/constraint-advocate.md",
+      "blobSha": "71279e07d6be9a4131d10ef54b112890cf8ba724",
+      "blobSize": 13181,
+      "sourceDigest": "b4afe3c00de4e76aa9c9e6b2d4261fe46eaa959f4e58c8d0f486f306f72d8b67",
+      "sourceId": "src_46f05279b54d29dd30cf6028fc3cc2db",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "5. Constraint Advocate",
+      "headings": [
+        {
+          "level": 2,
+          "text": "5. Constraint Advocate",
+          "anchor": "5-constraint-advocate"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/context-investigator.md",
+      "blobSha": "0a91d61aafafccd731b15afe685cc1fb8704ee4f",
+      "blobSize": 11236,
+      "sourceDigest": "74d1a5594b16c88c7c1ebd6d62f91dd258ba1177391373378fe258431c087457",
+      "sourceId": "src_769399a982cce901665762bf0ea4a1d9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "2. Context Investigator",
+      "headings": [
+        {
+          "level": 2,
+          "text": "2. Context Investigator",
+          "anchor": "2-context-investigator"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/lead-advisor-dialogue-1-impact.md",
+      "blobSha": "cfcbbaa0431ef2f8f0b869415c5905050e863070",
+      "blobSize": 6535,
+      "sourceDigest": "a53c0078bd839c5d9cace381350c7cb1c1fa1a97c1ed6f7d79a91cafeafd3e81",
+      "sourceId": "src_17942ea4c9be54ff13e47800295f4a9d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/lead-advisor-explanation.md",
+      "blobSha": "4bcc39eab0416d3b46b20d8d6643021c1045247f",
+      "blobSize": 7529,
+      "sourceDigest": "7d87be532209e74a9cc760c364ecd6c75a19c16cf1bf6cc7fbd5f9130b8df650",
+      "sourceId": "src_8fdc35cce59feae99bd788ebf33fae42",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/lead-advisor-interpretation.md",
+      "blobSha": "14e2e7cc20eafda20515617a64c8fe83db199668",
+      "blobSize": 10904,
+      "sourceDigest": "fa980f072e1432461c4a131cf43feb163b07dbc898fa9a86d17b5a55f212bf22",
+      "sourceId": "src_4f3ee8b1bd6c2cb24c4ffa4be9d45383",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "1. Lead Advisor",
+      "headings": [
+        {
+          "level": 2,
+          "text": "1. Lead Advisor",
+          "anchor": "1-lead-advisor"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/synthesizer.md",
+      "blobSha": "7f3dd51d9ab8d311d638b4bcdc4d7eb1b6b50d5b",
+      "blobSize": 20860,
+      "sourceDigest": "2408f18b27f5055eadd56daa09b737736be3883df3e78571cd2c158feb215ac9",
+      "sourceId": "src_a0ee64c015e192dece2cd9bfa70b5479",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "7. Synthesizer",
+      "headings": [
+        {
+          "level": 2,
+          "text": "7. Synthesizer",
+          "anchor": "7-synthesizer"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/system-shaper.md",
+      "blobSha": "da5e97a9c37255eff88b8abb47a69787077aaf29",
+      "blobSize": 14613,
+      "sourceDigest": "d6a45e74d84e0bfe1d6ad257a21717a8fee3a2f7339bf44eca1f6693441c7f15",
+      "sourceId": "src_f9c171d807c6fc36836f5a54dedfbc00",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "3. System Shaper",
+      "headings": [
+        {
+          "level": 2,
+          "text": "3. System Shaper",
+          "anchor": "3-system-shaper"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/alternative-shaper.md",
+      "blobSha": "f36c293b2f6b614b71efdbbb00ec825fa326f7cd",
+      "blobSize": 4029,
+      "sourceDigest": "9466facddc5f4741db78bb14b10809a6f82fe45bc9c44203fda2fce9ff14c7e2",
+      "sourceId": "src_57c8ef32b391aecd571cf9087959cf0c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/constraint-advocate.md",
+      "blobSha": "2806a370809d0b3a67e5062d50bc319c89cafe09",
+      "blobSize": 9712,
+      "sourceDigest": "db5ba1ab5f49d7f8a0b3771deeb89347abe9bb531eba20a5ea5ac48dae5eb1f0",
+      "sourceId": "src_606d3cb52066392571b2372c6a6e2a75",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/system-shaper.md",
+      "blobSha": "512227079f74eb0ec5aea744285540d3a1a6b173",
+      "blobSize": 9323,
+      "sourceDigest": "492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba",
+      "sourceId": "src_e330be1021513f022f8874534618f768",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "proposals/system-shaper.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "proposals/system-shaper.md",
+          "anchor": "proposalssystem-shapermd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator-raw.log",
+      "blobSha": "f59fc333882449d5498ba79700b2f27a10274ca0",
+      "blobSize": 196386,
+      "sourceDigest": "2bf0ab54350388c734e6b4ca282b5d33ffd827842df8bc132c1b61bb4b4b336f",
+      "sourceId": "src_08a8775554d147bd8898a8f23890d62a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator.json",
+      "blobSha": "c3ecddb8953510a9341e74cd120908868c43cb81",
+      "blobSize": 1778,
+      "sourceDigest": "9ed505716d740f5e0a655352fe1d576e1fcd41fb83f4c8c15b9398331b63a087",
+      "sourceId": "src_823653daba2e167ab51041dbbd209da8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+      "blobSha": "20798e890ee7ecf99b694a2efec209f8e9992e86",
+      "blobSize": 9446,
+      "sourceDigest": "5827186945b10396251ca5ebccc73dfbd89ebba2b9589d52dfe79fb732aa548a",
+      "sourceId": "src_617f477bb6b1846fb333fcaf7de4eaed",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation.json",
+      "blobSha": "469ac74b0f51841ca994e621975acd33a326169b",
+      "blobSize": 1679,
+      "sourceDigest": "7efe7f429b69dafd90518ad4e746b772ca43144c602943adb95d07f3d4839d9f",
+      "sourceId": "src_4384c68d5d83aa790483d52415330a00",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+      "blobSha": "512227079f74eb0ec5aea744285540d3a1a6b173",
+      "blobSize": 9323,
+      "sourceDigest": "492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba",
+      "sourceId": "src_b57fab74e7c70975b26087f199fc29a3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper.json",
+      "blobSha": "7f7e7967c26a0997027a4d96050c7f94a7f0c707",
+      "blobSize": 1302,
+      "sourceDigest": "a1109e2c56230965bade1803b4f59879d5683fe0fc6978a2ae2ffdd801300ec2",
+      "sourceId": "src_e36365445ddc0e9cfb314e24a94830de",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/4-alternative-shaper-raw.log",
+      "blobSha": "38f6cd9bc029fad7ab169f4f52a904eeafd6fa7f",
+      "blobSize": 43803,
+      "sourceDigest": "11ab770a77d432afff9b8b8e4008e3f1b78a6aacf4231a6f16c4c8742da99bfa",
+      "sourceId": "src_83ca5a27d505d32d1e32c1bae052cdd5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/4-alternative-shaper.json",
+      "blobSha": "84750db5cd441d0d427e1a7ad60f643e7bc5ea9b",
+      "blobSize": 1444,
+      "sourceDigest": "2c97ae9129513e34318eb75ab8c4f0c91eafd616231d1698b24063aa4c84f64d",
+      "sourceId": "src_2ac4faeba673bb179ab5252ef45b7426",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/5-constraint-advocate-raw.log",
+      "blobSha": "ca871c56a045fe87c9ebd52c21ffcd1a4addc159",
+      "blobSize": 78179,
+      "sourceDigest": "d44f25eb1db4707bd7c46170a8e9018883ff3e00648426df5c92c584f6c06d0e",
+      "sourceId": "src_9cd8fdd054eb3ce7ebff61fe0d10a6d9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/5-constraint-advocate.json",
+      "blobSha": "eafbd07fd4dd2b3d6537a592d24023896f377aab",
+      "blobSize": 1759,
+      "sourceDigest": "735872a777d405fef699c6afd590dc10f7c9d159098fd6e201d1854460653dc0",
+      "sourceId": "src_e8775c365e3631a90d1a4e4ddcacaa81",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/6-architecture-critic-raw.log",
+      "blobSha": "3125e998d5823995f74c722eb25b8faa7618480d",
+      "blobSize": 90017,
+      "sourceDigest": "23791a48e0be77351b58eab0c9e6c68ad7036e3893c099e031722c87846d9c6a",
+      "sourceId": "src_9d4d3ed814e6f32a07b0fe6b5611372b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/6-architecture-critic.json",
+      "blobSha": "bab13d2e83cd87765e9025ac808afc4311e04dfd",
+      "blobSize": 2553,
+      "sourceDigest": "ef7058dc26d4b3199df19d6c5e7145e929f00a04946796d5cdb586351452c5a3",
+      "sourceId": "src_d87f7c5641166ab00c03b5d55caccc11",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+      "blobSha": "6328335dcb51b256668d7587c3b7e21a03e06588",
+      "blobSize": 15912,
+      "sourceDigest": "03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e",
+      "sourceId": "src_9411fd57c4be2ef6954ccb7036b7a049",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer.json",
+      "blobSha": "f8c41cf60177ad158fcaa340687b4cbb0a1f1d61",
+      "blobSize": 1817,
+      "sourceDigest": "48a4f6b5e0fd6ae0e9318970f00ba050e17a1b462e5d7bafc7ed9a0fdb2e5097",
+      "sourceId": "src_b854631bd2322e5c31d68a0a895db25f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/8-lead-advisor-explanation-raw.log",
+      "blobSha": "219fa55ff16134c77ce30a343f8ed9dc73d67ee2",
+      "blobSize": 12196,
+      "sourceDigest": "7993b4461a750ab5e8d30822f92b8b81afec0bcdac3fb1d30465b0551897395b",
+      "sourceId": "src_e62d509e3f303a79a8cf82e5043c3f53",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/8-lead-advisor-explanation.json",
+      "blobSha": "24583b4bfe9e88f005bb820dbb99ee9bb7e67043",
+      "blobSize": 1571,
+      "sourceDigest": "ffebe511f206790eed45ec161b5da269d88316712c01cefe507cc86c2e2217a0",
+      "sourceId": "src_97e39fb82a26c9dc65f021b8a6f1d496",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+      "blobSha": "3dd02175966e34d0e9d272b95e3517da10c4e418",
+      "blobSize": 8620,
+      "sourceDigest": "e474e8cc9264dde8627b40050e1edd86969854f4cbb99e2390d803f6fcaae583",
+      "sourceId": "src_e57334bedf0dd035e13b487c71346b5a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact.json",
+      "blobSha": "12eb0e2d4c5eebc0305a72add258dc32e3b83b5a",
+      "blobSize": 2224,
+      "sourceDigest": "42e81ce9578817424002c53d0ee0596a4c4bac641cbdee46c0c044953efab228",
+      "sourceId": "src_0475c40a4199008a549be7e98ae6c0c6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/scout-report.md",
+      "blobSha": "3d9261baaa0dfda5169fb37db7ac03b78c7ded59",
+      "blobSize": 15530,
+      "sourceDigest": "a19ee82ef21810ae18a25d70e539aae4a947957b3345f7ebbba86a0ed69b41f2",
+      "sourceId": "src_7ef6bd027d2bbd1477ffb0afa3ababbc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/session.md",
+      "blobSha": "e57b1b0d1e022e14ae2b64becbeb04f8000859df",
+      "blobSize": 1834,
+      "sourceDigest": "57224cbdc5a67f9be0e424f227aee980a46cb9750c1473d55d473a2472868320",
+      "sourceId": "src_847e5e6e8db0274b1ca465cc3703db4d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Session Board — P01.3 (vnflow, unclear-input manual proof)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Session Board — P01.3 (vnflow, unclear-input manual proof)",
+          "anchor": "session-board-p013-vnflow-unclear-input-manual-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md",
+      "blobSha": "6328335dcb51b256668d7587c3b7e21a03e06588",
+      "blobSize": 15912,
+      "sourceDigest": "03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e",
+      "sourceId": "src_d332041ea81cc80ee3f0654faa839921",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Decision Packet — vnflow (synthesizer)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Decision Packet — vnflow (synthesizer)",
+          "anchor": "decision-packet-vnflow-synthesizer"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P02.1/driver-authorization-suite-run.log",
+      "blobSha": "2d5925fdbe14dbdb25e9be78676a4355d79753bf",
+      "blobSize": 32799,
+      "sourceDigest": "733d8ee7b2146d93eb131b30c44950b0741c6d6ef18c11387fe13cf6d9ae86a7",
+      "sourceId": "src_34e06292b3b98c6478acbf8ab75727ef",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P02.1/focused-suite-run.log",
+      "blobSha": "746e0a5ccb272e6b0020ad82a9130724058cc4de",
+      "blobSize": 311156,
+      "sourceDigest": "510effe294c0bd1baebb58eaf4499f147390ac6546c5da66c92ed3d785b5b8f7",
+      "sourceId": "src_4eae656f2cf828e5e8ad6f87bb281a69",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/detect-changes-isolated-diff.log",
+      "blobSha": "532ece7c0262c23d7e954eb2144c90287e52bc11",
+      "blobSize": 2197,
+      "sourceDigest": "df005882ad77afffc21f2fcd81d810bc554e5f3b787284c1d00d8c0b4accbede",
+      "sourceId": "src_a7dffafa02c41eac1d55a1b99d6cefbb",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/detect-changes-vs-main.log",
+      "blobSha": "8f8307227fb3ebf0440f1a286c4cdbb4f586ab6b",
+      "blobSize": 2533,
+      "sourceDigest": "01a589001c506d0d882995c99b93c099effa06e596a05d7411807f1e187d2ece",
+      "sourceId": "src_a4aaec97b3a9545940ddfa5bb3724f45",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/doer-fix-round-1-report.md",
+      "blobSha": "53318121525ac64ac4eb950f54c262826111f9d3",
+      "blobSize": 16760,
+      "sourceDigest": "9595366f1957d533e8c1e5593a618fe4de53a7b52958c31244b3d4dca46c9f50",
+      "sourceId": "src_5499f3c05d30a95ec1f6a732815b897a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P03.1 — Fix Round 1 Report",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03.1 — Fix Round 1 Report",
+          "anchor": "p031-fix-round-1-report"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/doer-fix-round-2-report.md",
+      "blobSha": "3970122a776743d0e0db2e3c5c195d6c0a4606e9",
+      "blobSize": 8589,
+      "sourceDigest": "49e8010b8b8128bcb56e42776a3ce0dd29fc9b53599e9ba1aab7eb51f82d1a40",
+      "sourceId": "src_7295e50895ea4f1d9c17c142f5154a89",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P03.1 — Fix Round 2 Report (final)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03.1 — Fix Round 2 Report (final)",
+          "anchor": "p031-fix-round-2-report-final"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/doer-report.md",
+      "blobSha": "f74aae6dd181b4910aa3d3d2c2bd10646326a831",
+      "blobSize": 22605,
+      "sourceDigest": "c20064e58e93eba2bb8c6263f189cf123e80accc4e6b3dc050c29052a2922d84",
+      "sourceId": "src_f711ed4b931436eef9b10b12d056f996",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.1 — Doer Report: Human-Turn Trusted-Input/Decision Door",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — Doer Report: Human-Turn Trusted-Input/Decision Door",
+          "anchor": "cell-p031-doer-report-human-turn-trusted-inputdecision-door"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-detect-changes-isolated-diff.log",
+      "blobSha": "55c88ecc9ee1f8d979b4238d1898e5d3ce7443df",
+      "blobSize": 1553,
+      "sourceDigest": "50c385e834b478669046f41066a75e9f6f7b9c844e89ce711456703b4b47c3c9",
+      "sourceId": "src_19c54df6869f3180aae1be5db19a0983",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-detect-changes-vs-main.log",
+      "blobSha": "8fea7ffc0012eab9a0c715d75fed3a166b2c7c96",
+      "blobSize": 2533,
+      "sourceDigest": "8656461244c41dd18a735c4bdff053601dc7f2f0395746ef828beab94787e636",
+      "sourceId": "src_7e8327bfe6a97769127797d7eceedbe1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-focused-suite-run.log",
+      "blobSha": "76f62bbcf53deb5bfaefb0a229807be8f6b27a83",
+      "blobSize": 321811,
+      "sourceDigest": "bf58800e563f2e63639ed6e756631a54aad3dbcbd5999b10260bd717d9a436c3",
+      "sourceId": "src_9b904b7696e15b1d3c2628f73e1364d1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+      "blobSha": "6592a264df11bcffcd3dd7facd51cf854d11a7ba",
+      "blobSize": 1036726,
+      "sourceDigest": "04223f63599492f9e7409a66cf18139e6df5b166b071f0122384c34116883cdf",
+      "sourceId": "src_bb364627cbdb223d99b7e84c36ccc138",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-detect-changes-isolated-diff.log",
+      "blobSha": "dd1b33ebbb4277a318ec78211825356d39501613",
+      "blobSize": 759,
+      "sourceDigest": "e8573bcf95948639fd4cad44a00d85f5954e2ace83389213a621d390274929ca",
+      "sourceId": "src_8cfabd9e7a9478b3ac444dd2954aa316",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-detect-changes-vs-main.log",
+      "blobSha": "a3525c7268b6b934da83a5e32292fdc68a4c8c4b",
+      "blobSize": 2533,
+      "sourceDigest": "ae21a651b2b70a5667892985490c2834907202af8c8fda6b322a370a17ea4a03",
+      "sourceId": "src_7a5b29b89ef5dc8e176a16745d1fb138",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-focused-suite-run.log",
+      "blobSha": "9fcd12eb66a7c6e290189e65f1cb83653bc45f53",
+      "blobSize": 322764,
+      "sourceDigest": "4d96d26f1c3a6bea891819131cfa662324314dbb27526b46f284a2228bcc9055",
+      "sourceId": "src_2e952ebf0283ae6e5cbd35a99ec58361",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+      "blobSha": "382880339fa8051853ee274ab3a78566b60e3098",
+      "blobSize": 1038489,
+      "sourceDigest": "01a411d17fe4e6a1dffcd788cc9d8230a617c79dcbab269b79f1ae8dfb801446",
+      "sourceId": "src_77df761810c356d1cfed9ebc3db88c53",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/focused-suite-run.log",
+      "blobSha": "a4114044b58be7c1f8351ddf3f44405d74f9d1f8",
+      "blobSize": 319071,
+      "sourceDigest": "e26dbccaa74b6f1e0cb1ea85bdf6f954f0c8672ad64cc9c1995fc94510a7f725",
+      "sourceId": "src_12a982314e8510c3ba7c79fe4c2a81de",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+      "blobSha": "cc336035577143870f19a740941f003de7adb6a4",
+      "blobSize": 1034969,
+      "sourceDigest": "03a572ab53ee82ad5bdd878c0dc4e6c6d945b222f573675ef3c65526ddd74fae",
+      "sourceId": "src_16d63eef4c7c37b5320e5dbee34d0a93",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-assertDispositionRefOwnedBySession.log",
+      "blobSha": "491a5a8fededc27870ef357e284071f077f8d97a",
+      "blobSize": 9498,
+      "sourceDigest": "84715a385922c6e7db9e6903b00dff16a65873e90c5b32bfb853ae012a319567",
+      "sourceId": "src_7b41872ebeabea720de1e6de88d76d76",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-recordDriverDisposition.log",
+      "blobSha": "dfff23a146ff87c5774e84ad4f7adf14859cc716",
+      "blobSize": 493,
+      "sourceDigest": "bf1e6c90863570bd79afd2a6cf5f8e0e2a9268197336f7a0c989dba290816a97",
+      "sourceId": "src_c9845ace133f9529bdc29e26e8da46db",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-replaySession.log",
+      "blobSha": "0eebf17aad60625cc65b724baeb974626affe2a0",
+      "blobSize": 21765,
+      "sourceDigest": "d7f56ed4e016a6f08c3d975b23a4dd1a21232f1242f425e77fd1f6a610324887",
+      "sourceId": "src_0c9f6fcd2b73084f843c3107951b1e1f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-runCoordinationUseCase.log",
+      "blobSha": "00066b1f49307bbc062adf2cc6b05157c4763488",
+      "blobSize": 3077,
+      "sourceDigest": "6749185a0a09948a7ae97c664d4c234913ad24bd06a184a08c6ff4d28ede02d6",
+      "sourceId": "src_938d0909238ea6e05254fba36cc91851",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-validateEventPayload.log",
+      "blobSha": "da81d1616232b8f785375cd86c62d145d362fdbb",
+      "blobSize": 37142,
+      "sourceDigest": "238b7d7a0c7bb9aa5d39a8aab18016c9c28a8a2d45273b5bc128a7f5bfe3605f",
+      "sourceId": "src_c3ea96a1ff57e964da77a0f9f71a8f6e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-validateSteps.log",
+      "blobSha": "aa3d17c89a9ae462e91d54efa0ef05b47e0237d6",
+      "blobSize": 5949,
+      "sourceDigest": "0507720886f709f4d37fa1149f1913a7119fb2bebcf1ce8c4945b21e35ed5776",
+      "sourceId": "src_bc6aedb3833c3e2f33200847bed2973a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/redteam-findings.json",
+      "blobSha": "8863d5b975df12cbefebf47338d1cb623236fb12",
+      "blobSize": 24056,
+      "sourceDigest": "6395b067b9983d9b4b87df39a2a64b06b30412b3d5632ea4d5e879ead6f6d002",
+      "sourceId": "src_6c872cbedfe5ff1c3090758658e67004",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/redteam-recheck.md",
+      "blobSha": "eecba54760457f46dee4eaf13b5456adeb8c0abb",
+      "blobSize": 13486,
+      "sourceDigest": "a74f55e6b2d736a9a498fe887e829304c9790ce8f179264b2f73e31e94610bbb",
+      "sourceId": "src_ada421938caa3b8ea50d841941b11b16",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P03.1 Red Team — Recheck After Doer Fix Round 1",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03.1 Red Team — Recheck After Doer Fix Round 1",
+          "anchor": "p031-red-team-recheck-after-doer-fix-round-1"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/redteam-report.md",
+      "blobSha": "3e67f0cc019fa1889479e2dd4b254daa3c4f3f70",
+      "blobSize": 11817,
+      "sourceDigest": "a7772814611412c32bcec78b42371f2ef5a33133969d5f3fae449cfeade39d2d",
+      "sourceId": "src_794fac91ae6986e95d54d3650ca4fbca",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P03.1 Red Team — `human-turn-recorded` Trusted-Input Door",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03.1 Red Team — `human-turn-recorded` Trusted-Input Door",
+          "anchor": "p031-red-team-human-turn-recorded-trusted-input-door"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-findings.json",
+      "blobSha": "2d821b717365c9cadc09f54e6316cc4e3cd1a659",
+      "blobSize": 12770,
+      "sourceDigest": "3ffea2d3b362c88510a146f7b9b1813c49246d2fdc814504b73c9ed27fc7036a",
+      "sourceId": "src_97ac0ced73779691995095756d6f720c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    }
+  ]
+}

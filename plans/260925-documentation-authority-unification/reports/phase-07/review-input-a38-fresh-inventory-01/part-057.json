@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 57,
+  "entries": [
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+      "blobSha": "c7b71fffa7b159ca1f60647c87fea42dd8b4b28f",
+      "blobSize": 5536,
+      "sourceDigest": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+      "sourceId": "src_8bb4631ca3562e49b4baaf771834e748",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Prior navigation before whole-file historical relocation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Prior navigation before whole-file historical relocation",
+          "anchor": "historical-file-prior-navigation-before-whole-file-historical-relocation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "blobSha": "4a98750e6832ea89434764737feb18abe48a1c47",
+      "blobSize": 37406,
+      "sourceDigest": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "sourceId": "src_cefa33375459e557e1c97e8f8ec91f4f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Prior navigation before whole-file historical relocation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Prior navigation before whole-file historical relocation",
+          "anchor": "historical-file-prior-navigation-before-whole-file-historical-relocation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+      "blobSha": "480846fd80dc7bb6f2d2c811a0b90c78eea30f9a",
+      "blobSize": 16220,
+      "sourceDigest": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+      "sourceId": "src_012fc2f0a5f4165090e011cda8d6c32c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Prior navigation before whole-file historical relocation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Prior navigation before whole-file historical relocation",
+          "anchor": "historical-file-prior-navigation-before-whole-file-historical-relocation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "blobSha": "9abd0b46ccad64fe16079c45aac753ccfcaa8a55",
+      "blobSize": 35775,
+      "sourceDigest": "e7ffb99241761e46ec108f2e9d4e47a6fa67be124594b75661b8aaebf16d1210",
+      "sourceId": "src_6724a19c17b5c4a200318b99e0c35d08",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: intent-preservation-ledger.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: intent-preservation-ledger.md",
+          "anchor": "retired-engine-snapshot-intent-preservation-ledgermd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+      "blobSha": "0b654aec5ce5ec305d9bd58432d3348f1d7d7dd6",
+      "blobSize": 6078,
+      "sourceDigest": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+      "sourceId": "src_5f0d606f42f771036f266cf8c8112f48",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Original legacy input architecture/system-context.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Original legacy input architecture/system-context.md",
+          "anchor": "historical-file-original-legacy-input-architecturesystem-contextmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "blobSha": "8828c8612f5847d1115c0c786dad179c390d1cbf",
+      "blobSize": 31872,
+      "sourceDigest": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+      "sourceId": "src_ed91c0258bea29eaa42d5cdb886cd75e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Original legacy input intent-preservation-ledger.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Original legacy input intent-preservation-ledger.md",
+          "anchor": "historical-file-original-legacy-input-intent-preservation-ledgermd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "blobSha": "fe98433fb9245e530514579201caee04d7fd98be",
+      "blobSize": 13985,
+      "sourceDigest": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "sourceId": "src_550a4bff6fa824f64f1683e57997107d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Original legacy input README.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Original legacy input README.md",
+          "anchor": "historical-file-original-legacy-input-readmemd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "blobSha": "d1aa06d86467e602655df60596d7be670d4b1375",
+      "blobSize": 7006,
+      "sourceDigest": "8a4d1ebaf6562f253c3ccd0a4410658d7144e084e3834c08a88eb9288a7915b6",
+      "sourceId": "src_fc7b41c1a43c7cd20824a69f45bd5162",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: proposals/semantic-cli-surface.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: proposals/semantic-cli-surface.md",
+          "anchor": "retired-engine-snapshot-proposalssemantic-cli-surfacemd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "blobSha": "7f1aa99a10a938ea38ec03e66f248e0e9e8451d3",
+      "blobSize": 20930,
+      "sourceDigest": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "sourceId": "src_c997026bd7d4d314bd8d299d03843eba",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: README.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: README.md",
+          "anchor": "retired-engine-snapshot-readmemd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "blobSha": "4b10ff4c0e140e7be7e3a1baa507196cdb039ae6",
+      "blobSize": 13530,
+      "sourceDigest": "42cab41d7ab9739a2145b68cf20599b95119007c79f5888f335a89fad8a14466",
+      "sourceId": "src_d9056556ebced7a586ac0b2fa691fb3c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: spec.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: spec.md",
+          "anchor": "retired-engine-snapshot-specmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "blobSha": "3aa809b9874a8fe893a4c44e5e0ae8dd18eb88a4",
+      "blobSize": 8895,
+      "sourceDigest": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "sourceId": "src_eb522c543659a2951c06a14ae41964ab",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: subcomponents/README.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: subcomponents/README.md",
+          "anchor": "retired-engine-snapshot-subcomponentsreadmemd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "blobSha": "8a87240c4b0d624829d37f1e76e7b3eef74218c6",
+      "blobSize": 9697,
+      "sourceDigest": "526d0b22dc43ed34423acfd18d97458ce411819271eb1c3a22bf9639c59cf85e",
+      "sourceId": "src_69a7cf9df1d21515ddf830d7c4e39c26",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: verification/implementation-alignment.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: verification/implementation-alignment.md",
+          "anchor": "retired-engine-snapshot-verificationimplementation-alignmentmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "blobSha": "13a76a19653a8672c3de35f65095fe2468552177",
+      "blobSize": 45289,
+      "sourceDigest": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "sourceId": "src_1466b0f9de741ba8ae009509e8e6bc36",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Architecture Advisory Artifact Templates",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Artifact Templates",
+          "anchor": "architecture-advisory-artifact-templates"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "blobSha": "1eecfce599718fbe019f98bf7dc013013cdc057a",
+      "blobSize": 21840,
+      "sourceDigest": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "sourceId": "src_e4fdcbaa7375f9cf0851780fd97553d2",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Architecture Advisory Evaluation Rubric",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Evaluation Rubric",
+          "anchor": "architecture-advisory-evaluation-rubric"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "blobSha": "08f5e525f34fa227321a46face70ed13dcee27d7",
+      "blobSize": 82161,
+      "sourceDigest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "sourceId": "src_dbe223be8d10efff206980017d9109b0",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Architecture Advisory Role Doctrine",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Role Doctrine",
+          "anchor": "architecture-advisory-role-doctrine"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "blobSha": "83ee461c251cc2a2c07219f51da20783627aa350",
+      "blobSize": 16287,
+      "sourceDigest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "sourceId": "src_170fc5197a99e6d0949d8c1c0e490c7d",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Coordination Operating Harness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Operating Harness",
+          "anchor": "coordination-operating-harness"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "blobSha": "ab04d2a3cdb0bcbd57a2a8f0073f6a97c7dc2f9d",
+      "blobSize": 3669,
+      "sourceDigest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "sourceId": "src_aac4a7ad3e9d80a8adfa20d90b57d0b4",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Architecture Advisory Coordinator Prompt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Coordinator Prompt",
+          "anchor": "architecture-advisory-coordinator-prompt"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "blobSha": "54c2d3f9a027a364cf6d06e9169d5efa94cfa9ba",
+      "blobSize": 27675,
+      "sourceDigest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "sourceId": "src_449467fe7b87d74ed0bb3e6d8182c1c4",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Master Multi-Agent Implementation Coordinator Prompt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Master Multi-Agent Implementation Coordinator Prompt",
+          "anchor": "master-multi-agent-implementation-coordinator-prompt"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/README.md",
+      "blobSha": "f6a5382ff52f9e99040a6dfdfae759e8bd87699f",
+      "blobSize": 5563,
+      "sourceDigest": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "sourceId": "src_aecd790f88c3c576fece205524e24848",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Playbooks",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Playbooks",
+          "anchor": "agent-coordination-playbooks"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "blobSha": "f0c176e44b33210fcd44cc7d78f3eb6a731421b3",
+      "blobSize": 41339,
+      "sourceDigest": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+      "sourceId": "src_1c1b002b3dbe314d427159648b0a7256",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Dispatch Control Plane Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Control Plane Redesign",
+          "anchor": "dispatch-control-plane-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "blobSha": "cb85f5d3b95677f4aa7606b41164e6f9b974c6ca",
+      "blobSize": 5039,
+      "sourceDigest": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "sourceId": "src_7ff22ce5a1ab024e79e0a71114172082",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Proposals",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Proposals",
+          "anchor": "agent-coordination-proposals"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "blobSha": "54542dbda2a5e88cf1a086b5c1a72e1fd9da440a",
+      "blobSize": 16084,
+      "sourceDigest": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+      "sourceId": "src_e9b841789041f7c083b6442b298dee3e",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Team Communication Protocol V1",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Team Communication Protocol V1",
+          "anchor": "team-communication-protocol-v1"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "blobSha": "3b1be59d4a32b1d2cf76f58157286ad21380cf23",
+      "blobSize": 6693,
+      "sourceDigest": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "sourceId": "src_ca7a42d1c2e50ea2aa4fc5b57fc06327",
+      "area": "Agent coordination",
+      "authorityStatus": "promoted",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination",
+          "anchor": "agent-coordination"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/spec.md",
+      "blobSha": "48639ea572883688e62b4279d10adf5ae7ef16a4",
+      "blobSize": 7571,
+      "sourceDigest": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+      "sourceId": "src_2ceee3cc2346ad20bf1b4b5f9cc01f25",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Spec",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Spec",
+          "anchor": "agent-coordination-spec"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
+      "blobSha": "f32f9f926950e54c97d36d440adc88c50b75a9da",
+      "blobSize": 3305,
+      "sourceDigest": "26412dd84e3ae4fccf8587ed7cf20404963e8b93d31674b8c34a71032f7090a8",
+      "sourceId": "src_55bbd3b068a69f48c9bbd0b6d9d49350",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell: none — track closed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: none — track closed",
+          "anchor": "current-cell-none-track-closed"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md",
+      "blobSha": "73af6f4c69411a6a71443a819498439f9a1255e6",
+      "blobSize": 19103,
+      "sourceDigest": "2becc5d17a36e793e00bbfde6385f95db525437640a2acb86e270bca79aebba1",
+      "sourceId": "src_cea2d8a3b1fc3b646a34df81388ede30",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Track: architecture-advisory-panel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: architecture-advisory-panel",
+          "anchor": "track-architecture-advisory-panel"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md",
+      "blobSha": "7694d826696c89411e252e9b65c960e423124740",
+      "blobSize": 28797,
+      "sourceDigest": "7cc7bccf29e4445c9912e7d659ed29c285294b9b0c511d8f4cd09045514f7fd7",
+      "sourceId": "src_20ae22f381f4c85fbb0abb0c7a89d775",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00.1 — Read-Only Dispatch Readiness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.1 — Read-Only Dispatch Readiness",
+          "anchor": "cell-p001-read-only-dispatch-readiness"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.1.md",
+      "blobSha": "c11c2e98a02d143d8dd2c40a35221942e507c808",
+      "blobSize": 31259,
+      "sourceDigest": "d0d64c72505415b7dfa1e0dbe5f3bdfa3159b2427c2049c75167db49926e4cc1",
+      "sourceId": "src_0ef8e7ce61a163d96bd4e04ab1200e87",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.1 — Author The Soul",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.1 — Author The Soul",
+          "anchor": "cell-p011-author-the-soul"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.2.md",
+      "blobSha": "15df8de0aaa34064ba6bfce13e362970e8f8cf15",
+      "blobSize": 6155,
+      "sourceDigest": "b00f3ef05d2bac58b3755b3395347821f2e5f6196a44121c4cdc08e3feaec4af",
+      "sourceId": "src_64cd5f9d556c7a8b77a1511567a7d3ec",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.2 — Clear-Input Manual Proof (mdview)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.2 — Clear-Input Manual Proof (mdview)",
+          "anchor": "cell-p012-clear-input-manual-proof-mdview"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.3.md",
+      "blobSha": "18be95f45651f474a7ab300c5776c5ab12e68cff",
+      "blobSize": 12187,
+      "sourceDigest": "53cf9cbd8d5917fa8886cc11e085522bc0b4215aebe0762488ad2b8f24e41e39",
+      "sourceId": "src_ad660398e664ee568cf93788d934c9cc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.3 — Unclear-Input Manual Proof (vnflow)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.3 — Unclear-Input Manual Proof (vnflow)",
+          "anchor": "cell-p013-unclear-input-manual-proof-vnflow"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P02.1.md",
+      "blobSha": "33ab9820ea6e8a2632536c97a88b847fe6e5ca95",
+      "blobSize": 32936,
+      "sourceDigest": "de6cbfca6dec1811d71e70e4c699617f54387b8ab1775883d9ebd63579e4a3bb",
+      "sourceId": "src_8c2b239f8ee4447c70c6ae541806d069",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.1 — Capability-Fit And Hard/Soft Placement Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.1 — Capability-Fit And Hard/Soft Placement Audit",
+          "anchor": "cell-p021-capability-fit-and-hardsoft-placement-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.1.md",
+      "blobSha": "a6df28cd3c6a2149009fdbb09420c595dabe7a03",
+      "blobSize": 11112,
+      "sourceDigest": "48af282880aea8684e74d94b590a455bd5ae60a36b94b334c742a66b1f82b769",
+      "sourceId": "src_79a0daedb66bc57478fbe8cf38411388",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.1 — Conditional Shared Capability (Human-Turn Trusted-Input Door)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — Conditional Shared Capability (Human-Turn Trusted-Input Door)",
+          "anchor": "cell-p031-conditional-shared-capability-human-turn-trusted-input-door"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.2.md",
+      "blobSha": "df1dffa637c9b0ac384a11f7f2a6285e41feda0c",
+      "blobSize": 9466,
+      "sourceDigest": "0e04268b6252bb455ad8d90d93ee64734ece32d2e18a7a9da81fa2c3edf819bc",
+      "sourceId": "src_c68133f64a709f661d64ea69df5b4553",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.2 — Protocol And Artifact Envelope (architecture-advisory-panel-v1)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.2 — Protocol And Artifact Envelope (architecture-advisory-panel-v1)",
+          "anchor": "cell-p032-protocol-and-artifact-envelope-architecture-advisory-panel-v1"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.1.md",
+      "blobSha": "9f153c8a250eaa34362c4ea28040d8b333df27ac",
+      "blobSize": 10551,
+      "sourceDigest": "e16352e3bc2bc18d732557be77ede849fa59e970c26243bc8514afdd9c1af91d",
+      "sourceId": "src_2b21c669c77c760037d60b53de0d2c4b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P04.1 — Production Skill And Projections (fgos-architecture-panel)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P04.1 — Production Skill And Projections (fgos-architecture-panel)",
+          "anchor": "cell-p041-production-skill-and-projections-fgos-architecture-panel"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md",
+      "blobSha": "b3c47c654ebb5c0eefd9c98f02c0c36c91bb50b1",
+      "blobSize": 11827,
+      "sourceDigest": "aa2827818ad5e62395ac0ef1607c084a5871e054b375545b1e6c3abe123033f7",
+      "sourceId": "src_0c307563ebb4635a8203d1f3b0077a18",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P04.2 — Surface, Examples, And Dialogue",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P04.2 — Surface, Examples, And Dialogue",
+          "anchor": "cell-p042-surface-examples-and-dialogue"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.1.md",
+      "blobSha": "79903ea439518cde6c55cb3d81e45209abfae264",
+      "blobSize": 9116,
+      "sourceDigest": "9d10185d3791bf6de3d9038c25bc96f7a1560727bf9fcd87fa3c576a4b457823",
+      "sourceId": "src_3a1959c4f6a4eab62a3c4e5dfbe43d09",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P05.1 — Hard Conformance And Recovery Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P05.1 — Hard Conformance And Recovery Proof",
+          "anchor": "cell-p051-hard-conformance-and-recovery-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
+      "blobSha": "746c1b264fa9a1abf08b4f219b9a9e9b22b69356",
+      "blobSize": 15227,
+      "sourceDigest": "d9c6de60b293a2cd1f9e1349ae6642057205edb79d149651c0a930412b74ea8a",
+      "sourceId": "src_1fb012cf531dee5b2e70b8b697df2a9e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P05.2 — Comparative Live Proof And Promotion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P05.2 — Comparative Live Proof And Promotion",
+          "anchor": "cell-p052-comparative-live-proof-and-promotion"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-bwrap.log",
+      "blobSha": "24bd5c60d0a5a7f08018953ceb4467887a8d2b99",
+      "blobSize": 150,
+      "sourceDigest": "0c9603c69ddc726f8010324e2a0044e1aecc420adc63f0fbcd884d42ca32fdba",
+      "sourceId": "src_3827d48b71302a1423626051af3108cd",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-cli.log",
+      "blobSha": "84c650a640910a1ac2b354f1e53d8f11af1daef1",
+      "blobSize": 1367,
+      "sourceDigest": "5989a33ff7c2232ae00f3a4b0f149050956bc5fb0a494a42965c0ab3d35a3f7b",
+      "sourceId": "src_21eb2bb64a4d0e3b891d4d17269db60d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-plan.log",
+      "blobSha": "407a83277436216c78c78d6c913b806187e5889c",
+      "blobSize": 1315,
+      "sourceDigest": "0adf618de7ce8f366e6cfd3a91c8d577fce57b85a4e81dac390179f9c5f53760",
+      "sourceId": "src_52688347a3d0296c950ee76b9a183a88",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-sandbox.log",
+      "blobSha": "b96f25c0acc6de18d65841f3f81a0823cb616b89",
+      "blobSize": 1220,
+      "sourceDigest": "e3f0b334ec414e7b7fe2e9c934e6a4ec2fce5ce5fff668cd0ed1cb2ac2581b41",
+      "sourceId": "src_7a30e2f50ad4c16f63e7bdcbdaacec8e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+      "blobSha": "7b809ffa06647dd02bba0469cdb25b19460f17e1",
+      "blobSize": 1026160,
+      "sourceDigest": "0c711e50abf24625c70b67c9f5609e573ab914906b4b308696103cccdec0f58c",
+      "sourceId": "src_2761d4d3736c76e8329fe740368219b9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/claude-bwrap.log",
+      "blobSha": "586f9b066fd38bc5d036469ceeb0c268f5c96a1a",
+      "blobSize": 1088,
+      "sourceDigest": "955150afd1cc603b83a73e03d4564d6f158ef9f02b3ac646f2ec44621c3d8a75",
+      "sourceId": "src_303eddeea6f725c621b6a961b58396ac",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/claude-reviewer.log",
+      "blobSha": "f3737defab6e0af7db862bfe7d7a107d4b615a2d",
+      "blobSize": 1828,
+      "sourceDigest": "e679b6434d520c07eed8cc802e92547be1dd527914a623fab585ed3d9e94c463",
+      "sourceId": "src_a03d8c2bffa719441a5bc040745173f7",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/codex-bwrap.log",
+      "blobSha": "d0a9b38f81ebb7b8fbbdf8e450117516034794b1",
+      "blobSize": 1210,
+      "sourceDigest": "10625701a9fc482d827c788d17a5c5186efd3cddbbefe34ce477c0dc69c391fe",
+      "sourceId": "src_983dcd67d57b131e35e716723b08ae6c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/codex-cli.log",
+      "blobSha": "2c830d65b3c6bc563bd17dc1f106db75f617185e",
+      "blobSize": 5248,
+      "sourceDigest": "03ad3f12208becde915c21a0420158d651ef84281310931ea7edae59f10df377",
+      "sourceId": "src_64fec0fc80fde376b8dc77dc63c6dbfa",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/codex-readonly.log",
+      "blobSha": "3430d3ec8846d05eb14f1e9f0973c829f297fc92",
+      "blobSize": 1741,
+      "sourceDigest": "424dbeca1ba7b6d7b4147b0541e4f38c6af0e3df13640bca109a038a304ff324",
+      "sourceId": "src_6fa01cabe2a63e335db888d28d7ee8c4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/red-team-recheck-corrected-bwrap-evidence.json",
+      "blobSha": "33aa452ae7f968863852a7a7aba707cbd5f69625",
+      "blobSize": 4997,
+      "sourceDigest": "92566345d1187dfb3ff7c376d971be267aae9db5493a761bbf8ef50b0ef5067f",
+      "sourceId": "src_992740e5e8b3e7f5cc4830c324cfba7b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/close.json",
+      "blobSha": "292bd2aae1ae8466d29ef93ee982dca7a1f89ede",
+      "blobSize": 2463,
+      "sourceDigest": "bd56c4c305789c7750602fa9d597b94c7917d2348cb7c6faef5a2e3f16c193e0",
+      "sourceId": "src_7890fc28cb3aa6d30441540b26e08310",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/fix-1.json",
+      "blobSha": "1e8053a929c00a1d4f7ba63a000ca508f161ac5b",
+      "blobSize": 8148,
+      "sourceDigest": "6ab66ffed7c169d738487014a27b0bc6b364155591f4b1540201c046d3542aba",
+      "sourceId": "src_ee867e8a660ad0510060b7adcdf5bef6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/fix-1b.json",
+      "blobSha": "0912465ce17b80e27e9fe8a3e76ad6fc4d0f7632",
+      "blobSize": 4153,
+      "sourceDigest": "1547fa7e354a12f03b2b6b8a14dae43b13525a2612fc571af6c263c209242ab1",
+      "sourceId": "src_344dd87f34fe9d24fa3a0f4fd9eebde8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/open.json",
+      "blobSha": "a0a6031d51ff4e75e666b4b655f723b5280899e2",
+      "blobSize": 6056,
+      "sourceDigest": "33916d711cfb0504c2d6e0b18819354e8176a0e1160d608baabbe28f376342aa",
+      "sourceId": "src_669edb01d86415080cfc855d78b233a1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/reviewer-recheck-fix1-findings.json",
+      "blobSha": "6969122200e9822626dea5a54d7dadb2d2c79d96",
+      "blobSize": 4916,
+      "sourceDigest": "f987055525222660b24d09f4eb6ffa1c3aad0a1a3445b549c825e5710be59ebf",
+      "sourceId": "src_3de704155a4725598782857bd016cfd9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/summary.json",
+      "blobSha": "bf541a5c7890817c0e7264497684ad0fcb753168",
+      "blobSize": 9150,
+      "sourceDigest": "ab6acf3118e33eeac40638560a07967afe371727a150bb517d7d4fa990c29751",
+      "sourceId": "src_e07340bbd634bb1babce6e3cff22242b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/close.json",
+      "blobSha": "964a528e05a735d72705e3a774fd917b055cdddc",
+      "blobSize": 2685,
+      "sourceDigest": "08e5131fe5c35642c8deb429b1a26a6b9b043df93cce946eaa44af91671863c3",
+      "sourceId": "src_ceaba79339fcdcd9f7f212e439308c14",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/fix-1.json",
+      "blobSha": "4098876c0290bdc74479db64a7f3da59e0648b08",
+      "blobSize": 7834,
+      "sourceDigest": "6f0cad6b342b07e1c096eae56e8fe8cb6215b9d0999adabfc7363fd84e9bb425",
+      "sourceId": "src_03cbf584da358ef904fc128e717d80a4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/fix1-session-workaround.json",
+      "blobSha": "0c6e79fabd6d41fc329a334ad45332e48e11a67d",
+      "blobSize": 7868,
+      "sourceDigest": "418b116b8ade6bc7319cff41b7df546facee8a78b554a0bb065f41ba30851cbe",
+      "sourceId": "src_ad34f6e07707e83a2143aac5a720efee",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/open.json",
+      "blobSha": "275aa453e8862d1d59e28b8e272eac0b700ef6c6",
+      "blobSize": 9517,
+      "sourceDigest": "f7ddff35cf2de2496bc9367390ceb14e27b1a88a5a726a5f7281b7d882d27a7e",
+      "sourceId": "src_19d41d23d9dd84ac6e3525ef0eb20609",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/critiques/architecture-critic.md",
+      "blobSha": "aa72db6b1dbb9c12fdc68c7a3ea879ca0e159492",
+      "blobSize": 6007,
+      "sourceDigest": "f1cb9805f6f1c09b7a33c2955a3da22284d3a35c1de79e7d23cc9403d873fb78",
+      "sourceId": "src_f7644677051ed0acc30e6de16b5699e8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "critiques/architecture-critic.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "critiques/architecture-critic.md",
+          "anchor": "critiquesarchitecture-criticmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md",
+      "blobSha": "6d70b7fb4abb9de4286b73e8e78d290434105c5f",
+      "blobSize": 3486,
+      "sourceDigest": "7240c8c2d181342ec433ccd1a27262c2a5ef7013d526a86780ca50df673f4625",
+      "sourceId": "src_f9101f5e4aa8a0d602cb4b9d9171ad58",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Verdict: no Decision Request sent yet — reasoning below",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Verdict: no Decision Request sent yet — reasoning below",
+          "anchor": "verdict-no-decision-request-sent-yet-reasoning-below"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1124 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 20,
+  "entries": [
+    {
+      "path": "docs/explanation/rul11-tum-lum-doctrine.md",
+      "blobSha": "de710dedb298293724e1b6b398902aa44212914a",
+      "blobSize": 2722,
+      "sourceDigest": "7f9367884f44f016fa50651ceaea1d36c744b868e3fab0c681ba91a49632c491",
+      "sourceId": "src_9c8b83baede8e4b43a2d06d850617570",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RUL11 — why \"heavy\" was the wrong diagnosis",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RUL11 — why \"heavy\" was the wrong diagnosis",
+          "anchor": "rul11-why-heavy-was-the-wrong-diagnosis"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/runtime-claim-doing-separation.md",
+      "blobSha": "56c6b4cad6bd49b9146cb9488534cd39ab1d016a",
+      "blobSize": 9772,
+      "sourceDigest": "0c15425e509ef07dd4853f7e1a0a494b2a6f0efba9ce3535118d0cbbcb7b45c7",
+      "sourceId": "src_c920095386f169f68eafa56ae73a9f9e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
+          "anchor": "doing-was-never-supposed-to-be-durable-history-it-was-live-coordination-masquerading-as-an-event"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/session-identity-3hop-walk-flaky-test.md",
+      "blobSha": "98fd235bef0f46d593e855a8e55f9b2f9c5305e6",
+      "blobSize": 3071,
+      "sourceDigest": "fa665eb03d43b39f4b5d59f3d953518aebe7833b68d01019de8010e0d1011d16",
+      "sourceId": "src_12f4906efe05a5e934d91a77f63746ec",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A third real-timer flaky test, and a different fix shape than the first two",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A third real-timer flaky test, and a different fix shape than the first two",
+          "anchor": "a-third-real-timer-flaky-test-and-a-different-fix-shape-than-the-first-two"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/settleclaim-revision-drift-self-caused.md",
+      "blobSha": "58c5db940d5ded992c1e19be5239c7b7c92348de",
+      "blobSize": 8121,
+      "sourceDigest": "bf74e1b1c2bb480808b7afbc557905b5394973cb0f573cbfa73546b269ad34fe",
+      "sourceId": "src_eaca8313e4e41bcae5af9e0ff27996ae",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A CAS check that couldn't tell \"I changed this myself\" from \"someone else changed this\"",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A CAS check that couldn't tell \"I changed this myself\" from \"someone else changed this\"",
+          "anchor": "a-cas-check-that-couldnt-tell-i-changed-this-myself-from-someone-else-changed-this"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "blobSha": "71a73bb640a7d1c77d551c1e797d32a191b1a865",
+      "blobSize": 738,
+      "sourceDigest": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "sourceId": "src_201f99ec26b692f787f74d344b274b9c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Deduplicating the \"fgos CLI fallback\" boilerplate across 23 skills",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deduplicating the \"fgos CLI fallback\" boilerplate across 23 skills",
+          "anchor": "deduplicating-the-fgos-cli-fallback-boilerplate-across-23-skills"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-design.md",
+      "blobSha": "88a6067bb9d05a2b652971a57570a1ff29d723f9",
+      "blobSize": 5502,
+      "sourceDigest": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "sourceId": "src_a7deb5973055961ad9fa85b45ac0d904",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS skill prose cleanup: the design behind `tsk-56w`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS skill prose cleanup: the design behind `tsk-56w`",
+          "anchor": "fgos-skill-prose-cleanup-the-design-behind-tsk-56w"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "blobSha": "5ab7caf055eb89bc8c59bdc9a6aaba863f4be6dd",
+      "blobSize": 515,
+      "sourceDigest": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "sourceId": "src_2cd957c1d36d85075afa12e75466a8a4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-coding-exploring`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-coding-exploring`'s skill-prose cleanup",
+          "anchor": "fgos-coding-explorings-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "blobSha": "810daf57cd17c43532510437d3aaa07367542e07",
+      "blobSize": 861,
+      "sourceDigest": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "sourceId": "src_8aff208c413a0d1ec77b664e0f9d8ba4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-coding-implement`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-coding-implement`'s skill-prose cleanup",
+          "anchor": "fgos-coding-implements-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "blobSha": "8817647f0d1f687c24dc3f8ca464df4cbadfbcea",
+      "blobSize": 512,
+      "sourceDigest": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "sourceId": "src_e6d3291bd26b72771f636942abf9190d",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-coding-planning`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-coding-planning`'s skill-prose cleanup",
+          "anchor": "fgos-coding-plannings-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "blobSha": "e2c7ab6128154774352525bd47a26f455d5b2f5d",
+      "blobSize": 518,
+      "sourceDigest": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "sourceId": "src_6d6d5ce9dc8a32cb17ccf78741aace87",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-coding-validating`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-coding-validating`'s skill-prose cleanup",
+          "anchor": "fgos-coding-validatings-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "blobSha": "6147dd6b3b4b7341b1ec2a86bcc49f0e51fb708c",
+      "blobSize": 707,
+      "sourceDigest": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "sourceId": "src_92881cd573cbd8031fd8b2901abf67ce",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-fanout`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-fanout`'s skill-prose cleanup",
+          "anchor": "fgos-fanouts-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "blobSha": "11182773be006cb5ac53813f5a46c5723f76391e",
+      "blobSize": 772,
+      "sourceDigest": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "sourceId": "src_4c7c5f87bcafc0e7327764c8f64d1026",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`merge-loop`'s skill-prose cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`merge-loop`'s skill-prose cleanup",
+          "anchor": "merge-loops-skill-prose-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "blobSha": "3e5596271df46086d24b588123098b1da4498b5b",
+      "blobSize": 784,
+      "sourceDigest": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "sourceId": "src_126c0ef0c5dc90a10b662e18e47ca705",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The remaining bare-citation cleanup: `fgos-routing`, `approve`, `pick`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The remaining bare-citation cleanup: `fgos-routing`, `approve`, `pick`",
+          "anchor": "the-remaining-bare-citation-cleanup-fgos-routing-approve-pick"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "blobSha": "48a2151be5a432dd81838e6b2049df5c09a16a66",
+      "blobSize": 1304,
+      "sourceDigest": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "sourceId": "src_cae3570c0bc61f595841925772cf2cd7",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`tsk-56w`'s smoke-test QA pass",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`tsk-56w`'s smoke-test QA pass",
+          "anchor": "tsk-56ws-smoke-test-qa-pass"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/spawnworker-idletimeout-flaky-test-margin.md",
+      "blobSha": "194fe956a3869040da5be735d27c73723de033a4",
+      "blobSize": 1876,
+      "sourceDigest": "27921d329901f329827bc8b7f26de1c09d25642cd69f75c3af2ba16440ec016e",
+      "sourceId": "src_e355ca670c91681b3c586c01af16d48d",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A too-tight real-timer margin in a dispatch test caused a real wasted retry cycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A too-tight real-timer margin in a dispatch test caused a real wasted retry cycle",
+          "anchor": "a-too-tight-real-timer-margin-in-a-dispatch-test-caused-a-real-wasted-retry-cycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/state-write-single-stringify.md",
+      "blobSha": "2e19530725598f87eb62d67a063d8721c52cd335",
+      "blobSize": 2908,
+      "sourceDigest": "0719a9c71e7e69f207ff6d1bda4066f1f034c908f7ecec7ae544944d0c7b9ba6",
+      "sourceId": "src_43a186680589a36b12b127c6219f55cd",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`state.json` writes now stringify the view once, not twice",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`state.json` writes now stringify the view once, not twice",
+          "anchor": "statejson-writes-now-stringify-the-view-once-not-twice"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/submit-dependency-scan-delivered-blindspot.md",
+      "blobSha": "2a1d42a331e63219db34284999af4b6c2175f3e1",
+      "blobSize": 3483,
+      "sourceDigest": "f14bbc1d77f1b49d458e186a5ee192c952e2730fa81b15d176bbb76fb2ca4e37",
+      "sourceId": "src_dadee10c176f788b7484848dee2c2d3b",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A merged-but-not-yet-cleaned-up item was invisible to duplicate detection",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A merged-but-not-yet-cleaned-up item was invisible to duplicate detection",
+          "anchor": "a-merged-but-not-yet-cleaned-up-item-was-invisible-to-duplicate-detection"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/submit-deps-direction-blocked-vs-superseded.md",
+      "blobSha": "233bcef4453b467f8604b6757aaec9e6a6648576",
+      "blobSize": 3407,
+      "sourceDigest": "c0945978e78b326cc3865bd251127743f7ae8f87d5739e466baf2a3a3b4bf956",
+      "sourceId": "src_29dc8936be295cbfb9234390326aa67e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`deps` only ever means \"blocked by\" — but the submit skill's own confirm step never said so",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`deps` only ever means \"blocked by\" — but the submit skill's own confirm step never said so",
+          "anchor": "deps-only-ever-means-blocked-by-but-the-submit-skills-own-confirm-step-never-said-so"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/sync-root-error-propagation.md",
+      "blobSha": "e9a93b94a6de0bbe0867fe4e45832c37d6b22276",
+      "blobSize": 3158,
+      "sourceDigest": "9d8262dd0215a6c3788d0db3d6fc514b12af66ff04b33fadb7d0d5b7451f76f7",
+      "sourceId": "src_8c68d3e1ff939063fe806561c21edce4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`sync-root`'s unclassified-outcome guard knew the real git error and dropped it anyway",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`sync-root`'s unclassified-outcome guard knew the real git error and dropped it anyway",
+          "anchor": "sync-roots-unclassified-outcome-guard-knew-the-real-git-error-and-dropped-it-anyway"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/sync-root-outcome-guard-citation-and-lock-lost-coverage.md",
+      "blobSha": "2457a5686a038188486ef0f562db257ced25e7ff",
+      "blobSize": 4660,
+      "sourceDigest": "fc5df295255935fe9b910fba26fc0922c5125d2edd49910e8f97a765d8e8dd2e",
+      "sourceId": "src_cb640bea7aeb1fb3d8167d3f85e9bcbc",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The guard's own test still existed — just cited under a file that no longer did",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The guard's own test still existed — just cited under a file that no longer did",
+          "anchor": "the-guards-own-test-still-existed-just-cited-under-a-file-that-no-longer-did"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/test-suite-wallclock-file-split.md",
+      "blobSha": "4816c7380d03da787ab8df4c22c99690400466b3",
+      "blobSize": 5003,
+      "sourceDigest": "fc38daab2c16a4aaf594a9211a4a4a8cee307ee2cac312c745af09f40492fac9",
+      "sourceId": "src_c3349aec60b6774767a2b8e5d8e0ea60",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`node --test` parallelizes per file — so one slow file sets the whole suite's floor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`node --test` parallelizes per file — so one slow file sets the whole suite's floor",
+          "anchor": "node---test-parallelizes-per-file-so-one-slow-file-sets-the-whole-suites-floor"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/tsk-397-post-merge-review-remediation.md",
+      "blobSha": "3ccbc2a0f48d8987508f1ea685bf100b277563df",
+      "blobSize": 6298,
+      "sourceDigest": "f4fb30a2f39fffffc0a79e11b64d6fd36e764a595f0e960cf524cd7206212a04",
+      "sourceId": "src_c133daf459953c032949a740d379fd62",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Two independent post-merge reviews of `tsk-397` found 10 real gaps",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Two independent post-merge reviews of `tsk-397` found 10 real gaps",
+          "anchor": "two-independent-post-merge-reviews-of-tsk-397-found-10-real-gaps"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/unsignaled-detection-backtick-false-positive.md",
+      "blobSha": "4fef0e807911b0ee7f736ae17b0b1635f39859f3",
+      "blobSize": 2762,
+      "sourceDigest": "f07217a3839e88701345a67a3657d872de56edb5cb56db97d32198c1c1abf15d",
+      "sourceId": "src_bab90196ec87e1aef7409f010ffba226",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The `[DONE]`/`[BLOCKED]` detector had a false-positive hole — closed by cross-provider proof-testing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The `[DONE]`/`[BLOCKED]` detector had a false-positive hole — closed by cross-provider proof-testing",
+          "anchor": "the-doneblocked-detector-had-a-false-positive-hole-closed-by-cross-provider-proof-testing"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/wontfix-worktree-reclaim-startup-reap.md",
+      "blobSha": "aff531e23ca8972b3320e082c0e0b1444fe7759a",
+      "blobSize": 2713,
+      "sourceDigest": "3b52346f283414d2ba7158a96991e8615f9f86fab941b7e6625b0788cdcab1c9",
+      "sourceId": "src_2f4443254ff9d43cf27bfc3aad3ca234",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`wontfix` items now get their worktree/branch reclaimed during startup reap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`wontfix` items now get their worktree/branch reclaimed during startup reap",
+          "anchor": "wontfix-items-now-get-their-worktreebranch-reclaimed-during-startup-reap"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/work-item-lifecycle-and-domain-model.md",
+      "blobSha": "fec8ab3699fc3ce55d6a1aa0b3bfc77cfc3e9953",
+      "blobSize": 7876,
+      "sourceDigest": "3ce6008a0d449dc2f4c743d0a45ce948a39815e7517dc806facb2dd60b9de267",
+      "sourceId": "src_c04d96b92eb90ec8cdd8fd3a42466159",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+          "anchor": "why-the-work-item-lifecycle-keeps-status-and-stage-separate-and-what-extending-it-costs"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "blobSha": "18187e05f0380f0c1ba6d5dff03554e930cbbe94",
+      "blobSize": 3970,
+      "sourceDigest": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "sourceId": "src_426033970dbd1a095546fe576aa2c63b",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The completion-signal instruction was three file-hops away from the worker that needed to read it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The completion-signal instruction was three file-hops away from the worker that needed to read it",
+          "anchor": "the-completion-signal-instruction-was-three-file-hops-away-from-the-worker-that-needed-to-read-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "blobSha": "0e34a440ac8d346fd4fcd40f5a4ab055e12bbf2c",
+      "blobSize": 3856,
+      "sourceDigest": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "sourceId": "src_6ecaf6c8bc152de3db4aac08795d6508",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Out-of-process worker prompts never mentioned Iron Law evidence — so it never got produced when it was cheapest",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Out-of-process worker prompts never mentioned Iron Law evidence — so it never got produced when it was cheapest",
+          "anchor": "out-of-process-worker-prompts-never-mentioned-iron-law-evidence-so-it-never-got-produced-when-it-was-cheapest"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/worktree-isolation-existing-path-hazard.md",
+      "blobSha": "80528ce7f2279cede44596bad42e01756ba62e62",
+      "blobSize": 7100,
+      "sourceDigest": "40aa2097ba3680d84cd2a9155b970238acf79e146ff8daf023b12caa811882d4",
+      "sourceId": "src_1426680bbf741a66b37d201a8a65e003",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The worktree-isolation race in concurrent fanout, precisely characterized — and the fix that actually works",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The worktree-isolation race in concurrent fanout, precisely characterized — and the fix that actually works",
+          "anchor": "the-worktree-isolation-race-in-concurrent-fanout-precisely-characterized-and-the-fix-that-actually-works"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+      "blobSha": "7aa41522171ba6820b200803744da84f47d218bc",
+      "blobSize": 4612,
+      "sourceDigest": "97a644fa5a29da7929e98c485e2e445a03a0073ec38b54ce14b340237d14a858",
+      "sourceId": "src_197b94aa6aa26ead3a3ca98def7ec535",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Manually resolving a merge conflict in a worktree can silently revert `.fgos/` — now mechanically guarded",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Manually resolving a merge conflict in a worktree can silently revert `.fgos/` — now mechanically guarded",
+          "anchor": "manually-resolving-a-merge-conflict-in-a-worktree-can-silently-revert-fgos-now-mechanically-guarded"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/write-rejected-no-diff-check.md",
+      "blobSha": "224ee0e8b4924740c86c2c25a0a28c23e199f6ba",
+      "blobSize": 3160,
+      "sourceDigest": "3a046842a92cc0f244bd2e6c35b0d5b0efb4e77a3792781fa38119153c46f263",
+      "sourceId": "src_13031f545a17be075668360676566c93",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A blob-equality proof that couldn't handle \"never existed at all\"",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A blob-equality proof that couldn't handle \"never existed at all\"",
+          "anchor": "a-blob-equality-proof-that-couldnt-handle-never-existed-at-all"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/write-rejected-trust-branchheadattake.md",
+      "blobSha": "ef765eb6815d0ad980d09118b26b1c6f7917e8d2",
+      "blobSize": 3428,
+      "sourceDigest": "169a3373c48086a261f661e3fb6a56af483ed758130dfa6ce2a8302657429975",
+      "sourceId": "src_08445fc727fc6342b19e99bb3fbd3339",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A worker branch that never touched `.fgos/` still got blocked as if it had",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A worker branch that never touched `.fgos/` still got blocked as if it had",
+          "anchor": "a-worker-branch-that-never-touched-fgos-still-got-blocked-as-if-it-had"
+        }
+      ]
+    },
+    {
+      "path": "docs/generated/README.md",
+      "blobSha": "03649b6ec9d78b38344b7f77c7528dde4de3e816",
+      "blobSize": 1170,
+      "sourceDigest": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "sourceId": "src_e700429db625df0bd24ace024df2428d",
+      "area": "Generated projection (unmapped)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Generated Documentation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Generated Documentation",
+          "anchor": "generated-documentation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/add-stage-default-gap/CONTEXT.md",
+      "blobSha": "076f2efb18a84d191462f2ae952dd6577ef57d3e",
+      "blobSize": 7050,
+      "sourceDigest": "84b1a2457f839aa048ce02b4ece6273a64b909683ec67d84d1cc73736158ad2f",
+      "sourceId": "src_61d4d36e4df51e97ae5213b60a7ba274",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "add-stage-default-gap — CONTEXT.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "add-stage-default-gap — CONTEXT.md",
+          "anchor": "add-stage-default-gap-contextmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/add-stage-default-gap/plan.md",
+      "blobSha": "e8e66da0d6b01f2c77a992a07aa8bd7b7aa1d57c",
+      "blobSize": 6788,
+      "sourceDigest": "eda99b02713f4a2f90436dc5d922681f14dfd38e84e0c18d0270420d27aa48e1",
+      "sourceId": "src_656897b6566a1fab9cb9927c4ac12bf5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "add-stage-default-gap — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "add-stage-default-gap — plan.md",
+          "anchor": "add-stage-default-gap-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-coordination-foundation/plan.md",
+      "blobSha": "8c5e570538b175bc93de7733ed8c388c10f000ac",
+      "blobSize": 10607,
+      "sourceDigest": "b8662bc6bc148bfbc5390d4785903cd339c9f15f8afea919960421d41738f59a",
+      "sourceId": "src_2f4e4a21564e2274df8121f1cd73b39c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Agent-Coordination Foundation — Capability, Dispatch, and Team Cognition Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent-Coordination Foundation — Capability, Dispatch, and Team Cognition Plan",
+          "anchor": "agent-coordination-foundation-capability-dispatch-and-team-cognition-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-coordination-foundation/RESEARCH.md",
+      "blobSha": "39698b8503f9d8713c6130e25876cd6f262b8878",
+      "blobSize": 4167,
+      "sourceDigest": "46ee4fc200930ef7b592b23ba1f713931bcdc014fe9145b34e60b3a66249bf99",
+      "sourceId": "src_09305cbdb1e62e9abae90abff4b8995a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Agent-coordination foundation — research log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent-coordination foundation — research log",
+          "anchor": "agent-coordination-foundation-research-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/findings.md",
+      "blobSha": "3edba9b9b2c9771a4c6a40bf040278e5dc48d17c",
+      "blobSize": 25738,
+      "sourceDigest": "e703a43adcb020d9c6e55f9fd731b16c45d59e4a0c038099ecdf36966798fa75",
+      "sourceId": "src_5bf8d7d1f9675e9839b7e952309de134",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "State/Root Resolution Foundation — Investigation Findings (P0)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "State/Root Resolution Foundation — Investigation Findings (P0)",
+          "anchor": "stateroot-resolution-foundation-investigation-findings-p0"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/prompt.md",
+      "blobSha": "dbcf23c7cf7029869f912a2e8e17d6b31e76ea35",
+      "blobSize": 8242,
+      "sourceDigest": "1d71ef54a94f585016a4d766ba77d72bef82206615568c0c262f619c519d358c",
+      "sourceId": "src_c930868c74e4992bf66f1345135d672d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Master Prompt — State/Root Resolution Foundation Investigation (P0)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Master Prompt — State/Root Resolution Foundation Investigation (P0)",
+          "anchor": "master-prompt-stateroot-resolution-foundation-investigation-p0"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/rfc-review-request-objectb-only.json",
+      "blobSha": "4a0fee025b16bf4bd2ade12e70b6319fadc8d371",
+      "blobSize": 2328,
+      "sourceDigest": "a0734dfce47271693242222781ff26dd5c2c07f06d16694ff0b46872f0bfcaf2",
+      "sourceId": "src_7074865da83c4e502e580453da07033b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/rfc-review-request-resume-1.json",
+      "blobSha": "9f3af07445df7eec28a9195e2a438d8a48b71932",
+      "blobSize": 2745,
+      "sourceDigest": "5ca5145bae824c94b5f26fa6ba5740edfde03304e3c3c42632bff0ad79ba15ed",
+      "sourceId": "src_56f90a4ff4e7795c2c97d05d5c82878a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/rfc-review-request-resume-2.json",
+      "blobSha": "11d6e523f61ff3fc86ad4bb3c7714a4a15d1f7ae",
+      "blobSize": 5793,
+      "sourceDigest": "70e5557ec2772c03a9f8d837aea09d69e5a0bfcd1349e1ca91223747166e91a1",
+      "sourceId": "src_b8a55ab44540d03ff90e9bc5ee4996eb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/rfc-review-request.json",
+      "blobSha": "91eae01e92dc906deb66752c405a3ac9976c0292",
+      "blobSize": 4858,
+      "sourceDigest": "e993ff8ac222473788b31a8902998c837959bff0eae614953a05bf0ca5aa104c",
+      "sourceId": "src_1daa3d96fc9adc381e650388d08e29ae",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/agent-coordination-state-root/rfc-state-root-fix.md",
+      "blobSha": "d89239456e742d0a7a4d2b6c07f91f7cf53c645b",
+      "blobSize": 6328,
+      "sourceDigest": "e887d3500d060877d21d855231fabde9b850a7ab09dac301127a8c05170788a5",
+      "sourceId": "src_cb98c194eb3bb2e3bdeb537ad66c5385",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RFC — state/root resolution fix shape (P0 investigation)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RFC — state/root resolution fix shape (P0 investigation)",
+          "anchor": "rfc-stateroot-resolution-fix-shape-p0-investigation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-agent-definitions/CONTEXT.md",
+      "blobSha": "7d5fea6f9f0c392e10309e305d71553f12d80d5e",
+      "blobSize": 12627,
+      "sourceDigest": "411f0624ecf98c1e7ec7f626d523c63d449a150b10ac4c3e53f27656be1bf781",
+      "sourceId": "src_bdc1ee1624711e85c0d7dd343e3f05f5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)",
+          "anchor": "context-platform-agnostic-canonical-root-for-forgents-own-agent-definitions-tsk-slq"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-agent-definitions/plan.md",
+      "blobSha": "6fdb9a60b96324ee115d79ee829fc9e1f03429a9",
+      "blobSize": 12658,
+      "sourceDigest": "ce03e00a6e02892dd54c6bc1db9de06cf40c3ae0dfee6c6b000945ba27ec62e3",
+      "sourceId": "src_f48d93fdd31e4787235abfab23987e21",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)",
+          "anchor": "plan-platform-agnostic-canonical-root-for-forgents-own-agent-definitions-tsk-slq"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-capacity-dispatch/CONTEXT.md",
+      "blobSha": "8a8eddf78425d36032986adeea796da578b45c61",
+      "blobSize": 9784,
+      "sourceDigest": "e8691a77c169e3b676916725c03ea9f77a8506ee08669318e3dac84b0147baed",
+      "sourceId": "src_77a04562c8ed8b64a545d7be5e6f5bad",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "agent-executor capacity-aware dispatch (domain 1) — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "agent-executor capacity-aware dispatch (domain 1) — locked decisions",
+          "anchor": "agent-executor-capacity-aware-dispatch-domain-1-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-capacity-dispatch/plan.md",
+      "blobSha": "10283515c6d5d4b080af65a73ae9f9050cf15408",
+      "blobSize": 13597,
+      "sourceDigest": "10d5aaa7c918f2f9dcdbcb7d6c1a5a61eed3d805ad7293ea88a67921d95af44f",
+      "sourceId": "src_ee61581a8c765ecfde8d4c5b5fd3daeb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-62v: capacity-aware dispatch generalization (domain 1)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-62v: capacity-aware dispatch generalization (domain 1)",
+          "anchor": "planmd-tsk-62v-capacity-aware-dispatch-generalization-domain-1"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-capacity-kind-task-resolution/CONTEXT.md",
+      "blobSha": "a817461001b2e1acb063deb43e3cab0870ea73d1",
+      "blobSize": 6018,
+      "sourceDigest": "f8d490bc04f2ca9f918d015d71853e4fce71d650aa4057ff61e7fc77464b5334",
+      "sourceId": "src_51662982e815d63bf3fe22a709cf733c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "agent-executor capacity kind:\"task\" resolution (tsk-3sw) — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "agent-executor capacity kind:\"task\" resolution (tsk-3sw) — locked decisions",
+          "anchor": "agent-executor-capacity-kindtask-resolution-tsk-3sw-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-capacity-kind-task-resolution/plan.md",
+      "blobSha": "48e9260228691486c996ce7acbe68d41f601b16d",
+      "blobSize": 7145,
+      "sourceDigest": "adead94b18b8728f9e4a4b69e549d9050ffe36dae598ea2af417b2818863dbdc",
+      "sourceId": "src_2b3a78a1eb704b52a03879e3461d7f0a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3sw: capacity kind:\"task\" agentType resolution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3sw: capacity kind:\"task\" agentType resolution",
+          "anchor": "planmd-tsk-3sw-capacity-kindtask-agenttype-resolution"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+      "blobSha": "a235347a49135423a88151058032ca790f3e44b7",
+      "blobSize": 6171,
+      "sourceDigest": "ff5c8fa78f76ee678e34fe65b1ac279afd68b77ea9d54697ace90a710b00cb6e",
+      "sourceId": "src_490318827297048bb5f983b955d53416",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "agent-executor generalized capacity-dispatch helper (tsk-53h) — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "agent-executor generalized capacity-dispatch helper (tsk-53h) — locked decisions",
+          "anchor": "agent-executor-generalized-capacity-dispatch-helper-tsk-53h-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-generalized-capacity-helper/plan.md",
+      "blobSha": "a30bea3a4401f8a59b5245e7d79b5aa1def3bba7",
+      "blobSize": 9915,
+      "sourceDigest": "f3423411f725b06e601c67f50f965d2fd6e06cc1c0970c1f554da9e4f99ec8aa",
+      "sourceId": "src_a588cf4e2873becbb20c438f965ac82f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan",
+          "anchor": "plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-judge-capacity-dispatch/CONTEXT.md",
+      "blobSha": "bb31f96abae95cca2f98575d3e0c11a838949d0d",
+      "blobSize": 3532,
+      "sourceDigest": "43a41eac435c182464f50f6caf2f02abbfdf125fbca508f87f2c946640da4964",
+      "sourceId": "src_3373a81fded1dbd95e293005d9c9e01b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "judgeDiscovery/judgeDecompose wired through agent-executor capacities — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "judgeDiscovery/judgeDecompose wired through agent-executor capacities — locked decisions",
+          "anchor": "judgediscoveryjudgedecompose-wired-through-agent-executor-capacities-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-retry-escalate-helper/CONTEXT.md",
+      "blobSha": "9a83134ea7211de522ed51363e4425b60cf4d0ed",
+      "blobSize": 9241,
+      "sourceDigest": "82e6bf9f282c98c5bede7ee08134ce0a02d044b6657d4e7691254ca289c9f7e2",
+      "sourceId": "src_10c9a3534b5849b88260587f9950a7a6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Generalize judge-executor.mjs's retry-then-escalate pattern — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Generalize judge-executor.mjs's retry-then-escalate pattern — locked decisions",
+          "anchor": "generalize-judge-executormjss-retry-then-escalate-pattern-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-retry-escalate-helper/plan.md",
+      "blobSha": "c5405ab4732a4982d5d7c1b7889561fb98d8f9be",
+      "blobSize": 7492,
+      "sourceDigest": "1193a3d1025bfba37642d71176a209827314ef41056f1c642cd6a076d41f86bd",
+      "sourceId": "src_954ae121057ae0095b04e5f065b031e8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — generalize judge-executor.mjs's retry-then-escalate pattern",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — generalize judge-executor.mjs's retry-then-escalate pattern",
+          "anchor": "plan-generalize-judge-executormjss-retry-then-escalate-pattern"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-submit-assist-classify/CONTEXT.md",
+      "blobSha": "c201e800869946fea7b8b4a75fd2d29fe558774e",
+      "blobSize": 11154,
+      "sourceDigest": "1aef975fafc1289b7e2641db1a0cb066330bad8fc74fdc507ec026cbeeb2d413",
+      "sourceId": "src_aba7c9a2cc8cccbfbac871037b090c51",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "submit-assist-classify wired through agent-executor capacities — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "submit-assist-classify wired through agent-executor capacities — locked decisions",
+          "anchor": "submit-assist-classify-wired-through-agent-executor-capacities-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agent-executor-submit-assist-classify/plan.md",
+      "blobSha": "264bce6df02a79835f10b48811d07f6786c28954",
+      "blobSize": 9212,
+      "sourceDigest": "066e7796d8d935852c25dc01adaf774f5dcc256b2153c3b37d0804629c8134ff",
+      "sourceId": "src_eee7013fafc7f1130d11a89b069ab67c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "submit-assist-classify wired through agent-executor capacities — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "submit-assist-classify wired through agent-executor capacities — plan",
+          "anchor": "submit-assist-classify-wired-through-agent-executor-capacities-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agentmessage-dispatchassignment-consumer-spike/plan.md",
+      "blobSha": "f959187654436dfdaf082ba532eacc403821e18c",
+      "blobSize": 5784,
+      "sourceDigest": "719d69cc168eb02038b01031cf598aa455d525b04f8ee51f64f757141aed8b19",
+      "sourceId": "src_4de6e48e125e236e04251b753b86a319",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3rn: Spike concrete consumer for AgentMessage/DispatchAssignment",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3rn: Spike concrete consumer for AgentMessage/DispatchAssignment",
+          "anchor": "planmd-tsk-3rn-spike-concrete-consumer-for-agentmessagedispatchassignment"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agentmessage-dispatchassignment-consumer-spike/RESEARCH.md",
+      "blobSha": "7dd30b35b46a1e65e5abdb87037f6a91d7c74f43",
+      "blobSize": 9553,
+      "sourceDigest": "7100ca266be0d7cd424e81cdb8b9b9a5f1590c723d2db98123706af7c440e265",
+      "sourceId": "src_7222bb59ecf23f0fdc4dd0c594cf2a1d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-3rn (Spike: concrete consumer for AgentMessage/DispatchAssignment)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-3rn (Spike: concrete consumer for AgentMessage/DispatchAssignment)",
+          "anchor": "researchmd-tsk-3rn-spike-concrete-consumer-for-agentmessagedispatchassignment"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agy-cwd-fidelity/plan.md",
+      "blobSha": "54d464c5cd74a1ccd487b770b60ad524cb7d4d48",
+      "blobSize": 2256,
+      "sourceDigest": "fbf94364e6e928976847f051127bc846a8b12a36c792ccccde5c92bbe8309c3f",
+      "sourceId": "src_c3f40fa37fab91ba4d9fd1b0657cd436",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-it0: agy ignores spawn cwd",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-it0: agy ignores spawn cwd",
+          "anchor": "planmd-tsk-it0-agy-ignores-spawn-cwd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/agy-cwd-fidelity/RESEARCH.md",
+      "blobSha": "e50d071c5ee662d2a817b051842ad8ac5ca1599e",
+      "blobSize": 3860,
+      "sourceDigest": "9f1da1d2735183075db94c8e59373eb9ffe9d2b73014c27a495d94e20bc97cab",
+      "sourceId": "src_aabaaa3f49b21aeb31a2bed7de2fe3e6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH: tsk-it0 — agy ignores spawn cwd",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH: tsk-it0 — agy ignores spawn cwd",
+          "anchor": "research-tsk-it0-agy-ignores-spawn-cwd"
+        }
+      ]
+    }
+  ]
+}

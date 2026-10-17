@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 25,
+  "entries": [
+    {
+      "path": "docs/history/events-jsonl-merge-abort-truncation-gap/iron-law-evidence.md",
+      "blobSha": "527e3c427038e026624ea890489451c4eda75a08",
+      "blobSize": 849,
+      "sourceDigest": "9b12df53edd337c7f5628955203a33a8789b57edc5071ac19af1d58f31112b49",
+      "sourceId": "src_942242bfc8cf84e61e09bced7f8a2dcd",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law Evidence — tsk-1ji",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law Evidence — tsk-1ji",
+          "anchor": "iron-law-evidence-tsk-1ji"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-abort-truncation-gap/plan.md",
+      "blobSha": "75a03e30df753db5c69dbbfdb2051e79b271ac50",
+      "blobSize": 10677,
+      "sourceDigest": "a6f6300a14c508b84aba108fd08d7302833e47940e8b07737ec2ee168af5f8c3",
+      "sourceId": "src_a202da77ef5d7117ce73615c1fbd5366",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-abort-truncation-gap — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-abort-truncation-gap — plan.md",
+          "anchor": "events-jsonl-merge-abort-truncation-gap-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-abort-truncation-gap/RESEARCH.md",
+      "blobSha": "12208c2bc4f68e689607c26580d5584db3d9b24f",
+      "blobSize": 27059,
+      "sourceDigest": "afaa13d55c7a3adb2ccdd15e8a740ccd6dd79c883eceed2fd81197fb42ebefdb",
+      "sourceId": "src_0986e6945225ff2bc44ed55fa1465dbe",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-abort-truncation-gap — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-abort-truncation-gap — RESEARCH",
+          "anchor": "events-jsonl-merge-abort-truncation-gap-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-driver-recurring-write-loss/CONTEXT.md",
+      "blobSha": "3bb6f521291f0e5d9ec9e04e3f90c840d41bff38",
+      "blobSize": 6533,
+      "sourceDigest": "083e80f0e4ec4189e79ddfebb9add650f444fc88db5a9a880879ad19cef6405a",
+      "sourceId": "src_332bf7be52310f195f243b7fc00870e2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-driver-recurring-write-loss — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-driver-recurring-write-loss — CONTEXT",
+          "anchor": "events-jsonl-merge-driver-recurring-write-loss-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-driver-recurring-write-loss/iron-law-evidence.md",
+      "blobSha": "1666d4fcf3f9f5a2312b2d7f429f30c2fdf1c5b6",
+      "blobSize": 3266,
+      "sourceDigest": "f93f9062901cd79af9190efb4a1aacc965eeb93a786c24cf210a60d0f57a9452",
+      "sourceId": "src_114cd1739c0066371d601256265f27a9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3wq — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3wq — Iron Law evidence",
+          "anchor": "tsk-3wq-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-driver-recurring-write-loss/plan.md",
+      "blobSha": "1991719708b781a855a9ee19ebcd54e28482d209",
+      "blobSize": 13906,
+      "sourceDigest": "22ad54efec8bcd34b046c92cfda63c76060412c3065207e3f0e2e10cf4af0858",
+      "sourceId": "src_37b1a305188d86b1a424f653bc25a8c7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-driver-recurring-write-loss — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-driver-recurring-write-loss — plan",
+          "anchor": "events-jsonl-merge-driver-recurring-write-loss-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-driver-recurring-write-loss/repro-notes.md",
+      "blobSha": "504ac24e6009ab03e01da0e13ef4a926b8718b29",
+      "blobSize": 5132,
+      "sourceDigest": "0a54b26c833be4fc12e57005fa210c3e954b2766c5ff3663651ad9473d8e5c85",
+      "sourceId": "src_670ca003b74a242c412133c97ae0bf25",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-driver-recurring-write-loss — repro notes",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-driver-recurring-write-loss — repro notes",
+          "anchor": "events-jsonl-merge-driver-recurring-write-loss-repro-notes"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-merge-driver-recurring-write-loss/RESEARCH.md",
+      "blobSha": "148217e41cc9edc693dcc4c251c694a9be48d78a",
+      "blobSize": 11869,
+      "sourceDigest": "1fe99cab3aa69b38e44f2a7f7e9d68f0b0a9f2e927b4734e38757d26b2f524cc",
+      "sourceId": "src_ec244063a5d8fdc37e16d8d50c8c5c7e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-merge-driver-recurring-write-loss — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-merge-driver-recurring-write-loss — RESEARCH",
+          "anchor": "events-jsonl-merge-driver-recurring-write-loss-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-truncation-force-rebaseline/plan.md",
+      "blobSha": "ccea0ac4160b0eb31136dd93bd6416b789d6211f",
+      "blobSize": 6120,
+      "sourceDigest": "3048d8acb4064dbd884cce2774f3f7fca554d305d9d433b49193b93ecd55e156",
+      "sourceId": "src_8b7aeca1f326b5fe32408643d4f5ad89",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-truncation-force-rebaseline — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-truncation-force-rebaseline — plan.md",
+          "anchor": "events-jsonl-truncation-force-rebaseline-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-jsonl-truncation-force-rebaseline/RESEARCH.md",
+      "blobSha": "2bc1bfca117f7a6891f75634de2fb68333e4f4c2",
+      "blobSize": 7581,
+      "sourceDigest": "ba0669d47f1d4b04db1d3cddcd29e584a900d193d93e31c1496ae8129d974faf",
+      "sourceId": "src_7bd1632d9b41a8feda6140da2af5fa09",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-jsonl-truncation-force-rebaseline — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-jsonl-truncation-force-rebaseline — RESEARCH",
+          "anchor": "events-jsonl-truncation-force-rebaseline-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-lock-concurrency-race/CONTEXT.md",
+      "blobSha": "600d974db53c7b6bbcbc2b2262a3edeabd5cba5c",
+      "blobSize": 7062,
+      "sourceDigest": "d6e4a0652374b60bcfd05db7389ed044a0d7a0ae7e490ffd3ae6265221d776ae",
+      "sourceId": "src_a9def48e729978ef766ddae4ea572c24",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-lock-concurrency-race — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-lock-concurrency-race — CONTEXT",
+          "anchor": "events-lock-concurrency-race-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-lock-concurrency-race/plan.md",
+      "blobSha": "f800b8a9eb67aa91878e775ddab2de3ef323ed96",
+      "blobSize": 5775,
+      "sourceDigest": "4f8fd040dba6f9b64ae2b9af1798bb19deeac75366ee89880f8db380db5a1dde",
+      "sourceId": "src_2e91d496d6e78eb9a0f41f5bd10d4d3c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "events-lock-concurrency-race — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "events-lock-concurrency-race — plan",
+          "anchor": "events-lock-concurrency-race-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/events-lock-concurrency-test-flake/plan.md",
+      "blobSha": "1d119396d1a1b291e7de6f352f0f4c24ca8e2af9",
+      "blobSize": 7411,
+      "sourceDigest": "ee89644b8d961d0ed77dda6280d7d34275952c250d050135dd18661443831fb4",
+      "sourceId": "src_3ccb434f16203695df31c152c6d52d08",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: test concurrency events.lock flaky làm hỏng cổng merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: test concurrency events.lock flaky làm hỏng cổng merge",
+          "anchor": "plan-test-concurrency-eventslock-flaky-làm-hỏng-cổng-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/CONTEXT-tsk-4fg.md",
+      "blobSha": "0e47117a263201d4a7d006d5f503685b0dc2c5b6",
+      "blobSize": 5624,
+      "sourceDigest": "d3f9a7aa1518646d6f27e102d858453ac3b289296f0f62c1580553dd1c50d7e5",
+      "sourceId": "src_60e513618ebf04a890134172162ea94e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos list child-view gate — CONTEXT (`tsk-4fg`)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos list child-view gate — CONTEXT (`tsk-4fg`)",
+          "anchor": "fgos-list-child-view-gate-context-tsk-4fg"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+      "blobSha": "7289f54bada715c0abd807250944b1e64b183f68",
+      "blobSize": 6064,
+      "sourceDigest": "9012d33ff082c42639b6d189d5969d2813776788ee97fd50b73191bf37003370",
+      "sourceId": "src_4d3ffed3841eedb457a81172d474bfbe",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-4so — advisory frontier blindness (ready/conflicts) ngoài stage executing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-4so — advisory frontier blindness (ready/conflicts) ngoài stage executing",
+          "anchor": "tsk-4so-advisory-frontier-blindness-readyconflicts-ngoài-stage-executing"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/CONTEXT-tsk-59x.md",
+      "blobSha": "38bbe707457a504e623213f79b18e12cf784824c",
+      "blobSize": 6660,
+      "sourceDigest": "dc06fc25402bb78ecf7e51224ea003fb896068a3653baeae76f9c42ae24d2f95",
+      "sourceId": "src_bfbd780b26af5462d415b45de9aa2e82",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "TTL leaf-aware cleanup — CONTEXT (`tsk-59x`)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "TTL leaf-aware cleanup — CONTEXT (`tsk-59x`)",
+          "anchor": "ttl-leaf-aware-cleanup-context-tsk-59x"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/CONTEXT.md",
+      "blobSha": "978e3b954ac33c1658bcc019d9634602a78e04e2",
+      "blobSize": 10220,
+      "sourceDigest": "6a096e67c1f9d9833f98659000fedcaef47611cc947e881dd3b37e3387faedc6",
+      "sourceId": "src_5e9d9bfec09e79f7176d46b29c22cac4",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Execution fan-out — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Execution fan-out — CONTEXT",
+          "anchor": "execution-fan-out-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/DISCUSSION.md",
+      "blobSha": "34a3014c450b58977598e23d4f0087166fcd9055",
+      "blobSize": 122856,
+      "sourceDigest": "863ff31d9d1d5b1b2c6c19d6717305db15639a7cd0d83d181ad6f6254957d14c",
+      "sourceId": "src_2ea1c4eee2ef98515077aa9144d36825",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Execution fan-out (fan-out B) — DISCUSSION",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Execution fan-out (fan-out B) — DISCUSSION",
+          "anchor": "execution-fan-out-fan-out-b-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/plan-tsk-1ug.md",
+      "blobSha": "f7d0cf26f62e87de15d59882deb088302c841b03",
+      "blobSize": 8119,
+      "sourceDigest": "466796c5740482a0653944a01b75bccf51b9db5d6bb4227a61b4fac5e89afd74",
+      "sourceId": "src_ca6d83ed9c5de5488c3053b5de56aa52",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan — tsk-1ug: `fgos rollup` hiểu `targets`, không chỉ `parent`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan — tsk-1ug: `fgos rollup` hiểu `targets`, không chỉ `parent`",
+          "anchor": "plan-tsk-1ug-fgos-rollup-hiểu-targets-không-chỉ-parent"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/plan-tsk-4fg.md",
+      "blobSha": "3a03ce582a8349f8a34be59e3534fce4e3abd626",
+      "blobSize": 6225,
+      "sourceDigest": "71e20c6608a17558ddc3e2a0aacc64237db12537bf0240c436e1b8fe93c294cf",
+      "sourceId": "src_044381315dbc8933e66c55afc1760aab",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos list child-view gate — plan (`tsk-4fg`)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos list child-view gate — plan (`tsk-4fg`)",
+          "anchor": "fgos-list-child-view-gate-plan-tsk-4fg"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/plan-tsk-4so.md",
+      "blobSha": "59641dec1ddf69376e8f6b8b1c827e8dba80833a",
+      "blobSize": 6965,
+      "sourceDigest": "4b92476ee480d6360fa2cd0a3e7ead8fea041e36bb34e5bacd689171ad1390c0",
+      "sourceId": "src_eb6771b2da30c30758291c64f719b3da",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-4so — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-4so — plan",
+          "anchor": "tsk-4so-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/plan-tsk-59x.md",
+      "blobSha": "f22c92ea5a422fdce8cc20dc342eddfd71f47f90",
+      "blobSize": 9145,
+      "sourceDigest": "47fb6febec9d7b76969e7ec28c0affd941b6ff8511e1c0fa747a9250fa54050d",
+      "sourceId": "src_fd233c4018d0a11ce5eec82560bf63fe",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "TTL leaf-aware cleanup — plan (`tsk-59x`)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "TTL leaf-aware cleanup — plan (`tsk-59x`)",
+          "anchor": "ttl-leaf-aware-cleanup-plan-tsk-59x"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/execution-fanout/plan.md",
+      "blobSha": "2c44af2aeaf508f4120bf198412227769ad31e09",
+      "blobSize": 14628,
+      "sourceDigest": "6d3fb8a514f18fa11ae0f60a6c6762574bab0d36f1d8fad6cfb068c9f7c3544f",
+      "sourceId": "src_cfdcd793b22c9e1b9166f13d3a208c59",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Execution fan-out — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Execution fan-out — plan",
+          "anchor": "execution-fan-out-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/executor-dispatch-fallback-live-monitor/plan.md",
+      "blobSha": "db37552ff0842406417bc920b8b231038d1ea189",
+      "blobSize": 2280,
+      "sourceDigest": "9ff0e869fb934105b2be7094ae4b7f8622a39d67b6a1275f3cb94ad15a855069",
+      "sourceId": "src_c9c3515f978c6e7c57d1ccc354d0b36a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-37ij: Step B live-visibility fix",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-37ij: Step B live-visibility fix",
+          "anchor": "planmd-tsk-37ij-step-b-live-visibility-fix"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/executor-dispatch-fallback-live-monitor/RESEARCH.md",
+      "blobSha": "499d40c407b6d527e00b7a3489a3e8703e13648b",
+      "blobSize": 4770,
+      "sourceDigest": "812ed6790032e6f69e11f8d073153d1a79f0e5b78ef3e56523306fb7fa4908a4",
+      "sourceId": "src_4091bab8f559deb29852c2238a02e164",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-37ij (Step B live-visibility fix)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-37ij (Step B live-visibility fix)",
+          "anchor": "researchmd-tsk-37ij-step-b-live-visibility-fix"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/executor-dispatch-step-b5-logging/plan.md",
+      "blobSha": "a6b035ebdc922866732443f901f07375b77c4a75",
+      "blobSize": 4545,
+      "sourceDigest": "de25af47843f1c377f3e1b555e95f567fa5a25fe7d5c8addd6631c81d64f1b06",
+      "sourceId": "src_07dcb0b3290231940b7cd5dfe2d0b3c4",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3kl",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3kl",
+          "anchor": "planmd-tsk-3kl"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/executor-dispatch-step-b5-logging/RESEARCH.md",
+      "blobSha": "349cee1489f9523168c7108053a28cd7ef5081a5",
+      "blobSize": 5080,
+      "sourceDigest": "8552463fc42a4f4f50ee10c1acb87912aa94d1ae955edcee20081208a484dc59",
+      "sourceId": "src_0c8572ed11e5ad3a4e0d087588cfd690",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-3kl (wire Step B.5 dispatch-log call into executor-dispatch-fallback.md)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-3kl (wire Step B.5 dispatch-log call into executor-dispatch-fallback.md)",
+          "anchor": "researchmd-tsk-3kl-wire-step-b5-dispatch-log-call-into-executor-dispatch-fallbackmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/expr-eval-chain/CONTEXT.md",
+      "blobSha": "aa7dd2fae3564e5f71b1b53ab20982fea0ca5f1e",
+      "blobSize": 3461,
+      "sourceDigest": "4b1db54a8232ba1f3bc2c6a9457cebcc8a9759b12dbf61234be294f1b2e64588",
+      "sourceId": "src_a1fab95a246d33e666ef5f37dcd68ef2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "expr-eval-chain — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "expr-eval-chain — locked decisions",
+          "anchor": "expr-eval-chain-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/expr-eval-chain/plan.md",
+      "blobSha": "2dd4d022aad50f87c1692a163824ee0dbac59ffb",
+      "blobSize": 4722,
+      "sourceDigest": "e36d08124d020d455d3dad32fd58f615073cea87d47473121851641e51d97d51",
+      "sourceId": "src_fe58736d137ad2c6e902759a1b7e3e45",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "expr-eval-chain — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "expr-eval-chain — plan",
+          "anchor": "expr-eval-chain-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/extract-dispatch-result-normalization-ladder/plan.md",
+      "blobSha": "82dceff51f9a2a882259ee2d42b433cfe49d53d8",
+      "blobSize": 5824,
+      "sourceDigest": "b42e22e80a89627cc34d0915d2932f64596782f6e90811e6166b993b9850f8be",
+      "sourceId": "src_f72e10d1ab24603117691cd94f7b0519",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-2tr: Extract dispatch result normalization ladder",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-2tr: Extract dispatch result normalization ladder",
+          "anchor": "plan-tsk-2tr-extract-dispatch-result-normalization-ladder"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/extract-dispatch-result-normalization-ladder/RESEARCH.md",
+      "blobSha": "9733fc14792158f0c5fb6fb49c275ffc15dc5d0c",
+      "blobSize": 5811,
+      "sourceDigest": "fc7b852e6bb452b52f186498e75f272f28f19d2d6c701c9c45b7640cd0fb8c2b",
+      "sourceId": "src_2aa160fbdf1885bae03be5bdd56cff37",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research — tsk-2tr: Extract dispatch result normalization ladder",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research — tsk-2tr: Extract dispatch result normalization ladder",
+          "anchor": "research-tsk-2tr-extract-dispatch-result-normalization-ladder"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-and-delegation-rubric/CONTEXT.md",
+      "blobSha": "3a566693bc9f441d119ea3c6aaa0fd67d7e76cb9",
+      "blobSize": 11276,
+      "sourceDigest": "ad36b97172ade7a56bdefac2a9410b2fa16a8a82dd7561c9a17c021c52d5cabe",
+      "sourceId": "src_c0321f9f7123f1b419b6519cf7ba61fa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-5kn — quyết định đã khoá",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-5kn — quyết định đã khoá",
+          "anchor": "tsk-5kn-quyết-định-đã-khoá"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-and-delegation-rubric/DISCUSSION.md",
+      "blobSha": "dd2ca6d16935a51fab2f6af3527d2bb82bf9b690",
+      "blobSize": 80181,
+      "sourceDigest": "82bc5a0f3f370aa8af8015265ea75ca5876aee441f351bec031645014dce5570",
+      "sourceId": "src_4c7ac2ed8c6606c7263cb783bcb4390c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fan-out & delegation rubric — DISCUSSION",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fan-out & delegation rubric — DISCUSSION",
+          "anchor": "fan-out-delegation-rubric-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-and-delegation-rubric/plan.md",
+      "blobSha": "131efb96677c4c6cfd1b759ec5d372bf8118566d",
+      "blobSize": 35677,
+      "sourceDigest": "08981f56f0bbfe29e8067a8d3b0e87d43bbc9e3c924b3ac53a6380269053eddd",
+      "sourceId": "src_775b130819a74eb2ecf23a878b4e2ae3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-5kn — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-5kn — plan",
+          "anchor": "tsk-5kn-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-dispatch-plan-routing/plan.md",
+      "blobSha": "79d2a4c6ba6c9aa199ff37482c2241e5b4f8ee45",
+      "blobSize": 11100,
+      "sourceDigest": "1b2172ea54ed52459cb53fa73497fef89ebc39c9b1dc4e3752849b505306a369",
+      "sourceId": "src_cb5564e9f61adf2be6aa18c9969afd6a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: Route fanout-batch dispatch decisions through compileDispatchPlan (tsk-4jo)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: Route fanout-batch dispatch decisions through compileDispatchPlan (tsk-4jo)",
+          "anchor": "plan-route-fanout-batch-dispatch-decisions-through-compiledispatchplan-tsk-4jo"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-dispatch-plan-routing/RESEARCH.md",
+      "blobSha": "c239ed8c8c1e3305bbd4d9a8770c30abe786d103",
+      "blobSize": 8492,
+      "sourceDigest": "976033409d3c18432bf98efac669cc369e1757fa87b165294d58d131e3eda06c",
+      "sourceId": "src_5c66a01e1616ea03d20f97181c841b59",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research: fanout-batch dispatch decisions through compileDispatchPlan (tsk-4jo)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research: fanout-batch dispatch decisions through compileDispatchPlan (tsk-4jo)",
+          "anchor": "research-fanout-batch-dispatch-decisions-through-compiledispatchplan-tsk-4jo"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-dispatch-sequential-loop/iron-law-evidence.md",
+      "blobSha": "6eade518fbcda961fbcd23ed5c8cd9ea5f17ee03",
+      "blobSize": 2781,
+      "sourceDigest": "603eb5321aa112db9845eeacc3ee49c8f94add16dd7a53125bce5c145eabfce4",
+      "sourceId": "src_fdfba9029dd14510c861c33f4b35f2ae",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-5v3",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-5v3",
+          "anchor": "iron-law-evidence-tsk-5v3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-dispatch-sequential-loop/plan.md",
+      "blobSha": "5fb89c533255baae65407c104dac3074eb60fc8f",
+      "blobSize": 8908,
+      "sourceDigest": "a18623646d4ecd4ccb999fce115c7d64dcf28ad9a0e8888d249e7f4dc487c0bb",
+      "sourceId": "src_6bb44c066a928ab3f00585518ebb00a1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — fanout-batch dispatch runs sequentially despite being called \"fanout\" (tsk-5v3)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — fanout-batch dispatch runs sequentially despite being called \"fanout\" (tsk-5v3)",
+          "anchor": "plan-fanout-batch-dispatch-runs-sequentially-despite-being-called-fanout-tsk-5v3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-dispatch-sequential-loop/RESEARCH.md",
+      "blobSha": "82078bd7c889ca0af2d335e1987e57a9b222bff2",
+      "blobSize": 5644,
+      "sourceDigest": "251d080b68d35d1ec866a58f7f9747ac83de452eac8f5fd1e8b521cc99835320",
+      "sourceId": "src_5c7717ad083c6bfcc70c2300575e9f06",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — fanout-batch-dispatch-sequential-loop (tsk-5v3)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — fanout-batch-dispatch-sequential-loop (tsk-5v3)",
+          "anchor": "research-fanout-batch-dispatch-sequential-loop-tsk-5v3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-per-child-sync-spawn-and-listwork/iron-law-evidence.md",
+      "blobSha": "91c9570e506603cc85f1713d3e13bd254b03d649",
+      "blobSize": 4710,
+      "sourceDigest": "13cc1a2caeb03e64e185f7ba4d545678fa7f4d67b8c25285d4e426362eb44c85",
+      "sourceId": "src_bfb6964fc61cd8f168b8897e69098b71",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-2ewi",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-2ewi",
+          "anchor": "iron-law-evidence-tsk-2ewi"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-per-child-sync-spawn-and-listwork/plan.md",
+      "blobSha": "9fe374e9124dfcdba958df94366e66f5e745a534",
+      "blobSize": 9395,
+      "sourceDigest": "9a293eb8ef65ae0edbfa4d53419eb6c312aea6160ca3dbf4269484f1acb365bf",
+      "sourceId": "src_ffe724d4d2467a888f7378b7e1ed0f11",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — fanout-batch per-child sync spawn and listWork reread (tsk-2ewi)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — fanout-batch per-child sync spawn and listWork reread (tsk-2ewi)",
+          "anchor": "plan-fanout-batch-per-child-sync-spawn-and-listwork-reread-tsk-2ewi"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-per-child-sync-spawn-and-listwork/RESEARCH.md",
+      "blobSha": "13505658a0ee121c251ffd25cb829f196c0d5e9e",
+      "blobSize": 8289,
+      "sourceDigest": "ae70f83e6efe6e0469af6e474e2437010ffbac76694b5397af936c8c84085d46",
+      "sourceId": "src_a5791e03ac13c501d68ddca88b7fac28",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — fanout-batch-per-child-sync-spawn-and-listwork (tsk-2ewi)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — fanout-batch-per-child-sync-spawn-and-listwork (tsk-2ewi)",
+          "anchor": "research-fanout-batch-per-child-sync-spawn-and-listwork-tsk-2ewi"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-timeout-and-orphan-detection/plan.md",
+      "blobSha": "6a74194b96db08e898ac8b8828bc30ac956c71c0",
+      "blobSize": 6360,
+      "sourceDigest": "418ba71ecac647bc6b3169f6ac03a6e87509211b8b4adae4be13fce5ac738ab5",
+      "sourceId": "src_be9a159d3f509d49a0c22397eed003b7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-vuj",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-vuj",
+          "anchor": "plan-tsk-vuj"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-batch-timeout-and-orphan-detection/RESEARCH.md",
+      "blobSha": "957ff164e4e799afb024b64a1f53bfd275b0fb70",
+      "blobSize": 3687,
+      "sourceDigest": "1bf5ed90a61432c29b3789f4cfeaceae2dd0d8f51fccfe954ec9218a564c5e52",
+      "sourceId": "src_19f298a0e6f50e342b13e6d5027c423d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research — fanout-batch timeout and orphan detection",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research — fanout-batch timeout and orphan detection",
+          "anchor": "research-fanout-batch-timeout-and-orphan-detection"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-execute-consolidation/CONTEXT.md",
+      "blobSha": "a84756ac50f474a7e3cc98953826544696bb25e5",
+      "blobSize": 7185,
+      "sourceDigest": "dc0641faf5f65261e544ed468d7fdef17ba5114e56649f6f33f0cb71406ccfe4",
+      "sourceId": "src_b5757fe6e8a74ebdf058fb4ea57d6612",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fanout-execute-consolidation — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fanout-execute-consolidation — CONTEXT",
+          "anchor": "fanout-execute-consolidation-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-execute-consolidation/DISCUSSION.md",
+      "blobSha": "6ae630957f02bb05adecb5572f195542836f8146",
+      "blobSize": 9649,
+      "sourceDigest": "5331a8800b2c843586e11d88a9f6fd063ba84df12b89faf188375396294f8630",
+      "sourceId": "src_5fe1fc2c6786de237189dc45786fc6fc",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fanout-execute-consolidation — DISCUSSION",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fanout-execute-consolidation — DISCUSSION",
+          "anchor": "fanout-execute-consolidation-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-execute-consolidation/plan.md",
+      "blobSha": "660b6f8f4d43a387440dee31eaba04f4bf35d642",
+      "blobSize": 11791,
+      "sourceDigest": "f3c7e9c702d5c1148608e0cd6ff82034b4004971514a06eda77848893788ee56",
+      "sourceId": "src_eb969f1a10713b901f6b7f9d07944daf",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fanout-execute-consolidation — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fanout-execute-consolidation — plan.md",
+          "anchor": "fanout-execute-consolidation-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fanout-proof-agy/plan.md",
+      "blobSha": "337bcbe5803d95a72c98934ded7829331db9c667",
+      "blobSize": 4427,
+      "sourceDigest": "1ee4e834f031dfe64847660ea29cab8bacc00b46eba18a986609e9b0b204060f",
+      "sourceId": "src_c29c6087c0c4d00126f16f5c25ce625d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-17h: fanout-proof-agy",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-17h: fanout-proof-agy",
+          "anchor": "planmd-tsk-17h-fanout-proof-agy"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-auto-release-main-checkout-lock/CONTEXT.md",
+      "blobSha": "1a8c3ed320ffe2a849f3fc64f562e37fec965693",
+      "blobSize": 6227,
+      "sourceDigest": "36ef9a2495a3c9ed0433201c3afd65b6ef607e8529f95afdb2e625dfad7a3653",
+      "sourceId": "src_a34fc52de8d5c830f9076ed8fe50fcf8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45z: Tự release main-checkout.lock khi chắc chắn xong việc",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45z: Tự release main-checkout.lock khi chắc chắn xong việc",
+          "anchor": "tsk-45z-tự-release-main-checkoutlock-khi-chắc-chắn-xong-việc"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-auto-release-main-checkout-lock/plan.md",
+      "blobSha": "e11b213e8dbb7d6dc8728974fa2c4e29b2757e75",
+      "blobSize": 6900,
+      "sourceDigest": "047539ddc6ce5f72f575343ca369091dab906532b9ef5c7fcb942f2e75230787",
+      "sourceId": "src_d3e355275974d2218ed8e8ae5a32437b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45z: plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45z: plan",
+          "anchor": "tsk-45z-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-choke-point-survey/CONTEXT.md",
+      "blobSha": "cd142d3d6081fa97c51f252d9be6fab82e1ac697",
+      "blobSize": 5127,
+      "sourceDigest": "27858acdfa6adcf73d355a8281a64e757728242bff377ba56052ae7ab16377be",
+      "sourceId": "src_f2a9044fdd5b6a2538bd5b8384d42b4b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: fgOS choke-point survey (tsk-1ab)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: fgOS choke-point survey (tsk-1ab)",
+          "anchor": "context-fgos-choke-point-survey-tsk-1ab"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-choke-point-survey/plan.md",
+      "blobSha": "ed835112c9d7b6c25b8235245b91623030e60f3b",
+      "blobSize": 8664,
+      "sourceDigest": "2d204be4bc3847410a3c984e93bb8065cc64140224f57f9a4c3f9e0d990a91d5",
+      "sourceId": "src_701c1b0ac6076e9b24723385e016783f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: fgOS choke-point survey (tsk-1ab)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: fgOS choke-point survey (tsk-1ab)",
+          "anchor": "plan-fgos-choke-point-survey-tsk-1ab"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-choke-point-survey/rollup.md",
+      "blobSha": "d679eaeadfa904769a765b9908572eea7f299ce3",
+      "blobSize": 2890,
+      "sourceDigest": "cbc28f4c7461053387da42e45d20374017989ce52ded5a87f5710b6ce046ff30",
+      "sourceId": "src_d88817e897706aec1c47b7e1b7213f23",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Rollup: fgOS choke-point survey (tsk-1ab)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Rollup: fgOS choke-point survey (tsk-1ab)",
+          "anchor": "rollup-fgos-choke-point-survey-tsk-1ab"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+      "blobSha": "8abb43108d1f66080190596197ea571aea3782f3",
+      "blobSize": 8937,
+      "sourceDigest": "82c64fcc835ab92c44ca71af5d75a67d10613196d424ae3766df1765c7f5057e",
+      "sourceId": "src_11d2bc0a6f7aba0e5daa9c693222df99",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-cleanup-loop — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-cleanup-loop — locked decisions",
+          "anchor": "fgos-cleanup-loop-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-cleanup-loop/plan.md",
+      "blobSha": "12a2effc8ddc7496de00bcfac606d8fbc6bd00aa",
+      "blobSize": 11312,
+      "sourceDigest": "2a60fb086fbbaa996118eabd1512f1d00d1a1fc93abfed75b4e5f8a2b6b7aa4e",
+      "sourceId": "src_b55524704249a5486f915ebf35034717",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-cleanup-loop — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-cleanup-loop — plan",
+          "anchor": "fgos-cleanup-loop-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-driving-item-display/CONTEXT.md",
+      "blobSha": "ee93d66381bb1d577395bced6b50061b9ffa8ddb",
+      "blobSize": 7559,
+      "sourceDigest": "2b26c5f5fcb22cf3937fe8dac5f4f9fa01ec1c5cacdab65fd92dc9d928499f57",
+      "sourceId": "src_389cfd9ad80eca3ab97cee4b975a448f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-23z — fgos-coding-driving shows the claimed item's title/description before working it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-23z — fgos-coding-driving shows the claimed item's title/description before working it",
+          "anchor": "tsk-23z-fgos-coding-driving-shows-the-claimed-items-titledescription-before-working-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-driving-item-display/plan.md",
+      "blobSha": "122eafd615b8e1d5a40e7d590b47208d3f41208a",
+      "blobSize": 5893,
+      "sourceDigest": "fd8ca47fd960b5a055ab498f4b4b819643b1e8f0336576006eeda7f0948e1b62",
+      "sourceId": "src_6c6a934c78c065f673927476c21626cb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-23z — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-23z — plan",
+          "anchor": "tsk-23z-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-driving-worktreebacked-claim-branch/CONTEXT.md",
+      "blobSha": "dc6f17ade6d602cc766856f5fcd58447c99b3006",
+      "blobSize": 5290,
+      "sourceDigest": "81bea39ac6038de31d8a91c18d7959d4e5da18481647defab390b50acae275be",
+      "sourceId": "src_9382e4eb910deab4ce14dc13ab62620b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-driving claim step — branch by domain.worktreeBacked",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-driving claim step — branch by domain.worktreeBacked",
+          "anchor": "fgos-coding-driving-claim-step-branch-by-domainworktreebacked"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-driving-worktreebacked-claim-branch/plan.md",
+      "blobSha": "44945f074fc8bc115305f067a0912fecbf9f3184",
+      "blobSize": 5618,
+      "sourceDigest": "5c2ef17dcdc6bd1877d75d4149526fcb8da46a18681314c364e43b18a7430bc5",
+      "sourceId": "src_ceeb5b83a8e40c4a9933806aa528a671",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — fgos-coding-driving claim step branch by domain.worktreeBacked",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — fgos-coding-driving claim step branch by domain.worktreeBacked",
+          "anchor": "plan-fgos-coding-driving-claim-step-branch-by-domainworktreebacked"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-implement-decide-first-prose/plan.md",
+      "blobSha": "8959e9b56941ebe2c98f574fb1681516edbe419b",
+      "blobSize": 6350,
+      "sourceDigest": "cc4ad53f0a85df8236887bcc53fbe5f8f2d9e58218b536b19979d30c925b03ee",
+      "sourceId": "src_2a3d8b2f2d265d4e4c8f1a1652650f5a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-1ep: fgos-coding-implement decide-first prose fix",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-1ep: fgos-coding-implement decide-first prose fix",
+          "anchor": "planmd-tsk-1ep-fgos-coding-implement-decide-first-prose-fix"
+        }
+      ]
+    }
+  ]
+}

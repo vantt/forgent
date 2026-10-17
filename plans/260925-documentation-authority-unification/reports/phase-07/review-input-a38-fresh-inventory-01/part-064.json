@@ -1,0 +1,1112 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 64,
+  "entries": [
+    {
+      "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "blobSha": "e9f34172196b35b48cd6166fd9163e8266852311",
+      "blobSize": 12820,
+      "sourceDigest": "644ad117232f45b7cd954b62481cef735824b9b680631f42d4446202be683d27",
+      "sourceId": "src_7ae0629d1800ba8153bc31296422e3e9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P07 — Strict Readiness, Docs, And Closeout (Final Phase)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P07 — Strict Readiness, Docs, And Closeout (Final Phase)",
+          "anchor": "p07-strict-readiness-docs-and-closeout-final-phase"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md",
+      "blobSha": "0bee4adda0c4ce30dad50b4542079e0bb89a3ba2",
+      "blobSize": 11943,
+      "sourceDigest": "99eb8d1df43f621b6bd6888496cf7189ded51a6ce9b94bb022241509ce676c86",
+      "sourceId": "src_52fb8d6c8450919789af4bd1ed937255",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P08 — Bwrap Executor Migration To Confinement Authority (Post-Close Follow-Up)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P08 — Bwrap Executor Migration To Confinement Authority (Post-Close Follow-Up)",
+          "anchor": "p08-bwrap-executor-migration-to-confinement-authority-post-close-follow-up"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+      "blobSha": "0974490af5ff2a2dfc37e94ed5e6dc112dcaaea7",
+      "blobSize": 11909,
+      "sourceDigest": "464cbe24284b33c0ba1102e9be188afd44b696115322a9ce6a4301aefb681060",
+      "sourceId": "src_817f8ea1a39a1073bc143e9bf7493632",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Coordination Envelope — Capability Fit, 2026-09-06",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Capability Fit, 2026-09-06",
+          "anchor": "coordination-envelope-capability-fit-2026-09-06"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount-result.json",
+      "blobSha": "7ee082dc48c22f95cd064718eebd217c498dca10",
+      "blobSize": 1813,
+      "sourceDigest": "52d0ea1ff7223c3aff70d31b1d76c258f14c4dd202615a1b6b2d9fc8e6e0a136",
+      "sourceId": "src_d9ce34c53a050f8e0cf3c08ecbfd276e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount.mjs",
+      "blobSha": "062a1c014719d00d70c18a142d639bfc5a722caf",
+      "blobSize": 2238,
+      "sourceDigest": "7cfac7b5cdcc6cca46c701f3ae9d17cc8a54335f6f127b681b4159d93643faa8",
+      "sourceId": "src_532f7a9984c565a4ff1658d4a089f513",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/probe.mjs",
+      "blobSha": "26680953ba929cda451c3cfbb334317eec429bb3",
+      "blobSize": 4083,
+      "sourceDigest": "851098fd00f2afe642b06ca0a54a24b2d6b8806f68393e099a030453271165cd",
+      "sourceId": "src_f1f6b36ea3d380d3c5606306559ebda5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json",
+      "blobSha": "daeb6669de59c58d0efcc0ce7bf89c99fd267087",
+      "blobSize": 3768,
+      "sourceDigest": "fdfb0270dfcfca6c36f1b1b8099882d390ee4de63c6960bb814b1ec35446736a",
+      "sourceId": "src_4328729834b1052c9660ff4536693b51",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+      "blobSha": "02f894648755764724f7e99684611e7a5d7f5161",
+      "blobSize": 1796,
+      "sourceDigest": "9b8d3478c64d1b94770dfaf360b72ab29ac4945ae0d5a18c1de4779da6ea16b9",
+      "sourceId": "src_820ee16d0d9b880fa8eac6a207e64a82",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
+      "blobSha": "125be87961979dd7fe083c49c180ca295b385377",
+      "blobSize": 1312,
+      "sourceDigest": "22e7c38d4e6c0b60c4855b1ae81f072649ee74c1ba3c9cc4c7ee51eb5d2598d1",
+      "sourceId": "src_d7a1565e9436f51ba4e88221b7e2d23b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I01.md",
+      "blobSha": "b9b4b65d4fd51fda80973e39166207a227fe4725",
+      "blobSize": 10860,
+      "sourceDigest": "edf260eaf088b942b557545b554e7fb413bdc4b640fc3c35889a446fedd3d93a",
+      "sourceId": "src_1d1b4e40bad201a88b09b77c0447de04",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "I01 — Agent Result Claim v2",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I01 — Agent Result Claim v2",
+          "anchor": "i01-agent-result-claim-v2"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I02.md",
+      "blobSha": "ece0affc3811d66939ce98d31f11d78cfb5858d7",
+      "blobSize": 5347,
+      "sourceDigest": "c210959817a693c9530c4f314f27b71d022dfc290336404a66801caa6fbefbbf",
+      "sourceId": "src_2f453398ba3f06de2c4f01d7de704b9e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "I02 — Effective Execution Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I02 — Effective Execution Contract",
+          "anchor": "i02-effective-execution-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+      "blobSha": "dc9ae6e8eace090da5693eef1c993d0f2916167a",
+      "blobSize": 12398,
+      "sourceDigest": "f4d948cd57d1aac6696970ffe265d9e1a6cab3cf7c09905cfeac60046cb511bf",
+      "sourceId": "src_b6e90af3e4c47a185df86cbaa1fb2778",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "I03 — RunResult v2 And Attribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I03 — RunResult v2 And Attribution",
+          "anchor": "i03-runresult-v2-and-attribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+      "blobSha": "9dbde5c20041af4f7f35a9acf3477d9d543de54a",
+      "blobSize": 13977,
+      "sourceDigest": "e12f24f2f9c977190175033e21d4c2ced9cfd539394acb70728827e832bf30a3",
+      "sourceId": "src_198eb2db79dce75a5ad990475aed2b6f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "I04 — dispatch.runtime.inspect",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I04 — dispatch.runtime.inspect",
+          "anchor": "i04-dispatchruntimeinspect"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+      "blobSha": "391ae1db643bac39897f468f117fe63f52099595",
+      "blobSize": 17459,
+      "sourceDigest": "93a4027c6cc2f154fa733ed9334fde94f8643341549fc259b462812042b93991",
+      "sourceId": "src_2bff3e45479a043845f0bc5bbf2aad97",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "I05 — dispatch.runtime.reconcile",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I05 — dispatch.runtime.reconcile",
+          "anchor": "i05-dispatchruntimereconcile"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+      "blobSha": "973dda87b4175691c1e402284173001341afc38f",
+      "blobSize": 8169,
+      "sourceDigest": "f38b778a76b664d8ed70f947636d8536f6ef2017eff15d3226ed4ef9a6ae440f",
+      "sourceId": "src_4025b63d7223ed96367ff2ef7e13dde5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Phase 00 — baseline snapshot harness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Phase 00 — baseline snapshot harness",
+          "anchor": "phase-00-baseline-snapshot-harness"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
+      "blobSha": "494a57c99ceab1e3c3e24db2aa1a603b52100648",
+      "blobSize": 3801,
+      "sourceDigest": "1e2c0a0cb8fe41676031a40679a61a3935f713a0f6c1850ae528f52d5a26d397",
+      "sourceId": "src_1ba3ad3742b57bfe8a8a3099dc237de8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell: P01.1 (Mutation Unlock)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P01.1 (Mutation Unlock)",
+          "anchor": "current-cell-p011-mutation-unlock"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md",
+      "blobSha": "cf5925e701f3a64aff1c6098395632ceed93a935",
+      "blobSize": 3696,
+      "sourceDigest": "84b4876ab77233d96f0d738a2e827e8e8e7de38cf22b0837b4e1b0cd6cc050d7",
+      "sourceId": "src_9053300df71765fea4324da614c019d0",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell: P02.1 (Chain Verb And Pack Registration)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P02.1 (Chain Verb And Pack Registration)",
+          "anchor": "current-cell-p021-chain-verb-and-pack-registration"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md",
+      "blobSha": "d09cb308b7806e0a87c5e52c19b9ddc10edf99e9",
+      "blobSize": 4851,
+      "sourceDigest": "062cf4b1acbfe48141416acc90518fc0945400cd0ed98e2a5cb1f7003226b2cd",
+      "sourceId": "src_139b0e95151e0396c10ce7924463f0bf",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell: P03.1 (Plan-Loop Skill And Live Proof — R1-R4 only)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P03.1 (Plan-Loop Skill And Live Proof — R1-R4 only)",
+          "anchor": "current-cell-p031-plan-loop-skill-and-live-proof-r1-r4-only"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md",
+      "blobSha": "0e3e7cd128e13927c043b01ff23fb742614c9ea3",
+      "blobSize": 14011,
+      "sourceDigest": "380b2214205baa0d76f61efc36929671470730e4ba1bdd1f0e2a262df1a50e38",
+      "sourceId": "src_43c42581e646f19741d439cbde9e1bc3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Track: group-thinking-plan-loop",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: group-thinking-plan-loop",
+          "anchor": "track-group-thinking-plan-loop"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "blobSha": "05efb5d027cd7b8d09c6002c82a832f4063322e6",
+      "blobSize": 124073,
+      "sourceDigest": "1ec797b388254eaee043cc4ff6d403bda0cc0703d7e6437789bd6fb4f2955beb",
+      "sourceId": "src_33a474ca9dd3c4fea1dfe32986d00be0",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.1 — Mutation Unlock",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.1 — Mutation Unlock",
+          "anchor": "cell-p011-mutation-unlock"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "blobSha": "a7f8f67113db7e15f3975fa44f3488546bc804a7",
+      "blobSize": 41731,
+      "sourceDigest": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce",
+      "sourceId": "src_5ef462af757aefef84ce96c1cd6abc0b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.1 — Chain Verb And Pack Registration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.1 — Chain Verb And Pack Registration",
+          "anchor": "cell-p021-chain-verb-and-pack-registration"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "blobSha": "07f45ebae6bf45551248c0467facf1d5e2c2293a",
+      "blobSize": 47026,
+      "sourceDigest": "d1bae74693a7c38eb902dd69facb8d4f87041f586f109da751ed723ee66d4482",
+      "sourceId": "src_8b1bd6b1b198d8e760a0d75443de1e02",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.1 — Plan-Loop Skill And Live Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — Plan-Loop Skill And Live Proof",
+          "anchor": "cell-p031-plan-loop-skill-and-live-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/README.md",
+      "blobSha": "aad91b5ac471c3a0664e448d33120172ca2437fe",
+      "blobSize": 4099,
+      "sourceDigest": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "sourceId": "src_784f4fc584633a6cddd916346426b7fb",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Verification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Verification",
+          "anchor": "agent-coordination-verification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p00.md",
+      "blobSha": "82a9df99623d66d49cae3e95f37e746e01934677",
+      "blobSize": 7416,
+      "sourceDigest": "23fdb940714f40125a481a92c4f29ec5d7dd6ac0818207b325197f4f77d60577",
+      "sourceId": "src_95f7c8a784d9a03c361afb0c0e9e5919",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P00 — Baseline Freeze — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P00 — Baseline Freeze — Cell Trace",
+          "anchor": "p00-baseline-freeze-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p01.md",
+      "blobSha": "b03a61736682b3056271b020031086194d3299ce",
+      "blobSize": 6580,
+      "sourceDigest": "3e85085725154b225b4c587d8044b028534fc73a9f98fb2f8edcf1ce407341b8",
+      "sourceId": "src_71f1cc7b6279e5e78b0d78e414c64219",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P01 — Run Admission And Fencing — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P01 — Run Admission And Fencing — Cell Trace",
+          "anchor": "p01-run-admission-and-fencing-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+      "blobSha": "5b1907197c0149765f5e23789fb5202c6da48106",
+      "blobSize": 8829,
+      "sourceDigest": "c022bbc25fa4ffec12a2d96c644f16ff8ea90ef50fda573c65d8a33ea323ad6b",
+      "sourceId": "src_0d03bd082c7bc72fc149cc3f5c827f72",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P02H Reopen — Herdr Worker-Command Seam, Closed For Real — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02H Reopen — Herdr Worker-Command Seam, Closed For Real — Cell Trace",
+          "anchor": "p02h-reopen-herdr-worker-command-seam-closed-for-real-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p02h.md",
+      "blobSha": "2fc9544da08c939acd81d75edbe7a23d0f492b02",
+      "blobSize": 7824,
+      "sourceDigest": "494a1cef1809721fdc0a174b48eb54e5a12e2e6e62e695b38595cf113c8fb9f8",
+      "sourceId": "src_841e3f732a8e8710be7e4ceb16f8f275",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P02H — Herdr Worker-Command Seam / Launch Reconciliation — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02H — Herdr Worker-Command Seam / Launch Reconciliation — Cell Trace",
+          "anchor": "p02h-herdr-worker-command-seam-launch-reconciliation-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p02l.md",
+      "blobSha": "a37a35e30de1d31e0bff878f86a1b47521b47f89",
+      "blobSize": 6584,
+      "sourceDigest": "8cb7de9dcbe2b14c2f9074c885b820a89e88d8ec663f4eb0089bce0635b507b4",
+      "sourceId": "src_74e153ef8ddd869d41d1b928b27c5b93",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P02L — Shared Confinement Authority Seam + Local Cli-Spawn Recovery — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02L — Shared Confinement Authority Seam + Local Cli-Spawn Recovery — Cell Trace",
+          "anchor": "p02l-shared-confinement-authority-seam-local-cli-spawn-recovery-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p03.md",
+      "blobSha": "333bc8e4cfb526b6df6f401e21ec0bd5b8b0f63d",
+      "blobSize": 5391,
+      "sourceDigest": "e57c0b28c6615dd9404833b26235bf22350b0106d42e5ed7a6ebec16de8ad605",
+      "sourceId": "src_15736eb85bdb4621f0246f409af47978",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P03 — Governed Pre-Delivery Fallback and Effect Boundary — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03 — Governed Pre-Delivery Fallback and Effect Boundary — Cell Trace",
+          "anchor": "p03-governed-pre-delivery-fallback-and-effect-boundary-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p04.md",
+      "blobSha": "d5ebd1bc9f8eba269f7955fd5cea739dda674784",
+      "blobSize": 2853,
+      "sourceDigest": "d85de509201084b509f40d4dfffa316c8153e39844aeab5c1d02268b93dec52e",
+      "sourceId": "src_d1fbd10311e9454c5de1a12ad3173994",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P04 — Pure Read Evaluators — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P04 — Pure Read Evaluators — Cell Trace",
+          "anchor": "p04-pure-read-evaluators-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p05.md",
+      "blobSha": "c4c4c8a5e12be258b6e8a84741411b0013cb3434",
+      "blobSize": 6701,
+      "sourceDigest": "31f5042ae7f008cfa0b59475f170840202ddf1f59fbf364554c35d614892835d",
+      "sourceId": "src_74192cd46b06f7428ec9469be1485bf3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P05 — Deterministic Standalone-Run Recovery Planner and `dispatch recover` Door — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P05 — Deterministic Standalone-Run Recovery Planner and `dispatch recover` Door — Cell Trace",
+          "anchor": "p05-deterministic-standalone-run-recovery-planner-and-dispatch-recover-door-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p05s.md",
+      "blobSha": "8a76a7f28f7bb3fdcfa9fb8581b25949e399b9ce",
+      "blobSize": 7311,
+      "sourceDigest": "7e5da0f8653730e81401ee76a65e8edb4d0a92c58d3e61c7409dc66dc7ca509b",
+      "sourceId": "src_fc7d0a9f54a03011dd006bcbee5fa335",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P05S — Coordination Session Recovery Door — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P05S — Coordination Session Recovery Door — Cell Trace",
+          "anchor": "p05s-coordination-session-recovery-door-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/runtime-recovery/p08.md",
+      "blobSha": "ceddc9e56c16aa73846d21f9721c9e47bdafa19e",
+      "blobSize": 8246,
+      "sourceDigest": "9d7bb7d84a8d30424d77e011671d573def3af6e03cd465193354127abc904451",
+      "sourceId": "src_e0024793df05f821a0dd702d716f6cb0",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P08 — Closeout And Capability Matrix — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P08 — Closeout And Capability Matrix — Cell Trace",
+          "anchor": "p08-closeout-and-capability-matrix-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p00.md",
+      "blobSha": "adf4ee2c83b224de8fdce0bd9837a15595065a3b",
+      "blobSize": 6577,
+      "sourceDigest": "1e49dd25464e22e97c879ad9511b302465ff6be38aa551522eafdc468cb5fede",
+      "sourceId": "src_3ff7751c2d86a78bad8d1555e9a535c4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00 — Inventory And Inputs Freeze",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00 — Inventory And Inputs Freeze",
+          "anchor": "cell-p00-inventory-and-inputs-freeze"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p01.md",
+      "blobSha": "f47a91722f349333a4a69c932c5b536964d22877",
+      "blobSize": 6869,
+      "sourceDigest": "ca963891b69709d3512206a61cefdf605b14521c38f246337fdd3424b440e651",
+      "sourceId": "src_0d3f20e67ed73c4e8a13e2081c8c0168",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01 — Command-Route Descriptor Generator",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01 — Command-Route Descriptor Generator",
+          "anchor": "cell-p01-command-route-descriptor-generator"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p02.md",
+      "blobSha": "6afce134eec3e445a31f7d401691457ae7318de5",
+      "blobSize": 8062,
+      "sourceDigest": "a9bcbddce966e12c42f35443a457690d53cf6ce578ff7ff4034a1542e07d7fb9",
+      "sourceId": "src_6a09afadb9bb62dae9956b5af0505c70",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02 — Parity Harness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02 — Parity Harness",
+          "anchor": "cell-p02-parity-harness"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p03.md",
+      "blobSha": "6b3195e492b21072918ffa661f1cc2658fce8d7d",
+      "blobSize": 6855,
+      "sourceDigest": "2433aae5b13cec5e047b7abb711dd9964f7ee0768887702b5ed8d1b5acc8cfe8",
+      "sourceId": "src_1b0f3e822804803046c86becbcd098ab",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03 — Envelope Vectors And Serialization Corpus",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03 — Envelope Vectors And Serialization Corpus",
+          "anchor": "cell-p03-envelope-vectors-and-serialization-corpus"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p04.md",
+      "blobSha": "cc3a4e971775a75d138032503a9046cca1482f71",
+      "blobSize": 7278,
+      "sourceDigest": "a552cbcc506d09db3534e13f2aca75f385b924d2ee4a3cc6329f87771ced5768",
+      "sourceId": "src_52d9491f767feaa91414f29536c2ff9c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P04 — Cargo Workspace Skeleton",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P04 — Cargo Workspace Skeleton",
+          "anchor": "cell-p04-cargo-workspace-skeleton"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p05.md",
+      "blobSha": "982b3e94cd5f5fde1ce46ee96101d175d63a4dc4",
+      "blobSize": 8682,
+      "sourceDigest": "ca8ea950ad0cf9c0e337bddd262e779a48e726b22b4ce5bec3645bcb94bc6cc0",
+      "sourceId": "src_88d08374b9126aa41f42863cd3803d71",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P05 — Kernel Contracts And Pure Router",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P05 — Kernel Contracts And Pure Router",
+          "anchor": "cell-p05-kernel-contracts-and-pure-router"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p06.md",
+      "blobSha": "a5631be26a6ab7e1350b0728d4f776bbd5fd1d7a",
+      "blobSize": 11178,
+      "sourceDigest": "964679d993e665d9dc733101361e0fe06e615e69657ca6adb748672da8602e8e",
+      "sourceId": "src_17949c5c788b20714c045a73a4cd3002",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P06 — Invocation Service And Authority",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P06 — Invocation Service And Authority",
+          "anchor": "cell-p06-invocation-service-and-authority"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p07.md",
+      "blobSha": "8cd2cbd4ac5a142a7b70604a86ddaf01e920631a",
+      "blobSize": 12101,
+      "sourceDigest": "8b0ad5277dcf59e5f7766144de111c8c8b8d96ea235b6d48a3e36ab4309c6310",
+      "sourceId": "src_fec28621fa1d1703117fa8ed7291e7ba",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P07 — CLI Adapter Legacy Exec",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P07 — CLI Adapter Legacy Exec",
+          "anchor": "cell-p07-cli-adapter-legacy-exec"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p08.md",
+      "blobSha": "411f89db7570fe74b786b2a5c2cc4665e2d09d00",
+      "blobSize": 10446,
+      "sourceDigest": "80d6a9b0879198e48d29f7f670c0547bdb05ee1507d1bf7db94445ffda55aefa",
+      "sourceId": "src_826d85b6c365b6e7777258dea3fb57b3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P08 — Native `version`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P08 — Native `version`",
+          "anchor": "cell-p08-native-version"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p09.md",
+      "blobSha": "b5acfe6c45635d6cc4739ac56bb7224e9e8838c6",
+      "blobSize": 13104,
+      "sourceDigest": "8dfd0b5ea0dd588ec71b6ce3452926db3bfc71ad716b054851710a2b8322fbb2",
+      "sourceId": "src_41d3ca164be83dce1b0a1b0037c2c3cd",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P09 — Release Tree Builder And Doctor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P09 — Release Tree Builder And Doctor",
+          "anchor": "cell-p09-release-tree-builder-and-doctor"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p10.md",
+      "blobSha": "0d49c76d41543769dfb13b209084633f1e652cef",
+      "blobSize": 11538,
+      "sourceDigest": "aa1a9331f800fcf5d9e98b95eb2b12a64963f4608ebea935ff9a5ea446f79180",
+      "sourceId": "src_6135c18558154fbd90ada57bea225cc3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P10 — Tier-Zero Resolver",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P10 — Tier-Zero Resolver",
+          "anchor": "cell-p10-tier-zero-resolver"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p11.md",
+      "blobSha": "4d261974aae64fb55f5fa71a8ded2c2e5295d3c6",
+      "blobSize": 12579,
+      "sourceDigest": "ec74f63f5e4396f8810ff1fe8226a5980c5c7e8ec2ef13bd83b972f8018ae385",
+      "sourceId": "src_774a8c18fd742a05720520fef1a38d54",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P11 — fgctl Crate, Manifest Verify, Release Store",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P11 — fgctl Crate, Manifest Verify, Release Store",
+          "anchor": "cell-p11-fgctl-crate-manifest-verify-release-store"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+      "blobSha": "d080535083c068de4739e7458eb36045bfdf5309",
+      "blobSize": 13989,
+      "sourceDigest": "b381164a5e5ea80d939321a5c2bcd2b95149f5f2f8fd171576e60200a3d4ee65",
+      "sourceId": "src_6e4d28de0e7e45b9892f86f21e779754",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P12 — fgctl Init And Workspace Activation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P12 — fgctl Init And Workspace Activation",
+          "anchor": "cell-p12-fgctl-init-and-workspace-activation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p13.md",
+      "blobSha": "93d54c6f79a327c14ee8a45da9e3669cbd949432",
+      "blobSize": 9727,
+      "sourceDigest": "d1174393c7ea4891ba5dbfc3d372cdded3c911c1709df9671e6bf4c94912f647",
+      "sourceId": "src_3b7743d5a387b286029561463996d796",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P13 — fgctl Upgrade, Repair, Rollback",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P13 — fgctl Upgrade, Repair, Rollback",
+          "anchor": "cell-p13-fgctl-upgrade-repair-rollback"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p14.md",
+      "blobSha": "36f17f7b3014aee86c3ce4780c575690fd82fb1e",
+      "blobSize": 9245,
+      "sourceDigest": "8eecdf79cb068fa38ec4a5ee165b33eb2b3834cf1b6648db242e5b347d9bd72d",
+      "sourceId": "src_8f9a8c3401a341d2fbb58ddef162e9f4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P14 — install.sh From GitHub Release",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P14 — install.sh From GitHub Release",
+          "anchor": "cell-p14-installsh-from-github-release"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p15.md",
+      "blobSha": "708c404c989e55ad352d92df83a441711bd28d8a",
+      "blobSize": 6248,
+      "sourceDigest": "f5c88267a5031eb6a421525029fd89018eb3eb79ea53d0d6f95297d7e10c5e10",
+      "sourceId": "src_95cf5870e9dccb4c8ae6a01c4fe01c59",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P15 — CI Release And External-Consumer Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P15 — CI Release And External-Consumer Proof",
+          "anchor": "cell-p15-ci-release-and-external-consumer-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p16.md",
+      "blobSha": "6dafba81899d0c4389939f10b3fa98f37bfefaa1",
+      "blobSize": 8793,
+      "sourceDigest": "629d7c61e9b2b583bad0efc658a2d8583258703b6d9c94f35b0276e7226ac1b7",
+      "sourceId": "src_3a089c652d5df4c4c1a1ac01f8fb1f22",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P16 — Docs, Changelog, Closeout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P16 — Docs, Changelog, Closeout",
+          "anchor": "cell-p16-docs-changelog-closeout"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "blobSha": "dd7edc95c281fd9bc7f86c61c48f35749ba33729",
+      "blobSize": 312,
+      "sourceDigest": "9818be755de4ba9b5ce00a46f7ffda1062c5d41c627f85432e7edfe10bef0e36",
+      "sourceId": "src_3965fefced124354f28c4bf1876f4b63",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell: none",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: none",
+          "anchor": "current-cell-none"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
+      "blobSha": "a75810911e2fe9e2a1e84ce3b9c2a8989cfb021a",
+      "blobSize": 18090,
+      "sourceDigest": "3ec50d7db56e8c106d7d6d8b55ec0a5a2b6a656425ce35a5d23ff91f9141c6de",
+      "sourceId": "src_8836c66c417347ff8c808dfa7fee5f4f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Track: step-07-mvp",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: step-07-mvp",
+          "anchor": "track-step-07-mvp"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md",
+      "blobSha": "b5df4bd810c879c0ffbeb4d7636ce73292378a1a",
+      "blobSize": 31807,
+      "sourceDigest": "6d96716bcc0a3015fd4bafd93ac4bafe9b310ef02cc170f97f52e443805d9a73",
+      "sourceId": "src_a89b599904e7d6ae288986918a50393b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.1 — executeAssignment Layering And Crash-Snapshot Timing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.1 — executeAssignment Layering And Crash-Snapshot Timing",
+          "anchor": "cell-p011-executeassignment-layering-and-crash-snapshot-timing"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
+      "blobSha": "86e5736e347d2a51e55de6139f16657261afebc2",
+      "blobSize": 115035,
+      "sourceDigest": "84287a6ddf17306d6b915b193ec5f3cbea31fa6ff8cf9240cefdb8d28738bc30",
+      "sourceId": "src_c0576ebb7341522feeabf65c59b1ab68",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.2 — Plan-Verdict Derivation And Planning Sweep Wiring",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.2 — Plan-Verdict Derivation And Planning Sweep Wiring",
+          "anchor": "cell-p012-plan-verdict-derivation-and-planning-sweep-wiring"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P02.1.md",
+      "blobSha": "8dcfc73c4e202291850eeeb5855bcc7e72ff1783",
+      "blobSize": 54683,
+      "sourceDigest": "16602b8fb55528a13cb5781432f83b1822d331a60cc0d9195d44c45fc97217da",
+      "sourceId": "src_e496eb1508a44302431c9e1abfee4767",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.1 — Assignment Provenance, Normalizer, Inline Validator (Declared Path Only)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.1 — Assignment Provenance, Normalizer, Inline Validator (Declared Path Only)",
+          "anchor": "cell-p021-assignment-provenance-normalizer-inline-validator-declared-path-only"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P02.2.md",
+      "blobSha": "5fc19f4b840a788f45df23bb9e688e5a3bbd3c33",
+      "blobSize": 55323,
+      "sourceDigest": "246cadc88f845faf70ae3dbd09793055d3943c7200c42578b997dbfe0daeb45e",
+      "sourceId": "src_dbbee341bab9a620b5f138c111c1f631",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.2 — Interpretation Reads Stamped Assignment Fields (R5 Only)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.2 — Interpretation Reads Stamped Assignment Fields (R5 Only)",
+          "anchor": "cell-p022-interpretation-reads-stamped-assignment-fields-r5-only"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P02.3.md",
+      "blobSha": "0408a421aa1c24ed90187831e9262b27441253c2",
+      "blobSize": 26407,
+      "sourceDigest": "7c2ff36b2bd3d34908ed8d897d39b1d1e86a600c8151d203f1e86b17d7feaff0",
+      "sourceId": "src_e5f2ba1a5e0d810b7aed467085524917",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.3 — G3: Persist And Re-Derive Dirty-Before Mutation Evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.3 — G3: Persist And Re-Derive Dirty-Before Mutation Evidence",
+          "anchor": "cell-p023-g3-persist-and-re-derive-dirty-before-mutation-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P02.4.md",
+      "blobSha": "cec9d5e4675999e2c5abae8958bdce947114a94e",
+      "blobSize": 76352,
+      "sourceDigest": "324b5f104f71c7ab65b4e845a012cd78f02070ece076d101d691c1ab1d90808b",
+      "sourceId": "src_e7ab34bd4fe8362d9c191cc435b0cefc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.4 — R7: Retire The Standalone Read-Only Heuristic",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.4 — R7: Retire The Standalone Read-Only Heuristic",
+          "anchor": "cell-p024-r7-retire-the-standalone-read-only-heuristic"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P02.5.md",
+      "blobSha": "5ce52f55b62374e09953ef2d818fe51e856d2e5c",
+      "blobSize": 83899,
+      "sourceDigest": "14c81504c9863284157748371c5eb3a06e5ca57ac16dd69388eb2b912d3b7615",
+      "sourceId": "src_9d6c809047ced8935f3c087cf4f16b9f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.5 — R8: Mission-Lite Migration Onto The Inline Path",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.5 — R8: Mission-Lite Migration Onto The Inline Path",
+          "anchor": "cell-p025-r8-mission-lite-migration-onto-the-inline-path"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md",
+      "blobSha": "6edee23653309805d05e5f80a12d361522065a2d",
+      "blobSize": 89639,
+      "sourceDigest": "e6e324698a3feda7f2c624d84b665a152e5a3eca06318662b7252ea80e7f65bd",
+      "sourceId": "src_5ffd2727e960267f48162b9ca8167e9c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.1 — R1+R2: Domain Harness Seam And The Non-Driving Rule",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — R1+R2: Domain Harness Seam And The Non-Driving Rule",
+          "anchor": "cell-p031-r1r2-domain-harness-seam-and-the-non-driving-rule"
+        }
+      ]
+    }
+  ]
+}

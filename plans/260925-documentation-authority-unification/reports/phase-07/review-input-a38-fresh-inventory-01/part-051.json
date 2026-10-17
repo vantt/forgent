@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 51,
+  "entries": [
+    {
+      "path": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "blobSha": "09cd5b5f5efe811a471de676e0aaaae29a24d8c0",
+      "blobSize": 6239,
+      "sourceDigest": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+      "sourceId": "src_5ea76f6e558a206cdc51885fb1619105",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
+          "anchor": "how-to-reuse-the-shared-executor-dispatch-fallback-fragment-in-a-new-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "blobSha": "12ad51f461b2346efa345f5bc1252e26a7784e07",
+      "blobSize": 13958,
+      "sourceDigest": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+      "sourceId": "src_7b032622b198dcb28e6225b5d378fbcd",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to run a state-writing `fgos` verb from inside a picked worktree",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to run a state-writing `fgos` verb from inside a picked worktree",
+          "anchor": "how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-worktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+      "blobSha": "cde1fec8a1deb660eb2665c2036ae59dfb09b3b9",
+      "blobSize": 7483,
+      "sourceDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+      "sourceId": "src_47ab407b02b780f129ddf4edfee82445",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to safely `git reset --hard` the main checkout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to safely `git reset --hard` the main checkout",
+          "anchor": "how-to-safely-git-reset---hard-the-main-checkout"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+      "blobSha": "b93170f76fc2371fd7c4e5096944d3807abc4b43",
+      "blobSize": 6392,
+      "sourceDigest": "09c9d35d624e13873356f381f2fb7bcceec71030252be1be8c50dfe9ba09326f",
+      "sourceId": "src_4df1ebc19d7c50c50562c16398498ec1",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to see done items in `fgos list` / `fgos triage`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to see done items in `fgos list` / `fgos triage`",
+          "anchor": "how-to-see-done-items-in-fgos-list-fgos-triage"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+      "blobSha": "a3ff2aa0d768fba89fc7ca71c0e5cc9e6c4f2841",
+      "blobSize": 5355,
+      "sourceDigest": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+      "sourceId": "src_d20f8810749323b375724793a14f8db6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Self-resolve verify-timeout, integration-drift, and unclassified merge failures",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Self-resolve verify-timeout, integration-drift, and unclassified merge failures",
+          "anchor": "self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+      "blobSha": "ced978c99f9b5aa308440a580b0e670d5c86fceb",
+      "blobSize": 4409,
+      "sourceDigest": "b16ea69f31b4c66c6a88e997a16d1ee29991be49cd9d96f8ea1b75c33901058e",
+      "sourceId": "src_f7d942beea7c77b10fb93623c2c2ca65",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to smoke-test fgos-coding-implement with a trivial verify=true item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to smoke-test fgos-coding-implement with a trivial verify=true item",
+          "anchor": "how-to-smoke-test-fgos-coding-implement-with-a-trivial-verifytrue-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+      "blobSha": "5b777797cda5eebda43157b997f9bb4d5c266b8a",
+      "blobSize": 4036,
+      "sourceDigest": "a6e4aa8a1aba39ed5ebf4f3cebeb437a1e7907ff27fd56c47b3d56be37d9828c",
+      "sourceId": "src_f290eada0f1ccee0c32522e6e68bc009",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to sweep the clarify/decompose backlog with `/fgOS:discover-loop`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to sweep the clarify/decompose backlog with `/fgOS:discover-loop`",
+          "anchor": "how-to-sweep-the-clarifydecompose-backlog-with-fgosdiscover-loop"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+      "blobSha": "f5f34efd1b8bdf5aad85463b201efc99263fe6c4",
+      "blobSize": 3796,
+      "sourceDigest": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+      "sourceId": "src_b0cad8b98775d1b28c2137bfbc90658a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to tell a stale worktree index apart from real uncommitted work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to tell a stale worktree index apart from real uncommitted work",
+          "anchor": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "blobSha": "498a903ca4aea32b06ad5fb45baa31b03f7423d9",
+      "blobSize": 6093,
+      "sourceDigest": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+      "sourceId": "src_83a04c0f8e3f1087f30df2cc14059165",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to unify two independently-written working-tree-clean checks into one scope-parameterized function",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to unify two independently-written working-tree-clean checks into one scope-parameterized function",
+          "anchor": "how-to-unify-two-independently-written-working-tree-clean-checks-into-one-scope-parameterized-function"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "blobSha": "fee0eab4c0bdddebf2de1e044f2029fc3eacbd16",
+      "blobSize": 3654,
+      "sourceDigest": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "sourceId": "src_7fbccd0abbb2df6f961e4a5c86fdcee5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to verify every citer before retiring a shared skill fragment",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to verify every citer before retiring a shared skill fragment",
+          "anchor": "how-to-verify-every-citer-before-retiring-a-shared-skill-fragment"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+      "blobSha": "a04ea6f443f2afb8c77bb1afa7e9689694740526",
+      "blobSize": 3404,
+      "sourceDigest": "7ac7b6e6dbf3bfa4bad486a649de2939799b02ea9cefaae6b051379069a303b8",
+      "sourceId": "src_b1ba095746a6579c9d2c2f961ab2d6cd",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to verify herdr cockpit reuses its existing tab instead of overwriting yours",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to verify herdr cockpit reuses its existing tab instead of overwriting yours",
+          "anchor": "how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead-of-overwriting-yours"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+      "blobSha": "a986de1e08a90f2c6402480aadf41ae05f44407e",
+      "blobSize": 7408,
+      "sourceDigest": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+      "sourceId": "src_666a809e095ad71dff09dc283be2245b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to wait out a genuinely active main-checkout lock holder",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to wait out a genuinely active main-checkout lock holder",
+          "anchor": "how-to-wait-out-a-genuinely-active-main-checkout-lock-holder"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+      "blobSha": "3f02b83a16bcf37975ee7e1197b46356ee7e1c37",
+      "blobSize": 6342,
+      "sourceDigest": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+      "sourceId": "src_cc64b4ddf5a0d5355a4cf8fe0f91b779",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to wire a headless function through an agent-executor executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to wire a headless function through an agent-executor executor",
+          "anchor": "how-to-wire-a-headless-function-through-an-agent-executor-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "blobSha": "e61da163376f2c421b1069368052672ff24ed652",
+      "blobSize": 3326,
+      "sourceDigest": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "sourceId": "src_470724eed2afb5a1cecff54ac9b65d55",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to wire a skill through the dispatch decision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to wire a skill through the dispatch decision",
+          "anchor": "how-to-wire-a-skill-through-the-dispatch-decision"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "blobSha": "c04874fc98ca2e512c53dde145b8beaf4544d69a",
+      "blobSize": 7895,
+      "sourceDigest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "sourceId": "src_b2772e51466a5e49a54023d17c898f00",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
+          "anchor": "how-to-wire-an-existing-skills-inline-reasoning-step-through-an-agent-executor-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+      "blobSha": "dac763c5f91817b1231724dcd06370c58ca2570a",
+      "blobSize": 5325,
+      "sourceDigest": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+      "sourceId": "src_c93737fb45bf0b4bc97b63a77c4ec642",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to write a doctor check that detects real shell-function breakage, not just text presence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to write a doctor check that detects real shell-function breakage, not just text presence",
+          "anchor": "how-to-write-a-doctor-check-that-detects-real-shell-function-breakage-not-just-text-presence"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+      "blobSha": "fd8835d17eb0473bdad2089163a5eb7d65c68098",
+      "blobSize": 3363,
+      "sourceDigest": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+      "sourceId": "src_e1021b2f99fdaa8b7c8bb30c33d9225c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to write a task-spec",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to write a task-spec",
+          "anchor": "how-to-write-a-task-spec"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+      "blobSha": "3d3ebc6bb337b17f1fe1729bf32ca1dde50779e6",
+      "blobSize": 6903,
+      "sourceDigest": "f006090af52c3e7c2ffcf1cc2774d9f95933d797ffb581fecae8f063e246da06",
+      "sourceId": "src_059da3243b9b09623665672fb1576f54",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "judge fail-safe debug log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "judge fail-safe debug log",
+          "anchor": "judge-fail-safe-debug-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+      "blobSha": "547c20693b558d0ab40922591507dd679a0b5ef8",
+      "blobSize": 6256,
+      "sourceDigest": "ac95f56ee5b7bcd7d426bf7596032374c92a38c61b9503e4328b4c8d61026609",
+      "sourceId": "src_da288e1c198b649e483149c77dc4900b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Judging real test duplication vs. superficially-similar tests",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Judging real test duplication vs. superficially-similar tests",
+          "anchor": "judging-real-test-duplication-vs-superficially-similar-tests"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+      "blobSha": "ba3784f82cda234405a451f9e8d5e303a40cdea2",
+      "blobSize": 3995,
+      "sourceDigest": "b4f246a647fdec09b96ed6ffdb00e6c6da3ceb0f70021efbd3d4c9e2648ea13f",
+      "sourceId": "src_e9e3f6a8a65c39144797e0f34ad98974",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Keep a real-fs-writing integration test from leaving a tracked file dirty",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Keep a real-fs-writing integration test from leaving a tracked file dirty",
+          "anchor": "keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+      "blobSha": "ca1ee4825551322bfcaa537b62848b6b682a3599",
+      "blobSize": 3883,
+      "sourceDigest": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+      "sourceId": "src_42329adf7b487135eb0244670baadc12",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Tiny multi-file edits stay one item when split overhead exceeds the work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Tiny multi-file edits stay one item when split overhead exceeds the work",
+          "anchor": "tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+      "blobSha": "fef7700da2d13dec2cadc959aaaf79f41847f730",
+      "blobSize": 7006,
+      "sourceDigest": "2398166bf987ee68ec2afd8b703a9527bcb7dc459d0bd427a348b42f10865bb6",
+      "sourceId": "src_b98dee8905f849c604c16d1b5c7b84a9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Launch claude in a new herdr pane from a plugin",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Launch claude in a new herdr pane from a plugin",
+          "anchor": "launch-claude-in-a-new-herdr-pane-from-a-plugin"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+      "blobSha": "040fe1f42e71364c90555079c5d075f0f96d1963",
+      "blobSize": 3222,
+      "sourceDigest": "4d9024f0f2470797015fb26114c7afb1e96c52b47f99b66640ba763d8439d99a",
+      "sourceId": "src_ba699b2a43bfc08b9b4d2b8283c6429d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Make a fail-safe catch block visible without breaking it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Make a fail-safe catch block visible without breaking it",
+          "anchor": "make-a-fail-safe-catch-block-visible-without-breaking-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md",
+      "blobSha": "199a483d3f2661d8681397e79c8525ab9087e3ec",
+      "blobSize": 8118,
+      "sourceDigest": "6458bcda95298b4c54d1b29a26c11d30d524362f0982e5f345a74538a9f1609d",
+      "sourceId": "src_96f5a4f503a49a69f64cd893e58ca3eb",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Make a hardcoded stage check domain-aware via `stageForStep`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Make a hardcoded stage check domain-aware via `stageForStep`",
+          "anchor": "make-a-hardcoded-stage-check-domain-aware-via-stageforstep"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+      "blobSha": "cebd370584aabe83951cd1cf36416bf4a8482ef6",
+      "blobSize": 5656,
+      "sourceDigest": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+      "sourceId": "src_4aa86ef7f5c1719d239d461719b8418c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recover from a merge-loop `merge-conflict` block by running `fgos catchup`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recover from a merge-loop `merge-conflict` block by running `fgos catchup`",
+          "anchor": "how-to-recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+      "blobSha": "6a3574a274faed569988e4d3dcb851c3dc95f649",
+      "blobSize": 3262,
+      "sourceDigest": "c4c5ba5207a871a4ab584f17d544fe282f47f64068d6667fad300e74f004ffc2",
+      "sourceId": "src_173ed5f8c2ea4444ab90acbae0aaca28",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`pickNextDiscoverItem`'s real sort-key order",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`pickNextDiscoverItem`'s real sort-key order",
+          "anchor": "picknextdiscoveritems-real-sort-key-order"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+      "blobSha": "fc5613706b81cc89d8ac512ec47349a552dc9cda",
+      "blobSize": 4924,
+      "sourceDigest": "458fef040aa8e85c3c0f4586dda4d86dec669f7d46d2841806828538892ba8a1",
+      "sourceId": "src_9c71935ea620e57dc3b97f09679e05f6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Poll fgOS CLI data from a Rust plugin",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Poll fgOS CLI data from a Rust plugin",
+          "anchor": "poll-fgos-cli-data-from-a-rust-plugin"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "blobSha": "5d4ab056aa56fbeed95a58f8176712a7756d9456",
+      "blobSize": 10314,
+      "sourceDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+      "sourceId": "src_5e2a26553b0f90842e2b70e138891c1c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Produce failing-test-first proof for an Iron Law-gated diff",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Produce failing-test-first proof for an Iron Law-gated diff",
+          "anchor": "produce-failing-test-first-proof-for-an-iron-law-gated-diff"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+      "blobSha": "ced40660a704dd3d16da0a2ad79cdfaf5f8cd050",
+      "blobSize": 1679,
+      "sourceDigest": "9b723f2783ae64ad500ed4979c35f6ccc1d124dc7fd557d6501afca72adc066d",
+      "sourceId": "src_72ff12ce679d03ba51cac035185abb07",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`rankImpact`'s real sort-key order",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`rankImpact`'s real sort-key order",
+          "anchor": "rankimpacts-real-sort-key-order"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+      "blobSha": "f476ef42d52b1f1a0b7abbc45c98b7053f8307bc",
+      "blobSize": 4221,
+      "sourceDigest": "d51f2ac0b381d3784413554d2e401b46599ecae1f66da4cef068c11eb5f7b5bd",
+      "sourceId": "src_22bf5d61e780363c4a1a939fcdfa8df5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Reconcile a strategic backlog row against real execution state",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Reconcile a strategic backlog row against real execution state",
+          "anchor": "reconcile-a-strategic-backlog-row-against-real-execution-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/recordgateapprove-s-real-contract/recordgateapprove-contract.md",
+      "blobSha": "0878c868e2c4ef3d09bfa6871ee86fc2e537f60e",
+      "blobSize": 3502,
+      "sourceDigest": "ae528a4e2f1ee9412185af84c95538fedcfd96cffa2aced4059f0f59b087358f",
+      "sourceId": "src_f3aa1f1d71f142ec17bf0ac2d15ef638",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`recordGateApprove`'s real contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`recordGateApprove`'s real contract",
+          "anchor": "recordgateapproves-real-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md",
+      "blobSha": "66a2c3fd40ecb94a4c452c0a29dd883b00e659dd",
+      "blobSize": 2438,
+      "sourceDigest": "eaea6ba9682b763b9b3270a273d9536c96ae54669df2c3dee7169314dd316d0b",
+      "sourceId": "src_e9d818cbd4f5684814c77a0c9828c0ac",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Reverse `fgos setup`'s wiring with `fgos uninstall`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Reverse `fgos setup`'s wiring with `fgos uninstall`",
+          "anchor": "reverse-fgos-setups-wiring-with-fgos-uninstall"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+      "blobSha": "dba1bcba6987a4798b06bbdc75666d53cdf7a2d9",
+      "blobSize": 6934,
+      "sourceDigest": "8e5f3014ed36106cfa16d4d2416d6be4c8e2798e7b465d11e8295e5a4371545b",
+      "sourceId": "src_367e24da15f7afd6b02e90013478dd4a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Scaffold and link a herdr plugin",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Scaffold and link a herdr plugin",
+          "anchor": "scaffold-and-link-a-herdr-plugin"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md",
+      "blobSha": "00e50df91ddfc5703a9d37f4d93c2913b53d3f38",
+      "blobSize": 3707,
+      "sourceDigest": "97a563929d3f31efc8c97089ff04588d3fcdba4276bcda170345833810b36a59",
+      "sourceId": "src_0eb2e248006b5f1d5f691fe99072d589",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Set or clear a work item's `parent` lineage via CLI",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Set or clear a work item's `parent` lineage via CLI",
+          "anchor": "set-or-clear-a-work-items-parent-lineage-via-cli"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md",
+      "blobSha": "208318a4f1fcbfb19d00c1a75aeb08ae647e1f20",
+      "blobSize": 2459,
+      "sourceDigest": "2c6864366e14ae08cef1991e4e6ebfcd22b992f65c072a1cd6c0208437df783b",
+      "sourceId": "src_06bf04297037842ee2dd503a12668115",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Shell fallback detection needs `type -P`, not `command -v`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Shell fallback detection needs `type -P`, not `command -v`",
+          "anchor": "shell-fallback-detection-needs-type--p-not-command--v"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+      "blobSha": "9a248d9c75e7f76da513c9e5a62b55a3e1b6312d",
+      "blobSize": 5967,
+      "sourceDigest": "27fef5ded87e738335203565af691eb0d7305d104d4512c153f483228b80c1e9",
+      "sourceId": "src_e5f129e60f292cdc1ec1cdf4c2dc72d3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec docs drift silently when only the code has an exact-match test",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec docs drift silently when only the code has an exact-match test",
+          "anchor": "spec-docs-drift-silently-when-only-the-code-has-an-exact-match-test"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+      "blobSha": "686bca6cb81312093fc799031037898b2ea2c596",
+      "blobSize": 1373,
+      "sourceDigest": "aaefbb62c81df89b309cfd0230506948945bfe75a9d01043ba7ec9784fbb87c7",
+      "sourceId": "src_18e2bec1376164e59dbf0761e479686b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "State-machine module file names",
+      "headings": [
+        {
+          "level": 1,
+          "text": "State-machine module file names",
+          "anchor": "state-machine-module-file-names"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md",
+      "blobSha": "6f933050843c393855c2e65e5c26df0441ea1b38",
+      "blobSize": 2190,
+      "sourceDigest": "f8f1fdd174e4712221ffc8969575311ef1b4b24ea7cd82c1fc623fb6fc50a3ef",
+      "sourceId": "src_e03ff68243091a0a1e34b7b27ca0b7b6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Submit a work item with a known verify command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Submit a work item with a known verify command",
+          "anchor": "submit-a-work-item-with-a-known-verify-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+      "blobSha": "dd5a6fc9f26fcb9f58e0838a7372a336ade14c4b",
+      "blobSize": 4192,
+      "sourceDigest": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+      "sourceId": "src_c4542c191831a894c24043521376b7c9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle",
+          "anchor": "sync-an-fgos-item-whose-fix-already-shipped-outside-the-normal-claimreturnapprove-lifecycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+      "blobSha": "bcddc9f7c397fd3ae35ec87c2e64ddd06ec0c186",
+      "blobSize": 2211,
+      "sourceDigest": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+      "sourceId": "src_5e424db78a011236701aeac5522ef514",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Test suite legibility/dedup cleanup — before/after numbers",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Test suite legibility/dedup cleanup — before/after numbers",
+          "anchor": "test-suite-legibilitydedup-cleanup-beforeafter-numbers"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+      "blobSha": "14cbd6b261a1846f83d9ff99cb8517e2c4a2e3bc",
+      "blobSize": 4755,
+      "sourceDigest": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+      "sourceId": "src_25b82ae47a03c96602755dd776462a28",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Worktree/merge lifecycle audit findings (2026-08-14)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worktree/merge lifecycle audit findings (2026-08-14)",
+          "anchor": "worktreemerge-lifecycle-audit-findings-2026-08-14"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+      "blobSha": "2ee7cfe6f909a75f0b6901a7833454d5a4e7aad0",
+      "blobSize": 4183,
+      "sourceDigest": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+      "sourceId": "src_d3ecae76f5cf975f8f5d40ba0a8ef51d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Gateway subsystem audit findings (2026-08-14)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Gateway subsystem audit findings (2026-08-14)",
+          "anchor": "gateway-subsystem-audit-findings-2026-08-14"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+      "blobSha": "50d4fae6ba0a69744112f904349c2901abfdf17b",
+      "blobSize": 11369,
+      "sourceDigest": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+      "sourceId": "src_d9cf66f479b2dfc7abdb1aee91217bf3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config",
+          "anchor": "the-coding-classify-intake-executors-full-lifecycle-created-never-wired-retired-as-dead-config"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+      "blobSha": "cad864908fd820cb845197fea2684387269daee8",
+      "blobSize": 4353,
+      "sourceDigest": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+      "sourceId": "src_e0e61798dba486d99954f16e4918dd13",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS Gateway API (CTR010)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Gateway API (CTR010)",
+          "anchor": "fgos-gateway-api-ctr010"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+      "blobSha": "5ecf07e5c730ff2cb1934e7538d8590c1c30d02f",
+      "blobSize": 3974,
+      "sourceDigest": "9f824520f8f0ef1ff7c874797b25035f90d6fd59892ac339bbfcd82cfae0c918",
+      "sourceId": "src_d6d65c73052cfc807329bdefb32eb83e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`backlog` status schema",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`backlog` status schema",
+          "anchor": "backlog-status-schema"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "blobSha": "2787bd6fa094ed5caed9f05f946a630de4ccd5f2",
+      "blobSize": 6755,
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Tool-registry: capability lookup is a prose contract, not compiled logic",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Tool-registry: capability lookup is a prose contract, not compiled logic",
+          "anchor": "tool-registry-capability-lookup-is-a-prose-contract-not-compiled-logic"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "blobSha": "340b9fd0269f14ce4ad70763398847ac151f700b",
+      "blobSize": 5610,
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3mv feature summary — teaching merge-loop to self-resolve the two block reasons that already had a proven playbook",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3mv feature summary — teaching merge-loop to self-resolve the two block reasons that already had a proven playbook",
+          "anchor": "tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "blobSha": "ed678e3cf22849528724bc040217392a647a1829",
+      "blobSize": 5409,
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Use `--force` to clear a red-first verify disagreement at clarify",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Use `--force` to clear a red-first verify disagreement at clarify",
+          "anchor": "use---force-to-clear-a-red-first-verify-disagreement-at-clarify"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "blobSha": "2822092f6e0645d88caf4e99bde09618dbfe7ea7",
+      "blobSize": 5291,
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Verify-cost audit: real pick/return/approve cycle counts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verify-cost audit: real pick/return/approve cycle counts",
+          "anchor": "verify-cost-audit-real-pickreturnapprove-cycle-counts"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "blobSha": "27d7280dcd29d04056d4eebb8f7cb3ed8348bd6d",
+      "blobSize": 9211,
+      "sourceDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "sourceId": "src_0d60b2e136715b9c8f067fa28dfc9824",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Viết verify cho một item thay đổi skill prose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Viết verify cho một item thay đổi skill prose",
+          "anchor": "viết-verify-cho-một-item-thay-đổi-skill-prose"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+      "blobSha": "05f6f1fc0c2158b7a391ea41b28c844fa93873cd",
+      "blobSize": 8998,
+      "sourceDigest": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+      "sourceId": "src_e338afbcd14d450c371e1c097f8a0f38",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Walking a heavy fgOS item through exploring, a 3-child split, and done",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Walking a heavy fgOS item through exploring, a 3-child split, and done",
+          "anchor": "walking-a-heavy-fgos-item-through-exploring-a-3-child-split-and-done"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+      "blobSha": "461597793a3083b8d5c2aeacc3d0e374c5ffea16",
+      "blobSize": 3621,
+      "sourceDigest": "1473f9facba459536b32c2f3f601de1f57689bcc6a435408a166a1d56b9360c2",
+      "sourceId": "src_147661b5d703d4b6114371bfff645b6f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Can fgOS reliably remove its own installed package?",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Can fgOS reliably remove its own installed package?",
+          "anchor": "can-fgos-reliably-remove-its-own-installed-package"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "blobSha": "4eab1e3ee7dd72da9fec9b3a75c57cc622a45523",
+      "blobSize": 1699,
+      "sourceDigest": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "sourceId": "src_70df51b268d9dd0ec317a81c199d1f90",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Herdr web dashboard: stitch export to component map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Herdr web dashboard: stitch export to component map",
+          "anchor": "herdr-web-dashboard-stitch-export-to-component-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+      "blobSha": "a3f4dad616c827a6ee875a9346ef3108ec089cd1",
+      "blobSize": 19091,
+      "sourceDigest": "1fc6b5faad80b9e0b4eb164806999e711dd96511d54390aafbeb811c1a456e0d",
+      "sourceId": "src_dba311415b27b2ed9c0966be3f232b9e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild",
+          "anchor": "why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+      "blobSha": "20c039ab8f5452ba5486576ee493a47dbfb8c9fd",
+      "blobSize": 4683,
+      "sourceDigest": "304174344338eff56e934cbdf815a429fdd7f9df295c19679630e73b68a62598",
+      "sourceId": "src_8a019b33a2bf3cb9f1f6998350912737",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a gate dialogue keeps the agent's checkpoint separate from the human's answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a gate dialogue keeps the agent's checkpoint separate from the human's answer",
+          "anchor": "why-a-gate-dialogue-keeps-the-agents-checkpoint-separate-from-the-humans-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+      "blobSha": "1058d5ab7d23c7fc7ab5b9faec701bdbf22c6387",
+      "blobSize": 4678,
+      "sourceDigest": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+      "sourceId": "src_d07af3bc913ee62b9dd384c4399fad68",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a leaf claim can now be refused, and why status:done already proves the merge happened",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a leaf claim can now be refused, and why status:done already proves the merge happened",
+          "anchor": "why-a-leaf-claim-can-now-be-refused-and-why-statusdone-already-proves-the-merge-happened"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+      "blobSha": "a60a25576138cf518eccac4ec90547b31e73b2b5",
+      "blobSize": 5277,
+      "sourceDigest": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+      "sourceId": "src_a5447c6ed392762f3b42e084f7a48991",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a leaf-to-root approve no longer gates on the shared checkout being clean",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a leaf-to-root approve no longer gates on the shared checkout being clean",
+          "anchor": "why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+      "blobSha": "1e00372c2af51263e1180e0a514b0650d7df183c",
+      "blobSize": 7199,
+      "sourceDigest": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+      "sourceId": "src_48ad08fec68bd246aef24cd7da601de3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos-coding-planning` writes a pass-through item's real verify before handoff",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos-coding-planning` writes a pass-through item's real verify before handoff",
+          "anchor": "why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-per-stage-exception-in-the-driver-meant-that-stage-had/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
+      "blobSha": "e80d64ca7fc60a6fb5ff5c3fbc33fb639de8f40e",
+      "blobSize": 4000,
+      "sourceDigest": "17fa81fa59ed3bd05be20b8bb683a90547383fcc054291b3eda86fd9aff47624",
+      "sourceId": "src_21ae269c1c95ddbae8703febca873b51",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a per-stage exception in the driver meant that stage had no owner",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a per-stage exception in the driver meant that stage had no owner",
+          "anchor": "why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-a-real-trip-and-acknowledge-event-recordironlawacknowled/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+      "blobSha": "0df4e7c602365694b992d68ffdf41f9e5c2d538b",
+      "blobSize": 1869,
+      "sourceDigest": "1941db9c88ac3cb8cdadf06a3a52d4bb2dba7d45bf43a8a40e4d14ed3126471d",
+      "sourceId": "src_284ad67cee2956d60f57a398897a8ff4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why Iron Law acknowledge writes its own event, not just a warn log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why Iron Law acknowledge writes its own event, not just a warn log",
+          "anchor": "why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log"
+        }
+      ]
+    }
+  ]
+}

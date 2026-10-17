@@ -1,0 +1,1085 @@
+{
+  "schemaVersion": 1,
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "mainAtPin": "3e358d04b36e3e24be55e25402c69237c2ab0327",
+  "selection": "Exact Phase 7 prerequisites plus all decision shards and Phase 6 candidate-unverified, identical-unit, partial-carry and fresh-reader artifacts present at B0.",
+  "count": 215,
+  "aggregateSHA256": "fde149da62d06a4f3c4c7c9ca65aaff83a1f8594f844fd899c2b7b123413063b",
+  "inputs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/conflict-resolutions.json",
+      "bytes": 1349923,
+      "sha256": "016c46259588bf7eaf57ab6a05f9f0891d85efbbe8d0aa7d77e1d701396b53b4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "bytes": 193284,
+      "sha256": "956ba17b2abf62ddf322395b71281f88b6fa573bbe8a998e5e3f12e73a132c9f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+      "bytes": 2030,
+      "sha256": "c328784acc56db7a1e3d99e0ac8cde05423f71a864bef5c3466a42f17d56e766"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "bytes": 4865,
+      "sha256": "6eae2191cfa43e48b3f51c8b56eb1427968979380f59b6eed8944610af4476dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+      "bytes": 9219,
+      "sha256": "22b3267406814112de22c1ab195c356cebf56c29b0cdb77347e6b2e4541c774d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round4-native-predecessors.json",
+      "bytes": 7443,
+      "sha256": "459d7354536ecd0adcfb90213220c163816e2e35a37464b8211fcee4c8fbcb5d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "bytes": 24566,
+      "sha256": "72160273e84d91aad5868eaee87e299d66cf2bdba197deedfb10f7a122903b47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+      "bytes": 46562,
+      "sha256": "a7d0b9279fc96a703847ac4e4a95ebdd6a262e45c00d994adda66f8465f4862c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+      "bytes": 985815,
+      "sha256": "e854db5a1e1ee3d727e58477290e02fec780f640b46afaeadf9dd51c20d9f30e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+      "bytes": 40772,
+      "sha256": "ab5a4c98160d733806505f6c89139c4ed99ab7b3b2413fc8cb45b70f013c639f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-current-closure-classifications.json",
+      "bytes": 22480,
+      "sha256": "125437aad6f44f7b8839cc7c1a457c73b84432977426ed2d215361b5bd822848"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "bytes": 880249,
+      "sha256": "eaf32b539aef4f3091171e8b3b3f750addb09b92078bbfbd0d3cbe703a3e3f02"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "bytes": 237085,
+      "sha256": "c3f1f7613c7aaee002e563a1102693a79f698967c7a1545bb8305faaed89746c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "bytes": 654753,
+      "sha256": "07ec7d7ebc7c86cdf58a67d74838913c442cab7d2706e798d4fd0b29cc899408"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "bytes": 1022226,
+      "sha256": "c726219adc50963180e8d7f105d97a855b8cf8cbe37e2a3381f369245d19d2dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-05.json",
+      "bytes": 1091944,
+      "sha256": "7a99917dcbb315f33bcb387eff4e127ec0e04f5b0cebe5ab01eb6055eff77256"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "bytes": 428590,
+      "sha256": "579f5a8bcbc0b212a7c96c2b3f2e20888f27675c340901c7404f481d05f002c4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-files.json",
+      "bytes": 61986,
+      "sha256": "bd0ae638207fffb435433bf91fde3db28f13a0291656b3be27743773a238c6ab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-history-closure-classifications.json",
+      "bytes": 315781,
+      "sha256": "b75e978b4256d25134ab9b2deddfb0f64395bce15b6c51eb956349858234706c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "bytes": 910523,
+      "sha256": "4397d0fb0eff3b85dd5f66dccd15a22662b24183004583f1650461d2fe62a544"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "bytes": 1019893,
+      "sha256": "b29f07ad884255432bbc49c199f80ed7de46b1363ed8449fbea9c52c99294fee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "bytes": 863701,
+      "sha256": "4fe305b49e0403944fa0c7433d94c721b6072ea07d249a553978b5128dc55733"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+      "bytes": 14102,
+      "sha256": "b9f069516b0ac58bb6dc16a15370db523c86613a0ea185e12c27abe10eb437d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge-pending.json",
+      "bytes": 12163,
+      "sha256": "e85d2d1a2e6ccf5433fdeb65115e16b211d3b5c194147e7d5b775a8072ce2cf0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "bytes": 25063,
+      "sha256": "05c303d8b356e21975c74b2be976cd04fa43d140a4db00c36ddc94d14064b782"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-01.json",
+      "bytes": 16068,
+      "sha256": "6b22f2e27b977d799e985d959bdfb6656949857b56bf0f7bf98eddac6b351511"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-02.json",
+      "bytes": 22924,
+      "sha256": "79e58af9416a61461a1b84639157c1e196e6f42ec96caeca383b7811ec04d97a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-03.json",
+      "bytes": 8374,
+      "sha256": "188b7925e006f9e5a6e89179226f523fab067050532f83f3e7dc343ea0747e0f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-04.json",
+      "bytes": 22699,
+      "sha256": "cdf0f17dd5089268db74af83b136aac5ae45ab49041cb71ab748a32a2f034b18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-05.json",
+      "bytes": 8696,
+      "sha256": "bbea328a9f233892e024a8a9a59bcf54b91b96b1881677d2c0db94cc4915205a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "bytes": 43286,
+      "sha256": "c48871a3fdf6ee869f00cb551c28462a6fb6e76500120c6a60d99bc5ce66cd19"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "bytes": 64204,
+      "sha256": "452b7e0b4af9d93cc75f0291e7bdbd598906e7007cecb19764f47d7bd17ef8c1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-08.json",
+      "bytes": 13299,
+      "sha256": "4ac644e6256fee9e0511060463ae329cbc4273eff914b63f566dfa380854ab78"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-09.json",
+      "bytes": 5934,
+      "sha256": "dbacaee7512ae65f5d35ec5b5bf93ca790941489dfd30eb7c0563e27f6a06d3e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-10.json",
+      "bytes": 5558,
+      "sha256": "2952c890f9ee4699b1d61d36194c192f2162fcdb1d3e981ad8fcde9f8abf83c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-11.json",
+      "bytes": 1794,
+      "sha256": "c73f02d1e3e8ef414b3302008b409b3042e38bbc796604deeaaea3d7552b9de3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-12.json",
+      "bytes": 11032,
+      "sha256": "2548cccda4418b78d1c347d6817a3e8094eafc38c67a99d03e9454e2e984d2db"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-13.json",
+      "bytes": 2473,
+      "sha256": "b2d2c3f51c151759f3afbdc1623cf7d12583a9e5e67bd4227cecd6ef588a703d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-14.json",
+      "bytes": 4368,
+      "sha256": "bf5754435d46a8dbfe5ed24cf1d51ac10a4fe87310f7e2c498c0e0a06e623352"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "bytes": 156755,
+      "sha256": "4031a69366f36b450b6f3f42033fe67e865fcc18724dca135aa82b8f3b81f15a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-16.json",
+      "bytes": 2512,
+      "sha256": "8bab4fbf7f1d8c171aeaf54ea10df7cb73aafa31db8278e291943e041277dcc0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-17.json",
+      "bytes": 3977,
+      "sha256": "37d71928969fdbd2e52d3f692f1ea177e8e483b7e8e62b1482162f33f8764171"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-18.json",
+      "bytes": 2296,
+      "sha256": "36f96c74df1e6035c8f69b2c3af9b5eb71e73662cbf7b07ceb6f16d4e3560901"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-19.json",
+      "bytes": 2058,
+      "sha256": "2282ec301a9866cafffb1e273db6b2153869ca9ed196ffb9e21a091bad82481e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-20.json",
+      "bytes": 1670,
+      "sha256": "21cdacd5fdbf0940e306246fccdf0a2dcb3183577af24de44e4ff334858c6ce3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-21.json",
+      "bytes": 2359,
+      "sha256": "f3017d60b35ef6ed6e03267932e450f4c38e6ae657a266c65c9632c10bca36c0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-22.json",
+      "bytes": 1667,
+      "sha256": "cc6bfbe67da3742cb860589a35393e749b7a91860b89a7961f3b78d4f9210383"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-23.json",
+      "bytes": 1285,
+      "sha256": "4d5fd04e04d72eee6dbebf012c299b08be3723e89ab121a627c2e5aa205d0c01"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-24.json",
+      "bytes": 2888,
+      "sha256": "95757d16f07a374b6c6b57d1973a0a02a9164cf25df96ec8fe72b1d5569d36d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-25.json",
+      "bytes": 1811,
+      "sha256": "f0c1dde0e5a9ae62fed3dfd2a9a33d5be81b32f9c8e2007638d54555ee9e5844"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-26.json",
+      "bytes": 3135,
+      "sha256": "f80ded5de8dbc14312f0c12668aceb89d2277354fbee97b2ddbf4e7e6c22868e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-27.json",
+      "bytes": 6458,
+      "sha256": "044b09264ada197133d254511f72c65cc73c952c579698da7a43c25d853d696b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-28.json",
+      "bytes": 15780,
+      "sha256": "d43e363ae2048be05f7896f1ece8da8e62208cd06d018660dc5b2efac0e6e652"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+      "bytes": 564568,
+      "sha256": "5dc2c8ffefed2fbd3529b8e233ddb5368dcc2b6c6ad0fb4d31e571eeefe04e85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-reopened-exact.json",
+      "bytes": 2983,
+      "sha256": "3741b9f89fa506db3c75c0366996600db7334fefdefd643c96fd98d5f7e213ff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-step6-repin-classifications.json",
+      "bytes": 15488,
+      "sha256": "44a2ced81a62a0ff33c775a21db91549e79cddb5f5db3603f0bdb025384e79b9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-binding.json",
+      "bytes": 89984,
+      "sha256": "677e1b7db0c8cb8476577d88a6ea059909b3e050928a3d28093d02c0b6e3e972"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+      "bytes": 493963,
+      "sha256": "e3f910a31cb1436b3f3e796b891748f0c9746d4b11a2dd0fcbb96771b0af8aa5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "bytes": 1231476,
+      "sha256": "92209aa7a408c6ef40ee16a9bde22ce259f3845cdc08ef52d65673442edae341"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-consumer-project.json",
+      "bytes": 5470,
+      "sha256": "d1363a2fb1400458d8f6b4600d172ffb20ccaa27f14ec9eb41d7079efba36626"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-history-evidence.json",
+      "bytes": 218383,
+      "sha256": "6e29c1972334ac04155058b5c1138f0861319c5591f27b37e722b83ff51679c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json",
+      "bytes": 118286,
+      "sha256": "aa3cd3a79e575e02298c2e383368a21391645747c8c51ad9cc1ce3917895574d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-generated-projections.json",
+      "bytes": 1261,
+      "sha256": "6331c4be904d82bc3130b3b2878e18d09eb54cf69fc00f908feae68e86914207"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "bytes": 50768,
+      "sha256": "8c85571a716d4c7b748efd90a0a9d41b396654151ba432a7be7c383233bde139"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "bytes": 1111647,
+      "sha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "bytes": 689600,
+      "sha256": "098f63cdbc57c9bfe314fb76a911c11167107a4c11c1ba755567aacf441dd35d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "bytes": 66945,
+      "sha256": "357f4f775f37b0bca2aaad8ba44709c83541703815a68d8ff14d6f1118cdc028"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "bytes": 4974,
+      "sha256": "4edb7460fd62803d8fe04e0ffd443d14967ac694552f3033d16c2813006d4254"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "bytes": 51215,
+      "sha256": "c874aacff8b374238b03f56c0e102ab635b3df2656112d6cd9310625a7d89e40"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "bytes": 11726,
+      "sha256": "248997591c4ca54330a3795f43ce9c55153e561df83db59d3805dbd4494c8087"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "bytes": 13115,
+      "sha256": "3b681e0a9b10fca21522fb80202850ecf8809656288fd49dc2247aa7dcf22dd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "bytes": 123401,
+      "sha256": "86f31e3c6e3919663993ec2038f0850afab815328a1c0858e126df88556b7bca"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "bytes": 12372,
+      "sha256": "754093569178332d7b0c7863f039ee669d33425e5aaa343a2b3d512137aafc9d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "bytes": 118509,
+      "sha256": "7fb839893a4c0f2855a53f7fb4dd818ee790e58d4751b176e226ec3a8f8f4b75"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "bytes": 16833,
+      "sha256": "a89c6e12b5bea70316355033e4ee7cf4fb5ce6999a4ec32bdeb0a97e38f19937"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "bytes": 15106,
+      "sha256": "29d7e3ffeac8d2c5749808b6864eb63710e1e58bc7889f5bb766196f0fa5f044"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "bytes": 13522,
+      "sha256": "f012c96d45b6cfd14dfa487c0e7b52c71d2075f2e57b8cd8d6e793e63bc637ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "bytes": 428652,
+      "sha256": "21624bacd888fbcd3b52c628c47ba4c1d7bdb630d26119db0f17e64532de454b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "bytes": 316760,
+      "sha256": "6acc241e3171f1d7173f6ab39ce65c8d1e111c1ef2970ec302dd2b6d60fb6eec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "bytes": 185389,
+      "sha256": "e0314ca6f67b43690f8c608c081c4216bf791b11a88eec96d5d82539064b49f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "bytes": 9877,
+      "sha256": "e7f95a52ed625f595c3eee5c02e0bc14d05438d5ac333b8dcfd7d932d369d832"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-switchboard-gap-successor.json",
+      "bytes": 2303,
+      "sha256": "484cd0880c8e9040ccb7604276998a5902b5faef4c56fb9199c19bcbc085dccf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-template-conservation.json",
+      "bytes": 112605,
+      "sha256": "0daff68911159922151ffdfc369bc9320969b986d03df1884ff39737f7e90177"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "bytes": 33079,
+      "sha256": "409de20ed07fce185a8d2c397ad8f7db9cd480dcce16cc29373a758f800a6d77"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architect-portal.json",
+      "bytes": 36363,
+      "sha256": "518d1ae3d9885d68d16e6549b21feed045036b74824087f09a5d3f1d566459f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+      "bytes": 301850,
+      "sha256": "4b587a8520bfbc9f7232d1962460a404fcb00e9960297ab7b3f46cc6871071d9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-map.json",
+      "bytes": 268077,
+      "sha256": "b9404f0489ad7d9b915da268771b5c0f28709e40bb7585df65ada8142b08a296"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "bytes": 369703,
+      "sha256": "819936a5e0de246065de14bb99863b19cac0aaf0e60c537fa95d2bd2b29175e9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "bytes": 126104,
+      "sha256": "941832c332ac866001efb4f387fe154a83dd1d4c9ddb6f181bdf897ae5d26fb4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "bytes": 113373,
+      "sha256": "714f2fbe9dfb444c9254afa105710fe61805b5622153e82d0cd8978f0daebbe6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "bytes": 36184,
+      "sha256": "acf6489bb3af8e7ba7c688ec6caf53fa65a825d226d23f999e592d5b3b841802"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-evidence-rework.json",
+      "bytes": 2603,
+      "sha256": "2be6dbc438943a3e41740aab2d760b12e1bb094d0129c39349a66f88fa301933"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-roadmap.json",
+      "bytes": 72784,
+      "sha256": "3319f4654968cfee78fc3fb733378355149c4b20820d6d9c236abfcdacd1f9a2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "bytes": 107038,
+      "sha256": "ab9453214632535fc96d6e375b68e93b29e8af422d7dc9e3e6bc0fc7d1c70aeb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+      "bytes": 63857,
+      "sha256": "7287335133c8920ea563c3f563bf05d5042535218797cc2a6d457b890968070d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-audit.json",
+      "bytes": 111040,
+      "sha256": "24f8719fb3189c454c0907d2b6130fe6232649085f1e80e858c285cc534c2eeb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-roadmap.json",
+      "bytes": 97505,
+      "sha256": "f382a1aee149577d2e3fc72421fc6c500a48883b60cba005f8bd008e046e70d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology.json",
+      "bytes": 122918,
+      "sha256": "715b8f24ace8def301f1e18f6c0a3c744ad17c0ab06fb9b65f2469b4b31e5af4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+      "bytes": 19403,
+      "sha256": "5efbad1adc8d8afa133f61d180f0ccc1e611b2a968c7fe48962a5b84f7d63917"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-02-documentation-system-design.json",
+      "bytes": 302992,
+      "sha256": "9b5931986c09b538f50dcddf72bee491f423edd15ba2de295c175b92e885c6a9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-03-documentation-system-discussion.json",
+      "bytes": 607278,
+      "sha256": "0338df4911c733c94dc9b92a88a686b6493541c93ea64df80c4d2dcf0139fa76"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-04-doing-coordination-redesign.json",
+      "bytes": 540200,
+      "sha256": "03745ce49d82db73b1217f35ecd19f2afb4b0c83ad211a83a5ffede502519a78"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json",
+      "bytes": 156294,
+      "sha256": "881254d7b3bc34b74e89c278b14690de459a232c5dbd6d1ed5058748330f17f6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-06-knowledge-registry-redesign.json",
+      "bytes": 471273,
+      "sha256": "48c615751d50eb68682604df8a0f0c9ffda5c9b531fa283d23e31e02a5b1c96c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-07-architecture-advisory-panel.json",
+      "bytes": 310632,
+      "sha256": "1cc1a8f4d6cc9711f5513e20dfa66dbffad8a0cc9c95c71e08484dde5030c993"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "bytes": 260057,
+      "sha256": "daff4d51b0640b07f1f6ddb24be28957af87de477dbd3a539646d5222f1b9948"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "bytes": 263302,
+      "sha256": "2a44b4350757794ebd928c4b8d41b1544f7f5677809de4eacae9399e48db64fe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-10-coordination-dispatch-contract.json",
+      "bytes": 135648,
+      "sha256": "58aa31118903c923daded2dc6788a204d1a3bca7c01ede7a7edf04bf594d800b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-11-coordination-envelope-probe-contract.json",
+      "bytes": 79200,
+      "sha256": "b648f6362f6b5c851a4820c7e52a040ca24338e4c3a6c047f4b127671bfa3997"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
+      "bytes": 179859,
+      "sha256": "efbb20b224b1a2c18c62795b0d785940b1eda27e850d9043a1f69d18fc1c410e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "bytes": 105752,
+      "sha256": "3f192ebfba0a5015ed7ed4e985483ca7047d748340f5cc4b86b6ae70165224d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-14-group-thinking-plan-loop.json",
+      "bytes": 140118,
+      "sha256": "07f513f2f79ac304ebbf74fd911f5a64d2159ccd0b5a86cc25e770ce6ca9227d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json",
+      "bytes": 46658,
+      "sha256": "c9ed9a24e019ed2f415e7089badbf152b42db56c08f8406c564e62b6fc2f1b02"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "bytes": 266002,
+      "sha256": "2c3c2ae8abbbc4d9a1a5b5f274d439d5addb64840657d5efcf7eab9a6e2f741e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+      "bytes": 13765,
+      "sha256": "5424afa82b331a83cfe19587add0823bb91cea17f520dedcf975c2537270e6ff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json",
+      "bytes": 871331,
+      "sha256": "7b7bd52e63db62b7c92953be9e6093783810ce4ef291750ff6b7392244e6e581"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+      "bytes": 271433,
+      "sha256": "af36b2a84919354d4360ee0ab69e6b0c5fc7208af98a3bf34ea062a39129bb26"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json",
+      "bytes": 348813,
+      "sha256": "c56f2a2e7e882e17dc618e39e33374340f3ace0173a3ba5a644b0617ce6b2322"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "bytes": 529825,
+      "sha256": "e5675f484781da04ab54d08316656642ba2dad2cf2ad2fd7bf7e08fba9525270"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+      "bytes": 84957,
+      "sha256": "a9f1005810e5170d22a81bbd1201eea7be2a1a0be02818f4072efc65a8ea2d9b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "bytes": 41037,
+      "sha256": "1ac888483caa650440161c8a4730368fd9266a9e39403aa8f320eaaa07aa74a3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "bytes": 43627,
+      "sha256": "1f80b605a771905fb376ec351cf6fea90aa31647fe58c1a4aa5c8512fc755182"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "bytes": 86994,
+      "sha256": "71be6a83fcc8247f2647847facc1fd88b2b52f49ca146afc040fad077c92baef"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "bytes": 2291,
+      "sha256": "b9759fc3b609765d3311d862905d2cb685ae79b63b1b55ee4de3170c6c704a1d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "bytes": 56677,
+      "sha256": "8b2d2afa5ecafd6944cee3f17503d176864a6ff98fbc9aee4bab642e26aaa8b2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "bytes": 449825,
+      "sha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "bytes": 1351275,
+      "sha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+      "bytes": 31331,
+      "sha256": "250dbe3c9544f454e28168dd15bd84279aaa20913ca9fae6d932d58d9a46ca9d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "bytes": 105698,
+      "sha256": "c1db534e765b5ecddfc2e2623c619d4ba30772c38205bddb06409fd243125408"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "bytes": 152969,
+      "sha256": "b6c343e801cbe8cbf6083bce9e38b5187701b50db7517ce38f392f0d52083654"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "bytes": 171413,
+      "sha256": "3d3362a3ee3684e07d56bb04c8660201e6dd14290582e7f4a8830bac144eba88"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "bytes": 104576,
+      "sha256": "d9be684ac67a9d22a9d48f1f05aac17002f188e27a001e5d4eed6422f9ef1188"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "bytes": 30961,
+      "sha256": "9a761cef78430765d5563fc9717fb08005067af29019a23ac18559e2c32e5a81"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "bytes": 16093,
+      "sha256": "99c042ca29b51f5b0a9048ca377a9063860e378365236d3af79005b8ba1c56a5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "bytes": 91404,
+      "sha256": "7963a5befc441a7ab77015407557d66c1a58851ddd540ecc71ba22ff57e46b13"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/plan.md",
+      "bytes": 62438,
+      "sha256": "e5c5d8c61f0f3dbc9377271c9ede820eb38b7364840c3654830543f0f598ee7f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+      "bytes": 22194,
+      "sha256": "2555189c4d792e53fc8f058e9cad4cc7e6e7628f7c2cc41d190c3594aa04c588"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "bytes": 62226100,
+      "sha256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+      "bytes": 44988772,
+      "sha256": "7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-status-baseline.json",
+      "bytes": 1539,
+      "sha256": "1fe19f459a3ff021725836642ec0eafe94ee6a8860f214c494c4bb8135737932"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+      "bytes": 476296,
+      "sha256": "b00d9bebd21807b07802f06d2b7b79c840712e0b2d2277b743339807a9e03788"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+      "bytes": 351813,
+      "sha256": "436accc646bc55c9ca390a9c2f1e28e391f0240425761fdccade60f01194aaed"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+      "bytes": 809945,
+      "sha256": "bb8e8a101205df9b7ee8882c7dc534de71193d41e95b16572174ab756d56f465"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+      "bytes": 794204,
+      "sha256": "999d40b2c42d142423fc6f386525fdc8e44b3398cc79a15409d84fe07cd22755"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "bytes": 767645,
+      "sha256": "e9f369b21f6aa7fef683309c090926aef0be496b07aceb221c6c0dd1746ccc3e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "bytes": 253009,
+      "sha256": "ce1f49f1735cb0c7847ed44fa780655de04ae31a4b3755eeea8c7ae6cb23cf9a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-specs-ui.json",
+      "bytes": 233514,
+      "sha256": "3305f0355af9d60964528a83ec4c52471ab53cde83fa1e4b580dfb376ae7f130"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "bytes": 90147,
+      "sha256": "a73ab77145d24c058cee7462f6aa670722b67cb8e8b59c7c66403f80735addc0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/closure-request-host-invocation-partial-carry.md",
+      "bytes": 122295,
+      "sha256": "407648737beed661a3d09f6f41c751bd84c4a51d1022ad97d302676b68dda6d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/extractor-blobs.txt",
+      "bytes": 388,
+      "sha256": "7a3a6b4909575a69cf8c25cf11014814a9b8fe12b8ea050c54983acc1a5a1baa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261013-1850-host-invocation-checkpoint.md",
+      "bytes": 5517,
+      "sha256": "cdd7b2b0f6305eba6d215c47f057e8e038ae050e3119b6a144960a18c994ad31"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261013-1850-host-invocation-checkpoint/fresh-reader-1.md",
+      "bytes": 10048,
+      "sha256": "1a66c836a6dec1405d5dcc30333eb585c892586a3b1be7fa973c5ba8c938c514"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261013-1850-host-invocation-checkpoint/fresh-reader-2.md",
+      "bytes": 9708,
+      "sha256": "d6c640a585cfa047b4aadcda82d107e8d978205c73402a6c02ed114afe6040c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-proposals.md",
+      "bytes": 17203,
+      "sha256": "384bec683a8ecae4bb819f55e259617b52a7fe0507122861309f7520fdaba1ff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-proposals/fresh-reader-1.md",
+      "bytes": 20858,
+      "sha256": "2600b4b32d52c25827e33bc3982ae7fed27b11c6badc2b71330fc03163eac84d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-proposals/fresh-reader-2.md",
+      "bytes": 18957,
+      "sha256": "ecf09583355893ba146ce7150c7b563fe0f464720fcb99f37a5837d45ef7e075"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-root-authorities.md",
+      "bytes": 11949,
+      "sha256": "8b79a365768a9f91d685f0dac74212870c94613eac77e167a15417e33a9370fe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-root-authorities/fresh-reader-1.md",
+      "bytes": 16151,
+      "sha256": "b14aec60d61c32ab4ae91fe37958c12eea8e226ddc3e6d17c0f562bfdbab02da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-root-authorities/fresh-reader-2.md",
+      "bytes": 13619,
+      "sha256": "405499b043a03a9125cee2fe0dd00a280ca05d5b51d5cb52e5183d8a50363dff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-runner.md",
+      "bytes": 10338,
+      "sha256": "11124be07e489eecfd3382be21eeeb1c1d8010c17f995fb853f453fc5f4928d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-runner/fresh-reader-brief-s9-runner.md",
+      "bytes": 4858,
+      "sha256": "183d780fe79220cee4e90125b575cf6ce9ada96c49967d43577ae15365d7689d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-runner/fresh-reader-s9-runner-1.md",
+      "bytes": 18899,
+      "sha256": "abb1871f99b12779f0896bb87229a6e24b2a8bdf70d0f17de3fa0b5071f3f742"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-runner/fresh-reader-s9-runner-2.md",
+      "bytes": 16690,
+      "sha256": "626129cfd65d71e821e7ca4f5218f71f7194b5e7310775cc3522dedd39cb28f7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui.md",
+      "bytes": 14758,
+      "sha256": "fd5b8d63237a0985b15e8172d04bcfac8863f297d23e61a096259d3d4b761f1d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-agent-confinement.md",
+      "bytes": 3765,
+      "sha256": "b5805650a8aaba5609c4a085030d950d53c4520b2a95457d4b8448d84cfeff87"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-claude-plugin.md",
+      "bytes": 3380,
+      "sha256": "bd96f0b2fddc7ab45e33932fadf557b5276808613cd93b2ab8b0671b77854751"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-decision-citation-drift.md",
+      "bytes": 3283,
+      "sha256": "a96ae84933c7fe4a3de4da23ec865bdb858d8836bb8264c2a89889870e4fd263"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-distillery.md",
+      "bytes": 3257,
+      "sha256": "f19fe7ef6683fbb39150b27aca20fd06a3f106d5a1fd201092bd549698886fc0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-herdr-web-dashboard.md",
+      "bytes": 3454,
+      "sha256": "6b3eec3f19c329b70b033e1ad9e56b1ac544de70f4540e493ab120a51a3970f8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-observe.md",
+      "bytes": 3343,
+      "sha256": "78db60ed505508bbcc124de3ac57c7cbffa55d21b855f23167e3f9651184c271"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-brief-s8-ui-spec.md",
+      "bytes": 3549,
+      "sha256": "77fcb665d4122d3d987e96da6e15975c1aae13895d8e4a183bf8e62766758054"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-agent-confinement.md",
+      "bytes": 16559,
+      "sha256": "4635a40af7bf3452559f5e1ce08c658899418d44748105dfaef0b56f99578b78"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-claude-plugin.md",
+      "bytes": 11544,
+      "sha256": "1cdde0fb298d88ac0a3c8bb600187eaf58661c80d01d2d487b475ec7ac768347"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-decision-citation-drift.md",
+      "bytes": 12428,
+      "sha256": "669a5bfa70bff3318849efb80114880ac4fe6a3b90fb8c4abc0e8b604b3340da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-distillery.md",
+      "bytes": 10482,
+      "sha256": "d38cb2d3ef92b22b2d58eef17417b76d1828a6900958f12cb3bc0f6e1449d164"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-herdr-web-dashboard.md",
+      "bytes": 9743,
+      "sha256": "2cfb1b47670756b53ea5e21d3fa53c277205ce442cfe21f57b95899266ddcb24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-observe.md",
+      "bytes": 11981,
+      "sha256": "973937dbfab4cb6ca1c493f20f90a62d64e31082a52a21268efcf0f2e37b86f6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-specs-ui/fresh-reader-s8-ui-spec.md",
+      "bytes": 11086,
+      "sha256": "174439ca1c2286b882dca3a2aa3eab73ebdb5532d8e33213a75df8d49dbc3f11"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-whole-system.md",
+      "bytes": 18066,
+      "sha256": "cfc99d283e9e4ea7ccb3a60bde5502917dbc6e2567fdde3c98bc2b0ba158e0fa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-whole-system/fresh-reader-1.md",
+      "bytes": 21121,
+      "sha256": "acef4e2fe2423e1fa4668a7a05307803906c50611d83da40da1c26c9c10b4e4a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-261015-whole-system/fresh-reader-2.md",
+      "bytes": 21715,
+      "sha256": "61328ea26dcf46fd4afb186b2689e5dfef38a8272e13e780dd7e6dab285bf641"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261013-1543-host-invocation-checkpoint.md",
+      "bytes": 7545,
+      "sha256": "8d1624f5ed6969cb22c39ec697a0bbfd71f6e18e8c48fad70b6d8627819e69fb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261015-proposals.md",
+      "bytes": 23220,
+      "sha256": "e9e823a2b9164bcd84356e949a47fae0c2efb0e909c9a7e38b97197fc8dd6adc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261015-root-authorities.md",
+      "bytes": 22202,
+      "sha256": "972820262767460fd239afcdcd66cf392d129d4c259210f9b421b9911d846daf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261015-runner.md",
+      "bytes": 22416,
+      "sha256": "248c8ad2c702b02fe211828a1542b1faa2f30cd298ee02d7d04435535706dece"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261015-specs-ui.md",
+      "bytes": 42860,
+      "sha256": "927f45aedcd705083d949e546ff24bdad15fa42030117519e2f54d579551518d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/fresh-reader-key-261015-whole-system.md",
+      "bytes": 23861,
+      "sha256": "eaed407693b45ea20f5d5d28b587b638c9b37ff0a24420c101d80ac51910e324"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+      "bytes": 157484,
+      "sha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions-host-invocation-routing.json",
+      "bytes": 3073,
+      "sha256": "6ee86d5a05dcaf35f8d54928b8f113ae08acf07c1c99d6efb879f9375bf7b206"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions-packaging-distribution.json",
+      "bytes": 4439,
+      "sha256": "c78974b4809add8c4717614687fa6ab3151faa9b0a366804d23b7295728bc36f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+      "bytes": 1045615,
+      "sha256": "e39ae47bf0eeeefa411a907589f39269f6d7c53a2da3a982fe6be4c73fe93f8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.md",
+      "bytes": 258165,
+      "sha256": "4498cfc66082655dde2c58beeaf273d0b593b6e858f5b2ce8243f98f26ce3af2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-identical-unit-groups.json",
+      "bytes": 994821,
+      "sha256": "942e3714774e826c3212312d127f379a3ca490aa1d2437998e54e6d37964bcde"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+      "bytes": 95724,
+      "sha256": "1c621a9670631552c0dba23ada128cdced6dfd57175961954f9bdb212382e4cf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "bytes": 276763,
+      "sha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-binding.json",
+      "bytes": 1861,
+      "sha256": "d8e75fac454616979e583bb6708f7865467d6792f4dc01d0a5b086a15b17b91b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-residual.json",
+      "bytes": 20985,
+      "sha256": "61c3263ca987046effa1f7615eaaa3bc9599f0acaca8785c86139a1518e13342"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-acceptance.json",
+      "bytes": 1672,
+      "sha256": "dc311ec0ca20794b0ed5d9f932f7600ba803631b7782f46446df86110eeac07a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+      "bytes": 7544,
+      "sha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/reader-links-baseline.txt",
+      "bytes": 155,
+      "sha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
+      "bytes": 5866,
+      "sha256": "75f342db9920767760ad9b63e6bf4e8ba12c5f2c856933b55d8ac42e171be628"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261013-2350-packaging-candidate-unverified-01.md",
+      "bytes": 242539,
+      "sha256": "c6741ae829e6c699430523c771c601b486dd3f4325aed0a3c10a3e1e966ca257"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261013-2350-packaging-candidate-unverified-02.md",
+      "bytes": 242551,
+      "sha256": "ba9c4337ce1f58ff8a64091d96faf30654b40b0e3fc4f0a67d42ef3db237688d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261013-2350-packaging-candidate-unverified-03.md",
+      "bytes": 243158,
+      "sha256": "9873b23165265abf2ec34d807b390a174bd101f3e23a5f3f569f5e65550186e3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261013-2350-packaging-candidate-unverified-04.md",
+      "bytes": 148748,
+      "sha256": "f15674ff2fd8cbe9d636230660a262b0d4cf886046247d26b3c8e94f478ff252"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-fresh-reader-1276467f3.md",
+      "bytes": 6698,
+      "sha256": "386a4e37884ea0a86655b1c73262e186ae346e167a7f84b1a477230948d8cd94"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-fresh-reader-1276467f3.md.json",
+      "bytes": 5251,
+      "sha256": "8a1e946fd35a2235d636eefe1dce98f9e7ec5a1609250dc0aa08153996a5677e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-binding.json",
+      "bytes": 1554,
+      "sha256": "6b7d8ace01e00fb4efd620062298d10c07bf7e821f6cb727bcff8e2b9f359254"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json",
+      "bytes": 3118,
+      "sha256": "d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+      "bytes": 168306,
+      "sha256": "f737004c3ffd4c4db3c51b3eaaaa64094cf3d578411236673eb120387c0f8f40"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-expected.json",
+      "bytes": 2977873,
+      "sha256": "3f9ce1b1b6a81ab437860f45bd07e09cc1ca9afcf4bba50ad391da041817dc07"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-global-summary.json",
+      "bytes": 659,
+      "sha256": "854622fafee538cd3552dc1e2bfb8236aa58716ccf2cdef62dad46429a2d998f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-other-group-queue.json",
+      "bytes": 16243,
+      "sha256": "6537b1c9e03bd7ecfca768d4263c2180275396d0ad95636d3f5792b6c1ef6cdf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-retirement-group-counts.json",
+      "bytes": 569,
+      "sha256": "5adaf6fe86ecc9a0f0cfe1b51654644aaa06a755fc4c2c94a26d0c8a18a163f8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+      "bytes": 29912,
+      "sha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c"
+    }
+  ]
+}

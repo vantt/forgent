@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 73,
+  "entries": [
+    {
+      "path": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "blobSha": "fd896b33553ba1a4f8de832ce75fecf325e6baea",
+      "blobSize": 11243,
+      "sourceDigest": "c3f31468ab486cf548fdd942ceb5fb0743a2abf476fb3820784a6f62c8b1a448",
+      "sourceId": "src_c8d0c56922ed1a7f21c94b8c2de404f4",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Verification: Implementation Alignment",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: Implementation Alignment",
+          "anchor": "verification-implementation-alignment"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "blobSha": "58240a9e6bd06ac0414b950f078046040f3c3c21",
+      "blobSize": 5518,
+      "sourceDigest": "88fd9d8bab58c2d320f4769383cd3f6de146f95fa97bf5271e96634a32602be4",
+      "sourceId": "src_e74928d2eab7f12913cd9bdf76c29c8f",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Verification: R1 Rust Host Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: R1 Rust Host Proof",
+          "anchor": "verification-r1-rust-host-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "blobSha": "d6b2d97c73587a91e6aa3cc0adc0cbd9b9530360",
+      "blobSize": 10956,
+      "sourceDigest": "455c0a5c92ad6d0c11fce08f2c45e0634b843a977dfe34a644cfc3f735bcea0c",
+      "sourceId": "src_2e6c1f539d0d04469d12d94288942413",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Verification: R2 External Process Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: R2 External Process Proof",
+          "anchor": "verification-r2-external-process-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "blobSha": "b839b1b12637810449c5ed3f5d659f32b8a3421c",
+      "blobSize": 10951,
+      "sourceDigest": "f8febf215e54b9302fb205b18e04efbfe94f11156d80682a874193dcd1b073a5",
+      "sourceId": "src_dd255ae04ba22e1b8745ba830c575010",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Verification: R3 Remote Peer Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: R3 Remote Peer Proof",
+          "anchor": "verification-r3-remote-peer-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/README.md",
+      "blobSha": "6c828c60a65c0c1e0c3f46b29fe21bb853c7c3ae",
+      "blobSize": 2662,
+      "sourceDigest": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "sourceId": "src_79e47aa185cc17e496ae98566298675e",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Verification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Verification",
+          "anchor": "host-invocation-verification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "blobSha": "cabc72da1401453b6e22ef8ea0ba8184d0b798ed",
+      "blobSize": 15798,
+      "sourceDigest": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "sourceId": "src_a945ac9f2c0d59d4f14274fc8a402d64",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Source Preservation Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Source Preservation Audit",
+          "anchor": "host-invocation-source-preservation-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "blobSha": "6e8baf504a1417f55e5dfe546f08c0139f66e49a",
+      "blobSize": 5639,
+      "sourceDigest": "37e2e505dfd4481341e40be7ce505422529846fd8754e0fed1e6ea84163973bd",
+      "sourceId": "src_d2b3e684b32df3e1a427a684f80bc475",
+      "area": "Host invocation routing",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Vision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Vision",
+          "anchor": "host-invocation-vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/intent-preservation-ledger.md",
+      "blobSha": "d450063a346fb1769193e1f227161acd72814d4d",
+      "blobSize": 15355,
+      "sourceDigest": "e5ad0a0575c903a523bfec990e1801c7eddedaf68376dc350f20fdc57fbf28e9",
+      "sourceId": "src_f6e6f8b9ba495d3ce4bb3165c324f8ef",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Platform Intent Preservation Ledger",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Platform Intent Preservation Ledger",
+          "anchor": "platform-intent-preservation-ledger"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "blobSha": "0bd855fee2917a396d0f8afd6dfa2262413e593c",
+      "blobSize": 5765,
+      "sourceDigest": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "sourceId": "src_7b215f6dce205f9a2474bdf717f5b7d1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Migration Authoring Rules (One-Owner Discipline)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Migration Authoring Rules (One-Owner Discipline)",
+          "anchor": "migration-authoring-rules-one-owner-discipline"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "blobSha": "1a0b61111db64cd59aa2e812b3af15e87c1b3b9b",
+      "blobSize": 3311,
+      "sourceDigest": "c52ff6f2119986e0f4ff2592ade83a8f376a0b7132eaf0dd7f696de6797ffe3b",
+      "sourceId": "src_2959b2fe6a513b2d9e9149176bdbe4f0",
+      "area": "Observe (metrics and friction)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: observe component architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: observe component architecture",
+          "anchor": "added-in-candidate-observe-component-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/observe/README.md",
+      "blobSha": "01d6d133af449852eba13b6fb8a182c803178ab0",
+      "blobSize": 1843,
+      "sourceDigest": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "sourceId": "src_a34c2207f1bedf7fe9d0f56418985ba7",
+      "area": "Observe (metrics and friction)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "observe candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "observe candidate area",
+          "anchor": "observe-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "blobSha": "d53fadefbdeb8f5d86255dded0bcc2dd727644f8",
+      "blobSize": 19320,
+      "sourceDigest": "a3f8d1ff084fc88ea632e8eaff6da19a384a381eb57d7d77a6e7a420a2018ce5",
+      "sourceId": "src_185ec5567e0bab5a2519f2b3ea87e237",
+      "area": "Observe (metrics and friction)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Observe Component Specification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Observe Component Specification",
+          "anchor": "observe-component-specification"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "blobSha": "d8c507718bcccebc2d1ecfcf306d28254584aac1",
+      "blobSize": 6776,
+      "sourceDigest": "baaf434769eaf074a7879bbbbe22be594aa8a9054ca4c5ad6968e4b86e5307e0",
+      "sourceId": "src_eba316b1601b5061a84754891f6f887c",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "fgctl And Local fgOS",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgctl And Local fgOS",
+          "anchor": "fgctl-and-local-fgos"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "blobSha": "69afb4489974600b8d20001f82a925619988c24e",
+      "blobSize": 6129,
+      "sourceDigest": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897",
+      "sourceId": "src_18540076909181039b037e3fef51ffe3",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Future Constraints",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Future Constraints",
+          "anchor": "future-constraints"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "blobSha": "c216baeb50e9ca64fc9ddfc93af43f06fbe3baac",
+      "blobSize": 19410,
+      "sourceDigest": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d",
+      "sourceId": "src_a51fb0335df4455c8f8c0f4f50d1bd5a",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Runtime Identity And Activation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runtime Identity And Activation",
+          "anchor": "runtime-identity-and-activation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "blobSha": "c3a07fc0da0233633e283940f14f55087de273a1",
+      "blobSize": 19183,
+      "sourceDigest": "932f7e4e53e44601840a644dd9d1d155a380ce7a1aa81294f200dadbe096867f",
+      "sourceId": "src_1e35fb6c78e625a813d2373e8c7ed258",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Code-Panel Rollout Plan: Packaging-Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Code-Panel Rollout Plan: Packaging-Distribution",
+          "anchor": "code-panel-rollout-plan-packaging-distribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "blobSha": "f41d4ea4369521f08c90505bfb66ff7f1f90e952",
+      "blobSize": 17444,
+      "sourceDigest": "7fa1b2360be1c710b408a6b729523bc7bda5e725f0047d9a9dcbd591cc34d5bc",
+      "sourceId": "src_5e72fbbd8b2193407ba5b8283b98d474",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Activation Binding",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Activation Binding",
+          "anchor": "contract-activation-binding"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "blobSha": "9cc30f4c26af2ad294088ad8c4988a92666d10c9",
+      "blobSize": 5863,
+      "sourceDigest": "c60f62fd26004410268079055a2f33e7024c9bc2d0a1c8b8ef0203de0e7a503f",
+      "sourceId": "src_b82cb8e7f82c096ce6f61cbc4c1364f6",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Distribution Pin",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Distribution Pin",
+          "anchor": "contract-distribution-pin"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "blobSha": "96a07ea195c10ba022c6c39d84484cff7abc2995",
+      "blobSize": 10097,
+      "sourceDigest": "fd0dfdefce3d3a36caeeb20463c5965cb4008e0b447462d7758f3c6f3c4d644a",
+      "sourceId": "src_f95352847843a6af30badf671351bdcc",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Instruction Composition And Projection",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Instruction Composition And Projection",
+          "anchor": "contract-instruction-composition-and-projection"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "blobSha": "11afd91cc315c54aef4df52440542e56e199bafb",
+      "blobSize": 6861,
+      "sourceDigest": "8ebcf75f26cc668fd42d33cc1fc5baaf4c251ea505aad221550544ec840cea3f",
+      "sourceId": "src_14fa5d487ceefb95c3ed0fbaf07bc1f1",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Projection Ledger",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Projection Ledger",
+          "anchor": "contract-projection-ledger"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "blobSha": "897d4ca578eefe2174c730dfe33cab2d24af7a8d",
+      "blobSize": 11590,
+      "sourceDigest": "4054796687df16bed7bf3770e3470a74ed99ea45e0d2ba63ef310f8174bde7fe",
+      "sourceId": "src_6deeef7f1ea0304cfa623a0270114b55",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Release Manifest",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Release Manifest",
+          "anchor": "contract-release-manifest"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "blobSha": "e87e4410cd7c3198076268676d84641ebb3abe8b",
+      "blobSize": 14793,
+      "sourceDigest": "ef90ae232ad4396ef3ec1d70014771c3213eae9289dc4e36613be1e23eb7f40d",
+      "sourceId": "src_4692f2a99fb730e6e0ea6987022c1206",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Repository Runtime Layout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Repository Runtime Layout",
+          "anchor": "contract-repository-runtime-layout"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "blobSha": "a2657dfd6682455363ad0a0f9def3734654ff738",
+      "blobSize": 12271,
+      "sourceDigest": "a607454729dd5e7171fe4b22f9b28b4cd01b441ee4267ee7f4b491ce73a43e61",
+      "sourceId": "src_2ffbca5a3dd15ef9182d674ca0184fd3",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Setup Doctor Registry",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Setup Doctor Registry",
+          "anchor": "contract-setup-doctor-registry"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "blobSha": "16638196b5ae41a3c5eeffd3a12c4a9aca8a81f8",
+      "blobSize": 11957,
+      "sourceDigest": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "sourceId": "src_f86f224800832146423379e603aa7d05",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Contract: Skill Package Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: Skill Package Distribution",
+          "anchor": "contract-skill-package-distribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "blobSha": "f9934395edc006a6259239ec4d25a6f163ffaf90",
+      "blobSize": 3367,
+      "sourceDigest": "f6bf6994580d75df3dbfff0658d269d77e32a59f8d0a24e328f426400c02ab99",
+      "sourceId": "src_0164a66d252a56bb002e35661229f19b",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Installed Default And npm Compatibility",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Installed Default And npm Compatibility",
+          "anchor": "installed-default-and-npm-compatibility"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "blobSha": "7aa0752ac87c473f5ae57f08dfa30a3f46e2fcb6",
+      "blobSize": 49005,
+      "sourceDigest": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+      "sourceId": "src_8d2cd70341a239d9476289b7fc66857c",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "History: Distribution Baseline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "History: Distribution Baseline",
+          "anchor": "history-distribution-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "blobSha": "ce9b71446d93efb82ecaa2e5ce58959a59e08171",
+      "blobSize": 13780,
+      "sourceDigest": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "sourceId": "src_ad77f5ba127f0a174e87cb7e45b6e8f7",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng",
+          "anchor": "cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "blobSha": "3649630acb32c4fe524c960b6fd6e6e0162315ab",
+      "blobSize": 14843,
+      "sourceDigest": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "sourceId": "src_debde34f52a2e0ff3a44f3e7f1415bb1",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Migration Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Migration Map",
+          "anchor": "migration-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "blobSha": "450bd1e19c2472669a001fc86ca086bd70aac488",
+      "blobSize": 14558,
+      "sourceDigest": "440db2077af6b47a31de11c589ef06860b7bed61a892a62bdec02d7e6760266b",
+      "sourceId": "src_016c1322120d5ef907cc52bb5e940a4f",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Rewrite Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Rewrite Plan",
+          "anchor": "rewrite-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "blobSha": "24b8770a0bd59b622e0784937ea208c17960c0e0",
+      "blobSize": 24736,
+      "sourceDigest": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "sourceId": "src_5f38c107c14101e6275e30af748ff18e",
+      "area": "Packaging-distribution",
+      "authorityStatus": "promoted",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Packaging-Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Packaging-Distribution",
+          "anchor": "packaging-distribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/reports/track-closeout.md",
+      "blobSha": "111c5a2beac1bc2b282fc5e1cd593dc717b315b9",
+      "blobSize": 12466,
+      "sourceDigest": "637a1c3c2a8fab87f188b508e59a9dc1b8480efb62ec6d1d4acd094777a924ef",
+      "sourceId": "src_c44ce6754bfe10c848d06a6a5c3c269a",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Packaging-Distribution Code-Panel Track Closeout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Packaging-Distribution Code-Panel Track Closeout",
+          "anchor": "packaging-distribution-code-panel-track-closeout"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "blobSha": "30a361b1a445c2b2308efdd0cf783f19da6e53fa",
+      "blobSize": 85794,
+      "sourceDigest": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+      "sourceId": "src_2f1c581d397152f2085313fb792e279a",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Spec: Packaging-Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Packaging-Distribution",
+          "anchor": "spec-packaging-distribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+      "blobSha": "e3cccb713fd22afc5773adce289cd0954be284d2",
+      "blobSize": 14320,
+      "sourceDigest": "15f5f3db04b2e759d3d17b82a02ecd87f48c7b0c7d87e1963a6947f0c4f35a44",
+      "sourceId": "src_681a7e66cbd9d48cfbfce156b979a5fc",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Verification: Implementation Alignment",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: Implementation Alignment",
+          "anchor": "verification-implementation-alignment"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "blobSha": "74aba6c3eef0e97eb0f0b1c492a2394fea9f2238",
+      "blobSize": 9486,
+      "sourceDigest": "be7366a641ead4f32be7462a4c8e7e9f2f081d50207a8956257d7c239885ffe9",
+      "sourceId": "src_6a15c45fd344c36840a3ea64ba6025ac",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Verification: Install And Release Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: Install And Release Proof",
+          "anchor": "verification-install-and-release-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "blobSha": "3de9154860752398269de16d96a7aa2eac936e09",
+      "blobSize": 17529,
+      "sourceDigest": "e6a389aa7495b41e4b953323511470e02322897f6a9d794d49ae8bacb77aa85b",
+      "sourceId": "src_440d119b07c348d4d534d16398127a1b",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Verification: Source Preservation Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: Source Preservation Audit",
+          "anchor": "verification-source-preservation-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/vision.md",
+      "blobSha": "78a698011df8a1e17b6ee875a55218c2f55717ba",
+      "blobSize": 6876,
+      "sourceDigest": "4a028337dc8a2ac3e80a4779c0e3af8601b854e6360c0d6cef32d644bfa74ad3",
+      "sourceId": "src_ec3640e9dce4701fa7c6b40947fb86e1",
+      "area": "Packaging-distribution",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Vision: Packaging-Distribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Vision: Packaging-Distribution",
+          "anchor": "vision-packaging-distribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "blobSha": "8a06dd6981440fc1f3a78f5ab02433c5b9eb8882",
+      "blobSize": 20231,
+      "sourceDigest": "1cfda337e23e4b5f8a5f1a6cf65346f553a1668c49888ab7b44df02595412223",
+      "sourceId": "src_0292a306f2a2c14d6dc74f6e357a1737",
+      "area": "Platform laws",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/platform-foundations.md",
+      "gap": false,
+      "firstHeading": "Platform Foundations",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Platform Foundations",
+          "anchor": "platform-foundations"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/architecture-advisory-panel.md",
+      "blobSha": "bc8082aff69504d9ce0573ab152cee3f7dc060fb",
+      "blobSize": 33205,
+      "sourceDigest": "6d9ccca7be37d1174b1d122598a2003800fc816b9d6c45d8c2d08c3271c424c2",
+      "sourceId": "src_224812a7fba19e5c50e9ba4422d8d781",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Architecture Advisory Panel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Advisory Panel",
+          "anchor": "architecture-advisory-panel"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "blobSha": "bc1da0e6465134ed7a4595dc8346760633f2e302",
+      "blobSize": 51614,
+      "sourceDigest": "578f84d5db9c35b81e411121de85396d7f0c8657e9f6845ca5dc39c7353d66dd",
+      "sourceId": "src_6c50fb6976d6bbde7adf08631bbcb301",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Component Authority Boundary Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Component Authority Boundary Map",
+          "anchor": "component-authority-boundary-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/coordination-capability-envelope.md",
+      "blobSha": "0e5011d285534e0f066bb83678b5e18b8feaa119",
+      "blobSize": 30098,
+      "sourceDigest": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13",
+      "sourceId": "src_2b478390f3b2a0c16cdc96d943eeda1c",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "anchor": "agent-coordination-capability-envelope-và-coordinator-owned-deliberation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "blobSha": "d9195bcb74c419f1ba2a65317a680d585e457940",
+      "blobSize": 15987,
+      "sourceDigest": "9b58b9d781eb2dfd2a67aa8e635e0b02a9beede172d38325adedd7bbd68aa402",
+      "sourceId": "src_98cdde473845589c95a94caa7611d425",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Coordination ↔ Dispatch & Execution Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination ↔ Dispatch & Execution Contract",
+          "anchor": "coordination-dispatch-execution-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "blobSha": "e0f60bce590f0de2dd28502533d5501e2a0eb713",
+      "blobSize": 12167,
+      "sourceDigest": "d294fc201b1ff9b73b18899b366e8e0366faaf3e2e910f3eeca7ca603569b24b",
+      "sourceId": "src_bc1faa710219a445d5e73ed7b683f932",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Coordination Envelope — Minimal Probe Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Minimal Probe Contract",
+          "anchor": "coordination-envelope-minimal-probe-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "blobSha": "47e1e5e4c199d1f37f9159431d23dfd1b8e529d1",
+      "blobSize": 14992,
+      "sourceDigest": "0f7a5b0db1cf1cb22c22fd0d270306af2e34010c48e09a651d1764c1b7e226f9",
+      "sourceId": "src_4de07a3e72b6edc886c7aab16657803d",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Coordination Envelope — Worker, Provider, and Control Boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Worker, Provider, and Control Boundary",
+          "anchor": "coordination-envelope-worker-provider-and-control-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "blobSha": "96d5236b7cff671abf67fdbe0a7155d730f9f9cb",
+      "blobSize": 1895,
+      "sourceDigest": "1f7fd2299fd6c451f8a983c87a5be2056e158c664fa19aeb0de787b641b6aaf9",
+      "sourceId": "src_21f9317df2ffd5dc3bea7032bd5ffbdd",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Dispatch Control Plane Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Control Plane Redesign",
+          "anchor": "dispatch-control-plane-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/documentation-system-unification.md",
+      "blobSha": "39700f5adc8e088b73292984f6191c0bb849c682",
+      "blobSize": 53565,
+      "sourceDigest": "2ed9005ac755ea48408d791a0783c23ed61b3678358152e7164ea9c22b98d88f",
+      "sourceId": "src_b3675bbb498b13e5a6c5c2e0743b9825",
+      "area": "Documentation system",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Proposal: Unified Documentation Operating System",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Proposal: Unified Documentation Operating System",
+          "anchor": "proposal-unified-documentation-operating-system"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/doing-coordination-redesign.md",
+      "blobSha": "3c6751c92cbeb99cccf611532c0b89c8843818d0",
+      "blobSize": 38568,
+      "sourceDigest": "65b9928c8644826a64a73c6eacda9e5bff15c16696b8eab4e64944e9e644c28f",
+      "sourceId": "src_1bacfc9d4c3f2b11cc97542315b3df38",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Doing Coordination Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Doing Coordination Redesign",
+          "anchor": "doing-coordination-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "blobSha": "46ef7365da9120c210948ff09b7f0bdc13802ee5",
+      "blobSize": 35396,
+      "sourceDigest": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "sourceId": "src_a09f3303a89f8a2997bb5b8198b42240",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Knowledge Registry Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Knowledge Registry Redesign",
+          "anchor": "knowledge-registry-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/README.md",
+      "blobSha": "ced44992a16912aac333f281c0b02e44795a4bf5",
+      "blobSize": 3071,
+      "sourceDigest": "3c9606e1c79b0f12aa9cf68ce736cf386eaf302448cc7847f8d15dda335a2d0b",
+      "sourceId": "src_eed5fd6d71161c7d17d8eee57fc08ea6",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Architect-Level Proposals",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architect-Level Proposals",
+          "anchor": "architect-level-proposals"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "blobSha": "51b864fee88820c111346f853abc15629109be57",
+      "blobSize": 32581,
+      "sourceDigest": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f",
+      "sourceId": "src_36ce5738244e6d79f7a5e843b6699480",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Step 09 - Group Thinking Substrate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 09 - Group Thinking Substrate",
+          "anchor": "step-09---group-thinking-substrate"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "blobSha": "260e9199953def059c16ea5f3c41aa56004c0da6",
+      "blobSize": 24741,
+      "sourceDigest": "4c421a90ae1c48bbbd6fef7e781010ed8aa2b26af8edc63f07ad2945c26ab46e",
+      "sourceId": "src_ba30c6c232747440a6cf7db179effff5",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Step 10 A0 - Coding Domain Boundary And Facade Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 10 A0 - Coding Domain Boundary And Facade Plan",
+          "anchor": "step-10-a0---coding-domain-boundary-and-facade-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "blobSha": "f29be355805d0d628ab13eef5bfce78e9d5b4b41",
+      "blobSize": 54522,
+      "sourceDigest": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+      "sourceId": "src_f1cd362e8fb7b9bd3b2fa9d6845608b0",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "anchor": "step-10---coding-domain-adoption-of-the-coordination-foundation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "blobSha": "b204d5413ea0d2b9782ee55e59393705dfb53814",
+      "blobSize": 69137,
+      "sourceDigest": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+      "sourceId": "src_dae4438e836ca6c66f8adb9a03443812",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
+          "anchor": "visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/README.md",
+      "blobSha": "5914032cc88b93638a91fc9d89033fb0e6c86c05",
+      "blobSize": 6590,
+      "sourceDigest": "6e743173617ff1ea81a23cc3fe9af065ebf1f21624b7d61529906c54b33ef7f5",
+      "sourceId": "src_66097db12621997618b0dcc8f5968a02",
+      "area": "Documentation system",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Platform Documentation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Platform Documentation",
+          "anchor": "platform-documentation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "blobSha": "d97d42e37a6b0e73c785340cffeebd390a4921ce",
+      "blobSize": 42894,
+      "sourceDigest": "c1b3d03c43d7d6021fc54c59a8eb97cfb202a70a049819067fb59d86b016a554",
+      "sourceId": "src_f6d36fe4ac49d79dd0e7235b80d42a02",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+          "anchor": "added-in-candidate-runner-dispatch-operability-implementation-slice-2026-09-16"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "blobSha": "abac8cfbde3d3ca2c224b72eb9efc5f8b8df1c5c",
+      "blobSize": 7101,
+      "sourceDigest": "e4e06018b864046a2256d6b385b1864e57f8308ef904caf6ee81149d572a1c44",
+      "sourceId": "src_f8561422d3529d08e3264d54a1e980a2",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Từ vựng dispatch hiện hành",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "blobSha": "c8d7cc9437ad73f4f80e7a8a35e78df2d2890930",
+      "blobSize": 4190,
+      "sourceDigest": "b94976ab75a5b09d1a888f94b5f77e93833f742d5547aba8696af9b3a1b8b598",
+      "sourceId": "src_2cca747fb4dfaa06130534fddc2eb45c",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Dispatch runtime inspection",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Dispatch runtime inspection",
+          "anchor": "added-in-candidate-runner-dispatch-runtime-inspection"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "blobSha": "2455fa8e7716efd5c8bbfb1ea12c45afb88896e1",
+      "blobSize": 6342,
+      "sourceDigest": "80820f44da4ec857d93e5c81da5d4205795b4b62381160a14a042c94e01a320c",
+      "sourceId": "src_52c3aeb41dc8d6b199b94c1b3c13c0ad",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "anchor": "added-in-candidate-runner-executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/contracts/routing-handoff.md",
+      "blobSha": "5ad350e395c2b9bfb7db23dfa8279e921685f645",
+      "blobSize": 7764,
+      "sourceDigest": "97b9a2cb6f1bc3acad1ec1a882b32660fda06538e008d66d57a2029cb0ae325d",
+      "sourceId": "src_e95b62ba299872651d80bf1116befa58",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Routing Handoff Contract — fgos-runner",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Routing Handoff Contract — fgos-runner",
+          "anchor": "routing-handoff-contract-fgos-runner"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "blobSha": "05076ee244d5301a7653f1435f5ddfaf44ad336d",
+      "blobSize": 182534,
+      "sourceDigest": "1afb7f78f6ac4a97dd2be6c2d847d5c6ab7c14cde3fd6065ac5f600fc1ff62bd",
+      "sourceId": "src_6b3deb6a4d63a03818685f2df5d2a55f",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+      "blobSha": "9cdb35b8b89de80f3503f77d2bf471da2b2ead62",
+      "blobSize": 5861,
+      "sourceDigest": "5feaca6672d1a905c2c686a72444c66bd6a2109afa6f21f0a5f4f4b92ac9dbb7",
+      "sourceId": "src_94a4661f369faffd2c4ee5bb6b6a4aeb",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "anchor": "added-in-candidate-runner-coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 19,
+  "entries": [
+    {
+      "path": "docs/explanation/driving-pane-rename-resolved-path.md",
+      "blobSha": "75ef3473d9444b8e47e61a8cc379e47ce119ee78",
+      "blobSize": 3487,
+      "sourceDigest": "d5ed99ceaa6a160673c85ed939dd5b35c8d756b4ee83d69f7d83ddda9084212b",
+      "sourceId": "src_1509068aa8ca4b955892d49f1d7c04e5",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The pane-rename call silently stopped relabeling panes after the first stage — the isolation guard couldn't verify `$PWD`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The pane-rename call silently stopped relabeling panes after the first stage — the isolation guard couldn't verify `$PWD`",
+          "anchor": "the-pane-rename-call-silently-stopped-relabeling-panes-after-the-first-stage-the-isolation-guard-couldnt-verify-pwd"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md",
+      "blobSha": "2694fade5c5185532a363a4dcaf9f92164746de7",
+      "blobSize": 3335,
+      "sourceDigest": "e81664dd9458b3b63443f83fddbeab2fc4c33258c592002454f3a2ef42ea433d",
+      "sourceId": "src_a8176c209f9973eb6476709047a20eb0",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `enduser-docs-index-stale` used to miss orphan entries, and how it was widened",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `enduser-docs-index-stale` used to miss orphan entries, and how it was widened",
+          "anchor": "why-enduser-docs-index-stale-used-to-miss-orphan-entries-and-how-it-was-widened"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/eventlog-guard-fail-closed-event-count-checkpoint.md",
+      "blobSha": "e5702d69228951f2f9fa75da8ba1e8502f5f1765",
+      "blobSize": 4790,
+      "sourceDigest": "2e7b4962a85d092042bbd4d0675696905c5d747dabca5d28b53c3239887250c6",
+      "sourceId": "src_ebd9b744fce0dacfd53cdf7fd28ab348",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Another real `.fgos/events.jsonl` loss — even after two prior fixes had already landed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Another real `.fgos/events.jsonl` loss — even after two prior fixes had already landed",
+          "anchor": "another-real-fgoseventsjsonl-loss-even-after-two-prior-fixes-had-already-landed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+      "blobSha": "e3ef3e22d3ae439368fa055896ca91e97aeafc32",
+      "blobSize": 7829,
+      "sourceDigest": "0b2458b2d9fcd8e3f1ffe4dd55dcabec781a776dc677ffccbe42af61fc1fbe7d",
+      "sourceId": "src_c58b2c15e980c60e660617261c4b4dab",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Retiring the dedicated periodic `.fgos/events` checkpoint commit — swept into the next real merge instead",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retiring the dedicated periodic `.fgos/events` checkpoint commit — swept into the next real merge instead",
+          "anchor": "retiring-the-dedicated-periodic-fgosevents-checkpoint-commit-swept-into-the-next-real-merge-instead"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+      "blobSha": "1cd4993c695bee98c728e5be004ee70fc9aa319e",
+      "blobSize": 8854,
+      "sourceDigest": "39b7e53d19f48957ad557150df4db9d9d64c67ced9ffbfb7675bc8b1f5ba5511",
+      "sourceId": "src_78bed7bce0a0ef15b1d1a9e97a554e2e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Tier A: redesigning `.fgos/events.jsonl` around content-hash identity and per-session files",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Tier A: redesigning `.fgos/events.jsonl` around content-hash identity and per-session files",
+          "anchor": "tier-a-redesigning-fgoseventsjsonl-around-content-hash-identity-and-per-session-files"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/events-jsonl-concurrent-data-loss-investigation.md",
+      "blobSha": "13ce8ce2517556c0f53688889057bc09ddeabc4a",
+      "blobSize": 5798,
+      "sourceDigest": "8f7b420a4944b3a5ebfa02dd2abf75ab864ac1274216dab8a0ff1cdc21180199",
+      "sourceId": "src_4285a63f05afac22643fac2b42e1462a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A critical, real events.jsonl data-loss pattern — investigated, root-caused, and scoped for a fix",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A critical, real events.jsonl data-loss pattern — investigated, root-caused, and scoped for a fix",
+          "anchor": "a-critical-real-eventsjsonl-data-loss-pattern-investigated-root-caused-and-scoped-for-a-fix"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+      "blobSha": "b86b4bfce2896a0def73e58f95bf4d4d36e0b4c2",
+      "blobSize": 9547,
+      "sourceDigest": "a100e178f0834551d357fc5a1c484dad56464016486f81361bf7ff4676047992",
+      "sourceId": "src_f96ed36563bda2ebd57bd4a8221b414a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The truncation guard existed but nobody ran it — now it runs itself",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The truncation guard existed but nobody ran it — now it runs itself",
+          "anchor": "the-truncation-guard-existed-but-nobody-ran-it-now-it-runs-itself"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md",
+      "blobSha": "fa3dad1a234001510d8fdc013524c55e5f0968eb",
+      "blobSize": 4221,
+      "sourceDigest": "2c4ebb5523f4a2d61d9c0400e708deec7198a422ce7eb6b5df6cd6ba212edf8d",
+      "sourceId": "src_12bc2dcf20f33363ee65cf24c0dd4072",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why manual out-of-process dispatches went unlogged, and how Step B.5 fixes it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why manual out-of-process dispatches went unlogged, and how Step B.5 fixes it",
+          "anchor": "why-manual-out-of-process-dispatches-went-unlogged-and-how-step-b5-fixes-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/expr-eval-chain-passthrough-vs-split.md",
+      "blobSha": "db9419fe6179efabf87fba84546973ae1aaabdcb",
+      "blobSize": 2124,
+      "sourceDigest": "e2af9ac34d82d7307b6e171f6b13c25f60573211c097423e534faa73600a0d7f",
+      "sourceId": "src_3a2375c457e8190a90662f75c42fec67",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A same-PR import dependency is not grounds for a `deps`-chain split",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A same-PR import dependency is not grounds for a `deps`-chain split",
+          "anchor": "a-same-pr-import-dependency-is-not-grounds-for-a-deps-chain-split"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md",
+      "blobSha": "41b961394810a2e8381742d3ffc16d8dfebd76e0",
+      "blobSize": 3773,
+      "sourceDigest": "2447cc1c9e791b3025fdf5495fe18ab67bf48bc75daaa24c7292f7489af45011",
+      "sourceId": "src_e6504afd9226c73c9900221cc7d4fa8f",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fanout-batch` must run backgrounded — and a caller can outlive it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fanout-batch` must run backgrounded — and a caller can outlive it",
+          "anchor": "fanout-batch-must-run-backgrounded-and-a-caller-can-outlive-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fanout-batch-concurrent-dispatch.md",
+      "blobSha": "fae70a383331fe308c983f773d5838c2d1ac8299",
+      "blobSize": 2667,
+      "sourceDigest": "df4d05cc6e3c46f59f808374358c95d0c8978e1c9b466f03c48c0328a9ad6955",
+      "sourceId": "src_14d8e34a89ccf31c3b213c219ebfffe4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "\"Fanout\" that fanned out one item at a time — a sequential `for` loop pretending to be parallel",
+      "headings": [
+        {
+          "level": 1,
+          "text": "\"Fanout\" that fanned out one item at a time — a sequential `for` loop pretending to be parallel",
+          "anchor": "fanout-that-fanned-out-one-item-at-a-time-a-sequential-for-loop-pretending-to-be-parallel"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+      "blobSha": "e209d3358620a20470ed254a896613ea3c106c2d",
+      "blobSize": 3828,
+      "sourceDigest": "7f6483f9b2e3d5813096882bc0c4ef7a4a573c31821434736e9ce97ed91f508d",
+      "sourceId": "src_a5fbccaf4067fcbf829da898ae0a6f40",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "One narrow fix landed from a three-part fanout-batch performance proposal — the other two stayed out for good reasons",
+      "headings": [
+        {
+          "level": 1,
+          "text": "One narrow fix landed from a three-part fanout-batch performance proposal — the other two stayed out for good reasons",
+          "anchor": "one-narrow-fix-landed-from-a-three-part-fanout-batch-performance-proposal-the-other-two-stayed-out-for-good-reasons"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fanout-execute-consolidation.md",
+      "blobSha": "67ff70cdec17372d29833c49dce340fe41c89dfb",
+      "blobSize": 4769,
+      "sourceDigest": "1f47a52304027bbacd46748e251dc68078edaddd961289b6e6d8b8c03f6ce99e",
+      "sourceId": "src_93e749bfe87b646a921219a7856b1b3a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The out-of-process fanout wave loop is now one verb, not spelled-out bash",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The out-of-process fanout wave loop is now one verb, not spelled-out bash",
+          "anchor": "the-out-of-process-fanout-wave-loop-is-now-one-verb-not-spelled-out-bash"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fanout-proof-agy-demo.md",
+      "blobSha": "12622294f4b04f002244fb24f3b6c0769b326a80",
+      "blobSize": 1459,
+      "sourceDigest": "533659a3757847af133661064a9a1bb04cd702797b99d070b1feac690ef753f6",
+      "sourceId": "src_71e2d8dc9c83c13fb414b2140e749680",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`examples/fanout-proof-agy/` — a deliberate two-piece fan-out test fixture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`examples/fanout-proof-agy/` — a deliberate two-piece fan-out test fixture",
+          "anchor": "examplesfanout-proof-agy-a-deliberate-two-piece-fan-out-test-fixture"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-edit-role-flag.md",
+      "blobSha": "80a611896d18593398e2197111d5338347706921",
+      "blobSize": 3168,
+      "sourceDigest": "8c3db743b9ce2cf81b65c17db3499f35375c70a4f7d44b6a3542aa4277cf1969",
+      "sourceId": "src_49a826bd50c1e5153212a6b9a8641f50",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos edit --role` — closing a provenance-trust gap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos edit --role` — closing a provenance-trust gap",
+          "anchor": "fgos-edit---role-closing-a-provenance-trust-gap"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-fanout-out-of-process-dispatch.md",
+      "blobSha": "658501995d4bf4eb0938652c6b728396d02af0fa",
+      "blobSize": 4606,
+      "sourceDigest": "388ef7e3f2402b8a4dbea8ad26c5b954b7a13f7ba975171cbf7cb73765cc5b9f",
+      "sourceId": "src_393f6aa08e035eb46260c50818693417",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `fgos-fanout` gained a real out-of-process firing path",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `fgos-fanout` gained a real out-of-process firing path",
+          "anchor": "why-fgos-fanout-gained-a-real-out-of-process-firing-path"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-gateway-lifecycle-verb.md",
+      "blobSha": "b43b08c1799f011d8809c0ad40e92c006bbeda2d",
+      "blobSize": 4508,
+      "sourceDigest": "72ebd6528c8f5f97216207f5d5266e2e6de23ed2c9700da7d59cc92a70fd160f",
+      "sourceId": "src_a0412b173f0f4003d4e0ada7a319222a",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the gateway needs its own CLI door, not a hand-rolled background process",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the gateway needs its own CLI door, not a hand-rolled background process",
+          "anchor": "why-the-gateway-needs-its-own-cli-door-not-a-hand-rolled-background-process"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+      "blobSha": "fdcd40600c97d230f5139c6c4995cf00d105b975",
+      "blobSize": 4087,
+      "sourceDigest": "16344f3f744ad817a02d72b05e3f9934313b403b4b737fbef4a6053df16ebf4b",
+      "sourceId": "src_b45e15b85231ff519edb05cfc6f5be9b",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Two different desync bugs, confirmed live, only one of them was this item's own fix",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Two different desync bugs, confirmed live, only one of them was this item's own fix",
+          "anchor": "two-different-desync-bugs-confirmed-live-only-one-of-them-was-this-items-own-fix"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-preflight-verb.md",
+      "blobSha": "f6fc83f5b51a06fa40b26d9dda214a0ea9e2107d",
+      "blobSize": 2545,
+      "sourceDigest": "475d5ae3a7340f420888f34f6b3ad123464998d64c0be577c5dac536b7494335",
+      "sourceId": "src_d6177645c18f73ef59468ec84f232c2f",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Three checks that already ran fast, but only got read after the slow suite finished",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Three checks that already ran fast, but only got read after the slow suite finished",
+          "anchor": "three-checks-that-already-ran-fast-but-only-got-read-after-the-slow-suite-finished"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-return-skip-redundant-verify.md",
+      "blobSha": "a1e44b2f1901dd258860789af5482d73a95fcd09",
+      "blobSize": 3127,
+      "sourceDigest": "bf67f3b6201879bcf5131ea25da0b6639d40c3d3eb2f1a323fc7b79f4572c118",
+      "sourceId": "src_4e7ed5c91786098dd056028812469b2d",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos return` no longer re-verifies a tree the worker already proved green",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos return` no longer re-verifies a tree the worker already proved green",
+          "anchor": "fgos-return-no-longer-re-verifies-a-tree-the-worker-already-proved-green"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/fgos-write-rejected-structural-deadlock.md",
+      "blobSha": "af6ef2641aad6ba930c69eba373c6c1428085088",
+      "blobSize": 3159,
+      "sourceDigest": "586dc2d5476d2f4569a8e7e9c59dff8077769d0ab3c1ae38bc506c8a86980618",
+      "sourceId": "src_47ade2cd9f9c4569595dc8caca036089",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos catchup`/`approve` can deadlock identically forever — the error now says why",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos catchup`/`approve` can deadlock identically forever — the error now says why",
+          "anchor": "fgos-catchupapprove-can-deadlock-identically-forever-the-error-now-says-why"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/footprint-diff-research-md-noise.md",
+      "blobSha": "c597db394e5fb0b71b4720e9f0c5541e05f93701",
+      "blobSize": 4066,
+      "sourceDigest": "82f3b8cd10c1a1486ffc4246a73cc6eec640fd8d2ed79e7ac51255cdf070e5f2",
+      "sourceId": "src_c952d0ee453dde87b618586d23bd130d",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A third \"100% guaranteed noise\" path in `footprintDiffHits`, fixed the same way as the first two",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A third \"100% guaranteed noise\" path in `footprintDiffHits`, fixed the same way as the first two",
+          "anchor": "a-third-100-guaranteed-noise-path-in-footprintdiffhits-fixed-the-same-way-as-the-first-two"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/gate-bypass-keyword-floor-false-positives.md",
+      "blobSha": "90de7451ef0b39c4ee7f19aef09502f749331b1b",
+      "blobSize": 3756,
+      "sourceDigest": "5a7bdf4b2e670309a3b425c216fb1a1c93e56db49d71ba3f0286ea03998e693e",
+      "sourceId": "src_09d9d4c27bd19a769601214f3c01f825",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Three real false positives in the auto-approve keyword gate, and their fixes",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Three real false positives in the auto-approve keyword gate, and their fixes",
+          "anchor": "three-real-false-positives-in-the-auto-approve-keyword-gate-and-their-fixes"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/general-verb-events-baseline-write-verified-fixed.md",
+      "blobSha": "74cc63bd5a841f0a90b6180fc001016e2f01f0c9",
+      "blobSize": 3830,
+      "sourceDigest": "c60f7c885b6fb58cbb73e12d735a1e6244dcccba470778de162102f31f1882ec",
+      "sourceId": "src_ca6c7f6e1ec03bfc200721a7482f1521",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A reported still-live baseline-append bug — closed as already fixed, with real proof instead of an assumption",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A reported still-live baseline-append bug — closed as already fixed, with real proof instead of an assumption",
+          "anchor": "a-reported-still-live-baseline-append-bug-closed-as-already-fixed-with-real-proof-instead-of-an-assumption"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/gitignore-docs-history-reverify.md",
+      "blobSha": "0bce86c171655e6cbaca1cef1f9bdd269ec702c0",
+      "blobSize": 1792,
+      "sourceDigest": "27df4c7714baabd404c9f437481da68b6b9ed73b017db3bdd9b5c2f39144a99d",
+      "sourceId": "src_b3a8a5993c7a85bd97155366f6bd77bb",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`docs/history/` staying un-ignored is now tested, not just a backlog memory",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`docs/history/` staying un-ignored is now tested, not just a backlog memory",
+          "anchor": "docshistory-staying-un-ignored-is-now-tested-not-just-a-backlog-memory"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/glm-openrouter-executor.md",
+      "blobSha": "eba317a0170719aab3b889c750933dded44cbaa0",
+      "blobSize": 6920,
+      "sourceDigest": "43afc2ad3fc9e7754b622735cf9960002a2c09fb453b764304945ba3823c41f9",
+      "sourceId": "src_c89519ec59286ffa3612dbc0da88de29",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Giving one executor its own environment without touching the default one",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Giving one executor its own environment without touching the default one",
+          "anchor": "giving-one-executor-its-own-environment-without-touching-the-default-one"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+      "blobSha": "0ec038fb59bb8a839db6665f040d7d5e692d7464",
+      "blobSize": 3437,
+      "sourceDigest": "d7cdf87db715d14b410a48210814c1471c9f8c7f3d289899018b93805abd5dbb",
+      "sourceId": "src_240935844b44bc125641b895d38b5ce9",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Herdr's `PaneOrchestrator` and fgOS's \"orchestrator\" are two different words that happen to be spelled the same",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Herdr's `PaneOrchestrator` and fgOS's \"orchestrator\" are two different words that happen to be spelled the same",
+          "anchor": "herdrs-paneorchestrator-and-fgoss-orchestrator-are-two-different-words-that-happen-to-be-spelled-the-same"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+      "blobSha": "cade178855b9f6dc0c9e70f4142d8a1db93b4413",
+      "blobSize": 25514,
+      "sourceDigest": "401803a81915681269a31491eb09abbb841ee58574e99199ec7e7bb330a573b5",
+      "sourceId": "src_5f21c802880a43c3401e53c3747c042d",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session",
+          "anchor": "watching-an-agent-work-in-a-real-pane-without-letting-the-next-dispatch-talk-to-a-strangers-session"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/iron-law-classification-recipe-path.md",
+      "blobSha": "0ac9d43cafaf25fcc4b24aa12ba31e24a0354113",
+      "blobSize": 3606,
+      "sourceDigest": "cf88a8e22ed366561283cca1a9d1b5451b3a1d68127fa86791d3baa279d034e7",
+      "sourceId": "src_3db0332cbe63ece5e75bdd792ef228ed",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A documented recipe's bare relative path silently returned \"no items\" instead of an error",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A documented recipe's bare relative path silently returned \"no items\" instead of an error",
+          "anchor": "a-documented-recipes-bare-relative-path-silently-returned-no-items-instead-of-an-error"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/list-id-callthreads-leak-fix.md",
+      "blobSha": "be9b4190367ae341683416f8810911c2dd6e0bde",
+      "blobSize": 2603,
+      "sourceDigest": "5c10402708514202f374e2ad56edeb1f8ace15a239a8dfe65de5a2f9e49053ef",
+      "sourceId": "src_97dd5573d0d174ecf43a4660e7337f67",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos list --id` no longer leaks every item's `callThreads`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos list --id` no longer leaks every item's `callThreads`",
+          "anchor": "fgos-list---id-no-longer-leaks-every-items-callthreads"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/list-id-fields-flag-lightweight-projection.md",
+      "blobSha": "5eedd487f1ba61bed4e30040933a5cda5670cbad",
+      "blobSize": 3584,
+      "sourceDigest": "07640645b3f6957f7c28f16ee3ef840f1af385069600938bc312585342a0d012",
+      "sourceId": "src_97757a2d99a87c9b032c38868be74553",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos list --id --fields` — a lightweight projection for the common re-read",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos list --id --fields` — a lightweight projection for the common re-read",
+          "anchor": "fgos-list---id---fields-a-lightweight-projection-for-the-common-re-read"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/lock-wait-self-vs-other-holder-identity.md",
+      "blobSha": "2d4ef7bae5245e759bdb633cee4813f75334d0e8",
+      "blobSize": 4997,
+      "sourceDigest": "452d1454f759ea9986ef028a4ca9ca99d065363791f9519b4ecea6ebde5e15e8",
+      "sourceId": "src_caf9423f765e35ef7a88afac9966c88e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The lock-wait poll line couldn't tell a session its own overlapping call from a stranger's",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The lock-wait poll line couldn't tell a session its own overlapping call from a stranger's",
+          "anchor": "the-lock-wait-poll-line-couldnt-tell-a-session-its-own-overlapping-call-from-a-strangers"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/loop-descendant-dedup-false-premise.md",
+      "blobSha": "dde011cad92a46d6c778a91d5e523f357daf4090",
+      "blobSize": 2977,
+      "sourceDigest": "84df654aaecc4482780ff2e134a06922666262de8201d0cf28210c5543750840",
+      "sourceId": "src_b03fc7382115b0a3fc53a75330a5c9fd",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Two \"identical-looking\" descendant checks turned out to intentionally diverge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Two \"identical-looking\" descendant checks turned out to intentionally diverge",
+          "anchor": "two-identical-looking-descendant-checks-turned-out-to-intentionally-diverge"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/loop-family-scheduleWakeup-self-reference-gap.md",
+      "blobSha": "c06a89467c8816dd703ad88143fffc213aa4751b",
+      "blobSize": 3977,
+      "sourceDigest": "6e7feeb228c411ffaf521518b642bdf0adfed3939e71564ae1640ace2d2be74a",
+      "sourceId": "src_16af098a7556b1b4d32b5c2a93a2d36e",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`merge-loop` ran exactly one item then silently stopped continuing — the recurring prompt named the wrong skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`merge-loop` ran exactly one item then silently stopped continuing — the recurring prompt named the wrong skill",
+          "anchor": "merge-loop-ran-exactly-one-item-then-silently-stopped-continuing-the-recurring-prompt-named-the-wrong-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md",
+      "blobSha": "b3d3228d5e9ab3c0213bd8ae2cd9c2e285b977ad",
+      "blobSize": 5538,
+      "sourceDigest": "f3441a2d5cd4b5599ee90edb506e6a956043f0a3c2a9bc5663f181a692f84258",
+      "sourceId": "src_bf2421b18141e85e26afe6d7268ede09",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A sweep loop's own commits held the shared lock \"hot\" for its entire run",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A sweep loop's own commits held the shared lock \"hot\" for its entire run",
+          "anchor": "a-sweep-loops-own-commits-held-the-shared-lock-hot-for-its-entire-run"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/main-checkout-lock-scope-audit.md",
+      "blobSha": "24f0b66a66217be7bbcf80f931eda8cdc4c80d49",
+      "blobSize": 3041,
+      "sourceDigest": "42eea06436e55de13793b197a588c055dfe6ca0f5a6dbe68e5d75b924e6182c9",
+      "sourceId": "src_7d797c970086b921fcd85b74f8024a50",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A suspected over-broad lock, audited and confirmed already fine",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A suspected over-broad lock, audited and confirmed already fine",
+          "anchor": "a-suspected-over-broad-lock-audited-and-confirmed-already-fine"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+      "blobSha": "6330359588dab399c75372bf0b5c91a8c767de4f",
+      "blobSize": 5170,
+      "sourceDigest": "e3b23281624b9ba9f24bdafbcc6231394ee88ce50b4ec16e795063f527db096f",
+      "sourceId": "src_61f3f4d3f6152d62a428af979153ec61",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A clean tree isn't a safe tree — the main-checkout-reset guard only checked one of the two ways to lose work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A clean tree isn't a safe tree — the main-checkout-reset guard only checked one of the two ways to lose work",
+          "anchor": "a-clean-tree-isnt-a-safe-tree-the-main-checkout-reset-guard-only-checked-one-of-the-two-ways-to-lose-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/merge-next-inline-approve-invocation.md",
+      "blobSha": "880d647e25d5c6d596c01e6ef6213c93fe58a072",
+      "blobSize": 2581,
+      "sourceDigest": "df3ba47a4c5ce0446910a63f668297cedb217f74e4c85e1b90847b0c7fb4fdec",
+      "sourceId": "src_b5eb20d1e0b912ba1d4b5e5cbf2cf1b3",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "An Iron Law block now invokes `approve` in the same turn, not a follow-up command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "An Iron Law block now invokes `approve` in the same turn, not a follow-up command",
+          "anchor": "an-iron-law-block-now-invokes-approve-in-the-same-turn-not-a-follow-up-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+      "blobSha": "8c389887b4b38d5745eb416b5d8334a1f0346f37",
+      "blobSize": 3272,
+      "sourceDigest": "aa1be4e217aa032da56d04927bb182e9566b64452a09cc475b044f5cb6922b32",
+      "sourceId": "src_8235e7faec228d553bf91d5cad8e6227",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The approve skip-verify fast path was correct but almost never fired on a busy trunk",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The approve skip-verify fast path was correct but almost never fired on a busy trunk",
+          "anchor": "the-approve-skip-verify-fast-path-was-correct-but-almost-never-fired-on-a-busy-trunk"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/mergedsha-missing-unreproduced-race.md",
+      "blobSha": "f03d8de13f08343bd735a3901bde41dead943a31",
+      "blobSize": 3543,
+      "sourceDigest": "48468ee0d3997c19a36110a4bc5016c3b8e86d66d5cfc42ba51e024897f1b1fe",
+      "sourceId": "src_6a0e27c27745fe770b5e96c5be50c602",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A real merge landed without `mergedSha` — unreproduced, now instrumented to catch it next time",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A real merge landed without `mergedSha` — unreproduced, now instrumented to catch it next time",
+          "anchor": "a-real-merge-landed-without-mergedsha-unreproduced-now-instrumented-to-catch-it-next-time"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/mode-gate-tiny-small-skip-load.md",
+      "blobSha": "40b68a0466e9c18e30f1dfd21759d315b95c1354",
+      "blobSize": 3923,
+      "sourceDigest": "68ad9607716c5e30ee3265dbb4ab3b964bc36136370b4dc9c99125ca09b76052",
+      "sourceId": "src_546d5c1f763c73d5295749102dcdd4f7",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The Mode gate classified tiny items — but never actually made anything lighter for them",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The Mode gate classified tiny items — but never actually made anything lighter for them",
+          "anchor": "the-mode-gate-classified-tiny-items-but-never-actually-made-anything-lighter-for-them"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/no-stuck-merge-abort-doctor-check.md",
+      "blobSha": "084d41614f57ab4660a8355d270dd49d22a64eac",
+      "blobSize": 4285,
+      "sourceDigest": "109a61f94a9027e378445a1cbe3236073239839a6d47a94d74e4b504b20a4456",
+      "sourceId": "src_2cae6f3deaf0e0102abe9ae1e50df28c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`git merge --abort` can itself fail — a doctor check now catches the stuck result",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`git merge --abort` can itself fail — a doctor check now catches the stuck result",
+          "anchor": "git-merge---abort-can-itself-fail-a-doctor-check-now-catches-the-stuck-result"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/noise-only-paths-truncation-guard-exemption.md",
+      "blobSha": "d6ca93cac62228c2d2307be95111d67556ee5922",
+      "blobSize": 1968,
+      "sourceDigest": "c6ac3b3f03fac069d02994f23a23320752151828edcf1cb626219eb442dddf96",
+      "sourceId": "src_bdeca30b9ae203412fb765b62a1e4f12",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A new noise file from Tầng A's own migration wasn't on the noise-exemption list yet",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A new noise file from Tầng A's own migration wasn't on the noise-exemption list yet",
+          "anchor": "a-new-noise-file-from-tầng-as-own-migration-wasnt-on-the-noise-exemption-list-yet"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/opportunistic-checks-regression-root-cause-bisection.md",
+      "blobSha": "44eb51d0baa61db81bafe5fba414b5484f69464f",
+      "blobSize": 3988,
+      "sourceDigest": "7511ba2f8a7b94a281b2c52b60bc7a7cff4a00214583917db2ae6e02a6bd6bc9",
+      "sourceId": "src_692c4ed59ad7dd8d62ac9c93c10b6904",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The real regression root cause — found by bisection, not by the item's own initial report",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The real regression root cause — found by bisection, not by the item's own initial report",
+          "anchor": "the-real-regression-root-cause-found-by-bisection-not-by-the-items-own-initial-report"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/opportunistic-checks-test-regression-fgos-oet.md",
+      "blobSha": "7f8a43325eb3ff96ae79338b4696a378627902dd",
+      "blobSize": 2519,
+      "sourceDigest": "e091e21797022ab42a13b77bafff7ba2accd5e9cb609316120831223cf7a72a0",
+      "sourceId": "src_3734b977698a0b1b7ae5de8d9c8b7d41",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A real 7-test regression from `tsk-1ji` — already fixed by the time this item ran",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A real 7-test regression from `tsk-1ji` — already fixed by the time this item ran",
+          "anchor": "a-real-7-test-regression-from-tsk-1ji-already-fixed-by-the-time-this-item-ran"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+      "blobSha": "b5419ae3dbe4db8eebdd246e58a14241d48efe95",
+      "blobSize": 4949,
+      "sourceDigest": "b4103283f59f112d7300767cdd238244a9f5f20a673f0ec710101e6ba34ff975",
+      "sourceId": "src_6e3cda6105b613533d42dab3ad9f32b9",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "When a claim outlives the work it was claiming",
+      "headings": [
+        {
+          "level": 1,
+          "text": "When a claim outlives the work it was claiming",
+          "anchor": "when-a-claim-outlives-the-work-it-was-claiming"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/partial-claim-event-loss-covered-by-tsk-1vc.md",
+      "blobSha": "ade4853681f693b30818ca7f78bb2b85c7089357",
+      "blobSize": 2900,
+      "sourceDigest": "1ac5d528589928989006fe5cd5a656890c2f5829e0c23c3640c3da56dfbece1c",
+      "sourceId": "src_06223d05a7f8491926e94b9b188d775c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A claim event silently vanishing — a variant of `tsk-1vc`'s class, verified already fixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A claim event silently vanishing — a variant of `tsk-1vc`'s class, verified already fixed",
+          "anchor": "a-claim-event-silently-vanishing-a-variant-of-tsk-1vcs-class-verified-already-fixed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/pi-runtime-capacity.md",
+      "blobSha": "9012fbee258956ed95b565e5b6c7cdea2dab174e",
+      "blobSize": 3985,
+      "sourceDigest": "6a96a241f802ad778c2f78f428a2362e291d3462f64d576593e4da0c7eb635d8",
+      "sourceId": "src_9bb0e6964d2b4475bf2ee5a4ceb6fc0b",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `pi` was registered as a runtime capacity, not just another provider",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `pi` was registered as a runtime capacity, not just another provider",
+          "anchor": "why-pi-was-registered-as-a-runtime-capacity-not-just-another-provider"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/planning-passthrough-action-footprint-sync.md",
+      "blobSha": "b7a07638bb3a5dfe44b88d9c2b471a892f131005",
+      "blobSize": 2208,
+      "sourceDigest": "fc60b410112e5582ef77436079ced63e3a9931429ff6799fdff0ea64caf06aab",
+      "sourceId": "src_56adffb5c8631a75acbb703fa323d709",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A pass-through (non-split) item's worker prompt used to render an empty `Directive`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A pass-through (non-split) item's worker prompt used to render an empty `Directive`",
+          "anchor": "a-pass-through-non-split-items-worker-prompt-used-to-render-an-empty-directive"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/planning-split-root-verify-sync.md",
+      "blobSha": "85db30db3a782a2b48b58b9fbf3411071aa58b1b",
+      "blobSize": 3349,
+      "sourceDigest": "50217d8024e465664908854c5f6876b7a2fb6a2deb2a8140abb3a8ee230b2326",
+      "sourceId": "src_73d1ea75572cd821cd82d5b98f332f40",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A split root item's own `verify` field had no sync step — `fgos sync-root` ran a placeholder as a shell command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A split root item's own `verify` field had no sync step — `fgos sync-root` ran a placeholder as a shell command",
+          "anchor": "a-split-root-items-own-verify-field-had-no-sync-step-fgos-sync-root-ran-a-placeholder-as-a-shell-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/postland-drift-notify-consumer.md",
+      "blobSha": "d9906f16307596076c5c52b44dedc32c5f8033eb",
+      "blobSize": 2949,
+      "sourceDigest": "e2bc12631aa7b8c9f43132a089cf30b55128702bfd34194763360cd0f19a3668",
+      "sourceId": "src_a72f126963c62e63c64919676aa2f4a4",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`postLand.notify` drift is now actually consumed, not just computed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`postLand.notify` drift is now actually consumed, not just computed",
+          "anchor": "postlandnotify-drift-is-now-actually-consumed-not-just-computed"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/pre-commit-fgos-content-precedence-guard.md",
+      "blobSha": "e43a4f658b0be58e497d79ca7d189fc41c2a7a6b",
+      "blobSize": 5720,
+      "sourceDigest": "998f1dd6636610456c5d35e88ec88731c536246d43fe536a833084fd448c6443",
+      "sourceId": "src_44300ecabeded0b937cbf9df20c9d078",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A pre-commit guard closes the one path `fgos approve`'s own refusal can't reach: a manual `git merge`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A pre-commit guard closes the one path `fgos approve`'s own refusal can't reach: a manual `git merge`",
+          "anchor": "a-pre-commit-guard-closes-the-one-path-fgos-approves-own-refusal-cant-reach-a-manual-git-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/resolve-park-reason-verb.md",
+      "blobSha": "737d54df32d54cfb42fd70be2a912e9c157f530e",
+      "blobSize": 2804,
+      "sourceDigest": "cc0b8b204f30cee966b11552548aff12ef4fd19d9ae17c19ad0da2b83cfcee89",
+      "sourceId": "src_c8e8042600aeef5fef4b42f61f472d11",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A new verb clears stale park text left on closed items — the field could never be cleared before",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A new verb clears stale park text left on closed items — the field could never be cleared before",
+          "anchor": "a-new-verb-clears-stale-park-text-left-on-closed-items-the-field-could-never-be-cleared-before"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/restore-verifiedsha-docs-on-main.md",
+      "blobSha": "5fbf6ab086b663000a6965924bc32b2fb10bb5fd",
+      "blobSize": 2541,
+      "sourceDigest": "c84c147c3073133b2678b5a59d16cfc75784642030710c8a810d1a0a0457112f",
+      "sourceId": "src_3a9f06f4495ee7fd1e6fc78ca8766c5c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "A revert that vanished at the next merge, because it reverted instead of restoring",
+      "headings": [
+        {
+          "level": 1,
+          "text": "A revert that vanished at the next merge, because it reverted instead of restoring",
+          "anchor": "a-revert-that-vanished-at-the-next-merge-because-it-reverted-instead-of-restoring"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/retro-next-shared-driving.md",
+      "blobSha": "c67ea99d7e89bc2dbc056e00bedac207b34e53a4",
+      "blobSize": 5112,
+      "sourceDigest": "e99b21f972b13bb978c5570f6d6b16133d3dd07b1384425023335f02f6065ce2",
+      "sourceId": "src_50856a6fdbb2df88cf31651f6b6bd670",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`/fgOS:retro-next` became a thin launcher — and the whole retro-loop this doc set was written by runs on it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`/fgOS:retro-next` became a thin launcher — and the whole retro-loop this doc set was written by runs on it",
+          "anchor": "fgosretro-next-became-a-thin-launcher-and-the-whole-retro-loop-this-doc-set-was-written-by-runs-on-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/return-approve-background-execution-guidance.md",
+      "blobSha": "ed9ef5d8f9dd8dd00593762d18368b5ceaccb402",
+      "blobSize": 1976,
+      "sourceDigest": "97d4c97c2fe6cc8cd8cd1a0f1447372549f9a9fd18c1db6b3696c0294f2e27b8",
+      "sourceId": "src_1d22384e3f5dc3685acdb4109356f3e1",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos return`/`fgos approve` need the same background-execution fix `fanout-batch` got",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos return`/`fgos approve` need the same background-execution fix `fanout-batch` got",
+          "anchor": "fgos-returnfgos-approve-need-the-same-background-execution-fix-fanout-batch-got"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/return-ephemeral-worktree-fgos-strip.md",
+      "blobSha": "7c7302c1d0d7d29816c014f8d9f087d7f56df8b7",
+      "blobSize": 2637,
+      "sourceDigest": "8e9840360911b64c2022a44b386e3a463a32b32f80fea2d73c5835b3e660cf33",
+      "sourceId": "src_06381feb45e9b2ff758a70317d7e6985",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The one worktree `createWorktree`'s `.fgos/` strip never reached — because it wasn't made by `createWorktree`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The one worktree `createWorktree`'s `.fgos/` strip never reached — because it wasn't made by `createWorktree`",
+          "anchor": "the-one-worktree-createworktrees-fgos-strip-never-reached-because-it-wasnt-made-by-createworktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/root-resolution-two-call-split-propagation.md",
+      "blobSha": "b47a2e7c79ec13576b048aeb1691f0d76dfe8be0",
+      "blobSize": 3180,
+      "sourceDigest": "ad12f866fc4aaad74f830f32a995b81e1b95b0a139729aa7e65bf35e85155142",
+      "sourceId": "src_d7fd25b1ce15f1fc5e7f24f6b36f163c",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "The `root=$(...)` worktree-guard workaround note reaches its last two skill files",
+      "headings": [
+        {
+          "level": 1,
+          "text": "The `root=$(...)` worktree-guard workaround note reaches its last two skill files",
+          "anchor": "the-root-worktree-guard-workaround-note-reaches-its-last-two-skill-files"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/routing-orient-stale-postdelivery-advisory.md",
+      "blobSha": "da70d1d39e59073d235fc078a59a8988be9c547d",
+      "blobSize": 1956,
+      "sourceDigest": "6c19e33d579c0c4a06f41b4ca7459dc0911dfaad92e5e15fd5863ec3f6561ad6",
+      "sourceId": "src_52b0c03c347b5b145a188627d76efd01",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos-routing`'s Orient step now surfaces the stale post-delivery advisory itself",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos-routing`'s Orient step now surfaces the stale post-delivery advisory itself",
+          "anchor": "fgos-routings-orient-step-now-surfaces-the-stale-post-delivery-advisory-itself"
+        }
+      ]
+    },
+    {
+      "path": "docs/explanation/rul11-anchor-test-citation-gloss-update.md",
+      "blobSha": "a2cab257b79f915f39cdf2d015c120f2e1071d46",
+      "blobSize": 2205,
+      "sourceDigest": "a34c9d753bd16ff5b5562e4d971ed529d8f0b2f4399f6cabc87ec3176d86cb81",
+      "sourceId": "src_39b5029f57cf380f8fcc0270390b7319",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the RUL11 anchor-phrase test needed updating for a citation gloss",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the RUL11 anchor-phrase test needed updating for a citation gloss",
+          "anchor": "why-the-rul11-anchor-phrase-test-needed-updating-for-a-citation-gloss"
+        }
+      ]
+    }
+  ]
+}

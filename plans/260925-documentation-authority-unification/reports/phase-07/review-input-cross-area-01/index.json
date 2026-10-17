@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-cross-area-inventory-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "totalEntries": 98,
+  "maxEntriesPerPart": 60,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-cross-area-01/part-01.json",
+      "entries": 60,
+      "bytes": 58469,
+      "sha256": "080c76cbb6b5c80721e7f5725c55f068c775e17cfc9db5f2a8a69d940802fdc2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-cross-area-01/part-02.json",
+      "entries": 38,
+      "bytes": 36679,
+      "sha256": "6047a2709520f33b7b7a5ad9e296450c0796d9d7dc9d81796d532c9e78cf50bd"
+    }
+  ],
+  "machineInventorySHA256": "f20646b858535c99d4c1dbdcec25881d5099264f5a17faa7df7fcee7fb70f253"
+}

@@ -1,0 +1,998 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 8,
+  "entries": [
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-03.log",
+      "blobSha": "7ed4f586ad7b9820206853ba8e9eef15b04f9c71",
+      "blobSize": 4143,
+      "sourceDigest": "31b06035645cc2adb266d97668c0b7a2495491226b0f17f8fb0723aa19c108d5",
+      "sourceId": "src_791e08d250e1f24d9d273f0b9fe63d5c",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-04.log",
+      "blobSha": "418bbee591c3150e7b979a242c5762aef11b4df6",
+      "blobSize": 5465,
+      "sourceDigest": "acd199c0bc82bd7db2f120ce856deac39fdfe3cbcc1844926cc60291af837b5f",
+      "sourceId": "src_a4a9c406ad1c64a94084ef52e562f6fe",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-05.log",
+      "blobSha": "e65845fab98766270dfc5a092cdbd845313de54e",
+      "blobSize": 4291,
+      "sourceDigest": "f15e06a91e92a3302f366cd3b15eaddfd0706d6be152919d117ade83f4f3a7b6",
+      "sourceId": "src_b09818899c6e2cfa1ae191b769b003e5",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-06.log",
+      "blobSha": "26a47e881a820a8b745c7b193fede3a2bbd40838",
+      "blobSize": 4924,
+      "sourceDigest": "856d32de9283ed2b3250d228f7b066db1ce6b8d5425accc63ad94bca5bef174c",
+      "sourceId": "src_49081e5f5ddc85eec5aeb7a02e761dd8",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-07-close.log",
+      "blobSha": "9568d9654c016984719811e245cb879d7dae21a1",
+      "blobSize": 4123,
+      "sourceDigest": "60cfbded79683acaf1d857d477df1293418bfa1c4ea05b48f0844ebf849ce97f",
+      "sourceId": "src_f7fcc087eb71059978199a3a6e1dc536",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md",
+      "blobSha": "7f2f44a31cbd44431ae8810d93ca4865ad97ab0a",
+      "blobSize": 2330,
+      "sourceDigest": "2164f44f09ababc993e3100cd61890fd13cbb63947f01e9b4fde06344dc14a83",
+      "sourceId": "src_a8551c8db9e7085ecb87406ac6dfaf62",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Turn 1 — real Decision Dialogue reply",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Turn 1 — real Decision Dialogue reply",
+          "anchor": "turn-1-real-decision-dialogue-reply"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/agy-trust-prompt.txt",
+      "blobSha": "fd28572050d728385f807b0ac7222fc51ae2ac7e",
+      "blobSize": 9258,
+      "sourceDigest": "b5388671ccb1b76db9aa1652bd5b95b0b0dd54a6d3e697cf1c563fdb7b42ad25",
+      "sourceId": "src_222edcdbb48165d9b83416749b40824b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/codex-trust-prompt.txt",
+      "blobSha": "d2b8e487e7e4a6689740b73067825a3430aa70f4",
+      "blobSize": 624,
+      "sourceDigest": "dc909480a4b0673694952adf158fdc95fb7a2d891337bef66e6fd501357ba186",
+      "sourceId": "src_af2c05888dfb078a701adcf17de6c2a2",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json",
+      "blobSha": "c561f088f4c05a6ec8ab0eb6adbe6b6e7b73735f",
+      "blobSize": 7242,
+      "sourceDigest": "476158c6feec5e7c80743b2b742512acf29e64dae98c38543dbe446c8937d8da",
+      "sourceId": "src_4d471e3405e9360fb99438c856d87365",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-02-critique.json",
+      "blobSha": "7ac9abac9bc4e9c208e1afc2c87de9f15c92a239",
+      "blobSize": 4336,
+      "sourceDigest": "95c91774b9a63c68af856f783bc7dd10a359de0135b31de7bc4aa499d537f520",
+      "sourceId": "src_3958475d6e36eece2db648319c09d71c",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-03-synth-redteam.json",
+      "blobSha": "043249c4a4ff2174821eed5c149ef5bea835070d",
+      "blobSize": 6223,
+      "sourceDigest": "ddf39e9401935d4403cb32793563babeba4bc3117611c87a76c39a2b659275c5",
+      "sourceId": "src_b4148d892f1cc6c47f7694008e57eda0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-04-explain.json",
+      "blobSha": "f62ea046a7909f93f4648d625240998109bea2aa",
+      "blobSize": 5011,
+      "sourceDigest": "a1de5afe9ffd6c3b0995e2176a8300ec333954779fb5f32c6f2e488720f7136b",
+      "sourceId": "src_7f522aa7284183ede6352b7963a1b5e7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-05-decide-close.json",
+      "blobSha": "60c72057b9a8f7f4c1115c46dd711c97eec6f039",
+      "blobSize": 2189,
+      "sourceDigest": "4ddb6c786d25701ca8b882b3e259d817689f1df21ca5582cd03b8d0f539104cc",
+      "sourceId": "src_b5c6de8ff731131f298aae1045c63426",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-01.log",
+      "blobSha": "c40ff5e92399e1b4eaece704de7e8b52a612995b",
+      "blobSize": 5903,
+      "sourceDigest": "76dfaaf4fb2b833f17ceb3084f9f3b579cc093bf6f1580ab02b41efaf2943e97",
+      "sourceId": "src_77346d48b312c91ff918a4c30f14b2f1",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-02.log",
+      "blobSha": "76f91abdd445617ae23a90fce3ef769d31c3510d",
+      "blobSize": 5763,
+      "sourceDigest": "81321981196cec222be438fd193580f249c56165b3523200d0a756cf495cbd6d",
+      "sourceId": "src_9d208d660cd48ab9243ae53c3c5e5997",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-03.log",
+      "blobSha": "b769e6f9e72a8580b009ae5acc5067712a792ffc",
+      "blobSize": 6098,
+      "sourceDigest": "8b311e71b6ba2d3451c5b7ea90b14add55c6ee195da9250e2b24491eeadb41a8",
+      "sourceId": "src_41304f969642409462df05661be37d04",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-04.log",
+      "blobSha": "db4789c94d4b3d3b06e234a4e4fdf1e71c0cfd49",
+      "blobSize": 4922,
+      "sourceDigest": "c5846856fff46a04e0d36925cfac2b8416291bfb1af6d9992ad4777ce442ef97",
+      "sourceId": "src_41bd36e9774bd1a0d43e230201f9c9ae",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-06-close.log",
+      "blobSha": "930dc53b7cf72209408e3a6881de5dc30749f5de",
+      "blobSize": 5417,
+      "sourceDigest": "9f80630e4d04d31c104e40232177c1652eae53a930693975f2a50eb8e1de5fc7",
+      "sourceId": "src_33e8e0debde93202575927aab7922729",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt",
+      "blobSha": "b1b55a9dd1b936d5087b80e4883724a83c02461c",
+      "blobSize": 5743,
+      "sourceDigest": "f0e8d5c4a284903b4794717b499f0bd0defe9c2d0eaf308ae7ec9d8dc6cc4283",
+      "sourceId": "src_a6ae1bfe69b25d80aa31dde7787451c8",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md",
+      "blobSha": "2f69efaa873410e55e92a8c10ed47c7466388395",
+      "blobSize": 5365,
+      "sourceDigest": "4593723f55a6928fcebba0398101b50752e2793d484b52c16cb858526b0525a7",
+      "sourceId": "src_3136c6a27f0b29f53dc0de07d8bb3343",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P01 — Authoring Template And Coding Verification Fragment — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P01 — Authoring Template And Coding Verification Fragment — Cell Trace",
+          "anchor": "p01-authoring-template-and-coding-verification-fragment-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md",
+      "blobSha": "981a60a7010a3675d316dd5953ae63547551aae2",
+      "blobSize": 6946,
+      "sourceDigest": "50f731abd954c73f8e7cfb30fe38f7efcc6b130cbe03d02b800bc50319f1288d",
+      "sourceId": "src_938abd1cad89a2ab4b3acf3d82ead083",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P02 — Plan-Loop Wording, Baseline Step, And Routing — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02 — Plan-Loop Wording, Baseline Step, And Routing — Cell Trace",
+          "anchor": "p02-plan-loop-wording-baseline-step-and-routing-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md",
+      "blobSha": "cd57a7059b82d9a0151321083b694f5dee3de102",
+      "blobSize": 6448,
+      "sourceDigest": "5ebecffab6b3f1b53f0bca921ad570781e966683bbc05b1169b43e2470f8bff1",
+      "sourceId": "src_c73cc2830a53798ca72671801fa4eafe",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P03 — Proof Tiers, Plan-Loop Proof-Contract Fixes, And Baseline Correction — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03 — Proof Tiers, Plan-Loop Proof-Contract Fixes, And Baseline Correction — Cell Trace",
+          "anchor": "p03-proof-tiers-plan-loop-proof-contract-fixes-and-baseline-correction-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md",
+      "blobSha": "18d45297a9a81e91a72099b717b4f749cd43bb4f",
+      "blobSize": 16911,
+      "sourceDigest": "64c477d38a3d2d3c9d0251e3791cc31c9c15245947089ec586d4ca6eedc3e2cc",
+      "sourceId": "src_5150455977b1ab5fd24385af9fe5bd07",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P04 — Post-Merge Verification Gate And Evidence-Contract Fixes — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P04 — Post-Merge Verification Gate And Evidence-Contract Fixes — Cell Trace",
+          "anchor": "p04-post-merge-verification-gate-and-evidence-contract-fixes-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md",
+      "blobSha": "ae3d57f329995e736aec8b26497ad68dab5bbe21",
+      "blobSize": 18210,
+      "sourceDigest": "37c55b35ca6f3cab290bb701d69d81306eba11e307b02cbd9690653dbb15e4ba",
+      "sourceId": "src_ef2acb6d5adb94c24ad5ba2c324fb5b7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P05 — tsk-1bh Engine Fix, Raw-Provenance Hardening, And Two-Round Review — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P05 — tsk-1bh Engine Fix, Raw-Provenance Hardening, And Two-Round Review — Cell Trace",
+          "anchor": "p05-tsk-1bh-engine-fix-raw-provenance-hardening-and-two-round-review-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+      "blobSha": "98857e7f8526d49fe2f6bd2000f1e1252e46a5a5",
+      "blobSize": 1889,
+      "sourceDigest": "e4ea59642930075355dfe2759c4e2e36cff943f17ca4bf26bf9c54104759b4dd",
+      "sourceId": "src_7d8bf085e71d8af8395a1ec4827f2530",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell — P05: Live proof và rollout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell — P05: Live proof và rollout",
+          "anchor": "current-cell-p05-live-proof-và-rollout"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+      "blobSha": "8cf166a98cb213b0672f3cd95a093214dfc1f8dc",
+      "blobSize": 10707,
+      "sourceDigest": "4bfc7a0e05c70a5af590143efc3d6f6547619c105228e91abab846ba2d9cc47d",
+      "sourceId": "src_2c9bf38338d914ac4908f11cbc75b70b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Track: code-panel-multicell-facade",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: code-panel-multicell-facade",
+          "anchor": "track-code-panel-multicell-facade"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md",
+      "blobSha": "50be79fd8c3dcf97547628dee3274622f592c1aa",
+      "blobSize": 27187,
+      "sourceDigest": "94c95ff28d851f5c008b4c4c80e048dc4e09ee1e0d9482c099724be3b3fe26c1",
+      "sourceId": "src_3982ad0a61b286febc8e3a3394c00231",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P00 — Contract và Baseline — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P00 — Contract và Baseline — Cell Trace",
+          "anchor": "p00-contract-và-baseline-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md",
+      "blobSha": "357bbe9aff3657a905ab5a0689a5f349c7176300",
+      "blobSize": 10555,
+      "sourceDigest": "bcd7002e09499be88d34338acbf97a30ec5639e3cb16b1e13d4f03027df651e9",
+      "sourceId": "src_539fc9c56081f63501ee4ec862c7cacb",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P01 — Two-Mode Facade & Contract Implementation — Cell Trace",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P01 — Two-Mode Facade & Contract Implementation — Cell Trace",
+          "anchor": "p01-two-mode-facade-contract-implementation-cell-trace"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p05.md",
+      "blobSha": "6dc32dbdc2de412ed122c4611dd5fdafc96ce591",
+      "blobSize": 2495,
+      "sourceDigest": "ed1b1a5b3e2ef16660d2e087b37e152136632d5a64b70f4f2aabea3d54165831",
+      "sourceId": "src_85b1792f300e198ff79616e0a125aef8",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P05 — Live proof và rollout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P05 — Live proof và rollout",
+          "anchor": "p05-live-proof-và-rollout"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/full-suite-baseline.md",
+      "blobSha": "904b4bbfca4418ec29cdfcb337d6175af048f547",
+      "blobSize": 11499,
+      "sourceDigest": "dfa6f9c57dfce950c28ee4534b0ba7e2e7b5f966303deb8fe0637c386475553f",
+      "sourceId": "src_3fde973472b01afbb23d927cd3c8aef2",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "code-panel-multicell-facade — full-suite baseline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "code-panel-multicell-facade — full-suite baseline",
+          "anchor": "code-panel-multicell-facade-full-suite-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+      "blobSha": "6ba9c0216b9fd69cfa153ec5150adf4c42685ef6",
+      "blobSize": 14323,
+      "sourceDigest": "16a1b7a6b31e87caf41417b507fe767ff48b2f1556936ebb6868302c9f0109b1",
+      "sourceId": "src_8b9a0239a1ae313f4567e26cd6fb1d8b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Paused & Stopped Plans Inventory (Requirement R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Paused & Stopped Plans Inventory (Requirement R4)",
+          "anchor": "paused-stopped-plans-inventory-requirement-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+      "blobSha": "c8960a8d9486f52691e87ac3dc90909869db3b5c",
+      "blobSize": 19061,
+      "sourceDigest": "9f03548f953f10e586a252a568f7a74ce857fb0856b7b9e963f64764df11994e",
+      "sourceId": "src_59d570abab86d706580710fcd97262b9",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+      "blobSha": "385c7c03ebd1ab3eafc05dcc729319b99ca934f1",
+      "blobSize": 6136,
+      "sourceDigest": "4b59a8a4020896f8a02d6c70e5ef525328930546bf22dd6486bcdac7555aa685",
+      "sourceId": "src_a4e5bb1bcd82b891a320c6018485e087",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Baseline Test Run Counts (Requirement R5 / Phase 04 Baseline)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Baseline Test Run Counts (Requirement R5 / Phase 04 Baseline)",
+          "anchor": "baseline-test-run-counts-requirement-r5-phase-04-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "blobSha": "52eb2d1a66262af714597dd091171bfe625c49a9",
+      "blobSize": 7886,
+      "sourceDigest": "35a09e646eae5bcc368bf961f818582aaf35f7ada65554df83120c1940e377e9",
+      "sourceId": "src_59188b9100f8593a61a92f36320192f9",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Merge To Main — Confinement Authority Implementation Track (Post-Close Follow-Up)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Merge To Main — Confinement Authority Implementation Track (Post-Close Follow-Up)",
+          "anchor": "merge-to-main-confinement-authority-implementation-track-post-close-follow-up"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
+      "blobSha": "74ec42504ed51b82e66b61cc2df570e80ba458dc",
+      "blobSize": 6025,
+      "sourceDigest": "c3d5f819bbaf4a0de177b3b3c3eae13e9eec0fdf4646e87f5ba4f670d593f413",
+      "sourceId": "src_74186c93ea54c04e237f1051fe64f7ff",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P00 — Contract Freeze And Repo Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P00 — Contract Freeze And Repo Map",
+          "anchor": "p00-contract-freeze-and-repo-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md",
+      "blobSha": "2032e12c92558d6a1d0cdcc7316e5185f325033a",
+      "blobSize": 9247,
+      "sourceDigest": "ba91d0687b2a5eeaadb97644bff6eef489739b30f6ccbaa43c027bc39793379e",
+      "sourceId": "src_c3babbe312ceff03698741f93cfcb16f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P01 — Config, Policy, And Machine Registry",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P01 — Config, Policy, And Machine Registry",
+          "anchor": "p01-config-policy-and-machine-registry"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md",
+      "blobSha": "cfa24e562252fb3408d98e7f3a2b30d1a194e4c2",
+      "blobSize": 12083,
+      "sourceDigest": "929163aea094a450b8199693b723700b8e757a80f0598c907b0d58a875970231",
+      "sourceId": "src_9fa5f496fad3a0a19c8fd3ffc6a69846",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P02 — One-Door Authority Observe Mode",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P02 — One-Door Authority Observe Mode",
+          "anchor": "p02-one-door-authority-observe-mode"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md",
+      "blobSha": "f76d6605a4520fa040358fe4ab748c3b6a893f40",
+      "blobSize": 12108,
+      "sourceDigest": "7fe38f5033fa915ada419a40f5498c7d6e28a55d55334c2246c339c674071c32",
+      "sourceId": "src_87e347c85491fb2897a9a7c695235d78",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P03 — Local Bwrap Backend, Probes, And Attestation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P03 — Local Bwrap Backend, Probes, And Attestation",
+          "anchor": "p03-local-bwrap-backend-probes-and-attestation"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md",
+      "blobSha": "2d4cbc24bdb5715cede26e904594754fb6270d51",
+      "blobSize": 16127,
+      "sourceDigest": "d75ce0cdbf47e5edce01c2447d636fdaeab9a836345d24623f65a5da809da244",
+      "sourceId": "src_1efa938f27b8b40fbc1d6e18af802ae0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P04 — Required Enforcement And Executor Migration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P04 — Required Enforcement And Executor Migration",
+          "anchor": "p04-required-enforcement-and-executor-migration"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md",
+      "blobSha": "60d9bca46dbc23deca3aa68056b1d24509ad1d99",
+      "blobSize": 11137,
+      "sourceDigest": "96a66d7cf3b2fa214d253ad41f52491e7d6b92688f383ee8b01d17e7edc8360b",
+      "sourceId": "src_3d34168f5d0bc1989868f0e1611d0d61",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P05 — Herdr And Legacy Confinement Convergence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P05 — Herdr And Legacy Confinement Convergence",
+          "anchor": "p05-herdr-and-legacy-confinement-convergence"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md",
+      "blobSha": "976a694c3cc62ae7f886b39b9b785c637ffda04b",
+      "blobSize": 11066,
+      "sourceDigest": "608e3a8b5841e83d09ed364f5c2521d520281516ee5db01b0ad43440a7e0d3d3",
+      "sourceId": "src_0101930bd438ef8d71a461ad9ec0a5b5",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P06 — Group-Thinking Coding Dogfood Proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P06 — Group-Thinking Coding Dogfood Proof",
+          "anchor": "p06-group-thinking-coding-dogfood-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "blobSha": "e9f34172196b35b48cd6166fd9163e8266852311",
+      "blobSize": 12820,
+      "sourceDigest": "644ad117232f45b7cd954b62481cef735824b9b680631f42d4446202be683d27",
+      "sourceId": "src_1960bce28d49b7b7235fbe247fc47f8e",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P07 — Strict Readiness, Docs, And Closeout (Final Phase)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P07 — Strict Readiness, Docs, And Closeout (Final Phase)",
+          "anchor": "p07-strict-readiness-docs-and-closeout-final-phase"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md",
+      "blobSha": "0bee4adda0c4ce30dad50b4542079e0bb89a3ba2",
+      "blobSize": 11943,
+      "sourceDigest": "99eb8d1df43f621b6bd6888496cf7189ded51a6ce9b94bb022241509ce676c86",
+      "sourceId": "src_dac7b6d171ae97083da3366a417018fb",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "P08 — Bwrap Executor Migration To Confinement Authority (Post-Close Follow-Up)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P08 — Bwrap Executor Migration To Confinement Authority (Post-Close Follow-Up)",
+          "anchor": "p08-bwrap-executor-migration-to-confinement-authority-post-close-follow-up"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+      "blobSha": "0974490af5ff2a2dfc37e94ed5e6dc112dcaaea7",
+      "blobSize": 11909,
+      "sourceDigest": "464cbe24284b33c0ba1102e9be188afd44b696115322a9ce6a4301aefb681060",
+      "sourceId": "src_9bc2fad27896e4c519f35f4786dfd829",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Coordination Envelope — Capability Fit, 2026-09-06",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Capability Fit, 2026-09-06",
+          "anchor": "coordination-envelope-capability-fit-2026-09-06"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount-result.json",
+      "blobSha": "7ee082dc48c22f95cd064718eebd217c498dca10",
+      "blobSize": 1813,
+      "sourceDigest": "52d0ea1ff7223c3aff70d31b1d76c258f14c4dd202615a1b6b2d9fc8e6e0a136",
+      "sourceId": "src_bf7865bb26cff836c7de4558e5c44a74",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount.mjs",
+      "blobSha": "062a1c014719d00d70c18a142d639bfc5a722caf",
+      "blobSize": 2238,
+      "sourceDigest": "7cfac7b5cdcc6cca46c701f3ae9d17cc8a54335f6f127b681b4159d93643faa8",
+      "sourceId": "src_f85e6d8fe3614b5ea9e17a491ddf45ee",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/probe.mjs",
+      "blobSha": "26680953ba929cda451c3cfbb334317eec429bb3",
+      "blobSize": 4083,
+      "sourceDigest": "851098fd00f2afe642b06ca0a54a24b2d6b8806f68393e099a030453271165cd",
+      "sourceId": "src_4c4c53854672d3113480da381b840101",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json",
+      "blobSha": "daeb6669de59c58d0efcc0ce7bf89c99fd267087",
+      "blobSize": 3768,
+      "sourceDigest": "fdfb0270dfcfca6c36f1b1b8099882d390ee4de63c6960bb814b1ec35446736a",
+      "sourceId": "src_c196ac2717a0698c42d2af1326dae7c3",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+      "blobSha": "02f894648755764724f7e99684611e7a5d7f5161",
+      "blobSize": 1796,
+      "sourceDigest": "9b8d3478c64d1b94770dfaf360b72ab29ac4945ae0d5a18c1de4779da6ea16b9",
+      "sourceId": "src_48db9278a8c177c11a2627528f3eb2af",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
+      "blobSha": "125be87961979dd7fe083c49c180ca295b385377",
+      "blobSize": 1312,
+      "sourceDigest": "22e7c38d4e6c0b60c4855b1ae81f072649ee74c1ba3c9cc4c7ee51eb5d2598d1",
+      "sourceId": "src_82352667f13f271cd3e54edbbf107142",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md",
+      "blobSha": "b9b4b65d4fd51fda80973e39166207a227fe4725",
+      "blobSize": 10860,
+      "sourceDigest": "edf260eaf088b942b557545b554e7fb413bdc4b640fc3c35889a446fedd3d93a",
+      "sourceId": "src_90244da6e48359fc424aef80a65c1302",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "I01 — Agent Result Claim v2",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I01 — Agent Result Claim v2",
+          "anchor": "i01-agent-result-claim-v2"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md",
+      "blobSha": "ece0affc3811d66939ce98d31f11d78cfb5858d7",
+      "blobSize": 5347,
+      "sourceDigest": "c210959817a693c9530c4f314f27b71d022dfc290336404a66801caa6fbefbbf",
+      "sourceId": "src_ba6bd16680eb030a045c15ba0b3a7069",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "I02 — Effective Execution Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I02 — Effective Execution Contract",
+          "anchor": "i02-effective-execution-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+      "blobSha": "dc9ae6e8eace090da5693eef1c993d0f2916167a",
+      "blobSize": 12398,
+      "sourceDigest": "f4d948cd57d1aac6696970ffe265d9e1a6cab3cf7c09905cfeac60046cb511bf",
+      "sourceId": "src_2e20796b48d635a7290e9fec3420004d",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "I03 — RunResult v2 And Attribution",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I03 — RunResult v2 And Attribution",
+          "anchor": "i03-runresult-v2-and-attribution"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+      "blobSha": "9dbde5c20041af4f7f35a9acf3477d9d543de54a",
+      "blobSize": 13977,
+      "sourceDigest": "e12f24f2f9c977190175033e21d4c2ced9cfd539394acb70728827e832bf30a3",
+      "sourceId": "src_4be7a85b50fcacf984fcbed792b69e68",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "I04 — dispatch.runtime.inspect",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I04 — dispatch.runtime.inspect",
+          "anchor": "i04-dispatchruntimeinspect"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+      "blobSha": "391ae1db643bac39897f468f117fe63f52099595",
+      "blobSize": 17459,
+      "sourceDigest": "93a4027c6cc2f154fa733ed9334fde94f8643341549fc259b462812042b93991",
+      "sourceId": "src_f3f75ac7f155c0486391d21d68c0559e",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "I05 — dispatch.runtime.reconcile",
+      "headings": [
+        {
+          "level": 1,
+          "text": "I05 — dispatch.runtime.reconcile",
+          "anchor": "i05-dispatchruntimereconcile"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+      "blobSha": "973dda87b4175691c1e402284173001341afc38f",
+      "blobSize": 8169,
+      "sourceDigest": "f38b778a76b664d8ed70f947636d8536f6ef2017eff15d3226ed4ef9a6ae440f",
+      "sourceId": "src_25164526b8849ba68038d4f72a979419",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Phase 00 — baseline snapshot harness",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Phase 00 — baseline snapshot harness",
+          "anchor": "phase-00-baseline-snapshot-harness"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
+      "blobSha": "494a57c99ceab1e3c3e24db2aa1a603b52100648",
+      "blobSize": 3801,
+      "sourceDigest": "1e2c0a0cb8fe41676031a40679a61a3935f713a0f6c1850ae528f52d5a26d397",
+      "sourceId": "src_d479c0bed14b4c92a7366979a83b6f13",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell: P01.1 (Mutation Unlock)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P01.1 (Mutation Unlock)",
+          "anchor": "current-cell-p011-mutation-unlock"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md",
+      "blobSha": "cf5925e701f3a64aff1c6098395632ceed93a935",
+      "blobSize": 3696,
+      "sourceDigest": "84b4876ab77233d96f0d738a2e827e8e8e7de38cf22b0837b4e1b0cd6cc050d7",
+      "sourceId": "src_e240ed76f50af1288ce717ae5ff47e67",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell: P02.1 (Chain Verb And Pack Registration)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P02.1 (Chain Verb And Pack Registration)",
+          "anchor": "current-cell-p021-chain-verb-and-pack-registration"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md",
+      "blobSha": "d09cb308b7806e0a87c5e52c19b9ddc10edf99e9",
+      "blobSize": 4851,
+      "sourceDigest": "062cf4b1acbfe48141416acc90518fc0945400cd0ed98e2a5cb1f7003226b2cd",
+      "sourceId": "src_cd18f2f40e07164463984f0262deb2ba",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Current Cell: P03.1 (Plan-Loop Skill And Live Proof — R1-R4 only)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell: P03.1 (Plan-Loop Skill And Live Proof — R1-R4 only)",
+          "anchor": "current-cell-p031-plan-loop-skill-and-live-proof-r1-r4-only"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md",
+      "blobSha": "0e3e7cd128e13927c043b01ff23fb742614c9ea3",
+      "blobSize": 14011,
+      "sourceDigest": "380b2214205baa0d76f61efc36929671470730e4ba1bdd1f0e2a262df1a50e38",
+      "sourceId": "src_436c35efb362ef5d8ce7deddf323b0c0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Track: group-thinking-plan-loop",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: group-thinking-plan-loop",
+          "anchor": "track-group-thinking-plan-loop"
+        }
+      ]
+    }
+  ]
+}

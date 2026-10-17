@@ -1,0 +1,1130 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 22,
+  "entries": [
+    {
+      "path": "docs/history/catchup-manual-merge-fgos-write-rejected-deadlock/RESEARCH.md",
+      "blobSha": "07aa87613683bb76ee67792975b93383a21d3bd9",
+      "blobSize": 9083,
+      "sourceDigest": "4eb7490d06f862e5faf1fbb6198f1ede3ea459b934f5887faf748b61eeb569be",
+      "sourceId": "src_f26d00a32cda02ea8132fb24f37c0893",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research: tsk-2xg — manual-merge-forced `.fgos/*` deadlock between the pre-commit hook and `fgos-write-rejected`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research: tsk-2xg — manual-merge-forced `.fgos/*` deadlock between the pre-commit hook and `fgos-write-rejected`",
+          "anchor": "research-tsk-2xg-manual-merge-forced-fgos-deadlock-between-the-pre-commit-hook-and-fgos-write-rejected"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-spurious-not-uptodate-merge-refusal/CONTEXT.md",
+      "blobSha": "cb1ef9174936d62abf846b833a34aca2333eaa3d",
+      "blobSize": 6923,
+      "sourceDigest": "0d53eff996ae4cce99b75fb15102655624dfbea0abb62c6273123d042f106b15",
+      "sourceId": "src_29c5e16cfb12178e16d0559a60b73d1e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — tsk-5et",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — tsk-5et",
+          "anchor": "context-tsk-5et"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-spurious-not-uptodate-merge-refusal/iron-law-evidence.md",
+      "blobSha": "fa623e1e59e9f2ba893a77f58d096a637a33238e",
+      "blobSize": 2269,
+      "sourceDigest": "4c671fc9abdab48421de24d91acb0ce1b22b43194ee150e0a80423656cc1a56a",
+      "sourceId": "src_724e1a2bc906f9efc3b445e678a3b6ff",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-5et — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-5et — Iron Law evidence",
+          "anchor": "tsk-5et-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-spurious-not-uptodate-merge-refusal/plan.md",
+      "blobSha": "d647aefe515ad02cc493fc4023fd05937ee8cd55",
+      "blobSize": 10807,
+      "sourceDigest": "c0692b258eb8eb5d4b30f0ede17ccb960c03851598b28472299bc01770dfa99c",
+      "sourceId": "src_d6a9b8452d1fc690b5640da2ed23563e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-5et",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-5et",
+          "anchor": "planmd-tsk-5et"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-spurious-not-uptodate-merge-refusal/RESEARCH.md",
+      "blobSha": "6ca3964235674c5c1012b2d1a846df3f6ab02bba",
+      "blobSize": 6165,
+      "sourceDigest": "5667e2f158274ffc8f1479436dcd2747cb2fa9b594612cba9ad3a147090577fe",
+      "sourceId": "src_f628e7e7ad8baa99736c7ff09daf54fb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — tsk-5et",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — tsk-5et",
+          "anchor": "research-tsk-5et"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-worktree-cwd-fix/CONTEXT.md",
+      "blobSha": "5fe5aa43993c80b79dfe4eb70cb3d1bdbe54441d",
+      "blobSize": 16469,
+      "sourceDigest": "a88e5a2ea32475608d49196c496e3c279206b97c7d0cb39e1ca5a7ae23986eda",
+      "sourceId": "src_7bd9ab77f2d1cfd2c91cd9f34875232e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "catchup worktree cwd fix — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "catchup worktree cwd fix — locked decisions",
+          "anchor": "catchup-worktree-cwd-fix-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-worktree-cwd-fix/plan-tsk-4uj.md",
+      "blobSha": "da137974031959fede2c37d8771522bf74e17346",
+      "blobSize": 13329,
+      "sourceDigest": "8ad8f2d207d735bc1f3d949054c9e59835b02338576867a03fd0eb2ec4112ceb",
+      "sourceId": "src_56c44932d93dda30c445f74e3c0c9b29",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "sync-root/approve trust-dir opt-in flag — plan (tsk-4uj)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "sync-root/approve trust-dir opt-in flag — plan (tsk-4uj)",
+          "anchor": "sync-rootapprove-trust-dir-opt-in-flag-plan-tsk-4uj"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-worktree-cwd-fix/plan-tsk-5vl.md",
+      "blobSha": "dcb17cc119106edd639ca92e55aa27b91bc11bd2",
+      "blobSize": 7985,
+      "sourceDigest": "469346519156b50c26b88c9d4e96ac3e2fd031697e06ce0dfdffe4c2aea08cef",
+      "sourceId": "src_ebd744ebb670f4c1c115d3da9524aed3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "catchup worktree cwd fix — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "catchup worktree cwd fix — plan",
+          "anchor": "catchup-worktree-cwd-fix-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-worktree-cwd-fix/plan.md",
+      "blobSha": "3a7e2de7f3ab421dbbcfcdd9d954ff4139cd7e09",
+      "blobSize": 15087,
+      "sourceDigest": "e25e5ed8028106682dc3b7530b5cf6d6936327893845f000b7b7155ccd3d4087",
+      "sourceId": "src_73ead8f537dc29ed622d586943120d90",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "promote-to-component trust-dir opt-in flag — plan (tsk-2bg)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "promote-to-component trust-dir opt-in flag — plan (tsk-2bg)",
+          "anchor": "promote-to-component-trust-dir-opt-in-flag-plan-tsk-2bg"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/catchup-worktree-cwd-fix/RESEARCH.md",
+      "blobSha": "bdb24be42d015abd76be9f492d3ea0558fa15cb4",
+      "blobSize": 16542,
+      "sourceDigest": "cf4ffc1a68cd1f084f75b144106705d723c61b4f25cd638e23708df449f87bce",
+      "sourceId": "src_de65bbf13dee6f0bd374c89d4205d886",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "catchup worktree cwd fix — research",
+      "headings": [
+        {
+          "level": 1,
+          "text": "catchup worktree cwd fix — research",
+          "anchor": "catchup-worktree-cwd-fix-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cell-6-3-validate-plan-live-smoke/plan.md",
+      "blobSha": "2aed201158889a6b7b795b266f0205e4f4e1b41b",
+      "blobSize": 506,
+      "sourceDigest": "fd4178c88352db84ddb2f36b35fe6ccac09d83d18c4be6bdc6fd095f582c9851",
+      "sourceId": "src_bef02cb72d142b6424693fd4d2f70ddf",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Approach",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Approach",
+          "anchor": "approach"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cell-6-final-review-item-live-smoke/plan.md",
+      "blobSha": "f261eb557197d44f57be315fb42ed37c8817ff15",
+      "blobSize": 445,
+      "sourceDigest": "7ee607eb2764bfcba754ce83fc6db1eba990d8cb9a76a4e03d73a872104840c2",
+      "sourceId": "src_b76d3c9252f24ad4000b7eb792bd4937",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Cell 6.final live smoke: throwaway item for executing.review-item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.final live smoke: throwaway item for executing.review-item",
+          "anchor": "cell-6final-live-smoke-throwaway-item-for-executingreview-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/changelog-herdr-spawn-generalization/plan.md",
+      "blobSha": "576a5dc67d9663d3f44e24ed8ec0e3e4b9affb96",
+      "blobSize": 1083,
+      "sourceDigest": "7cc50802f9d100927bf3c1aea30bf8ed61da17f1cce0df9aa1e12bdd67edcf5d",
+      "sourceId": "src_824b4d2ecbdab96cd281647b5937948e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-r81: CHANGELOG entry for herdr-spawn generalization work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-r81: CHANGELOG entry for herdr-spawn generalization work",
+          "anchor": "planmd-tsk-r81-changelog-entry-for-herdr-spawn-generalization-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/checkpoint-distillate-gate-provenance/CONTEXT.md",
+      "blobSha": "bc2fd1b3af1931861de5945f57a78bf23fcac108",
+      "blobSize": 8308,
+      "sourceDigest": "cdbe746b5d469ec93eccc6ce4c95a76d432374fb7a3eb6b1f2f47b17480e6bf5",
+      "sourceId": "src_7c388165338496631874854d5c17c82b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: checkpoint distillate + record chốt 3-phần lên gate (STR70a)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: checkpoint distillate + record chốt 3-phần lên gate (STR70a)",
+          "anchor": "context-checkpoint-distillate-record-chốt-3-phần-lên-gate-str70a"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/checkpoint-distillate-gate-provenance/plan.md",
+      "blobSha": "dbe812bf1d36ade907d070ce3ab3706ecbf01959",
+      "blobSize": 7889,
+      "sourceDigest": "cbca70d0c9710c9042ab39a96371416ca697b79edf6d4b69778272b4ea07b257",
+      "sourceId": "src_447ff10a3611b05e6a0e45bfa4348735",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md: checkpoint distillate + record chốt 3-phần lên gate (STR70a)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md: checkpoint distillate + record chốt 3-phần lên gate (STR70a)",
+          "anchor": "planmd-checkpoint-distillate-record-chốt-3-phần-lên-gate-str70a"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/ci-install-packaging-matrix/CONTEXT.md",
+      "blobSha": "f6c08d319d1d9c60972329f667f80fc6f206f076",
+      "blobSize": 7355,
+      "sourceDigest": "e870413f96c3024b8dead7318dd1b471e4f59449cfe50770fc371d84aaae27b3",
+      "sourceId": "src_1e6e3ef2d59399e17eb4ead59e892e28",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: CI workflow for install-packaging matrix (tsk-49r)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: CI workflow for install-packaging matrix (tsk-49r)",
+          "anchor": "context-ci-workflow-for-install-packaging-matrix-tsk-49r"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/ci-install-packaging-matrix/plan.md",
+      "blobSha": "f2e3693893d6ccf66f6b2659240143ef3fb6c422",
+      "blobSize": 9057,
+      "sourceDigest": "e09461071ec2910e5b5f245f7460adfd0f46872aea377ae2f75ac9838ec8b66a",
+      "sourceId": "src_d2cbc777fd7d861446c3a6208ddb91c2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: CI workflow for install-packaging matrix (tsk-49r)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: CI workflow for install-packaging matrix (tsk-49r)",
+          "anchor": "plan-ci-workflow-for-install-packaging-matrix-tsk-49r"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claim-reclaim-branchhead-reset/CONTEXT.md",
+      "blobSha": "106feec8c4811ee66100ff9e5ee314ac4a73d230",
+      "blobSize": 8078,
+      "sourceDigest": "a42c915db4f1720f636acebff2bd3f08611c6084ad11481a865ea9375d8bf247",
+      "sourceId": "src_f051dcb0510375d52251b92ca6232c32",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: claim reclaim resets branchHeadAtTake, hiding pre-reclaim commits from return (tsk-2zv)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: claim reclaim resets branchHeadAtTake, hiding pre-reclaim commits from return (tsk-2zv)",
+          "anchor": "context-claim-reclaim-resets-branchheadattake-hiding-pre-reclaim-commits-from-return-tsk-2zv"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claim-reclaim-branchhead-reset/plan.md",
+      "blobSha": "e4ed1d5ebf340cfd9c42440a682581be85e307ed",
+      "blobSize": 7917,
+      "sourceDigest": "e143d53e6dc89da34ba509f3101038d19a37a21d564b23bfa6cfcdeea17c51ec",
+      "sourceId": "src_10ad1c9739d0148347b9fd16af0c129c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: claim reclaim resets branchHeadAtTake (tsk-2zv)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: claim reclaim resets branchHeadAtTake (tsk-2zv)",
+          "anchor": "plan-claim-reclaim-resets-branchheadattake-tsk-2zv"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-code-hook-spawn-enoent/CONTEXT.md",
+      "blobSha": "1332b613e9b62e8b966fad3a76c150561238b36d",
+      "blobSize": 4499,
+      "sourceDigest": "88646646dad5f2e1db81e37dd1116cbdaa3f3de9e180c858a80da8a4439506f5",
+      "sourceId": "src_fd70a20e7fd1636278a61f9107c10ae7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-2aa — Claude Code hook execution ENOENT posix_spawn '/bin/sh'",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-2aa — Claude Code hook execution ENOENT posix_spawn '/bin/sh'",
+          "anchor": "tsk-2aa-claude-code-hook-execution-enoent-posix_spawn-binsh"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-code-hook-spawn-enoent/plan.md",
+      "blobSha": "44a45994eb6602c60f874bc1beffb995e4e0bd50",
+      "blobSize": 2651,
+      "sourceDigest": "b3d8c27b55f1f1d5750beb03ecd81b0ef5ae98b8db457dfe0d8432e6c71f1615",
+      "sourceId": "src_d17fda23997e24d2831d4c0f837b8519",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-2aa — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-2aa — plan",
+          "anchor": "tsk-2aa-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-executor-allowedtools-fix/CONTEXT.md",
+      "blobSha": "33fc4029b18cec1398bd989e10b383783b3fca33",
+      "blobSize": 2253,
+      "sourceDigest": "bd7d1e4ef0ccffd380d1c730fa810fb63c9573eaa86a90afceacb763fd422331",
+      "sourceId": "src_f46495b506257662249b76bcdfa4c2a2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT.md — tsk-1dsr: allowedTools scope decision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT.md — tsk-1dsr: allowedTools scope decision",
+          "anchor": "contextmd-tsk-1dsr-allowedtools-scope-decision"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-executor-allowedtools-fix/plan.md",
+      "blobSha": "525355755acceabf3acf20b75545b00609fa19d6",
+      "blobSize": 3672,
+      "sourceDigest": "122c0cc0b18e6e6b81e4073cea44759299f15e97dc4a4d081a0c712cd96da4ef",
+      "sourceId": "src_59b5cca4b1c3f0667d89436868d3c8e5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-1dsr: fix allowedTools scope + retest",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-1dsr: fix allowedTools scope + retest",
+          "anchor": "planmd-tsk-1dsr-fix-allowedtools-scope-retest"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-executor-d4-proof/plan.md",
+      "blobSha": "594a3b3804d9f3ef54e6ab3d5dcd70ca8eaefeae",
+      "blobSize": 6859,
+      "sourceDigest": "67159354e63523a58adac27bd85e8449e2a17a573b2d9408785989387d359efc",
+      "sourceId": "src_df3170d7ea8c57d72aff6cd7fa757dfa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-1jt: D4 proof-test the named `claude` executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-1jt: D4 proof-test the named `claude` executor",
+          "anchor": "planmd-tsk-1jt-d4-proof-test-the-named-claude-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-named-executor/evidence/round3-d4-attempt-claude-result.json",
+      "blobSha": "bb8aec7be4bc3df4e0b8a9157841d782ff4d01bf",
+      "blobSize": 944,
+      "sourceDigest": "9c9c00401584595fd8b1abdfc2b9b70b82ee8d24fa5a611ce3ae62ef4e8fe4a4",
+      "sourceId": "src_68b2430b928fa6fc3a27c15b0b0200c0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/claude-named-executor/evidence/round3-dispatch-prompt.txt",
+      "blobSha": "97ce41b82243a715391aad8c56e6f2b55cc4ec11",
+      "blobSize": 2133,
+      "sourceDigest": "716534950f12b94e53162273b2300c5e9d41ff9d3369cd540f5439cea826427a",
+      "sourceId": "src_17cf8117aaba6d13b99decd443a7b860",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/claude-named-executor/plan.md",
+      "blobSha": "d204745d2f02f3a1ab1e8b71bb3a6b91c8d48d75",
+      "blobSize": 4425,
+      "sourceDigest": "d986a4fb48bb8c99acb68d95658ad54e41dc7fc1eea6d72bda60182fcebb444d",
+      "sourceId": "src_094643d3cfbf8c7f8ebca6afbd08e51e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-1cn: Register claude as a named executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-1cn: Register claude as a named executor",
+          "anchor": "planmd-tsk-1cn-register-claude-as-a-named-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/claude-named-executor/RESEARCH.md",
+      "blobSha": "e829af6edad53a146447665da92f65771a8dfd6a",
+      "blobSize": 24032,
+      "sourceDigest": "66d5023d65689fc900cc8286677a9927cae292d0e8f154aade9a87833142ea72",
+      "sourceId": "src_58a412657da9bb9cc22aa053aaa2f91e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — claude-named-executor (tsk-1cn, tsk-1jt, tsk-1dsr)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — claude-named-executor (tsk-1cn, tsk-1jt, tsk-1dsr)",
+          "anchor": "research-claude-named-executor-tsk-1cn-tsk-1jt-tsk-1dsr"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/clean-machine-zone-state-decisions/plan.md",
+      "blobSha": "2303aaa9d59c137d28e169e39ce2a1e247245dfd",
+      "blobSize": 13100,
+      "sourceDigest": "d8e81ae5ac8024fac178a40138076fd748f394e5a81c462118a8b38d10cb5dba",
+      "sourceId": "src_9e31a750d277369992fb2e6cb58c9989",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1ud — Làm sạch vùng máy (state.decisions): tách ghi-sổ, đếm trích dẫn",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1ud — Làm sạch vùng máy (state.decisions): tách ghi-sổ, đếm trích dẫn",
+          "anchor": "tsk-1ud-làm-sạch-vùng-máy-statedecisions-tách-ghi-sổ-đếm-trích-dẫn"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cli-data-work-field-shape-ambiguity/CONTEXT.md",
+      "blobSha": "5dc1c4a4c7c9c92e8e4f67f898e55c15c3ad0657",
+      "blobSize": 5051,
+      "sourceDigest": "62db3105abc6cf5ef6c2ff0ce2fb186731bc6ad90fa698ab8a6b3d7e920bbf12",
+      "sourceId": "src_eb7805eed225918a98a8de1dbe9a77c9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3gv: `data.work` has three different shapes under one field name",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3gv: `data.work` has three different shapes under one field name",
+          "anchor": "tsk-3gv-datawork-has-three-different-shapes-under-one-field-name"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cli-data-work-field-shape-ambiguity/RESEARCH.md",
+      "blobSha": "dae425b2c4195769358db24045095f598eb86119",
+      "blobSize": 2469,
+      "sourceDigest": "efbec55c6c31c816aab21ebbb070a84aed5e510c7966fcdbf8a61ad6ee3f2333",
+      "sourceId": "src_648e407d432e0ea1f1619d7c540afeed",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3gv — Research log",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3gv — Research log",
+          "anchor": "tsk-3gv-research-log"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cli-invocation-fault-provenance/CONTEXT.md",
+      "blobSha": "3bfea7f61eef9ec6de315ed8436bb521bc55dae3",
+      "blobSize": 10467,
+      "sourceDigest": "358b97623a43a8f7f60cfe1cbc91f35e64af163d5efc3613057d1d2b1845589a",
+      "sourceId": "src_2bf1b796e958566a070bdda211fe9aee",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — CLI invocation-fault provenance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — CLI invocation-fault provenance",
+          "anchor": "context-cli-invocation-fault-provenance"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/cli-invocation-fault-provenance/plan.md",
+      "blobSha": "d0ca6c440bc82c0d760a04b3f9f11d3b56651254",
+      "blobSize": 18800,
+      "sourceDigest": "ead63c1b7fb30fb152aa14ffd1710d51d3770e961a407111d4329f1af1ed406f",
+      "sourceId": "src_77c2f554093ac5f158dde5d00b645e0b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — CLI invocation-fault provenance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — CLI invocation-fault provenance",
+          "anchor": "planmd-cli-invocation-fault-provenance"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/close-distribution-spec-doctor-fix/CONTEXT.md",
+      "blobSha": "e1c56e8e981c275d03113c722a72766063a4be97",
+      "blobSize": 4753,
+      "sourceDigest": "f61857839129e58470370c0df9b2b834116e3cd63c37ab7e1101db1143682f27",
+      "sourceId": "src_9f88985c8c3aec23f71f464cba511b14",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1qm — close `docs/specs/distribution.md`'s doctor-fix drift",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1qm — close `docs/specs/distribution.md`'s doctor-fix drift",
+          "anchor": "tsk-1qm-close-docsspecsdistributionmds-doctor-fix-drift"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/close-distribution-spec-doctor-fix/plan.md",
+      "blobSha": "45f6410a4facfad00d01a2dd51016da5cddb83c5",
+      "blobSize": 1948,
+      "sourceDigest": "37f542e73b05022c7745a2eaa6b3200a1c09e6fea9e88902816729c0ee7a881c",
+      "sourceId": "src_79233dbbcb4fc2f94d92163909b12d1f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1qm — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1qm — plan",
+          "anchor": "tsk-1qm-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/codebase-scatter-consolidation-roadmap/plan.md",
+      "blobSha": "79d36de40b26cd62b3f199c164c1879e602c96fd",
+      "blobSize": 13022,
+      "sourceDigest": "fbb8a25ee12e350bf4fb42e3ee6b190d8c11e4ed57eeb25a97d2df437f8f6a3d",
+      "sourceId": "src_aca031fff081f8fccf5aac3e1983835a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md -- tsk-3wl5: codebase scatter consolidation roadmap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md -- tsk-3wl5: codebase scatter consolidation roadmap",
+          "anchor": "planmd----tsk-3wl5-codebase-scatter-consolidation-roadmap"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/codebase-scatter-consolidation-roadmap/RESEARCH.md",
+      "blobSha": "cd7bd89ee3fde8e5320e469ed05035eda377609f",
+      "blobSize": 4902,
+      "sourceDigest": "813d74bad96f7293f8452971582b51dd714b526e9288baf468cdfd9e76984dfc",
+      "sourceId": "src_21fc5df1f0af0d425e46d16767ff55c3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md -- tsk-3wl5: khao sat tum lum ngoai dispatch",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md -- tsk-3wl5: khao sat tum lum ngoai dispatch",
+          "anchor": "researchmd----tsk-3wl5-khao-sat-tum-lum-ngoai-dispatch"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/codex-bypass-executor/plan.md",
+      "blobSha": "55c888cb94e4c4150cf7af411adac982bfec55a2",
+      "blobSize": 7639,
+      "sourceDigest": "9b9b8b73ec842e7fa7c3b716eee29e0691b24ea34f14661f5ed59682ef5521b2",
+      "sourceId": "src_c4a3e3efba525cd01c5559948fca44eb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3tkc: wire codex CLI as an executor via bypass-all",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3tkc: wire codex CLI as an executor via bypass-all",
+          "anchor": "planmd-tsk-3tkc-wire-codex-cli-as-an-executor-via-bypass-all"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/codex-bypass-executor/RESEARCH.md",
+      "blobSha": "c8ff098f369999b5dde227a8c371fb87f2b22a56",
+      "blobSize": 5093,
+      "sourceDigest": "3be1436dee56deb2ed53f7645c3983d1c77c51c2d2fde3878122a4e187adfb6a",
+      "sourceId": "src_3ded64a82e360b4e4da044195ad7f436",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-3tkc: wire codex CLI as an executor via bypass-all",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-3tkc: wire codex CLI as an executor via bypass-all",
+          "anchor": "researchmd-tsk-3tkc-wire-codex-cli-as-an-executor-via-bypass-all"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/coding-classify-intake-capacity-rename/plan.md",
+      "blobSha": "9e8d3e6b6b9d0d0a2c9c3e541140e0302b1dd21d",
+      "blobSize": 6045,
+      "sourceDigest": "eb34d22fb91c313a1166be26154e6002de02c4e76fd2202a1910db0aedb16aaa",
+      "sourceId": "src_1c688930cd0b073bb49c26c21c1580f9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: rename+move submit-assist-classify capacity into coding-domain ownership",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: rename+move submit-assist-classify capacity into coding-domain ownership",
+          "anchor": "plan-renamemove-submit-assist-classify-capacity-into-coding-domain-ownership"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+      "blobSha": "0ecbf359e5c8ebd76818b86be0013fd3d3606902",
+      "blobSize": 19082,
+      "sourceDigest": "e84c99ce3f28d40fe96adbd44f019ae0dc14fc0b466880dc6356f113e1b8d795",
+      "sourceId": "src_04b67ddfeb6bae06566bf817c5691222",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "coding planning/validating gate redesign — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "coding planning/validating gate redesign — locked decisions",
+          "anchor": "coding-planningvalidating-gate-redesign-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/coding-planning-validating-gate-redesign/plan.md",
+      "blobSha": "a4a0864954551cac02bfe61ec16aad08c6497016",
+      "blobSize": 13428,
+      "sourceDigest": "345ee783c1c93b1a416db4945f6f5d2d387583b864326d3e0714d92c01dcfa81",
+      "sourceId": "src_e7d23f5eab8a585d845f87152fb013ed",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan — tsk-224 gate redesign (fgos-coding-planning / fgos-coding-validating)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan — tsk-224 gate redesign (fgos-coding-planning / fgos-coding-validating)",
+          "anchor": "plan-tsk-224-gate-redesign-fgos-coding-planning-fgos-coding-validating"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/coding-planning-validating-gate-redesign/RESEARCH.md",
+      "blobSha": "54428ddadf61b89a5e30236bda1839b05a4fc02c",
+      "blobSize": 6694,
+      "sourceDigest": "3b27b7715e288fc0feacd3bc7c82a6b9c9a3dfb98ff963380b741d8f69823e80",
+      "sourceId": "src_0bb888264050f50475407cb88db1f578",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research — tsk-224 gate redesign (fgos-coding-planning / fgos-coding-validating)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research — tsk-224 gate redesign (fgos-coding-planning / fgos-coding-validating)",
+          "anchor": "research-tsk-224-gate-redesign-fgos-coding-planning-fgos-coding-validating"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/commit-time-fgos-deletion-guard/plan.md",
+      "blobSha": "595b982c3b7bc7555cdc045b442d3a40e07590f9",
+      "blobSize": 9374,
+      "sourceDigest": "8ec3247307693334bbcf9088bdd69a9d027f385fb0c19408c9e034ca3c46afa3",
+      "sourceId": "src_c3bea6192ea23bbf89f517f77ef2c6ed",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: commit-time guard against staging a `.fgos/` deletion (tsk-56u)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: commit-time guard against staging a `.fgos/` deletion (tsk-56u)",
+          "anchor": "plan-commit-time-guard-against-staging-a-fgos-deletion-tsk-56u"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/commit-time-fgos-deletion-guard/RESEARCH.md",
+      "blobSha": "269d9e0a947c316dd57b597c81f36e6f71b12d47",
+      "blobSize": 5998,
+      "sourceDigest": "50aef3127dc83d676f8d3408d73bce69eca06d4d5d8279640900686bac19ad73",
+      "sourceId": "src_abce6340c816661ef655369ae58bd4ad",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research: commit-time guard against staging a .fgos/ deletion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research: commit-time guard against staging a .fgos/ deletion",
+          "anchor": "research-commit-time-guard-against-staging-a-fgos-deletion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/b6-metrics-harness-prd.md",
+      "blobSha": "9128e1d833e28046600eebaef65b6dbf6aa32f4e",
+      "blobSize": 10055,
+      "sourceDigest": "2d8dab000b4e5fe107c45b1a8e6f20b2338acf97210dac35696a31af37b1fbd3",
+      "sourceId": "src_5347e32445b716aa5b9d6fd14da412d3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "PRD — B6 Metrics Harness (knowledge registry sprawl-control proof)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "PRD — B6 Metrics Harness (knowledge registry sprawl-control proof)",
+          "anchor": "prd-b6-metrics-harness-knowledge-registry-sprawl-control-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/DISCUSSION.md",
+      "blobSha": "3b9092313779e0fccb6efef59af59d047248a2f4",
+      "blobSize": 183794,
+      "sourceDigest": "5f637cbed545a852ba8bf1fed6a68add20c342784742a38fa2fedcee9a14ed35",
+      "sourceId": "src_867778c4f40b3a8bb2c9d4946158f90e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Extensible multi-audience artifact-producer registry for compound-learn — Discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Extensible multi-audience artifact-producer registry for compound-learn — Discussion",
+          "anchor": "extensible-multi-audience-artifact-producer-registry-for-compound-learn-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/plan.md",
+      "blobSha": "8480874947c47e0008f45742a0db929f147a83a2",
+      "blobSize": 13739,
+      "sourceDigest": "4695de4f2acb9dff9d5ebfb9743e4ba85f2ca44c67fa096fbf015e1dca7b1eb5",
+      "sourceId": "src_e3534c7540de051e452a1d580d20565f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-5mh: run the real knowledge-registry migration apply",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-5mh: run the real knowledge-registry migration apply",
+          "anchor": "planmd-tsk-5mh-run-the-real-knowledge-registry-migration-apply"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+      "blobSha": "d1d8a84fd87e2dba47ee9003353b9429e91d870d",
+      "blobSize": 302334,
+      "sourceDigest": "936a01c9d7c53d4c870f0db2a0760c7294f616a43d65a4911514895d89301025",
+      "sourceId": "src_07a61572997d91406714ad82f596fa7c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/reports/inventory-report.md",
+      "blobSha": "2d3dffd7555281c3b7aeb32af63fe8066ea1428a",
+      "blobSize": 52768,
+      "sourceDigest": "02e2c79944b1ab0eff83d8000e6dac98713491885f643fb85478f41c40e9dda9",
+      "sourceId": "src_40ccc761356038f5d0780629138b1137",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Knowledge Inventory & Classification Report",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Knowledge Inventory & Classification Report",
+          "anchor": "knowledge-inventory-classification-report"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/reports/tsk-1hy-storytelling-material-probe-report.md",
+      "blobSha": "6490fd8a1ccc372545825a15729ed29566834ac2",
+      "blobSize": 4978,
+      "sourceDigest": "8a8606aac0c6f8a331c3bebd6e741fb1f0200f7ef4038668c0a5db8b803501b2",
+      "sourceId": "src_397640d581daea230deb940f773d5c1c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Storytelling-material probe (tsk-1hy) — real answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Storytelling-material probe (tsk-1hy) — real answer",
+          "anchor": "storytelling-material-probe-tsk-1hy-real-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "blobSha": "c19b01f57a8c304a82f0c779a64ef086137bb24c",
+      "blobSize": 17362,
+      "sourceDigest": "4c779bb17d5b05e25f38f1c9a477fc3ff93d780f14412e841c34a7a3307029b3",
+      "sourceId": "src_023ab48a0cb0f7e0b3527c79b86aa70e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research log — tsk-28x, stage `discovery`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research log — tsk-28x, stage `discovery`",
+          "anchor": "research-log-tsk-28x-stage-discovery"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/context-md-enforcement-scope/CONTEXT.md",
+      "blobSha": "a66406e4e6b4ec7260b98d1519c3aaa168b0d323",
+      "blobSize": 6509,
+      "sourceDigest": "c416d69210e39fba425de62401cc0f1ccebc27d1b98f4bb629c1dba781a4e224",
+      "sourceId": "src_767c6da91e634495b86cf49a0eacc1c1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "context-md-enforcement-scope — locking whether/where CONTEXT.md is required",
+      "headings": [
+        {
+          "level": 1,
+          "text": "context-md-enforcement-scope — locking whether/where CONTEXT.md is required",
+          "anchor": "context-md-enforcement-scope-locking-whetherwhere-contextmd-is-required"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/context-md-enforcement-scope/iron-law-evidence.md",
+      "blobSha": "0d9064f850cef06638002a6feb79ac7eabc5364e",
+      "blobSize": 3050,
+      "sourceDigest": "9747e7ae2be4a9a2df73e89693d4f8b3fb682bfdb200155313034499efe603b6",
+      "sourceId": "src_a05806a3ade4c9f4013c2e845072393a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-47e",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-47e",
+          "anchor": "iron-law-evidence-tsk-47e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/context-md-enforcement-scope/plan.md",
+      "blobSha": "fa8335cf849fd9762c263cc49ecfbe24b37343aa",
+      "blobSize": 1890,
+      "sourceDigest": "b7b6a23523fb2cf5db2e628b730c29926c99f8288be3f46d948625a4e6d9edc5",
+      "sourceId": "src_87780582b87e4f52d04692ca0970bfee",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan — context-md-enforcement-scope (tsk-47e)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan — context-md-enforcement-scope (tsk-47e)",
+          "anchor": "plan-context-md-enforcement-scope-tsk-47e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/core-foundation-domain-boundary/CONTEXT.md",
+      "blobSha": "240d4784436b6b73ef7417bfe8a787662de09aa1",
+      "blobSize": 13398,
+      "sourceDigest": "7057df08f2c2281a7605fdee40d5e74e9993941ced9b7c73fdbab1f9c760e9a0",
+      "sourceId": "src_583eef46111e31cb0fa4ca8be35cbca5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Core-foundation vs domain-specific directory/module boundary (tsk-397)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Core-foundation vs domain-specific directory/module boundary (tsk-397)",
+          "anchor": "core-foundation-vs-domain-specific-directorymodule-boundary-tsk-397"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+      "blobSha": "d7d863d741c2aa09c3347a9a634e13b3c3c201d4",
+      "blobSize": 166112,
+      "sourceDigest": "be77828acb6e2dc81f1dd06dc6619cfac74564a506757fb42f4d40d9f7442d4f",
+      "sourceId": "src_4ec361d29d7f862c5078a40887ffc50c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Core-foundation vs domain-specific directory/module boundary (tsk-397)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Core-foundation vs domain-specific directory/module boundary (tsk-397)",
+          "anchor": "core-foundation-vs-domain-specific-directorymodule-boundary-tsk-397"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/core-foundation-domain-boundary/plan.md",
+      "blobSha": "ce5b521c2d375b06ec47e6d13d6d845802ee71a5",
+      "blobSize": 32379,
+      "sourceDigest": "0e777c8107e6439f4e60effd63a874cea4f857150cb7b81dfaed18707f1c9474",
+      "sourceId": "src_6190da0165bdd3eb53abf451025c4673",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — core-foundation vs domain-specific directory/module boundary (tsk-397)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — core-foundation vs domain-specific directory/module boundary (tsk-397)",
+          "anchor": "plan-core-foundation-vs-domain-specific-directorymodule-boundary-tsk-397"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/current-dispatch-vocabulary-overlay/plan.md",
+      "blobSha": "1ff1f00c420b00cc8cce178121b417fba1094ac4",
+      "blobSize": 6761,
+      "sourceDigest": "d222b4114dd1016cbd4211f44147a3b05bd02ba6d9be6fa56287924e84688b61",
+      "sourceId": "src_508e0e356f2afc78cc1d8fa7500bafd6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Context",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Context",
+          "anchor": "context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/current-dispatch-vocabulary-overlay/RESEARCH.md",
+      "blobSha": "fbff00c2ba872b7ef35be69d97ffd8a0b8c12bf5",
+      "blobSize": 7710,
+      "sourceDigest": "eb2a7d7eb752c1358c5a0f488cc1d64c30ef6d42e07eb5e2be76938ea02a0764",
+      "sourceId": "src_c4ce79417381d2ef70856fdb5fd3bbfd",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — current-dispatch-vocabulary-overlay (tsk-4he)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — current-dispatch-vocabulary-overlay (tsk-4he)",
+          "anchor": "research-current-dispatch-vocabulary-overlay-tsk-4he"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 26,
+  "entries": [
+    {
+      "path": "docs/history/fgos-coding-implement-decide-first-prose/RESEARCH.md",
+      "blobSha": "7ef09bf97151bb4ed584b488f88a55f914e99dfd",
+      "blobSize": 3399,
+      "sourceDigest": "bfcfc06726cffd648bd0ae27ed21db7dd67f4ef8b1c1ede2bf24b8a385586654",
+      "sourceId": "src_a1906f647914d45334e444c964f181f7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-1ep (fgos-coding-implement decide-first prose fix)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-1ep (fgos-coding-implement decide-first prose fix)",
+          "anchor": "researchmd-tsk-1ep-fgos-coding-implement-decide-first-prose-fix"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-shaping-branch-isolation/CONTEXT.md",
+      "blobSha": "89e29ac0a4727acd6519b7d1367dace56bca487e",
+      "blobSize": 7623,
+      "sourceDigest": "0fa2dd471b898430266d0cedb2cdbf3bf1573a79d0f9fe6d65f08f21ade1aca6",
+      "sourceId": "src_2b023bb254ee2d4dc82afae3e29a4f58",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT.md — tsk-5qs: fgos-coding-shaping branch isolation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT.md — tsk-5qs: fgos-coding-shaping branch isolation",
+          "anchor": "contextmd-tsk-5qs-fgos-coding-shaping-branch-isolation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-shaping-branch-isolation/plan.md",
+      "blobSha": "3c6e67848bf43f89ae7fb348e02ee2803756f00d",
+      "blobSize": 9526,
+      "sourceDigest": "ac334e64ff3a93d8a118071f2677cce14fa18df805148a227b1d86f8e3f26f37",
+      "sourceId": "src_cd4d21b1fc8708c72f8d7399de9f1396",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — fgos-coding-shaping branch isolation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — fgos-coding-shaping branch isolation",
+          "anchor": "plan-fgos-coding-shaping-branch-isolation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-shaping-branch-isolation/RESEARCH.md",
+      "blobSha": "df304533b9148158e3811f9d615dd50fbef89496",
+      "blobSize": 5191,
+      "sourceDigest": "7287b017e3435ef6b8486ee567582ee07b2da620fc10f9f85b2db93cc19f94ab",
+      "sourceId": "src_52b3e7c911715dc1fc5c05f0302c3516",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-5qs (fgos-coding-shaping dirties main)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-5qs (fgos-coding-shaping dirties main)",
+          "anchor": "researchmd-tsk-5qs-fgos-coding-shaping-dirties-main"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-shaping/CONTEXT.md",
+      "blobSha": "02b0d8563e521ddc41d49b59a7c1f3eea3215a02",
+      "blobSize": 7950,
+      "sourceDigest": "4dcb2991328d87cc46fb094650594cb884f46816ceb168e8cf1d2a96b1892234",
+      "sourceId": "src_0a4704832ae9f5224efd4662adf47d0f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-shaping — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-shaping — locked decisions",
+          "anchor": "fgos-coding-shaping-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-coding-shaping/plan.md",
+      "blobSha": "8d200c729baa9afdec196d382fad68da6d21f3bd",
+      "blobSize": 6194,
+      "sourceDigest": "214360be2e49c5a4cd0c656a5cb499b6e78d99e4f953cfb8c01ceda5088307f3",
+      "sourceId": "src_e57a691473fc37355a746f6777e61c81",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-shaping — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-shaping — plan",
+          "anchor": "fgos-coding-shaping-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-cook-branch-isolation/plan.md",
+      "blobSha": "758b5adcde986fec5abedae769d7b4a5fd988d5b",
+      "blobSize": 6159,
+      "sourceDigest": "c32e870ceaa7d5e86e00084169a68ccebee5127d2dc3ce5b17846ad6a40022fb",
+      "sourceId": "src_f37e231a36661c12135ea731b95ed7d9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-hes: /fgOS:cook branch isolation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-hes: /fgOS:cook branch isolation",
+          "anchor": "planmd-tsk-hes-fgoscook-branch-isolation"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-cook-branch-isolation/RESEARCH.md",
+      "blobSha": "dcfb9eab848d9fff0dc91a6205b579761504df03",
+      "blobSize": 6323,
+      "sourceDigest": "bbeb925eb2fb2d21afed0972dbf9998cd6ffc12b39e0639dccbfe1be2755954b",
+      "sourceId": "src_29042c2b8a86f34948197c5e3b8bec06",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-hes: /fgOS:cook branch isolation (discovery round)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-hes: /fgOS:cook branch isolation (discovery round)",
+          "anchor": "researchmd-tsk-hes-fgoscook-branch-isolation-discovery-round"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-discover-claim-via-pick/plan.md",
+      "blobSha": "72e712b7ab28327654ca0ee3f8014db2bc4cd5f0",
+      "blobSize": 4866,
+      "sourceDigest": "b3022af5bc6f5d795c1f60a3045214f6d30176a0295c7278ae31b3e17cf53e53",
+      "sourceId": "src_d39097298d42e3892571ff533bfac7b6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — /fgOS:discover claims via pick, not take",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — /fgOS:discover claims via pick, not take",
+          "anchor": "plan-fgosdiscover-claims-via-pick-not-take"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-edit-role-flag/plan.md",
+      "blobSha": "b5136560bf891fe6f9d3dcd91f3f28237b2f69b5",
+      "blobSize": 6619,
+      "sourceDigest": "5ea663ad11f0f3124ec71b237170f11348f6fa4ec1f30af5e335ec5f40a3e637",
+      "sourceId": "src_8c52e563440fb851ea5cf6cc0e3742fa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — fgos-edit-role-flag (tsk-34o)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — fgos-edit-role-flag (tsk-34o)",
+          "anchor": "planmd-fgos-edit-role-flag-tsk-34o"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-edit-role-flag/RESEARCH.md",
+      "blobSha": "8a559890547e6cce3453a4b9ea958a81f9bb5875",
+      "blobSize": 4171,
+      "sourceDigest": "d95588718a796b5fb7b9154b981b7edfa6297613a3dd6aa48b1857a365861180",
+      "sourceId": "src_431ac7c827605aec7eec88c8b6c8ea8b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — fgos-edit-role-flag (tsk-34o)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — fgos-edit-role-flag (tsk-34o)",
+          "anchor": "researchmd-fgos-edit-role-flag-tsk-34o"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-exploring-impact-analysis-gate/CONTEXT.md",
+      "blobSha": "ec68c1aa583004489c283d2330dcab1d78351d42",
+      "blobSize": 7119,
+      "sourceDigest": "759d1c17f245600a7e0c16e04f4e1e9f346df3d25d6c8afbed6327b6fee601b1",
+      "sourceId": "src_6a60c115adaa2e990e11b0622254ab79",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-exploring-impact-analysis-gate — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-exploring-impact-analysis-gate — locked decisions",
+          "anchor": "fgos-coding-exploring-impact-analysis-gate-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-exploring-impact-analysis-gate/plan.md",
+      "blobSha": "195c33147aedd21a5b07e2a580caa4bb086834a0",
+      "blobSize": 4195,
+      "sourceDigest": "8ad09f82667cad0505d3cdee410ec5c47d3a775f791f55e47b8676c4f79b7b87",
+      "sourceId": "src_cdf30a06961df3d2890894c2f8cb5f11",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-exploring-impact-analysis-gate — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-exploring-impact-analysis-gate — plan",
+          "anchor": "fgos-coding-exploring-impact-analysis-gate-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-fanout-out-of-process-dispatch/plan.md",
+      "blobSha": "db6f09cd13361169ae06e2ef7b1925d9d767257c",
+      "blobSize": 9303,
+      "sourceDigest": "c5fab0d4044acbfda1b318313187ea2673d2622fe180763fc66884cee453ea06",
+      "sourceId": "src_a79bf178d8eea314e057a39e8d565f37",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-4bq — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-4bq — plan.md",
+          "anchor": "tsk-4bq-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-gateway-mcp-surface/CONTEXT.md",
+      "blobSha": "bd2d92108930fd9fa3537f8f2a15ac625c649a08",
+      "blobSize": 6110,
+      "sourceDigest": "cab0a904cab78551a249d007eca7f37cd12e5859676104541f874d9736bb685c",
+      "sourceId": "src_31abeef86cd7efc39be82875b6974058",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS gateway MCP surface — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS gateway MCP surface — decision record",
+          "anchor": "fgos-gateway-mcp-surface-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-gateway-mcp-surface/iron-law-evidence.md",
+      "blobSha": "bd0031aacc39b6f40c51a7edc72da0f5820ec11e",
+      "blobSize": 3581,
+      "sourceDigest": "fb01955f805c56fc211659ba64ec75609092a2a5791567f93fd82cdb7770b510",
+      "sourceId": "src_0119f78783af377b2d2f7f256b24abbc",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-7l9-3",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-7l9-3",
+          "anchor": "iron-law-evidence-tsk-7l9-3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-gateway-mcp-surface/plan.md",
+      "blobSha": "93663ea94e264d6120ca781835ffc8dcfb9a4204",
+      "blobSize": 18602,
+      "sourceDigest": "0eba2da6ba376ce539ddf3668ea1aac312302d5fdb157cab970f4355981c2501",
+      "sourceId": "src_57218b31456fdb37556457c2c328df98",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS gateway MCP surface — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS gateway MCP surface — plan",
+          "anchor": "fgos-gateway-mcp-surface-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-global-install-stage-verb-skew/plan.md",
+      "blobSha": "df16bb46aaf17a9315ce8881896966a2dfda13f8",
+      "blobSize": 8119,
+      "sourceDigest": "10bd1c7203088c46598ff96e8e2874a583ff39471274521fe192a46ee2bc80da",
+      "sourceId": "src_2c0c0547442bfe6d85bcd6b40cf6311c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — fgos-global-install-stage-verb-skew (tsk-2ej)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — fgos-global-install-stage-verb-skew (tsk-2ej)",
+          "anchor": "plan-fgos-global-install-stage-verb-skew-tsk-2ej"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-global-install-stage-verb-skew/RESEARCH.md",
+      "blobSha": "5b6b41edcc9079099e286740a0c311d7d9cb6982",
+      "blobSize": 6199,
+      "sourceDigest": "b3074bb6bb6c693f95880b440c1e9599abba8e35ef865593d314030d2a3c1842",
+      "sourceId": "src_c7f4514d326f60ff005d0b4a687b44c5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — fgos-global-install-stage-verb-skew (tsk-2ej)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — fgos-global-install-stage-verb-skew (tsk-2ej)",
+          "anchor": "research-fgos-global-install-stage-verb-skew-tsk-2ej"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-interface-daemon/CONTEXT.md",
+      "blobSha": "1362cceef3061a56620adf2b4b228adae1f356d8",
+      "blobSize": 12639,
+      "sourceDigest": "4fe9b45d43c976c32cb0bc2daddfb5bf1bbc8c65f6afd26c95a251680a8bcca0",
+      "sourceId": "src_4488747551fc56579357717a8c5db175",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS interface daemon — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS interface daemon — decision record",
+          "anchor": "fgos-interface-daemon-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-interface-daemon/plan.md",
+      "blobSha": "6aa0b38a9a7c5fe40e7f71f5cf1554ea1205b548",
+      "blobSize": 6932,
+      "sourceDigest": "15a1b524ba0750d4df1203489266fe33c2294dc51afd186c9218330db4979f91",
+      "sourceId": "src_699f0dd78893bdd3159372570ee4711e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS interface daemon — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS interface daemon — plan.md",
+          "anchor": "fgos-interface-daemon-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-interface-daemon/RESEARCH.md",
+      "blobSha": "45fcb19aafc0e358eaf5c19ca395361fef57b580",
+      "blobSize": 4981,
+      "sourceDigest": "1dbdde0231532e70a5d73df6183aa2232803685768fab49c32306bf5b39ec039",
+      "sourceId": "src_02ad7f829e606e2ef62223ba77872c6c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS interface daemon — RESEARCH.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS interface daemon — RESEARCH.md",
+          "anchor": "fgos-interface-daemon-researchmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-lifecycle-tracking-concurrent-desync/plan.md",
+      "blobSha": "ef80e18d465daa5f877a6362e4ea7f67eb3fb467",
+      "blobSize": 3082,
+      "sourceDigest": "2286e292397d14f95391b946d6822d2f50543c5c86e0c6a86140fe2cf81b853c",
+      "sourceId": "src_f3e830dc6094222c15847286a94f8cfa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-lifecycle-tracking-concurrent-desync — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-lifecycle-tracking-concurrent-desync — plan.md",
+          "anchor": "fgos-lifecycle-tracking-concurrent-desync-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-lifecycle-tracking-concurrent-desync/RESEARCH.md",
+      "blobSha": "7efbbb172275a3ee0dba0afa0aeec1331b7b5811",
+      "blobSize": 5975,
+      "sourceDigest": "d7704ae6241d10cea8929eaddc918740ae3893009c1d3f32992aff13cd0417aa",
+      "sourceId": "src_77bcbf93c2ea9ef4fa35deb689a57873",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-lifecycle-tracking-concurrent-desync — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-lifecycle-tracking-concurrent-desync — RESEARCH",
+          "anchor": "fgos-lifecycle-tracking-concurrent-desync-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-list-id-lightweight-projection/plan.md",
+      "blobSha": "d09d316f7f9409ae7293cfb661ad3e328fa1e98c",
+      "blobSize": 5405,
+      "sourceDigest": "6580faf62df05d29f91268871c428dfc1c877bd49922345d7334bce736a58f6c",
+      "sourceId": "src_33b1466b6cf7be08db6643221d44a8f5",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-4zr: lightweight projection for `fgos list --id`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-4zr: lightweight projection for `fgos list --id`",
+          "anchor": "planmd-tsk-4zr-lightweight-projection-for-fgos-list---id"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-list-id-lightweight-projection/RESEARCH.md",
+      "blobSha": "88d86d593a865878980f6620e77d8964be7e50a6",
+      "blobSize": 3248,
+      "sourceDigest": "86159d40a270092225698b6daae99a170416553384cb60e638904b59a357fc97",
+      "sourceId": "src_7cae1f65cdb4423376e8c0bebf002dfe",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — fgos-list-id-lightweight-projection (tsk-4zr)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — fgos-list-id-lightweight-projection (tsk-4zr)",
+          "anchor": "researchmd-fgos-list-id-lightweight-projection-tsk-4zr"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-list-triage-open-only-default/CONTEXT.md",
+      "blobSha": "edc8e3464575bd65a455b95cb109ebc154eceeae",
+      "blobSize": 4964,
+      "sourceDigest": "9c12d8041a3a81b345db26c960d23d5b2be74c0e246302e250896361ad64fb7d",
+      "sourceId": "src_2de6040efad65f1bd8a0f0311bfd951d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-list-triage-open-only-default",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-list-triage-open-only-default",
+          "anchor": "fgos-list-triage-open-only-default"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-list-triage-open-only-default/plan.md",
+      "blobSha": "d8ae8dc68d9e8b37f7374ed3a1899399292c3d48",
+      "blobSize": 6624,
+      "sourceDigest": "3832190f0bd0fc216ede44f661873b69fae05f4176c171dd60fbec4e22ef35e5",
+      "sourceId": "src_0ca48e70e138da1c470210426a3cba02",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: fgos-list-triage-open-only-default",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: fgos-list-triage-open-only-default",
+          "anchor": "plan-fgos-list-triage-open-only-default"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-marketing-domain-foundation/CONTEXT.md",
+      "blobSha": "d5a21ee5a7a93fc880c6e0a4c219ff0a94d9adf4",
+      "blobSize": 16401,
+      "sourceDigest": "6c08f46b5c9b8c23485de174c7680476ec1e9d41b24a1c4d44543f750ee88872",
+      "sourceId": "src_2582400f8b8182b04e3c864a414a8a54",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-marketing-domain-foundation — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-marketing-domain-foundation — CONTEXT",
+          "anchor": "fgos-marketing-domain-foundation-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-marketing-domain-foundation/design-distill.md",
+      "blobSha": "174be4786c065103ea13fe9e2893fb2ad3a5a40c",
+      "blobSize": 17775,
+      "sourceDigest": "c6ba8e51e09aae5d2d82843f4d99942ac5948400aa1f163511321bbbdb824804",
+      "sourceId": "src_f83bd1e19b1484b96cbedfa8890dbba2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Bản chốt thiết kế: Multi-role Team Harness & Marketing-Cockpit Absorption",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bản chốt thiết kế: Multi-role Team Harness & Marketing-Cockpit Absorption",
+          "anchor": "bản-chốt-thiết-kế-multi-role-team-harness-marketing-cockpit-absorption"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-marketing-domain-foundation/DISCUSSION.md",
+      "blobSha": "bb39f26932d2efb74536499afc4d03d2bde082dd",
+      "blobSize": 65710,
+      "sourceDigest": "2b20e95be57721c9119f5858b16b6af1cb1bf4b1ddd513080cac8815e5fe7ee2",
+      "sourceId": "src_ec8f31ebf9fc8f0a6df7be6aa38a5121",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS × marketing-cockpit — foundation absorption discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS × marketing-cockpit — foundation absorption discussion",
+          "anchor": "fgos-marketing-cockpit-foundation-absorption-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-marketing-domain-foundation/plan.md",
+      "blobSha": "3bc6b4069d14c18f44566d142be4881c15477347",
+      "blobSize": 32577,
+      "sourceDigest": "b101eaecd09184a0164eed59167be207448ffd47bbbd106ea27e8c9a9fd1e10a",
+      "sourceId": "src_a5296a3fca5495f42d95c1f14fdef7ab",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-marketing-domain-foundation — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-marketing-domain-foundation — plan",
+          "anchor": "fgos-marketing-domain-foundation-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-mission-boundary/CONTEXT.md",
+      "blobSha": "d56a3f64b162d8fe0900e247d8e5153ac4d1fdd3",
+      "blobSize": 8926,
+      "sourceDigest": "cf03fe39f75bb94c6b6da1e1fa5f0e39dd72d7f2fda129c453a5a9520fb18cc7",
+      "sourceId": "src_63da8d77754228aabd1596d5a77a1cba",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS mission boundary — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS mission boundary — CONTEXT",
+          "anchor": "fgos-mission-boundary-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+      "blobSha": "eb38208a2873106244f62d90073e955146f715ba",
+      "blobSize": 36133,
+      "sourceDigest": "66c323a910493dc93a5480dfeace7cb2c0e6d145b55cfa861d5413b38fe395c9",
+      "sourceId": "src_99fc8bcd79e091b7dd963a6db7ccf8f2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS mission boundary — DISCUSSION",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS mission boundary — DISCUSSION",
+          "anchor": "fgos-mission-boundary-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-mission-boundary/plan.md",
+      "blobSha": "ed238635fd540621bec8f99f8e63cf88d6202eb6",
+      "blobSize": 5041,
+      "sourceDigest": "dd1f7152890cd216ed4cd41fb0045ad5356590d24d9ccebb1c940636b228a14e",
+      "sourceId": "src_256eaa3aa7cc3758727aae450da14aae",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-mission-boundary — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-mission-boundary — plan",
+          "anchor": "fgos-mission-boundary-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-participant-contract/CONTEXT.md",
+      "blobSha": "043b6f22bf8190bcefe833fe4f04ee25a4276910",
+      "blobSize": 6940,
+      "sourceDigest": "683116348d9856098143529333c8fe08f42cb95aa15d99591062c1bfdbaa68f1",
+      "sourceId": "src_20147a3b7a276cc9323ea3a5e1e23d1c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-participant-contract — clarify decisions (tsk-64e)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-participant-contract — clarify decisions (tsk-64e)",
+          "anchor": "fgos-participant-contract-clarify-decisions-tsk-64e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-participant-contract/plan.md",
+      "blobSha": "514371273d6d7d38ee68b61ddd80a7c1873aecec",
+      "blobSize": 5967,
+      "sourceDigest": "ccc4ca838d5be98757fde7faf0cdaf4c23e5d0ba56ea2a356f96fe85b6537cb5",
+      "sourceId": "src_1751f0a2343e8a431875855e28b116ce",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-participant-contract — plan (tsk-64e)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-participant-contract — plan (tsk-64e)",
+          "anchor": "fgos-participant-contract-plan-tsk-64e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-pick-worktree-relocation/CONTEXT.md",
+      "blobSha": "f384d658e05ba67ec71729b73aeeaea04616f1ac",
+      "blobSize": 6308,
+      "sourceDigest": "df75a3008655107ba1dab993155debca10f300f64f41f222588ce3ec1610c046",
+      "sourceId": "src_9ecb88ded6e8a99d66a272e4800bc3dc",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: fgOS pick worktree relocation (tsk-424)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: fgOS pick worktree relocation (tsk-424)",
+          "anchor": "context-fgos-pick-worktree-relocation-tsk-424"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-pick-worktree-relocation/plan.md",
+      "blobSha": "d3e1fdafc7abff1f8ee236a711221e25cc001fd0",
+      "blobSize": 5113,
+      "sourceDigest": "c549cf7ceb1220b115b5fe1dfdc91c363e9b96cd3383ada1b9b2caf66ab4c2f8",
+      "sourceId": "src_45cd12eaef4e39808d97869cc15a0899",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md: fgOS pick worktree relocation (tsk-424)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md: fgOS pick worktree relocation (tsk-424)",
+          "anchor": "planmd-fgos-pick-worktree-relocation-tsk-424"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-context-gap-handback/CONTEXT.md",
+      "blobSha": "e70a1b2711f8f1fa5420535468c16396ecabbdba",
+      "blobSize": 7280,
+      "sourceDigest": "8298345b2e19c7e6540348be90715f2e65103956a5ef08de4657160ae0d904e3",
+      "sourceId": "src_c856e32a9d547dd021154847f7e970c0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos-coding-planning: hand-back path for a material CONTEXT.md gap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos-coding-planning: hand-back path for a material CONTEXT.md gap",
+          "anchor": "fgos-coding-planning-hand-back-path-for-a-material-contextmd-gap"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-context-gap-handback/plan.md",
+      "blobSha": "0b16876f3a1d70f280366cd326b521cbb3e781ee",
+      "blobSize": 7010,
+      "sourceDigest": "0133626c885620f5f8e86847960b547abd9ac24412dd208a6a44d6bf2559ae2b",
+      "sourceId": "src_de8e85ede0fb809cd9745fe29f1334fa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: fgos-coding-planning hand-back path for a material CONTEXT.md gap",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: fgos-coding-planning hand-back path for a material CONTEXT.md gap",
+          "anchor": "plan-fgos-coding-planning-hand-back-path-for-a-material-contextmd-gap"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md",
+      "blobSha": "af5e762c6ed18f49a07c0773ec660b43ec64be85",
+      "blobSize": 5216,
+      "sourceDigest": "68f8e7a8d15efe9405388b2b7dd8218a75befd300948a047ad3971ece4b1423c",
+      "sourceId": "src_328b5356bc1b1d33d63acf0ab18453b3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — tsk-5ay: fgos-coding-planning cồng kềnh hơn cần thiết — 2 fix có bằng chứng",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — tsk-5ay: fgos-coding-planning cồng kềnh hơn cần thiết — 2 fix có bằng chứng",
+          "anchor": "context-tsk-5ay-fgos-coding-planning-cồng-kềnh-hơn-cần-thiết-2-fix-có-bằng-chứng"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-mode-gate-and-gate-traceability/plan.md",
+      "blobSha": "9309577b6a84b43a7bc7a107a91db266841dd50e",
+      "blobSize": 4548,
+      "sourceDigest": "5f175d7b13889520796eaa7a17d25bdfed5746987663bac4096eb9ed92579240",
+      "sourceId": "src_4d452535bfbc5a03105a64ef1984cff9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-5ay: dời mode-gate sang fgos-routing + kỷ luật truy-nguồn vào Gate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-5ay: dời mode-gate sang fgos-routing + kỷ luật truy-nguồn vào Gate",
+          "anchor": "planmd-tsk-5ay-dời-mode-gate-sang-fgos-routing-kỷ-luật-truy-nguồn-vào-gate"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-split-step-footprint/CONTEXT.md",
+      "blobSha": "138e89c4a64fc93b90b90c62b66208fd36cb318f",
+      "blobSize": 2887,
+      "sourceDigest": "cf2d03e1e3721c50edb32f668a0b8121ee731ad518f98f021dfafb04ceb6866f",
+      "sourceId": "src_c57a51121a319618e6ccff1482ad3554",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — tsk-3uz: fgos-coding-planning's split step không set --footprint cho con",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — tsk-3uz: fgos-coding-planning's split step không set --footprint cho con",
+          "anchor": "context-tsk-3uz-fgos-coding-plannings-split-step-không-set---footprint-cho-con"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-planning-split-step-footprint/plan.md",
+      "blobSha": "e1f3f1a1f4d46b56ec1f50551a5d0ba933ea067f",
+      "blobSize": 2039,
+      "sourceDigest": "70347b0dbf78294c747bfd967aa2fae12fb7840a96c90e277f56eb34fb982247",
+      "sourceId": "src_f2abcee839e1ff5dee1f6ca656cf0272",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3uz: fgos-coding-planning's split step gets --footprint guidance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3uz: fgos-coding-planning's split step gets --footprint guidance",
+          "anchor": "planmd-tsk-3uz-fgos-coding-plannings-split-step-gets---footprint-guidance"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-plugin-cli-resolution/DISCUSSION.md",
+      "blobSha": "cc9781e53be70f5aebdeddb419203d35527192f9",
+      "blobSize": 24440,
+      "sourceDigest": "aeb37827b64891b7755df96845a9e31e1888b582c453b6a735783e67a0b9d36c",
+      "sourceId": "src_3a430f7316bc7a1e018b4702bac76587",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS plugin skill CLI resolution across install shapes",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS plugin skill CLI resolution across install shapes",
+          "anchor": "fgos-plugin-skill-cli-resolution-across-install-shapes"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/CONTEXT.md",
+      "blobSha": "33658267c2b9cebb35742b4044d670c34d7753a9",
+      "blobSize": 9605,
+      "sourceDigest": "3dccb3057a0fcfc8393f8e57972752ad182d6e1a64d1aa3b35135b56cedb0ea1",
+      "sourceId": "src_615c8adecc755e0400d1210f89876471",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS plugin dev-skill packaging gap — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS plugin dev-skill packaging gap — CONTEXT",
+          "anchor": "fgos-plugin-dev-skill-packaging-gap-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/plan.md",
+      "blobSha": "c4bc244b6a8778f212f7a5c8594dda06b10d5e0a",
+      "blobSize": 10301,
+      "sourceDigest": "8bf685f64437077b65072ffd0f6f9831eb826ace8b393f0055baadc73ce9b07a",
+      "sourceId": "src_60acf2da713c3add5773d79194f7e132",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS plugin dev-skill packaging gap — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS plugin dev-skill packaging gap — plan",
+          "anchor": "fgos-plugin-dev-skill-packaging-gap-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/RESEARCH.md",
+      "blobSha": "467eafccfc190829ceefe0b821b0a8ab50543ceb",
+      "blobSize": 9677,
+      "sourceDigest": "ebc2cd8a487e9f5c4fb4eef93edd24dad01b4ced57ae82b2715ec08f447c72a8",
+      "sourceId": "src_70aa868389e2e329db4f1e64ae0f6a4a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos plugin dev-skill packaging gap — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos plugin dev-skill packaging gap — RESEARCH",
+          "anchor": "fgos-plugin-dev-skill-packaging-gap-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-preflight-verb/plan.md",
+      "blobSha": "6d51e5abffbfdcbe0a7cdfb91435747588b30ac6",
+      "blobSize": 12216,
+      "sourceDigest": "c969342e78f1f63d136ee0c676632d4d660920c6e51ebfec8f675338f8c50b26",
+      "sourceId": "src_d947c8c6274cd5b01d1cb2c602c0dc80",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: tsk-4e1 — `fgos preflight` verb",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: tsk-4e1 — `fgos preflight` verb",
+          "anchor": "plan-tsk-4e1-fgos-preflight-verb"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-preflight-verb/RESEARCH.md",
+      "blobSha": "6a839324946298d730369bc52e700b4bdbe49127",
+      "blobSize": 7276,
+      "sourceDigest": "6f1f32995a77dc598d440f00bf63cd92bde10228e65ffb1c296856a9ef72264b",
+      "sourceId": "src_5d16023e68c75b106816ec970ff06798",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research: tsk-4e1 — `fgos preflight` verb",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research: tsk-4e1 — `fgos preflight` verb",
+          "anchor": "research-tsk-4e1-fgos-preflight-verb"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-repo-prefix-path-fix/CONTEXT.md",
+      "blobSha": "f521a3827ee68f6b07b3ab05801f674256d0331f",
+      "blobSize": 4330,
+      "sourceDigest": "37d18a7cea7a513b39331c6ac2c924243e5231d7126c4de2b9fa22fc53d14e42",
+      "sourceId": "src_c12e8e77a3a00c7847baf97629f03852",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS `repo/` path prefix fix — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS `repo/` path prefix fix — CONTEXT",
+          "anchor": "fgos-repo-path-prefix-fix-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-repo-prefix-path-fix/plan.md",
+      "blobSha": "c6e33a2f4fba9813ee66f673075bd4565bc1333c",
+      "blobSize": 6653,
+      "sourceDigest": "50c7b5b8c40ad80a1577558265a1c5017032d8b5be3ba507717d39f08b71535c",
+      "sourceId": "src_0fd1a6d239c119d63b86b1a8532893d6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS `repo/` path prefix fix — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS `repo/` path prefix fix — plan",
+          "anchor": "fgos-repo-path-prefix-fix-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-retro-loop/CONTEXT.md",
+      "blobSha": "dac1016ddba21378fc3b753f35e5c293bc7222a4",
+      "blobSize": 8480,
+      "sourceDigest": "935a55527330e254a38aca1a0c9e7a745e4e32ed8e3a58b3bc5cdce77dc9b59c",
+      "sourceId": "src_c328329e5d1d5fd293f196d95af0d3b8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3o3: /fgOS:retro-loop — CONTEXT.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3o3: /fgOS:retro-loop — CONTEXT.md",
+          "anchor": "tsk-3o3-fgosretro-loop-contextmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-retro-loop/iron-law-evidence.md",
+      "blobSha": "cbfd17ffcae0f0d4bf0b71f834ff2e07136cac71",
+      "blobSize": 3207,
+      "sourceDigest": "f9d4b3b8c73600fbe9099f8e2dfe0cc0011887cc9e09a8a8405b90ed3d967cb7",
+      "sourceId": "src_a8f27f6f38cd653cc8c7a38f4902e1fb",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3o3: Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3o3: Iron Law evidence",
+          "anchor": "tsk-3o3-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-retro-loop/plan.md",
+      "blobSha": "b27166ac6f26ae4b723054f7b6bdfd2233450d2c",
+      "blobSize": 14937,
+      "sourceDigest": "51bb6d2cbe55e4faa19d842aa8b41434d2ce77a7d6bb859c0e323f9c177cf398",
+      "sourceId": "src_a529e80422f92976f52f786ebc57f676",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3o3: /fgOS:retro-loop — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3o3: /fgOS:retro-loop — plan.md",
+          "anchor": "tsk-3o3-fgosretro-loop-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-routing-mode-gate-skip-load/plan.md",
+      "blobSha": "97b8aa87ab939e0abfffdca2d6a9784f0170ade9",
+      "blobSize": 15333,
+      "sourceDigest": "fa539b7123333c50f4433c152aaf0fd31edfde61be14032cbe330eed20e42066",
+      "sourceId": "src_5a1c5ddd630d49f32c14bee15a31a996",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-2yog: build the skip-load path the Mode gate names as missing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-2yog: build the skip-load path the Mode gate names as missing",
+          "anchor": "planmd-tsk-2yog-build-the-skip-load-path-the-mode-gate-names-as-missing"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-routing-mode-gate-skip-load/RESEARCH.md",
+      "blobSha": "de7271c6a5666a7cdb5d245e5efaa1d61e97d71e",
+      "blobSize": 4393,
+      "sourceDigest": "cab46fa47188ce5bca9454ceb2b198ef112e57e4e6d41eac5eb7f8ce3f617467",
+      "sourceId": "src_9df449183d62467c4236638fa86d0914",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — fgos-routing-mode-gate-skip-load (tsk-2yog)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — fgos-routing-mode-gate-skip-load (tsk-2yog)",
+          "anchor": "research-fgos-routing-mode-gate-skip-load-tsk-2yog"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-session-start-hook-worktree-root/plan.md",
+      "blobSha": "56dd752626a152dc00332950cb886e41166e876d",
+      "blobSize": 3376,
+      "sourceDigest": "c0d0b29f721c1ffc623e3bebf0eff03871dbfcea4569b66e05fad3d064716208",
+      "sourceId": "src_b5b814bd8103cc3d79a818ba5332cdff",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-5ma",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-5ma",
+          "anchor": "planmd-tsk-5ma"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/fgos-setup-global-config-init/CONTEXT.md",
+      "blobSha": "7265fea3d49238d517cd34c09ea91ea77bfd7ac5",
+      "blobSize": 7618,
+      "sourceDigest": "861e337983d6980fa02cb951e2d8914a4a7d489885b68ce759b23f67a62042a2",
+      "sourceId": "src_80e60ad8bb9dc4c0188451f47d1eb71a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgos setup initializes global config",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgos setup initializes global config",
+          "anchor": "fgos-setup-initializes-global-config"
+        }
+      ]
+    }
+  ]
+}

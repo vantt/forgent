@@ -155,20 +155,18 @@ independent red-team findings without authorizing promotion, cutover or retireme
 ### L11-7 — Route CTR010 numbering to the owner now
 
 - **Date:** 2026-10-17
-- **Status:** decided for routing; owner answer pending
+- **Status:** sent by the Lead; owner answer pending
 - **What is happening:** CTR010 names both `confinement-authority.v1` in the platform
   contract registry and `fgos-gateway.v1` in Gateway API material; the registry also
   lacks a separate Gateway REST row.
 - **Cause:** two independently evolved public/stable contract names reused the same
   number.
-- **Options and costs:** (A) retain CTR010 for confinement and assign Gateway REST the
-  next verified-free number, updating Gateway references; (B) retain CTR010 for
-  Gateway and renumber confinement, updating the registry/runtime documentation; (C)
-  define a new owner-approved numbering structure for both, with the largest migration
-  and compatibility cost.
-- **Recommendation:** option A, because the platform architecture registry and
-  confinement rollout history already call CTR010 the officially registered live
-  confinement contract, while the missing Gateway row is the observed registry gap.
+- **Options and costs as sent:** (A) Gateway keeps CTR010; confinement-authority takes
+  the next verified-free number and Gateway receives its missing registry row; (B)
+  confinement-authority keeps CTR010 and Gateway takes the next verified-free number
+  plus its registry row; (C) defer, parking only the dependent rows.
+- **Recommendation as sent:** option A. This is the Lead's released recommendation;
+  the owner still decides because the choice renumbers a stable/public contract.
 - **Scope of answer:** the contract number owner and the new Gateway registry row.
   No edit, renumbering or compatibility claim occurs until the owner answers.
 - **Lead decision:** ask this question in the first owner batch; continue unrelated
@@ -181,20 +179,23 @@ independent red-team findings without authorizing promotion, cutover or retireme
   owner queue; red-team P7-10.
 - **Affected rows/steps:** CTR010 and Gateway REST registry rows; Steps 1, 3 and 9.
 
-## Open owner question — CTR010
+## Open owner question — CTR010 (sent)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
   the other contract receive?
-- **Recommendation:** retain CTR010 for `confinement-authority.v1`; assign Gateway
-  REST the next free contract number after checking the final registry.
-- **Cost of recommendation:** Gateway candidate/knowledge/YAML references and the
-  component-boundary row must change and be independently reviewed; compatibility
-  evidence must state whether the number has shipped externally.
-- **Alternative cost:** retaining CTR010 for Gateway rewrites the registered
-  confinement contract and its rollout/history references; a new numbering structure
-  touches both populations.
+- **Recommendation sent by the Lead:** Gateway keeps CTR010;
+  `confinement-authority.v1` receives the next verified-free number; add the missing
+  Gateway registry row.
+- **Cost of recommendation:** the registered confinement contract and its
+  rollout/history references must be updated and independently reviewed.
+- **Alternative cost:** retaining CTR010 for confinement updates Gateway
+  candidate/knowledge/YAML references and adds its registry row; deferral keeps Step
+  3's collision rows and Step 9's zero-conflict verdict parked.
 - **Scope of answer:** contract numbering and registry ownership only. Unrelated Phase
   7 work continues; Step 3's affected rows and Step 9 closure wait.
+- **Dispatch fact:** Lead sent this question before Step 1 execution. Step 1 found no
+  additional owner-only question; `owner-batch-01.md` records the complete five-part
+  sent form.
 
 An L11 decision settles only its stated scope. It cannot authorize promotion, alias
 adoption, retirement, deletion, cutover, main landing, push, locked-law change or the

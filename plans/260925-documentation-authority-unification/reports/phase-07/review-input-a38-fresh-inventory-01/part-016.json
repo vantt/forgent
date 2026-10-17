@@ -1,0 +1,974 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 16,
+  "entries": [
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+      "blobSha": "e9330b5cdd1247f2ebcd62767420aec0f5a92491",
+      "blobSize": 2939,
+      "sourceDigest": "71b37fd4ead0bd167513a32b3c5b3176065574b008bb965245c4ad7b22795a9c",
+      "sourceId": "src_cc0e7496d1f6e0217e1f2eb176894b28",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+      "blobSha": "f013bf9fc021a19135f068f50a46b5ae50e1a120",
+      "blobSize": 4540,
+      "sourceDigest": "05a73ff3855f133d32e9f223be63a59d0145db16c142c48bfe0d361ac9ae99e2",
+      "sourceId": "src_8e30a4ff19287af7dcaac412de71a80f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Worker isolation — Phase 01 blocking question, first answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worker isolation — Phase 01 blocking question, first answer",
+          "anchor": "worker-isolation-phase-01-blocking-question-first-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+      "blobSha": "da6d93d39e4d2e4b79468f47897853145ff59db6",
+      "blobSize": 4333,
+      "sourceDigest": "403c52c47968ec432897ac8ba23c4bf74769830266bd9fbc2000f7f742d2409b",
+      "sourceId": "src_6402f4ca6af5417a4da9cb15ce34a6f2",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Permission posture — where it actually comes from, and the rule that follows",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Permission posture — where it actually comes from, and the rule that follows",
+          "anchor": "permission-posture-where-it-actually-comes-from-and-the-rule-that-follows"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+      "blobSha": "27f59bf52fb63bc03497de5346a50f18c971dc12",
+      "blobSize": 3411,
+      "sourceDigest": "5bb1a8960f7e739177f4f25c68b35280600014a3aa7e0f7e3d987870dc2dee22",
+      "sourceId": "src_e51ee48e5f93a7e68466b3d2e33dd8c1",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+      "blobSha": "99a7ea298c667143595ba1773ff317e4bdb3481c",
+      "blobSize": 4342,
+      "sourceDigest": "3605c13dd0bef6a87ce7fee55877caa0fe20d8808d82167b31ed15e75903ed9d",
+      "sourceId": "src_616ad5306b89c57a72600c5e1509449f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+      "blobSha": "a463c073e04e03413cef08d858ec9f84dee4c969",
+      "blobSize": 4205,
+      "sourceDigest": "be03987e3306b6a0d6d06a230cfdac3034e6bc63b33447920e4ebc0ec755dd26",
+      "sourceId": "src_cd57eebcb2180b1c19e6b49c4a1c7f95",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Worker isolation — separate herdr session, measured",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worker isolation — separate herdr session, measured",
+          "anchor": "worker-isolation-separate-herdr-session-measured"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+      "blobSha": "c8a13857375493e9d9c3ed2972ba351c45e9e48c",
+      "blobSize": 2545,
+      "sourceDigest": "86604b250428d52b4b400cd157d42de0a4136f0ca9f8f26d039105dce047c20d",
+      "sourceId": "src_75fa03d766422f3866bd664dccc659c0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+      "blobSha": "93e45bf53ff9d7780834825b4629c0ca5deb5f61",
+      "blobSize": 2240,
+      "sourceDigest": "10c87fb8d7e7cdefce1b0df3243039005915f58a6178465b60fa3672177f8a2a",
+      "sourceId": "src_c5a71ea6715270df8d5da6b707d04398",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-probe.sh",
+      "blobSha": "697fc4ea78f131b9ab40cb2abeffb997dc6cd6a9",
+      "blobSize": 6420,
+      "sourceDigest": "b7073e5e7680da7487551defbd24d464ee760c1f425362f2943a212356a0f25a",
+      "sourceId": "src_f3695f6e4b072052a11cbcf804a26e98",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-result.json",
+      "blobSha": "79c1e42cb7c59d03a1e2fdd143f00466c4846e96",
+      "blobSize": 252,
+      "sourceDigest": "f2429c13d2183ad4fc3766cc16c1707ef9ab30058768c10ad3005baec9650f20",
+      "sourceId": "src_4ba40f2b656527e5cf27ad87d2724afe",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs",
+      "blobSha": "106fe7bd291208b4aefc080dd0f69984228036a9",
+      "blobSize": 7747,
+      "sourceDigest": "97fc02c11132e5121535e6413c6982152a24d655cda3fc6d030193f71d6550a2",
+      "sourceId": "src_734b13de2fc1e913e0dbeb534412685a",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-result.json",
+      "blobSha": "56a8d4a61173513ba044e62f00b00151757dae27",
+      "blobSize": 4690,
+      "sourceDigest": "6eab22ba101a53e4ebf943e380b33b17330055a91b32f5ab0ef6d07ce5f44d1d",
+      "sourceId": "src_3419f159cd11295938b31009b80e6a1b",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+      "blobSha": "efbcdca2c406d8db61cebd944e56a9b327bac310",
+      "blobSize": 6552,
+      "sourceDigest": "c15f5ae19f74eb8865836e234bd7c78661025a96636838d6800e9d91c91c1bd2",
+      "sourceId": "src_57d072130a15af646f41223a37d8eb4e",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-result.json",
+      "blobSha": "d066313ff25505263b979bc0089314872f4230ec",
+      "blobSize": 1673,
+      "sourceDigest": "62677c57a19f67cbc1fba2e748bb56696f8f8fcd052fe0ee80c1ec5f4eac205f",
+      "sourceId": "src_3108820f724dbe742fb54dc2477242be",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/failure-result.json",
+      "blobSha": "a5d7e9d53b548bf5e954bcab2c3a410d74488643",
+      "blobSize": 2652,
+      "sourceDigest": "a1d7b9d99d83dcc67d71a7ea3ab591a4bab2c4e5f9b8760bee946271ebb9424d",
+      "sourceId": "src_add1db05ec9e0bbff37384d1daccf8c0",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+      "blobSha": "c0facb09e0cf4249f0ee471e8f2e9a755c6fac64",
+      "blobSize": 7477,
+      "sourceDigest": "1422556ed169c9d16213eea5ae102c2c0c983ded3988813bf5d66eca8076be55",
+      "sourceId": "src_db42803456365aeb87349ab806256431",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-result.json",
+      "blobSha": "0137fca9ca3768a659fc821b7f9179bd7b712628",
+      "blobSize": 5664,
+      "sourceDigest": "0a801cee02497cd3f73a3dee5e8697614b974d1960c3b82d7252cd78c0479a67",
+      "sourceId": "src_e918fb1863c66819d5ddd9651ec1ef13",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+      "blobSha": "3c8523766e5acfce621961ee9b7266b72e586ba3",
+      "blobSize": 6237,
+      "sourceDigest": "bd1956c169365fdee92834e51dbb2c5bb7a1d64c6aca38f8e35cd29125941ceb",
+      "sourceId": "src_200d8eb8999b804447ed8248151e2321",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-result.json",
+      "blobSha": "373eb80358437c21009228aa663a7e70e9968f44",
+      "blobSize": 2715,
+      "sourceDigest": "aab1f5efd77642f10a35a4ec4f12db1917b6f264018aa337c2f960640cdbd825",
+      "sourceId": "src_8454b21e4fcb125f333d216f89413bf5",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json",
+      "blobSha": "e6b1d20af9076946d2ee5bc0c578b770501db03f",
+      "blobSize": 2230,
+      "sourceDigest": "09e89bbd2c56b474c9114de778ec5cdbdcb4645de17d5ba323f7f76ed6fafafb",
+      "sourceId": "src_45d9becacf22813c9595ebf1d1d23e5a",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+      "blobSha": "59970aecde73607098ae2f15b534550351580a45",
+      "blobSize": 10178,
+      "sourceDigest": "15ed286bfe6c39664487ffa8e4cbe6f607342487ff8099a4cc4f43e727b6280c",
+      "sourceId": "src_f9fd1271d09373afe6ba1a9205ee9685",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+      "blobSha": "b0a95ed3d1b5b29f513613a356e9acad1c2714df",
+      "blobSize": 11258,
+      "sourceDigest": "b82a2d01f6552e09911c3e26cc0aa53f9b3c1337107b61d2702223f499ac9ab0",
+      "sourceId": "src_626bf5878bf13f799f8e7183a014f353",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
+      "blobSha": "cdce4146f3966fafe80d981ba076ee34642b57d1",
+      "blobSize": 1351,
+      "sourceDigest": "49f9700f25a5625f896dab25a4ec92b582e01bf4ea0ca2033d00b62151935bd1",
+      "sourceId": "src_03d7c3cb0f7394fdc82c5ba6f89fdb8f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-2-boundary.sh",
+      "blobSha": "b4e4a96ba3c9da1f4c5b0285505405b80e94bb24",
+      "blobSize": 1732,
+      "sourceDigest": "e5f870a2e8e3b307d4fbf6880a9a9da9b0d4ac31253405ef612e3ffb70946b07",
+      "sourceId": "src_585a015928a17767e8d7da2d1a25d2ed",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-3-mount-order.sh",
+      "blobSha": "259bd0a7b19add80d428c7ba8aefb9e4a2fcff93",
+      "blobSize": 1895,
+      "sourceDigest": "50c3d63074bc2c231929bedaf18c8fbfaa281826d90314142d7b2601a6516c4f",
+      "sourceId": "src_3d3757f760ac3b4e62df0d4d064c85cf",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-4-pane.sh",
+      "blobSha": "d53e49365b061dd1cbb96f23cc32fe2348ce9286",
+      "blobSize": 2845,
+      "sourceDigest": "49baf6e0a3ab9a823390ee6128cf6aed6a437001b1130415ebed9b4cbe681782",
+      "sourceId": "src_9e65cab267ea9438977580ca1568c9f4",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-5-pid-preservation.sh",
+      "blobSha": "5fd42879ced63e783e759fa18e140318045ef36f",
+      "blobSize": 1756,
+      "sourceDigest": "b24e2c43bd54f9dd04e14d49acbc6877aedae27e5c9e54a188f207760c55a95d",
+      "sourceId": "src_8b728f0f5d4a9ac52c4e61a1156c8853",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-6-unshare-confinement.sh",
+      "blobSha": "6a07069b3ed21f61611bec15f5ec0dc0194a6f92",
+      "blobSize": 1721,
+      "sourceDigest": "2b279ced0c1e42da203b221dfd3ae170773ece97955034d444379cbfc662d0fb",
+      "sourceId": "src_67d6e3c865e50b78823f7dd60d0a7d6c",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-7-unshare-pane.sh",
+      "blobSha": "e405c3e7a9c8ebbec16b740ffa20048c174e7600",
+      "blobSize": 2718,
+      "sourceDigest": "90f7f34e432be99ee5353fd8e182ac45e497617a9b8bf996c2047492b1c2378b",
+      "sourceId": "src_cba620b00282f408a97a75410ca4569d",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "blobSha": "5d6585ef3d39f7c4aeb9516e71d549b1edd73e3e",
+      "blobSize": 5740,
+      "sourceDigest": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422",
+      "sourceId": "src_827b676a5c1a6aecea9b2d556e162431",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Filesystem confinement for a herdr worker — what was measured, 2026-09-08",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Filesystem confinement for a herdr worker — what was measured, 2026-09-08",
+          "anchor": "filesystem-confinement-for-a-herdr-worker-what-was-measured-2026-09-08"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
+      "blobSha": "4009e10bd5fc86737501698b5d5d72c54eba9871",
+      "blobSize": 906,
+      "sourceDigest": "79502d3a1303442b260388fcaf133fb2150b0b285c309dd416157c1f8c198f5a",
+      "sourceId": "src_b897700d4b5a80a3ddde1b4e09fda6ce",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh",
+      "blobSha": "7adc8cff3aeffe03b34ba4640299267cbd99751c",
+      "blobSize": 455,
+      "sourceDigest": "36039123dabf5120473614dfc8ce63ead2ac07e910973c9258f3b1934b2f43c2",
+      "sourceId": "src_491fc68ad6ab1391d2e909e49f7b6e51",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md",
+      "blobSha": "c63db533bea90b59b1ddd900b182d4b116583044",
+      "blobSize": 9251,
+      "sourceDigest": "4b3d5f345a57c172689e9b56fce77ed53d6ab3b577f36681dda40872cff7b33f",
+      "sourceId": "src_aed8bc3e1fc030f63ba45c2eda6bf8a1",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Dispatch Visibility V0 — live proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Visibility V0 — live proof",
+          "anchor": "dispatch-visibility-v0-live-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vision.md",
+      "blobSha": "423fa0bb746706e39a3394968c3aa5470e496eb6",
+      "blobSize": 16816,
+      "sourceDigest": "b7737691c5eae9995ac3125712b5b946f95acdef7136dd5a716143131881a606",
+      "sourceId": "src_97a4a3949069a3e861982c5e141353c7",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Foundation Vision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Foundation Vision",
+          "anchor": "agent-coordination-foundation-vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "blobSha": "dfe474228af68940d67f4f47384fc643e94c9d23",
+      "blobSize": 12486,
+      "sourceDigest": "c5d1c7678771e0011f91a4dd184a937621b643eb773ce3bb43cdf6cb0188d8ce",
+      "sourceId": "src_016665b71ef4aaca8934fdec27b88e06",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Canonical Agent Coordination Concepts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Canonical Agent Coordination Concepts",
+          "anchor": "canonical-agent-coordination-concepts"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+      "blobSha": "0eb8639c4ec48f44e184118b32cac76a1ac59e95",
+      "blobSize": 4834,
+      "sourceDigest": "f7a2b8177b1c8e22cb7e9fd70266780e81842004bfe65f0ddfa6f1150e1594e9",
+      "sourceId": "src_70814f086b03b670b8c1fa097b9c1d5f",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Concept Relationships",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Concept Relationships",
+          "anchor": "agent-coordination-concept-relationships"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "blobSha": "028bb5b83ffe0923a49d6f39d9f2ea1c121c91e5",
+      "blobSize": 3208,
+      "sourceDigest": "b146eba822c2be41289cb8d49d64cffcfae157aea4450b36cfb9ac31fcbc6d38",
+      "sourceId": "src_2624cff10091fe12be963d9f0816f058",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Deprecated And Reserved Coordination Terms",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deprecated And Reserved Coordination Terms",
+          "anchor": "deprecated-and-reserved-coordination-terms"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/README.md",
+      "blobSha": "a6db89e5eae7e8c115c983ca0c3bed866562bc33",
+      "blobSize": 2174,
+      "sourceDigest": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "sourceId": "src_8e69662bad8f589f6b4d33ce7fd2f6f3",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Vocabulary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Vocabulary",
+          "anchor": "agent-coordination-vocabulary"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+      "blobSha": "d9b6d34f75a79b5910909a555c32298e922bdbfb",
+      "blobSize": 7343,
+      "sourceDigest": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
+      "sourceId": "src_67c289ddc0feb2a0925c7b0381343f45",
+      "area": "Agent coordination",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/architect/architecture-intent.md",
+      "blobSha": "e72b0e930345e01bca1b97c81fd7a528092cd098",
+      "blobSize": 38301,
+      "sourceDigest": "f71f0592b1e1d8bf030c5ec247d8ad652d15dc85ef001c081fe8c90ee7d5071f",
+      "sourceId": "src_a0ef717dd35f0ee801826d64838a38a9",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Architecture Intent",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Intent",
+          "anchor": "architecture-intent"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "blobSha": "e0e3b69aeb3fe2d0027c7c4414e481bbc71359e1",
+      "blobSize": 60161,
+      "sourceDigest": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+      "sourceId": "src_68612e0581fb8641a32f3613829b8ef4",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "fgOS Component Boundary Advisory",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Component Boundary Advisory",
+          "anchor": "fgos-component-boundary-advisory"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/component-boundary/README.md",
+      "blobSha": "259c50571df89f6d0b5c4e929c95018e67457d5d",
+      "blobSize": 10296,
+      "sourceDigest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "sourceId": "src_842acfcf06f535a243e5c90103a6dfd8",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Component Boundary Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Component Boundary Architecture",
+          "anchor": "component-boundary-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/component-boundary/repo-layout-vision.md",
+      "blobSha": "bf351f4eb46207a4d40643950b7e43a313e96c6e",
+      "blobSize": 7267,
+      "sourceDigest": "07691b34374b874752010a5585020635cb3ff396c1719594a4b1980e2318e314",
+      "sourceId": "src_05bb25a2e335f3ffed707e480fb51c18",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Repo Layout Vision: Apps And Packages",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Repo Layout Vision: Apps And Packages",
+          "anchor": "repo-layout-vision-apps-and-packages"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/dispatch-control-plane-redesign.md",
+      "blobSha": "6d66e789fbe1fdf433d1c9a72d8ab3de32b0f8b1",
+      "blobSize": 371,
+      "sourceDigest": "ee67263b92b3c9fed2a88995f5eab3bc7768e237de7022d62e1fe7de7c8ce42a",
+      "sourceId": "src_1832a9f13e426711f25fb8b3127812fe",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Dispatch Control Plane Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Control Plane Redesign",
+          "anchor": "dispatch-control-plane-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/documentation-system-design.md",
+      "blobSha": "cbb634aa4c221da02bd34e41cb234abb70dfaa9b",
+      "blobSize": 19003,
+      "sourceDigest": "959d8a9327ceb9744d85a3e83d026a6523fae3f195794fe96761905e96147fc5",
+      "sourceId": "src_be39747e6504ba3f6910cb2df130cf87",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Documentation System Design",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation System Design",
+          "anchor": "documentation-system-design"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/documentation-system-discussion.md",
+      "blobSha": "da8440522f43fc48d9b5b7355ae6ab0f1d0db490",
+      "blobSize": 62100,
+      "sourceDigest": "5ae36d7a64cd97f7a343a783e0039c9c5da0f7a3cec74e41c060f9ecf581a851",
+      "sourceId": "src_24272147e2bcb17733d1b459c277f9dc",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Documentation System Discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Documentation System Discussion",
+          "anchor": "documentation-system-discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/doing-coordination-redesign.md",
+      "blobSha": "d2f91b320e5dbb30d68c94895936bdc739860516",
+      "blobSize": 37138,
+      "sourceDigest": "ffc69e6749b10612e6f98bbb165f6ba0b4f150cc104080e59e90edbb3fdb8798",
+      "sourceId": "src_b28a6309da1595a66b2fa76a0f11e172",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Doing Coordination Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Doing Coordination Redesign",
+          "anchor": "doing-coordination-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/domainization/README.md",
+      "blobSha": "10bba1a86978a08564cac0ca623bc4ed0326b987",
+      "blobSize": 10848,
+      "sourceDigest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "sourceId": "src_9220f10bcc9b45010309118de727b63e",
+      "area": "Skills and domainization",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "fgOS Domainization Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "fgOS Domainization Architecture",
+          "anchor": "fgos-domainization-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+      "blobSha": "1d1c62597bca995404ed6a849e7bcddf99262235",
+      "blobSize": 21740,
+      "sourceDigest": "06e5994c1f64d470f78627a3748b4daba5d123b3868f1eb28fd42a6ebc264f3a",
+      "sourceId": "src_a86b8ba8039a11b3dd473673e93c753d",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation Documentation Standardization Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation Documentation Standardization Plan",
+          "anchor": "host-invocation-documentation-standardization-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "blobSha": "8f9cff691d411cf3081a254fbad1569ea363fcab",
+      "blobSize": 13325,
+      "sourceDigest": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+      "sourceId": "src_26ba3310994546588bc4fb3d3a29a0f6",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "External Provider Protocol",
+      "headings": [
+        {
+          "level": 1,
+          "text": "External Provider Protocol",
+          "anchor": "external-provider-protocol"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "blobSha": "87dfcee9223924979f3ae8fe31ea8f6a0fa51f89",
+      "blobSize": 23452,
+      "sourceDigest": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6",
+      "sourceId": "src_f2b970bce4a117d507895f826ac1f9eb",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Host Invocation And Provider Routing Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Host Invocation And Provider Routing Architecture",
+          "anchor": "host-invocation-and-provider-routing-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "blobSha": "0b70925148b3a445a8e3b1b3058234919471f731",
+      "blobSize": 13288,
+      "sourceDigest": "90e6dcd22a5729f513b3104b5f2113d9fad57e677a8485b6b2452183b8f97a67",
+      "sourceId": "src_4ea112e3be5c0ab24bae3bde4509f813",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Legacy CLI Transition",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Legacy CLI Transition",
+          "anchor": "legacy-cli-transition"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "blobSha": "0dafce9566fbf071a1656fd2d34ec169e1444b7d",
+      "blobSize": 20457,
+      "sourceDigest": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+      "sourceId": "src_45cad8033aee2c1354e27bd9eca93dbc",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Node To Rust Component Migration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Node To Rust Component Migration",
+          "anchor": "node-to-rust-component-migration"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "blobSha": "8b00cb73d06147f87760411288a0a4e3ec5543a1",
+      "blobSize": 32211,
+      "sourceDigest": "6ec5a5afad77acdf0dacf5523ae8a5b452e2ff5bd92015830c7526ebcee3e41a",
+      "sourceId": "src_f2b59090edf24c3998fad99a2e6da772",
+      "area": "Host invocation routing",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/host-invocation-routing/README.md",
+      "gap": false,
+      "firstHeading": "Rust Host And Proof Providers Implementation Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Rust Host And Proof Providers Implementation Plan",
+          "anchor": "rust-host-and-proof-providers-implementation-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/knowledge-registry-redesign.md",
+      "blobSha": "ace04a2ddb00e44cf28f39f1f9cfd20d37362d75",
+      "blobSize": 33903,
+      "sourceDigest": "e589e9af6fc3ca57d5fa39127a0bf9e6597c8b8af6e2c183595982ed71a87827",
+      "sourceId": "src_261586a73f13c8054f1b034316efcd69",
+      "area": "Legacy architect (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Knowledge Registry Redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Knowledge Registry Redesign",
+          "anchor": "knowledge-registry-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/future-constraints.md",
+      "blobSha": "690c7e63a7a4c53efc62d678fa076bd9533736ed",
+      "blobSize": 3549,
+      "sourceDigest": "b94afa9dc318f4c0f3831bca33ed6c41571b7ce33a1adc88f818318bc9571ee7",
+      "sourceId": "src_e41643166814e7479c7adb6671a20114",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Future Constraints: Shared Gateway, Adapter, And Substrate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Future Constraints: Shared Gateway, Adapter, And Substrate",
+          "anchor": "future-constraints-shared-gateway-adapter-and-substrate"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "blobSha": "c6bbdd30d60f39702cae14ecd61466025e22e7d3",
+      "blobSize": 9034,
+      "sourceDigest": "9a78209b05b2780633e232c529e3be9b55157e56a20802f8e4b7a3e33e776532",
+      "sourceId": "src_05772938fb68b245094e5c4f5eab741d",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Distribution Baseline And Scattered Spec Fragments",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Distribution Baseline And Scattered Spec Fragments",
+          "anchor": "distribution-baseline-and-scattered-spec-fragments"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/migration-map.md",
+      "blobSha": "c5edca5674db61597039adc791e55f2bfa710530",
+      "blobSize": 13633,
+      "sourceDigest": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "sourceId": "src_efe4e371bbdbe44baaa55b407797adf3",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "1. Purpose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "1. Purpose",
+          "anchor": "1-purpose"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/README.md",
+      "blobSha": "d21d72df42e8f6ce1d92a5772dce80251afb6a78",
+      "blobSize": 9620,
+      "sourceDigest": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "sourceId": "src_443e54dd87bbc68a6a440c1a0739f142",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "Packaging And Distribution Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Packaging And Distribution Architecture",
+          "anchor": "packaging-and-distribution-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "blobSha": "9ceb3ec594ddf7658e410f3826f9f8276ec635b6",
+      "blobSize": 13331,
+      "sourceDigest": "c7fa1d6d36c59334da472b459d0bd2aad74975e40884de130445c4a30a0eb903",
+      "sourceId": "src_4e26b765e12ab14169c9d46faa80bab1",
+      "area": "Packaging-distribution",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": "docs/platform/packaging-distribution/README.md",
+      "gap": false,
+      "firstHeading": "1. Goal",
+      "headings": [
+        {
+          "level": 1,
+          "text": "1. Goal",
+          "anchor": "1-goal"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 54,
+  "entries": [
+    {
+      "path": "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+      "blobSha": "f0e7938a5a061aff77924115bfca7d6c8627d716",
+      "blobSize": 5488,
+      "sourceDigest": "03a93249a7a4676ae0d4274481fd6767d48b2f2e4954a8662a183451ce5ae7b0",
+      "sourceId": "src_39118406ba912ff087d9942a19d07df8",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeRunnerItem` now checks ancestry before attempting a merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeRunnerItem` now checks ancestry before attempting a merge",
+          "anchor": "why-mergerunneritem-now-checks-ancestry-before-attempting-a-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+      "blobSha": "1af41a2175707efaa49336d2ecadffdb4f98415d",
+      "blobSize": 6479,
+      "sourceDigest": "cc4b9a3505afd445faa711cdd4a9336139f37b8bb5615e9d27e67736d6060b26",
+      "sourceId": "src_2a88f650a9a5a6ed280b10d197397afb",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeRunnerItem` returns `merge-failed-unclassified` instead of crashing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeRunnerItem` returns `merge-failed-unclassified` instead of crashing",
+          "anchor": "why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+      "blobSha": "16b521961a737614d1a164f2dc452abf9dac5dcd",
+      "blobSize": 5849,
+      "sourceDigest": "19cd1f0d94834d774d7ae6e6731647de25627011c11c0ea4ee6ec8916d21832a",
+      "sourceId": "src_c68010fce154da9079fd9d38d47ec55f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry",
+          "anchor": "why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md",
+      "blobSha": "7bf8c8c5528d22d01605f1fb07c1a1c9185a0cd1",
+      "blobSize": 3334,
+      "sourceDigest": "6896bf5609e588577090c5b7bb9f3b3b7a308fd917a015bf3e926230f13ef0d4",
+      "sourceId": "src_02d0f27ff2a3798d125860da5657ea04",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeRunnerItem`'s commit-failure error now carries git's real stderr",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeRunnerItem`'s commit-failure error now carries git's real stderr",
+          "anchor": "why-mergerunneritems-commit-failure-error-now-carries-gits-real-stderr"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md",
+      "blobSha": "fa10dd801c1d1e14cf49d09bfc3cee0b9496ed66",
+      "blobSize": 4986,
+      "sourceDigest": "f2460a129d6116a75cf8ba3ff07008e17ebcf028994013a03278863b73e575f5",
+      "sourceId": "src_c0a78004e27cc34e423d55c5d0ad5f91",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeRunnerItem` takes a separate `lockRoot` param",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeRunnerItem` takes a separate `lockRoot` param",
+          "anchor": "why-mergerunneritem-takes-a-separate-lockroot-param"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergesets-groups-conflicts-instead-of-dropping-them-from/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md",
+      "blobSha": "3e1abe01a885297dc568f663b7a87616563e6408",
+      "blobSize": 4491,
+      "sourceDigest": "d72546f4209382ef013e77c2823130cd7bb2d3b65e6816401b467cc8ebdeebac",
+      "sourceId": "src_47d225b6da53b7a181e7b144209f4ed2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeSets` groups conflicts instead of dropping them from `ready`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeSets` groups conflicts instead of dropping them from `ready`",
+          "anchor": "why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+      "blobSha": "cb4d0df28f714d24aa6ae123061b6d378e8776e3",
+      "blobSize": 6375,
+      "sourceDigest": "accbc9b3b34449dc43362941baa186205becf51162cefc0639f293a786674acd",
+      "sourceId": "src_805874d98f758fbc94eba359350ae2c4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `mergeTree` groups by parent and sorts recursively by `blocks`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `mergeTree` groups by parent and sorts recursively by `blocks`",
+          "anchor": "why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
+      "blobSha": "9843f83511525aafe756f8c19f0651f590151351",
+      "blobSize": 4252,
+      "sourceDigest": "f2f37b1d6dcb81dff0bf92bab2593fcdcfaa2cd60a2492e8e22d9f147ad9641d",
+      "sourceId": "src_dbe24c23348328b6174a1606ab6b0220",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists",
+          "anchor": "why-planmjss-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "blobSha": "6b84d13da7ef4d1273111fe9565ec1eac7da1e1e",
+      "blobSize": 3385,
+      "sourceDigest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "sourceId": "src_32e59ac8f50d718a9074862bf5893235",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why plugin skills need a CLI path fallback",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why plugin skills need a CLI path fallback",
+          "anchor": "why-plugin-skills-need-a-cli-path-fallback"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+      "blobSha": "417e2244513fe7cd47804430d6bf9f464426ef95",
+      "blobSize": 3231,
+      "sourceDigest": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+      "sourceId": "src_a2664aec3c2512bb0d35be21ef87b69b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `ppidOf` bounds its `ps` call with a 200ms timeout",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `ppidOf` bounds its `ps` call with a 200ms timeout",
+          "anchor": "why-ppidof-bounds-its-ps-call-with-a-200ms-timeout"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+      "blobSha": "c493628cefc11c51527d99d0f9f6327853207599",
+      "blobSize": 5276,
+      "sourceDigest": "e94de3a209a668fa9596f20671ce844cc266004a3db01afba683581bfcba563b",
+      "sourceId": "src_5fe3e08fb2e1503fbe40dcac45aa996c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `promote-engine` merges members instead of rebasing them",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `promote-engine` merges members instead of rebasing them",
+          "anchor": "why-promote-engine-merges-members-instead-of-rebasing-them"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+      "blobSha": "219b24585329e675ffb4dbe9fdf38d765e17fc1e",
+      "blobSize": 4878,
+      "sourceDigest": "6929d591447c43e2b2bbd6ae0628334b75f8f247093e83d71880d89523e8ef03",
+      "sourceId": "src_d1d0bc484e4ad36c9cc8a516e61a82b5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `promote-preflight` uses `git merge-tree` instead of a real merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `promote-preflight` uses `git merge-tree` instead of a real merge",
+          "anchor": "why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+      "blobSha": "ab078dad3bd91c5dfc41ad7da1214067a1a621eb",
+      "blobSize": 4121,
+      "sourceDigest": "72208fa160dba1e126a66fb33cf647bb328a368a00e2cc2ace7ce90a084f1c38",
+      "sourceId": "src_a7c3403c01014ad078fbbc03c89df0ba",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `promote-to-component` reports `merged-parent-rejected` separately",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `promote-to-component` reports `merged-parent-rejected` separately",
+          "anchor": "why-promote-to-component-reports-merged-parent-rejected-separately"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-promote-to-component-restructures-git-before-writing-par/why-promote-to-component-restructures-git-before-writing-parent-state.md",
+      "blobSha": "c504b65df3dcd075ed1914a090d35f3da45cc050",
+      "blobSize": 5470,
+      "sourceDigest": "8c02839641dff66d5c4222f6bbcadc1cfd6d127f8717d50490eb172a8be77249",
+      "sourceId": "src_aeb7bfd792ca7892c5f2f7fbe11456e6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `promote-to-component` restructures git before writing parent state",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `promote-to-component` restructures git before writing parent state",
+          "anchor": "why-promote-to-component-restructures-git-before-writing-parent-state"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
+      "blobSha": "9bbf69b149875e28313d778c58a49684a6ebf363",
+      "blobSize": 3278,
+      "sourceDigest": "214f92a87de9ecbd944aa63df9de0682de0a858f5bf63871630c7c35c3c5b251",
+      "sourceId": "src_f15f241dfecf8269f054e4703e4afa2e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why reclaiming an orphaned worktree checkout must check for live uncommitted work first",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why reclaiming an orphaned worktree checkout must check for live uncommitted work first",
+          "anchor": "why-reclaiming-an-orphaned-worktree-checkout-must-check-for-live-uncommitted-work-first"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+      "blobSha": "3dd941d399a52e040eb6f0e35679827e5ce765f1",
+      "blobSize": 4462,
+      "sourceDigest": "1736f5ac4c5f4be0e93e7431147b044a438e04168f0daf7e584a105f39daa905",
+      "sourceId": "src_7a43de886917016dccf37b71e5f96180",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside",
+          "anchor": "why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-session-is-live-inside"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+      "blobSha": "9db432f3ed575b50ebe0ac9589f29ae8e8c1e6eb",
+      "blobSize": 3242,
+      "sourceDigest": "199e66bc263202b6d3d37ee81d4acb4f7ed62125630db0a0169b4f7aeacd26dc",
+      "sourceId": "src_01542a7d38e3aaa407b14d0ef35696d8",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why \"register a finished item into the merge list\" needs no new code",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why \"register a finished item into the merge list\" needs no new code",
+          "anchor": "why-register-a-finished-item-into-the-merge-list-needs-no-new-code"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-resolvediscovery-guards-re-parking-an-already-parked-ite/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
+      "blobSha": "7ea05e292ccfbf0c061290a4514b300be06e3265",
+      "blobSize": 3396,
+      "sourceDigest": "1b70c94ada204bd25c52d27deb3ff90a59253430b3516fd39a87d09107cc2c34",
+      "sourceId": "src_e94f139bbe04f3fd323a5880e5cebddd",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `resolveDiscovery` guards re-parking an already-parked item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `resolveDiscovery` guards re-parking an already-parked item",
+          "anchor": "why-resolvediscovery-guards-re-parking-an-already-parked-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+      "blobSha": "62715b6d40d7c02d74fd4ef1424256f02298b7b1",
+      "blobSize": 4302,
+      "sourceDigest": "fd41b1809659ad5b5e34a3ad2ebaf1ea86639c9bbf6f50e8ad7b2c09b9af8421",
+      "sourceId": "src_aad083c08f152ae154f2c82fe7907432",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a partially materialized decompose no longer locks out the remaining children",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a partially materialized decompose no longer locks out the remaining children",
+          "anchor": "why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+      "blobSha": "2b3ec11e613c0973a69e8b7e9013119cb5388214",
+      "blobSize": 5850,
+      "sourceDigest": "8f938126c47a1c135da8b1d25b7bd90a17a5fca2b1a30eba56e12f66e6c1095f",
+      "sourceId": "src_58d39bdfb490334e2606da587867a1ac",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `resolvePlan`'s pass-through path now checks `planApproveVerify` before `executing`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `resolvePlan`'s pass-through path now checks `planApproveVerify` before `executing`",
+          "anchor": "why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md",
+      "blobSha": "b9e7f69748d364e422e60609e46c051226f04355",
+      "blobSize": 5059,
+      "sourceDigest": "a6406008ab472aaa32efac38d4e82fdfb3711be64dd7247d2042e93c199d5860",
+      "sourceId": "src_6e2896e53d2d054842bed39c03ed956d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why retrospective documents vanished on orphaned branches",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why retrospective documents vanished on orphaned branches",
+          "anchor": "why-retrospective-documents-vanished-on-orphaned-branches"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+      "blobSha": "461659b290f09473e679bfad1c66b7e5dd9ef3a8",
+      "blobSize": 3492,
+      "sourceDigest": "b05caaea2c00d62457ecc702a1d9c04c4cac2aae07701f574271d5d52163d342",
+      "sourceId": "src_fc6d52db8496ad6f8b4fcbc0cab5bf84",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `return`'s blocked-friction hint checks real output, not the verify command string",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `return`'s blocked-friction hint checks real output, not the verify command string",
+          "anchor": "why-returns-blocked-friction-hint-checks-real-output-not-the-verify-command-string"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+      "blobSha": "1ae8ad0fd968e09038bea60d2c06b6a23f07276d",
+      "blobSize": 12583,
+      "sourceDigest": "17f3d9220d7e36c2dabf350e26eaf86c24dcaceaa55928bddd356bd65df837bb",
+      "sourceId": "src_eade57b18b69496b0bd5c0bfaa3b994d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why capability, executor, and capacity are three separate concepts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why capability, executor, and capacity are three separate concepts",
+          "anchor": "why-capability-executor-and-capacity-are-three-separate-concepts"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+      "blobSha": "eed6a888add0ea3389a7d149704173b96cedffe4",
+      "blobSize": 6036,
+      "sourceDigest": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+      "sourceId": "src_858c734a2b1f1e1bb02120350057bc37",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why session-claim liveness measures worktree activity, not PID or event-log age",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why session-claim liveness measures worktree activity, not PID or event-log age",
+          "anchor": "why-session-claim-liveness-measures-worktree-activity-not-pid-or-event-log-age"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md",
+      "blobSha": "2df628a9ac85f7bc8eb1d6b46ff648c84c2b725f",
+      "blobSize": 13673,
+      "sourceDigest": "997b1643436909261e53ff5fdfe0251b8a4b671751fb069f20bd617aab26a0f0",
+      "sourceId": "src_814d416f7cafdc375d62322cca948b31",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why splitting test files hits a floor, and why narrowing verify never helped",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why splitting test files hits a floor, and why narrowing verify never helped",
+          "anchor": "why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+      "blobSha": "017d7da5bc36cc9bb4eb10127efd14e4e2bf4fbf",
+      "blobSize": 9813,
+      "sourceDigest": "baa3695dba0d2b34592eb5157ec2b3b71e46d445a2c74e7a875f1d2dc4a8956d",
+      "sourceId": "src_f0d86d3daa34623727ed7b6d7ebc1aef",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `dispatch.mjs` was redesigned around \"task,\" not agent capacity",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `dispatch.mjs` was redesigned around \"task,\" not agent capacity",
+          "anchor": "why-dispatchmjs-was-redesigned-around-task-not-agent-capacity"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "blobSha": "4dee250000bb5127adc85e92a7665e28ae492abc",
+      "blobSize": 5089,
+      "sourceDigest": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "sourceId": "src_ba74b26364636ac470bb6e343aaf3a87",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning",
+          "anchor": "why-stage-skills-forbid-ad-hoc-taskagent-delegation-for-their-own-reasoning"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "blobSha": "6174626fd58906f79508059084da41d44fff86e6",
+      "blobSize": 19262,
+      "sourceDigest": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+      "sourceId": "src_b63b63eab726e1ddf31dae91c4ec019a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "state.decisions splits engine bookkeeping from cited design decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "state.decisions splits engine bookkeeping from cited design decisions",
+          "anchor": "statedecisions-splits-engine-bookkeeping-from-cited-design-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+      "blobSha": "cbaa54d27715587d068959de9686912d90b0e659",
+      "blobSize": 4907,
+      "sourceDigest": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+      "sourceId": "src_ec41c7f5e0b1b6d4624ae9e20f95fd1a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `state.json` became an incrementally-read snapshot",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `state.json` became an incrementally-read snapshot",
+          "anchor": "why-statejson-became-an-incrementally-read-snapshot"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md",
+      "blobSha": "f0810d8894244b6a6bd9501ba88fd6a52fe3a9ae",
+      "blobSize": 3491,
+      "sourceDigest": "f3665f981acc26b93ba3ad39c9c8221b75634b8c24b7d3b204ab599fa754c2c7",
+      "sourceId": "src_7159d3405831370eff9b9302d9a7891f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `state.json`'s write became atomic while its lock-scope claim turned out already fixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `state.json`'s write became atomic while its lock-scope claim turned out already fixed",
+          "anchor": "why-statejsons-write-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "blobSha": "b2bf45fa5e5487a22c2fbdab75efe4f83f5c6768",
+      "blobSize": 22451,
+      "sourceDigest": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+      "sourceId": "src_7f8e0c227cf8a52f22c80da7585203db",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why status splits into status + statusCategory only for the front segment of the lifecycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why status splits into status + statusCategory only for the front segment of the lifecycle",
+          "anchor": "why-status-splits-into-status-statuscategory-only-for-the-front-segment-of-the-lifecycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+      "blobSha": "7975127bd5ede51570f4519ac48090c7ea6b68d5",
+      "blobSize": 5833,
+      "sourceDigest": "4a7053b67ac5f2dd23a243504edad6b3d1c7661ae3a453937df9a0b84b3a33dd",
+      "sourceId": "src_e0f59a05c33032a63d89fba449bba5c1",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `agy` dispatch needed `--new-project`, and still isn't fully reliable",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `agy` dispatch needed `--new-project`, and still isn't fully reliable",
+          "anchor": "why-agy-dispatch-needed---new-project-and-still-isnt-fully-reliable"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+      "blobSha": "7e6e3c8bc65d9a20a23502f888e7a756bea26650",
+      "blobSize": 3559,
+      "sourceDigest": "721432d91385d3e2cc85e3c188323f09f07680d47c46822e2904baec2d786cc1",
+      "sourceId": "src_fb0798195bbc9523797de033645e1934",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the decision-code check ratchets against a baseline instead of blocking everything",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the decision-code check ratchets against a baseline instead of blocking everything",
+          "anchor": "why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+      "blobSha": "91746ab26d1c9a9d2168811a991d9536a125662b",
+      "blobSize": 6102,
+      "sourceDigest": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+      "sourceId": "src_0a6cc9e4f6d235fb8666bd2f4a23aff0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the decision-ID-collision auto-resolver only trusts a shared link target, not a shared id, to detect an edit dispute",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the decision-ID-collision auto-resolver only trusts a shared link target, not a shared id, to detect an edit dispute",
+          "anchor": "why-the-decision-id-collision-auto-resolver-only-trusts-a-shared-link-target-not-a-shared-id-to-detect-an-edit-dispute"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-dispatch-gate-widened-to-kind-task-and-mechanism-val/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md",
+      "blobSha": "649a32e2db937397b8181ef51b8832e0d03d56f5",
+      "blobSize": 3603,
+      "sourceDigest": "a3b67cbf2102040a83873c54b3e08e6eed2530453bd9d5941f68d7e5321be3a4",
+      "sourceId": "src_7d340890049b4a5a40e4a3d924b8a141",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location",
+          "anchor": "why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+      "blobSha": "1cb532b9886dcc7be1336a8e973225c21f5ee37d",
+      "blobSize": 7146,
+      "sourceDigest": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+      "sourceId": "src_489cf1a6cf59279498277656a7839077",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the fgOS interface daemon is one process that only ever shells out to the CLI",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the fgOS interface daemon is one process that only ever shells out to the CLI",
+          "anchor": "why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "blobSha": "12afa5a5f4cf2c41f318c741d3c0f71667c85b35",
+      "blobSize": 3951,
+      "sourceDigest": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+      "sourceId": "src_d320a05d443b96864353af0c98539dac",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the gateway edit route reuses EDITABLE_FIELDS and passes through `fgos edit`'s refusal",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the gateway edit route reuses EDITABLE_FIELDS and passes through `fgos edit`'s refusal",
+          "anchor": "why-the-gateway-edit-route-reuses-editable_fields-and-passes-through-fgos-edits-refusal"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+      "blobSha": "0517906d197565ae4c494c0b6812303726a3a186",
+      "blobSize": 6582,
+      "sourceDigest": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+      "sourceId": "src_d69c7b99929be457fced1726f1376311",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
+          "anchor": "why-the-herdr-fgos-dashboard-shipped-as-three-sequential-children-and-what-surfaced-along-the-way"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+      "blobSha": "1901fc8e96a9e1ba7af588ce505ae206f5da0791",
+      "blobSize": 3240,
+      "sourceDigest": "e52946b5e42cccc11594ac25ce718fe1276b54f93c1e3d940e7d93a604990b6b",
+      "sourceId": "src_07904d2248093ab9490d7c49bd0b7abd",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why Cloudflare Access is an additive second auth layer, not a replacement",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why Cloudflare Access is an additive second auth layer, not a replacement",
+          "anchor": "why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+      "blobSha": "2e63ecef8722ccc3ea9a7e964b976ae4b75bd01c",
+      "blobSize": 12820,
+      "sourceDigest": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+      "sourceId": "src_eccf2cd8d64e348dea9fd4775ab5e44d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the herdr web dashboard became a static client of the gateway, not its own server",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the herdr web dashboard became a static client of the gateway, not its own server",
+          "anchor": "why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-install-packaging-e2e-test-replaced-a-byte-identical/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md",
+      "blobSha": "3f31f9f9a334b54501e7ea2961e83af3f6e167c8",
+      "blobSize": 3263,
+      "sourceDigest": "20c4b6f082ebee52b742f709a06fd4330d324e9464f9616e370bc8b4120bf0a4",
+      "sourceId": "src_675493aabdc2126507f9605ecb8ef28b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the install-packaging e2e test checks for leaked paths, not a byte-identical `.fgos` snapshot",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the install-packaging e2e test checks for leaked paths, not a byte-identical `.fgos` snapshot",
+          "anchor": "why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+      "blobSha": "bb0af3596ae0384f2e5ef0e52fb0ea5a9c496d8e",
+      "blobSize": 5161,
+      "sourceDigest": "d6a3fe8f3bb758e1f6cea7b8f3ce75a22d455a8e79672170264aae7f09803aeb",
+      "sourceId": "src_b53b8689b388d732a8ead91c5cb4756c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the Iron Law evidence contract gathers proof but never acknowledges",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the Iron Law evidence contract gathers proof but never acknowledges",
+          "anchor": "why-the-iron-law-evidence-contract-gathers-proof-but-never-acknowledges"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+      "blobSha": "1b5697d122c091fe23f256b7731cf67d78b602dc",
+      "blobSize": 5155,
+      "sourceDigest": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+      "sourceId": "src_d9b45c676733ad5f702cdfb670a9f923",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the Iron Law gate only fires at the trunk boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the Iron Law gate only fires at the trunk boundary",
+          "anchor": "why-the-iron-law-gate-only-fires-at-the-trunk-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+      "blobSha": "154682e6d2f8b00bcf9b7c5c06dc339e767ac3f3",
+      "blobSize": 1516,
+      "sourceDigest": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+      "sourceId": "src_02f6d9ee4e7261062490523b0b376c9a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the `judge-discovery` and `judge-decompose` capacities were removed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the `judge-discovery` and `judge-decompose` capacities were removed",
+          "anchor": "why-the-judge-discovery-and-judge-decompose-capacities-were-removed"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "blobSha": "b64d0410aae67c5bbf3b9b8fca86ab670392a7d2",
+      "blobSize": 3901,
+      "sourceDigest": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+      "sourceId": "src_061842b9401494d8cfc82bb1a180ae96",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the launcher-vocabulary word guard was retired right after `tsk-1s5` fixed it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the launcher-vocabulary word guard was retired right after `tsk-1s5` fixed it",
+          "anchor": "why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+      "blobSha": "bedd75074bc16f54da78e990fa9ee4f25453305c",
+      "blobSize": 6138,
+      "sourceDigest": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+      "sourceId": "src_8406d33649bb2607107001feb16b9c3a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the live events.jsonl corrupted, and why the fix needed a split",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the live events.jsonl corrupted, and why the fix needed a split",
+          "anchor": "why-the-live-eventsjsonl-corrupted-and-why-the-fix-needed-a-split"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+      "blobSha": "83cc1a70ee12dbaecce128d5cce44899844f94f3",
+      "blobSize": 8346,
+      "sourceDigest": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+      "sourceId": "src_c9cb6f3348cba3049dbb8ee9e5834182",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the \"Locked decisions\" heading contract fails open, not closed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the \"Locked decisions\" heading contract fails open, not closed",
+          "anchor": "why-the-locked-decisions-heading-contract-fails-open-not-closed"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "blobSha": "da88c2889ac8ed025393f8a063a37a418b160a26",
+      "blobSize": 4779,
+      "sourceDigest": "d1c92b16b111d9a0f2e607324cd82a181881dea907289c12c9cd6c03b68cdb9f",
+      "sourceId": "src_744c175effd1bcbd7b8724d15fd9b2fc",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the main-checkout-lock hook used to block worktree commits it had no reason to touch",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the main-checkout-lock hook used to block worktree commits it had no reason to touch",
+          "anchor": "why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md",
+      "blobSha": "397c4dbdabfa43f43bd321c8fbce760174704a08",
+      "blobSize": 8751,
+      "sourceDigest": "f30b57cc38dc2b49ffdc84c1620075253dac1973b3289c6b622de5bbe354c5b0",
+      "sourceId": "src_98234cf83639cd9c8b2c48d5e929f6ca",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the main-checkout lock needs a heartbeat during merge verify",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the main-checkout lock needs a heartbeat during merge verify",
+          "anchor": "why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+      "blobSha": "bb678130e7feed3eb28ebb09033f04abfba23553",
+      "blobSize": 5322,
+      "sourceDigest": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+      "sourceId": "src_1e8369bd90045cfccd656584d9d3dc9f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the pre-commit hook got its own shorter main-checkout-lock TTL",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the pre-commit hook got its own shorter main-checkout-lock TTL",
+          "anchor": "why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md",
+      "blobSha": "4e3d33c262028aa570c259adaa214bab2bd0376c",
+      "blobSize": 6410,
+      "sourceDigest": "2864db6b7e220327d3120b22e2d2bbc142c89efabebc03cd7ef428e50dcf9155",
+      "sourceId": "src_8e13264e5ec47094807d51c6979bb0b1",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the \"stage-axis driving loop and status-axis pool-sweep stay separate\" decision got superseded",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the \"stage-axis driving loop and status-axis pool-sweep stay separate\" decision got superseded",
+          "anchor": "why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-stay-separate-decision-got-superseded"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+      "blobSha": "a8e1e5b7be656686105e7096fba101260e051d1f",
+      "blobSize": 13406,
+      "sourceDigest": "76bc924026b31c1a8f8ac9e8521ccd2ec55f26ab493ce96516f21e6dc3a51bca",
+      "sourceId": "src_e07cb9521710c817fe546d8e31fa87d2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why a stale worktree index produced a wrong Iron Law test count",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why a stale worktree index produced a wrong Iron Law test count",
+          "anchor": "why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "blobSha": "c5f4d0dd5a3d632d08d7f8ba437d1b86dff5316d",
+      "blobSize": 3343,
+      "sourceDigest": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "sourceId": "src_ab004023756e192fa039c8a78876c756",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the verify-fail-post-merge playbook retries through `awaiting-approval`, not `proposed`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the verify-fail-post-merge playbook retries through `awaiting-approval`, not `proposed`",
+          "anchor": "why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+      "blobSha": "0e82806347f83d42d0f606ce0038bd1c30fe0728",
+      "blobSize": 7914,
+      "sourceDigest": "767c690e8abe45c7cf4dc1bd9758ab42ea378ca54b03f5665d9c2aa9d0327fa0",
+      "sourceId": "src_3fee04544f0d1faf2c991f2b679128a0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+          "anchor": "why-the-work-item-lifecycle-keeps-status-and-stage-separate-and-what-extending-it-costs"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+      "blobSha": "8377d7dd4a93dde75481e57a712b908d6c689bad",
+      "blobSize": 12589,
+      "sourceDigest": "4fb03d17657b334ccdf5f3a8dea55357f8fc5964f6511de4819c6d94a3fd3e0b",
+      "sourceId": "src_908b53f7d9d3688f0860150c56f0e822",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why the merge target-ref slot disabled lock self-recognition",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why the merge target-ref slot disabled lock self-recognition",
+          "anchor": "why-the-merge-target-ref-slot-disabled-lock-self-recognition"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md",
+      "blobSha": "71ec8ee5194d370be19bc541dd4d2d04d2673e81",
+      "blobSize": 7213,
+      "sourceDigest": "bf58b7f4a79d90d17d4ee75196fea2232e76b4c791235f30bfdfbe9aa5148073",
+      "sourceId": "src_f1a7228d50f2a870d59540b8213df65b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `wontfix` had to join `done` at every \"is this resolved?\" check site",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `wontfix` had to join `done` at every \"is this resolved?\" check site",
+          "anchor": "why-wontfix-had-to-join-done-at-every-is-this-resolved-check-site"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md",
+      "blobSha": "f116dbcd4715cbf76aee49f94904ec298bdbded3",
+      "blobSize": 3871,
+      "sourceDigest": "52ac9bbcd996eef240a70d019c9e26496107de91f8ee29b0d30340b58fb017e3",
+      "sourceId": "src_ae39d8d84d46c81c7292d4a526c852ef",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why `work.acceptance` gets a narrow write-time evidence-traceability check",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why `work.acceptance` gets a narrow write-time evidence-traceability check",
+          "anchor": "why-workacceptance-gets-a-narrow-write-time-evidence-traceability-check"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-work-item-titles-get-a-100-character-ceiling-at-the-stor/work-item-title-length-ceiling.md",
+      "blobSha": "95c71fafdeb0469f161c6eb57c98b9160c604799",
+      "blobSize": 5902,
+      "sourceDigest": "c1cee13f46cbfa02f2e194a676d68d3abec3768d0ce2a9bc027a663a4d58d46e",
+      "sourceId": "src_bf686ec93ebe1bc1e2a5411bbca50f5d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why work-item titles get a 100-character ceiling at the store layer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why work-item titles get a 100-character ceiling at the store layer",
+          "anchor": "why-work-item-titles-get-a-100-character-ceiling-at-the-store-layer"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+      "blobSha": "42a7b47dcf0991e36b6664646a79a4dd943a27f5",
+      "blobSize": 11708,
+      "sourceDigest": "6546931d7683a58ca77fea1581bac5c165d7482cf69fbbf4d070041e5d74071f",
+      "sourceId": "src_2ed7054d14c593be7128020ab2f6dfde",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Why workflow prose gates on a capability query, not a hardcoded tool name",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Why workflow prose gates on a capability query, not a hardcoded tool name",
+          "anchor": "why-workflow-prose-gates-on-a-capability-query-not-a-hardcoded-tool-name"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
+      "blobSha": "8bb3aa2cbbee6b61c95e16d454ec285155f14a5f",
+      "blobSize": 3150,
+      "sourceDigest": "425cc636f23aaa702328c90faace7de53defccd6480978e698308da2eda5f416",
+      "sourceId": "src_7dfaf57e47d639a799fc52de9574dfd7",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Windows `npm install -g --prefix` has no `lib` or `bin` subfolder",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Windows `npm install -g --prefix` has no `lib` or `bin` subfolder",
+          "anchor": "windows-npm-install--g---prefix-has-no-lib-or-bin-subfolder"
+        }
+      ]
+    }
+  ]
+}

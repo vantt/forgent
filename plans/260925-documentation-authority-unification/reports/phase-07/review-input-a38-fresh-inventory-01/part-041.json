@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 41,
+  "entries": [
+    {
+      "path": "docs/history/tsk-3um-cli-test-split/plan.md",
+      "blobSha": "ccca6d2b392c151f08deb22f94e2c769c921f185",
+      "blobSize": 11770,
+      "sourceDigest": "d9eec060ccd9ddec0ea5a185ae8c4309a6756005651c2ea73ad98a43218a5e88",
+      "sourceId": "src_7043a97af4fa8d2669c6f2f9beedbfe7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3um: chẻ `test/cli/fgos.test.mjs`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3um: chẻ `test/cli/fgos.test.mjs`",
+          "anchor": "planmd-tsk-3um-chẻ-testclifgostestmjs"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3uw4-rul11-citation-gloss/plan.md",
+      "blobSha": "1ae9514091a8775eeea6273707a824b2498db33c",
+      "blobSize": 3981,
+      "sourceDigest": "9cdd185d4d77667907e8f53f5666f221054b7e7d4e9de885d736ac928a0fb158",
+      "sourceId": "src_5eedb5187c129a50698de329d1566416",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3uw4",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3uw4",
+          "anchor": "planmd-tsk-3uw4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3uw4-rul11-citation-gloss/RESEARCH.md",
+      "blobSha": "7267265aa9ae70ed09f477411a5769b4d25df71c",
+      "blobSize": 5748,
+      "sourceDigest": "b28507dfa7801dfd2a7a4c122959ea2276e7599b6a697919b85e821cbbcaa62b",
+      "sourceId": "src_ce68fca714fb86163e111c99e27221a7",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-3uw4",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-3uw4",
+          "anchor": "researchmd-tsk-3uw4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3uz/iron-law-evidence.md",
+      "blobSha": "5f658dc848bf94bd231819a376c22c0449aac398",
+      "blobSize": 2183,
+      "sourceDigest": "d83b81b201c368b787f7f2ebdee08c7037ef5492f4e4b4bd1f62ce8ce2ff092d",
+      "sourceId": "src_206ebcab5ca19eb71a35536a5fd76d63",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-3uz",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-3uz",
+          "anchor": "iron-law-evidence-tsk-3uz"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3ve-2/plan.md",
+      "blobSha": "5e2b43a558781f927b7019d0a45376b18cdebf7b",
+      "blobSize": 3086,
+      "sourceDigest": "129bc5f35d6f06bfddcb3d913473a915f8803b53eb2bae77e6b98eef9525bc1d",
+      "sourceId": "src_e8969e6575d86e1b6123ec274cb887af",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3ve-2",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3ve-2",
+          "anchor": "planmd-tsk-3ve-2"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3ve-3/plan.md",
+      "blobSha": "9d2a424dbe7f9dce0c653246a578c7b59f596b31",
+      "blobSize": 4148,
+      "sourceDigest": "b87cef08d4868c4e1deb1b07ec8a1bda89a7acda50a7e43a206442022fd173bf",
+      "sourceId": "src_1ee09341b7034eb72baf608df1f56034",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3ve-3",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3ve-3",
+          "anchor": "planmd-tsk-3ve-3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3ve-4/plan.md",
+      "blobSha": "e63a23a85301cf6ebb06b09be9d858fedd4a2e01",
+      "blobSize": 3321,
+      "sourceDigest": "72483af7685cf89969d7feeb21290f6424bd3305b4e47766c8d4c3bcfb789ef8",
+      "sourceId": "src_a4367ef7457c377113bfd94f62e60ea3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3ve-4",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3ve-4",
+          "anchor": "planmd-tsk-3ve-4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3wo/iron-law-evidence.md",
+      "blobSha": "207731111338a0c79680ee707ab7f108939b0cce",
+      "blobSize": 2830,
+      "sourceDigest": "2e9417503dc2e8ad85dcce322720b4eff123a88d9a589d53d76d7dcacc24398e",
+      "sourceId": "src_00ce56b6252323dbec514f2dcf14afae",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3wo — Iron Law failing-test-first evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3wo — Iron Law failing-test-first evidence",
+          "anchor": "tsk-3wo-iron-law-failing-test-first-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "blobSha": "fe2b334c385c3a0694f895a68096a5367d7e9f9f",
+      "blobSize": 8201,
+      "sourceDigest": "454c4ae302110af570dc213ac36161ae310d0723a74ae4b6e3f20634799fc987",
+      "sourceId": "src_6d38b389ba6061b8ee1f4a4a3bbefc43",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: re-key check-decision-citation-drift.mjs's baseline by content, not line",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: re-key check-decision-citation-drift.mjs's baseline by content, not line",
+          "anchor": "plan-re-key-check-decision-citation-driftmjss-baseline-by-content-not-line"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/RESEARCH.md",
+      "blobSha": "8504ba86d7987919c85706d539def17a5a1c40cb",
+      "blobSize": 4244,
+      "sourceDigest": "b978613a62769fb8dd837c32d06f0f2a6024d4a3e90372f93984150859fe74db",
+      "sourceId": "src_9cd1f602e0f5b8bb788e8ce1bdbea323",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH: check-decision-citation-drift.mjs line-keyed baseline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH: check-decision-citation-drift.mjs line-keyed baseline",
+          "anchor": "research-check-decision-citation-driftmjs-line-keyed-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xd-decompose-child-directive-prose/CONTEXT.md",
+      "blobSha": "ec4484d200ce8ff0b882e3d9d849811378dac2da",
+      "blobSize": 8088,
+      "sourceDigest": "13525764f310c45b8bd2cac9f15f0cf9bc0dd54d861c677b6758d3c7a31561f2",
+      "sourceId": "src_dcf2a33758ef3c784638e4e44d4565c2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3xd — Truyền thân mệnh lệnh xuống task con khi auto-decompose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3xd — Truyền thân mệnh lệnh xuống task con khi auto-decompose",
+          "anchor": "tsk-3xd-truyền-thân-mệnh-lệnh-xuống-task-con-khi-auto-decompose"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xd-decompose-child-directive-prose/plan.md",
+      "blobSha": "d2ae9cf07aa9e14239c30aefab4cdac1e607f054",
+      "blobSize": 8033,
+      "sourceDigest": "35c33901d4e45490f7a46b5b4012eb84feb382924936acbee049c606ac08e676",
+      "sourceId": "src_3efdf8bfe70d596ce3e3e5cdfaaddb84",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-3xd: decompose child directive prose (action + read_first)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-3xd: decompose child directive prose (action + read_first)",
+          "anchor": "plan-tsk-3xd-decompose-child-directive-prose-action-read_first"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xd/iron-law-evidence.md",
+      "blobSha": "a1ba2de68a3741156457c2169a237b4d2bcdf853",
+      "blobSize": 3761,
+      "sourceDigest": "ef0b54757afa854af368ee2f33895a1b5ca4895eb7077f644238afb13d026345",
+      "sourceId": "src_cdbc262e600cea35845f0caa405cedff",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-3xd",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-3xd",
+          "anchor": "iron-law-evidence-tsk-3xd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xo-domain-agnostic-stage-literals/CONTEXT.md",
+      "blobSha": "450d9bf9ecc19b03cc790d5191cefaf08aa1d027",
+      "blobSize": 5373,
+      "sourceDigest": "fc5d5483d9c841750e07fb60a690299a0b4e66dec32fcc5d5b4bcfd28e21593a",
+      "sourceId": "src_e67234c28eeeb8cd9ef54d4869cf0da9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3xo — domain-agnostic stage literals in discover/decompose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3xo — domain-agnostic stage literals in discover/decompose",
+          "anchor": "tsk-3xo-domain-agnostic-stage-literals-in-discoverdecompose"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xo-domain-agnostic-stage-literals/iron-law-evidence.md",
+      "blobSha": "7581ecca74404f5f77d44979637a1084c1ef9c62",
+      "blobSize": 4085,
+      "sourceDigest": "8ce304dee4affa630696b985f00478d1ef018df22a9f9a11e068d29ea6c08790",
+      "sourceId": "src_c95c91be44e4e8f35f3ef77d812f9b91",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3xo — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3xo — Iron Law evidence",
+          "anchor": "tsk-3xo-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xo-domain-agnostic-stage-literals/plan.md",
+      "blobSha": "555f9fe04d2f8206255be89170e42a59f26171fe",
+      "blobSize": 7307,
+      "sourceDigest": "2fc43685881e61487dc18704723870f4b215fc45c4235136e1076e5885e26dfb",
+      "sourceId": "src_1656c776a3fe8894d2cd79fd162ed458",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3xo — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3xo — plan",
+          "anchor": "tsk-3xo-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3xog/plan.md",
+      "blobSha": "137c0506063ef365163199df1c15187c4c29765a",
+      "blobSize": 5215,
+      "sourceDigest": "62350f2aa47346ad122a3ef25d06b3fb943c3b322b9b33c786dfc1f6c18ffc34",
+      "sourceId": "src_e81ada331ed1a9c6197372fea7db4d8e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-3xog",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-3xog",
+          "anchor": "planmd-tsk-3xog"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3yh-take-deps-resolved-status/CONTEXT.md",
+      "blobSha": "2991bf78d8258ed2fcaa22248d3bd1b68f9cf364",
+      "blobSize": 6359,
+      "sourceDigest": "90d359000cc6ae62e6a8a0d9da55816e5b12217daa78a1a52f5331109ce29822",
+      "sourceId": "src_a931d4aee0ca0a410b2eff9add559045",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3yh-take-deps-resolved-status — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3yh-take-deps-resolved-status — locked decisions",
+          "anchor": "tsk-3yh-take-deps-resolved-status-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3yh-take-deps-resolved-status/plan.md",
+      "blobSha": "9348d4b265f73fb8ba07efca7f41901545fb98c3",
+      "blobSize": 6126,
+      "sourceDigest": "40305989100d8a10cd438d2dbd6883860dc972ea699a527194247261c5d710f8",
+      "sourceId": "src_417c950e4433dff7367616f777884515",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-3yh-take-deps-resolved-status — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-3yh-take-deps-resolved-status — plan",
+          "anchor": "tsk-3yh-take-deps-resolved-status-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3yh-take-deps-resolved-status/scout-notes.md",
+      "blobSha": "a4ac8eff73072d0a29e7600acd9af7debf5b1ed6",
+      "blobSize": 111,
+      "sourceDigest": "1ed5fb4db5367fba576ac0790d1b10af2f1933d77729e9d6f0e91df75bb4eb18",
+      "sourceId": "src_aa26e11b07cc6a848a3aa80b8b4e1b9a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Scout 1",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Scout 1",
+          "anchor": "scout-1"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-3ys/iron-law-evidence.md",
+      "blobSha": "1c83b7e38449ca76f3b34d4045f2324822c9e3ae",
+      "blobSize": 5066,
+      "sourceDigest": "10af3c98706b8c152cfc5f21ad1e37f0b42a4f29974c0b1143fc4b83e53ab21c",
+      "sourceId": "src_4982440dcbcafb536e1d6d571deb8e2a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-3ys",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-3ys",
+          "anchor": "iron-law-evidence-tsk-3ys"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-403/iron-law-evidence.md",
+      "blobSha": "23a63cf62af686ada5ae07b50550baac3e2e4a5f",
+      "blobSize": 3182,
+      "sourceDigest": "50ea61e56e9f1d18a8c53fb57714b7f9a00a7c83a4577fe1cfd118a43b94f9d6",
+      "sourceId": "src_632f081e240fba0ca8728931b2477841",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-403",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-403",
+          "anchor": "iron-law-evidence-tsk-403"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-41h-gateway-edit-route/plan.md",
+      "blobSha": "0211244330f14afb557d53a8f7178ac9a4d5c1f2",
+      "blobSize": 8777,
+      "sourceDigest": "1c43f9c2c73e24e19dc302cba3ba88e3ae3ece4c53f633e5b817acf1ab9670f3",
+      "sourceId": "src_39658ea1907c21623f35a84029921e14",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-41h: gateway route edit for /v1 (PATCH /work/{id})",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-41h: gateway route edit for /v1 (PATCH /work/{id})",
+          "anchor": "planmd-tsk-41h-gateway-route-edit-for-v1-patch-workid"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-41h-gateway-edit-route/RESEARCH.md",
+      "blobSha": "24937f36065e63708ea5a3f7c72f8bfedc305c0c",
+      "blobSize": 4974,
+      "sourceDigest": "bbe63032ecb69e20691ddad6fce4dc196992494bd9959f18745a871bdd2323ef",
+      "sourceId": "src_5397aeebd57beb24b4c62718f53a8c83",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — tsk-41h: gateway route edit for /v1 (PATCH /work/{id})",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — tsk-41h: gateway route edit for /v1 (PATCH /work/{id})",
+          "anchor": "research-tsk-41h-gateway-route-edit-for-v1-patch-workid"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-424n/iron-law-evidence.md",
+      "blobSha": "c2fc7ec5af6f56933e122660071130968959325f",
+      "blobSize": 2989,
+      "sourceDigest": "6ada238a35f24826328f4c45570e8cae09dd3336ce26f4297c2bb280cadd5443",
+      "sourceId": "src_c3db649b5980ab7750c9917611e8b0f1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-424n",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-424n",
+          "anchor": "iron-law-evidence-tsk-424n"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-43q/iron-law-evidence.md",
+      "blobSha": "1e00e5028d8f1dc61fd10c406ce421bf005dc87f",
+      "blobSize": 3472,
+      "sourceDigest": "4a995d3b84383eaef283f607233c70a3dbafe80be0ba8785248da24c121fa11b",
+      "sourceId": "src_67237f6bffe4b6d8a9265a57a7290d5c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-43q",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-43q",
+          "anchor": "iron-law-evidence-tsk-43q"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-43z/iron-law-evidence.md",
+      "blobSha": "fbc0dbf1e454ff8257609924a4c77a399592c891",
+      "blobSize": 2857,
+      "sourceDigest": "46270a2746c2f94ed8ebb550fa8d8addfe1c1b379c11902d42b2c139b48b795c",
+      "sourceId": "src_2338f94f5cfeab6a9662eecedab68fc9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-43z — Iron Law failing-test-first evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-43z — Iron Law failing-test-first evidence",
+          "anchor": "tsk-43z-iron-law-failing-test-first-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-45a/CONTEXT.md",
+      "blobSha": "2db5e8fd1402111a35a10fdb1297548c6378837b",
+      "blobSize": 2023,
+      "sourceDigest": "2882f044931b3c4d204e296daa3032cbf63f24434adbf4b44ab057cc8d1261ca",
+      "sourceId": "src_9d6043cd00821b530efa369d3ab9b255",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45a — milestone closeout, tsk-49o split out",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45a — milestone closeout, tsk-49o split out",
+          "anchor": "tsk-45a-milestone-closeout-tsk-49o-split-out"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-45f/iron-law-evidence.md",
+      "blobSha": "1c9dd9ce482f92d3a4926dc8f206cdd2e19e942e",
+      "blobSize": 4479,
+      "sourceDigest": "778be00bb9a713d5fd5d2fa65e4e28ae6a1c884cc7c83d7c4ed042bd9ee640d1",
+      "sourceId": "src_f53ef1129f972d33cce79a9e879f91b2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45f — Iron Law evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45f — Iron Law evidence",
+          "anchor": "tsk-45f-iron-law-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-45f/plan.md",
+      "blobSha": "0b48463ad75dc4c6f113288609268892006c7a26",
+      "blobSize": 7491,
+      "sourceDigest": "ee98c6bd699d57a43bdbfc9215465472b9a30f8a976a1a06ad96ad5706ed8716",
+      "sourceId": "src_a575c550b4422d21607deab3890a7192",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45f — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45f — plan",
+          "anchor": "tsk-45f-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-45g/iron-law-evidence.md",
+      "blobSha": "5ca3fa730234d6d1ddf811e05e5426abc5adf0f6",
+      "blobSize": 2235,
+      "sourceDigest": "ce80d875530a093aecd6b1249295624357d5b034b28527998d6b904984c9bd46",
+      "sourceId": "src_669d1bb57aae0dbf11160b1c5b420068",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45g — Iron Law failing-test-first evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45g — Iron Law failing-test-first evidence",
+          "anchor": "tsk-45g-iron-law-failing-test-first-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-45y-worktree-fgos-lock-decouple-stale-premise/CONTEXT.md",
+      "blobSha": "82c462e68773bc66984204461b9344bfa9feda88",
+      "blobSize": 6389,
+      "sourceDigest": "7c8aff1ad2764ff1f131432ccc0e04e1241bbc201c557802fc445e90965879b1",
+      "sourceId": "src_1470ce52b98723904ca817d65ff234ca",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-45y — worktree/.fgos decouple proposal re-checked against current code (stale)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-45y — worktree/.fgos decouple proposal re-checked against current code (stale)",
+          "anchor": "tsk-45y-worktreefgos-decouple-proposal-re-checked-against-current-code-stale"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-463-verify-backtick-escape-loss/plan.md",
+      "blobSha": "c222e20b3aee101183e74c06aa7adf1f40e1a9c3",
+      "blobSize": 6260,
+      "sourceDigest": "f128e5a41e4ecbd1b289506279a2e75f5fbf5acee372b0cf1ac848ef791d52cf",
+      "sourceId": "src_92dbcf19f1cebb7e0b4c0f724aed6737",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: tsk-463 — prevent backtick-escape loss when transcribing a verify command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: tsk-463 — prevent backtick-escape loss when transcribing a verify command",
+          "anchor": "plan-tsk-463-prevent-backtick-escape-loss-when-transcribing-a-verify-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-463-verify-backtick-escape-loss/RESEARCH.md",
+      "blobSha": "5c56b9621e7f8e8449d01d7fc47f3d33bfea241d",
+      "blobSize": 5692,
+      "sourceDigest": "3a1c915f4cf8c11337045e818b6a179f00b0b9a3f2e67c83312be2dd40b07bcb",
+      "sourceId": "src_14d996e645474cbc44194741a980a7ff",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research: tsk-463 — verify's backtick-escape-loss transcription risk",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research: tsk-463 — verify's backtick-escape-loss transcription risk",
+          "anchor": "research-tsk-463-verifys-backtick-escape-loss-transcription-risk"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-46a/iron-law-evidence.md",
+      "blobSha": "fe286d3471b8bf8d6334778cf3257d7356ccffb1",
+      "blobSize": 1954,
+      "sourceDigest": "d67bdd342cf827b5c9d7b0ea51c5018a1d9c3058b1a45203d56cc4d4a218b4c9",
+      "sourceId": "src_281988997a44c117c3d826e7901af008",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-46a",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-46a",
+          "anchor": "iron-law-evidence-tsk-46a"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-46f/iron-law-evidence.md",
+      "blobSha": "1ba0c201b6c5a6c03d6abb2a5dd25a2f0525964f",
+      "blobSize": 2659,
+      "sourceDigest": "813f3369416ce098369e4d0b5e0d336e70fa3a0fb9126b0abda57be1c3d985dc",
+      "sourceId": "src_6431187849396d1fedeb95521ac5430f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-46f",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-46f",
+          "anchor": "iron-law-evidence-tsk-46f"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-46v/iron-law-evidence.md",
+      "blobSha": "a49670e0407829f12f0452567132f2d40db522af",
+      "blobSize": 1801,
+      "sourceDigest": "ce86933129c6e6513ee7930fb1d366cc0bc83464044b14bfdca2d3755969cde5",
+      "sourceId": "src_53a535290a9d34a5dc1ffb04b36e89b4",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law Evidence — tsk-46v",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law Evidence — tsk-46v",
+          "anchor": "iron-law-evidence-tsk-46v"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-47r/iron-law-evidence.md",
+      "blobSha": "ea5b9f4535cd02bca89c99517a10fdf60d82606d",
+      "blobSize": 6140,
+      "sourceDigest": "333a7be08ffeda3d0b515b6ca1d6e4d5a0dd78274cca750746057d16aabeff53",
+      "sourceId": "src_757cb64f8ddb8010716470928636330b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-47r",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-47r",
+          "anchor": "iron-law-evidence-tsk-47r"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-480-approve-movework-friction-guard/CONTEXT.md",
+      "blobSha": "219930c2f921969b07f0ce132de3de0190c35bad",
+      "blobSize": 7137,
+      "sourceDigest": "17e125c44847f3a57cb4ffc804322974db214719a3e65ee71f785f15e1ad10f9",
+      "sourceId": "src_926f34425567417848d23ea7e510a576",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: tsk-480 — approve's post-merge moveWork can throw silently after a permanent state change",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: tsk-480 — approve's post-merge moveWork can throw silently after a permanent state change",
+          "anchor": "context-tsk-480-approves-post-merge-movework-can-throw-silently-after-a-permanent-state-change"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
+      "blobSha": "b08e9ac6dae15952027ffde3f1487b5030c6fe39",
+      "blobSize": 4532,
+      "sourceDigest": "6c1f2fd36d969b326ec23173718b12520fae798030fc8fa8fc5cbfde225aedc3",
+      "sourceId": "src_52a8ad5187d9ab0f196100f7c214e5e8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-480",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-480",
+          "anchor": "iron-law-evidence-tsk-480"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-480-approve-movework-friction-guard/plan.md",
+      "blobSha": "a58e77e5072f81c54701867305ee2a87e858727b",
+      "blobSize": 9063,
+      "sourceDigest": "c0052de5c9a14dbe8d122137fdd3a056fee8168a676f03f1598aaf913d38b009",
+      "sourceId": "src_bcfd31c865e7283aa99cd54e2bd7a256",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: tsk-480 — approve's post-success moveWork can throw silently after a permanent state change",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: tsk-480 — approve's post-success moveWork can throw silently after a permanent state change",
+          "anchor": "plan-tsk-480-approves-post-success-movework-can-throw-silently-after-a-permanent-state-change"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-480-approve-movework-friction-guard/scout-notes.md",
+      "blobSha": "c3b9357262a2b2ae4e568ad7db0cc7d83a08ba58",
+      "blobSize": 242,
+      "sourceDigest": "8fc8bd200065d129f4b597658fce7460f6981f8846bbae7d30e757f86bbc9187",
+      "sourceId": "src_ad82ec65ac56e9d0792376fe65cce0dc",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Scout 1",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Scout 1",
+          "anchor": "scout-1"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-483-list-side-log-pagination-scoping/CONTEXT.md",
+      "blobSha": "726a3e3a319aa69ffa1825f91cd2b5f217d2703c",
+      "blobSize": 3022,
+      "sourceDigest": "9bd33172fc7cc6ba5ddb66785b977860e0eba189e7cbbbeb719432dbff05fa17",
+      "sourceId": "src_5d136dd80920677364300c558d452568",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: list scopes side-logs to the ids actually returned",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: list scopes side-logs to the ids actually returned",
+          "anchor": "context-list-scopes-side-logs-to-the-ids-actually-returned"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-483-list-side-log-pagination-scoping/plan.md",
+      "blobSha": "924f2de535298cc4c379dbc7e7ccb932c94c4480",
+      "blobSize": 5052,
+      "sourceDigest": "53872687b361c1a02901eb0876d47fd5a6ddb7fd623a2df6c67e352aa2bd360b",
+      "sourceId": "src_7d63c715697ec6919604348783a2e293",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: scope list's side-logs to the returned work ids",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: scope list's side-logs to the returned work ids",
+          "anchor": "plan-scope-lists-side-logs-to-the-returned-work-ids"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-483-list-side-log-pagination-scoping/RESEARCH.md",
+      "blobSha": "6fb9d2f40aec53fdd38ecb022444763463112958",
+      "blobSize": 4389,
+      "sourceDigest": "6d6aa93250eeea2435b64b843a8517b579484fb62a75dac2f84000cb16b3845a",
+      "sourceId": "src_83e1a2da7ad4698f3fe6f5f346abe85b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH: reopening list's D5/D35 work-only pagination scope",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH: reopening list's D5/D35 work-only pagination scope",
+          "anchor": "research-reopening-lists-d5d35-work-only-pagination-scope"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-483/iron-law-evidence.md",
+      "blobSha": "ffc8c8bdc41d3a0fabb2d88a8609b443e6c5e989",
+      "blobSize": 1930,
+      "sourceDigest": "f4e52320b254b0a937f85f4b176e219c2caebf383cdb83248cba95a89e59e35a",
+      "sourceId": "src_d1c4569ac29430628917b746d98269c4",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-483",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-483",
+          "anchor": "iron-law-evidence-tsk-483"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-48i/iron-law-evidence.md",
+      "blobSha": "e36b32135951059f18c37072ef57c09b763ea6cc",
+      "blobSize": 2335,
+      "sourceDigest": "80b140bca5a2dc00204488bf41e5f4d48a4f790d581fe21f7c87d281a8e2d630",
+      "sourceId": "src_ad69ca15c1827cfeda3654e2c162dfc9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-48i",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-48i",
+          "anchor": "iron-law-evidence-tsk-48i"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-48w/iron-law-evidence.md",
+      "blobSha": "4b8018e1c6a9c93601fb40281b9ea5f4f9e18f57",
+      "blobSize": 4293,
+      "sourceDigest": "773c65da77c420955a1e9d9c606566575cd61048282fd781b9dbafe8bd3f8599",
+      "sourceId": "src_508a330fb03269fe919cf4749659825d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-48w",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-48w",
+          "anchor": "iron-law-evidence-tsk-48w"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49a-runner-claim-race/CONTEXT.md",
+      "blobSha": "6e9f33dc980b5365489297ec45eb5a391a0d5219",
+      "blobSize": 7344,
+      "sourceDigest": "19cbd75c454824248481e17b1cb4aad23506cc95f4933c2ec335c988e3e6bfa8",
+      "sourceId": "src_944684a8d6a759ddc70e6f0e1c161865",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Runner claim race (tsk-49a) — CONTEXT",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runner claim race (tsk-49a) — CONTEXT",
+          "anchor": "runner-claim-race-tsk-49a-context"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49a-runner-claim-race/plan.md",
+      "blobSha": "a060ddba44724915fe60120dbc69c30037bf62a6",
+      "blobSize": 7029,
+      "sourceDigest": "823bc52192e6f1e735086c205ea143ba3ce483120316537e6c360f2b5f4c19ee",
+      "sourceId": "src_9b4ec517be75a7387dc3ee5345159326",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Runner claim race (tsk-49a) — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runner claim race (tsk-49a) — plan",
+          "anchor": "runner-claim-race-tsk-49a-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49e-incremental-read-snapshot/CONTEXT.md",
+      "blobSha": "b3be8f8d8dfc7a982b52e26488d44e3837076431",
+      "blobSize": 3544,
+      "sourceDigest": "746ff0ae76c8be93fbccfa18fb953d34b109d9279cb57156f468ff51fa695db5",
+      "sourceId": "src_dc5582d856e20f12548e9a2b85551346",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: the incremental-read snapshot mechanism (tsk-49e)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: the incremental-read snapshot mechanism (tsk-49e)",
+          "anchor": "context-the-incremental-read-snapshot-mechanism-tsk-49e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49e-incremental-read-snapshot/plan.md",
+      "blobSha": "6b550789c80513906427e1e2bff56e6336b180cd",
+      "blobSize": 7177,
+      "sourceDigest": "41b29bf181e369da45dcdc71d1cb14c172cbbaa32794d18135054ed2e84e93e9",
+      "sourceId": "src_9a8c614268f944702f42557cd8cd52ca",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: incremental-read snapshot (byte-offset seek + last-line fingerprint)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: incremental-read snapshot (byte-offset seek + last-line fingerprint)",
+          "anchor": "plan-incremental-read-snapshot-byte-offset-seek-last-line-fingerprint"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49e-incremental-read-snapshot/RESEARCH.md",
+      "blobSha": "d5909de2dd92b00d9f8cb1040d9b23e7f9278f5a",
+      "blobSize": 6396,
+      "sourceDigest": "3c6a3a54fbb449a07c6a06fd29777f261ec08a3b72338dedf3259c299e11aa87",
+      "sourceId": "src_429de5902c6264f30d5608f2dc2a801b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH: an incremental-read snapshot that actually saves I/O",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH: an incremental-read snapshot that actually saves I/O",
+          "anchor": "research-an-incremental-read-snapshot-that-actually-saves-io"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49e/iron-law-evidence.md",
+      "blobSha": "c810ee353229c1f38f6535af92ff8898623c9e52",
+      "blobSize": 1887,
+      "sourceDigest": "3d7074329539452770355c65dc073ebec90bf472777aaf1592b283aa586e9d69",
+      "sourceId": "src_b2fbc7a788ed15e2be80c4e6f40199f1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-49e",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-49e",
+          "anchor": "iron-law-evidence-tsk-49e"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49u-coding-classify-intake-retirement/CONTEXT.md",
+      "blobSha": "1461583355db904345881194a914c869ba73b3a3",
+      "blobSize": 3162,
+      "sourceDigest": "af6ae308e3da3bc315b150973ad98a4d003fcb1f43b294c3f46bf78373137364",
+      "sourceId": "src_909d531da3ccd893c351115374ef921d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: coding-classify-intake — alive-or-dead verdict",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: coding-classify-intake — alive-or-dead verdict",
+          "anchor": "context-coding-classify-intake-alive-or-dead-verdict"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-49u-coding-classify-intake-retirement/plan.md",
+      "blobSha": "fc4338337b9aa8f5ef3c78a8b3a60bf7f800e94b",
+      "blobSize": 3302,
+      "sourceDigest": "01536f36d64dea0bc7f7724658051b709ff5b4c6213cfad8434706c0d88a482a",
+      "sourceId": "src_51d8cce57222a60816dd4af0394d43b6",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: retire the orphaned coding-classify-intake config entry",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: retire the orphaned coding-classify-intake config entry",
+          "anchor": "plan-retire-the-orphaned-coding-classify-intake-config-entry"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-4ax/iron-law-evidence.md",
+      "blobSha": "49b82669da45a54baf3db111920a3310cf5455b6",
+      "blobSize": 6527,
+      "sourceDigest": "a714914fb01caca4d61f95dfb182d13e28cf08485ac39af3e77f924974f58eb0",
+      "sourceId": "src_68b83717e03a21a29476f081716603c8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence: tsk-4ax",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence: tsk-4ax",
+          "anchor": "iron-law-evidence-tsk-4ax"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-4b2-discovery-exploring-stage-wiring/CONTEXT.md",
+      "blobSha": "4cacbe7d4b49832ebc7bde7034e57a159f3b0f3e",
+      "blobSize": 8665,
+      "sourceDigest": "a30c8acf854f5d1b03fe0fc0fe88e2383d8be32a65c1f728c649e3a2313be4c9",
+      "sourceId": "src_21c54fb6fff064fd891ebec9274588c9",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: wire the `discovery`/`exploring` stages into the real flow",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: wire the `discovery`/`exploring` stages into the real flow",
+          "anchor": "context-wire-the-discoveryexploring-stages-into-the-real-flow"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-4b2-discovery-exploring-stage-wiring/plan.md",
+      "blobSha": "ba49aeb52962ce8f6340babc759f3a8f92e565f4",
+      "blobSize": 11169,
+      "sourceDigest": "ebd77bf53f971fc9b21e0e817f57a614ea30e5bd7b49df059390d61e9bc8113a",
+      "sourceId": "src_273868513cc458eaf0b151322ed97b6b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: wire `discovery`/`exploring` into the real flow",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: wire `discovery`/`exploring` into the real flow",
+          "anchor": "plan-wire-discoveryexploring-into-the-real-flow"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/tsk-4b2/iron-law-evidence.md",
+      "blobSha": "2ebd952f8429a4a7daae76dc21580350ed913d2a",
+      "blobSize": 2424,
+      "sourceDigest": "3ebda5182551e24fdb1f3e6cfdc92c0b2ed5ce5a79c457b4d5573e83ffccaa88",
+      "sourceId": "src_3e121a9fc33a0c0df10af651c60d8e2e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-4b2",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-4b2",
+          "anchor": "iron-law-evidence-tsk-4b2"
+        }
+      ]
+    }
+  ]
+}

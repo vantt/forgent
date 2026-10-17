@@ -1,0 +1,840 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 75,
+  "entries": [
+    {
+      "path": "docs/specs/enduser-docs-authoring.md",
+      "blobSha": "c33827941b896027ae9715a2b320ab1f8fda4d87",
+      "blobSize": 8989,
+      "sourceDigest": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "sourceId": "src_9b306198ea39015ceb60ce61e6320225",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Soạn & nuôi tài liệu người-dùng-cuối (enduser-docs-authoring)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Soạn & nuôi tài liệu người-dùng-cuối (enduser-docs-authoring)",
+          "anchor": "spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/enduser-docs-index.md",
+      "blobSha": "e0b50c37f23eb62a06ded8346cdb96c5d2851988",
+      "blobSize": 19960,
+      "sourceDigest": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "sourceId": "src_811db09dd20c819a1574ccc8eff49338",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Chỉ mục đọc-theo-tag tài liệu người-dùng-cuối (enduser-docs-index)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Chỉ mục đọc-theo-tag tài liệu người-dùng-cuối (enduser-docs-index)",
+          "anchor": "spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/fgos-plugin.md",
+      "blobSha": "fd3609b13dd023c66767db856f0b767315b952fa",
+      "blobSize": 10199,
+      "sourceDigest": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "sourceId": "src_fe59be11f3c3bee80f01264f9858e8b0",
+      "area": "Claude plugin surface",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: fgOS Plugin (Claude Code slash-command surface)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "anchor": "spec-fgos-plugin-claude-code-slash-command-surface"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "blobSha": "e7edb5668119e67384175cace620459e97175ddd",
+      "blobSize": 21374,
+      "sourceDigest": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "sourceId": "src_2b3c5db8c14660c55d02bd8ec565a688",
+      "area": "Herdr gateway and web dashboard",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "anchor": "spec-herdr-web-dashboard-browser-surface-for-fgos-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "blobSha": "e64d4735c8737a0550157ff2010d72dc364528ff",
+      "blobSize": 19903,
+      "sourceDigest": "7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4",
+      "sourceId": "src_4a04b5937e2bc137f5022a0ce2ce12a0",
+      "area": "Observe (metrics and friction)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Observe Component Specification",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Observe Component Specification",
+          "anchor": "observe-component-specification"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "blobSha": "1c58a7c8c07a566f2c9240efa2e9615411a4585f",
+      "blobSize": 36238,
+      "sourceDigest": "80242347886ffd2d34dabe5a328928d07abec916cbecb210782fd74cb11030b3",
+      "sourceId": "src_5839d9ee49693c2ccfe0533ee76609c8",
+      "area": "Platform laws",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": "docs/platform/platform-foundations.md",
+      "gap": false,
+      "firstHeading": "Spec: Platform Foundations (luật nền)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Platform Foundations (luật nền)",
+          "anchor": "spec-platform-foundations-luật-nền"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "blobSha": "2851a42e42d2bf8490584a537f6cc48e7ff65484",
+      "blobSize": 29498,
+      "sourceDigest": "22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250",
+      "sourceId": "src_d58382ed4b6d6ae882cc36d90ca8822b",
+      "area": "Legacy spec (unmapped)",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Reading Map (sản phẩm)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Reading Map (sản phẩm)",
+          "anchor": "reading-map-sản-phẩm"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "blobSha": "8c661ab0d92650ebdfcbc1cf87c6eeaf0772b835",
+      "blobSize": 598460,
+      "sourceDigest": "1c6c01ad2197db7ef884314de4ca40fa58fd3f9e0bfcd2953de42e100d7ea8a8",
+      "sourceId": "src_8e2eda7d746c62f2277991404e429d23",
+      "area": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Spec: Runner (vòng tự hành)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Runner (vòng tự hành)",
+          "anchor": "spec-runner-vòng-tự-hành"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "blobSha": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
+      "blobSize": 18656,
+      "sourceDigest": "214c64c60cc3b3d2dfaeb6550b2ebbe6c38a4c759104086d238e96223895c7a8",
+      "sourceId": "src_9cb94af66b4e3deeb4d6fc75206a233e",
+      "area": "System overview",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: System Overview",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: System Overview",
+          "anchor": "spec-system-overview"
+        }
+      ]
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "blobSha": "a3e5d7597e5116d90ae760268dc82ea1f7723383",
+      "blobSize": 326941,
+      "sourceDigest": "aa7f9f1041531a918c58cdf5f41995a257c5ec8c353d4237a21096d24b60eef0",
+      "sourceId": "src_6563742bc0ef617ccfb57712cee3e9ff",
+      "area": "Work state / work lifecycle engine",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Work-State (tầng quản việc của forgent)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Work-State (tầng quản việc của forgent)",
+          "anchor": "spec-work-state-tầng-quản-việc-của-forgent"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/architecture.md",
+      "blobSha": "cc28d9a5e847618bd45ab6587621f9daa5f30790",
+      "blobSize": 1478,
+      "sourceDigest": "4dbe00e3ac6e365af738e61bf930780958e82b59f29d947d94859d037dbe9d0d",
+      "sourceId": "src_f94dde7a44ec6671c7aac9131d254a0c",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Architecture Topic>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Architecture Topic>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/area-readme.md",
+      "blobSha": "46143c6f5c7af14b2c2b8529026a2946e78e2e84",
+      "blobSize": 3763,
+      "sourceDigest": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+      "sourceId": "src_48786db3224eafc9f6e9a6b01d329f6d",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Area Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Area Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/contract.md",
+      "blobSha": "985a371e7409660dc6b49e53bfd222c632731456",
+      "blobSize": 1192,
+      "sourceDigest": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d",
+      "sourceId": "src_d8a1fc686a18ef58195b8dc418d56689",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Contract: <Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Contract: <Name>",
+          "anchor": "contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/decision.md",
+      "blobSha": "ea211d664ee95c974a947871f4f5345123144390",
+      "blobSize": 857,
+      "sourceDigest": "c0f1d59f2917dfc70841f52ea1dc8232cb5e5f8ff88c950d4a498fc9a6a17802",
+      "sourceId": "src_5044b1348265d72797b0b45841fffee2",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Decision: <Title>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Decision: <Title>",
+          "anchor": "decision"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/discussion.md",
+      "blobSha": "ed0e7c60671cb9ff516ba2bd0201b07246354c8d",
+      "blobSize": 812,
+      "sourceDigest": "3cc78a7f91f9d2f350158c36117fd470d971dae394f8deeeac98758ca9868e0a",
+      "sourceId": "src_bb4f32e93f1034d59abf50ea33bbb937",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Topic> Discussion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Topic> Discussion",
+          "anchor": "discussion"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/generated.md",
+      "blobSha": "2f7f8a65031ef9fe9047c05155f3b11d19c1c860",
+      "blobSize": 634,
+      "sourceDigest": "e94a37cae8b21421eeca2fd2b54e602c92d43a50d1b36af7dea01dce6ca3806c",
+      "sourceId": "src_749821d916e8cf8ef9ffcb79048ecbaa",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Generated Artifact Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Generated Artifact Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/intent-preservation-ledger.md",
+      "blobSha": "366ddbe32e528a6ee50c6fcf1830fa2118be0eed",
+      "blobSize": 1879,
+      "sourceDigest": "4b2c2916f67d00b5158ce9d82c93bb21dfad41f6c5cc3ffdbf01d29a51fe9c50",
+      "sourceId": "src_33416735a1ced03ac6536cd02487ab42",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Area> Intent Preservation Ledger",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Area> Intent Preservation Ledger",
+          "anchor": "intent-preservation-ledger"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/spec.md",
+      "blobSha": "51e321d43ccebd06e6b05e224b32ad924e27f0bf",
+      "blobSize": 1449,
+      "sourceDigest": "980f368c517dad90aa9a1426285d6d200633e4ef6f0c4625e40d1ee9923a0b0e",
+      "sourceId": "src_0910e0cac98b129113b3ff58daec0f66",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Spec: <Area Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: <Area Name>",
+          "anchor": "spec"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/subcomponent-readme.md",
+      "blobSha": "40eb35fe975151d9ddbf0268e0a7f0c890f235f3",
+      "blobSize": 2506,
+      "sourceDigest": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+      "sourceId": "src_451afa8e4d8a9b091693509dd5a358b4",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "<Subcomponent Name>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "<Subcomponent Name>",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/verification.md",
+      "blobSha": "0e10a1bd27e91e250f4ab5719a7bd54db19334ab",
+      "blobSize": 829,
+      "sourceDigest": "3ae81f2d4d4724e6e4da585ac073ae5ce78b5f7ace0fba37f504bf9579c722f4",
+      "sourceId": "src_5b7b8544903de09280f9610ca68798aa",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Verification: <Claim>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Verification: <Claim>",
+          "anchor": "verification"
+        }
+      ]
+    },
+    {
+      "path": "docs/templates/vision.md",
+      "blobSha": "065e00a7e13668d3160c6cb300242b4ce3f0116e",
+      "blobSize": 1238,
+      "sourceDigest": "61d867cd5921cb157c8cfbaa874f733fa94b4478c4d1710a59d6804dae57f622",
+      "sourceId": "src_bdfecad40714d0b49f622aa4078dc9c4",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Vision: <Area>",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Vision: <Area>",
+          "anchor": "vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "blobSha": "eb96f8d9e850f7c0781c1796d750645d0bb23e05",
+      "blobSize": 13207,
+      "sourceDigest": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "sourceId": "src_b4a4756afafc4212a77487d3ee372fb0",
+      "area": "Documentation system",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Transitional Documentation Authority Switchboard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Transitional Documentation Authority Switchboard",
+          "anchor": "transitional-documentation-authority-switchboard"
+        }
+      ]
+    },
+    {
+      "path": "docs/tutorials/.gitkeep",
+      "blobSha": "8b137891791fe96927ad78e64b0aad7bded08bdc",
+      "blobSize": 1,
+      "sourceDigest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "sourceId": "src_1cfdd26e89ed7763323e07e27b144005",
+      "area": "End-user documentation (Diataxis)",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "blobSha": "4650474a4a120ad30291b58c4f4c55b4a6caef83",
+      "blobSize": 3564,
+      "sourceDigest": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "sourceId": "src_9ca3b397b3d364854d95353f3cf03bf2",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr web dashboard — UI spec overview",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr web dashboard — UI spec overview",
+          "anchor": "herdr-web-dashboard-ui-spec-overview"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/15-system-events.md",
+      "blobSha": "6f90ca72cd9860ba3672e7f249906e1c0a44a8ab",
+      "blobSize": 2058,
+      "sourceDigest": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+      "sourceId": "src_f8c0ba2bc694d5684df601e347f6cc25",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "System events",
+      "headings": [
+        {
+          "level": 1,
+          "text": "System events",
+          "anchor": "system-events"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/20-domain-rules.md",
+      "blobSha": "65f412bfc8304ee6bba82cfc0bdf2484ef3e04b3",
+      "blobSize": 3249,
+      "sourceDigest": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "sourceId": "src_55b5121429eea88c16a997ecfb3a25bc",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Domain rules",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Domain rules",
+          "anchor": "domain-rules"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/30-states-and-errors.md",
+      "blobSha": "d325391eabce213f65f9dea5dfad3c9387b14d7b",
+      "blobSize": 2313,
+      "sourceDigest": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "sourceId": "src_c2936881692b9a90a1dca1d00207bd38",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "States and errors",
+      "headings": [
+        {
+          "level": 1,
+          "text": "States and errors",
+          "anchor": "states-and-errors"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/components/C01-item-card.md",
+      "blobSha": "271420848336ec91b670bf2481344e21b154ad49",
+      "blobSize": 2392,
+      "sourceDigest": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "sourceId": "src_508ee7fa7695ffa2ac5967818f5d17a9",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "C01 — Item card (status pill + quick actions)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "C01 — Item card (status pill + quick actions)",
+          "anchor": "c01-item-card-status-pill-quick-actions"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "blobSha": "d0600c229df25316b734289a17533f2a11c59b30",
+      "blobSize": 2647,
+      "sourceDigest": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+      "sourceId": "src_e5553b7bc70b50240d6a7ff88b7e5f9f",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "F01 — Answer a parked question, end to end",
+      "headings": [
+        {
+          "level": 1,
+          "text": "F01 — Answer a parked question, end to end",
+          "anchor": "f01-answer-a-parked-question-end-to-end"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "blobSha": "73809ee31a5be5fed418d03ae49ac12de6777603",
+      "blobSize": 2293,
+      "sourceDigest": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+      "sourceId": "src_9bd8a1ab5f5ad2d8d302bf6b40831fd9",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "F02 — Approve a merge, end to end",
+      "headings": [
+        {
+          "level": 1,
+          "text": "F02 — Approve a merge, end to end",
+          "anchor": "f02-approve-a-merge-end-to-end"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/generated/action-registry.csv",
+      "blobSha": "63fe771b1f13e322fce4316b3c6e02cd3b74a214",
+      "blobSize": 2078,
+      "sourceDigest": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+      "sourceId": "src_83a86a2a390ddda1bec9b7d1758f779c",
+      "area": "UI specification",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/generated/coverage-report.md",
+      "blobSha": "58fdd374b272f69d0896098d6779ce7159c189d6",
+      "blobSize": 571,
+      "sourceDigest": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+      "sourceId": "src_74544250c03ab7a726a774c48d74a659",
+      "area": "UI specification",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Coverage Report (generated)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coverage Report (generated)",
+          "anchor": "coverage-report-generated"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/generated/navigation-graph.yaml",
+      "blobSha": "cf03812f5036a34ef874f9f142e897f255810370",
+      "blobSize": 7359,
+      "sourceDigest": "0b28f3554b2a5fba6a70d8fa728742ebfdd6f3e5a9f0a2bfe1149721d40617de",
+      "sourceId": "src_3f3c7a11a0dd7195ea22959505a196ef",
+      "area": "UI specification",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/generated/surface-registry.yaml",
+      "blobSha": "2365591cefa3da5a53b16ed7e60e557c6caf4ab4",
+      "blobSize": 3197,
+      "sourceDigest": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+      "sourceId": "src_87e4b32c121c994ae0d0d8c7da4c6438",
+      "area": "UI specification",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/generated/wireframe-v2.html",
+      "blobSha": "8dbcdfb265010bde1c3cbb3fe1f2dbd0292aacc0",
+      "blobSize": 631319,
+      "sourceDigest": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "sourceId": "src_3331a458bb770be1afceedec701ad219",
+      "area": "UI specification",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/modals/M01-answer-question.md",
+      "blobSha": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+      "blobSize": 3963,
+      "sourceDigest": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "sourceId": "src_76a9c01a2ba861a437d9ec9c8568f948",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M01 — Answer a parked question",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M01 — Answer a parked question",
+          "anchor": "m01-answer-a-parked-question"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/modals/M02-approve-merge.md",
+      "blobSha": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+      "blobSize": 3802,
+      "sourceDigest": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "sourceId": "src_fcabb512ad4803404eaab1938eab08ea",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M02 — Approve a merge",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M02 — Approve a merge",
+          "anchor": "m02-approve-a-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "blobSha": "09aa20dbc0fae13211c64077188d5e7950d56120",
+      "blobSize": 3587,
+      "sourceDigest": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "sourceId": "src_5c52d3dd5c864ae51adc028f0818c3b2",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "M03 — Add or edit a work item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "M03 — Add or edit a work item",
+          "anchor": "m03-add-or-edit-a-work-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/schema/surface-contract.schema.json",
+      "blobSha": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "blobSize": 4084,
+      "sourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "sourceId": "src_d42077b2745fdf77e958dfc8ec96862f",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/ui-spec/screens/S01-sign-in.md",
+      "blobSha": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+      "blobSize": 3401,
+      "sourceDigest": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "sourceId": "src_6357a9e5b7336e84049ca179cfbb7156",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S01 — Sign in",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S01 — Sign in",
+          "anchor": "s01-sign-in"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "blobSha": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+      "blobSize": 11488,
+      "sourceDigest": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "sourceId": "src_f5b30a1cc58663e94363f2b8f611352c",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S02 — Taskboard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S02 — Taskboard",
+          "anchor": "s02-taskboard"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/screens/S03-task-detail.md",
+      "blobSha": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+      "blobSize": 11428,
+      "sourceDigest": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "sourceId": "src_d9327e67c9168836413e38d9dd064dc1",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S03 — Task detail",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S03 — Task detail",
+          "anchor": "s03-task-detail"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "blobSha": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+      "blobSize": 4732,
+      "sourceDigest": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "sourceId": "src_0ca26d584162c91b6b08f65f3e8932a1",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "S04 — Questions needing answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "S04 — Questions needing answer",
+          "anchor": "s04-questions-needing-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "blobSha": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "blobSize": 509,
+      "sourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "sourceId": "src_0cc0a2bce50729e7c745727d601b0e05",
+      "area": "UI specification",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/user/README.md",
+      "blobSha": "8fdeba9324e66beb0ddc1d83ca5651290173874e",
+      "blobSize": 1136,
+      "sourceDigest": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "sourceId": "src_795ef06d6f84b7479410bcc868bf5640",
+      "area": "Unclassified",
+      "authorityStatus": "unclassified",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "User Documentation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "User Documentation",
+          "anchor": "user-documentation"
+        }
+      ]
+    },
+    {
+      "path": "docs/work-item-lifecycle-vision.md",
+      "blobSha": "2f672212ecb5b9f38aa900892534e76e1552e28c",
+      "blobSize": 6935,
+      "sourceDigest": "d4267552c03638faa76d826ba5f47677a7ee683e23f50e933d1705bb78b6cf08",
+      "sourceId": "src_2aa3652bb5dcf02ee6aadcd8e7b6046f",
+      "area": "root:docs/work-item-lifecycle-vision.md",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+          "anchor": "chu-trình-work-item-của-fgos-tầm-nhìn-nền-tảng"
+        }
+      ]
+    }
+  ]
+}

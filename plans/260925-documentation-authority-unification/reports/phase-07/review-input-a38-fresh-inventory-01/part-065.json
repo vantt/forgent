@@ -1,0 +1,950 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 65,
+  "entries": [
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "blobSha": "58194b141714f4827be2bed14b767ddd8112d096",
+      "blobSize": 57175,
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceId": "src_7e6b8dec4413b8a14501ac19fd4883cc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.2 — R3: CLI `--contract` Door",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.2 — R3: CLI `--contract` Door",
+          "anchor": "cell-p032-r3-cli---contract-door"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md",
+      "blobSha": "0ecf15649f13d5ff4491da05ab1a9062042cad84",
+      "blobSize": 29221,
+      "sourceDigest": "c36ef7c7abb3d707ecd20aebc336005bcdfe1dea25e33f31b3cb391d111041ea",
+      "sourceId": "src_89970c8a5b8e60c67e5a89abf9710410",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.3 — R4-R6: The Two Live Proofs And ADR Traceability",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.3 — R4-R6: The Two Live Proofs And ADR Traceability",
+          "anchor": "cell-p033-r4-r6-the-two-live-proofs-and-adr-traceability"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md",
+      "blobSha": "478ab7b33f6ef9ed8a9274839ac9b7cbca11a0c7",
+      "blobSize": 7736,
+      "sourceDigest": "2b65bf491a39e6d346efa8e930a9b6421aed695719274c0bba30614928e1a00e",
+      "sourceId": "src_4c9f28cb776dcee708894006876995e9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Proof 1 — Standalone Inline Read-Only (R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Proof 1 — Standalone Inline Read-Only (R4)",
+          "anchor": "proof-1-standalone-inline-read-only-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md",
+      "blobSha": "7fb6685d13f49b497b01082914bd6c164f28ce01",
+      "blobSize": 9568,
+      "sourceDigest": "a53692f5af53770219d4eba11b38fdaf3b15c1ff8a17d57697906571384f0fa2",
+      "sourceId": "src_5033d2cdb5aed9be4ecefe6645aa7f71",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Proof 2 — Coding Consult Supporting A Planning Work (R5)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Proof 2 — Coding Consult Supporting A Planning Work (R5)",
+          "anchor": "proof-2-coding-consult-supporting-a-planning-work-r5"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/assignment.json",
+      "blobSha": "267a3fd14152e209c4b8585b4013babcf554ae5f",
+      "blobSize": 3235,
+      "sourceDigest": "b4d964f2ab06e6012ab8121b8524d4e65fbc6f593d86d5da7ded4af94564a2a2",
+      "sourceId": "src_e517614253ce8273e11936b052c9c4cb",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/command-stdout.txt",
+      "blobSha": "f3f2c987eb86274e97ca7077b1e63732fa4087e4",
+      "blobSize": 2309,
+      "sourceDigest": "dbe49ed9e4e154601008b62c9ab50b4cfc1fcefb542484a1bcdc015cf9bd846d",
+      "sourceId": "src_586acde1f8795cec8cceac810fba8bb4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/contract.json",
+      "blobSha": "f100cb26dd7ab467e09a7f969af509bbfc60f183",
+      "blobSize": 1328,
+      "sourceDigest": "8958393d638beee92f7d1760f39fe265abfbcc2c8d86b6fd64640035c656ebf1",
+      "sourceId": "src_4aa0f7a4aa0473580fc52c812b462660",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-report.md",
+      "blobSha": "1d15eb6e9fecba404f6d6bc16aa9f7783e254ed8",
+      "blobSize": 3822,
+      "sourceDigest": "6739fa69d717a94187b6d727d77554964bc58981757485d9801f7a339fe3cc07",
+      "sourceId": "src_6be8c14470d87488ac63f4706be59ff8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Review: ADR-007 Decision vs. `enrich-and-validate-contract.mjs`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Review: ADR-007 Decision vs. `enrich-and-validate-contract.mjs`",
+          "anchor": "review-adr-007-decision-vs-enrich-and-validate-contractmjs"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-result.json",
+      "blobSha": "b0ecd7defe380d5fcc3b959be581d86b68065d76",
+      "blobSize": 2827,
+      "sourceDigest": "8fefff1659cf73606e9e614db2b0c91719f0dbcabc9838be0e022a688d23bd59",
+      "sourceId": "src_1a07d9fb0b4e7112f843ffdf3373deca",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/dispatch-plan.json",
+      "blobSha": "94a519497310e44fe5ced0229aca37d5c8f86dc9",
+      "blobSize": 596,
+      "sourceDigest": "8f525a2e5a9200a73e6a31587aae832ac66616a1e15aed327e197024ca06cf9d",
+      "sourceId": "src_1c0ab58e77b2820280704f38a7f92720",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/exit.json",
+      "blobSha": "fccbc4d0c80e63d2cebcd988c9b10d25dcc0f384",
+      "blobSize": 126,
+      "sourceDigest": "8a41be3a64499181d53b4e9f92ddc6500b115e451fcb83e236ed6d03e8526438",
+      "sourceId": "src_292e6ce9b64a9a2519941095ab477f32",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/result.json",
+      "blobSha": "24016e0c191b600aee14c304ee62105aae73ea4a",
+      "blobSize": 1542,
+      "sourceDigest": "c88f260f9897f5e769573ed6c263e49c8c5bd5b2cde8b249cce367ea279964b2",
+      "sourceId": "src_3001065d2a63f02005b27a5bb4464538",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/run.json",
+      "blobSha": "674c1a5949ca9ecd96792db5b4548a00569b1c2a",
+      "blobSize": 445,
+      "sourceDigest": "ed8343971e1ef745c61f170649829501704a3048d1c0630addc71367c98018d2",
+      "sourceId": "src_e5d57782d4cbfdfd9632f8d2202756f4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/assignment.json",
+      "blobSha": "4989ea034819655bec7ff49d794cec8cd6b38bef",
+      "blobSize": 1966,
+      "sourceDigest": "10dbdb222ed2a47b20d221979fffbe640280323114ab054ad92478e88d80e6bd",
+      "sourceId": "src_dbb0180a4aeaed3c70bc92253600dd54",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/command-stdout.txt",
+      "blobSha": "36e16b0fb965d79475305c873c6ae2e4f1d29d93",
+      "blobSize": 4086,
+      "sourceDigest": "46c655e81b05d3682f5fca4adcf4b69dc4b93fe684923a9a8936a1c078d74322",
+      "sourceId": "src_28f3c362f0996bdf32e967b8967d4486",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/contract.json",
+      "blobSha": "1ec207d7d2d2e05f84dfd54f5c4f68ba28608834",
+      "blobSize": 406,
+      "sourceDigest": "d41de5a4fd4e32884bdc561fde41420acdd4194ceb1a05dbf4470d7d7261e8e4",
+      "sourceId": "src_2ac31bd0e0fc2896dcc9af172eae19a6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt",
+      "blobSha": "c4d74986a875315507afd3eec10da95a6e2a98e3",
+      "blobSize": 361,
+      "sourceDigest": "4d5acc1e7ca5b19659d51cbba3f5ed2a6e6c039900179b57c836b3889abb4f02",
+      "sourceId": "src_e1a955d8520c7fe46681555d60bf94da",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-report.md",
+      "blobSha": "05921a8ca5a6c46cc1bf46a25703b61962612d58",
+      "blobSize": 3093,
+      "sourceDigest": "329500a4063116f1fae43bf7be10263745675ff8ba9a328f980f833e6a255a6a",
+      "sourceId": "src_78d8cdd0eecbb6bb9897e819c410c873",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Advisor findings — plan.md vs CONTEXT.md consistency (tsk-44e)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Advisor findings — plan.md vs CONTEXT.md consistency (tsk-44e)",
+          "anchor": "advisor-findings-planmd-vs-contextmd-consistency-tsk-44e"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-result.json",
+      "blobSha": "857c27925e7a20149c865d90dbe5164decfecad3",
+      "blobSize": 2102,
+      "sourceDigest": "78e56b0a1d70fc3a2e965d5a371bef2e4ee3961a365ebc69477d64b258ab79ab",
+      "sourceId": "src_aada93ba3c9e7a148ff293259c4056a2",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/dispatch-plan.json",
+      "blobSha": "2931f1cf1250e9d71f9b6f718616fd5f3ab2de48",
+      "blobSize": 567,
+      "sourceDigest": "688dd261b54c2a50a58ee9b05df6bbf6dbc7f33cf08a8012ac6f72079e61abdc",
+      "sourceId": "src_521c8638d771b2ea5cb7e7626952facc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/exit.json",
+      "blobSha": "322d4d388b1cfa948ef19b735de2d87401ac88c5",
+      "blobSize": 126,
+      "sourceDigest": "6d86fba1e78f59566068b09335497c106fd0c5a000039f793c41635bb9993695",
+      "sourceId": "src_1783eb928214c22853a385893d309351",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/result.json",
+      "blobSha": "7c7632ac5ee43bb8fd1785fea18000fc5641a836",
+      "blobSize": 3548,
+      "sourceDigest": "cc25d1bff5ed75ba70bd486ab75e3871d8653579b8b9132b0c9d036efad56c4f",
+      "sourceId": "src_7876414a5915c37947045a71e3467cd6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/run.json",
+      "blobSha": "87307ace7f46c32c09835e7d6dbe488bb696fae3",
+      "blobSize": 358,
+      "sourceDigest": "39e46283f73118bba8a264c558a27ac2c17ec51cfcb2f4ec562a800ec0876711",
+      "sourceId": "src_bf262f6cb665643c7e2db674c6a4bf95",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "blobSha": "a88c6aa6df4a1af8154d62fe77a4b50b5aa3efa9",
+      "blobSize": 1121,
+      "sourceDigest": "bbca28a6b23db02c131ca567c8392e64aab8ff6d714542ffaf6dc9b590b429e0",
+      "sourceId": "src_fde8aa85b130a9acb2c1b1487941c93b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell",
+          "anchor": "current-cell"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "blobSha": "efe6c66bd40cfd3e1b9797aa9663518186b9ce6d",
+      "blobSize": 12214,
+      "sourceDigest": "d1894ead685351da39199eb027dbd7e135bbfb70e6546d4e982ac51d656ba00c",
+      "sourceId": "src_ccc204cfc190c865b6bd5e5e5c55830d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Step 08 Final Deferral Audit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 08 Final Deferral Audit",
+          "anchor": "step-08-final-deferral-audit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "blobSha": "44bc17848e502ad621c63839c8ecd631ab3967df",
+      "blobSize": 29170,
+      "sourceDigest": "e05d8f8a9bce116cbe2b1c7389ba6b31691fd955c7368f65a5f55b79058861ca",
+      "sourceId": "src_ff6e940d932e5eba5775bd070d954083",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Track: step-08-standalone-coordination",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Track: step-08-standalone-coordination",
+          "anchor": "track-step-08-standalone-coordination"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+      "blobSha": "8dda0c64b93846660266041c1e90a07a44324a09",
+      "blobSize": 32079,
+      "sourceDigest": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
+      "sourceId": "src_ec93488257138738c59ab3878025e3d1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00.1 — Canonical decisions and contracts (Phase 00 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.1 — Canonical decisions and contracts (Phase 00 R1-R4)",
+          "anchor": "cell-p001-canonical-decisions-and-contracts-phase-00-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "blobSha": "b4322060665abf85ef0a3498a35b66156bf6444a",
+      "blobSize": 51884,
+      "sourceDigest": "9a008bee07bb1572e0baeab785a30855443c3ef94694af8162380d10fc098901",
+      "sourceId": "src_ac99be234c2baa387d60477c47543b91",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00.2 — Truthful provider/tier/executor resolution (Phase 00 R5-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.2 — Truthful provider/tier/executor resolution (Phase 00 R5-R8)",
+          "anchor": "cell-p002-truthful-providertierexecutor-resolution-phase-00-r5-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "blobSha": "b9b7449a2260889708e8f6eebe0e117036b25c0a",
+      "blobSize": 39666,
+      "sourceDigest": "f5d7b0f59237da1553b23e1e6beaa5b4acec01c9cb9047db65b0f63204642a4f",
+      "sourceId": "src_9437a1df8f82b961896aaaa5af10c1b6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00.3 — CLI override, fallback posture, live two-executor proof (Phase 00 R9-R11)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.3 — CLI override, fallback posture, live two-executor proof (Phase 00 R9-R11)",
+          "anchor": "cell-p003-cli-override-fallback-posture-live-two-executor-proof-phase-00-r9-r11"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.4.md",
+      "blobSha": "2b8d287c0927c77f346677c2dd3bdb156e5a4c2e",
+      "blobSize": 51268,
+      "sourceDigest": "b4fd5b1a4de8e82aac192a6e17a6400552de45fc1d714349af6a574781ea8fc5",
+      "sourceId": "src_7db389cf7d272877f80a710f006d0c82",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P00.4 — Fix provider-family derivation disagreement (closes Phase 00)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P00.4 — Fix provider-family derivation disagreement (closes Phase 00)",
+          "anchor": "cell-p004-fix-provider-family-derivation-disagreement-closes-phase-00"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+      "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4",
+      "blobSize": 76860,
+      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
+      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.1 — CoordinationSession store, schema, events, direct cutover (Phase 01 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.1 — CoordinationSession store, schema, events, direct cutover (Phase 01 R1-R4)",
+          "anchor": "cell-p011-coordinationsession-store-schema-events-direct-cutover-phase-01-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "blobSha": "9e0d366147dd7f094eacc4526fe2a7ff55226b42",
+      "blobSize": 96661,
+      "sourceDigest": "7220c73e20c747161c34a3a09290c2e7f55469d38124c620e47e562659255621",
+      "sourceId": "src_d032d9fb06ff9d88dc3f9184c654062e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P01.2 — Session engine, dynamic consult, resume, live proof (Phase 01 R5-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P01.2 — Session engine, dynamic consult, resume, live proof (Phase 01 R5-R8)",
+          "anchor": "cell-p012-session-engine-dynamic-consult-resume-live-proof-phase-01-r5-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.1.md",
+      "blobSha": "98aada1aed26638e268ea9e53d8ee24921f4ccf3",
+      "blobSize": 14603,
+      "sourceDigest": "9515570f2049ac08dc1e56ee7ea7794c4dbaa52255f049ee0d616cb85f085cf2",
+      "sourceId": "src_5b1af05180a8220be1fd0ee65ef67f82",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.1 — FlowDefinition IR (schema/validators only)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.1 — FlowDefinition IR (schema/validators only)",
+          "anchor": "cell-p021-flowdefinition-ir-schemavalidators-only"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.2.md",
+      "blobSha": "a9a2dcfa058c7c9e95f104d042ec2d6a4f8b2a41",
+      "blobSize": 12233,
+      "sourceDigest": "886695ff7898ab5c75f7bab1bd7f8c812ee96904b92d9bd19c8898190de0b076",
+      "sourceId": "src_9ec0c37a0ad0e429563f4f5f1be53e00",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P02.2 — Workflow projection adapter, CoordinationProtocol loader, fixtures, setup/doctor (closes Phase 02)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P02.2 — Workflow projection adapter, CoordinationProtocol loader, fixtures, setup/doctor (closes Phase 02)",
+          "anchor": "cell-p022-workflow-projection-adapter-coordinationprotocol-loader-fixtures-setupdoctor-closes-phase-02"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.1.md",
+      "blobSha": "38f18dac12204ea6274af154cf4d74146080b45b",
+      "blobSize": 17538,
+      "sourceDigest": "b321e5b0e4a17165536c54bd164960a3bbc8655407d4c023c7fd61351d402a40",
+      "sourceId": "src_67af62e5c536166dbdf1e7b75148139f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.1 — Declared consult protocol materialization (Phase 03 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.1 — Declared consult protocol materialization (Phase 03 R1-R4)",
+          "anchor": "cell-p031-declared-consult-protocol-materialization-phase-03-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.2.md",
+      "blobSha": "f8451584d5d991322c12eb438c26bfe87e35869e",
+      "blobSize": 11505,
+      "sourceDigest": "6b0459805d77d5afe76244b487de33ebae500043bc575dff9227aae1ef9f92aa",
+      "sourceId": "src_3f63b2597c8c7e58ead1eb4f60b6f6d2",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P03.2 — Session bounds, negative sweep, equivalence proof, live proof (closes Phase 03)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P03.2 — Session bounds, negative sweep, equivalence proof, live proof (closes Phase 03)",
+          "anchor": "cell-p032-session-bounds-negative-sweep-equivalence-proof-live-proof-closes-phase-03"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.1.md",
+      "blobSha": "0be55b27699c9a2951fb72d64b5a4424ffc4fb65",
+      "blobSize": 16155,
+      "sourceDigest": "03a8a23589eee208e43da0638279802f357f9e26014d955e8dc723726672d8a8",
+      "sourceId": "src_c184d5cdc4dfb6380a9747afa12880c4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P04.1 — Cohort Planner V1 (pure, Phase 04 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P04.1 — Cohort Planner V1 (pure, Phase 04 R1-R4)",
+          "anchor": "cell-p041-cohort-planner-v1-pure-phase-04-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.2.md",
+      "blobSha": "38e9cdff3f5596f70179c4a3555be5cde5443ad0",
+      "blobSize": 18044,
+      "sourceDigest": "bed15ca1493ec96012aa1ac22588472b9d33aa8da06f2415425d904c2e1f9386",
+      "sourceId": "src_e596ea886c00cd87c502316939e19aec",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P04.2 — Independent fan-out, fan-in, evidence handling, live proofs (Phase 04 R5-R9)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P04.2 — Independent fan-out, fan-in, evidence handling, live proofs (Phase 04 R5-R9)",
+          "anchor": "cell-p042-independent-fan-out-fan-in-evidence-handling-live-proofs-phase-04-r5-r9"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.1.md",
+      "blobSha": "4897000aaac40d428e0ba641672fe76f2d28691c",
+      "blobSize": 8840,
+      "sourceDigest": "619c71342521da919db2feb6fc9254fca967386123ae92d61a30e44fd98a0810",
+      "sourceId": "src_6cf40d56d430fa10a238ddf4c3652cd6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P05.1 — Group Cognition framework declaration (Phase 05 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P05.1 — Group Cognition framework declaration (Phase 05 R1-R4)",
+          "anchor": "cell-p051-group-cognition-framework-declaration-phase-05-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.2.md",
+      "blobSha": "908b100149cc5439fc102e5f8b8706f1f2fb248b",
+      "blobSize": 17974,
+      "sourceDigest": "56b214ef4971459afacc383fd86856f519aece0ba77a38ed73e8c02eec8117ad",
+      "sourceId": "src_d84bb47e1a7fcb4fa854769ebd0cc588",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P05.2 — Group Cognition framework live proof (Phase 05 R5-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P05.2 — Group Cognition framework live proof (Phase 05 R5-R8)",
+          "anchor": "cell-p052-group-cognition-framework-live-proof-phase-05-r5-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.1.md",
+      "blobSha": "cb00f0a6ec473b849011bfffa980f7e6a5cbfade",
+      "blobSize": 11102,
+      "sourceDigest": "91eb92d31c5fa4907d1b4b899e60084d385e0c78b9e8e5a8deb4d919fe5973a9",
+      "sourceId": "src_151e2405beec2944760ed347ed508fb4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P06.1 — Recovery, quorum, retry/replacement, cancellation (Phase 06 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P06.1 — Recovery, quorum, retry/replacement, cancellation (Phase 06 R1-R4)",
+          "anchor": "cell-p061-recovery-quorum-retryreplacement-cancellation-phase-06-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.2.md",
+      "blobSha": "af69c69567c7b5ffc3d71ec561711abb4d52f179",
+      "blobSize": 13095,
+      "sourceDigest": "8cb4c0f5b6d2536d951634342ace1fe118d09c0fff6c82fdbbe7d11b7ad0dfd8",
+      "sourceId": "src_68252ad094edd9c43a1347b4c50b1aa1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P06.2 — Hard budgets, adversarial suite, work isolation, closure (Phase 06 R5-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P06.2 — Hard budgets, adversarial suite, work isolation, closure (Phase 06 R5-R8)",
+          "anchor": "cell-p062-hard-budgets-adversarial-suite-work-isolation-closure-phase-06-r5-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md",
+      "blobSha": "0cf2bfac85fddc324d29d2c129b9a4fd64bc0962",
+      "blobSize": 11977,
+      "sourceDigest": "6b4c7177c7e0da2690371ee120ba3927baf6c18b065940ff71956e84562275c6",
+      "sourceId": "src_eb3f6e92a996e1a1f00b733fa67022ab",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P07.1 — Public CLI, request/schema boundary, headless adapter (Phase 07 R1-R4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P07.1 — Public CLI, request/schema boundary, headless adapter (Phase 07 R1-R4)",
+          "anchor": "cell-p071-public-cli-requestschema-boundary-headless-adapter-phase-07-r1-r4"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.2.md",
+      "blobSha": "809cf0b000a474ed55b6ebd3605e9140f0987085",
+      "blobSize": 11132,
+      "sourceDigest": "c46f759dc74b717273b621606a6c9ec5b42e108090e29fa42dcf9aedf41af61c",
+      "sourceId": "src_9c3d4aa132259aa56bfe3412a795b990",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell P07.2 — Capability parity, external adoption, canonical closure, final Deferral Audit (Phase 07 R5-R8)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell P07.2 — Capability parity, external adoption, canonical closure, final Deferral Audit (Phase 07 R5-R8)",
+          "anchor": "cell-p072-capability-parity-external-adoption-canonical-closure-final-deferral-audit-phase-07-r5-r8"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "blobSha": "b29f85bf3e788dc23ce867e7c89411c8c3d11de7",
+      "blobSize": 665658,
+      "sourceDigest": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+      "sourceId": "src_002566f6b6381c490b942aed5e6f4628",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/codex-cli-live-proof.log",
+      "blobSha": "037c71c42390b1f22d20842ddde06a044561e3f9",
+      "blobSize": 7136,
+      "sourceDigest": "decb070e7648f1463bdedbf41880931e075e118509464238332ca96f1cbab943",
+      "sourceId": "src_8250b7a67438cb302389d9f6fd7e054f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/glm-cli-live-proof.log",
+      "blobSha": "7aeec356a3fbfc8ce21cc7adb11d702d2199a1df",
+      "blobSize": 7251,
+      "sourceDigest": "e4f5926a84bc25c615e9bda7943489fd47371345c5cb468effb9fc4f6e5bab66",
+      "sourceId": "src_85319eb9155016c26920e357a7cec288",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-attempt1-config-tier-stop.stderr.log",
+      "blobSha": "7070c382ebba489c2b3172e9bcaf94b2c7e925f7",
+      "blobSize": 1345,
+      "sourceDigest": "ceb9aa411f3dfb7f7ea222a9e80b4c67617d79365fbc8f4aecc00908594fd189",
+      "sourceId": "src_f719bc3e99fa727467f14a5e70c0fc40",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-attempt1-config-tier-stop.stdout.log",
+      "blobSha": "a50f8792e97813e06513e4d0c5bb1e1313299d5a",
+      "blobSize": 708,
+      "sourceDigest": "054a793f7cdc248a467ff814d7b8f204345df99e4012fdbe30c4aed33a27b159",
+      "sourceId": "src_36e6ce0a914662f9990bcb3eeb8e85af",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-attempt2-no-evidence-partial.stderr.log",
+      "blobSha": "cff5d982a67767a988ff344738634983023f246f",
+      "blobSize": 400,
+      "sourceDigest": "ac6fdd22f88e28ca42f32bb62806d540c2bee68bcd1aed2e9978fbe5d3e62e4f",
+      "sourceId": "src_484b932d9634606ca9e90c3789b7e4fd",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-attempt2-no-evidence-partial.stdout.log",
+      "blobSha": "aaa68c27374a0207879dc98bdbd85a33c3917878",
+      "blobSize": 2950,
+      "sourceDigest": "da7894c0852f4ffe8762dbacafa210933361fa69cc1296bdf1cd17cdb9f91a06",
+      "sourceId": "src_c83345b5cf1fb03f1e488ecf8a887c1b",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-live-proof.log",
+      "blobSha": "ffbcee87b05a21516c8a9db19c58088332204472",
+      "blobSize": 11130,
+      "sourceDigest": "4e6aebb395151a316474c0604ef09812359aa2c326c614a68e21bc392a8d913d",
+      "sourceId": "src_d8dfe2ec796b1e23f0ae56533ce6ec07",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run1-open-primary-consult.stderr.log",
+      "blobSha": "fe6ccd27dbe3aa3a356abbcd0f614915bac869e4",
+      "blobSize": 800,
+      "sourceDigest": "258d950eb60264d0fd1cf573968eb94137f1704bb6bd3a2c0c0d8ee8cd7a2cd6",
+      "sourceId": "src_4cc01671546f8914fdef8c8df8c724dd",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run1-open-primary-consult.stdout.log",
+      "blobSha": "d45ed1811fb62188850ec51f01791297e5e64c89",
+      "blobSize": 7926,
+      "sourceDigest": "0113aa234e6c35b3a8f7e6a17be385aeefc606849dfc3377b38aecd6ce65c842",
+      "sourceId": "src_56643867d8250d87b8c5505a973c6c22",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "blobSize": 0,
+      "sourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceId": "src_82be7faf3f3c01ffd0588a12fd0f77a5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stdout.log",
+      "blobSha": "adb6be950ff3f89b100356b6d76caceaf5d2cc82",
+      "blobSize": 7349,
+      "sourceDigest": "63ada0e2acd428ba8305a6a83f64a8c0ac9a88db27d153f14410eb3139cf0bed",
+      "sourceId": "src_3275c7df6f3af74912c66dee4cd02466",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt",
+      "blobSha": "ee78cde3ac63322d93a24362e74fc32e9c51bb54",
+      "blobSize": 2115,
+      "sourceDigest": "50b444c2cc71ceb9a0f289d55584139621a121568b98995a72a0c2bf49c52a73",
+      "sourceId": "src_23533013e5cc8a386d2bc5d7ec09df88",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
+      "blobSha": "ee78cde3ac63322d93a24362e74fc32e9c51bb54",
+      "blobSize": 2115,
+      "sourceDigest": "50b444c2cc71ceb9a0f289d55584139621a121568b98995a72a0c2bf49c52a73",
+      "sourceId": "src_79f3e6093979cf14f018edd148fe782d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/glm-cli-attempt1-config-tier-stop.stderr.log",
+      "blobSha": "d03a206dc820560eb53c38560179be83d8c817b0",
+      "blobSize": 1344,
+      "sourceDigest": "df81a568e6d877d52fc498624abe7c0aaf9ecacd17a494f6e89ec4d4a27edff9",
+      "sourceId": "src_c04420c0bbd7ba0939afb62c2950c9bb",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/glm-cli-attempt1-config-tier-stop.stdout.log",
+      "blobSha": "59d0e5b99a8a5cc66a966634cc1683a4a9d36779",
+      "blobSize": 704,
+      "sourceDigest": "586e220f48c17eacb0424b7fc0864131d72a8b4b9d9b5e8bf8bcf562e17d0d4d",
+      "sourceId": "src_c0cc8fdd0542a18e1f39ef0cb2373234",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    }
+  ]
+}

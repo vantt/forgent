@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 28,
+  "entries": [
+    {
+      "path": "docs/history/gather-capacity-purpose-binding/plan.md",
+      "blobSha": "cf5fc81e15c96256a4b6e0fb56d8c9fcd4b6de5b",
+      "blobSize": 8880,
+      "sourceDigest": "ce5c9aa7e72244a9c79e12851aa657ccab785b6f948553d096e93d41f27f9cc5",
+      "sourceId": "src_47d6e7691d63277595755f25e934209f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — gather-capacity-purpose-binding (tsk-2ie5)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — gather-capacity-purpose-binding (tsk-2ie5)",
+          "anchor": "planmd-gather-capacity-purpose-binding-tsk-2ie5"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/git-merge-abort-can-itself-fail/plan.md",
+      "blobSha": "d5468eba5a67e3a8629cc5074640a45d0902d106",
+      "blobSize": 12050,
+      "sourceDigest": "e023be38144b35a963efb8a33df5abef531344f07488e3843c9b195c64bfa679",
+      "sourceId": "src_694002f8d629e6d52168f5f8bac45d87",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — git merge --abort can itself fail (tsk-40a)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — git merge --abort can itself fail (tsk-40a)",
+          "anchor": "plan-git-merge---abort-can-itself-fail-tsk-40a"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/git-merge-abort-can-itself-fail/RESEARCH.md",
+      "blobSha": "59d258a90e31afb63f11436e9efc52d0c8306958",
+      "blobSize": 5363,
+      "sourceDigest": "1f640f18a1db37c24164e628dbeff455c58c6661c59f69a5276df3865c175b9d",
+      "sourceId": "src_422d6c52d28ced9a80ee70ba9f6df56e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Research — git merge --abort can itself fail (tsk-40a)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Research — git merge --abort can itself fail (tsk-40a)",
+          "anchor": "research-git-merge---abort-can-itself-fail-tsk-40a"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/glm-executor-smoke-test/plan.md",
+      "blobSha": "52ae9611f7ad46640b159785a58e7a330e4d5b8c",
+      "blobSize": 5413,
+      "sourceDigest": "8823befdcec186dbadc0e77a0d7e3f04941d5af3f68aa71b83f40c35a988bf16",
+      "sourceId": "src_be6fdeb3dcf37cde22cef519e48d8f4a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — glm executor smoke test (tsk-3gr)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — glm executor smoke test (tsk-3gr)",
+          "anchor": "plan-glm-executor-smoke-test-tsk-3gr"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/glm-openrouter-executor/iron-law-evidence.md",
+      "blobSha": "d2f7fe9c798f7e18c52b462a7f57a14d463ab502",
+      "blobSize": 3954,
+      "sourceDigest": "f2a1aa75860a96fdf83bd3d41d615da57626efafe270ec6addf7d2b632a999b0",
+      "sourceId": "src_bf4b0bd46f9a34082586c1c1756aab83",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-gb3",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-gb3",
+          "anchor": "iron-law-evidence-tsk-gb3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/glm-openrouter-executor/plan.md",
+      "blobSha": "d38823ff8d8a3ea9edb807034ea62597bb68bf1e",
+      "blobSize": 11247,
+      "sourceDigest": "2f08cdcd99fd94ddc471dc1ef7081d87163c6e62b2b74dc6f2c0ffb83bf94a5e",
+      "sourceId": "src_b2cf036c055444c818e79437acb37916",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — glm OpenRouter executor (tsk-gb3)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — glm OpenRouter executor (tsk-gb3)",
+          "anchor": "plan-glm-openrouter-executor-tsk-gb3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/glm-openrouter-executor/RESEARCH.md",
+      "blobSha": "681ce6f47b12c3172a126a4d23469fb7ee6a5864",
+      "blobSize": 7953,
+      "sourceDigest": "467944c0b2b90bbcbc5fcf0af4825ea442eaff185dd7a88a689e784729d7bceb",
+      "sourceId": "src_7e1e8a4aac9e7424446651121d2c5e9a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — glm OpenRouter executor (tsk-gb3)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — glm OpenRouter executor (tsk-gb3)",
+          "anchor": "research-glm-openrouter-executor-tsk-gb3"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/global-project-config-awareness/CONTEXT.md",
+      "blobSha": "b04e536ee845f6a47dfa805f9f4861294cb17394",
+      "blobSize": 10211,
+      "sourceDigest": "e13b6e3292604c41824de4960ace0e11f28579171144017af992da339f2ebeec",
+      "sourceId": "src_bc6f967efd68b663cbe9a6e9768e99df",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT: fgOS awareness hai cấp cài đặt global vs project (+ context thứ 3: dev-checkout self-hosting)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT: fgOS awareness hai cấp cài đặt global vs project (+ context thứ 3: dev-checkout self-hosting)",
+          "anchor": "context-fgos-awareness-hai-cấp-cài-đặt-global-vs-project-context-thứ-3-dev-checkout-self-hosting"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/global-project-config-awareness/plan.md",
+      "blobSha": "0049528802268291e02d556d7560921e20dc77df",
+      "blobSize": 9084,
+      "sourceDigest": "5dfb45061eede5f3bb91a644a74629bcba551bb94153c96c1dc1716a4156ed74",
+      "sourceId": "src_78dcb95eefb95fb7ec6b2ba92c389c7c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: tsk-2ta — fgOS awareness hai cấp global vs project config (+ context 3 fallback)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: tsk-2ta — fgOS awareness hai cấp global vs project config (+ context 3 fallback)",
+          "anchor": "plan-tsk-2ta-fgos-awareness-hai-cấp-global-vs-project-config-context-3-fallback"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/goal-check-timeout-visibility/plan.md",
+      "blobSha": "aa8cb364f012cd0ac74f20dd1d2516b5412046f7",
+      "blobSize": 13304,
+      "sourceDigest": "aaf02e06200c985563b9905abe3e43da0e8341996625ba09f16729c1ca737fd3",
+      "sourceId": "src_5a1ea3251557847621eeee456451b694",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan: goal-check-timeout-visibility (tsk-53o)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan: goal-check-timeout-visibility (tsk-53o)",
+          "anchor": "plan-goal-check-timeout-visibility-tsk-53o"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/heavy-keywords-word-boundary-match/CONTEXT.md",
+      "blobSha": "1aba6f89aa7d32a0ee74a3d4e791f3b61b08caf1",
+      "blobSize": 5690,
+      "sourceDigest": "d415a37eadcac4165fa98b4f02f47d98000804be93f0aa458cfedf61f23aa737",
+      "sourceId": "src_1a6309ea3b1ed96225c3fabfb5280a3c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "heavy-keywords-word-boundary-match — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "heavy-keywords-word-boundary-match — locked decisions",
+          "anchor": "heavy-keywords-word-boundary-match-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/heavy-keywords-word-boundary-match/plan.md",
+      "blobSha": "834276187ee0909ceed31c71410f219c59667ab9",
+      "blobSize": 9497,
+      "sourceDigest": "839394875565c2a4803b9ac290b7761025df32a0cf3b024e128d0c07c1b16f43",
+      "sourceId": "src_cdcf7badd3347353074a515152c6cff1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "heavy-keywords-word-boundary-match — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "heavy-keywords-word-boundary-match — plan",
+          "anchor": "heavy-keywords-word-boundary-match-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/heavy-risk-delivered-plan-md-gate/plan.md",
+      "blobSha": "3e336eb3e5a9843a00e2778805c40e1e11bc81f1",
+      "blobSize": 5520,
+      "sourceDigest": "d3b320880d8367a52d5ce11dcd8b1c9be546ce81542f3cb55920b82f02b2dc55",
+      "sourceId": "src_7d4d67a83d2f5fb310908b47203fe596",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-2p6: heavy-risk item reaching delivered without a plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-2p6: heavy-risk item reaching delivered without a plan.md",
+          "anchor": "planmd-tsk-2p6-heavy-risk-item-reaching-delivered-without-a-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/hello-world-vanilla-js/CONTEXT.md",
+      "blobSha": "272390dfd86963db746e9b21c02dd45d5cfedd91",
+      "blobSize": 2175,
+      "sourceDigest": "ba6b382dbdb1746bc7e0c742eeed7f679df988caa6dbd1a12a90f3df7105c1af",
+      "sourceId": "src_687cd6bb608c1924e1c4bb1b0fb85100",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "hello-world-vanilla-js — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "hello-world-vanilla-js — locked decisions",
+          "anchor": "hello-world-vanilla-js-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/hello-world-vanilla-js/plan.md",
+      "blobSha": "5534892069c0a6c3685dd93aafa4ab128ed90802",
+      "blobSize": 1628,
+      "sourceDigest": "45e18d37f5ecce7183f2a679656bf775b0f3230ac99e86fc45d4b60ccf8f532f",
+      "sourceId": "src_e2c379822f0a750b75944ac554d008df",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "hello-world-vanilla-js — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "hello-world-vanilla-js — plan",
+          "anchor": "hello-world-vanilla-js-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-auto-merge-pane-guard/CONTEXT.md",
+      "blobSha": "43c71f1799cd6601e7810b74cd9de3e795bef8fe",
+      "blobSize": 8806,
+      "sourceDigest": "aa5b104fc0b14a7e75d1b74ad04e389dff01342388b6fcc9e1abc54ce19046fc",
+      "sourceId": "src_083e37ce48c3d2c8bd9785061c0bcd87",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT.md — herdr-plugin auto-merge/retro/cleanup pane lifecycle (tsk-5d4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT.md — herdr-plugin auto-merge/retro/cleanup pane lifecycle (tsk-5d4)",
+          "anchor": "contextmd-herdr-plugin-auto-mergeretrocleanup-pane-lifecycle-tsk-5d4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-auto-merge-pane-guard/plan.md",
+      "blobSha": "08a875d92e0264295822660b9f3092527373699a",
+      "blobSize": 8963,
+      "sourceDigest": "4fb917353568918b444fff6e9c236497fbcfa20d899463cfd18940ccd975ed9f",
+      "sourceId": "src_7b5ce37bbc77b9c75f0950146262e4d0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — herdr-plugin auto-merge/retro/cleanup pane lifecycle (tsk-5d4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — herdr-plugin auto-merge/retro/cleanup pane lifecycle (tsk-5d4)",
+          "anchor": "planmd-herdr-plugin-auto-mergeretrocleanup-pane-lifecycle-tsk-5d4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-auto-merge-pane-guard/RESEARCH.md",
+      "blobSha": "be8c9bf492d056b5388232d362ab93efc3967f6e",
+      "blobSize": 8434,
+      "sourceDigest": "f8b2f6fe3e9b5d11858c0ea42adcd04c276da8a1b0299d39a2732ea730715d2c",
+      "sourceId": "src_8097fbaa9838e5d706d5d4dbe0b75508",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — herdr-plugin auto-merge pane guard/close lifecycle (tsk-5d4)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — herdr-plugin auto-merge pane guard/close lifecycle (tsk-5d4)",
+          "anchor": "researchmd-herdr-plugin-auto-merge-pane-guardclose-lifecycle-tsk-5d4"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-dashboard-own-tab/CONTEXT.md",
+      "blobSha": "b0328b5c52ceacbb07857749979b28675259b7e4",
+      "blobSize": 4299,
+      "sourceDigest": "5ac01a425b948770396e3f376aaeef5d9a81059caa59a0f5a1d2db48cddf2f72",
+      "sourceId": "src_44044ceb9a844c61cbf6de444dd21e87",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-cockpit-dashboard-own-tab — locked decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-cockpit-dashboard-own-tab — locked decisions",
+          "anchor": "herdr-cockpit-dashboard-own-tab-locked-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-dashboard-own-tab/plan.md",
+      "blobSha": "3ae0bf2cd1b61dd7af2b89aae4b58daec93d0578",
+      "blobSize": 6073,
+      "sourceDigest": "ce12b38ee46606b9b312f4bfd6fa5331e8fb70bdf0a8a21628bd72522b29befa",
+      "sourceId": "src_0b53c4572ff3506b7e8c09962419a55a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-cockpit-dashboard-own-tab — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-cockpit-dashboard-own-tab — plan",
+          "anchor": "herdr-cockpit-dashboard-own-tab-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-keyboard-mouse-focus/CONTEXT.md",
+      "blobSha": "c90bcaf73842706cc7c4af8ae76fb45e3d4bddfe",
+      "blobSize": 5583,
+      "sourceDigest": "248b02d5ab3edfdf5c1f4198e4b75bccca699d7b09c6bcd63e22fda4e643f153",
+      "sourceId": "src_54c765d608523bada7373995b11c7216",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr cockpit — keyboard/mouse focus UX (tsk-4n7)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr cockpit — keyboard/mouse focus UX (tsk-4n7)",
+          "anchor": "herdr-cockpit-keyboardmouse-focus-ux-tsk-4n7"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-keyboard-mouse-focus/plan.md",
+      "blobSha": "d7efcfc52660b77e8c23e04f753428b6d582f22f",
+      "blobSize": 7924,
+      "sourceDigest": "8365599f6a0511730e172119ef331f35e8d499b60b84126d479918a8d644d11d",
+      "sourceId": "src_4be1531a3c00d5535245c362c2dc70ae",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — herdr cockpit keyboard/mouse focus UX (tsk-4n7)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — herdr cockpit keyboard/mouse focus UX (tsk-4n7)",
+          "anchor": "plan-herdr-cockpit-keyboardmouse-focus-ux-tsk-4n7"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/context-tsk-4ry.md",
+      "blobSha": "c5024b76fa9695b0ab196f125fd3f086c5c0091a",
+      "blobSize": 7637,
+      "sourceDigest": "ebe9eb6040ca62f9c652d74e3d11e2cf4b061a4bd83ee4c92168f8614a056f82",
+      "sourceId": "src_ff61bdd7cd35366837df166ab53ab291",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — tsk-4ry: herdr admin-lane loop relaunch guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — tsk-4ry: herdr admin-lane loop relaunch guard",
+          "anchor": "context-tsk-4ry-herdr-admin-lane-loop-relaunch-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/plan-tsk-3q8z.md",
+      "blobSha": "d607ee365d3d1a4debcad5b622c04666b991a78c",
+      "blobSize": 2013,
+      "sourceDigest": "ca5e14ceab12a72a3e46759bb5299424be64e56933bd247b43e44848edd46eb5",
+      "sourceId": "src_d690a3a02dd17b89e82311794b9838c3",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-3q8z: reused-pane retirement + auto-discover boot-window guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-3q8z: reused-pane retirement + auto-discover boot-window guard",
+          "anchor": "plan-tsk-3q8z-reused-pane-retirement-auto-discover-boot-window-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/plan-tsk-4ry.md",
+      "blobSha": "d514f4108e35d63dafe881124b437748c3a2d9f2",
+      "blobSize": 10429,
+      "sourceDigest": "ab52984b2f33f862c92f4923eb51665eab4c712351fc734249247011285a9d63",
+      "sourceId": "src_cf14c694959dbe50f9fe4c0d1655ab3c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-4ry: admin-lane (merge/retro/cleanup) loop relaunch guard",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-4ry: admin-lane (merge/retro/cleanup) loop relaunch guard",
+          "anchor": "plan-tsk-4ry-admin-lane-mergeretrocleanup-loop-relaunch-guard"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/plan.md",
+      "blobSha": "ed8414945742ad2024302b394c094974fea36414",
+      "blobSize": 12588,
+      "sourceDigest": "7dbc5ed0872283e805380f20aede7b9e359d4c73fd48b26fb0f8cd4d6ce316a1",
+      "sourceId": "src_44d74302e271b6867e48ce4e20a7f495",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — tsk-40g: herdr cockpit pane-guard fixes (3 defects)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — tsk-40g: herdr cockpit pane-guard fixes (3 defects)",
+          "anchor": "plan-tsk-40g-herdr-cockpit-pane-guard-fixes-3-defects"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/RESEARCH.md",
+      "blobSha": "5c0e71ea35455f50f4a923407bc81bab2053f585",
+      "blobSize": 7127,
+      "sourceDigest": "63285f5cde371d7c18df75f4241b2eeba9fd76f3a186234652a9d03b842f8925",
+      "sourceId": "src_5523d697288505975c8ffd4e134f559a",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH — tsk-40g",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH — tsk-40g",
+          "anchor": "research-tsk-40g"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-project-root/CONTEXT.md",
+      "blobSha": "020235bc5ac5e4eefc3931278fc6fba3751efdaf",
+      "blobSize": 8365,
+      "sourceDigest": "5b5f5ac5f53a9452bf2ce6a1baddfe7a8ec56d9c7d07af53bc199eb9c01d90ae",
+      "sourceId": "src_5bfbc0796273a1d4c0be5aec203350fa",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "CONTEXT — herdr cockpit: project root và cwd khi open một task",
+      "headings": [
+        {
+          "level": 1,
+          "text": "CONTEXT — herdr cockpit: project root và cwd khi open một task",
+          "anchor": "context-herdr-cockpit-project-root-và-cwd-khi-open-một-task"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-cockpit-project-root/plan.md",
+      "blobSha": "f8a25923a56b6558f2eb38bb311004f0c5033042",
+      "blobSize": 7954,
+      "sourceDigest": "8a49295158c1f9e85a135e34635e106fc4723882e2525be25be3f633544ac667",
+      "sourceId": "src_2b7f1e92cf4d6441266b9fcfb7731b84",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan.md — tsk-45u: chuẩn hóa cwd khi cockpit mở pane cho một task",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan.md — tsk-45u: chuẩn hóa cwd khi cockpit mở pane cho một task",
+          "anchor": "planmd-tsk-45u-chuẩn-hóa-cwd-khi-cockpit-mở-pane-cho-một-task"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-layout-and-action-queues/CONTEXT.md",
+      "blobSha": "419e6ae543e229994bd7dbd22e29deae13b33de7",
+      "blobSize": 9431,
+      "sourceDigest": "f14caac344ae5bc3ff11cd58e1c640713af29345050c112a6bb117c17f83f37c",
+      "sourceId": "src_b85dc1eca4f1c0ef5324ac8463c6b295",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin dashboard: layout + action-queue redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin dashboard: layout + action-queue redesign",
+          "anchor": "herdr-plugin-dashboard-layout-action-queue-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-layout-and-action-queues/palette.md",
+      "blobSha": "bef645270fff65a1a025c9ce3fb5a4633db46140",
+      "blobSize": 3859,
+      "sourceDigest": "f491e8d43860a60cfbaadfc48697629933ca6e398744e8bd62275247e083a2e5",
+      "sourceId": "src_118e3cf2c8fa430822e4afcebaacdc65",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin dashboard: ANSI-16 color palette",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin dashboard: ANSI-16 color palette",
+          "anchor": "herdr-plugin-dashboard-ansi-16-color-palette"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-layout-and-action-queues/plan.md",
+      "blobSha": "dd488c230198487b401c413622404881d54c0e94",
+      "blobSize": 7485,
+      "sourceDigest": "6f62dee5c5e1f1b221490c20b7cfd41358eb83ae33c6587bd5af8d42b63c74d4",
+      "sourceId": "src_99ab94afb815ba0c07cc5ce6c469c71f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan — herdr-plugin dashboard: layout + action-queue redesign",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan — herdr-plugin dashboard: layout + action-queue redesign",
+          "anchor": "plan-herdr-plugin-dashboard-layout-action-queue-redesign"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-pane-tracking/CONTEXT.md",
+      "blobSha": "eeb36b54c1a88e9e507545c25994732f3fb02b03",
+      "blobSize": 6505,
+      "sourceDigest": "f19da38b68ea543ce1dffb0be4258fd1e919d1c08d175b7b3b2538ef3b8fee93",
+      "sourceId": "src_4a8e2b71dde34c27dbe85cda57b1d8ce",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr dashboard pane tracking — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr dashboard pane tracking — decision record",
+          "anchor": "herdr-dashboard-pane-tracking-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-pane-tracking/plan.md",
+      "blobSha": "2927735d670917243e492d8348480d57815b589f",
+      "blobSize": 10293,
+      "sourceDigest": "d5cb513cbb87753e77bf872e7c2f95a4dd513903c9dcf1b48f4b2297f810ed00",
+      "sourceId": "src_336a06e95f9c4d5b3675951073e76209",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr dashboard pane tracking — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr dashboard pane tracking — plan",
+          "anchor": "herdr-dashboard-pane-tracking-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-tables/CONTEXT.md",
+      "blobSha": "e2e9dbd5a0f7f3245d1bccd6031a2b3ed0587701",
+      "blobSize": 3708,
+      "sourceDigest": "697fcbb210d1e7fed71769fa327235608fd079cfd068cb8f6f117f72cce988b7",
+      "sourceId": "src_cb944757dc63ba5cc74919643a584e7c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr dashboard tables — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr dashboard tables — decision record",
+          "anchor": "herdr-dashboard-tables-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-dashboard-tables/plan.md",
+      "blobSha": "25831bb6224a7161cbd4dad38608f05281cb319c",
+      "blobSize": 3283,
+      "sourceDigest": "336dc2983cc1a59a0d46275f72e8f68d589b974179b55f3258396884c9da02b0",
+      "sourceId": "src_477dc696715aedaa585bcb45011aaaf8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr dashboard tables — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr dashboard tables — plan",
+          "anchor": "herdr-dashboard-tables-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-discover-pane-autoclose-wiring/CONTEXT.md",
+      "blobSha": "ffd1cfdb2be8ea0d8f61060d99349ad339d9c8e0",
+      "blobSize": 5030,
+      "sourceDigest": "49bb60404cb97427d0f35eb4f8bb9dffc2b684b36fe3bcbeb09962d662767728",
+      "sourceId": "src_ca49380d7ae698e174ffba5dcbaf7f18",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Wire herdr-plugin's discover pane launch to pass --autoClose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Wire herdr-plugin's discover pane launch to pass --autoClose",
+          "anchor": "wire-herdr-plugins-discover-pane-launch-to-pass---autoclose"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-discover-pane-autoclose-wiring/plan.md",
+      "blobSha": "1dea7ac21cbee7a22a954759e7d0b8944d5a0033",
+      "blobSize": 5817,
+      "sourceDigest": "852fa81e0a36136064bf993a42a3d288907b7a13419173bd489b2c535c3c55fa",
+      "sourceId": "src_22ae7c595bfab239d7f204a3098e1666",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Plan: wire herdr-plugin's discover pane launch to pass --autoClose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Plan: wire herdr-plugin's discover pane launch to pass --autoClose",
+          "anchor": "plan-wire-herdr-plugins-discover-pane-launch-to-pass---autoclose"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-discover-pane-autoclose-wiring/RESEARCH.md",
+      "blobSha": "ef9f74262c9218389ea7ee20efa81da637392026",
+      "blobSize": 4797,
+      "sourceDigest": "9e1c199ba0c066e3f41f8ab7f11b223c37b7a240e92221a7e2f0c4ff758e384b",
+      "sourceId": "src_a84247ea7aad6507b3d4eed8053f01fe",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "RESEARCH.md — tsk-358",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RESEARCH.md — tsk-358",
+          "anchor": "researchmd-tsk-358"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-fgos-hexagonal-architecture/CONTEXT.md",
+      "blobSha": "6f6a0c65348fcb42321f59bc62144d12bb9de799",
+      "blobSize": 6480,
+      "sourceDigest": "79ea41474ae8c9a2e23cbc034d3d19c057aeadb716c8808204a3cb56f3423db2",
+      "sourceId": "src_7b1999a87b5d545bdf9e2679a2a46de0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-fgos dashboard hexagonal architecture — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-fgos dashboard hexagonal architecture — decision record",
+          "anchor": "herdr-fgos-dashboard-hexagonal-architecture-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-fgos-hexagonal-architecture/plan.md",
+      "blobSha": "955b263897d650368101c8d5d601c6e87eae3d88",
+      "blobSize": 8216,
+      "sourceDigest": "2de6fad7e661b8bb3546ddde02ec8b9ee285437bd399f9a44fbcea05ec2cca45",
+      "sourceId": "src_f1d748b3ab1e95523dd1e0bd14360ab0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-fgos dashboard hexagonal architecture — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-fgos dashboard hexagonal architecture — plan",
+          "anchor": "herdr-fgos-dashboard-hexagonal-architecture-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-fgos-tui-plugin/CONTEXT.md",
+      "blobSha": "e99c656938727c37de6a7ee50c66bf1bf085b656",
+      "blobSize": 6180,
+      "sourceDigest": "0270bb831244c8228ea5638e58beb58c3ca522467701b587c18daf7d39893da2",
+      "sourceId": "src_35259d84982fdc4d65042cbcfbde2dc0",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr fgOS TUI plugin — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr fgOS TUI plugin — decision record",
+          "anchor": "herdr-fgos-tui-plugin-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-fgos-tui-plugin/plan.md",
+      "blobSha": "5f70228a69ef16e0ac7eff770eb4e6cc038b6e62",
+      "blobSize": 9543,
+      "sourceDigest": "18ab2fefc292738d8402a5f043897f15b3720733ddb73284eedd7e112078b32a",
+      "sourceId": "src_3cab203c130f2f3b8dea6c273ffaddbd",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr fgOS TUI plugin — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr fgOS TUI plugin — plan",
+          "anchor": "herdr-fgos-tui-plugin-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-jump-to-running-pane/CONTEXT.md",
+      "blobSha": "5e401a9c335c9dc970a9c3adc380558bfbd69204",
+      "blobSize": 4023,
+      "sourceDigest": "faae985b0d4655534480b02387ee8a1206371f609dbe375a0cf90f76013c542d",
+      "sourceId": "src_9e0d51a3c0cd35cb33113a781fb35dba",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr jump-to-running-pane — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr jump-to-running-pane — decision record",
+          "anchor": "herdr-jump-to-running-pane-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-jump-to-running-pane/plan.md",
+      "blobSha": "a0dc48435499f14d5c32cf4589556caabfa736bb",
+      "blobSize": 4070,
+      "sourceDigest": "07b9de703b53c413e28467295befdcdef997a55bea7df24b1d08250fd72d6b49",
+      "sourceId": "src_a182eba51af21d32f0cd0fa9b317606c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr jump-to-running-pane — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr jump-to-running-pane — plan",
+          "anchor": "herdr-jump-to-running-pane-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-launch-agent-from-work-item/CONTEXT.md",
+      "blobSha": "d45a28a714588b0a02c6eeaaf21a10d9c8a59a89",
+      "blobSize": 2037,
+      "sourceDigest": "d517f64545cc8e955b5e5b583b86267cd44fd2c90be28b7df5b6ca9c3a4f717b",
+      "sourceId": "src_f92b34e05352351093ccc41ae23f554e",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr launch-agent from unstarted work item — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr launch-agent from unstarted work item — decision record",
+          "anchor": "herdr-launch-agent-from-unstarted-work-item-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-launch-agent-from-work-item/plan.md",
+      "blobSha": "3cd685144437ae0bc4aab2d4d0e40b746a7f4e7b",
+      "blobSize": 745,
+      "sourceDigest": "6632049d6244650b29998aff5333cc487e981ae1993c507d9e397c7360843e64",
+      "sourceId": "src_30a6815be16692cef441c53aed7cf337",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr launch-agent from unstarted work item — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr launch-agent from unstarted work item — plan",
+          "anchor": "herdr-launch-agent-from-unstarted-work-item-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-need-answer-after-deliver-stage-crash/CONTEXT.md",
+      "blobSha": "7b41d77854a2178ca1ab2a66153f8ddd6cfb7cc0",
+      "blobSize": 5867,
+      "sourceDigest": "bc1617838a7ebe79553c02f071a2a3d4e9725a39b2130c496d4d91f27e6e04fe",
+      "sourceId": "src_13a654be190017d93803a79cf266254f",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1pg: herdr-plugin NEED ANSWER / AFTER DELIVER boxes render empty",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1pg: herdr-plugin NEED ANSWER / AFTER DELIVER boxes render empty",
+          "anchor": "tsk-1pg-herdr-plugin-need-answer-after-deliver-boxes-render-empty"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-need-answer-after-deliver-stage-crash/plan.md",
+      "blobSha": "8844fe7cabc700b94fad90e627ce097ac9a062e6",
+      "blobSize": 8887,
+      "sourceDigest": "bf123acfa786ec78bd4318d5d1c2fe06835ea7c6fb70b0e4dafe2fbb6ec3b12f",
+      "sourceId": "src_a5c8ac184e9cd3fbadebea37bc46fe0b",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-1pg: herdr-plugin NEED ANSWER / AFTER DELIVER boxes render empty",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-1pg: herdr-plugin NEED ANSWER / AFTER DELIVER boxes render empty",
+          "anchor": "tsk-1pg-herdr-plugin-need-answer-after-deliver-boxes-render-empty"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-operation-tab-layout/CONTEXT.md",
+      "blobSha": "e9104bb884a91e0eb257cfd7c0cac40c2848405e",
+      "blobSize": 4986,
+      "sourceDigest": "f3b26deeebe46b829ad900b7ba0ad06f3edb5c04988bf643e55a730f3963dc4e",
+      "sourceId": "src_f4871e7a0823d5eff4eeba3b4ffd0880",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin layout manager: fg:agents-N cap + fg:operation tab",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin layout manager: fg:agents-N cap + fg:operation tab",
+          "anchor": "herdr-plugin-layout-manager-fgagents-n-cap-fgoperation-tab"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-operation-tab-layout/plan.md",
+      "blobSha": "9b35223f57ee94d39e1958a7831ee102fefa7342",
+      "blobSize": 9821,
+      "sourceDigest": "ef91e70260935cef5329d9de83df909cd5c840bfda43c8a8871027b1f6f64937",
+      "sourceId": "src_40c22e934dab8e403821ca8ce7c8c7ef",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-operation-tab-layout — plan.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-operation-tab-layout — plan.md",
+          "anchor": "herdr-operation-tab-layout-planmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-orchestrator-terminology-boundary/plan.md",
+      "blobSha": "e7f5f15ca3e8af1dc877339441d89b5fbd030d34",
+      "blobSize": 6421,
+      "sourceDigest": "1eacb2464a354793e30a507ca702a98ef844d3c9c6d62c6d2134b35227b50a4d",
+      "sourceId": "src_dbe8571f9680c1a38c3f4f1b8adf93a4",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "tsk-10n — Herdr runtime boundary and orchestrator terminology",
+      "headings": [
+        {
+          "level": 1,
+          "text": "tsk-10n — Herdr runtime boundary and orchestrator terminology",
+          "anchor": "tsk-10n-herdr-runtime-boundary-and-orchestrator-terminology"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-orchestrator-terminology-boundary/RESEARCH.md",
+      "blobSha": "501eea8058ffa476b98500d72f28ad57c6d3c62b",
+      "blobSize": 7365,
+      "sourceDigest": "131119184c07013777fb066137d4e7b10d37991c6e7afd760f8737dd923523c0",
+      "sourceId": "src_a94d49adf6510bebb1c77aeb9b0d89d2",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-orchestrator-terminology-boundary — RESEARCH",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-orchestrator-terminology-boundary — RESEARCH",
+          "anchor": "herdr-orchestrator-terminology-boundary-research"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-plugin-doing-status-literal-match/CONTEXT.md",
+      "blobSha": "18ea219c84b3706e6bb1b89a043658091d284eff",
+      "blobSize": 5115,
+      "sourceDigest": "c4e2249ca60161dec5904e922cd721b67a2b327934b5b9f6f9af8fc4c710d074",
+      "sourceId": "src_2ed9d12be4f049d67c83f28d1d4babd1",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin: literal-status vs statusCategory in-process pane filter",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin: literal-status vs statusCategory in-process pane filter",
+          "anchor": "herdr-plugin-literal-status-vs-statuscategory-in-process-pane-filter"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-plugin-doing-status-literal-match/plan.md",
+      "blobSha": "8e0b64c3098716387817b69bfe2d4b78aab712e8",
+      "blobSize": 4479,
+      "sourceDigest": "cff3915ecab4c22777950843fd1c15fc2ba4f70a811abd90b986b933f394dc36",
+      "sourceId": "src_315f2ebbb966101ba6971df9ac1d6234",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan: herdr-plugin literal-status pinning test (tsk-4ot)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan: herdr-plugin literal-status pinning test (tsk-4ot)",
+          "anchor": "plan-herdr-plugin-literal-status-pinning-test-tsk-4ot"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-plugin-parkreason-pane-filter/CONTEXT.md",
+      "blobSha": "94b3e3b73df2c0f41396690afc8a270229050cdc",
+      "blobSize": 7175,
+      "sourceDigest": "6e2a21c09cc559d7ca81c5504520c34b0060d27ce5a3360a2ade30bcf88e4ac3",
+      "sourceId": "src_577e88770210329c7e21d392fa5aab46",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin: expose parkReason, drop literal-status pane filter",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin: expose parkReason, drop literal-status pane filter",
+          "anchor": "herdr-plugin-expose-parkreason-drop-literal-status-pane-filter"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-plugin-parkreason-pane-filter/plan.md",
+      "blobSha": "eedb1fcbf3ea6f582964a8ec53d100340172e5e0",
+      "blobSize": 13360,
+      "sourceDigest": "b0583db41bc92032801df147db89cc27bb2e04e50b552e6b845235033dbd6fdc",
+      "sourceId": "src_90f90dbf8e22f5510e8ab6127ed7c478",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "plan: expose parkReason on fgos list --json (tsk-48i)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "plan: expose parkReason on fgos list --json (tsk-48i)",
+          "anchor": "plan-expose-parkreason-on-fgos-list---json-tsk-48i"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-shared-launch-agent/CONTEXT.md",
+      "blobSha": "638de7944a5a6555cd9af01f6a18ff926aa8c35d",
+      "blobSize": 7051,
+      "sourceDigest": "77803286e412088804f98c4ecfa766d2d3ec0131e923194e66f0b1ff77fff9de",
+      "sourceId": "src_744348987d5fbeab9a864b6b60f432c8",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr shared launch-agent function — decision record",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr shared launch-agent function — decision record",
+          "anchor": "herdr-shared-launch-agent-function-decision-record"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-shared-launch-agent/plan.md",
+      "blobSha": "416d2d69bb15e53ca2c9b56433aa6b68e79e6281",
+      "blobSize": 7275,
+      "sourceDigest": "4773366adab27e3daa19378551f14132ebbea90b01fa0b1932ffcfc983d04a36",
+      "sourceId": "src_df42d2f42592ef65787163a3da8f083c",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr shared launch-agent function — plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr shared launch-agent function — plan",
+          "anchor": "herdr-shared-launch-agent-function-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/history/herdr-spawn-agy-interactive-mode/iron-law-evidence.md",
+      "blobSha": "815496f5c3a2350bad311200d83f3da601621cf2",
+      "blobSize": 6347,
+      "sourceDigest": "623b19de80fb710f11326b973d6d7f7b9d7f12688bb7ab8c2cb7cc143a6de9f7",
+      "sourceId": "src_671c0c120ba74a97ff76936206ca762d",
+      "area": "History/evidence",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Iron Law evidence — tsk-10j",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Iron Law evidence — tsk-10j",
+          "anchor": "iron-law-evidence-tsk-10j"
+        }
+      ]
+    }
+  ]
+}

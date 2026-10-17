@@ -1,0 +1,962 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 71,
+  "entries": [
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.5.md",
+      "blobSha": "fc0db1fd0b9d7ba55168fe8af6f8697ad0cf7908",
+      "blobSize": 22589,
+      "sourceDigest": "74e687db06758dec05e69027f29db47e91d967856d4f9bdf13b55c36a247560b",
+      "sourceId": "src_cd89ffa47de0bb5aeb3df5c5bb782dad",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P10.5 — Integration And Usability Proof (Phase 10, gating cell before P10.6-P10.9)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P10.5 — Integration And Usability Proof (Phase 10, gating cell before P10.6-P10.9)",
+          "anchor": "p105-integration-and-usability-proof-phase-10-gating-cell-before-p106-p109"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md",
+      "blobSha": "08af5437a5f6d7193d56514639cc1a07315ca49b",
+      "blobSize": 20737,
+      "sourceDigest": "ba5a6d2fb00384b666fe25a8a8fb1af8354a82eb90dd095a0b5f3b53a1a08770",
+      "sourceId": "src_f13c5c2606905ea07dfcdc001f5383ef",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P10.6 — RFC-Review-Lite Conformance (Phase 10)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P10.6 — RFC-Review-Lite Conformance (Phase 10)",
+          "anchor": "p106-rfc-review-lite-conformance-phase-10"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md",
+      "blobSha": "f0857ca6829ae2edc0c9749bada24cfec8ed4bdb",
+      "blobSize": 20112,
+      "sourceDigest": "ef8fb2a805d0da5c13507422a11bdcff4ea31810d9801c7e13c3156815748df0",
+      "sourceId": "src_1f7884a8f0d96eac494d5c6a063d3327",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P10.7 — Nominal-Group-Lite Conformance (Phase 10)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P10.7 — Nominal-Group-Lite Conformance (Phase 10)",
+          "anchor": "p107-nominal-group-lite-conformance-phase-10"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md",
+      "blobSha": "7bf5c3f201baf2f8fe11159a0d723ba67c7d49e6",
+      "blobSize": 24278,
+      "sourceDigest": "156295eba52da1ecf2179e6bc72851bec3db0533d66b5c8ab6b4e3e4053eaaba",
+      "sourceId": "src_b010256546e325c66e5fcea0525b5644",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P10.8 — Delphi-Feedback-Lite Conformance (Phase 10)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P10.8 — Delphi-Feedback-Lite Conformance (Phase 10)",
+          "anchor": "p108-delphi-feedback-lite-conformance-phase-10"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md",
+      "blobSha": "483b3c090083b410e1d43d60096570d23b1ce0e7",
+      "blobSize": 21805,
+      "sourceDigest": "bd1f08b9da60ddeaba373d2206613f2a9f93af6d0159dccae06fb40ef860e634",
+      "sourceId": "src_5911ed7fdc36d4d1fac6318219ff9540",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "P10.9 — Isolation, Security, And Authority Regression (Phase 10)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "P10.9 — Isolation, Security, And Authority Regression (Phase 10)",
+          "anchor": "p109-isolation-security-and-authority-regression-phase-10"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md",
+      "blobSha": "76e8cc72a6ca66f87ecf9504572dda8bca6792e2",
+      "blobSize": 1025,
+      "sourceDigest": "6ad54f6abeadf8d193e4796f13951d7e2edc6e9a99f4275cc2cd78d184250e4a",
+      "sourceId": "src_24209e1ae42bf33f51864685152a9199",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Current Cell — none (idle)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Current Cell — none (idle)",
+          "anchor": "current-cell-none-idle"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/index.md",
+      "blobSha": "91c06cf2aa46dc754753f6b9f7b5ab5d1e9cbb0e",
+      "blobSize": 19428,
+      "sourceDigest": "76ab5124568004ce6e7c1664de82458dd76116ef94e5f9282a4aec2955d2d7e6",
+      "sourceId": "src_547a6576f56066904706010697bcd56d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Team Dispatch V1 - Step 1-5 Audit Trace Index",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Team Dispatch V1 - Step 1-5 Audit Trace Index",
+          "anchor": "team-dispatch-v1---step-1-5-audit-trace-index"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md",
+      "blobSha": "54045750c1bd4f6532162aeb9b21f52695a0cb4d",
+      "blobSize": 9389,
+      "sourceDigest": "108a77dca01446bb26785f476f31a27c095450ec7b03aa484ca0985a966a990c",
+      "sourceId": "src_9c15c46cdcc741fbfbb676a5ff37c87d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.0 — Reconcile In-Flight Review-Item Verdict Routing",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.0 — Reconcile In-Flight Review-Item Verdict Routing",
+          "anchor": "cell-60-reconcile-in-flight-review-item-verdict-routing"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md",
+      "blobSha": "7c22d7a268d724ee6d4edfbd4bcb62b0baf74b50",
+      "blobSize": 6870,
+      "sourceDigest": "8f3237ca090e92978c0e14ae9ffe7d8ce00fd605a464d4cb059337156035150a",
+      "sourceId": "src_83e8860b44bd78baabe14d1d26b95229",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.1 — planning.validate-plan Fake Executor Happy Path",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.1 — planning.validate-plan Fake Executor Happy Path",
+          "anchor": "cell-61-planningvalidate-plan-fake-executor-happy-path"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md",
+      "blobSha": "f777127bc358bd5ccf22cd52af5be70059a6d714",
+      "blobSize": 31830,
+      "sourceDigest": "f336b6cf6b2d9c59f4e98ff4d0286914de058248e0fd3993ed0297487be536de",
+      "sourceId": "src_1591cd09fe8e335beec5d65272656037",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.2 — planning.validate-plan Negative Cases + Red-Team Hardening",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.2 — planning.validate-plan Negative Cases + Red-Team Hardening",
+          "anchor": "cell-62-planningvalidate-plan-negative-cases-red-team-hardening"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md",
+      "blobSha": "f85d2716cae31cf06648759b838514c29dcd0705",
+      "blobSize": 24967,
+      "sourceDigest": "6a5576df7ef5ad9fb232d97780129269b0ac91b491d106670e91b3d7814c3110",
+      "sourceId": "src_6391bd631425966fddf0953d97ebfb50",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.3 — planning.validate-plan live smoke",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.3 — planning.validate-plan live smoke",
+          "anchor": "cell-63-planningvalidate-plan-live-smoke"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md",
+      "blobSha": "dbc1267d7cfc479b0cb7b738a57c394254ad8e31",
+      "blobSize": 9293,
+      "sourceDigest": "a70a8997d07553864a82014c9c1c7e72f37a3f4eb998fc9967b5c9f14ffcc0e0",
+      "sourceId": "src_820396a082cb6392e9c6f8d057549bbb",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.4 — executing.review-item fake executor",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.4 — executing.review-item fake executor",
+          "anchor": "cell-64-executingreview-item-fake-executor"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md",
+      "blobSha": "aedabf974a07a4e027cfa97f7b902aebe472647a",
+      "blobSize": 13568,
+      "sourceDigest": "c937375452c4f0ae3390f9c244cfa3f17648034dc790e0254b5f56b0922b5e50",
+      "sourceId": "src_4ca040ca606ab12483e849e6cfff1c99",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.5 — executing.scout-blast-radius read-only researcher",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.5 — executing.scout-blast-radius read-only researcher",
+          "anchor": "cell-65-executingscout-blast-radius-read-only-researcher"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md",
+      "blobSha": "eeda9160e58c5b1d3a05877b6d4b0190a73f35eb",
+      "blobSize": 12493,
+      "sourceDigest": "45746ab1b470484b5ae6796c093fb88247a062c60239ab6ce0ca9a11429ac09a",
+      "sourceId": "src_6aad86d07fec2449aa8a29cf9e35628e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.6 — executing.scoped-subtask mutating helper",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.6 — executing.scoped-subtask mutating helper",
+          "anchor": "cell-66-executingscoped-subtask-mutating-helper"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md",
+      "blobSha": "d63b29b0aaa5ed031180a60df3f6180646734872",
+      "blobSize": 10779,
+      "sourceDigest": "7b6d51a1a589d24edc0f1317ba1ea8e4805d34c56d8acc6a95dc12007d81bc1a",
+      "sourceId": "src_3d38ce63d751202ecf9aa01a6211a2dd",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.7 — Post-close hardening (cross-cutting review findings)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.7 — Post-close hardening (cross-cutting review findings)",
+          "anchor": "cell-67-post-close-hardening-cross-cutting-review-findings"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md",
+      "blobSha": "f7925a287f36fdfe90f9c3d8e1f3fd0c863862f9",
+      "blobSize": 17511,
+      "sourceDigest": "a2bfcf5835d6f565995079320d3d74b16fc1431fdc0d4baac92bf4188055c774",
+      "sourceId": "src_2759d059b7d86bfc6bf3adcdaee790d6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Cell 6.final — Consolidate Step 6",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Cell 6.final — Consolidate Step 6",
+          "anchor": "cell-6final-consolidate-step-6"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/hem-probe.sh",
+      "blobSha": "c709b15a8fae1be79e77e71ecf3ae5f7979bb9a3",
+      "blobSize": 2931,
+      "sourceDigest": "3b8158b7f04338458074a4403cc685f546c91166f38c6f866d7d60b678760bfe",
+      "sourceId": "src_87a6d6a98c75d1ee192c90b91439f833",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+      "blobSha": "d2c20838350a0372217c4deddff8030fa9e29f0b",
+      "blobSize": 4385,
+      "sourceDigest": "4ca49578ffd3359d78ac8d3520eb7d0e72d292ce8f90919ee3ba8fd905697308",
+      "sourceId": "src_89f399cb7b6d10732d05963109470366",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Agent in an isolated session with a private HOME — measured",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent in an isolated session with a private HOME — measured",
+          "anchor": "agent-in-an-isolated-session-with-a-private-home-measured"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+      "blobSha": "3a83e12e36ce6900b153d580729f393f0c997aa4",
+      "blobSize": 5858,
+      "sourceDigest": "c70d088c8a324b769fe38d0ebadae7e93d439390b53c5041c0bd11c594f2f1db",
+      "sourceId": "src_b8a46b13cfac284e19f52e5ac4a2adba",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+      "blobSha": "e9330b5cdd1247f2ebcd62767420aec0f5a92491",
+      "blobSize": 2939,
+      "sourceDigest": "71b37fd4ead0bd167513a32b3c5b3176065574b008bb965245c4ad7b22795a9c",
+      "sourceId": "src_a7c312484478a5b7ff263a15b36e5af0",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+      "blobSha": "f013bf9fc021a19135f068f50a46b5ae50e1a120",
+      "blobSize": 4540,
+      "sourceDigest": "05a73ff3855f133d32e9f223be63a59d0145db16c142c48bfe0d361ac9ae99e2",
+      "sourceId": "src_3df5c81febee17b1327bcdd42c0d4277",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Worker isolation — Phase 01 blocking question, first answer",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worker isolation — Phase 01 blocking question, first answer",
+          "anchor": "worker-isolation-phase-01-blocking-question-first-answer"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+      "blobSha": "da6d93d39e4d2e4b79468f47897853145ff59db6",
+      "blobSize": 4333,
+      "sourceDigest": "403c52c47968ec432897ac8ba23c4bf74769830266bd9fbc2000f7f742d2409b",
+      "sourceId": "src_df4a5f80ea2e4ebac86569b2f6e67c5e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Permission posture — where it actually comes from, and the rule that follows",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Permission posture — where it actually comes from, and the rule that follows",
+          "anchor": "permission-posture-where-it-actually-comes-from-and-the-rule-that-follows"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+      "blobSha": "27f59bf52fb63bc03497de5346a50f18c971dc12",
+      "blobSize": 3411,
+      "sourceDigest": "5bb1a8960f7e739177f4f25c68b35280600014a3aa7e0f7e3d987870dc2dee22",
+      "sourceId": "src_35483916c2950993bb889622cc9c55d3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+      "blobSha": "99a7ea298c667143595ba1773ff317e4bdb3481c",
+      "blobSize": 4342,
+      "sourceDigest": "3605c13dd0bef6a87ce7fee55877caa0fe20d8808d82167b31ed15e75903ed9d",
+      "sourceId": "src_99716b628ad6862c14a89c6f5b00b79f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+      "blobSha": "a463c073e04e03413cef08d858ec9f84dee4c969",
+      "blobSize": 4205,
+      "sourceDigest": "be03987e3306b6a0d6d06a230cfdac3034e6bc63b33447920e4ebc0ec755dd26",
+      "sourceId": "src_0a320c8997a1a253d2242ddefa0eb43c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Worker isolation — separate herdr session, measured",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worker isolation — separate herdr session, measured",
+          "anchor": "worker-isolation-separate-herdr-session-measured"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+      "blobSha": "c8a13857375493e9d9c3ed2972ba351c45e9e48c",
+      "blobSize": 2545,
+      "sourceDigest": "86604b250428d52b4b400cd157d42de0a4136f0ca9f8f26d039105dce047c20d",
+      "sourceId": "src_6a0186e2f332eb882536e1b06b26d6a5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+      "blobSha": "93e45bf53ff9d7780834825b4629c0ca5deb5f61",
+      "blobSize": 2240,
+      "sourceDigest": "10c87fb8d7e7cdefce1b0df3243039005915f58a6178465b60fa3672177f8a2a",
+      "sourceId": "src_f685a0cf7f0e3208611d555242123899",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-probe.sh",
+      "blobSha": "697fc4ea78f131b9ab40cb2abeffb997dc6cd6a9",
+      "blobSize": 6420,
+      "sourceDigest": "b7073e5e7680da7487551defbd24d464ee760c1f425362f2943a212356a0f25a",
+      "sourceId": "src_47115b64f83ee4e4d56c872234384020",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-result.json",
+      "blobSha": "79c1e42cb7c59d03a1e2fdd143f00466c4846e96",
+      "blobSize": 252,
+      "sourceDigest": "f2429c13d2183ad4fc3766cc16c1707ef9ab30058768c10ad3005baec9650f20",
+      "sourceId": "src_4cc99814ef1de57fdc37f87c1a2062b1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs",
+      "blobSha": "106fe7bd291208b4aefc080dd0f69984228036a9",
+      "blobSize": 7747,
+      "sourceDigest": "97fc02c11132e5121535e6413c6982152a24d655cda3fc6d030193f71d6550a2",
+      "sourceId": "src_61e0ee0f1f5f0f5f36adb7792aff37d3",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-result.json",
+      "blobSha": "56a8d4a61173513ba044e62f00b00151757dae27",
+      "blobSize": 4690,
+      "sourceDigest": "6eab22ba101a53e4ebf943e380b33b17330055a91b32f5ab0ef6d07ce5f44d1d",
+      "sourceId": "src_92c2e1784b14e5da5d613ec06f139105",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+      "blobSha": "efbcdca2c406d8db61cebd944e56a9b327bac310",
+      "blobSize": 6552,
+      "sourceDigest": "c15f5ae19f74eb8865836e234bd7c78661025a96636838d6800e9d91c91c1bd2",
+      "sourceId": "src_778808045f71d7b3d742644c32e244ab",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-result.json",
+      "blobSha": "d066313ff25505263b979bc0089314872f4230ec",
+      "blobSize": 1673,
+      "sourceDigest": "62677c57a19f67cbc1fba2e748bb56696f8f8fcd052fe0ee80c1ec5f4eac205f",
+      "sourceId": "src_a8b93119deecff2dbc96eb42d68a4402",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/failure-result.json",
+      "blobSha": "a5d7e9d53b548bf5e954bcab2c3a410d74488643",
+      "blobSize": 2652,
+      "sourceDigest": "a1d7b9d99d83dcc67d71a7ea3ab591a4bab2c4e5f9b8760bee946271ebb9424d",
+      "sourceId": "src_c07271ea47a7d74fa0d818e1d0aefa76",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+      "blobSha": "c0facb09e0cf4249f0ee471e8f2e9a755c6fac64",
+      "blobSize": 7477,
+      "sourceDigest": "1422556ed169c9d16213eea5ae102c2c0c983ded3988813bf5d66eca8076be55",
+      "sourceId": "src_b48b6aa653e2aa95f6e3b4d3b8bae1cc",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-result.json",
+      "blobSha": "0137fca9ca3768a659fc821b7f9179bd7b712628",
+      "blobSize": 5664,
+      "sourceDigest": "0a801cee02497cd3f73a3dee5e8697614b974d1960c3b82d7252cd78c0479a67",
+      "sourceId": "src_7b326329c82edb925ec3e81472ddad6f",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+      "blobSha": "3c8523766e5acfce621961ee9b7266b72e586ba3",
+      "blobSize": 6237,
+      "sourceDigest": "bd1956c169365fdee92834e51dbb2c5bb7a1d64c6aca38f8e35cd29125941ceb",
+      "sourceId": "src_ee91a10efef695a3fc80e7bb54dd61f1",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-result.json",
+      "blobSha": "373eb80358437c21009228aa663a7e70e9968f44",
+      "blobSize": 2715,
+      "sourceDigest": "aab1f5efd77642f10a35a4ec4f12db1917b6f264018aa337c2f960640cdbd825",
+      "sourceId": "src_e4b87e3282dd188fec2f1975dd8d868e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json",
+      "blobSha": "e6b1d20af9076946d2ee5bc0c578b770501db03f",
+      "blobSize": 2230,
+      "sourceDigest": "09e89bbd2c56b474c9114de778ec5cdbdcb4645de17d5ba323f7f76ed6fafafb",
+      "sourceId": "src_873b230ca68a0eaddfca30d24f23b7d5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+      "blobSha": "59970aecde73607098ae2f15b534550351580a45",
+      "blobSize": 10178,
+      "sourceDigest": "15ed286bfe6c39664487ffa8e4cbe6f607342487ff8099a4cc4f43e727b6280c",
+      "sourceId": "src_a5b74f32242480a2ad7ccfd1d2efd2c7",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+      "blobSha": "b0a95ed3d1b5b29f513613a356e9acad1c2714df",
+      "blobSize": 11258,
+      "sourceDigest": "b82a2d01f6552e09911c3e26cc0aa53f9b3c1337107b61d2702223f499ac9ab0",
+      "sourceId": "src_1ddcc9e8bfcf2d2691c47757c6ddee88",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
+      "blobSha": "cdce4146f3966fafe80d981ba076ee34642b57d1",
+      "blobSize": 1351,
+      "sourceDigest": "49f9700f25a5625f896dab25a4ec92b582e01bf4ea0ca2033d00b62151935bd1",
+      "sourceId": "src_075ad70cfb8ced6112ee39b618602c8a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-2-boundary.sh",
+      "blobSha": "b4e4a96ba3c9da1f4c5b0285505405b80e94bb24",
+      "blobSize": 1732,
+      "sourceDigest": "e5f870a2e8e3b307d4fbf6880a9a9da9b0d4ac31253405ef612e3ffb70946b07",
+      "sourceId": "src_56f3c1f300e9905be3b3b35d6b99e607",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-3-mount-order.sh",
+      "blobSha": "259bd0a7b19add80d428c7ba8aefb9e4a2fcff93",
+      "blobSize": 1895,
+      "sourceDigest": "50c3d63074bc2c231929bedaf18c8fbfaa281826d90314142d7b2601a6516c4f",
+      "sourceId": "src_969ea3ae66dc4b991d6b600502dedb05",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-4-pane.sh",
+      "blobSha": "d53e49365b061dd1cbb96f23cc32fe2348ce9286",
+      "blobSize": 2845,
+      "sourceDigest": "49baf6e0a3ab9a823390ee6128cf6aed6a437001b1130415ebed9b4cbe681782",
+      "sourceId": "src_bae281a1ebe8caa919572799616bc478",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-5-pid-preservation.sh",
+      "blobSha": "5fd42879ced63e783e759fa18e140318045ef36f",
+      "blobSize": 1756,
+      "sourceDigest": "b24e2c43bd54f9dd04e14d49acbc6877aedae27e5c9e54a188f207760c55a95d",
+      "sourceId": "src_0f24cb2107b75609e2ba3c1e5392eeab",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-6-unshare-confinement.sh",
+      "blobSha": "6a07069b3ed21f61611bec15f5ec0dc0194a6f92",
+      "blobSize": 1721,
+      "sourceDigest": "2b279ced0c1e42da203b221dfd3ae170773ece97955034d444379cbfc662d0fb",
+      "sourceId": "src_7112d53b0680137859dfc6fe507e6dd6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-7-unshare-pane.sh",
+      "blobSha": "e405c3e7a9c8ebbec16b740ffa20048c174e7600",
+      "blobSize": 2718,
+      "sourceDigest": "90f7f34e432be99ee5353fd8e182ac45e497617a9b8bf996c2047492b1c2378b",
+      "sourceId": "src_1ef05f268d68aa9270d111cd305afe7c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "blobSha": "5d6585ef3d39f7c4aeb9516e71d549b1edd73e3e",
+      "blobSize": 5740,
+      "sourceDigest": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422",
+      "sourceId": "src_ca37ed2bd9ab17a87f70c1a6bb91a13c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Filesystem confinement for a herdr worker — what was measured, 2026-09-08",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Filesystem confinement for a herdr worker — what was measured, 2026-09-08",
+          "anchor": "filesystem-confinement-for-a-herdr-worker-what-was-measured-2026-09-08"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
+      "blobSha": "4009e10bd5fc86737501698b5d5d72c54eba9871",
+      "blobSize": 906,
+      "sourceDigest": "79502d3a1303442b260388fcaf133fb2150b0b285c309dd416157c1f8c198f5a",
+      "sourceId": "src_fbf10765dea02dac71d1cee0360ee7f0",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh",
+      "blobSha": "7adc8cff3aeffe03b34ba4640299267cbd99751c",
+      "blobSize": 455,
+      "sourceDigest": "36039123dabf5120473614dfc8ce63ead2ac07e910973c9258f3b1934b2f43c2",
+      "sourceId": "src_8bf5cb65c048f6875556221a9b76f375",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md",
+      "blobSha": "c63db533bea90b59b1ddd900b182d4b116583044",
+      "blobSize": 9251,
+      "sourceDigest": "4b3d5f345a57c172689e9b56fce77ed53d6ab3b577f36681dda40872cff7b33f",
+      "sourceId": "src_c073552e4d57a6d9a8e1b0f2ebf5b85a",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Dispatch Visibility V0 — live proof",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Visibility V0 — live proof",
+          "anchor": "dispatch-visibility-v0-live-proof"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vision.md",
+      "blobSha": "bd8cfc6897ffbffce984dd4f6c83810d516f7053",
+      "blobSize": 16165,
+      "sourceDigest": "15424581be04de19fc1a9b5477ddd42d7822ef1a434f1a5a867ffea5d7103bf6",
+      "sourceId": "src_179354588fa80c93ddf715b82a255451",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Foundation Vision",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Foundation Vision",
+          "anchor": "agent-coordination-foundation-vision"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "blobSha": "b1c61a8ab027aad1629d5d251284347b5ab9cbcc",
+      "blobSize": 8196,
+      "sourceDigest": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+      "sourceId": "src_6e48908876b7e4e8dae86e03075c8597",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Canonical Agent Coordination Concepts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Canonical Agent Coordination Concepts",
+          "anchor": "canonical-agent-coordination-concepts"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "blobSha": "c35483e0fb6aebdf536abb8cb3587f7994a0e608",
+      "blobSize": 5498,
+      "sourceDigest": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+      "sourceId": "src_0f42a36cdd18cea757c726465a155f9b",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Concept Relationships",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Concept Relationships",
+          "anchor": "agent-coordination-concept-relationships"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "blobSha": "742818dbbca5dfff8bfe0f364498ef59092a4fe4",
+      "blobSize": 3700,
+      "sourceDigest": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+      "sourceId": "src_f01b3e7986722823728138c26cdea51b",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Deprecated And Reserved Coordination Terms",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deprecated And Reserved Coordination Terms",
+          "anchor": "deprecated-and-reserved-coordination-terms"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/README.md",
+      "blobSha": "0c166527bb5940d1e24c6858cdba8d8cafd0f76d",
+      "blobSize": 3148,
+      "sourceDigest": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "sourceId": "src_a9d13591f5632f51775b8b38b7ab2250",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Vocabulary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Vocabulary",
+          "anchor": "agent-coordination-vocabulary"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+      "blobSha": "d9b6d34f75a79b5910909a555c32298e922bdbfb",
+      "blobSize": 7343,
+      "sourceDigest": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
+      "sourceId": "src_8a4f99f9b38d8c735616396cbdf7bb06",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": null,
+      "headings": []
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "blobSha": "be0a0ccd3145a06c34af422002af3847a53a4cbc",
+      "blobSize": 58015,
+      "sourceDigest": "fb3f6e2da6cbe36758cd0889886e20221163012805c2dae3dffd1cb5465eab89",
+      "sourceId": "src_67b82ce641d273397b56fff5f1fd4af3",
+      "area": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/component-boundary.md",
+      "gap": false,
+      "firstHeading": "Architecture Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Architecture Map",
+          "anchor": "architecture-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/claude-plugin/README.md",
+      "blobSha": "91bb22f7f17c81dca11191f539b2d3c2d0259131",
+      "blobSize": 1765,
+      "sourceDigest": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "sourceId": "src_458d6c32fcf2bb89bc97712ce4cb8faf",
+      "area": "Claude plugin surface",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "claude-plugin candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "claude-plugin candidate area",
+          "anchor": "claude-plugin-candidate-area"
+        }
+      ]
+    }
+  ]
+}

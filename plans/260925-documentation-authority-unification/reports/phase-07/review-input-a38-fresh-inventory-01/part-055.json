@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 55,
+  "entries": [
+    {
+      "path": "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+      "blobSha": "4daf6cbcd071064bc8103d9550f1e9f54395709f",
+      "blobSize": 10536,
+      "sourceDigest": "cd6d69131eab5bcef9abb5a41bb1af1c432fb328932900525919295b3348cc78",
+      "sourceId": "src_e56147560eb176c471703cbeb99f4384",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Work-item pipeline: stages, verbs, actors, handoffs",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work-item pipeline: stages, verbs, actors, handoffs",
+          "anchor": "work-item-pipeline-stages-verbs-actors-handoffs"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+      "blobSha": "398f6fc86fd4b70a13c8fc2a252867230ceed76a",
+      "blobSize": 10646,
+      "sourceDigest": "6eaf8a9eca523a4eab98549a28ab7c190b551d23414d0ff96c2b5e9e92c382b7",
+      "sourceId": "src_15c1c64aa401ac0dd853913f4d476be9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Work-item `priority`: calculated formula, and `intent`'s retirement",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work-item `priority`: calculated formula, and `intent`'s retirement",
+          "anchor": "work-item-priority-calculated-formula-and-intents-retirement"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+      "blobSha": "384f0ee83c44db018365b873021b5297519ea9df",
+      "blobSize": 26182,
+      "sourceDigest": "cf92920a8a721b0bba1b6dc080e89f7f103a65c175d333a5a64d5d0db9383033",
+      "sourceId": "src_77d980a8e0d1052a89f7d9fc0394b94a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Worker slot is the engine-owned occupancy unit across every launcher",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worker slot is the engine-owned occupancy unit across every launcher",
+          "anchor": "worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+      "blobSha": "32ef709b223b9d8736b938ddddb76903de48b344",
+      "blobSize": 10631,
+      "sourceDigest": "4d8a7fc2492d9336fbf69e578667db72cbe6200c428c51f950af77f747c2211a",
+      "sourceId": "src_93badc6774675d607aa11fd7f1dd4fb7",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Worktree-dispatch attestation, level 1: advisory-only, never a gate",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Worktree-dispatch attestation, level 1: advisory-only, never a gate",
+          "anchor": "worktree-dispatch-attestation-level-1-advisory-only-never-a-gate"
+        }
+      ]
+    },
+    {
+      "path": "docs/operator-runbook-herdr-cockpit.md",
+      "blobSha": "4af3a6fad11e084245d9c04b1eafbcbd5783ec20",
+      "blobSize": 3489,
+      "sourceDigest": "5c5b7d6c6d80c4822586376676176e58d3434536f774bea50e162b20990840da",
+      "sourceId": "src_0aa4fa2dad602086e495b51e203a2b84",
+      "area": "root:docs/operator-runbook-herdr-cockpit.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Operator runbook — herdr cockpit",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Operator runbook — herdr cockpit",
+          "anchor": "operator-runbook-herdr-cockpit"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform-foundations.md",
+      "blobSha": "31b0ae0eb3d5f62e55d412952e43ca07127fcc12",
+      "blobSize": 16398,
+      "sourceDigest": "22636a8d5d3314242428e7bad1e8f1196dec7548b17dc5c8b0d0ae15525e6fa4",
+      "sourceId": "src_1df4ee2f5e5f34543d202d459a414045",
+      "area": "root:docs/platform-foundations.md",
+      "authorityStatus": "legacy-current",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+          "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "blobSha": "70b6bcb36377525fda22273c038cd62b35572968",
+      "blobSize": 38085,
+      "sourceDigest": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "sourceId": "src_9166a62424f4281b4eb2f7ecea11303d",
+      "area": "Agent confinement",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: confinement authority v1",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: confinement authority v1",
+          "anchor": "added-in-candidate-confinement-authority-v1"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "blobSha": "3592427af5e6a6341a14bcb3eac1518c7e4e14df",
+      "blobSize": 5694,
+      "sourceDigest": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+      "sourceId": "src_285d73272be430eacd0670766df0886a",
+      "area": "Agent confinement",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: confinement authority decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: confinement authority decisions",
+          "anchor": "added-in-candidate-confinement-authority-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "blobSha": "18467a5fc9847b597132053b3ca940da64551491",
+      "blobSize": 9258,
+      "sourceDigest": "44517fc6797bc7657676ff52b20ae9f07c4e10c6ebe7074b92d72c09ee57a6b0",
+      "sourceId": "src_609ab0f807838956c09928fcd59977af",
+      "area": "Agent confinement",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Added in candidate: rollout and settled facts",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Added in candidate: rollout and settled facts",
+          "anchor": "added-in-candidate-rollout-and-settled-facts"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/README.md",
+      "blobSha": "6c7197bbee89d424949468427bdd981b526a20c6",
+      "blobSize": 2043,
+      "sourceDigest": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "sourceId": "src_5b39c345bda13f8475e98c3410912b91",
+      "area": "Agent confinement",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "agent-confinement candidate area",
+      "headings": [
+        {
+          "level": 1,
+          "text": "agent-confinement candidate area",
+          "anchor": "agent-confinement-candidate-area"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "blobSha": "4a0913d0c7775ceded16aabb56f03a6a109bc105",
+      "blobSize": 47318,
+      "sourceDigest": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "sourceId": "src_7f940e4f214b1600af8d74f30a294af4",
+      "area": "Agent confinement",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Spec: Agent Confinement Authority",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Spec: Agent Confinement Authority",
+          "anchor": "spec-agent-confinement-authority"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "blobSha": "2d4101ac2c1b0a551b45425b3f93f1e514ef8b93",
+      "blobSize": 20241,
+      "sourceDigest": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+      "sourceId": "src_53ecf7e081d847b44265315b45ff7cb2",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Dispatch Control Plane",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Dispatch Control Plane",
+          "anchor": "dispatch-control-plane"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "blobSha": "e6ff7665730c24fe4e1bd6da759dc3a257c0e221",
+      "blobSize": 4730,
+      "sourceDigest": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+      "sourceId": "src_50f3af45bf8e615a93eda37beaebd339",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Evidence And Result Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Evidence And Result Architecture",
+          "anchor": "evidence-and-result-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "blobSha": "7757efe1d24c419542249fb7f308dc5a23d390e6",
+      "blobSize": 17108,
+      "sourceDigest": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "sourceId": "src_5b762b7d5b3b81ccadd17c0940559eef",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Executor Fallback And Effect Eligibility",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Executor Fallback And Effect Eligibility",
+          "anchor": "executor-fallback-and-effect-eligibility"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "blobSha": "920e8460583a8998bb8724e78d6b311b185efbb1",
+      "blobSize": 10660,
+      "sourceDigest": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+      "sourceId": "src_e5af8b412dce6879ddb6a1d0307562a2",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Group Thinking Trigger Surface",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Group Thinking Trigger Surface",
+          "anchor": "group-thinking-trigger-surface"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "blobSha": "783450f0c5bf9925f0a891c39ec79395a1645c5f",
+      "blobSize": 6221,
+      "sourceDigest": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+      "sourceId": "src_52eb249d7febb34caf97fa5a6f201828",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Coordination Protocol Model",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Protocol Model",
+          "anchor": "coordination-protocol-model"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/README.md",
+      "blobSha": "41c0dceba644c5f58cd38eab24605ed15a78e549",
+      "blobSize": 7287,
+      "sourceDigest": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "sourceId": "src_ffb87f5dbd9051f95f5ea97296f2e8ea",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Architecture",
+          "anchor": "agent-coordination-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "blobSha": "23ad4ad1920383bb2949fd4d3a8f470acf6332be",
+      "blobSize": 20039,
+      "sourceDigest": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "sourceId": "src_a6ca8dfe79cc52475eda05f97efea780",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "RunHandle And Recovery Material",
+      "headings": [
+        {
+          "level": 1,
+          "text": "RunHandle And Recovery Material",
+          "anchor": "runhandle-and-recovery-material"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "blobSha": "7f72e87805607cce6afac4bf3cc40b467f4bd437",
+      "blobSize": 4334,
+      "sourceDigest": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+      "sourceId": "src_09f42cb7cb44c627e70ff2b81c320359",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Assignment Execution Runtime Model",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Assignment Execution Runtime Model",
+          "anchor": "assignment-execution-runtime-model"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "blobSha": "4394e7380f1375439900bc0ca5dc413ae2eae698",
+      "blobSize": 22938,
+      "sourceDigest": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+      "sourceId": "src_af27be414b7765e3762c74fbff07161f",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Runtime Recovery And Work Continuity",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Runtime Recovery And Work Continuity",
+          "anchor": "runtime-recovery-and-work-continuity"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "blobSha": "5400e1a5c21d7bc411234784c8253286922002fe",
+      "blobSize": 7994,
+      "sourceDigest": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+      "sourceId": "src_17a4ecb41c3b77739a49546966884461",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Visibility And Herdr",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Visibility And Herdr",
+          "anchor": "visibility-and-herdr"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "blobSha": "adc3dc1706d5efa4fc0d686886d931d9afadcf68",
+      "blobSize": 5573,
+      "sourceDigest": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+      "sourceId": "src_58331fd2795904b8715c811bf4d75290",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Work Integration Boundaries",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Work Integration Boundaries",
+          "anchor": "work-integration-boundaries"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "blobSha": "eca2dc5648dbd2277a8a3b8ebbac872e71a9ec03",
+      "blobSize": 22127,
+      "sourceDigest": "535f6be79291bd2e15602a338e67157296c078e74034450d1a075d7148683f3d",
+      "sourceId": "src_569d1bac982a996dfef7adf956218166",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Assignment, Run, And RunResult Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Assignment, Run, And RunResult Contract",
+          "anchor": "assignment-run-and-runresult-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "blobSha": "0b38056229183592c9beb4ff552eb302b3375804",
+      "blobSize": 4379,
+      "sourceDigest": "47228521c9c5c777a888ee5995300f8c44e4e1a7bd2906f03ee0616f7fa5a171",
+      "sourceId": "src_02b4602e4768c8858e9aad0762b2bbc0",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Workflow Step Operation Contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Workflow Step Operation Contract",
+          "anchor": "workflow-step-operation-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "blobSha": "153861be774dfe2878d877fcd3f6d2013df0491d",
+      "blobSize": 3397,
+      "sourceDigest": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+      "sourceId": "src_180425f8bdddf334ed57b5e9b983544d",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-001: Work Owns Delivery Lifecycle",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-001: Work Owns Delivery Lifecycle",
+          "anchor": "adr-001-work-owns-delivery-lifecycle"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "blobSha": "819cd57ceb23b3ead39116742e121643088b8aea",
+      "blobSize": 2342,
+      "sourceDigest": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+      "sourceId": "src_a2d2c83a3059e9cf6ab7c78a6c965ef5",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-002: Preserve Workflow step Primary Operation Compatibility",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-002: Preserve Workflow step Primary Operation Compatibility",
+          "anchor": "adr-002-preserve-workflow-step-primary-operation-compatibility"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "blobSha": "157f1d46c1a66a9525ba767f4dc695cfefb9f68a",
+      "blobSize": 2784,
+      "sourceDigest": "ac76cdc7b77f1d60ce6927a96a14efbf261bc515afbec3186b9d629bc895c555",
+      "sourceId": "src_71531a51e2d9a34d878c676cec778b30",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-003: Separate Assignment, Run, And RunResult",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-003: Separate Assignment, Run, And RunResult",
+          "anchor": "adr-003-separate-assignment-run-and-runresult"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "blobSha": "3f5cf4d68f75b2ee564e15bc71ba08660b5f1382",
+      "blobSize": 2038,
+      "sourceDigest": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+      "sourceId": "src_e6a82c717cfa485472f4c4a6ff1dc2c2",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-004: Reserve Job For A Future Scheduler",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-004: Reserve Job For A Future Scheduler",
+          "anchor": "adr-004-reserve-job-for-a-future-scheduler"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "blobSha": "748eb09a0d321b5242d7b34677b0be9155157ea2",
+      "blobSize": 2666,
+      "sourceDigest": "27fd53c723b38780e3bd3dee13827006c7bfa6650e57e3a29f55f941de37a772",
+      "sourceId": "src_5c032f289f8b05b40e43bf8dfec5e355",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-005: Herdr Is Visibility, Not Evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-005: Herdr Is Visibility, Not Evidence",
+          "anchor": "adr-005-herdr-is-visibility-not-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "blobSha": "3e98aabba904b8ea6a385ec6f12ab181c96eefd9",
+      "blobSize": 5958,
+      "sourceDigest": "43e11510b2ec0e2b924023e2398e3730dfa19c2a316a8823ba54a2633c1fdd0b",
+      "sourceId": "src_997fe918bf41e401e014463e25c773be",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot",
+          "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "blobSha": "2c1ad6ba89962c84c709b6d8a5626560f8033937",
+      "blobSize": 4398,
+      "sourceDigest": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+      "sourceId": "src_97e0cae299d00aa068345425e97db166",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-007: Domain Harness Seam And Non-Driving Inline Evidence",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-007: Domain Harness Seam And Non-Driving Inline Evidence",
+          "anchor": "adr-007-domain-harness-seam-and-non-driving-inline-evidence"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "blobSha": "f60d51a1701f466614ad6b8f2d7330a8715e97bb",
+      "blobSize": 7944,
+      "sourceDigest": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+      "sourceId": "src_df26af5f4ab9ca246a0d3f69610f0107",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+          "anchor": "adr-011-dispatch-owns-lifecycle-herdr-is-transport-the-receiver-writes-the-receipt"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/README.md",
+      "blobSha": "d4ec9c80ee34e41612a0f2b97b94b273b4ae02aa",
+      "blobSize": 4134,
+      "sourceDigest": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "sourceId": "src_0eb5c6c3ca9d1a87620f3c8e3959bb3c",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Architecture Decisions",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Architecture Decisions",
+          "anchor": "agent-coordination-architecture-decisions"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "blobSha": "75079758f92ff4665ffb328f66e72ebc3a75dcee",
+      "blobSize": 15574,
+      "sourceDigest": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c",
+      "sourceId": "src_e6f8073f5ba30b27d5cd8e3b4c523369",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Team Dispatch And Herdr Stability",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Team Dispatch And Herdr Stability",
+          "anchor": "agent-team-dispatch-and-herdr-stability"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "blobSha": "e71ab8f652e85db0eca544b16fd8888a8b34899f",
+      "blobSize": 1816,
+      "sourceDigest": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+      "sourceId": "src_e8a3b2067f0696c616d90c49570d8e9f",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Claim Preservation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Claim Preservation",
+          "anchor": "agent-coordination-claim-preservation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+      "blobSha": "a9aee89853820d793ece2f6045acef9b52c5a740",
+      "blobSize": 6015,
+      "sourceDigest": "714c1acff0c1314e401c63f586c52edcec7acc8873898a7a21a29d0739b75c04",
+      "sourceId": "src_e5f778921d4b39f14817e34657885786",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Agent Coordination Documentation Governance",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Documentation Governance",
+          "anchor": "agent-coordination-documentation-governance"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "blobSha": "c044dcb139560b84ff421850adda8b8a43cee6e2",
+      "blobSize": 64938,
+      "sourceDigest": "2c59e9060dddfe463c8cb7da4ac0c5694f333ec5a5a2abe8b954312fa042a931",
+      "sourceId": "src_6ba0083b40106fb2f5b90471f9127fa9",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Agent Coordination Documentation Standardization Plan",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Documentation Standardization Plan",
+          "anchor": "agent-coordination-documentation-standardization-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+      "blobSha": "231f6e31a68b800b22248355b938d6ca7fed1fd7",
+      "blobSize": 4382,
+      "sourceDigest": "03653cadcf168ee1fc2190ab7546a91392f55f988d8012435ac05b1698e1a3c0",
+      "sourceId": "src_ef6e26d4adb8798fe25ff24babed0919",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Migration Status",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Migration Status",
+          "anchor": "agent-coordination-migration-status"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+      "blobSha": "6bee07bed5305b35161afae2f92590a132d618d4",
+      "blobSize": 2815,
+      "sourceDigest": "f43934d95cee46df8a950f7dd1607f101b90bf33af5bfa9dd6867fd8eaae60c7",
+      "sourceId": "src_20f156090e64c7afd9e7d757d5f40511",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Documentation Migration Completion",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Documentation Migration Completion",
+          "anchor": "agent-coordination-documentation-migration-completion"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "blobSha": "6252bc252e1cca837b37b86d8f07de992036ffcb",
+      "blobSize": 1761,
+      "sourceDigest": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+      "sourceId": "src_3ffa801d6ad0c6ba21255dfb65172d16",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Proof Preservation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Proof Preservation",
+          "anchor": "agent-coordination-proof-preservation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "blobSha": "83e290723e0d986368d573398e0e347ab97e5ce9",
+      "blobSize": 1815,
+      "sourceDigest": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+      "sourceId": "src_688f71a2786b002b219d3ee18c62ccf5",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Proposal Status",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Proposal Status",
+          "anchor": "agent-coordination-proposal-status"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "blobSha": "a9d993be7109e4eb45535cf5530d3f21020e9659",
+      "blobSize": 131125,
+      "sourceDigest": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+      "sourceId": "src_5592f3b1c75f872f884d1418f5f0836f",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Source Inventory",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Source Inventory",
+          "anchor": "agent-coordination-source-inventory"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "blobSha": "7a57b8e901d15bb4e09683f3fe7a077691dc8c50",
+      "blobSize": 2642,
+      "sourceDigest": "ed1dce37107235dd5a5b5fb18664601e0227d7be43acfaf5cdea331c8e9a72f1",
+      "sourceId": "src_df73d1d49c6e9babe31a8e47b3de09c0",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination Documentation Migration - 2026-08-31",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination Documentation Migration - 2026-08-31",
+          "anchor": "agent-coordination-documentation-migration---2026-08-31"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "blobSha": "b034d9112bc44536ffa91b5b7b5ba2c661de96ae",
+      "blobSize": 35898,
+      "sourceDigest": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "sourceId": "src_7bb30c44b03462995584946073088c1c",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Orchestration Vocabulary Map",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Orchestration Vocabulary Map",
+          "anchor": "orchestration-vocabulary-map"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "blobSha": "974319ed6c8c7be54f8f96b35d4720a57e5e9bd1",
+      "blobSize": 12385,
+      "sourceDigest": "875a2f7fe2989d987c980470959b1e64219b5a455f9db401db98928241a1f865",
+      "sourceId": "src_965aea5a197e16a8539986ce6a260960",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Coordination Envelope — Chat Progress and Next Work",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Coordination Envelope — Chat Progress and Next Work",
+          "anchor": "coordination-envelope-chat-progress-and-next-work"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "blobSha": "7078229d17be84ecc299c3edf3647c53037cf117",
+      "blobSize": 17824,
+      "sourceDigest": "c470ced668aab375c2b846672efce763561beb71f13867607b4de87b9b740ccc",
+      "sourceId": "src_27cf91e37db688ffe01e4d11d54be521",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Group-Thinking Plan Loop — Design Proposal",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Group-Thinking Plan Loop — Design Proposal",
+          "anchor": "group-thinking-plan-loop-design-proposal"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "blobSha": "16b6eb3306dd19fa69537bafa7e2b0f13e0e0a57",
+      "blobSize": 8893,
+      "sourceDigest": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "sourceId": "src_beebe63364b01b84704300dfda35a528",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Step 09 / Step 10 Replan Handoff Prompt",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Step 09 / Step 10 Replan Handoff Prompt",
+          "anchor": "step-09-step-10-replan-handoff-prompt"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/README.md",
+      "blobSha": "a6e94d53c18f6a52cfa2410a0a715df7b222fead",
+      "blobSize": 1718,
+      "sourceDigest": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "sourceId": "src_ec302008d0adebc234f608f3594c60bc",
+      "area": "Agent coordination",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": "docs/platform/agent-coordination/README.md",
+      "gap": false,
+      "firstHeading": "Agent Coordination History",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Agent Coordination History",
+          "anchor": "agent-coordination-history"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "blobSha": "3c9f9a082c024da7ea28ceed03fa645408a72316",
+      "blobSize": 8035,
+      "sourceDigest": "5e9fa05c1f8d9b689985685240a6c17375fd575b9978fb29b9391460fdfd2b99",
+      "sourceId": "src_a88eec30bb5fd1ec2bb1c917b7b78399",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Retired engine snapshot: architecture/system-context.md",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Retired engine snapshot: architecture/system-context.md",
+          "anchor": "retired-engine-snapshot-architecturesystem-contextmd"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "blobSha": "08cd139ee3708ec712a69dbf1c5cca576d9ba31c",
+      "blobSize": 21935,
+      "sourceDigest": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+      "sourceId": "src_6798e85c3efe427f2c6c2204869c7c41",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Coordination Recovery Planning And Session Continuation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Coordination Recovery Planning And Session Continuation",
+          "anchor": "historical-file-coordination-recovery-planning-and-session-continuation"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "blobSha": "694ddfebb57a7e8f3807c3d893f6e48a1fdc52e0",
+      "blobSize": 9372,
+      "sourceDigest": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+      "sourceId": "src_cc9a390a6f2fa4777178a72e70aad37c",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Coordination Foundation Baseline",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Coordination Foundation Baseline",
+          "anchor": "historical-file-coordination-foundation-baseline"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "blobSha": "3a7038abe501f8a9e8e315d87fcc8c90cc1992a5",
+      "blobSize": 25272,
+      "sourceDigest": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+      "sourceId": "src_08a84fb4ed17b6ba3f1049af27873fd5",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving dispatch runtime, mixed obsolete resolver contract",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving dispatch runtime, mixed obsolete resolver contract",
+          "anchor": "historical-file-surviving-dispatch-runtime-mixed-obsolete-resolver-contract"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+      "blobSha": "01cdc2c5512e2cbb33166c754c2ef18294829242",
+      "blobSize": 4199,
+      "sourceDigest": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+      "sourceId": "src_d4464ccfd1c9b0c6b3182cd2ecdc1b1e",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving normalized evidence trust boundary",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving normalized evidence trust boundary",
+          "anchor": "historical-file-surviving-normalized-evidence-trust-boundary"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "blobSha": "837de6ffc40634c2ab160636b272f3e55c56e104",
+      "blobSize": 15791,
+      "sourceDigest": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+      "sourceId": "src_346b3b85dae2d79de720d4a4bc68b2c8",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving fallback/recovery design; old proposal details mixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving fallback/recovery design; old proposal details mixed",
+          "anchor": "historical-file-surviving-fallbackrecovery-design-old-proposal-details-mixed"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "blobSha": "6fa0324f73c22cb02af991e2bbd6989254f1c279",
+      "blobSize": 17806,
+      "sourceDigest": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+      "sourceId": "src_8320236ceef0a2d43d4edb24b261b28d",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Group Thinking Trigger Surface",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Group Thinking Trigger Surface",
+          "anchor": "historical-file-group-thinking-trigger-surface"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "blobSha": "31f3357d9313b7dafa380bc2bcec4c0ae813cc95",
+      "blobSize": 8545,
+      "sourceDigest": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+      "sourceId": "src_c97f9c2c02c814ed33d18245fe4a01b6",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Coordination Protocol Model",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Coordination Protocol Model",
+          "anchor": "historical-file-coordination-protocol-model"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "blobSha": "4fd845e1bef8c98b2e92d6013894208e8611902b",
+      "blobSize": 8408,
+      "sourceDigest": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "sourceId": "src_696df31c5c97a28da417343d2781fc28",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: Agent Coordination Architecture",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: Agent Coordination Architecture",
+          "anchor": "historical-file-agent-coordination-architecture"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "blobSha": "99dabffff8cc8c1fceab50d796632b9d827e32cb",
+      "blobSize": 19393,
+      "sourceDigest": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+      "sourceId": "src_1a276810a10593fdbd04640ce3ee3ae7",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving run-control/recovery design; mixed old contract details",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving run-control/recovery design; mixed old contract details",
+          "anchor": "historical-file-surviving-run-controlrecovery-design-mixed-old-contract-details"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "blobSha": "21701ad63113002821e1bce052d51dcdf30c1c70",
+      "blobSize": 5439,
+      "sourceDigest": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+      "sourceId": "src_42caffd61bb87ff6bc93ec8ad9fbfd18",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving Assignment/Run execution chain; old session membership mixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving Assignment/Run execution chain; old session membership mixed",
+          "anchor": "historical-file-surviving-assignmentrun-execution-chain-old-session-membership-mixed"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "blobSha": "e8c8ed2565c7249965004ff4c0bdb165ba28d769",
+      "blobSize": 27397,
+      "sourceDigest": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+      "sourceId": "src_f5b28b82cbf32531c9a3093dc174c0a4",
+      "area": "Platform documentation (unmapped candidate)",
+      "authorityStatus": "candidate",
+      "proposedTargetOwner": null,
+      "gap": true,
+      "firstHeading": "Historical File: surviving dispatch recovery; old session continuation mixed",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Historical File: surviving dispatch recovery; old session continuation mixed",
+          "anchor": "historical-file-surviving-dispatch-recovery-old-session-continuation-mixed"
+        }
+      ]
+    }
+  ]
+}

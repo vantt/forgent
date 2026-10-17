@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-fresh-groups-01",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "part": 50,
+  "entries": [
+    {
+      "path": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+      "blobSha": "1b170d728c1a4b860c881766056d06ea1fab08e9",
+      "blobSize": 3883,
+      "sourceDigest": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+      "sourceId": "src_d3d0b73425be7823efee2f80e559d2c4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "`fgos version` verb output fields",
+      "headings": [
+        {
+          "level": 1,
+          "text": "`fgos version` verb output fields",
+          "anchor": "fgos-version-verb-output-fields"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "blobSha": "c48c112b4ce23dede94495044e0e5b6524b7cae7",
+      "blobSize": 3112,
+      "sourceDigest": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "sourceId": "src_d50ed32377de9dea1fd6b3f140fe0133",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fix a pre-existing item that keeps re-asking an already-answered clarify question",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fix a pre-existing item that keeps re-asking an already-answered clarify question",
+          "anchor": "fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "blobSha": "2bbfe8ff2750424cad3b62d17f3a8bf117b69a58",
+      "blobSize": 4071,
+      "sourceDigest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "sourceId": "src_76e3898f7ab5fbbb9324f3e97aa4aa6f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
+          "anchor": "fix-a-project-skill-that-skill-reports-as-unknown-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md",
+      "blobSha": "1f0db7d727515744a8169339fc1fae912f103855",
+      "blobSize": 3151,
+      "sourceDigest": "879e80394412724ef63aaa42ad849ac0b90dbbbdcc793ed849807a0cccccc64c",
+      "sourceId": "src_ab19999cbbc18c55026b9d2a6d54892a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Fix dead fgOS shell-rc source lines",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Fix dead fgOS shell-rc source lines",
+          "anchor": "fix-dead-fgos-shell-rc-source-lines"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+      "blobSha": "231598113bcd1f4d9753a0a22a7741d69364d2e5",
+      "blobSize": 14329,
+      "sourceDigest": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "sourceId": "src_f20d8c69b5c0a7d5bee80419f45abab0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "forgentX repo's tool-registry configuration",
+      "headings": [
+        {
+          "level": 1,
+          "text": "forgentX repo's tool-registry configuration",
+          "anchor": "forgentx-repos-tool-registry-configuration"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+      "blobSha": "dab8ed532d0be37b43c1f6f45475432963a1444d",
+      "blobSize": 5322,
+      "sourceDigest": "9b5e2fa808e434bccc38965fe724d06890806b30ea070886f8eea6ae6952b169",
+      "sourceId": "src_0810e19f086bbc6329e4a3e4ba6229bc",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Friction and decision events are real storytelling material, once boilerplate is filtered",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Friction and decision events are real storytelling material, once boilerplate is filtered",
+          "anchor": "friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+      "blobSha": "558b659e5d9a6712c8192d8eecf97e316a37fe9f",
+      "blobSize": 4106,
+      "sourceDigest": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "sourceId": "src_1073045c580a79156437eaa6dcfa44a2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door",
+      "headings": [
+        {
+          "level": 1,
+          "text": "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door",
+          "anchor": "fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an-awaiting-human-door"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+      "blobSha": "524508802cb3d204fa1f28175cd4cca26c91f3ab",
+      "blobSize": 6183,
+      "sourceDigest": "213feb3b76a6bfa28a7342cf5475640f11947d971311a93d745871555edf0f08",
+      "sourceId": "src_7beefbad515aea5d92164791f53bdc37",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Gate-bypass config",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Gate-bypass config",
+          "anchor": "gate-bypass-config"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+      "blobSha": "137da2fe536d1a15208954d960db0a0955c60461",
+      "blobSize": 5436,
+      "sourceDigest": "2d853a86c421c024f1cb77d5250055625da8b551041503d9eeb3d91a04a92d49",
+      "sourceId": "src_46004e7982deafbdf6b960c1658d73f2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Global config merge reuses the existing fill-missing-only primitive",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Global config merge reuses the existing fill-missing-only primitive",
+          "anchor": "global-config-merge-reuses-the-existing-fill-missing-only-primitive"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+      "blobSha": "ea03dfaaaedb07435dc31fd8a1528d4821bcd20f",
+      "blobSize": 15299,
+      "sourceDigest": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "sourceId": "src_5ab18a2025dd58c65f4696c8e0baffd1",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr-plugin dashboard layout: work-items panel + action-queue boxes",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr-plugin dashboard layout: work-items panel + action-queue boxes",
+          "anchor": "herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "blobSha": "dc1b60d41162e2c7581a8624d6fe6a06e62c0107",
+      "blobSize": 15239,
+      "sourceDigest": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "sourceId": "src_840bfb8bc28802178fae472cda588d7c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "herdr web dashboard: layout, userflow and visual language",
+      "headings": [
+        {
+          "level": 1,
+          "text": "herdr web dashboard: layout, userflow and visual language",
+          "anchor": "herdr-web-dashboard-layout-userflow-and-visual-language"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+      "blobSha": "7b266a2e4b83ca129de0d2e848a4d5df21108c53",
+      "blobSize": 24476,
+      "sourceDigest": "226432b47535724640abcbe21c5f6e4d00a8e571a1d17361d1a3bc0df733a3f2",
+      "sourceId": "src_ce92867988a468da071337b9518cc447",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
+          "anchor": "how-fgos-isolates-concurrent-sessions-and-why-the-event-logs-write-door-blocks-instead-of-backing-off"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "blobSha": "f0879e458ddeee85dc938df075a93c95c5785d31",
+      "blobSize": 4987,
+      "sourceDigest": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+      "sourceId": "src_7de084ec678fbbec31a080926118d3bf",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How fgOS's event log is allowed to evolve without breaking replay",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How fgOS's event log is allowed to evolve without breaking replay",
+          "anchor": "how-fgoss-event-log-is-allowed-to-evolve-without-breaking-replay"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+      "blobSha": "d7a231c46e8ddef89a22d9726d371271059c36dd",
+      "blobSize": 5494,
+      "sourceDigest": "6b7f5e4051165365e0ed62b0781b0061ec5b3423b0048541180e7ec471b9d10d",
+      "sourceId": "src_e93b27b5b71552310659acf115c5e485",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to add a CHANGELOG.md entry for a user-visible change",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to add a CHANGELOG.md entry for a user-visible change",
+          "anchor": "how-to-add-a-changelogmd-entry-for-a-user-visible-change"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "blobSha": "10d93a0ae5e99b98ce9dfddc8f42ec95ee53af99",
+      "blobSize": 6620,
+      "sourceDigest": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+      "sourceId": "src_940d31aa121bec0eae63f49757678d7a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to add a drift guard for CLI registry help prose",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to add a drift guard for CLI registry help prose",
+          "anchor": "how-to-add-a-drift-guard-for-cli-registry-help-prose"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+      "blobSha": "4bbce578d22c321cf14148990c313b2aed5bfada",
+      "blobSize": 4724,
+      "sourceDigest": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "sourceId": "src_8489f4601e7de3b5a17de46be0548ce4",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to add a new `createWorktree` call site without hand-writing cleanup",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to add a new `createWorktree` call site without hand-writing cleanup",
+          "anchor": "how-to-add-a-new-createworktree-call-site-without-hand-writing-cleanup"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+      "blobSha": "c5127f03c0d0c1f6047d4043d97de5b9bce8fc16",
+      "blobSize": 3723,
+      "sourceDigest": "9c814172778b2cecba2202dbe7197e75fe476604ab70876ff95f822e1fc499da",
+      "sourceId": "src_1ac21a5e2a9e3e8cf4a3796599f7ea9a",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to advance a work item through `clarify` and `decompose` with `discover`/`decompose`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to advance a work item through `clarify` and `decompose` with `discover`/`decompose`",
+          "anchor": "how-to-advance-a-work-item-through-clarify-and-decompose-with-discoverdecompose"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+      "blobSha": "2ee2c30fe9076dac9e655f808effb28f7fe2eaec",
+      "blobSize": 7673,
+      "sourceDigest": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "sourceId": "src_1d577ca53d270ea6a30f83bb8f928611",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
+          "anchor": "how-to-avoid-a-hung-verify-command-on-fgos-returnapprovecatchup"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+      "blobSha": "7fbcc58e3d2c01bb3ac5b4afcf25e5512fcc50fe",
+      "blobSize": 6645,
+      "sourceDigest": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "sourceId": "src_9260332649d0cad8714c7502b077abb3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag",
+          "anchor": "how-to-branch-fgos-coding-drivings-claim-step-by-a-domains-worktreebacked-flag"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "blobSha": "56ae9ff595f34a5aa1e4944aca41c237d2eddde8",
+      "blobSize": 9088,
+      "sourceDigest": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+      "sourceId": "src_01f116c5c0450da3b86f1d3117c8a9ec",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to check a root item's progress with `fgos rollup`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to check a root item's progress with `fgos rollup`",
+          "anchor": "how-to-check-a-root-items-progress-with-fgos-rollup"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+      "blobSha": "7ebc71ac6a9c6f4b014ca2e7848b2d4406044d8b",
+      "blobSize": 4746,
+      "sourceDigest": "ba351cd515dd8bbbbad298bc3348286bc983a63fe960bb54d9a6c3eef85c6cf7",
+      "sourceId": "src_abaa9344239c56d41bcf82858d0a577e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to check main-checkout-lock status before retrying",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to check main-checkout-lock status before retrying",
+          "anchor": "how-to-check-main-checkout-lock-status-before-retrying"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+      "blobSha": "17f3ac6c7a5c871d60e1fffcb663db04d91d64af",
+      "blobSize": 3607,
+      "sourceDigest": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+      "sourceId": "src_55ed60a0b2aea5426fc01c461adff220",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to check whether a suspected racing mechanism ever actually fired, before fixing it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to check whether a suspected racing mechanism ever actually fired, before fixing it",
+          "anchor": "how-to-check-whether-a-suspected-racing-mechanism-ever-actually-fired-before-fixing-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+      "blobSha": "124829f0a56ce94582a232fe273fc2800d32416d",
+      "blobSize": 8842,
+      "sourceDigest": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "sourceId": "src_269c8a72d8bbffe1652a13afceee0284",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to claim an item that is still at stage `clarify` or `decompose`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to claim an item that is still at stage `clarify` or `decompose`",
+          "anchor": "how-to-claim-an-item-that-is-still-at-stage-clarify-or-decompose"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+      "blobSha": "87171dee5d2a747c47cfb2787783d6ccb799a723",
+      "blobSize": 5323,
+      "sourceDigest": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "sourceId": "src_1033a100a99d379e6294f7ed81baa52d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to clear a stuck `.fgos/main-checkout.lock`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to clear a stuck `.fgos/main-checkout.lock`",
+          "anchor": "how-to-clear-a-stuck-fgosmain-checkoutlock"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "blobSha": "866ee13a366c1b126782ad306c7b921696a74a0f",
+      "blobSize": 5343,
+      "sourceDigest": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "sourceId": "src_f8671a8cb6e0ec4d8e8f1e6e8e64d798",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to close a duplicate, superseded, or admin-decided work item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to close a duplicate, superseded, or admin-decided work item",
+          "anchor": "how-to-close-a-duplicate-superseded-or-admin-decided-work-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "blobSha": "77a0c41bff9abb5fafb9b46c4e2385bf736f07b7",
+      "blobSize": 15308,
+      "sourceDigest": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "sourceId": "src_c6286b852110bdd777ccd60afcede75d",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to close out a goalTier milestone/MVP item once all its targets are done",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to close out a goalTier milestone/MVP item once all its targets are done",
+          "anchor": "how-to-close-out-a-goaltier-milestonemvp-item-once-all-its-targets-are-done"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+      "blobSha": "9fffbaa6cb843c329011656043299a339c9ec48f",
+      "blobSize": 4088,
+      "sourceDigest": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "sourceId": "src_5bb1d15200aad97a049ef0880ed6dcec",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to close out a work item whose real work was already done before this claim",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to close out a work item whose real work was already done before this claim",
+          "anchor": "how-to-close-out-a-work-item-whose-real-work-was-already-done-before-this-claim"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+      "blobSha": "f69eae0cf704dfcd6430ee9c2e4178f0383c9865",
+      "blobSize": 6256,
+      "sourceDigest": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "sourceId": "src_d403ab29ee2622ecf203b4db5c3fac59",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to compute a parallel dispatch wave schedule",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to compute a parallel dispatch wave schedule",
+          "anchor": "how-to-compute-a-parallel-dispatch-wave-schedule"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+      "blobSha": "62cd4f98e6108901c4153b7461a56a928317ccbd",
+      "blobSize": 5890,
+      "sourceDigest": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "sourceId": "src_aba9b9b56b1679c550a60fbaa57f4195",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to configure a executor to dispatch via a named agent instead of a raw command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to configure a executor to dispatch via a named agent instead of a raw command",
+          "anchor": "how-to-configure-a-executor-to-dispatch-via-a-named-agent-instead-of-a-raw-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md",
+      "blobSha": "150d09460781fe774c1693416b20e109d73c6aea",
+      "blobSize": 2579,
+      "sourceDigest": "ec39837cfc6a4c3c8390e3a9794457ba53bc39a6e14e6754c4e1e8bad3e2e1fb",
+      "sourceId": "src_ac8bf27cb84bf79e0592c44b603f1162",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to continue when a root item decomposes into children mid-session",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to continue when a root item decomposes into children mid-session",
+          "anchor": "how-to-continue-when-a-root-item-decomposes-into-children-mid-session"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+      "blobSha": "5efab1ddd10eaf63c26670837c993b72c8fa564c",
+      "blobSize": 2840,
+      "sourceDigest": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+      "sourceId": "src_cd3d5834499475fe93944841fc7e6843",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to cut a fgOS release tag",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to cut a fgOS release tag",
+          "anchor": "how-to-cut-a-fgos-release-tag"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+      "blobSha": "572e6ee1f0fe8b8d45ef8655a1e7c7a5d9cd1f7d",
+      "blobSize": 2984,
+      "sourceDigest": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "sourceId": "src_f47847339e237eaf0bcd646a011cc0cc",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to declare `--footprint` when `fgos-coding-planning` splits an item",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to declare `--footprint` when `fgos-coding-planning` splits an item",
+          "anchor": "how-to-declare---footprint-when-fgos-coding-planning-splits-an-item"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "blobSha": "85848f15808d663a4f0101d0bf4c9e2bdc544b31",
+      "blobSize": 9245,
+      "sourceDigest": "001c9aae61caafc3345e172df8ddb7d14d3c361d72a1ca469ae63892ce3936cf",
+      "sourceId": "src_c0970f36d4c5a3168b19deb40058d491",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to diagnose a `fgos return` blocked by a verify failure unrelated to your change",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to diagnose a `fgos return` blocked by a verify failure unrelated to your change",
+          "anchor": "how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-unrelated-to-your-change"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "blobSha": "27ef4ef5ec2610f5f4d285b26ba3f54b8fccaf68",
+      "blobSize": 10013,
+      "sourceDigest": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d",
+      "sourceId": "src_6af49fabc368c8c1fac75634e39430f9",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`",
+          "anchor": "how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+      "blobSha": "d306d8d6a57cdcf10353df3bb0206d35b31d41bb",
+      "blobSize": 8314,
+      "sourceDigest": "200236306b0081ac87b034ffabc300fcd431c4584e75d5e3de1f097c6e67e160",
+      "sourceId": "src_3d5c4653389116a79eb8b8d13bd29597",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to extract a judge-only retry helper into a executor-agnostic one",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to extract a judge-only retry helper into a executor-agnostic one",
+          "anchor": "how-to-extract-a-judge-only-retry-helper-into-a-executor-agnostic-one"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "blobSha": "61c3d2b53cf8f8299da491cb24c9e90d271c6ea6",
+      "blobSize": 6680,
+      "sourceDigest": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "sourceId": "src_7423835ffc1bf51469caeb0438c3b0af",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to find every caller before making a CLI flag required",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to find every caller before making a CLI flag required",
+          "anchor": "how-to-find-every-caller-before-making-a-cli-flag-required"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "blobSha": "72597af0e0e9bcdacd5b54cf553880e4acce1587",
+      "blobSize": 25067,
+      "sourceDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "sourceId": "src_380819325d3d58a107ae32ec5829871b",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to fix a `fgos-write-rejected` merge block on a `.fgos/` change",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to fix a `fgos-write-rejected` merge block on a `.fgos/` change",
+          "anchor": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md",
+      "blobSha": "3a343784cfc20bef016e385308432332815124cb",
+      "blobSize": 9146,
+      "sourceDigest": "340cabf429adb34768220a58a529c01fc9f319a010c28b0f132fb381df55d565",
+      "sourceId": "src_e587684a24919b9979fbdeb8e97962f0",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to fix a verify command that mixes prose with a real command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to fix a verify command that mixes prose with a real command",
+          "anchor": "how-to-fix-a-verify-command-that-mixes-prose-with-a-real-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md",
+      "blobSha": "cfae3cbec4db40981ec04842bd8d0f0b3536b2a6",
+      "blobSize": 3146,
+      "sourceDigest": "cf0c7be1ab2a519a7a1c6cc9b079e4c53a0127af20e7e6e7d63ed6e22a4db085",
+      "sourceId": "src_2bf22d0942499da7368be33c9e4f9df5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to get the fgOS Claude Code plugin installed via `fgos doctor`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to get the fgOS Claude Code plugin installed via `fgos doctor`",
+          "anchor": "how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-doctor"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+      "blobSha": "ff153682d27a2a7e99f9917ac039c73951683f7c",
+      "blobSize": 5766,
+      "sourceDigest": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "sourceId": "src_fd8914ee864880422b9436ebf5b31e6e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to grant a nested `claude -p` executor call its own scoped `allowedTools`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to grant a nested `claude -p` executor call its own scoped `allowedTools`",
+          "anchor": "how-to-grant-a-nested-claude--p-executor-call-its-own-scoped-allowedtools"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md",
+      "blobSha": "77057bbcd9539df7d16fc591fce48b7ead428ac2",
+      "blobSize": 4842,
+      "sourceDigest": "4cdd7f4d897306197c6d3c58b70abb9371a2fe72dc069956a0f057a12d4583be",
+      "sourceId": "src_77637aad1b3d9a28c9b8235127fe2e15",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to hand a material CONTEXT.md gap back from fgos-coding-planning to fgos-coding-exploring",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to hand a material CONTEXT.md gap back from fgos-coding-planning to fgos-coding-exploring",
+          "anchor": "how-to-hand-a-material-contextmd-gap-back-from-fgos-coding-planning-to-fgos-coding-exploring"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "blobSha": "ea49117bdff570429ca0a04e1cce982ea64e461f",
+      "blobSize": 7061,
+      "sourceDigest": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "sourceId": "src_259f1f99ab48451c201c39f02c535ecc",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to hold an open-ended design brainstorm with `fgos-coding-shaping`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to hold an open-ended design brainstorm with `fgos-coding-shaping`",
+          "anchor": "how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "blobSha": "5ce48f6318dec46e812e0e1861bf10998913091e",
+      "blobSize": 6978,
+      "sourceDigest": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+      "sourceId": "src_47d5f6c87af17a5ce76e976583df6ef1",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill",
+          "anchor": "how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+      "blobSha": "b9bf5c990b07f311e148dbe59db47eab2613e8ed",
+      "blobSize": 3386,
+      "sourceDigest": "92611e49ab43531075b869592f35deb99c03e140d17ae9e213eb50ebaeb37344",
+      "sourceId": "src_6d06985dbbda9c4844b00686610cda25",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "Land a delivered item whose branch was never actually merged",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Land a delivered item whose branch was never actually merged",
+          "anchor": "land-a-delivered-item-whose-branch-was-never-actually-merged"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+      "blobSha": "8125e795653a50c78d0efec8c5e2b26a35694e29",
+      "blobSize": 6542,
+      "sourceDigest": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "sourceId": "src_1851a58c9fcf729dab4438801015f311",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to pass a caller-supplied verdict to `fgos discover`/`fgos plan`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to pass a caller-supplied verdict to `fgos discover`/`fgos plan`",
+          "anchor": "how-to-pass-a-caller-supplied-verdict-to-fgos-discoverfgos-plan"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "blobSha": "4ab31d040a03b1dfe899027dedd3379d5f124893",
+      "blobSize": 4284,
+      "sourceDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "sourceId": "src_929341b785508f9ea50a62a4679b3493",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to preserve shell escapes when transcribing a verify command",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to preserve shell escapes when transcribing a verify command",
+          "anchor": "how-to-preserve-shell-escapes-when-transcribing-a-verify-command"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+      "blobSha": "feff65b59173b401af72e04f7b84658926cf87cf",
+      "blobSize": 3351,
+      "sourceDigest": "2fa5b40f7393ce81cc3d1d0aac8103f1010fac1c200ac6057117a4e36de2a6c8",
+      "sourceId": "src_700ba74f64b898e53e1d2be17946836e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to process the next clarify/decompose item with `/fgOS:discover-next`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to process the next clarify/decompose item with `/fgOS:discover-next`",
+          "anchor": "how-to-process-the-next-clarifydecompose-item-with-fgosdiscover-next"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+      "blobSha": "f8de935d6666a8092cc96da4c61d57d47cc1a59b",
+      "blobSize": 6101,
+      "sourceDigest": "c247d077edaf72cca273869705f79d15b4cd9369361160cf4fdfa31bcce92c11",
+      "sourceId": "src_47bc9ebcf6caceeed973b58dab74f967",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to read a CRITICAL impact-analysis result before treating it as a real blocker",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to read a CRITICAL impact-analysis result before treating it as a real blocker",
+          "anchor": "how-to-read-a-critical-impact-analysis-result-before-treating-it-as-a-real-blocker"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+      "blobSha": "95a326c889f539fb8e94e7a09649816b424103c4",
+      "blobSize": 2964,
+      "sourceDigest": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "sourceId": "src_1dfbc82a9738b3374f2836e3364c0fa5",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failure",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failure",
+          "anchor": "how-to-recognize-a-claude-code-hook-enoent-posix_spawn-binsh-failure"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+      "blobSha": "d02a4a6af2fe746b40e67db3eec828c1306eea15",
+      "blobSize": 3802,
+      "sourceDigest": "ae82a549d4a48d9794346f9af03c6938add3322cbd29a114f0ddbbaa81cdf7d8",
+      "sourceId": "src_cdb26a6b29281fa61feacf91784d7970",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to reconcile a blocked item after a leaf-into-root merge race",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to reconcile a blocked item after a leaf-into-root merge race",
+          "anchor": "how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge-race"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+      "blobSha": "c72bb94184f46d787e3c81328b4ce7d0ae086cd3",
+      "blobSize": 4314,
+      "sourceDigest": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+      "sourceId": "src_b1b0be20029b6ae9c66b6ecbb595d3c2",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session",
+          "anchor": "how-to-reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-fgoseventsjsonl-mid-session"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+      "blobSha": "93b3589c17db25a07b977c3a7c6c9ebd71d8cc6c",
+      "blobSize": 3970,
+      "sourceDigest": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "sourceId": "src_b4b72dfb937f44a6258b7246195c4110",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recover a `blocked` item with `fgos catchup` from inside its own worktree",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recover a `blocked` item with `fgos catchup` from inside its own worktree",
+          "anchor": "how-to-recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+      "blobSha": "8613a879253585e0a8cabf972bc329ece1c93a29",
+      "blobSize": 6054,
+      "sourceDigest": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+      "sourceId": "src_0da1bc5b59d49023d8fa3d968740b0a6",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recover a blocked merge-conflict item when `fgos catchup` itself can't reconcile it",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recover a blocked merge-conflict item when `fgos catchup` itself can't reconcile it",
+          "anchor": "how-to-recover-a-blocked-merge-conflict-item-when-fgos-catchup-itself-cant-reconcile-it"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+      "blobSha": "64dcb751ef28196cd94e4a37a9cad547ab566200",
+      "blobSize": 7645,
+      "sourceDigest": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+      "sourceId": "src_a1a9c0f30e1820343c918a90a7f7447c",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recover a stuck `doing` claim after a worktree-creation failure",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recover a stuck `doing` claim after a worktree-creation failure",
+          "anchor": "how-to-recover-a-stuck-doing-claim-after-a-worktree-creation-failure"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+      "blobSha": "460acf4a2a582c1680b91e5d8d354dbea01f61de",
+      "blobSize": 4152,
+      "sourceDigest": "b5aa56ffaa8cefd466642878efabe91a02231a037963b947f999abc863a6860d",
+      "sourceId": "src_a910b46f70b9658564d356962d7e410e",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`",
+          "anchor": "how-to-recover-fgos-approvefgos-sync-root-from-inside-a-worktree-with---trust-dir"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+      "blobSha": "96175ce68c57f759b63f20a2d044b45d14118e91",
+      "blobSize": 8175,
+      "sourceDigest": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+      "sourceId": "src_5db52108c23c955c3ea819094fbed0e7",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to register a fixable doctor check in fgOS",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to register a fixable doctor check in fgOS",
+          "anchor": "how-to-register-a-fixable-doctor-check-in-fgos"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+      "blobSha": "84b799c978e695b532f1112c775744f037fb355c",
+      "blobSize": 8293,
+      "sourceDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+      "sourceId": "src_84bb80158acbe438f677ea24ec5e6ca3",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity",
+          "anchor": "how-to-resolve-a-git-merge-conflict-on-fgoseventsjsonl-without-breaking-seq-contiguity"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+      "blobSha": "29fc0f254e5b3533b2bcc93ffa2d97c4e757478d",
+      "blobSize": 3669,
+      "sourceDigest": "737974e91ba956ff3e07b7b2bc4ba5d8780990f377f112cd41355a25c422abca",
+      "sourceId": "src_0c6b721a2b7863a9f0057a736e40743f",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to resolve ambiguous multi-target errors from an impact-analysis provider",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to resolve ambiguous multi-target errors from an impact-analysis provider",
+          "anchor": "how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "blobSha": "7d6465dc53e89e533e7479d7a4bc5aae17e3701a",
+      "blobSize": 8837,
+      "sourceDigest": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+      "sourceId": "src_939e6213c8ec81e6d27876cb91501c30",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
+          "anchor": "how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id"
+        }
+      ]
+    },
+    {
+      "path": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+      "blobSha": "70fb94321161e115b06cd7da855ac1ed26429357",
+      "blobSize": 4925,
+      "sourceDigest": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+      "sourceId": "src_ac32a5cab879714dba41c1f8d3991c30",
+      "area": "End-user authoring, index, and knowledge registry",
+      "authorityStatus": "non-authority",
+      "proposedTargetOwner": null,
+      "gap": false,
+      "firstHeading": "How to respond when `fgos doctor` reports a shared `.fgos/events.jsonl` truncation",
+      "headings": [
+        {
+          "level": 1,
+          "text": "How to respond when `fgos doctor` reports a shared `.fgos/events.jsonl` truncation",
+          "anchor": "how-to-respond-when-fgos-doctor-reports-a-shared-fgoseventsjsonl-truncation"
+        }
+      ]
+    }
+  ]
+}
