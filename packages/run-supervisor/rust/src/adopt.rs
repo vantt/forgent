@@ -299,7 +299,9 @@ mod tests {
         let now = crate::gate::boottime_ns();
         assert!(still_starting(Some(&at(&boot, now)), grace));
         assert!(!still_starting(Some(&at(&boot, now)), Duration::ZERO));
-        assert!(!still_starting(Some(&at(&boot, now.saturating_sub(120_000_000_000))), grace), "an old envelope");
+        // Aged by waiting, not by arithmetic: a machine that booted a minute ago has no "two minutes ago".
+        std::thread::sleep(Duration::from_millis(30));
+        assert!(!still_starting(Some(&at(&boot, now)), Duration::from_millis(10)), "an old envelope");
         // Another boot is only knowable where the platform has a boot id.
         if facts::boot_id().is_some() {
             assert!(!still_starting(Some(&at("another-boot", now)), grace), "another boot: the starter is gone");
