@@ -391,6 +391,23 @@ the independent findings without authorizing promotion, cutover or retirement.
   `review-a38-step-05-seed-and-rollup-01.md`.
 - **Affected rows/steps:** X-LOCK-05, QF-01..13, CONTROL-FRAME; Steps 5 and 9.
 
+### L11-18 — Merge main again before the reader key is sealed
+
+- **Date:** 2026-10-17
+- **Status:** decided (Lead under A42; same trade-off the owner approved in L11-15)
+- **What is happening:** main `741e6206b` changed the identity scope again (6 files):
+  `AGENTS.md`, new candidate `docs/platform/event-store/spec.md`,
+  `instruction-composition-and-projection.md`, legacy `docs/specs/distribution.md`,
+  `docs/specs/platform-foundations.md` (laws L1–L8 become L1–L10) and `docs/specs/reading-map.md`.
+- **Options and costs:** defer per L11-3 (Step 7 seals a key over a corpus that misses
+  the event-store spec, and N2 forces a reader-staleness recheck after the Step 9
+  merge); merge now (identity stays unsynced until the single Step 9 carry, as with L11-15).
+- **Decision:** merge now, before Step 7 authoring. The `reading-map.md` conflict keeps
+  the branch transition note and takes main's L1–L10 line. The event-store spec joins
+  Step 7 navigation scope; all identity changes ride the Step 9 carry; L11-3 stays the
+  default for later merges.
+- **Affected rows/steps:** Steps 7, 8, 9; P7-DOC-GAP-03.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
@@ -446,3 +463,14 @@ remaining owner-only actions named above.
 - **Evidence:** X-LOCK-05; `src/setup/registrations.mjs:2223-2258`;
   `src/setup/holder-lock-checks.mjs`.
 - **Boundary:** documentation conservation only; no code change.
+
+### P7-DOC-GAP-03 — Carry main's new laws and instruction changes into candidates
+
+- **Status:** routed to the Step 9 closing carry of main imports.
+- **Gap:** main `741e6206b` raised the locked platform laws from L1–L8 to L1–L10 in legacy
+  `docs/specs/platform-foundations.md` and changed `AGENTS.md`, legacy
+  `docs/specs/distribution.md` and `instruction-composition-and-projection.md`; candidate
+  successors (`docs/platform/platform-foundations.md` and the distribution/instruction
+  candidates) must conserve these changes before cutover.
+- **Boundary:** documentation conservation only; a law change is never edited in place
+  by this plan; no code change.

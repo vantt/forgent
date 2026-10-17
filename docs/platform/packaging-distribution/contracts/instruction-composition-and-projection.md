@@ -36,11 +36,12 @@ Rendering is downstream. The hard contract is composition semantics: order, auth
 | Concern | Owner |
 | --- | --- |
 | Meaning of a rule or instruction | Owning platform/component/domain |
-| Composition engine, registry shape, stale checks, projection health | Packaging-distribution |
+| Composition engine and registry shape (kind order, override, conflict, rule selection and budgets) | Agent Context Engine (RUL102, `docs/specs/distribution.md`); the code still lives in `src/setup/instruction-registry.mjs` and `src/setup/instruction-composition.mjs` as the engine's seed until its first budget/tiering slice moves it |
+| Source discovery and install, render adapters, projection ledger, stale checks, projection health and repair | Packaging-distribution |
 | Host-specific file syntax | Host adapter |
 | Runtime execution behavior after instructions are read | Owning runtime/workflow component |
 
-Packaging-distribution does not decide whether a component's rule is wise. It decides how registered instruction sources are composed, validated, rendered, and repaired.
+Packaging-distribution does not decide whether a component's rule is wise, nor how rules compose. It discovers and installs registered instruction sources, asks the Agent Context Engine for each host's effective set, and renders, records and repairs the projections.
 
 ## 3. Target Shape
 
