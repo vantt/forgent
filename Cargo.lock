@@ -111,6 +111,7 @@ dependencies = [
  "sha2",
  "thiserror",
  "tokio",
+ "windows-sys",
 ]
 
 [[package]]

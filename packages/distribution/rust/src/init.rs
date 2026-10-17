@@ -952,8 +952,6 @@ pub struct PublishArgs<'a> {
 pub enum HolderLockGate {
     /// Guarantee, two-process probe and borrow vectors all green.
     Passed { elapsed_ms: f64 },
-    /// No lock driver on this platform (Windows): nothing ran.
-    Unsupported,
 }
 
 /// The holder-lock gate every activation passes right before it publishes:
@@ -961,11 +959,11 @@ pub enum HolderLockGate {
 /// and `lock_root`, then the borrow vectors with `git`. All of it runs in this
 /// process through the crate fgctl links; nothing under the candidate release
 /// runs. A red result refuses the activation; there is no switch to skip it.
-pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> Result<HolderLockGate, InitError> {
+pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path, helper: &fgos_holder_lock::HelperExe) -> Result<HolderLockGate, InitError> {
     use fgos_holder_lock::borrow_vectors::{self, RunError};
     let started = std::time::Instant::now();
     if !fgos_holder_lock::driver::current().supported() {
-        return Ok(HolderLockGate::Unsupported);
+        return Err(InitError::LockKernelSemanticsFailed(format!("no holder-lock driver on {}", std::env::consts::OS)));
     }
     let workspace_locks = workspace_root.join(".fgos").join("locks");
     for dir in [workspace_locks.as_path(), lock_root] {
@@ -979,13 +977,10 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> 
                 guarantee.notes.join("; ")
             )));
         }
-        fgos_holder_lock::HelperExe::current()
-            .map_err(|err| format!("the running executable is unknown: {err}"))
-            .and_then(|helper| fgos_holder_lock::semantics::two_process_probe(dir, &helper))
+        fgos_holder_lock::semantics::two_process_probe(dir, helper)
             .map_err(|detail| InitError::LockKernelSemanticsFailed(format!("{}: {detail}", dir.display())))?;
     }
-    let helper = fgos_holder_lock::HelperExe::current().map_err(|err| InitError::LockBorrowVectorsFailed(format!("the running executable is unknown: {err}")))?;
-    let report = borrow_vectors::run(git, &helper, &[], false).map_err(|err| {
+    let report = borrow_vectors::run(git, helper, &[], false).map_err(|err| {
         InitError::LockBorrowVectorsFailed(match err {
             RunError::Unavailable(detail) | RunError::Usage(detail) => detail,
         })
@@ -1005,9 +1000,9 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> 
 pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     // Before the capsule is written, so a refusal leaves no capsule behind
     // (only the two lock directories the gate probed).
-    if holder_lock_gate(args.workspace_root, &args.store_root.join("locks"), Path::new("git"))? == HolderLockGate::Unsupported {
-        eprintln!("holder-lock: unsupported on Windows until its Windows driver lands");
-    }
+    let helper = fgos_holder_lock::HelperExe::current()
+        .map_err(|err| InitError::LockKernelSemanticsFailed(format!("the running executable is unknown: {err}")))?;
+    holder_lock_gate(args.workspace_root, &args.store_root.join("locks"), Path::new("git"), &helper)?;
 
     let workspace_id = compute_workspace_id(args.workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);
@@ -1990,11 +1985,9 @@ mod tests {
     fn holder_lock_gate_passes_on_a_local_mount_with_the_real_git() {
         let _serial = GATE_TESTS.lock().unwrap_or_else(|e| e.into_inner());
         let root = fresh_temp_root("holder_lock_gate_pass");
-        let outcome = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), Path::new("git")).unwrap();
-        match outcome {
-            HolderLockGate::Passed { elapsed_ms } => assert!(elapsed_ms < GATE_BOUND_MS, "gate took {elapsed_ms} ms"),
-            other => panic!("expected the gate to pass, got {other:?}"),
-        }
+        let helper = fgos_holder_lock::HelperExe::current().unwrap();
+        let HolderLockGate::Passed { elapsed_ms } = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), Path::new("git"), &helper).unwrap();
+        assert!(elapsed_ms < GATE_BOUND_MS, "gate took {elapsed_ms} ms");
         assert!(root.join("ws/.fgos/locks").is_dir());
         assert!(root.join("state/locks").is_dir());
         let _ = std::fs::remove_dir_all(&root);
@@ -2008,7 +2001,7 @@ mod tests {
         let bin = root.join("bin");
         std::fs::create_dir_all(&bin).unwrap();
         let git = git_that_ignores_gc_switch(&bin);
-        let err = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), &git).unwrap_err();
+        let err = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), &git, &fgos_holder_lock::HelperExe::current().unwrap()).unwrap_err();
         let text = err.to_string();
         assert!(text.starts_with("lock-borrow-vectors-failed: "), "{text}");
         assert!(text.contains("gc-auto-loose-objects"), "{text}");

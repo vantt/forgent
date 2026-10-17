@@ -36,7 +36,7 @@
       "free": { "result": "free" },
       "borrower": { "result": "borrower" },
       "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file", "job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"] } },
-      "predecessor": { "result": "predecessor", "state": { "enum": ["empty", "not-empty", "unknown", "absent"] }, "domain": "predecessor domain record, absent when state is absent" },
+      "predecessor": { "result": "predecessor", "state": { "enum": ["empty", "not-empty", "unknown", "absent"] }, "domain": "predecessor domain record, absent when state is absent", "reason": "string, present when state is not-empty or unknown (e.g. predecessor-other-session, no-judge-on-this-platform, record-unknown-shape, record-not-json, record-unreadable); record-unreadable adds detail, record-not-json names domain {raw: first 120 characters}" },
       "guarantee": { "result": "guarantee", "guarantee": "guarantee object of holder-lock.port.v1.json" },
       "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "usage", "io", "internal"] }, "message": "string" }
     }

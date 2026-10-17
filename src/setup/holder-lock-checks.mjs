@@ -15,7 +15,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 
-import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, descriptionHolders, ROUTE_CALL_TIMEOUT_MS } from '../holder-lock/driver.mjs';
+import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, descriptionHolders, lockTransport, routeEnv, ROUTE_CALL_TIMEOUT_MS } from '../holder-lock/driver.mjs';
+import { startHold, waitReadySync, releaseHold } from '../holder-lock/hold-transport.mjs';
 import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
@@ -30,6 +31,7 @@ import { loadGlobalConfig } from '../config/global-config.mjs';
 export { MAX_KILL_WAIT_MS };
 
 const BORROW_VECTORS_TIMEOUT_MS = 30_000;
+const PREDECESSOR_STATE_TIMEOUT_MS = 10_000;
 /** The kernel drops a dead holder's lock at once; this only covers a racing fork in the caller. */
 const PROBE_FREE_WAIT_MS = 500;
 const PROBE_POLL_MS = 5;
@@ -129,6 +131,7 @@ function sleep(ms) {
  * half that failed. The probe file is removed either way.
  */
 export async function twoProcessProbe(dir, bin) {
+  if (lockTransport() === 'hold') return holdTwoProcessProbe(dir, bin);
   const started = Date.now();
   sweepStaleProbes(dir);
   const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
@@ -167,12 +170,75 @@ export async function twoProcessProbe(dir, bin) {
   }
 }
 
+function pathProbe(bin, file) {
+  return runLockRouteSync({ bin, args: ['--probe', file], timeoutMs: ROUTE_CALL_TIMEOUT_MS }).result;
+}
+
+/**
+ * The same probe on the hold transport (Windows): a `lock-hold` helper takes
+ * the lock in its own process, a fresh path-based probe must see it held, and
+ * once the helper is terminated the lock must be free.
+ */
+async function holdTwoProcessProbe(dir, bin) {
+  const started = Date.now();
+  sweepStaleProbes(dir);
+  const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
+  fs.writeFileSync(file, '', { flag: 'a' });
+  let hold = null;
+  try {
+    hold = startHold({ bin, lockPath: file, wait: { kind: 'try' }, killWaitMs: DEFAULT_KILL_WAIT_MS, env: routeEnv() });
+    const { line } = waitReadySync(hold, bin, ROUTE_CALL_TIMEOUT_MS * 2);
+    if (!line) {
+      hold = null;
+      throw new Error('the lock-hold helper did not answer');
+    }
+    if (line.result !== 'acquired') throw new Error(`a fresh probe file answered ${line.result}${line.reason ? ` (${line.reason})` : ''}${line.detail ? `: ${line.detail}` : ''}`);
+    const whileAlive = pathProbe(bin, file);
+    releaseHold(hold);
+    hold = null;
+    if (whileAlive !== 'held') throw new Error(`a lock held by a live helper was seen as ${whileAlive}`);
+    const deadline = Date.now() + PROBE_FREE_WAIT_MS;
+    for (;;) {
+      const after = pathProbe(bin, file);
+      if (after === 'free') break;
+      if (Date.now() >= deadline) throw new Error(`the lock was still ${after} ${PROBE_FREE_WAIT_MS} ms after its holder helper died`);
+      await sleep(PROBE_POLL_MS);
+    }
+    return Date.now() - started;
+  } finally {
+    if (hold) {
+      try {
+        releaseHold(hold);
+      } catch {
+        // the probe already failed; the helper dies with this process
+      }
+    }
+    fs.rmSync(file, { force: true });
+  }
+}
+
+function guaranteeShape(guarantee) {
+  return JSON.stringify({ driver: guarantee.driver, exclusion: guarantee.exclusion, borrow: guarantee.borrow, holders: guarantee.holders });
+}
+
+/** Why a guarantee refuses the locks, or null when the driver can exclude there. */
+export function guaranteeRefusal(label, dir, guarantee) {
+  const shape = guaranteeShape(guarantee);
+  if (guarantee.exclusion === 'unsupported') {
+    return `${label} ${dir} ${shape}: holder-lock has no driver on ${guarantee.platform}; gateway, sessions, runner, dispatch, advance, recovery and the provider locks cannot run here`;
+  }
+  if (guarantee.exclusion === 'none') {
+    return `${label} ${dir} ${shape}: the filesystem gives no lock exclusion (${(guarantee.notes ?? []).join('; ') || 'network filesystem'}); move the state root or the workspace to a local disk`;
+  }
+  return null;
+}
+
 /**
  * For `<fgosDir>/locks` and `<lockRoot>`: the driver's guarantee through
  * `lock-fd --guarantee`, then the two-process probe on that same mount.
- * `kernel` with a green probe passes; Windows (`unsupported`) warns; a
- * network filesystem (`none`) fails by name; a missing directory warns
- * (setup creates it).
+ * `kernel` with a green probe passes; a platform with no driver
+ * (`unsupported`) and a network filesystem (`none`) fail by name; a missing
+ * directory warns (setup creates it).
  */
 export async function checkLockKernelSemantics(repoRoot) {
   let bin;
@@ -200,13 +266,10 @@ export async function checkLockKernelSemantics(repoRoot) {
       failures.push(`${label} ${dir}: ${err.message}`);
       continue;
     }
-    const shape = JSON.stringify({ driver: guarantee.driver, exclusion: guarantee.exclusion, borrow: guarantee.borrow, holders: guarantee.holders });
-    if (guarantee.exclusion === 'unsupported') {
-      warnings.push(`${label} ${dir} ${shape}: holder-lock has no driver on ${guarantee.platform} yet; gateway, sessions, runner, dispatch, advance, recovery and the provider locks cannot run here`);
-      continue;
-    }
-    if (guarantee.exclusion === 'none') {
-      failures.push(`${label} ${dir} ${shape}: the filesystem gives no lock exclusion (${(guarantee.notes ?? []).join('; ') || 'network filesystem'}); move the state root or the workspace to a local disk`);
+    const shape = guaranteeShape(guarantee);
+    const refusal = guaranteeRefusal(label, dir, guarantee);
+    if (refusal) {
+      failures.push(refusal);
       continue;
     }
     try {
@@ -229,10 +292,9 @@ export async function checkLockKernelSemantics(repoRoot) {
 /**
  * `fgos internal lock-borrow-vectors`: a borrowed description must not leak
  * to any background process of git. Any red vector fails (there is no
- * run-time switch that turns borrowing off). Not applicable on Windows.
+ * run-time switch that turns borrowing off).
  */
-export function checkLockBorrowVectors(repoRoot, { platform = process.platform } = {}) {
-  if (platform === 'win32') return { passed: true, message: 'info: not applicable on Windows (no holder-lock driver yet)' };
+export function checkLockBorrowVectors(repoRoot) {
   let bin;
   try {
     bin = hostBin({ fgosDir: fgosDirOf(repoRoot) });
@@ -363,8 +425,40 @@ function cmdlineOf(pid) {
   return raw ? raw.toString('utf8').split('\0').filter(Boolean).join(' ').slice(0, 200) : '<unreadable>';
 }
 
+/**
+ * A `windows-job` record is judged by the host (one read-only contender-view
+ * pass, never a kill): `empty` and `absent` are no problem, anything else
+ * warns with the domain and the reason the host names.
+ */
+function windowsJobProblem(lockFile, recordPath, record, fgosDir) {
+  let bin;
+  try {
+    bin = hostBin({ fgosDir });
+  } catch (err) {
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host cannot judge it: ${err.message}`;
+  }
+  const res = spawnSync(bin, ['internal', 'lock-fd', '--protocol', String(PROTOCOL), '--predecessor-state', lockFile], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: PREDECESSOR_STATE_TIMEOUT_MS,
+    killSignal: 'SIGKILL',
+    maxBuffer: 1024 * 1024,
+  });
+  let out = null;
+  try {
+    out = JSON.parse(String(res.stdout ?? '').split('\n').find((line) => line.trim() !== '') ?? '');
+  } catch {
+    out = null;
+  }
+  if (out?.result !== 'predecessor') {
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${res.error?.message ?? `exit ${res.status}`})`;
+  }
+  if (out.state === 'empty' || out.state === 'absent') return null;
+  return `${recordPath}: windows-job domain ${JSON.stringify(out.domain ?? record.domainId)} is ${out.state} (${out.reason ?? 'no reason named'}); the next holder ends it, or an acquire answers held (predecessor-domain-not-empty)`;
+}
+
 /** `null` when the predecessor record is absent or names an empty domain; otherwise why it does not. */
-function predecessorProblem(lockFile) {
+function predecessorProblem(lockFile, fgosDir) {
   const recordPath = `${lockFile}.predecessor.json`;
   let raw;
   try {
@@ -380,7 +474,7 @@ function predecessorProblem(lockFile) {
     return `${recordPath} is not JSON: ${raw.slice(0, 120)}`;
   }
   if (record?.v !== 1) return `${recordPath} has unknown version ${JSON.stringify(record?.v)}: ${raw.slice(0, 120)}`;
-  if (record.domainKind === 'windows-job') return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; it cannot be judged on this platform`;
+  if (record.domainKind === 'windows-job') return windowsJobProblem(lockFile, recordPath, record, fgosDir);
   const verdict = judge(record.domainId);
   if (verdict === 'dead') return null;
   return `${recordPath}: ${record.domainKind} domain ${JSON.stringify(record.domainId)} is not empty (${verdict}); the next holder kills it, or an acquire answers held (predecessor-domain-not-empty)`;
@@ -411,7 +505,7 @@ export function checkLockHolders(repoRoot) {
   for (const { lock, files: lockFiles } of rows) {
     for (const file of lockFiles) {
       files += 1;
-      const problem = predecessorProblem(file);
+      const problem = predecessorProblem(file, fgosDir);
       if (problem) predecessors.push(`${lock}: ${problem}`);
       const holders = descriptionHolders(file);
       if (holders.kind !== 'list') {

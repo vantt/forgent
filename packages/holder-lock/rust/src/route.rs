@@ -164,13 +164,13 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe"].into_iter().filter(|m| flags.has(m)).collect();
+    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state"].into_iter().filter(|m| flags.has(m)).collect();
     if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
-        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>");
+        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>, --predecessor-state <lockFile>");
     }
     let mode = modes[0];
     if mode != "--try" && mode != "--wait-ms" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
@@ -190,6 +190,9 @@ fn lock_fd(args: &[String]) -> i32 {
         let target = PathBuf::from(flags.values("--guarantee")[0]);
         let dir = if target.is_dir() { target } else { target.parent().map(Path::to_path_buf).unwrap_or(target) };
         return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json() }), EXIT_OK);
+    }
+    if mode == "--predecessor-state" {
+        return predecessor_state(Path::new(flags.values("--predecessor-state")[0]));
     }
     let drv = driver::current();
     if mode == "--probe" {
@@ -271,6 +274,36 @@ fn lock_fd(args: &[String]) -> i32 {
             emit(Some("held"), json!({ "reason": "predecessor-domain-not-empty", "domain": domain }), EXIT_NEGATIVE)
         }
     }
+}
+
+/// `lock-fd --predecessor-state <lockFile>`: one reading of the contender view
+/// on the record next to `lock_file`. Never kills, never edits the record.
+fn predecessor_state(lock_file: &Path) -> i32 {
+    use fgos_process::{domain_watch, DomainState};
+    let record_path = crate::predecessor::record_path(lock_file);
+    let text = match std::fs::read_to_string(&record_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return emit(Some("predecessor"), json!({ "state": "absent" }), EXIT_OK),
+        Err(err) => return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }), EXIT_OK),
+    };
+    let Ok(raw) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } }), EXIT_OK);
+    };
+    let Some(domain) = crate::predecessor::parse_record(&raw) else {
+        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw }), EXIT_OK);
+    };
+    let named = crate::predecessor::domain_json(&domain);
+    let mut watch = domain_watch(&domain);
+    let state = match watch.is_empty() {
+        DomainState::Empty => "empty",
+        DomainState::NotEmpty => "not-empty",
+        DomainState::Unknown => "unknown",
+    };
+    let mut fields = json!({ "state": state, "domain": named });
+    if state != "empty" {
+        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
+    }
+    emit(Some("predecessor"), fields, EXIT_OK)
 }
 
 /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
