@@ -36,11 +36,8 @@ effort: 4h
    `claude-herdr-bwrap` (y nguyên) vào `claude`; đổi 26 entry `prefer` từ
    `claude-herdr` sang `claude`, giữ nguyên dạng (chuỗi hay object); xoá
    `claude-herdr`.
-4. **Gemini:** thêm `--model`, `{model}` vào `args` của hai invocation omp.
-   Chạy một lần thật ở mỗi tier có model khác nhau
-   (`fgos run "trả lời OK" --provider gemini --rigor <r>`). omp không nhận id
-   nào thì sửa ô đó trong `modelPolicies.gemini` sang id omp nhận, và ghi id cũ
-   với id mới vào báo cáo phase.
+4. **Gemini:** đã làm ở phase 05 (thêm `--model {model}`; omp nhận cả bốn id
+   của ladder, không cần sửa ladder). Phase này không còn việc gemini.
 
 ## Kiểm chứng
 

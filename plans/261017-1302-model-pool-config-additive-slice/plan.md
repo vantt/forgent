@@ -39,7 +39,7 @@ created: 2026-10-17
 | A3 trả về đúng hình dạng `providerAccountInventory` và gộp vào kho lease | Kho cũ đòi `kind` và `files` trên account (`provider-capacity.mjs:68-156`); thiết kế mới chuyển chúng về invocation, việc đó thuộc B2 | Bộ đọc `llmAccounts` chỉ phục vụ `explain` và doctor; lease không đọc nó cho tới B1 |
 | A2 cho phép danh sách và `@pool` | Lease còn xoay account theo họ (`capacityProviderOf`, `account-pin.mjs:17`) cho tới B1 | Khi chạy, `bind()` chỉ dùng mục thuộc pool của họ; mục khác hiện trong `explain` với nhãn `pending-pool-routing` |
 | Gộp claude cần sửa lỗi "gộp với `runner.executor`" | Red-team thấy lỗi đó không còn (`resolve.mjs:270-276`) | Phase 01 chứng minh bằng test trước, không sửa lỗi |
-| Gemini thêm `--model {model}` | Ladder gemini dùng id kiểu agy (`gemini-3.8-flash-low`, `gemini-4-argon-high`) | Phase 01 chứng minh omp nhận các id này bằng một lần chạy thật; không nhận thì sửa ladder trong cùng phase |
+| Gemini thêm `--model {model}` | Ladder gemini dùng id kiểu agy (`gemini-3.8-flash-low`, `gemini-4-argon-high`) | Đã giải ở phase 05: chạy thật cho thấy omp khớp cả bốn id sang `gemini-3.8-flash` / `gemini-4-argon`; ladder giữ nguyên |
 
 ## Phạm vi
 
@@ -67,8 +67,8 @@ invocation trong `prefer` của capability là ghim (`advise` ghim
 | Phase | Nội dung | Phụ thuộc | Giờ | Trạng thái |
 |---|---|---|---|---|
 | [00](phase-00-preconditions.md) | Commit config của anh; chụp baseline `bind()` | — | 1 | xong |
-| [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp | 00 | 3 | chờ |
-| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr`; `--model {model}` cho gemini | 00, 05 | 4 | config và test đã sửa trong working tree, chưa commit; gemini chờ kết quả 05 |
+| [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp; thêm `--model {model}` cho gemini | 00 | 3 | xong |
+| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr` | 00, 05 | 4 | xong |
 | [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | chờ |
 | [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | chờ |
 | [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | chờ |

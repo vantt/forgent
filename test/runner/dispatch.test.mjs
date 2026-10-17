@@ -895,7 +895,7 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, its "agy-cli-mucdong" invocation resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, run through omp with the tier model passed on every invocation', () => {
   const cfg = committedRunnerConfig();
   const executor = cfg.executors?.gemini;
   assert.ok(executor, 'executors.gemini must exist');
@@ -903,21 +903,21 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['agy-cli-mucdong', 'agy-herdr-mucdong', 'agy-cli-bwrap-mucdong', 'agy-cli-tetnu']) {
+  for (const id of ['omp-gemini-tetcu72', 'omp-cli-bwrap-gemini-tetcu72']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
-  const invocation = executor.invocations.find((inv) => inv.id === 'agy-cli-mucdong');
-  assert.ok(invocation, 'gemini must declare an "agy-cli-mucdong" invocation');
-  assert.equal(invocation.via, 'cli');
-  assert.equal(invocation.adapter, 'cli-spawn');
-  assert.equal(invocation.command, 'agy');
-  assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
-  // tsk-1xm: replaced the unconditional --dangerously-skip-permissions
-  // bypass with --mode accept-edits + a settings.json command denylist
-  // (src/setup/agy-permissions.mjs) — the boundary is now capability-
-  // enforced (agy's own permission engine), not just prompt prose.
-  assert.ok(!invocation.args.includes('--dangerously-skip-permissions'));
-  assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
+  // The Antigravity CLI is no longer installed; nothing may still spawn it.
+  assert.ok(executor.invocations.every((inv) => inv.command === 'omp'), `gemini invocations must all run omp, got ${JSON.stringify(executor.invocations.map((inv) => inv.command))}`);
+  for (const inv of executor.invocations) {
+    // Without --model omp runs its profile default whatever the tier asked for.
+    const at = inv.args.indexOf('--model');
+    assert.ok(at >= 0 && inv.args[at + 1] === '{model}', `${inv.id} must pass --model {model}`);
+    assert.deepEqual(inv.confinement, { backend: 'bwrap' }, `${inv.id} runs confined`);
+  }
+  const headless = executor.invocations.find((inv) => inv.id === 'omp-cli-bwrap-gemini-tetcu72');
+  assert.equal(headless.via, 'cli');
+  assert.equal(headless.adapter, 'cli-spawn');
+  assert.ok(headless.args.includes('{prompt}'));
 });
 
 // Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
