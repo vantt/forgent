@@ -50,7 +50,9 @@ pub enum Domain {
     /// bound the holder's process tree; judged by the Windows driver
     /// ([`platform::windows_job`]), `Unknown` / `Refused` on other platforms.
     WindowsJob(WindowsJob),
-    /// The root of a macOS process tree. No driver yet: always `Unknown` / `Refused`.
+    /// The root of a macOS process tree, a session and process-group leader;
+    /// best-effort, judged by the `macos-tree` containment driver, `Unknown` /
+    /// `Refused` on other platforms.
     MacosTree(ProcTuple),
 }
 
@@ -138,7 +140,7 @@ pub(crate) fn signal_settled(outcome: &control::SignalOutcome) -> bool {
 
 impl DomainWatch {
     /// Is the domain empty, as the current platform sees it? Only `linux-gate` and `linux-pgroup`
-    /// on Linux and `windows-job` on Windows have a real answer.
+    /// on Linux, `windows-job` on Windows and `macos-tree` on macOS have a real answer.
     pub fn is_empty(&mut self) -> DomainState {
         match &mut self.inner {
             #[cfg(windows)]
@@ -149,6 +151,7 @@ impl DomainWatch {
                 Verdict::Unknown => DomainState::Unknown,
             },
             Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_state(leader),
+            Watch::Direct(Domain::MacosTree(root)) => containment::tree_state(root),
             Watch::Direct(_) => DomainState::Unknown,
         }
     }
@@ -168,6 +171,7 @@ impl DomainWatch {
                 }
             }
             Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_kill(leader),
+            Watch::Direct(Domain::MacosTree(root)) => containment::tree_kill(root),
             Watch::Direct(_) => KillOutcome::Refused,
         }
     }
