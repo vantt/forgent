@@ -151,6 +151,16 @@ mod win {
         }
     }
 
+    impl Owned {
+        /// Whether the process behind this handle has ended, waiting up to
+        /// `tick` for that. A method, so a closure that calls it captures the
+        /// whole owner (and its `Drop`), never just the raw handle inside.
+        fn ended_within(&self, tick: Duration) -> bool {
+            // SAFETY: waiting on an open handle with a bounded timeout.
+            unsafe { WaitForSingleObject(self.0, tick.as_millis() as u32) == WAIT_OBJECT_0 }
+        }
+    }
+
     fn creation_time(process: HANDLE) -> Option<u64> {
         // SAFETY: four valid out-pointers for a handle with query access.
         unsafe {
@@ -216,10 +226,7 @@ mod win {
                 return Err(format!("parent pid {ppid} was created after this process: the pid was reused"));
             }
         }
-        Ok(move |tick: Duration| {
-            // SAFETY: waiting on an open handle with a bounded timeout.
-            unsafe { WaitForSingleObject(parent.0, tick.as_millis() as u32) == WAIT_OBJECT_0 }
-        })
+        Ok(move |tick: Duration| parent.ended_within(tick))
     }
 }
 
