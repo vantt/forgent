@@ -146,6 +146,7 @@ dependencies = [
  "fgos-process",
  "libc",
  "serde_json",
+ "windows-sys",
 ]
 
 [[package]]
@@ -181,6 +182,7 @@ version = "0.2.0"
 dependencies = [
  "libc",
  "serde_json",
+ "windows-sys",
 ]
 
 [[package]]

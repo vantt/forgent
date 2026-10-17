@@ -11,6 +11,13 @@
       "the description is always FD_CLOEXEC except inside exactly one spawn that borrows it, through an explicit fd mapping",
       "after acquire, fstat(fd).ino must equal stat(path).ino; otherwise close and retry",
       "release and borrower close only; nobody calls LOCK_UN on any copy of a description"
+    ],
+    "windowsFileRules": [
+      "the lock is LockFileEx on the process's own handle, offset 0, length 1; an ERROR_IO_PENDING answer is an error, never a held lock",
+      "the lock belongs to the locking process and is never carried by an inheritable or duplicated handle: a child holding a handle does not hold the lock",
+      "every successful lock is unlocked explicitly (UnlockFileEx) before its handle closes; the close-only rule above applies to POSIX descriptions, which borrowed copies share",
+      "after acquire the locked handle and a fresh handle to the path must name the same file (volume serial plus the 128-bit file id, FileIdInfo); otherwise unlock, close and retry",
+      "a path on a remote volume (GetDriveTypeW == DRIVE_REMOTE, or FileRemoteProtocolInfo readable) is refused with unavailable/unsupported-filesystem and guarantee exclusion none"
     ]
   },
   "operations": {
@@ -43,8 +50,31 @@
         "handle": "handle returned by acquire (EX)",
         "spec": { "argv": "string[]", "cwd": "string", "env": "string map" }
       },
-      "rule": "the only way a child command passes with the holder's authority. Hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
+      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
       "output": { "exit": "integer|null", "signal": "string|null", "leftoversKilled": "integer >= 0" }
+    },
+    "borrowerCheck": {
+      "posix": "fd 3 has the same dev:ino as the lock file and a non-blocking exclusive lock on it succeeds (lock-fd --borrowed-check)",
+      "windows": {
+        "env": "FGOS_LOCK_JOB=<lock name>:<job name>; no slot is read",
+        "passesOnlyWhenAll": [
+          "(a) the env names this lock and a job",
+          "(b) the predecessor record names that job and a holder tuple",
+          "(c) IsProcessInJob(self, job)",
+          "(d) the recorded holder (pid + creation time) is in this process's ancestor chain and probe sees the lock held"
+        ],
+        "notBorrowerReason": {
+          "enum": ["job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"],
+          "meaning": {
+            "job-missing": "(a) fails: env absent, malformed, or naming another lock",
+            "record-mismatch": "(b) fails: record absent, unreadable, or naming another job or no holder tuple",
+            "not-in-job": "(c) fails",
+            "holder-not-ancestor": "(d) fails: the recorded holder is not an ancestor",
+            "lock-not-held": "(d) fails: probe sees the lock free"
+          }
+        },
+        "secrecy": "the job name is not a secret: it is written in the record and the env. The authority comes from (c) and (d)."
+      }
     },
     "probe": {
       "input": { "resource": "resource" },
@@ -59,7 +89,7 @@
           { "kind": "unlistable", "reason": "string" }
         ]
       },
-      "notes": "Linux scans /proc/*/fdinfo/* for a lock: line on the inode of the lock file. macOS and Windows-without-helper report unlistable."
+      "notes": "Linux scans /proc/*/fdinfo/* for a lock: line on the inode of the lock file. macOS and Windows report unlistable (Win32 has no API that lists byte-range lock holders)."
     },
     "guarantee": {
       "input": { "path": "directory the lock files live in" },
@@ -81,6 +111,10 @@
         "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "host-version-mismatch", "io-error"] },
         "detail": "string"
       },
+      "errors": {
+        "lock-release-stuck": "release could not end the helper or empty its domain within the bounded wait; the lock may still be held",
+        "borrow-busy": "run_borrowed was called while another borrow of the same handle is still running, or release was called during a borrow"
+      },
       "invariants": [
         "timeout and held never leave a description open: the lock is released before the result is returned",
         "predecessor-domain-not-empty is returned after the lock was released again",
@@ -101,16 +135,26 @@
     "levelMeaning": {
       "kernel": "enforced by the kernel and measured on a real machine",
       "kernel-unmeasured": "kernel semantics expected, no measurement yet",
-      "job-scoped": "enforced through a job/helper process plus the predecessor rule (Windows driver)",
+      "job-scoped": "enforced through a job plus the predecessor rule; the borrow level of the Windows driver (not an exclusion level)",
       "unsupported": "the driver does not provide it; the caller must not rely on it",
       "none": "no guarantee (network filesystem); the driver refuses the lock with a named error"
     },
     "drivers": {
       "linux-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "kernel" },
       "macos-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "unsupported" },
-      "windows": { "exclusion": "unsupported", "borrow": "unsupported", "holders": "unsupported" },
-      "network-fs": { "exclusion": "none", "borrow": "none", "holders": "none" }
+      "windows": { "driver": "lockfileex", "exclusion": "kernel", "borrow": "job-scoped", "holders": "unsupported", "holdersResult": "unlistable" },
+      "network-fs": { "exclusion": "none", "borrow": "none", "holders": "none" },
+      "windows-remote-volume": { "driver": "lockfileex", "exclusion": "none", "borrow": "none", "holders": "none", "refusal": "unsupported-filesystem" }
     },
     "containment": "macOS holder-lock containment is best-effort and is reported in notes, not in a level"
+  },
+  "helperRoles": {
+    "entry": ["fgos internal holder-lock-helper <role> ...", "fgctl internal holder-lock-helper <role> ..."],
+    "roles": {
+      "probe-holder": { "argv": "--path P", "meaning": "takes the lock on P in its own process and reports, used by the two-process semantics probe" },
+      "job-keeper": { "argv": "--job NAME --record <recordPath>", "meaning": "second owner of a borrow job, outside it; exits only when the holder finished (or its handle is signaled) and the job view is empty (predecessor.v1.json keeperExit)" }
+    },
+    "status": "internal: no CLI promise, argv may change with the crate",
+    "helperExe": "the crate API takes the helper executable as an explicit HelperExe path parameter; production passes the current executable, tests of the binary crates pass their own binary"
   }
 }

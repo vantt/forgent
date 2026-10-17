@@ -9,7 +9,9 @@
         { "flag": "--try", "meaning": "one non-blocking LOCK_EX attempt on fd 3" },
         { "flag": "--wait-ms N", "meaning": "LOCK_EX attempts until N milliseconds elapsed (N integer >= 1); the caller still kills the helper on its own deadline" },
         { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards" },
-        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails)" },
+        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" },
+        { "flag": "--probe <lockFile>", "meaning": "path-based shared try, no fd needed (Node on Windows): result free or held; the shared lock is dropped at once" },
+        { "flag": "--predecessor-state <lockFile>", "meaning": "read-only: one pass of the contender view on the predecessor record next to <lockFile>; never kills; result predecessor" },
         { "flag": "--guarantee <path>", "meaning": "no fd needed; print the guarantee of the directory <path> lives in" }
       ]
     },
@@ -33,13 +35,14 @@
       "unavailable": { "result": "unavailable", "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "io-error"] }, "detail": "string" },
       "free": { "result": "free" },
       "borrower": { "result": "borrower" },
-      "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file"] } },
+      "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file", "job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"] } },
+      "predecessor": { "result": "predecessor", "state": { "enum": ["empty", "not-empty", "unknown", "absent"] }, "domain": "predecessor domain record, absent when state is absent" },
       "guarantee": { "result": "guarantee", "guarantee": "guarantee object of holder-lock.port.v1.json" },
       "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "usage", "io", "internal"] }, "message": "string" }
     }
   },
   "exitCodes": {
-    "0": "acquired | free | borrower | guarantee",
+    "0": "acquired | free | borrower | guarantee | predecessor",
     "2": "usage error (result error, code usage)",
     "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 1)",
     "10": "held | not-borrower",
