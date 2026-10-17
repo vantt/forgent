@@ -2,6 +2,8 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { spawn } from 'node:child_process';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -390,58 +392,64 @@ test('lock-status: registered in the --help --json manifest as read-only (touche
 });
 
 
-test('take --no-wait fails immediately on a live-held lock, same message/exit code as an unwaited claim, no retry delay', () => {
+// The main checkout mutex is a kernel lock: a holder is a live process, never
+// a record with a TTL, so these hold it from a real child and kill that child.
+async function withMainHeldByChild(cwd, fn) {
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(cwd, '.fgos') });
+  try {
+    return await fn(holder);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
+}
+
+function runAsync(cwd, args) {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    const child = spawn(process.execPath, [FGOS, ...args], { cwd, env: { ...process.env, FGOS_SESSION_ID: 'fgos-cli-harness-test' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => { stdout += d; });
+    child.stderr.on('data', (d) => { stderr += d; });
+    child.on('exit', (status) => resolve({ status, stdout, stderr, elapsed: Date.now() - started }));
+  });
+}
+
+test('take --no-wait fails at once while another process holds main, naming the lock and the holder pid', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
-  writeLiveLock(cwd, 1000); // well within DEFAULT_TTL_MS -- would never clear on its own during this test
-
-  const result = run(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /main checkout locked by pid/);
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must never engage the retry loop at all');
-  // A run that waited prints its retry progress line before every sleep; the lock holder (this
-  // process) never releases, so a waiting run could not have succeeded either.
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
+  await withMainHeldByChild(cwd, async (holder) => {
+    const result = await runAsync(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
+    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
+  });
 });
 
 
-test('take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3\'s default-ON behavior', () => {
+test('take (default, no flags) waits for the holder of main and succeeds once it lets go', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-default-take', { verify: 'true' });
-  // remainingTtlMs ~= 3s at write time: short enough to clear inside this
-  // test without waiting out the real DEFAULT_TTL_MS (3 minutes). The
-  // budget's own BOUNDARY_GRACE_MS (lock-wait.mjs) is what actually makes
-  // this reliable, not a large margin here -- without it, the loop's own
-  // give-up instant and the lock's real clearance instant are derived from
-  // the same clock read and coincide almost exactly, racing event-loop
-  // timer jitter regardless of how big this margin is.
-  writeLiveLock(cwd, DEFAULT_TTL_MS - 3000);
-
-  const start = Date.now();
-  const result = run(cwd, ['take', 'wait-default-take']);
-  const elapsed = Date.now() - start;
-
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
-  assert.ok(elapsed >= 500, `must have actually waited for the lock to clear, not raced past it (took ${elapsed}ms)`);
+  await withMainHeldByChild(cwd, async (holder) => {
+    setTimeout(() => holder.child.kill('SIGKILL'), 1500);
+    const result = await runAsync(cwd, ['take', 'wait-default-take']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
+    assert.ok(result.elapsed >= 500, `must have waited for the holder, not raced past it (took ${result.elapsed}ms)`);
+  });
 });
 
 
-test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs, and fails with the exhausted-budget message once spent', () => {
+test('take --wait <ms> is the budget: it fails naming the wait once spent while the holder keeps main', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-tight-budget-take', { verify: 'true' });
-  writeLiveLock(cwd, 1000); // remainingTtlMs ~179s -- would never clear naturally in a test
-
-  const start = Date.now();
-  const result = run(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
-  const elapsed = Date.now() - start;
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /waited \d+ms before giving up/, 'an exhausted explicit --wait budget must be distinguishable from an immediate-fail');
-  // The lock's remainingTtlMs is ~179s; only the explicit 600ms budget can have ended this run, so
-  // the ceiling here is far below that snapshot rather than a tight multiple of the budget.
-  assert.ok(elapsed >= 500 && elapsed < 60_000, `must have waited roughly the --wait budget, not the full remainingTtlMs (took ${elapsed}ms)`);
+  await withMainHeldByChild(cwd, async () => {
+    const result = await runAsync(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, /after waiting \d+ ms/, 'an exhausted --wait budget is distinguishable from an immediate fail');
+    assert.ok(result.elapsed >= 500 && result.elapsed < 60_000, `must have waited roughly the --wait budget (took ${result.elapsed}ms)`);
+  });
 });
 
 
@@ -465,17 +473,15 @@ test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3'
 });
 
 
-test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
+test('pick --no-wait fails at once while another process holds main, same as take --no-wait', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
-  writeLiveLock(cwd, 1000);
-
-  const result = run(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /main checkout locked by pid/);
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must not wait before giving up');
+  await withMainHeldByChild(cwd, async (holder) => {
+    const result = await runAsync(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
+    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
+  });
 });
 
 

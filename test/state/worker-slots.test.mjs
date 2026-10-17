@@ -162,7 +162,7 @@ test('hasWorkerSlotRoom past the ceiling clamps free at zero rather than reporti
   assert.equal(room.occupied, 12);
 });
 
-test('hasWorkerSlotRoom falls back to a batch of 1 for a malformed batchSize', () => {
+test('hasWorkerSlotRoom falls back to a batch of 1 for a malformed batchSize', async () => {
   const view = viewOf(doingItem('a'));
   assert.equal(hasWorkerSlotRoom(view, { ceiling: 5, batchSize: 0 }).granted, 1);
   assert.equal(hasWorkerSlotRoom(view, { ceiling: 5, batchSize: -2 }).granted, 1);
@@ -187,9 +187,9 @@ function initTempRepo() {
 }
 
 /** assert.throws returns undefined, so capture the error to inspect it. */
-function captureThrow(fn) {
+async function captureThrow(fn) {
   try {
-    fn();
+    await fn();
   } catch (err) {
     return err;
   }
@@ -217,16 +217,16 @@ function setup({ ceiling, occupants = 0 } = {}) {
   return { repoRoot, dir };
 }
 
-test('claimWork is unchanged when no workerSlots config exists, however many items are already running', () => {
+test('claimWork is unchanged when no workerSlots config exists, however many items are already running', async () => {
   const { repoRoot, dir } = setup({ occupants: 20 });
-  const claim = claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
+  const claim = await claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
   assert.equal(claim.to, 'doing');
   assert.equal(listWork(dir).work.target.status, 'doing');
 });
 
-test('claimWork refuses once the configured ceiling is reached', () => {
+test('claimWork refuses once the configured ceiling is reached', async () => {
   const { repoRoot, dir } = setup({ ceiling: 2, occupants: 2 });
-  const err = captureThrow(() => claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot }));
+  const err = await captureThrow(() => claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot }));
   assert.ok(err instanceof ClaimError);
   assert.equal(err.code, 'worker-slot-ceiling');
   assert.match(err.message, /worker-slot ceiling reached/);
@@ -234,27 +234,27 @@ test('claimWork refuses once the configured ceiling is reached', () => {
   assert.equal(err.ceiling, 2);
 });
 
-test('a ceiling refusal is categorised validation, so the runner halts one item instead of crashing its drain-run', () => {
+test('a ceiling refusal is categorised validation, so the runner halts one item instead of crashing its drain-run', async () => {
   const { repoRoot, dir } = setup({ ceiling: 1, occupants: 1 });
-  const err = captureThrow(() => claimWork(dir, { id: 'target', actor: 'runner', isolate: false, repoRoot }));
+  const err = await captureThrow(() => claimWork(dir, { id: 'target', actor: 'runner', isolate: false, repoRoot }));
   assert.equal(err.category, 'validation');
 });
 
-test('claimWork still allows a claim while the ceiling has room', () => {
+test('claimWork still allows a claim while the ceiling has room', async () => {
   const { repoRoot, dir } = setup({ ceiling: 5, occupants: 2 });
-  const claim = claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
+  const claim = await claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
   assert.equal(claim.to, 'doing');
 });
 
-test('the ceiling refusal happens BEFORE moveWork, leaving the item at todo rather than orphaned at doing', () => {
+test('the ceiling refusal happens BEFORE moveWork, leaving the item at todo rather than orphaned at doing', async () => {
   const { repoRoot, dir } = setup({ ceiling: 1, occupants: 1 });
-  assert.throws(() => claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot }), ClaimError);
+  await assert.rejects(() => claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot }), ClaimError);
   assert.equal(listWork(dir).work.target.status, 'todo');
 });
 
-test('the gate fires uniformly for isolate:true (pick), not only for the isolate:false take path', () => {
+test('the gate fires uniformly for isolate:true (pick), not only for the isolate:false take path', async () => {
   const { repoRoot, dir } = setup({ ceiling: 1, occupants: 1 });
-  const err = captureThrow(() => claimWork(dir, {
+  const err = await captureThrow(() => claimWork(dir, {
     id: 'target',
     actor: 'session',
     isolate: true,
@@ -265,10 +265,10 @@ test('the gate fires uniformly for isolate:true (pick), not only for the isolate
   assert.equal(listWork(dir).work.target.status, 'todo');
 });
 
-test('every claim actor is subject to the gate — a worker holds a slot regardless of who launched it', () => {
+test('every claim actor is subject to the gate — a worker holds a slot regardless of who launched it', async () => {
   for (const actor of ['session', 'runner', 'human']) {
     const { repoRoot, dir } = setup({ ceiling: 1, occupants: 1 });
-    const err = captureThrow(() => claimWork(dir, { id: 'target', actor, isolate: false, repoRoot }));
+    const err = await captureThrow(() => claimWork(dir, { id: 'target', actor, isolate: false, repoRoot }));
     assert.equal(err.code, 'worker-slot-ceiling', `actor ${actor} should be gated`);
   }
 });
@@ -327,11 +327,11 @@ test('fgos report supplies its own rationale when no stop reason is given, since
 // file at all; reading it bare made a broken one throw an UNCATEGORIZED error
 // straight through claimWork — exit 1 with a raw stack instead of the
 // validation code, and a whole runner drain-run dying with it.
-test('a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash', () => {
+test('a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash', async () => {
   const { repoRoot, dir } = setup();
   fs.writeFileSync(path.join(dir, 'config.json'), '{ not json');
 
-  claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
+  await claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
 
   assert.equal(
     listWork(dir).work.target.status,
