@@ -131,7 +131,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|lock-hold|state-root|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
+        return usage("fgos internal <lock-fd|lock-hold|state-root|process-observe|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -153,6 +153,7 @@ pub fn main(args: &[OsString]) -> i32 {
         "lock-fd" => lock_fd(&others),
         "lock-hold" => lock_hold(&others),
         "state-root" => state_root_route(&others),
+        "process-observe" => process_observe(&others),
         "quiesce-scan" => quiesce_scan(&others),
         "lock-borrow-vectors" => lock_borrow_vectors(&others),
         other => usage(&format!("unknown internal route {other}")),
@@ -371,6 +372,39 @@ fn state_root_route(args: &[String]) -> i32 {
         "lockRoot": root.join("locks").to_string_lossy(),
         "source": source.as_str(),
     });
+    emit(None, fields, EXIT_OK)
+}
+
+/// `process-observe --pid N`: one look at `pid` by the process facts crate,
+/// the same reading the Rust judge decides from. Node asks it where it has no
+/// process table of its own to read (Windows creation time).
+fn process_observe(args: &[String]) -> i32 {
+    use fgos_process::facts::{observe, Observed, UnreadableCause};
+    let flags = match Flags::parse(args, &["--pid"], &[]) {
+        Ok(flags) => flags,
+        Err(message) => return usage(&message),
+    };
+    let pid = match flags.one("--pid") {
+        Ok(Some(raw)) => match raw.parse::<u32>() {
+            Ok(pid) if pid > 0 => pid,
+            _ => return usage(&format!("--pid needs a positive integer, got {raw}")),
+        },
+        Ok(None) => return usage("--pid N is required"),
+        Err(message) => return usage(&message),
+    };
+    let fields = match observe(fgos_process::ProcId(pid)) {
+        Observed::Absent => json!({ "state": "absent" }),
+        Observed::Zombie => json!({ "state": "zombie" }),
+        Observed::Live { start_time } => json!({ "state": "live", "startTime": start_time }),
+        Observed::Unreadable(cause) => {
+            let cause = match cause {
+                UnreadableCause::DriverMissing => "driver-missing",
+                UnreadableCause::Permission => "permission",
+                UnreadableCause::Timeout => "timeout",
+            };
+            json!({ "state": "unreadable", "cause": cause })
+        }
+    };
     emit(None, fields, EXIT_OK)
 }
 

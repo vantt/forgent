@@ -17,6 +17,8 @@ use fgos_holder_lock::predecessor::record_path;
 use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, HelperExe, Mode, Probe, Resource, Wait};
 use serde_json::Value;
 use windows_support::*;
+use windows_sys::Win32::Foundation::{GetHandleInformation, SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
+use std::os::windows::io::AsRawHandle;
 
 const KILL_WAIT_MS: u64 = 2000;
 
@@ -229,4 +231,50 @@ fn the_borrow_vectors_and_the_sibling_check_are_green_on_windows() {
     println!("sibling: {:?}; total {} ms; {}", report.sibling, report.elapsed_ms, report.git_version);
     assert_eq!(report.vectors.len(), 4);
     assert!(report.pass(), "{report:#?}");
+}
+
+const PROBE_ROLE: &str = "WB_PROBE_RESULT";
+const PROBE_HANDLE: &str = "WB_PROBE_HANDLE";
+
+/// The borrowed child's side of the handle test: reports whether the handle
+/// value it was given is open in this process. Does nothing unless a borrow
+/// started it.
+#[test]
+fn borrowed_child_handle_probe() {
+    let Ok(result) = std::env::var(PROBE_ROLE) else { return };
+    let value: usize = std::env::var(PROBE_HANDLE).unwrap().parse().unwrap();
+    let mut flags = 0u32;
+    // SAFETY: asking the kernel about a handle value; an invalid one fails.
+    let open = unsafe { GetHandleInformation(value as HANDLE, &mut flags) } != 0;
+    fs::write(result, if open { "open" } else { "closed" }).unwrap();
+}
+
+#[test]
+fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
+    let _serial = serial();
+    let dir = temp_dir("handles");
+    let resource = Resource::new("wb-handles", dir.join("handles.lock"));
+    let handle = take(&resource);
+    // Inheritable, as a handle opened by any other library in the holder may be.
+    let owned = fs::File::create(dir.join("owned.txt")).unwrap();
+    let raw = owned.as_raw_handle() as HANDLE;
+    // SAFETY: setting the inherit flag on a handle this test owns.
+    assert_ne!(unsafe { SetHandleInformation(raw, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) }, 0);
+    let result = dir.join("probe.txt");
+    let exe = std::env::current_exe().unwrap();
+    let spec = BorrowSpec {
+        argv: vec![exe.to_string_lossy().into_owned(), "--exact".into(), "borrowed_child_handle_probe".into(), "--nocapture".into()],
+        cwd: None,
+        env: [(PROBE_ROLE.to_string(), result.to_string_lossy().into_owned()), (PROBE_HANDLE.to_string(), (raw as usize).to_string())].into_iter().collect(),
+        clear_env: false,
+        stdio: BorrowStdio::Null,
+    };
+
+    let outcome = run_borrowed(&handle, &spec, &helper()).expect("run_borrowed");
+
+    assert_eq!(outcome.exit, Some(0));
+    assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the holder's inheritable handle must not reach the borrowed child");
+    assert_keeper_gone();
+    release(handle);
+    let _ = fs::remove_dir_all(&dir);
 }

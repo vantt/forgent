@@ -4,8 +4,7 @@
 // `fgos lock fence <name>` is the only way out, and there is no automatic fix.
 
 import fs from 'node:fs';
-import { hotPaths, readHotRecord } from '../state/hot-lock.mjs';
-import { judge } from '../runner/dispatch/process-identity.mjs';
+import { hotPaths, readHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 import { fgosDirOf } from './holder-lock-checks.mjs';
 
 /** The hot resources, by registry name. */
@@ -25,8 +24,8 @@ function ageMs(recordPath, now) {
  * One hot record: `null` when it is absent or healthy, else why it needs a
  * person. A record that does not parse is a problem at once; a parsed record
  * whose holder the judge answers `unknown` for longer than the grace is one
- * too (a live holder on this platform answers `unknown` only when /proc or
- * its namespace cannot be read, so a young record is just a busy holder).
+ * too (a live holder answers `unknown` only when the process table or its
+ * namespace cannot be read, so a young record is just a busy holder).
  */
 function recordProblem(resource, fgosDir, now) {
   const { record: recordPath } = hotPaths(fgosDir, resource);
@@ -38,7 +37,7 @@ function recordProblem(resource, fgosDir, now) {
   }
   if (seen.state === 'absent') return null;
   if (seen.state === 'unreadable') return `${resource}: ${recordPath} does not parse (${JSON.stringify(seen.raw.slice(0, 80))})`;
-  if (judge(seen.record) !== 'unknown') return null;
+  if (judgeHotRecord(seen.record, fgosDir) !== 'unknown') return null;
   const age = ageMs(recordPath, now);
   if (age <= UNKNOWN_JUDGE_GRACE_MS) return null;
   return `${resource}: ${recordPath} names pid ${seen.record.pid} that cannot be judged here, for ${Math.round(age / 60000)} min`;

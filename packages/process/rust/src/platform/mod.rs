@@ -16,6 +16,8 @@ pub mod macos;
 #[cfg(windows)]
 pub mod windows;
 pub mod windows_job;
+#[cfg(windows)]
+pub mod windows_spawn;
 
 /// Facts and control as one OS gives them. A driver answers only what has a
 /// clear meaning on its OS and says `Unlistable` / `Unsupported` otherwise.

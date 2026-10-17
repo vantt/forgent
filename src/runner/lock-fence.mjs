@@ -13,8 +13,7 @@
 import fs from 'node:fs';
 import { lockHolders, probe, resolveLock, lockEntry, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
 import { ownPidChain } from '../holder-lock/fences.mjs';
-import { hotPaths, readHotRecord, clearHotRecord } from '../state/hot-lock.mjs';
-import { judge } from './dispatch/process-identity.mjs';
+import { hotPaths, readHotRecord, clearHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 
 export const TERM_WAIT_MS = 5000;
 export const KILL_WAIT_MS = 3000;
@@ -173,7 +172,7 @@ async function fenceHotRecord({ name, fgosDir, confirm, attestStopped }) {
   let holders = [];
   let terminated = [];
   let killed = [];
-  const verdict = seen.state === 'ok' ? judge(seen.record) : 'unreadable';
+  const verdict = seen.state === 'ok' ? judgeHotRecord(seen.record, fgosDir) : 'unreadable';
   if (verdict === 'alive') {
     const holder = identityOf(seen.record.pid);
     if (new Set(ownPidChain()).has(holder.pid)) {

@@ -380,26 +380,47 @@ mod os {
     /// failure the suspended child is terminated and the error returned.
     pub fn assign_and_resume(job: &Job, child: &Child) -> io::Result<()> {
         let process = child.as_raw_handle() as HANDLE;
-        let result = (|| {
-            let thread_id = only_thread_of(child.id())?;
-            // SAFETY: opening a thread for suspend/resume rights, then using the handle it returns.
-            let thread = unsafe { OpenThread(THREAD_SUSPEND_RESUME, 0, thread_id) };
-            if thread.is_null() {
-                return Err(io::Error::last_os_error());
+        let thread = match only_thread_of(child.id()) {
+            Ok(thread_id) => {
+                // SAFETY: opening a thread for suspend/resume rights, then using the handle it returns.
+                let thread = unsafe { OpenThread(THREAD_SUSPEND_RESUME, 0, thread_id) };
+                if thread.is_null() {
+                    Err(io::Error::last_os_error())
+                } else {
+                    Ok(Owned(thread))
+                }
             }
-            let thread = Owned(thread);
+            Err(err) => Err(err),
+        };
+        match thread {
+            Ok(thread) => assign_and_resume_handles(job, process, thread.0),
+            Err(err) => {
+                // SAFETY: terminating the child this handle names.
+                unsafe {
+                    TerminateProcess(process, 1);
+                }
+                Err(err)
+            }
+        }
+    }
+
+    /// [`assign_and_resume`] for a process whose process and main-thread
+    /// handles the caller already holds (the thread needs suspend/resume rights,
+    /// as the handle `CreateProcessW` returns has).
+    pub fn assign_and_resume_handles(job: &Job, process: HANDLE, thread: HANDLE) -> io::Result<()> {
+        let result = (|| {
             // SAFETY: both handles are open.
             if unsafe { AssignProcessToJobObject(job.0 .0, process) } == 0 {
                 return Err(io::Error::last_os_error());
             }
             // SAFETY: the thread handle is open; u32::MAX is the failure value.
-            if unsafe { ResumeThread(thread.0) } == u32::MAX {
+            if unsafe { ResumeThread(thread) } == u32::MAX {
                 return Err(io::Error::last_os_error());
             }
             Ok(())
         })();
         if result.is_err() {
-            // SAFETY: terminating the child this handle names.
+            // SAFETY: terminating the process this handle names.
             unsafe {
                 TerminateProcess(process, 1);
             }
