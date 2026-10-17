@@ -1,0 +1,307 @@
+// The holder-lock doctor checks and setup fixes, run for real: the host
+// route answers the guarantee, the probe hands a real description to a real
+// child, `flock(1)` of util-linux plays a foreign holder, and the fence fix
+// goes through the host's quiesce scan.
+import { test, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+
+// Every machine lock of this file lives under a private state root; children inherit it.
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder-lock-checks-state-root-'));
+
+const {
+  checkLockKernelSemantics,
+  checkLockBorrowVectors,
+  checkLockHolders,
+  checkLockFences,
+  fixLockFences,
+  checkLockPredecessorKillWait,
+  checkStateRoot,
+  fixLockDirs,
+  twoProcessProbe,
+  activatedHolderLockRelease,
+  MAX_KILL_WAIT_MS,
+} = await import('../../src/setup/holder-lock-checks.mjs');
+const { checkStopped, ownPidChain, fenceStatus } = await import('../../src/holder-lock/fences.mjs');
+const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
+const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
+
+const HOST_BIN = process.env.FGOS_HOST_BIN;
+const STATE_ROOT = process.env.FGOS_STATE_ROOT;
+const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'checks', GIT_AUTHOR_EMAIL: 'checks@test', GIT_COMMITTER_NAME: 'checks', GIT_COMMITTER_EMAIL: 'checks@test' };
+const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
+
+let scratch;
+const children = new Set();
+before(() => {
+  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
+  scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder-lock-checks-'));
+});
+after(async () => {
+  for (const child of children) await stop(child);
+  fs.rmSync(scratch, { recursive: true, force: true });
+  fs.rmSync(STATE_ROOT, { recursive: true, force: true });
+});
+
+function workspace(name) {
+  const root = path.join(scratch, name);
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  execFileSync('git', ['init', '-q'], { cwd: root, env: GIT_ENV });
+  execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'init'], { cwd: root, env: GIT_ENV });
+  return root;
+}
+
+function writeConfig(file, config) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(config)}\n`);
+}
+
+async function stop(child) {
+  children.delete(child);
+  if (child.exitCode === null && child.signalCode === null) {
+    const exited = new Promise((resolve) => { child.once('exit', resolve); });
+    child.kill('SIGKILL');
+    await exited;
+  }
+}
+
+/** The environment of a process fgOS did not start: none of the variables that mark one. */
+function foreignEnv(extra = {}) {
+  const env = { PATH: process.env.PATH, ...extra };
+  return env;
+}
+
+/** `flock -o <file> sleep 30` (the sleep does not inherit the lock) and wait until the kernel lists it as a holder of `file`. */
+async function holdWithFlock(file, env) {
+  const child = spawn('flock', ['-o', file, 'sleep', '30'], { env, stdio: 'ignore' });
+  children.add(child);
+  const deadline = Date.now() + 5000;
+  for (;;) {
+    const holders = descriptionHolders(file);
+    if (holders.kind === 'list' && holders.pids.includes(child.pid)) return child;
+    if (Date.now() > deadline) throw new Error('flock did not take the lock');
+    await new Promise((resolve) => { setTimeout(resolve, 20); });
+  }
+}
+
+// ─── lock-predecessor-kill-wait ─────────────────────────────────────────
+
+test('lock-predecessor-kill-wait: absent passes with the default, valid values name their source', () => {
+  const root = workspace('kill-wait');
+  const globalConfigPath = path.join(scratch, 'kill-wait-home', '.fgos', 'config.json');
+  let res = checkLockPredecessorKillWait(root, { globalConfigPath });
+  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 2000 (default)' });
+
+  writeConfig(globalConfigPath, { lock: { predecessorKillWaitMs: 750 } });
+  res = checkLockPredecessorKillWait(root, { globalConfigPath });
+  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 750 (global)' });
+
+  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: 500 } });
+  res = checkLockPredecessorKillWait(root, { globalConfigPath });
+  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 500 (project)' }, 'project overrides global');
+
+  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: MAX_KILL_WAIT_MS } });
+  assert.equal(checkLockPredecessorKillWait(root, { globalConfigPath }).passed, true, 'the upper bound itself is accepted');
+});
+
+test('lock-predecessor-kill-wait: negative, string, fractional and over-the-bound values fail by name', () => {
+  const root = workspace('kill-wait-bad');
+  const globalConfigPath = path.join(scratch, 'kill-wait-bad-home', '.fgos', 'config.json');
+  for (const value of [-5, 0, '2000', 1.5, MAX_KILL_WAIT_MS + 1]) {
+    writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: value } });
+    const res = checkLockPredecessorKillWait(root, { globalConfigPath });
+    assert.equal(res.passed, false, `value ${JSON.stringify(value)}`);
+    assert.match(res.message, /^lock\.predecessorKillWaitMs = .* \(project\) must be an integer from 1 to 60000$/);
+  }
+  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
+  const res = checkLockPredecessorKillWait(root, { globalConfigPath });
+  assert.equal(res.passed, false);
+  assert.match(res.message, /unreadable: cannot parse shared config/);
+});
+
+// ─── lock-dirs fix + lock-kernel-semantics ──────────────────────────────
+
+test('lock-dirs creates both lock directories with mode 0700, and only once', () => {
+  const root = workspace('dirs');
+  const lockRoot = path.join(STATE_ROOT, 'locks');
+  fs.rmSync(lockRoot, { recursive: true, force: true });
+  const first = fixLockDirs(root);
+  assert.equal(first.changed, true, first.message);
+  for (const dir of [path.join(root, '.fgos', 'locks'), lockRoot]) {
+    assert.equal(fs.statSync(dir).mode & 0o777, 0o700, dir);
+  }
+  assert.deepEqual(fixLockDirs(root), { changed: false, message: 'lock directories present' });
+});
+
+test('lock-kernel-semantics warns for a missing lock directory, then passes on the real mount once setup created it', async () => {
+  const root = workspace('semantics');
+  const missing = await checkLockKernelSemantics(root);
+  assert.equal(missing.passed, true);
+  assert.match(missing.message, /^warning: .*workspace .*\.fgos\/locks does not exist yet, not measured \(fgos setup creates it\)/);
+  fixLockDirs(root);
+  const res = await checkLockKernelSemantics(root);
+  assert.equal(res.passed, true, res.message);
+  assert.doesNotMatch(res.message, /^warning:/);
+  assert.match(res.message, /workspace .*"driver":"flock","exclusion":"kernel","borrow":"kernel","holders":"kernel"}, two-process probe green/);
+  assert.match(res.message, /machine .*, two-process probe green$/);
+  assert.deepEqual(fs.readdirSync(path.join(root, '.fgos', 'locks')), [], 'the probe file is removed');
+});
+
+test('the two-process probe passes on tmpfs as well', { skip: !fs.existsSync('/dev/shm') && 'no /dev/shm' }, async () => {
+  const dir = fs.mkdtempSync(path.join('/dev/shm', 'fgos-semantics-probe-'));
+  try {
+    const ms = await twoProcessProbe(dir, HOST_BIN);
+    assert.ok(ms < 2000, `probe took ${ms} ms`);
+    assert.deepEqual(fs.readdirSync(dir), []);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the probe refuses a probe file another process already holds', async () => {
+  const dir = path.join(scratch, 'probe-leak');
+  fs.mkdirSync(dir);
+  // A foreign process already holds the very file the probe will lock: the fresh probe file is not fresh.
+  const file = path.join(dir, `.semantics-probe-${process.pid}.lock`);
+  fs.writeFileSync(file, '');
+  const holder = await holdWithFlock(file, foreignEnv());
+  await assert.rejects(twoProcessProbe(dir, HOST_BIN), /a fresh probe file answered held/);
+  await stop(holder);
+});
+
+// ─── lock-borrow-vectors ────────────────────────────────────────────────
+
+test('lock-borrow-vectors passes with the real host and real git; Windows is not applicable', () => {
+  const root = workspace('vectors');
+  const res = checkLockBorrowVectors(root);
+  assert.equal(res.passed, true, res.message);
+  assert.match(res.message, /^all 4 vectors and the sibling check green \(git version /);
+  assert.deepEqual(checkLockBorrowVectors(root, { platform: 'win32' }), { passed: true, message: 'info: not applicable on Windows (no holder-lock driver yet)' });
+});
+
+// ─── lock-holders ───────────────────────────────────────────────────────
+
+test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
+  const root = workspace('holders');
+  fixLockDirs(root);
+  const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
+  fs.writeFileSync(gateway, '');
+  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 10 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+
+  const foreign = await holdWithFlock(gateway, foreignEnv());
+  const warned = checkLockHolders(root);
+  assert.equal(warned.passed, true);
+  assert.match(warned.message, new RegExp(`^warning: gateway ${gateway.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')} held by pid ${foreign.pid} \\(flock -o .*gateway\\.lock sleep 30\\), not a fgOS process nor a borrowed child`));
+  await stop(foreign);
+
+  const borrowed = await holdWithFlock(gateway, foreignEnv({ FGOS_LOCK_FD: 'gateway:3' }));
+  const clean = checkLockHolders(root);
+  assert.match(clean.message, /^\d+ lock file\(s\) of 10 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
+  await stop(borrowed);
+});
+
+test('lock-holders: a predecessor domain that is still running warns with the domain; a dead one does not', async () => {
+  const root = workspace('predecessor');
+  fixLockDirs(root);
+  const lockFile = path.join(root, '.fgos', 'locks', 'runner.lock');
+  fs.writeFileSync(lockFile, '');
+  const gate = spawn('sleep', ['30'], { stdio: 'ignore' });
+  children.add(gate);
+  await new Promise((resolve) => { gate.once('spawn', resolve); });
+  const domainId = { host: os.hostname(), bootId: getBootId(), pidNs: getPidNs(), pid: gate.pid, startTime: getProcessStartTime(gate.pid) };
+  fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 1, domainKind: 'linux-gate', domainId }));
+  const live = checkLockHolders(root);
+  assert.match(live.message, /^warning: runner: .*runner\.lock\.predecessor\.json: linux-gate domain .* is not empty \(alive\)/);
+  assert.ok(live.message.includes(`"pid":${gate.pid}`));
+  await stop(gate);
+  assert.doesNotMatch(checkLockHolders(root).message, /^warning:/, 'a dead gate is an empty domain');
+
+  fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 2, domainKind: 'linux-gate' }));
+  assert.match(checkLockHolders(root).message, /^warning: runner: .* has unknown version 2/);
+});
+
+// ─── lock-fences ────────────────────────────────────────────────────────
+
+/** A ready activation of a release whose payload ships the lock registry (or not). */
+function activate(root, { withRegistry }) {
+  const release = path.join(scratch, `release-${path.basename(root)}-${withRegistry ? 'v3' : 'v1'}`);
+  const payload = path.join(release, 'libexec', 'legacy-node');
+  fs.mkdirSync(payload, { recursive: true });
+  writeConfig(path.join(release, 'manifest.json'), { schemaVersion: 1, components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs' } } });
+  if (withRegistry) {
+    const registry = path.join(payload, 'packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
+    fs.mkdirSync(path.dirname(registry), { recursive: true });
+    fs.copyFileSync(new URL('../../packages/holder-lock/contracts/lock-registry.v1.json', import.meta.url), registry);
+  }
+  writeConfig(path.join(root, '.fgos', 'installation', 'activation.json'), { schemaVersion: 1, status: 'ready', releasePath: release });
+}
+
+/** fgOS processes of other sessions match every workspace through their argv; name the ones running now (fences-stop-check does the same). */
+function otherSessionPids() {
+  const probe = path.join(scratch, 'foreign-probe');
+  fs.mkdirSync(probe, { recursive: true });
+  const scan = checkStopped({ workspaces: [probe], hostBin: HOST_BIN });
+  return [...ownPidChain(), ...scan.blockers.filter((b) => b.kind === 'process').map((b) => b.pid)];
+}
+
+test('lock-fences sees the missing fences, and the fix places them only under an activated holder-lock release', () => {
+  const root = workspace('fences');
+  const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
+  const before = checkLockFences(root, { providerRuntimeDir });
+  assert.equal(before.passed, true);
+  assert.match(before.message, /^warning: 5 of 5 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
+
+  const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
+  assert.equal(noActivation.changed, false);
+  assert.match(noActivation.message, /^fences not placed: no readable activation at /);
+
+  activate(root, { withRegistry: false });
+  assert.match(activatedHolderLockRelease(root).reason, /still runs the old lock code/);
+  assert.match(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }).message, /^fences not placed: the activated release .* still runs the old lock code/);
+  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false, 'nothing was written');
+
+  activate(root, { withRegistry: true });
+  let fixed;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
+    if (fixed.changed || !/still running/.test(fixed.message)) break;
+  }
+  assert.equal(fixed.changed, true, fixed.message);
+  assert.match(fixed.message, /^placed 5 fence\(s\)/);
+  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 5 legacy lock path(s) fenced' });
+  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 5 legacy lock path(s) already fenced' });
+});
+
+test('the fence fix refuses while an fgOS payload of the workspace runs, and names it', async () => {
+  const root = workspace('fences-blocked');
+  activate(root, { withRegistry: true });
+  fs.mkdirSync(path.join(root, 'bin'));
+  fs.writeFileSync(path.join(root, 'bin', 'fgos.mjs'), 'setInterval(() => {}, 1000);\n');
+  const payload = spawn(process.execPath, ['bin/fgos.mjs'], { cwd: root, stdio: 'ignore' });
+  children.add(payload);
+  await new Promise((resolve) => { payload.once('spawn', resolve); });
+  const providerRuntimeDir = path.join(scratch, 'fences-blocked-provider-capacity');
+  const res = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids().filter((pid) => pid !== payload.pid) });
+  assert.equal(res.changed, false);
+  assert.match(res.message, new RegExp(`^fences not placed: fgOS processes still running, stop them first: .*pid ${payload.pid} `));
+  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false);
+  await stop(payload);
+});
+
+// ─── state-root ─────────────────────────────────────────────────────────
+
+test('state-root: Node and the host agree; a pinned root also shows the unpinned answer', () => {
+  const root = workspace('state-root');
+  const pinned = checkStateRoot(root);
+  assert.equal(pinned.passed, true, pinned.message);
+  assert.ok(pinned.message.startsWith(`stateRoot ${STATE_ROOT}, lockRoot ${path.join(STATE_ROOT, 'locks')} (pinned); without the pin the host resolves stateRoot `), pinned.message);
+
+  const home = path.join(scratch, 'state-root-home');
+  const { FGOS_STATE_ROOT: _pin, FGOS_STATE_HOME: _home, XDG_STATE_HOME: _xdg, ...rest } = process.env;
+  const unpinned = checkStateRoot(root, { env: { ...rest, HOME: home } });
+  // Node asks the route once per process and keeps the answer; the host answers the same environment.
+  assert.equal(unpinned.passed, true, unpinned.message);
+});
