@@ -281,12 +281,12 @@ test('the blind argv masks before it binds back, binds its own directory read-on
   }
 });
 
-test('a non-blind dispatch\'s argv is what it was before: no pid namespace, no mask, binds in resource order', async () => {
+test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in resource order', async () => {
   const project = makeProject();
   const { prepared, assessment } = await prepare(project, { blind: false });
   const args = prepared.invocation.args;
   const head = args.slice(0, args.indexOf('--'));
-  const expected = ['--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp'];
+  const expected = ['--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp', '--unshare-pid', '--as-pid-1'];
   for (const res of assessment.resources) {
     const writable = res.access === 'write' || res.access === 'read-write';
     expected.push(writable ? '--bind' : '--ro-bind', res.hostTarget, res.executionTarget.path);
@@ -300,14 +300,15 @@ test('a non-blind dispatch\'s argv is what it was before: no pid namespace, no m
 // Behaviour under real bwrap
 // ---------------------------------------------------------------------------
 
-test('a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it can', async (t) => {
+test('a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it still reaches files but not processes', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
 
   const open = await observe(makeProject(), { blind: false });
   assert.equal(open.peerReport, 'ok');
   assert.equal(open.gateAnswer, 'ok');
   assert.equal(open.peerHome, 'ok');
-  assert.equal(open.peerProcess, 'ok');
+  // Every launch has its own pid namespace now, so a peer's process is out of reach blind or not.
+  assert.equal(open.peerProcess, 'ENOENT');
   assert.equal(open.socket, 'connected');
 
   const blind = await observe(makeProject(), { blind: true });
