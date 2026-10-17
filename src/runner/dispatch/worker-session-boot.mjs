@@ -1,5 +1,4 @@
-// Bring a worker's own herdr session up, and make sure it has somewhere to
-// split a pane from.
+// Bring a worker's own herdr session up.
 //
 // This is the step that closes the escape hole the isolation probes measured.
 // The finding, in one line: `HERDR_SOCKET_PATH` is injected by herdr into every
@@ -13,15 +12,15 @@
 // find with no environment variable at all. Neither measure closes the hole
 // alone, which is why the config door refuses `bypass` unless both are declared.
 //
-// The bootstrap step here was not designed in advance; it was found by a probe
-// failing. `herdr pane split` needs an existing pane to split FROM, and a
-// freshly started session has none, so the first dispatch into a new worker
-// session died in 8ms with herdr's own `pane_not_found`. A session is given a
-// workspace before anything tries to split off it.
+// Bringing a session up is the one herdr thing this module still does itself:
+// starting a server process is not a terminal operation. Everything that talks
+// to a running server goes through terminal-control, including the first
+// workspace of a fresh session, which the driver creates when the first tab of
+// a group asks for one (`herdr tab create` needs a workspace to hold the tab).
 
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
-import { createHerdrClient } from './herdr-agent.mjs';
+import { createRoundTerminalControl } from './terminal-slot.mjs';
 import { isolatedSessionEnv, socketPathForSession, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
 
 /** The session every confined worker shares unless an executor names another. */
@@ -29,24 +28,22 @@ export const DEFAULT_WORKER_SESSION = 'fgos-worker';
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
-
-/** Is anything actually listening on this socket? Asked with the cheapest
- * call herdr answers, and a failure is read as "no" -- the point is to
- * distinguish a live server from the file a dead one left behind. */
-function answersOn(socketPath, { herdrBin, cwd, env, run }) {
+/** Is a server actually answering on the session `env` addresses? Asked with the
+ * cheapest call terminal-control answers, and a failure is read as "no" -- the
+ * point is to tell a live server from the socket file a dead one left behind. */
+function serverAnswers(terminalControl) {
   try {
-    createHerdrClient({ herdrBin, cwd, env, ...(run ? { run } : {}) }).paneList();
-    return true;
+    const answer = terminalControl.capabilities();
+    return answer?.result === 'capabilities' && answer.serverIncarnation != null;
   } catch {
     return false;
   }
 }
 
 /**
- * Ensure `sessionName` is running and has at least one pane, and return the
- * environment that addresses it.
+ * Ensure `sessionName` is running, and return the environment that addresses it.
  *
- * Refuses outright to touch the operator's own session — that assertion runs
+ * Refuses outright to touch the operator's own session -- that assertion runs
  * before anything is started, so a mistake in configuration cannot reach the
  * point of spawning a server against the cockpit.
  *
@@ -55,14 +52,11 @@ function answersOn(socketPath, { herdrBin, cwd, env, run }) {
  */
 export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, {
   callerEnv = process.env,
-  workerHome,
-  cwd,
   herdrBin = 'herdr',
   spawnFn = spawn,
   existsSync = fs.existsSync,
-  // The herdr call boundary, injectable so the whole lifecycle is testable
-  // without a herdr install and without a terminal.
-  run,
+  // The terminal-control client that asks a session whether it answers.
+  terminalControlFor = (env) => createRoundTerminalControl({ herdrBin, herdrEnv: env }),
   sleepFn = sleep,
   unlinkFn = fs.unlinkSync,
   timeoutMs = 30000,
@@ -74,15 +68,16 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   const operatorHome = callerEnv?.HOME ?? process.env.HOME;
   const socketPath = socketPathForSession(sessionName, { home: operatorHome });
   const env = isolatedSessionEnv(callerEnv, sessionName, { home: operatorHome });
+  const terminalControl = terminalControlFor(env);
 
   // A server that died without unlinking leaves its socket file behind. Read
   // as "already up", that file wedges every confined dispatch from then on:
-  // nothing listens, the workspace call fails, and each round refuses with
+  // nothing listens, the first pane call fails, and each round refuses with
   // `confinement-unavailable` until a person deletes the file by hand. The
   // file is evidence a server once ran, never that one is running -- so a
   // socket nobody answers is removed and started again.
   let socketPresent = existsSync(socketPath);
-  if (socketPresent && !answersOn(socketPath, { herdrBin, cwd, env, run })) {
+  if (socketPresent && !serverAnswers(terminalControl)) {
     try { unlinkFn(socketPath); } catch { /* a socket we cannot remove is reported by the wait below */ }
     socketPresent = existsSync(socketPath);
   }
@@ -107,34 +102,18 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
       }
       await sleepFn(pollMs);
     }
-  }
-
-  const client = createHerdrClient({ herdrBin, cwd, env, ...(run ? { run } : {}) });
-
-  let panes = [];
-  try {
-    panes = client.paneList();
-  } catch {
-    // A server that just wrote its socket may not be answering yet; the
-    // workspace call below is the real readiness test.
-    panes = [];
-  }
-
-  let rootPaneId = panes[0] ?? null;
-  if (!rootPaneId) {
-    rootPaneId = client.workspaceCreate({
-      cwd,
-      label: 'fgos-worker',
-      env: workerHome ? { HOME: workerHome } : undefined,
-    });
-    if (!rootPaneId) {
-      throw new WorkerSessionError(
-        'session-unavailable',
-        `worker session "${sessionName}" is running but would not create a workspace to split from.`,
-        { sessionName, socketPath },
-      );
+    // The socket file appears before the server answers on it.
+    while (!serverAnswers(terminalControl)) {
+      if (Date.now() >= deadline) {
+        throw new WorkerSessionError(
+          'session-unavailable',
+          `worker session "${sessionName}" wrote its socket but did not answer within ${timeoutMs}ms (${socketPath}).`,
+          { sessionName, socketPath },
+        );
+      }
+      await sleepFn(pollMs);
     }
   }
 
-  return { sessionName, socketPath, env, rootPaneId, startedServer };
+  return { sessionName, socketPath, env, startedServer };
 }

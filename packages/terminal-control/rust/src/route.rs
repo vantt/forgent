@@ -6,7 +6,7 @@
 //! JSON line on stdout. A port result, `unsupported` and `unknown` included,
 //! exits 0: the route decides nothing, it only carries the core's answer.
 
-use crate::core::{Core, CoreConfig};
+use crate::core::{Core, CoreConfig, Want};
 use crate::driver::herdr::{HerdrConfig, HerdrDriver};
 use crate::policy::{policy_by_name, Limits};
 use crate::port::*;
@@ -162,6 +162,12 @@ fn herdr_config(envelope: &Value) -> Result<HerdrConfig, String> {
             config.env.push((key.clone(), value.to_string()));
         }
     }
+    // herdr sets `HERDR_SOCKET_PATH` in every pane it creates, so a caller
+    // running inside one reaches the same server the CLI would; the caller's own
+    // `env` still wins.
+    if config.socket_path.is_none() {
+        config.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|p| !p.is_empty());
+    }
     Ok(config)
 }
 
@@ -171,8 +177,9 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "attach" => {
             let key: String = field(request, "key")?;
             let pane: String = field(request, "pane")?;
+            let group_key: Option<String> = optional(request, "groupKey")?;
             let display: Option<Display> = optional(request, "display")?;
-            answer(core.attach(&key, &pane, display), slot_answer)
+            answer(core.attach(&key, &pane, group_key.as_deref(), display), slot_answer)
         }
         "launch" => {
             let key: String = field(request, "key")?;
@@ -209,7 +216,10 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         }
         "inspect" => {
             let key: String = field(request, "key")?;
-            let inspection = core.inspect(&key);
+            let detail: Option<bool> = optional(request, "detail")?;
+            let foreground: Option<bool> = optional(request, "foreground")?;
+            let activity: Option<bool> = optional(request, "activity")?;
+            let inspection = core.inspect_parts(&key, Want { detail: detail.unwrap_or(false), foreground: foreground.unwrap_or(true), activity: activity.unwrap_or(true) });
             let mut fields = json!({ "pane": inspection.pane });
             if let Some(foreground) = inspection.foreground {
                 fields["foreground"] = json!(foreground);
@@ -232,7 +242,8 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "label" => {
             let key: String = field(request, "key")?;
             let display: Display = field(request, "display")?;
-            answer(core.label(&key, &display), ok_answer)
+            let report_state: Option<String> = optional(request, "reportState")?;
+            answer(core.label(&key, &display, report_state.as_deref()), ok_answer)
         }
         "capabilities" => {
             let report = core.capabilities();

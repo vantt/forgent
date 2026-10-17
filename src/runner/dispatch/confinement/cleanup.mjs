@@ -8,9 +8,9 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession, envForEndpoint } from '../worker-session.mjs';
+import { createRoundTerminalControl } from '../terminal-slot.mjs';
 import { getProcessStartTime } from '../process-identity.mjs';
 import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
 import { RUN_TIMEOUT_MAX_MS } from '../run-timeout.mjs';
@@ -75,12 +75,12 @@ export function ensurePrivateDir(dir, { root } = {}) {
  * home (and the login copy in it) must outlive the failed run. The reaper
  * reclaims it once the pane is gone.
  */
-export function markResourceRetained(dirPath, { paneId, herdrSession } = {}) {
+export function markResourceRetained(dirPath, { paneId, terminalKey, herdrSession } = {}) {
   const marker = readOwnershipMarker(dirPath);
   if (!marker || !paneId) return false;
   fs.writeFileSync(
     path.join(dirPath, OWNERSHIP_MARKER_FILE),
-    JSON.stringify({ ...marker, paneId: String(paneId), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
+    JSON.stringify({ ...marker, paneId: String(paneId), ...(terminalKey ? { terminalKey: String(terminalKey) } : {}), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
     { encoding: 'utf8', mode: 0o600 },
   );
   return true;
@@ -143,7 +143,7 @@ export const LAUNCH_GRACE_MS = 120000;
  * `credentialKept`) as post-prepare changes; any other change is still an ownership-marker mismatch.
  */
 export const OWNERSHIP_BINDING_FIELDS = Object.freeze([
-  'paneId', 'herdrEndpoint', 'herdrSession', 'binderPid', 'binderStartTime', 'boundAt', 'launchedAt',
+  'paneId', 'terminalKey', 'herdrEndpoint', 'herdrSession', 'binderPid', 'binderStartTime', 'boundAt', 'launchedAt',
 ]);
 
 /**
@@ -154,14 +154,15 @@ export const OWNERSHIP_BINDING_FIELDS = Object.freeze([
  * ours, so a caller can fail closed. A rebinding replaces the earlier binding (and keeps `launchedAt`,
  * which only a launch writes).
  */
-export function bindOwnershipMarker(dirPath, { paneId, herdrEndpoint, herdrSession, binderPid = process.pid, binderStartTime, boundAt = new Date().toISOString() } = {}) {
+export function bindOwnershipMarker(dirPath, { paneId, terminalKey, herdrEndpoint, herdrSession, binderPid = process.pid, binderStartTime, boundAt = new Date().toISOString() } = {}) {
   const marker = readOwnershipMarker(dirPath);
   if (!marker) throw new Error('ownership-marker-missing');
   if (!Number.isInteger(binderPid) || binderPid <= 0) throw new Error('binder-pid-invalid');
   const startTime = binderStartTime === undefined ? getProcessStartTime(binderPid) : binderStartTime;
-  const { paneId: _p, herdrEndpoint: _e, herdrSession: _s, binderPid: _b, binderStartTime: _t, boundAt: _a, ...rest } = marker;
+  const { paneId: _p, terminalKey: _k, herdrEndpoint: _e, herdrSession: _s, binderPid: _b, binderStartTime: _t, boundAt: _a, ...rest } = marker;
   const binding = {
     ...(paneId ? { paneId: String(paneId) } : {}),
+    ...(terminalKey ? { terminalKey: String(terminalKey) } : {}),
     ...(herdrEndpoint ? { herdrEndpoint: String(herdrEndpoint) } : {}),
     ...(herdrSession ? { herdrSession: String(herdrSession) } : {}),
     binderPid,
@@ -398,41 +399,39 @@ function envForMarkerPane(herdrSession, herdrEndpoint) {
   return null;
 }
 
-/** Whether a herdr pane is still open: true / false, or null when herdr
- * cannot be asked (not installed, no reachable server, nothing recorded to ask). */
-function defaultPaneOpen(paneId, herdrSession, herdrEndpoint) {
+/** Whether the pane a marker recorded is still open: true / false, or null when it cannot be told
+ * (herdr not installed, no reachable server, nothing recorded to ask, or a marker written before panes
+ * were addressed by key, which names no slot to ask about). */
+function defaultPaneOpen(paneId, herdrSession, herdrEndpoint, terminalKey) {
   try {
     // The server that owns the pane: the recorded endpoint's (or session's), never whichever one this
     // process's own environment happens to name. A marker recording neither cannot be asked, so the
     // expiry rule decides.
     const env = envForMarkerPane(herdrSession, herdrEndpoint);
-    if (!env) return null;
-    const out = spawnSync(process.env.FGOS_HERDR_BIN?.trim() || 'herdr', ['pane', 'list'], {
-      encoding: 'utf8', timeout: 5000, env,
-    });
-    if (out.status !== 0) return null;
-    const parsed = JSON.parse(out.stdout);
-    const panes = parsed?.result?.panes ?? parsed?.panes ?? [];
-    return panes.some((p) => (p.pane_id ?? p.paneId) === paneId);
+    if (!env || !terminalKey) return null;
+    const seen = createRoundTerminalControl({ herdrBin: process.env.FGOS_HERDR_BIN?.trim() || 'herdr', herdrEnv: env }).inspect({ key: terminalKey });
+    if (seen.pane === 'live') return true;
+    if (seen.pane === 'gone') return false;
+    return null;
   } catch {
     return null;
   }
 }
 
-/** Close a pane a dead binder bound but never launched a worker into. Best effort: a pane that cannot
- * be closed is a visible leftover, never a credential. */
-function defaultClosePane(paneId, herdrSession, herdrEndpoint) {
+/** Close a pane a dead binder bound but never launched a worker into, by key. Best effort: a pane that
+ * cannot be closed is a visible leftover, never a credential. A marker without a key closes nothing. */
+function defaultClosePane(paneId, herdrSession, herdrEndpoint, terminalKey) {
   const env = envForMarkerPane(herdrSession, herdrEndpoint);
-  if (!env) return;
+  if (!env || !terminalKey) return;
   try {
-    spawnSync(process.env.FGOS_HERDR_BIN?.trim() || 'herdr', ['pane', 'close', String(paneId)], { encoding: 'utf8', timeout: 5000, env });
+    createRoundTerminalControl({ herdrBin: process.env.FGOS_HERDR_BIN?.trim() || 'herdr', herdrEnv: env }).release({ key: terminalKey, disposition: 'close' });
   } catch { /* best effort */ }
 }
 
 /** The pane check for a sweep run right after the caller closed some panes itself: those panes are
  * closed, and every other pane is asked exactly as the regular sweep asks it. */
 export function paneOpenUnlessClosed(closedPanes) {
-  return (paneId, herdrSession, herdrEndpoint) => (closedPanes.has(paneId) ? false : defaultPaneOpen(paneId, herdrSession, herdrEndpoint));
+  return (paneId, herdrSession, herdrEndpoint, terminalKey) => (closedPanes.has(paneId) ? false : defaultPaneOpen(paneId, herdrSession, herdrEndpoint, terminalKey));
 }
 
 function isProcessAlive(pid) {
@@ -459,8 +458,8 @@ function isRecordedProcessAlive(pid, startTime = null) {
  * Safe to run repeatedly; ignores unowned or still-active directories.
  *
  * Seams: `checkLiveness(pid, startTime)` (is the recorded process alive), `checkPaneOpen(paneId,
- * herdrSession, herdrEndpoint)` (true / false / null when herdr cannot be asked), `closePane(paneId,
- * herdrSession, herdrEndpoint)` (close the empty pane of a bound home no worker was launched into).
+ * herdrSession, herdrEndpoint, terminalKey)` (true / false / null when herdr cannot be asked), `closePane(paneId,
+ * herdrSession, herdrEndpoint, terminalKey)` (close the empty pane of a bound home no worker was launched into).
  */
 export function reapOrphanedConfinementResources({
   tempRoot,
@@ -533,7 +532,7 @@ export function reapOrphanedConfinementResources({
       // the process that launched it. Expiry still wins over an unanswerable pane check
       // (`checkPaneOpen` -> null), so a credential copy cannot outlive maxAgeMs just because herdr is away.
       const paneKeeps = () => {
-        const open = checkPaneOpen(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null);
+        const open = checkPaneOpen(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null, marker.terminalKey ?? null);
         return open === true || (open === null && !isExpired);
       };
 
@@ -587,7 +586,7 @@ export function reapOrphanedConfinementResources({
         continue;
       }
       if (closeEmptyPane) {
-        try { closePane(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null); } catch { /* best effort */ }
+        try { closePane(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null, marker.terminalKey ?? null); } catch { /* best effort */ }
       }
 
       {

@@ -2383,7 +2383,11 @@ export async function executeAssignment(assignment, opts = {}) {
             workId: resolvedExecutorId,
             tier: effectivePolicy.tier,
             model: effectivePolicy.model,
-            dispatchBatchKey: opts.dispatchBatchKey,
+            // The panes of one unit run share a tab: its attempts and rounds are one group.
+            dispatchBatchKey: opts.dispatchBatchKey
+              ?? effectiveAssignment.unitRunId
+              ?? effectiveAssignment.provenance?.unitRunId
+              ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
             controlToken,
             controlEpoch,
             launchCommandId,

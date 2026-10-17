@@ -93,3 +93,42 @@ fn a_shape_that_does_not_match_is_none_not_a_guess() {
     assert!(parse_layout(&wrong).is_none());
     assert!(parse_process_info(&serde_json::json!({})).is_none());
 }
+
+#[test]
+fn explain_says_whether_a_screen_rule_matched_or_herdr_only_fell_back() {
+    let ruled = serde_json::json!({
+        "state": "idle", "visible_idle": true, "matched_rule": { "id": "live_prompt_box" },
+        "evaluated_rules": [{ "id": "live_prompt_box", "matched": true, "evidence": { "region_preview": "> typed" } }],
+    });
+    let seen = parse_explain(&ruled);
+    assert_eq!((seen.state.as_deref(), seen.matched_rule.as_deref(), seen.visible_idle, seen.prompt_text.as_str()), (Some("idle"), Some("live_prompt_box"), true, "> typed"));
+
+    let fallback = serde_json::json!({ "state": "idle", "matched_rule": null, "fallback_reason": "default_known_agent_idle_fallback", "visible_idle": false });
+    let seen = parse_explain(&fallback);
+    assert_eq!(seen.state.as_deref(), Some("idle"));
+    assert_eq!(seen.matched_rule, None, "a fallback verdict carries no rule");
+    assert!(!seen.visible_idle);
+}
+
+#[test]
+fn explain_without_a_verdict_is_a_detector_with_no_state() {
+    let seen = parse_explain(&serde_json::json!({}));
+    assert_eq!(seen.state, None);
+    assert!(!seen.visible_blocker && !seen.visible_working);
+    assert_eq!(seen.prompt_text, "");
+}
+
+#[test]
+fn explain_accepts_the_verdict_wrapped_in_a_result() {
+    let wrapped = serde_json::json!({ "id": "cli:agent:explain", "result": { "state": "blocked", "visible_blocker": true } });
+    let seen = parse_explain(&wrapped);
+    assert_eq!(seen.state.as_deref(), Some("blocked"));
+    assert!(seen.visible_blocker);
+}
+
+#[test]
+fn agent_get_gives_the_agent_state_and_session() {
+    let body = serde_json::json!({ "agent": { "agent": "claude", "agent_status": "working", "agent_session": { "value": "sess-1" } } });
+    let activity = parse_activity(&body).unwrap();
+    assert_eq!((activity.state.as_str(), activity.agent.as_deref(), activity.session.as_deref()), ("working", Some("claude"), Some("sess-1")));
+}

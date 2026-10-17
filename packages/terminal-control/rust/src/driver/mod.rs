@@ -101,11 +101,34 @@ pub struct ProcessInfo {
 }
 
 /// Agent activity of a pane, when the driver declares `activity.state`.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Activity {
     pub state: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agent: Option<String>,
+    /// Session id of the agent, when the driver knows it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session: Option<String>,
+    /// What the driver's screen detector sees; present only when asked for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<ActivityDetail>,
+}
+
+/// The driver's own screen detector verdict for a pane.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityDetail {
+    /// Detector state; absent when it gave no verdict.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    pub visible_blocker: bool,
+    pub visible_idle: bool,
+    pub visible_working: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub matched_rule: Option<String>,
+    /// Text typed in the agent's prompt box and not yet submitted.
+    pub prompt_text: String,
 }
 
 /// Outcome of a close that checked the server incarnation before and after.
@@ -127,7 +150,7 @@ pub trait TerminalDriver {
     fn capabilities(&self) -> Vec<&'static str>;
     fn server_incarnation(&self) -> DriverResult<ServerIncarnation>;
 
-    fn tab_create(&self, label: &str, cwd: Option<&str>) -> DriverResult<CreatedPane>;
+    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane>;
     /// `ratio` is the share kept by the existing pane, as herdr measures it.
     fn pane_split(
         &self,
@@ -135,6 +158,7 @@ pub trait TerminalDriver {
         direction: Direction,
         ratio: f64,
         cwd: Option<&str>,
+        env: &[(String, String)],
     ) -> DriverResult<CreatedPane>;
     /// Close one pane only if `expected` is still the live server incarnation
     /// right before and right after the close; otherwise `Unknown`.
@@ -160,6 +184,15 @@ pub trait TerminalDriver {
         args: &[String],
         timeout_ms: u64,
     ) -> DriverResult<()>;
+    /// The driver's own detector verdict for the pane (`activity.state`).
+    fn activity_detail(&self, _pane: &str) -> DriverResult<ActivityDetail> {
+        Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} gives no detector detail", self.name()) })
+    }
+    /// Tell the driver which agent runs in a pane it does not recognise, so
+    /// the pane can be addressed as one (`activity.state`).
+    fn report_agent(&self, _pane: &str, _agent: &str, _state: &str) -> DriverResult<()> {
+        Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} cannot be told an agent", self.name()) })
+    }
     fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()>;
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
     /// Geometry of the tab holding `pane`.

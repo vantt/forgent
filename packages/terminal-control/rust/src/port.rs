@@ -89,12 +89,33 @@ pub struct AllocateRequest {
     /// Structured data for the placement policy only.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role_hint: Option<String>,
+    /// Working directory of the new pane's shell.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cwd: Option<String>,
+    /// Environment of the new pane's shell.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub env: std::collections::BTreeMap<String, String>,
 }
 
 /// Start through the driver's agent support instead of a plain `pane.run`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivitySpec {
     pub kind: String,
+    #[serde(default)]
+    pub args: Vec<String>,
+    /// How long the driver may take to bring the agent to ready; the core's
+    /// launch-identify timeout when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timeout_ms: Option<u64>,
+}
+
+/// The foreground process a launch is expected to become, when it is not the
+/// launched command itself (a launcher script that `exec -a`s the real one).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExpectedProcess {
+    pub argv0: String,
+    pub command: String,
     #[serde(default)]
     pub args: Vec<String>,
 }
@@ -109,6 +130,8 @@ pub struct LaunchSpec {
     pub env: std::collections::BTreeMap<String, String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivitySpec>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expect: Option<ExpectedProcess>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

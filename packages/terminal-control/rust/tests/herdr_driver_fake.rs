@@ -90,12 +90,17 @@ fn each_capability_runs_the_expected_command() {
     let fake = Fake::new("argv");
     let d = fake.driver();
 
-    let tab = d.tab_create("lead-1", Some("/work")).unwrap();
+    let tab = d.tab_create("lead-1", Some("/work"), &[("HOME".to_string(), "/h".to_string())]).unwrap();
     assert_eq!((tab.tab_id.as_str(), tab.pane_id.as_str()), ("wS:tF9", "wS:p59X"));
-    let pane = d.pane_split("wS:p59X", Direction::Down, 0.3, None).unwrap();
+    let pane = d.pane_split("wS:p59X", Direction::Down, 0.3, Some("/w2"), &[("A".to_string(), "b".to_string())]).unwrap();
     assert_eq!(pane.pane_id, "wS:p59Y");
     d.pane_run("wS:p59Y", "sh /tmp/launch.sh").unwrap();
     d.send_text("wS:p59Y", "hello world", true).unwrap();
+    d.send_text("wS:p59Y", "draft", false).unwrap();
+    let seen = d.activity_detail("wS:p59Y").unwrap();
+    assert_eq!((seen.state.as_deref(), seen.visible_idle, seen.visible_working), (Some("idle"), true, false));
+    assert_eq!((seen.matched_rule.as_deref(), seen.prompt_text.as_str()), (Some("live_prompt_box"), "❯ half typed\n"));
+    d.report_agent("wS:p59Y", "claude", "working").unwrap();
     d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()]).unwrap();
     assert_eq!(d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(), "line one\nline two\n");
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
@@ -108,15 +113,17 @@ fn each_capability_runs_the_expected_command() {
 
     let calls: Vec<String> = fake.calls().into_iter().skip(2).collect();
     let expect = [
-        "tab create --label lead-1 --no-focus --cwd /work",
-        "pane split --pane wS:p59X --direction down --ratio 0.3 --no-focus",
+        "tab create --label lead-1 --no-focus --cwd /work --env HOME=/h",
+        "pane split --pane wS:p59X --direction down --ratio 0.3 --no-focus --cwd /w2 --env A=b",
         "pane run wS:p59Y sh /tmp/launch.sh",
-        "pane send-text wS:p59Y hello world",
-        "pane send-keys wS:p59Y Enter",
+        "agent prompt wS:p59Y hello world",
+        "pane send-text wS:p59Y draft",
+        "agent explain wS:p59Y --json",
+        "pane report-agent wS:p59Y --source fgos --agent claude --state working",
         "pane send-keys wS:p59Y Escape Enter",
         "pane read wS:p59Y --lines 40 --source visible",
         "pane process-info --pane wS:p59Y",
-        "pane get wS:p59Y",
+        "agent get wS:p59Y",
         "agent start seat-1 --kind claude --pane wS:p59Y --timeout 30000 -- --model opus",
         "tab rename wS:tF9 fgos lead",
         "pane rename wS:p59Y seat 1",
@@ -129,7 +136,7 @@ fn each_capability_runs_the_expected_command() {
 #[test]
 fn split_ratio_is_the_share_the_existing_pane_keeps() {
     let fake = Fake::new("ratio");
-    fake.driver().pane_split("wS:p59X", Direction::Right, 0.5, None).unwrap();
+    fake.driver().pane_split("wS:p59X", Direction::Right, 0.5, None, &[]).unwrap();
     assert!(fake.calls().iter().any(|c| c.contains("--direction right --ratio 0.5")));
 }
 
@@ -156,8 +163,8 @@ fn absent_herdr_declares_nothing_and_every_op_is_unsupported() {
     config.timeout_ms = 1_000;
     let d = HerdrDriver::new(config);
     assert!(d.capabilities().is_empty());
-    assert!(is_unsupported(d.tab_create("x", None)));
-    assert!(is_unsupported(d.pane_split("p", Direction::Down, 0.5, None)));
+    assert!(is_unsupported(d.tab_create("x", None, &[])));
+    assert!(is_unsupported(d.pane_split("p", Direction::Down, 0.5, None, &[])));
     assert!(is_unsupported(d.read_screen("p", None, None)));
     assert!(is_unsupported(d.layout_geometry("p")));
     assert!(is_unsupported(d.server_incarnation()));
@@ -166,13 +173,15 @@ fn absent_herdr_declares_nothing_and_every_op_is_unsupported() {
 
 #[test]
 fn a_hung_herdr_command_is_unknown_after_the_timeout() {
-    let mut fake = Fake::new("hang").env("FAKE_HERDR_HANG", "pane get");
-    fake.config.timeout_ms = 400;
-    let d = fake.driver();
-    let started = std::time::Instant::now();
-    assert!(is_unknown(d.activity("wS:p59Y")));
-    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang is never read as gone");
-    assert!(started.elapsed() < std::time::Duration::from_secs(5));
+    for hung in ["agent get", "pane get"] {
+        let mut fake = Fake::new("hang").env("FAKE_HERDR_HANG", hung);
+        fake.config.timeout_ms = 400;
+        let d = fake.driver();
+        let started = std::time::Instant::now();
+        let refused = if hung == "agent get" { is_unknown(d.activity("wS:p59Y")) } else { is_unknown(d.pane_liveness("wS:p59Y")) };
+        assert!(refused, "a hang of `{hung}` is never read as gone or idle");
+        assert!(started.elapsed() < std::time::Duration::from_secs(5));
+    }
 }
 
 #[test]
@@ -210,7 +219,7 @@ fn commands_do_not_inherit_the_callers_descriptors() {
     let dir = scratch("fds");
     let dump = dir.join("fds");
     let fake = Fake::new("fds").env("FAKE_HERDR_FDS", &dump.to_string_lossy());
-    fake.driver().tab_create("x", None).unwrap();
+    fake.driver().tab_create("x", None, &[]).unwrap();
     let seen = std::fs::read_to_string(&dump).unwrap();
     let open: Vec<i32> = seen.lines().filter_map(|l| l.trim().parse().ok()).collect();
     // SAFETY: closing the two fds opened above.
@@ -227,7 +236,7 @@ fn commands_do_not_inherit_the_callers_descriptors() {
 fn windows_declares_nothing() {
     let d = HerdrDriver::new(HerdrConfig::new(fake_bin()));
     assert!(d.capabilities().is_empty());
-    assert!(is_unsupported(d.tab_create("x", None)));
+    assert!(is_unsupported(d.tab_create("x", None, &[])));
 }
 
 #[cfg(unix)]
@@ -376,4 +385,46 @@ mod incarnation {
         assert_eq!(fake.calls().iter().filter(|c| c.starts_with("pane close")).count(), 1, "never closed a second time");
         let _ = std::fs::remove_dir_all(&dir);
     }
+}
+
+#[test]
+fn a_session_without_a_workspace_gets_one_and_its_root_pane_is_the_first_pane() {
+    let fake = Fake::new("no-workspace").env("FAKE_HERDR_NO_WORKSPACE", "1");
+    let created = fake.driver().tab_create("lead-1", Some("/work"), &[]).unwrap();
+    assert_eq!((created.tab_id.as_str(), created.pane_id.as_str()), ("wS:tF9", "wS:p59X"));
+    let calls: Vec<String> = fake.calls().into_iter().skip(2).collect();
+    assert_eq!(
+        calls,
+        [
+            "tab create --label lead-1 --no-focus --cwd /work",
+            "workspace create --label lead-1 --no-focus --cwd /work",
+            "tab rename wS:tF9 lead-1",
+        ]
+    );
+}
+
+#[test]
+fn a_screen_comes_back_as_plain_text_or_in_the_envelope_and_a_failure_is_named() {
+    let plain = Fake::new("read-plain");
+    assert_eq!(plain.driver().read_screen("wS:p59Y", Some(60), None).unwrap(), "line one\nline two\n");
+    assert!(plain.calls().iter().any(|c| c == "pane read wS:p59Y --lines 60"));
+
+    let enveloped = Fake::new("read-json").env("FAKE_HERDR_READ_JSON", "1");
+    assert_eq!(enveloped.driver().read_screen("wS:p59Y", None, None).unwrap(), "enveloped screen");
+
+    let failing = Fake::new("read-fail").env("FAKE_HERDR_PANE_GONE", "1");
+    match failing.driver().read_screen("wS:p59Y", None, None) {
+        Err(Refusal::Unknown { reason }) => assert!(reason.contains("pane_not_found"), "{reason}"),
+        other => panic!("a failed read must be a named refusal, got {other:?}"),
+    }
+}
+
+#[test]
+fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_stays_a_refusal() {
+    let none = Fake::new("no-agent").env("FAKE_HERDR_AGENT_NOT_FOUND", "1");
+    let activity = none.driver().activity("wS:p59Y").unwrap();
+    assert_eq!((activity.state.as_str(), activity.agent), ("unknown", None));
+
+    let failing = Fake::new("agent-get-garbled").env("FAKE_HERDR_GARBLE", "1");
+    assert!(is_unknown(failing.driver().activity("wS:p59Y")), "an unreadable answer is not \"no agent\"");
 }

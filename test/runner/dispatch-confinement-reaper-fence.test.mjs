@@ -49,6 +49,10 @@ import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs
 import { RUN_TIMEOUT_MAX_MS } from '../../src/runner/dispatch/run-timeout.mjs';
 import { herdrEndpointForEnv, socketPathForSession } from '../../src/runner/dispatch/worker-session.mjs';
 import { EXECUTOR_ADAPTERS, bindConfinedHomesToSupervisor } from '../../src/runner/dispatch/transport.mjs';
+import { createTerminalControl } from '../../src/terminal-control/client.mjs';
+import { createSessionFake } from '../helpers/fake-herdr-session.mjs';
+import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -456,66 +460,63 @@ test.todo('S2(6) a stale claim left by a reaper that crashed after claiming make
 test.todo('S2(6) a later pass takes over a stale claim only once its recorded claimant pid is provably dead, never while it lives, then runs its own read, claim and re-read — needs run supervisor + holder-lock (deferred part ii)');
 
 // ---------------------------------------------------------------------------------------------
-// (7) The pane check queries the endpoint the round actually used. Mock herdr: a script on
-// FGOS_HERDR_BIN that logs the endpoint it was asked on and prints a pane list.
+// (7) The pane check asks terminal-control about the slot a marker names, on the endpoint the round
+// actually used. A slot needs an allocation record, so these tests allocate through the same route,
+// against a fake herdr that answers `pane get` from a list of open panes and logs the server asked.
 
-function withMockHerdr(w, fn) {
-  const bin = path.join(w.tmp, 'mock-herdr.sh');
-  const log = path.join(w.tmp, 'mock-herdr.log');
-  const panes = path.join(w.tmp, 'mock-herdr-panes.json');
-  fs.writeFileSync(bin, [
-    '#!/bin/sh',
-    'printf \'%s|%s|%s\\n\' "$*" "${HERDR_SESSION-unset}" "${HERDR_SOCKET_PATH-unset}" >> "$S2_HERDR_LOG"',
-    'cat "$S2_HERDR_PANES"',
-    '',
-  ].join('\n'), { mode: 0o700 });
-  const setPanes = (ids) => fs.writeFileSync(panes, JSON.stringify({ result: { panes: ids.map((pane_id) => ({ pane_id })) } }));
-  setPanes([]);
-  const saved = { FGOS_HERDR_BIN: process.env.FGOS_HERDR_BIN, S2_HERDR_LOG: process.env.S2_HERDR_LOG, S2_HERDR_PANES: process.env.S2_HERDR_PANES };
-  Object.assign(process.env, { FGOS_HERDR_BIN: bin, S2_HERDR_LOG: log, S2_HERDR_PANES: panes });
+async function withSessionFake(w, fn) {
+  const harness = await startTerminalHarness();
+  const herdr = createSessionFake(path.join(w.tmp, 'herdr'), { queue: ['w1:p7'] });
+  const saved = process.env.FGOS_HERDR_BIN;
+  process.env.FGOS_HERDR_BIN = herdr.bin;
   try {
-    return fn({ setPanes, calls: () => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean) : []) });
+    const tc = createTerminalControl({ herdrBin: herdr.bin, env: { HERDR_SOCKET_PATH: harness.socketPath } });
+    assert.equal(tc.allocate({ key: 'k-s2', groupKey: 'g-s2', display: { label: 'g' } }).result, 'slot');
+    return await fn({ herdr, socket: harness.socketPath });
   } finally {
-    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    if (saved === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = saved;
+    harness.stop();
   }
 }
 
-test('S2(7) control: a retained home whose session is named is asked on that session and follows the pane (mock herdr)', () => {
+test('S2(7) control: a retained home whose session is named is asked on that session and follows the pane', async () => {
   const w = workspace();
   try {
-    withMockHerdr(w, ({ setPanes, calls }) => {
+    await withSessionFake(w, ({ herdr, socket }) => {
       const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-      markResourceRetained(dir, { paneId: 'w1:p7', herdrSession: 'fgos-s2' });
-      setPanes(['w1:p7']);
+      markResourceRetained(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrSession: 'fgos-s2' });
+      extendOwnershipMarker(dir, { herdrEndpoint: socket });
       reap(w, { alive: false });
       assert.equal(exists(dir), true, 'open pane keeps the home past expiry');
-      assert.match(calls()[0] ?? '', /^pane list\|fgos-s2\|/);
-      setPanes([]);
+      assert.equal(herdr.calls().find((c) => c.args[0] === 'pane' && c.args[1] === 'get')?.session, 'fgos-s2', 'the recorded session is the one asked');
+      herdr.close('w1:p7');
       reap(w, { alive: false });
       assert.equal(exists(dir), false, 'closed pane releases it');
     });
   } finally { w.cleanup(); }
 });
 
-test('S2(7) REGRESSION default-session round (HERDR_SESSION unset): the binding records the endpoint actually used, so the reaper asks herdr there and keeps the home while the pane is open (V24)', () => {
+test('S2(7) REGRESSION default-session round (HERDR_SESSION unset): the binding records the endpoint actually used, so the reaper asks herdr there and keeps the home while the pane is open (V24)', async () => {
   const w = workspace();
   try {
-    withMockHerdr(w, ({ setPanes, calls }) => {
+    await withSessionFake(w, ({ herdr, socket }) => {
       const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
       // A default-session round: the client env names no session, so the endpoint is the socket herdr
       // itself falls back to. The binding records it before launch; a later retain (authority.mjs, with
       // round.herdrSession null) keeps it.
-      const endpoint = herdrEndpointForEnv({ HOME: '/home/s2-user' });
-      assert.deepEqual(endpoint, { herdrEndpoint: socketPathForSession('default', { home: '/home/s2-user' }), herdrSession: null });
-      bindOwnershipMarker(dir, { paneId: 'w1:p7', ...endpoint, binderPid: CONTROLLER_PID, binderStartTime: null });
+      const fallback = herdrEndpointForEnv({ HOME: '/home/s2-user' });
+      assert.deepEqual(fallback, { herdrEndpoint: socketPathForSession('default', { home: '/home/s2-user' }), herdrSession: null });
+      // The recorded endpoint is the one the test herdr listens on, so it can be asked for real.
+      bindOwnershipMarker(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrEndpoint: socket, herdrSession: null, binderPid: CONTROLLER_PID, binderStartTime: null });
       markOwnershipLaunched(dir);
-      markResourceRetained(dir, { paneId: 'w1:p7', herdrSession: null });
-      setPanes(['w1:p7']);
+      markResourceRetained(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrSession: null });
       reap(w, { alive: false, pane: undefined });
-      assert.ok(calls().length > 0, 'the reaper never asked herdr: a default-session pane is unaskable');
-      assert.equal(calls()[0], `pane list|unset|${endpoint.herdrEndpoint}`, 'asked on the recorded socket, with no session assumed');
+      const asked = herdr.calls().filter((c) => c.args[0] === 'pane' && c.args[1] === 'get');
+      assert.ok(asked.length > 0, 'the reaper never asked herdr: a default-session pane is unaskable');
+      assert.equal(asked[0].socket, socket, 'asked on the recorded socket');
+      assert.equal(asked[0].session, null, 'with no session assumed');
       assert.equal(exists(dir), true, 'an open default-session pane lost its home to expiry');
-      setPanes([]);
+      herdr.close('w1:p7');
       reap(w, { alive: false, pane: undefined });
       assert.equal(exists(dir), false, 'closed pane releases it');
     });
@@ -529,36 +530,42 @@ test('S2(7) herdrEndpointForEnv: the socket path the client env names wins, then
   assert.deepEqual(herdrEndpointForEnv({ HOME: '/h' }), { herdrEndpoint: '/h/.config/herdr/herdr.sock', herdrSession: null });
 });
 
-test.todo('S2(7) live, not mocked: defaultPaneOpen against the endpoint recorded for a real default-session pane returns true while it is open and false after it closes [needs a live herdr; out of scope for a deterministic suite]');
+test('S2(7) a marker that names no slot key is never asked about and never has its pane closed blind; the expiry rule decides its home', async () => {
+  const w = workspace();
+  try {
+    await withSessionFake(w, ({ herdr, socket }) => {
+      const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
+      markResourceRetained(dir, { paneId: 'w1:p7', herdrSession: 'fgos-s2' });
+      extendOwnershipMarker(dir, { herdrEndpoint: socket });
+      const before = herdr.calls().length;
+      reap(w, { alive: false, onClose: () => assert.fail('a pane named only by id is never closed') });
+      assert.equal(herdr.calls().length, before, 'herdr was not asked');
+      assert.equal(exists(dir), false, 'a pane that cannot be asked about does not keep a login copy past its expiry');
+    });
+  } finally { w.cleanup(); }
+});
+
+test.todo('S2(7) live, not mocked: the reaper against the endpoint recorded for a real default-session pane returns true while it is open and false after it closes [needs a live herdr; out of scope for a deterministic suite]');
 
 // ---------------------------------------------------------------------------------------------
 // (8) Plumbing authority -> transport -> herdr-round. A confined herdr-spawn round driven through the
-// real adapter door with a mock herdr; the binding is a spy standing in for Confinement Authority's
-// bind/markLaunched (the adapter only ever sees those two functions).
+// real adapter door with a fake herdr and the real terminal-control route; the binding is a spy
+// standing in for Confinement Authority's bind/markLaunched (the adapter only ever sees those two functions).
 
 const POSIX_ONLY = process.platform === 'win32' && 'the mock herdr is a POSIX shell wrapper';
 
-function createRoundMockHerdr(tmp) {
-  const script = path.join(tmp, 'round-herdr.mjs');
-  const bin = path.join(tmp, 'round-herdr.sh');
-  const log = path.join(tmp, 'round-herdr.jsonl');
-  fs.writeFileSync(log, '');
-  fs.writeFileSync(script, `
-import fs from 'node:fs';
-const args = process.argv.slice(2);
-fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify({ args, socket: process.env.HERDR_SOCKET_PATH ?? null, session: process.env.HERDR_SESSION ?? null }) + '\\n');
-const ok = (result) => { console.log(JSON.stringify({ id: 'cli:mock', result })); process.exit(0); };
-const [group, action] = args;
-if (group === 'pane' && action === 'split') ok({ pane: { pane_id: 'mock-pane-1' } });
-if (group === 'pane' && action === 'process-info') ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 1, foreground_process_group_id: 1, foreground_processes: [] } });
-ok({});
-`);
-  fs.writeFileSync(bin, `#!/bin/sh\nexec node "${script}" "$@"\n`, { mode: 0o755 });
-  const calls = () => fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l));
-  return { bin, calls };
+async function withRoundHerdr(tmp, fn) {
+  const harness = await startTerminalHarness();
+  const fake = createFakeHerdr(path.join(tmp, 'fake'), { socketPath: harness.socketPath });
+  try {
+    return await fn({ fake, socket: harness.socketPath });
+  } finally {
+    fake.cleanup();
+    harness.stop();
+  }
 }
 
-async function confinedRound(tmp, mock, { confinementBinding, runIds = {} } = {}) {
+async function confinedRound(tmp, fake, { confinementBinding, runIds = {} } = {}) {
   const runDir = path.join(tmp, 'run');
   fs.mkdirSync(runDir, { recursive: true });
   return EXECUTOR_ADAPTERS['herdr-spawn'](
@@ -573,7 +580,7 @@ async function confinedRound(tmp, mock, { confinementBinding, runIds = {} } = {}
     },
     {
       cwd: tmp, timeoutMs: 5000, workId: 'w-s2-8', tier: 'standard', model: 'sonnet',
-      herdrBin: mock.bin, runDir, transportDeadlines: { readyTimeoutMs: 200, resendAfterMs: 200 },
+      herdrBin: fake.herdrBin, runDir, transportDeadlines: { readyTimeoutMs: 200, resendAfterMs: 200 },
       confinementBinding,
       ...runIds,
     },
@@ -588,58 +595,67 @@ function withHerdrEnv(vars, fn) {
   return Promise.resolve().then(fn).finally(restore);
 }
 
-function spyBinding(mock, { failBind = false } = {}) {
+function spyBinding(fake, { failBind = false } = {}) {
   const events = [];
   return {
     events,
     binding: {
-      bind: (b) => { events.push({ kind: 'bind', binding: b, herdrCallsBefore: mock.calls().length }); if (failBind) throw new Error('bind refused for the test'); },
-      markLaunched: () => { events.push({ kind: 'launched', herdrCallsBefore: mock.calls().length }); },
+      bind: (b) => { events.push({ kind: 'bind', binding: b, herdrCallsBefore: fake.calls().length }); if (failBind) throw new Error('bind refused for the test'); },
+      markLaunched: () => { events.push({ kind: 'launched', herdrCallsBefore: fake.calls().length }); },
     },
   };
 }
 
-test('S2(8) a NON-assignment confined dispatch binds pane, endpoint and its own pid before pane run, then records the launch, outside the isAssignmentRun guard', { skip: POSIX_ONLY }, async () => {
+const isPaneRun = (c) => c[0] === 'pane' && c[1] === 'run';
+
+test('S2(8) a NON-assignment confined dispatch binds pane, endpoint and its own pid before the launch, then records the launch, outside the isAssignmentRun guard', { skip: POSIX_ONLY }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
   try {
-    const mock = createRoundMockHerdr(tmp);
-    const spy = spyBinding(mock);
-    const socket = path.join(tmp, 'herdr.sock');
-    await withHerdrEnv({ HERDR_SOCKET_PATH: socket }, () => assert.rejects(() => confinedRound(tmp, mock, { confinementBinding: spy.binding })));
-    const calls = mock.calls();
-    const runIdx = calls.findIndex((c) => c.args[0] === 'pane' && c.args[1] === 'run');
-    assert.ok(runIdx >= 0, 'the round reached pane run');
-    assert.deepEqual(spy.events.map((e) => e.kind), ['bind', 'launched']);
-    const [bind, launched] = spy.events;
-    assert.deepEqual(bind.binding, { paneId: 'mock-pane-1', herdrEndpoint: socket, herdrSession: null, binderPid: process.pid });
-    assert.ok(bind.herdrCallsBefore <= runIdx && launched.herdrCallsBefore <= runIdx, 'bind and the launch record both precede pane run');
-    assert.equal(calls[runIdx].socket, socket, 'the recorded endpoint is the one the round\'s client used');
+    await withRoundHerdr(tmp, async ({ fake, socket }) => {
+      const spy = spyBinding(fake);
+      await withHerdrEnv({ HERDR_SOCKET_PATH: socket }, () => assert.rejects(() => confinedRound(tmp, fake, { confinementBinding: spy.binding })));
+      const calls = fake.calls();
+      const runIdx = calls.findIndex(isPaneRun);
+      assert.ok(runIdx >= 0, 'the round reached the launch');
+      assert.deepEqual(spy.events.map((e) => e.kind), ['bind', 'launched']);
+      const [bind, launched] = spy.events;
+      const { terminalKey, ...rest } = bind.binding;
+      assert.deepEqual(rest, { paneId: 'mock-pane-1', herdrEndpoint: socket, herdrSession: null, binderPid: process.pid });
+      assert.match(terminalKey, /^fgos-w-s2-8-/, 'the binding records the slot key the reaper asks about');
+      assert.ok(bind.herdrCallsBefore <= runIdx && launched.herdrCallsBefore <= runIdx, 'bind and the launch record both precede the launch');
+      assert.equal(fake.envs()[runIdx].socket, socket, 'the recorded endpoint is the one the round\'s route used');
+    });
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
 test('S2(8) a default-session confined round (no HERDR_SOCKET_PATH, no HERDR_SESSION) records the socket herdr falls back to, never a session name', { skip: POSIX_ONLY }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
   try {
-    const mock = createRoundMockHerdr(tmp);
-    const spy = spyBinding(mock);
-    await withHerdrEnv({}, () => assert.rejects(() => confinedRound(tmp, mock, { confinementBinding: spy.binding })));
-    assert.deepEqual(spy.events[0].binding, { paneId: 'mock-pane-1', herdrEndpoint: socketPathForSession('default', { home: process.env.HOME }), herdrSession: null, binderPid: process.pid });
+    await withRoundHerdr(tmp, async ({ fake }) => {
+      const spy = spyBinding(fake);
+      await withHerdrEnv({}, () => assert.rejects(() => confinedRound(tmp, fake, { confinementBinding: spy.binding })));
+      assert.ok(spy.events.length > 0, 'the round bound its home before launching');
+      const { terminalKey, ...rest } = spy.events[0].binding;
+      assert.ok(terminalKey);
+      assert.deepEqual(rest, { paneId: 'mock-pane-1', herdrEndpoint: socketPathForSession('default', { home: process.env.HOME }), herdrSession: null, binderPid: process.pid });
+    });
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
-test('S2(8) a bind failure closes the pane and fails the round before pane run; no worker starts', { skip: POSIX_ONLY }, async () => {
+test('S2(8) a bind failure closes the pane and fails the round before the launch; no worker starts', { skip: POSIX_ONLY }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
   try {
-    const mock = createRoundMockHerdr(tmp);
-    const spy = spyBinding(mock, { failBind: true });
-    await withHerdrEnv({ HERDR_SOCKET_PATH: path.join(tmp, 'herdr.sock') }, () => assert.rejects(
-      () => confinedRound(tmp, mock, { confinementBinding: spy.binding }),
-      (err) => { assert.match(`${err.code ?? ''} ${err.errorClass ?? ''} ${err.message}`, /confinement-bind-failed|could not bind/); return true; },
-    ));
-    const calls = mock.calls();
-    assert.equal(calls.some((c) => c.args[0] === 'pane' && c.args[1] === 'run'), false, 'no pane run after a failed bind');
-    assert.ok(calls.some((c) => c.args[0] === 'pane' && c.args[1] === 'close' && c.args.includes('mock-pane-1')), 'the pane was closed');
-    assert.deepEqual(spy.events.map((e) => e.kind), ['bind']);
+    await withRoundHerdr(tmp, async ({ fake, socket }) => {
+      const spy = spyBinding(fake, { failBind: true });
+      await withHerdrEnv({ HERDR_SOCKET_PATH: socket }, () => assert.rejects(
+        () => confinedRound(tmp, fake, { confinementBinding: spy.binding }),
+        (err) => { assert.match(`${err.code ?? ''} ${err.errorClass ?? ''} ${err.message}`, /confinement-bind-failed|could not bind/); return true; },
+      ));
+      const calls = fake.calls();
+      assert.equal(calls.some(isPaneRun), false, 'no launch after a failed bind');
+      assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'close' && c.includes('mock-pane-1')), 'the pane was closed');
+      assert.deepEqual(spy.events.map((e) => e.kind), ['bind']);
+    });
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 

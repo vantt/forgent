@@ -8,7 +8,7 @@
 // that never built assignmentLaunchContext (RT059-F2) both shipped and went
 // unnoticed: nothing exercised the seam they broke.
 
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -16,6 +16,25 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
+import { paneModelSource } from '../helpers/herdr-pane-model.mjs';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
+
+// Every herdr call goes through terminal-control, which needs a host binary and a socket whose
+// listener identifies the herdr server; the harness provides both and a private state root.
+let harness;
+let agentPidLog;
+before(async () => {
+  harness = await startTerminalHarness();
+  agentPidLog = path.join(harness.stateRoot, '..', 'mock-agent-pids.log');
+});
+after(() => {
+  try {
+    for (const pid of fs.readFileSync(agentPidLog, 'utf8').split('\n').filter(Boolean)) {
+      try { process.kill(Number(pid), 'SIGKILL'); } catch { /* already gone */ }
+    }
+  } catch { /* no agent was ever started */ }
+  harness?.stop();
+});
 
 function mkTempDir(prefix = 'fgos-herdr-assignment-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -33,7 +52,7 @@ function initGitRepo(repoDir) {
 /**
  * A fake herdr binary, in the same shape test/runner/herdr-spawn-adapter.test.mjs's
  * own `createMockHerdr` already proves works for `agent start`/`agent get`/
- * `agent prompt`/`pane split`/`pane close`/`pane process-info`: it answers
+ * `agent prompt`/`tab create`/`pane close`/`pane process-info`: it answers
  * enough of herdr 0.8.2's real envelope shapes to carry one round to
  * settlement, then plays the worker by writing the ack/report/result files
  * the brief pointed it at.
@@ -49,6 +68,7 @@ function createMockHerdr(repoDir) {
   const scriptPath = path.join(repoDir, 'mock-herdr.mjs');
   const wrapperPath = path.join(repoDir, 'mock-herdr.sh');
   const logPath = path.join(repoDir, 'mock-log.jsonl');
+  const paneStatePath = path.join(repoDir, 'mock-panes.json');
   const mutationPath = path.join(repoDir, 'herdr-worker-output.txt');
 
   fs.writeFileSync(logPath, '');
@@ -56,6 +76,7 @@ function createMockHerdr(repoDir) {
   fs.writeFileSync(scriptPath, `
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 const logPath = ${JSON.stringify(logPath)};
 const mutationPath = ${JSON.stringify(mutationPath)};
@@ -67,15 +88,12 @@ const fail = (code, message) => { console.log(JSON.stringify({ error: { code, me
 
 const [group, action] = args;
 
-if (group === 'pane' && action === 'split') ok({ pane: { pane_id: 'mock-pane-1' } });
-if (group === 'pane' && action === 'close') ok({ closed: true });
 if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) ok({ type: 'ok' });
-if (group === 'pane' && action === 'process-info') {
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: 200, foreground_processes: [{ pid: 200, name: 'agy' }, { pid: 100, name: 'zsh' }] } });
-}
-if (group === 'agent' && action === 'start') ok({ agent: { agent_status: 'idle' } });
-if (group === 'agent' && action === 'read') ok({ read: { text: '' } });
-if (group === 'agent' && action === 'get') ok({ agent: { agent_status: 'idle', pane_id: 'mock-pane-1', state_change_seq: 0 } });
+${paneModelSource({ statePath: paneStatePath, agentPidLog })}
+// herdr prints a screen as plain text, not in the JSON envelope.
+if (group === 'pane' && action === 'read') { console.log(''); process.exit(0); }
+if (group === 'pane' && (action === 'send-keys' || action === 'send-text')) ok({});
+if (group === 'agent' && action === 'get') ok({ agent: { agent_status: 'idle', pane_id: args[2], state_change_seq: 0 } });
 if (group === 'agent' && action === 'prompt') {
   const text = args[3];
   if (text.startsWith('/')) ok({ agent: { agent_status: 'idle' } });

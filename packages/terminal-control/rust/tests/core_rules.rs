@@ -161,10 +161,38 @@ fn attach_records_the_pane_and_release_never_closes_it() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("attach"));
     let own = core.allocate(&request("own", "g")).unwrap().slot;
-    let attached = core.attach("att", &own.pane_id, None).unwrap();
+    let attached = core.attach("att", &own.pane_id, None, None).unwrap();
     assert_eq!(attached.origin, Origin::Attached);
     let out = core.release("att", Disposition::Close, None).unwrap();
     assert_eq!(out, ReleaseOutcome::Released { disposition: Disposition::Close });
     assert!(driver.calls("pane.close").is_empty());
     assert!(driver.panes.borrow().contains_key(&own.pane_id));
+}
+
+#[test]
+fn cwd_and_env_reach_the_driver_for_a_new_tab_and_for_a_split() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("spawn-env"));
+    let mut first = request("a", "g");
+    first.cwd = Some("/work".into());
+    first.env.insert("K".into(), "v".into());
+    core.allocate(&first).unwrap();
+    let mut second = request("b", "g");
+    second.cwd = Some("/other".into());
+    core.allocate(&second).unwrap();
+    assert!(driver.calls("tab.create")[0].contains("cwd=/work env=1"));
+    assert!(driver.calls("pane.split")[0].contains("cwd=/other env=0"));
+}
+
+#[test]
+fn an_attached_pane_joins_the_group_it_names_and_the_next_pane_opens_beside_it() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("attach-group"));
+    let own = core.allocate(&request("own", "other")).unwrap().slot;
+    let attached = core.attach("anchor", &own.pane_id, Some("batch"), None).unwrap();
+    assert_eq!(attached.origin, Origin::Attached);
+    let next = core.allocate(&request("seat", "batch")).unwrap().slot;
+    assert_eq!(next.tab_id, own.tab_id, "the batch continues in the tab of its attached pane");
+    assert_eq!(driver.tab_count(), 1);
+    assert_eq!(driver.calls("pane.split").len(), 1);
 }

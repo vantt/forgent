@@ -207,6 +207,7 @@ export function readRunOutcome(runResult, { repoRoot }) {
     runDir,
     runId: runResult?.runId ?? null,
     paneId: visibility?.paneId ?? null,
+    terminalKey: visibility?.terminalKey ?? null,
     herdrSession: visibility?.herdrSession ?? null,
   };
 }
@@ -215,7 +216,7 @@ export function readRunOutcome(runResult, { repoRoot }) {
  * Start every invocation of the account at once and report one row per CLI, then close the panes the
  * rounds left open. `createAssignment(contract)` builds and claims an inline Assignment;
  * `dispatch(assignment, { runnerConfig })` is the Assignment door and resolves to a RunResult;
- * `closePane({ paneId, herdrSession })` closes one pane. All three are injectable for tests.
+ * `closePane({ paneId, herdrSession, terminalKey })` closes one pane by its terminal-control key. All three are injectable for tests.
  */
 export async function runAccountProbe({
   cfg, provider, accountId, executorId = null, invocationIds = null, repoRoot,
@@ -243,11 +244,11 @@ export async function runAccountProbe({
       const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId };
       run = readRunOutcome(await dispatch(assignment, { runnerConfig, cliOverride }), { repoRoot });
     } catch (err) {
-      run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, herdrSession: err?.herdrSession ?? null };
+      run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, terminalKey: err?.terminalKey ?? null, herdrSession: err?.herdrSession ?? null };
     }
     const { outcome, evidence, matchedRule } = classifyAccountProbe(run);
     // A settled round closes its own pane, so a refused close here means there was nothing left open.
-    const pane = run.paneId ? (closePane({ paneId: run.paneId, herdrSession: run.herdrSession }) ? 'closed-by-probe' : 'not-open') : null;
+    const pane = run.paneId ? (closePane({ paneId: run.paneId, herdrSession: run.herdrSession, terminalKey: run.terminalKey }) ? 'closed-by-probe' : 'not-open') : null;
     return {
       cli: inv.cli,
       invocationId: inv.invocationId,

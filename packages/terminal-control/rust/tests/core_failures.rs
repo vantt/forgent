@@ -18,6 +18,7 @@ fn launch_spec() -> LaunchSpec {
         cwd: "/tmp".into(),
         env: Default::default(),
         activity: None,
+        expect: None,
     }
 }
 
@@ -90,11 +91,34 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
     assert_eq!(run.len(), 1);
     assert!(run[0].contains("cd '/tmp' && exec 'sleep' '30'"), "{}", run[0]);
     assert!(core.reconcile_scan(0).unwrap().is_empty());
-    let inspection = core.inspect("a");
+    let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Live);
     assert_eq!(inspection.foreground.map(|f| f.pid), Some(child.id()));
     child.kill().unwrap();
     child.wait().unwrap();
+}
+
+#[test]
+fn a_command_that_replaced_the_shell_is_still_the_foreground_of_its_slot() {
+    // `exec` makes the launched command the pane's own root process: its pid is the shell pid.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("exec-root"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    driver.set_foreground(
+        &slot.pane_id,
+        child.id(),
+        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
+        child.id(),
+    );
+    let LaunchOutcome::Launched(identity) = core.launch("a", &launch_spec()).unwrap() else { panic!("not launched") };
+    assert_eq!(identity.pid, child.id());
+    assert_eq!(core.inspect("a", false).foreground.map(|f| f.pid), Some(child.id()), "inspect finds the exec'd root through the launched marker");
+    child.kill().unwrap();
+    child.wait().unwrap();
+    // The process is gone: nothing is reported as the foreground, whatever the marker says.
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
+    assert_eq!(core.inspect("a", false).foreground, None);
 }
 
 #[test]
@@ -105,7 +129,7 @@ fn a_server_restart_invalidates_old_records_and_never_closes_the_new_servers_pan
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.restart_server();
     // The pane id now belongs to the new incarnation; the old record must not reach it.
-    let inspection = core.inspect("a");
+    let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Unknown);
     let released = core.release("a", Disposition::Close, None).unwrap();
     assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
@@ -193,7 +217,7 @@ fn send_and_read_reach_the_pane_of_the_key() {
     core.send("a", None, Some(&["Enter".to_string()]), false).unwrap();
     assert!(core.send("a", Some("x"), Some(&["Enter".to_string()]), false).is_err());
     assert_eq!(core.read("a", None, None).unwrap(), format!("screen of {}", slot.pane_id));
-    core.label("a", &Display { label: "new".into(), ..Display::default() }).unwrap();
+    core.label("a", &Display { label: "new".into(), ..Display::default() }, None).unwrap();
     assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} new", slot.pane_id)]);
 }
 
@@ -201,10 +225,10 @@ fn send_and_read_reach_the_pane_of_the_key() {
 fn inspect_of_a_missing_key_or_gone_pane_is_not_live() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("inspect"));
-    assert_eq!(core.inspect("nope").pane, PaneState::Unknown);
+    assert_eq!(core.inspect("nope", false).pane, PaneState::Unknown);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.kill_pane(&slot.pane_id);
-    assert_eq!(core.inspect("a").pane, PaneState::Gone);
+    assert_eq!(core.inspect("a", false).pane, PaneState::Gone);
 }
 
 #[test]
@@ -242,7 +266,7 @@ fn the_core_never_launches_into_an_attached_or_released_slot() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("launch-guards"));
     let own = core.allocate(&request("own", "g")).unwrap().slot;
-    core.attach("att", &own.pane_id, None).unwrap();
+    core.attach("att", &own.pane_id, None, None).unwrap();
     assert!(core.launch("att", &launch_spec()).is_err());
     core.release("own", Disposition::Retain, None).unwrap();
     assert!(core.launch("own", &launch_spec()).is_err());

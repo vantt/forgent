@@ -8,7 +8,8 @@ import path from 'node:path';
 import { DispatchError } from './dispatch-error.mjs';
 import { interpretRunResult } from './run-result.mjs';
 import { getProcessStartTime } from './process-identity.mjs';
-import { createHerdrClient } from './herdr-agent.mjs';
+import { normalizeAgentName } from './herdr-agent.mjs';
+import { createRoundTerminalControl, createSlotIo, portKey } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
 import {
   publishImmutableProof,
@@ -140,56 +141,28 @@ export function readHerdrLaunchCommand(runDir, launchCommandId) {
  * `detached-run-supervisor` role `isCliSpawnRunStillWorking`
  * (assignment-runner.mjs) fills for `cli-spawn`: "is the detached run this
  * admission decision cares about still doing real work, independent of
- * whether the process that dispatched it is still alive?" herdr's pane
- * deliberately outlives the runner that dispatched it (same design point as
- * cli-spawn's detached supervisor/worker), so a runner-only liveness check
- * is blind to a SIGKILLed runner whose pane/agent is still alive.
+ * whether the process that dispatched it is still alive?" The pane
+ * deliberately outlives the runner that dispatched it, so a runner-only
+ * liveness check is blind to a SIGKILLed runner whose agent is still alive.
  *
- * Unlike `isCliSpawnRunStillWorking` (local fs-binding reads, always
- * synchronous and instant), this calls `paneProcessInfo` -- a REAL `herdr`
- * CLI subprocess with its own non-deterministic availability
- * (`herdr_unavailable`/`herdr_call_timeout`) -- so it is async and MUST be
- * called as a bounded, best-effort PRE-CHECK outside `admitRunAttempt`'s own
- * synchronous CAS critical section (Phase 4/5 of this track hardened that
- * section specifically to never block on anything external); only the
- * RESULT is carried into the section, mirroring the shape
- * `isCliSpawnRunStillWorking` already uses there.
+ * The slot is found by key through terminal-control (`slotIo`, or the key of
+ * the launch command's agent name), never by label or by scanning argv. Each
+ * question is a bounded call outside `admitRunAttempt`'s own synchronous CAS
+ * critical section; only the RESULT is carried into the section.
  *
  * Returns:
- * - `false` when nothing herdr-side was ever bound to check (no
- *   controller/commands record, or one with no `paneId` yet) -- mirrors
- *   `isCliSpawnRunStillWorking`'s own "nothing to check" `false` for the
- *   equivalent case.
- * - `true`/`false` when herdr answered with a real classification. Prefers
- *   `client.agentGet(paneId)`'s own semantic `agent_status` (herdr >=0.9.1:
- *   `idle|working|blocked|done|unknown`) over inferring liveness from raw
- *   foreground-process presence -- a process can be present while the agent
- *   itself is idle/done (between turns, cleaning up), and `agent_status`
- *   answers "is this agent still doing real work" directly instead of by
- *   inference. `working` and `blocked` both count as still working: a
- *   `blocked` agent (paused on its own question, e.g. a permission prompt)
- *   is a live, unsettled attempt, not a finished one -- admitting a second
- *   attempt over it would still be the exact double-materialization this
- *   check exists to prevent. Falls back to the OLDER `paneProcessInfo`
- *   foreground-process check (this file's own original implementation, kept
- *   verbatim below) only when `agentGet` itself fails outright (herdr
- *   <0.9.1, a socket hiccup) -- mirrors this same file's own reconcile probe
- *   above, which already tries `agentGet` first and falls back the same way.
- * - `'unknown'` (never a plain boolean) when herdr's own classification is
- *   itself `'unknown'`, or when BOTH the `agentGet` and `paneProcessInfo`
- *   calls failed/timed out -- genuinely undecidable, not "confirmed dead".
- *   Deliberately FAIL CLOSED: `admitRunAttempt`'s M1 check must treat
- *   `'unknown'` the same as "still working" (both are truthy, so a plain
- *   `||` already does this) and refuse the new attempt, matching this
- *   track's own repeated "fail closed on undecidable liveness, never fail
- *   open" rule elsewhere (`resolveMutatingCwdPosture`, the composite-pid
- *   AMBIGUOUS lock status). An operator who has independently confirmed the
- *   prior attempt is genuinely gone already has an escape valve for exactly
- *   this shape -- `--force-new-attempt` (M1's own existing "a prior attempt
- *   this host can no longer observe correctly" case) -- so failing closed
- *   here costs nothing new, it only reuses that existing door.
+ * - `false` when nothing was ever bound to check (no commands record, or one
+ *   with no `paneId` yet), or when the agent is idle/done or its pane is gone.
+ * - `true` when the agent is `working` or `blocked`: a blocked agent (paused
+ *   on its own question) is a live, unsettled attempt, and admitting a second
+ *   attempt over it would be the double-materialization this check prevents.
+ *   Without a readable status, a live non-shell foreground process counts.
+ * - `'unknown'` (never a plain boolean) when the status is `unknown` or
+ *   nothing could be read -- undecidable, not "confirmed dead". Fail closed:
+ *   admission treats it like "still working"; `--force-new-attempt` is the
+ *   escape valve for an operator who has confirmed the prior attempt is gone.
  */
-export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBin, cwd, env, timeoutMs = 5000 } = {}) {
+export async function isHerdrSpawnRunStillWorking(runDir, { slotIo, herdrBin, env } = {}) {
   const commandsDir = path.join(runDir, 'controller', 'commands');
   if (!fs.existsSync(commandsDir)) return false;
   let commandFiles;
@@ -219,10 +192,10 @@ export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBi
   } catch {
     return 'unknown'; // a session name that cannot be addressed: undecidable, fail closed
   }
-  const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env: clientEnv });
+  const io = slotIo ?? slotIoFor(command, { herdrBin: resolvedHerdrBin, env: clientEnv });
 
   try {
-    const { agentStatus } = client.agentGet(paneId);
+    const { agentStatus } = io.state();
     if (agentStatus === 'working' || agentStatus === 'blocked') return true;
     if (agentStatus === 'idle' || agentStatus === 'done') return false;
     if (agentStatus === 'unknown') return 'unknown';
@@ -230,17 +203,21 @@ export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBi
     // new state this code doesn't know yet): fall through to the
     // process-presence check below rather than guessing either way.
   } catch {
-    // agentGet failed outright -- fall through to the process check below.
+    // The state could not be read -- fall through to the process check below.
   }
 
-  let pInfo;
   try {
-    pInfo = client.paneProcessInfo(paneId, { timeoutMs });
-  } catch {
-    return 'unknown';
-  }
-  const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
-  return Boolean(workerProc);
+    const seen = io.foreground();
+    if (seen.pane === 'live') return Boolean(seen.foreground);
+    if (seen.pane === 'gone') return false;
+  } catch { /* undecidable */ }
+  return 'unknown';
+}
+
+/** The slot of a launch command: its key is the agent name the round launched under. */
+function slotIoFor(command, { herdrBin, env }) {
+  const tc = createRoundTerminalControl({ herdrBin, herdrEnv: env });
+  return createSlotIo({ tc, key: portKey(normalizeAgentName(command.herdrName)) });
 }
 
 export function publishHerdrAdapterReceipt(runDir, launchCommandId, receiptData) {
@@ -616,56 +593,30 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
   }
 
   // Check Herdr probe
-  const probe = opts.probe || (opts.herdrClient ? async (herdrName, paneId) => {
+  const probe = opts.probe || (opts.slotIo ? async () => {
+    const io = opts.slotIo;
+    let seen;
+    try { seen = io.foreground(); } catch { return { status: 'absent' }; }
+    if (seen.pane !== 'live') return { status: 'absent' };
     let info = null;
-    try {
-      info = opts.herdrClient.agentGet(herdrName);
-    } catch {
-      if (paneId) {
-        try {
-          info = opts.herdrClient.agentGet(paneId);
-        } catch {}
-      }
-    }
+    try { info = io.state(); } catch { /* the process below still says whether it is there */ }
+    const worker = seen.foreground;
+    const resourceIncarnation = computeHerdrResourceIncarnation({
+      paneId: command.paneId,
+      shellPid: null,
+      workerPid: worker?.pid || null,
+      foregroundPgid: worker?.pgid || null,
+      processStartTime: worker?.pid ? getProcessStartTime(worker.pid) : null,
+    });
     if (info) {
-      let pInfo = null;
-      if (paneId) {
-        try { pInfo = opts.herdrClient.paneProcessInfo(paneId); } catch {}
-      }
-      const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
-      const resourceIncarnation = pInfo ? computeHerdrResourceIncarnation({
-        paneId,
-        shellPid: pInfo.shellPid || null,
-        workerPid: workerProc?.pid || null,
-        foregroundPgid: pInfo.foregroundPgid || null,
-        processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
-      }) : null;
       return {
-        status: info?.agent_status || info?.agentStatus || 'present',
-        agentSession: info?.agent_session?.value || info?.agentSession || null,
+        status: info.agentStatus && info.agentStatus !== 'unknown' ? info.agentStatus : 'present',
+        agentSession: info.agentSession || null,
         resourceIncarnation,
         info,
       };
     }
-    if (paneId) {
-      try {
-        const pInfo = opts.herdrClient.paneProcessInfo(paneId);
-        const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
-        return {
-          status: workerProc ? 'present' : 'absent',
-          resourceIncarnation: computeHerdrResourceIncarnation({
-            paneId,
-            shellPid: pInfo.shellPid || null,
-            workerPid: workerProc?.pid || null,
-            foregroundPgid: pInfo.foregroundPgid || null,
-            processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
-          }),
-        };
-      } catch {
-        return { status: 'absent' };
-      }
-    }
-    return { status: 'absent' };
+    return { status: worker ? 'present' : 'absent', resourceIncarnation };
   } : null);
 
   if (probe) {
