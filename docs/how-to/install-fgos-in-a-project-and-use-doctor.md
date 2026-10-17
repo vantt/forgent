@@ -374,7 +374,7 @@ runner picks executors from that capability's pool in
 ```json
 "runner": { "capabilities": { "nominal-group:generate": {
   "prefer": [
-    { "executor": "claude-herdr" },
+    { "executor": "claude" },
     { "executor": "xai", "invocation": "pi-herdr-vantt" },
     { "executor": "openai" },
     { "executor": "glm", "invocation": "pi-cli-bwrap-openrouter" }
