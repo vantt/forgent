@@ -1,0 +1,11 @@
+[package]
+name = "fgos-holder-lock"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fgos-process = { path = "../../process/rust" }
+serde_json = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }

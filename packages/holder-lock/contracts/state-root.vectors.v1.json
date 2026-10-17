@@ -1,0 +1,30 @@
+{
+  "contract": { "id": "state-root-vectors", "version": 1 },
+  "description": "Shared vectors for the single state-root resolution. Each vector gives the complete environment of the resolving process (a variable not listed is unset) and the expected result. Paths use `/`; a vector with platforms [\"windows\"] compares path components instead.",
+  "route": "internal-route.state-root.v1.json",
+  "vectors": [
+    { "name": "fgos-state-home-wins", "env": { "FGOS_STATE_HOME": "/custom/state", "XDG_STATE_HOME": "/xdg", "HOME": "/home/u" }, "expect": { "stateRoot": "/custom/state", "lockRoot": "/custom/state/locks", "source": "fgos-state-home" } },
+    { "name": "fgos-state-home-verbatim-no-suffix", "env": { "FGOS_STATE_HOME": "/custom/fgos-here" }, "expect": { "stateRoot": "/custom/fgos-here", "lockRoot": "/custom/fgos-here/locks", "source": "fgos-state-home" } },
+    { "name": "fgos-state-home-keeps-inner-whitespace", "env": { "FGOS_STATE_HOME": " /custom/state " }, "expect": { "stateRoot": " /custom/state ", "lockRoot": " /custom/state /locks", "source": "fgos-state-home" } },
+    { "name": "xdg-state-home", "env": { "XDG_STATE_HOME": "/xdg", "HOME": "/home/u" }, "expect": { "stateRoot": "/xdg/fgos", "lockRoot": "/xdg/fgos/locks", "source": "xdg-state-home" } },
+    { "name": "home-default", "env": { "HOME": "/home/u" }, "expect": { "stateRoot": "/home/u/.local/state/fgos", "lockRoot": "/home/u/.local/state/fgos/locks", "source": "home" } },
+    { "name": "home-wins-over-userprofile", "env": { "HOME": "/home/u", "USERPROFILE": "/profile" }, "expect": { "stateRoot": "/home/u/.local/state/fgos", "lockRoot": "/home/u/.local/state/fgos/locks", "source": "home" } },
+    { "name": "userprofile-when-home-unset", "env": { "USERPROFILE": "/profile" }, "expect": { "stateRoot": "/profile/.local/state/fgos", "lockRoot": "/profile/.local/state/fgos/locks", "source": "userprofile" } },
+    { "name": "home-empty-string-is-set", "env": { "HOME": "", "USERPROFILE": "/profile" }, "expect": { "stateRoot": ".local/state/fgos", "lockRoot": ".local/state/fgos/locks", "source": "home" } },
+    { "name": "nothing-set-relative-fallback", "env": {}, "expect": { "stateRoot": ".local/state/fgos", "lockRoot": ".local/state/fgos/locks", "source": "relative-fallback" } },
+    { "name": "empty-fgos-state-home-ignored", "env": { "FGOS_STATE_HOME": "", "XDG_STATE_HOME": "/xdg", "HOME": "/home/u" }, "expect": { "stateRoot": "/xdg/fgos", "lockRoot": "/xdg/fgos/locks", "source": "xdg-state-home" } },
+    { "name": "whitespace-fgos-state-home-ignored", "env": { "FGOS_STATE_HOME": "   ", "HOME": "/home/u" }, "expect": { "stateRoot": "/home/u/.local/state/fgos", "lockRoot": "/home/u/.local/state/fgos/locks", "source": "home" } },
+    { "name": "empty-xdg-ignored", "env": { "XDG_STATE_HOME": "", "HOME": "/home/u" }, "expect": { "stateRoot": "/home/u/.local/state/fgos", "lockRoot": "/home/u/.local/state/fgos/locks", "source": "home" } },
+    { "name": "whitespace-xdg-ignored", "env": { "XDG_STATE_HOME": "\t ", "HOME": "/home/u" }, "expect": { "stateRoot": "/home/u/.local/state/fgos", "lockRoot": "/home/u/.local/state/fgos/locks", "source": "home" } },
+    { "name": "sandbox-home-with-pinned-root", "env": { "HOME": "/sandbox/home", "FGOS_STATE_ROOT": "/real/state/fgos" }, "expect": { "stateRoot": "/real/state/fgos", "lockRoot": "/real/state/fgos/locks", "source": "pinned" } },
+    { "name": "pinned-root-wins-over-state-home", "env": { "FGOS_STATE_ROOT": "/real/state/fgos", "FGOS_STATE_HOME": "/other", "HOME": "/home/u" }, "expect": { "stateRoot": "/real/state/fgos", "lockRoot": "/real/state/fgos/locks", "source": "pinned" } },
+    { "name": "blank-pinned-root-ignored", "env": { "FGOS_STATE_ROOT": " ", "HOME": "/sandbox/home" }, "expect": { "stateRoot": "/sandbox/home/.local/state/fgos", "lockRoot": "/sandbox/home/.local/state/fgos/locks", "source": "home" } },
+    { "name": "sandbox-home-without-pin-moves-the-root", "env": { "HOME": "/sandbox/home" }, "expect": { "stateRoot": "/sandbox/home/.local/state/fgos", "lockRoot": "/sandbox/home/.local/state/fgos/locks", "source": "home" }, "note": "documents why dispatch must pin FGOS_STATE_ROOT: without it a sandbox HOME is a different machine scope" },
+    {
+      "name": "windows-userprofile",
+      "platforms": ["windows"],
+      "env": { "USERPROFILE": "C:\\Users\\u" },
+      "expect": { "stateRootComponents": ["C:\\Users\\u", ".local", "state", "fgos"], "source": "userprofile" }
+    }
+  ]
+}

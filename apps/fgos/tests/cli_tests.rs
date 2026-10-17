@@ -1379,3 +1379,38 @@ fn test_native_verb_with_stdin_payload_still_reads_it() {
         String::from_utf8_lossy(&output.stderr)
     );
 }
+
+/// The host resolves the state root once and pins it into the Node
+/// payload's environment as `FGOS_STATE_ROOT`; a root the caller already
+/// pinned is passed through untouched.
+#[cfg(unix)]
+#[test]
+fn host_pins_the_state_root_for_the_node_payload() {
+    use std::os::unix::fs::PermissionsExt;
+    let manifest_path = ensure_dev_manifest();
+    let dir = std::env::temp_dir().join(format!("fgos_test_state_root_{}", std::process::id()));
+    fs::create_dir_all(&dir).unwrap();
+    let seen = dir.join("seen.txt");
+    let fake_node = dir.join("node");
+    fs::write(&fake_node, format!("#!/bin/sh\nprintf '%s' \"$FGOS_STATE_ROOT\" > '{}'\n", seen.display())).unwrap();
+    fs::set_permissions(&fake_node, fs::Permissions::from_mode(0o755)).unwrap();
+    let path = format!("{}:{}", dir.display(), std::env::var("PATH").unwrap_or_default());
+    let run = |pinned: Option<&str>| {
+        let mut cmd = Command::new(fgos_bin());
+        cmd.args(["add", "--help"])
+            .env("PATH", &path)
+            .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+            .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+            .env("FGOS_STATE_HOME", "/custom/state-home")
+            .env_remove("FGOS_STATE_ROOT");
+        if let Some(root) = pinned {
+            cmd.env("FGOS_STATE_ROOT", root);
+        }
+        let out = cmd.output().unwrap();
+        assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
+        fs::read_to_string(&seen).unwrap()
+    };
+    assert_eq!(run(None), "/custom/state-home");
+    assert_eq!(run(Some("/already/pinned")), "/already/pinned");
+    let _ = fs::remove_dir_all(&dir);
+}

@@ -4,8 +4,9 @@ import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
+import { pathToFileURL } from 'node:url';
 
 import {
   CODEX_REFRESH_INTERVAL_MS,
@@ -42,6 +43,11 @@ import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs
 import { finalizeConfinementResources } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
+
+// The account lock is machine-scoped under the state root: a private root keeps this file's locks off
+// the machine's real ones, and every child process started below inherits it.
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-renewal-state-root-'));
+const PROVIDER_CAPACITY_URL = pathToFileURL(path.resolve(import.meta.dirname, '../../src/runner/dispatch/provider-capacity.mjs')).href;
 
 // Every token below is an obviously fake string. The tests never touch a real store or a real CLI: the
 // call is an injected spawn that rewrites the scratch home the way a real CLI would after a renewal.
@@ -333,48 +339,70 @@ test('two refreshes started together on one account cause one renewal, and the e
   } finally { w.cleanup(); }
 });
 
-test('a dead runner whose renewal child still runs keeps the lock: no second renewal starts', async () => {
+test('a dead runner whose renewal child still runs keeps the lock: no second renewal starts', { timeout: 30_000 }, async (t) => {
   const w = workspace();
   try {
     writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
-    const dead = spawnSync(process.execPath, ['-e', '']);
-    const lockDir = path.join(w.accountDir, 'lock');
-    fs.mkdirSync(lockDir, { recursive: true });
-    fs.writeFileSync(path.join(lockDir, '0000000001.json'), JSON.stringify({
-      holder: { pid: dead.pid, processStartTime: null },
-      child: { pid: process.pid, processStartTime: null },
-      acquiredAt: new Date().toISOString(),
-    }));
+    // A real runner process: it takes the account lock, starts its renewal call (a `node` that sleeps)
+    // through the lock, and is then killed while the call still runs.
+    const CHILD_MS = 1500;
+    const holder = spawn(process.execPath, ['--input-type=module', '-e', `
+import fs from 'node:fs';
+import { tryAcquireAccountLock } from ${JSON.stringify(PROVIDER_CAPACITY_URL)};
+const lock = tryAcquireAccountLock({ runtimeDir: ${JSON.stringify(w.runtimeDir)}, provider: 'xai', accountId: 'acct' });
+const child = lock.spawnHolding(process.execPath, ['-e', 'setTimeout(() => {}, ${CHILD_MS})'], { stdio: ['ignore', 'pipe', 'pipe'] });
+fs.writeSync(1, String(child.pid) + '\\n');
+setInterval(() => {}, 1000);
+`], { stdio: ['ignore', 'pipe', 'inherit'] });
+    t.after(() => holder.kill('SIGKILL'));
+    const childPid = await new Promise((resolve, reject) => {
+      holder.stdout.once('data', (chunk) => resolve(Number(String(chunk).trim())));
+      holder.once('exit', (code) => reject(new Error(`holder exited (code ${code}) before starting its call`)));
+    });
+    t.after(() => { try { process.kill(childPid, 'SIGKILL'); } catch { /* already gone */ } });
+    const holderExited = new Promise((resolve) => holder.once('exit', resolve));
+    holder.kill('SIGKILL');
+    await holderExited;
+
     const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
     const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn, lockWaitMs: 150 });
     assert.deepEqual(result, { status: 'skipped', reason: 'lock-busy' });
     assert.equal(starts.length, 0);
 
-    // Once the child is gone the dead holder is reclaimed as usual.
-    fs.writeFileSync(path.join(lockDir, '0000000001.json'), JSON.stringify({ holder: { pid: dead.pid }, child: { pid: dead.pid }, acquiredAt: new Date().toISOString() }));
-    const again = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn, lockWaitMs: 150 });
+    // Once the call has ended, the lock is free and the renewal runs.
+    const again = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn, lockWaitMs: CHILD_MS + 5000 });
     assert.equal(again.status, 'renewed');
   } finally { w.cleanup(); }
 });
 
-test('the renewal child pid is recorded in the lock record while the call runs', async () => {
+test('without an injected spawn the renewal call runs through the account lock and holds it', { timeout: 30_000 }, async () => {
   const w = workspace();
   try {
     writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
-    let recorded = null;
-    const { spawnFn } = fakeSpawn({
-      layoutName: 'pi',
-      delayMs: 30,
-      onStart: () => {
-        setTimeout(() => {
-          const lockDir = path.join(w.accountDir, 'lock');
-          const file = fs.readdirSync(lockDir).filter((n) => /^\d+\.json$/.test(n)).sort().pop();
-          recorded = JSON.parse(fs.readFileSync(path.join(lockDir, file), 'utf8')).child ?? null;
-        }, 10);
-      },
-    });
-    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
-    assert.equal(recorded?.pid, 424242);
+    // A stand-in `pi` on PATH: it records whether it was handed the lock's description, then renews the
+    // home it is pointed at the way the real CLI does.
+    const bin = path.join(w.tmp, 'bin');
+    fs.mkdirSync(bin);
+    const seenPath = path.join(w.tmp, 'seen.json');
+    fs.writeFileSync(path.join(bin, 'pi'), `#!${process.execPath}
+const fs = require('node:fs');
+const path = require('node:path');
+let fd3 = false;
+try { fd3 = fs.fstatSync(3).isFile(); } catch {}
+fs.writeFileSync(${JSON.stringify(seenPath)}, JSON.stringify({ lockFd: process.env.FGOS_LOCK_FD ?? null, fd3 }));
+const file = path.join(process.env.PI_CODING_AGENT_DIR, 'auth.json');
+const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+doc.xai = { ...doc.xai, access: ${JSON.stringify(FAKE.newAccess)}, refresh: ${JSON.stringify(FAKE.newRefresh)}, expires: Date.now() + 6 * 3600 * 1000 };
+fs.writeFileSync(file, JSON.stringify(doc, null, 2) + '\\n');
+process.stdout.write('OK');
+`, { mode: 0o755 });
+    const env = { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}` };
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, env });
+    assert.equal(result.status, 'renewed');
+    assert.deepEqual(JSON.parse(fs.readFileSync(seenPath, 'utf8')), { lockFd: 'provider-account:3', fd3: true });
+    const free = tryAcquireAccountLock({ runtimeDir: w.runtimeDir, provider: 'xai', accountId: 'acct' });
+    assert.ok(free, 'released once the call ended');
+    free.release();
   } finally { w.cleanup(); }
 });
 

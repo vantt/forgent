@@ -1,0 +1,65 @@
+{
+  "contract": { "id": "internal-route-lock-borrow-vectors", "version": 1 },
+  "command": "fgos internal lock-borrow-vectors",
+  "description": "Runs the borrow vectors against a throwaway repository with real git: a borrowed description must not leak to any background process. Red means doctor FAIL and fgctl activate refuses. There is no switch that disables borrowing at run time.",
+  "argv": {
+    "required": ["--protocol 1"],
+    "optional": [
+      { "flag": "--vector <name>", "repeatable": true, "meaning": "run only the named vectors; default all four" },
+      { "flag": "--keep-repo", "meaning": "keep the temporary repository for diagnosis and print its path in detail" }
+    ]
+  },
+  "environment": {
+    "repo": "a fresh temporary repository under the temp directory, removed afterwards",
+    "borrowedGitArgs": "every git call is made through run_borrowed, which prepends -c gc.auto=0 -c maintenance.auto=false",
+    "lockFile": "a lock file inside the temporary directory, taken EX by the vector runner"
+  },
+  "vectors": [
+    {
+      "name": "shell-alias-background",
+      "setup": "git alias defined through config that starts a background `sleep` in the shell",
+      "action": "git <alias> through run_borrowed",
+      "assert": "the lock is free (probe == free) as soon as git has exited and the owner closed its description"
+    },
+    {
+      "name": "filter-clean-smudge",
+      "setup": "clean/smudge filter whose script starts a background process",
+      "action": "git add and git checkout of a filtered file through run_borrowed",
+      "assert": "the lock is free as soon as git has exited and the owner closed its description"
+    },
+    {
+      "name": "hook-background",
+      "setup": "hook (pre-commit and post-commit) that starts a background process",
+      "action": "git commit through run_borrowed",
+      "assert": "the lock is free as soon as git has exited and the owner closed its description; leftovers are killed by run_borrowed before it returns"
+    },
+    {
+      "name": "gc-auto-loose-objects",
+      "setup": "repository config gc.auto=1 and enough loose objects to make gc --auto eligible",
+      "action": "git commit through run_borrowed",
+      "assert": "the lock is free as soon as git has exited and the owner closed its description; no gc process outlives the call"
+    }
+  ],
+  "siblingCheck": {
+    "name": "sibling-refused",
+    "meaning": "a sibling process with the same FGOS_LOCK_FD value that opened the file itself is not a borrower (lock-fd --borrowed-check answers not-borrower)"
+  },
+  "stdout": {
+    "v": 1,
+    "protocol": 1,
+    "result": { "enum": ["pass", "fail"] },
+    "vectors": [{ "name": "string", "result": { "enum": ["pass", "fail"] }, "elapsedMs": "number", "detail": "string" }],
+    "sibling": { "result": { "enum": ["pass", "fail"] }, "detail": "string" },
+    "gitVersion": "string",
+    "elapsedMs": "number"
+  },
+  "budget": { "totalElapsedMs": 1000, "meaning": "the full run stays under one second on the reference machine; exceeding it is reported in detail, not a failure by itself" },
+  "exitCodes": {
+    "0": "pass: all vectors and the sibling check green",
+    "2": "usage error",
+    "3": "host-version-mismatch",
+    "10": "fail: at least one vector red",
+    "12": "unavailable (no git, unsupported platform): treated as fail by activate",
+    "70": "internal error"
+  }
+}

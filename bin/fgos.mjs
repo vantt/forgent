@@ -2658,10 +2658,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         if ((positional[1] ?? 'plan') === 'plan') {
           // F1: --cwd names the specific working directory whose per-cwd
-          // dispatch lock clear-cwd-lock targets -- distinct from --dir
-          // above (the main checkout root). Omitted, the use case's own
-          // default (the CLI process's real process.cwd()) applies, same
-          // ergonomics as running the command from inside the stuck cwd.
+          // dispatch lock clear-cwd-lock reports on (held or free; it never
+          // clears a kernel lock) -- distinct from --dir above (the main
+          // checkout root). Omitted, the use case's own default (the CLI
+          // process's real process.cwd()) applies, same ergonomics as
+          // running the command from inside the cwd in question.
           const runParam = flags.run ?? flags['run-id'];
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({

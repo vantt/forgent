@@ -1262,7 +1262,7 @@ export const COMMAND_REGISTRY = [
             action: { type: 'string', description: '"plan" only: the action kind to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), or "repair-projection" (requires --run).' },
             run: { type: 'string', description: '"plan" only: target runId for collect-result or repair-projection.' },
             'run-id': { type: 'string', description: '"plan" only: same as --run.' },
-            cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock targets (default: the current directory).' },
+            cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock reports on (default: the current directory).' },
             plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
             provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
             account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/config.json.' },

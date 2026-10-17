@@ -16,139 +16,14 @@ import { inspectDispatchRuntime, clearAllRunsCache, withRunsCache } from './runt
 // test/runner/dispatch-reconciliation-import-graph.test.mjs).
 import { RUN_STATUSES } from './visibility-session.mjs';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+// The lock door: reconcile's own apply mutex and the per-cwd dispatch lock it
+// reports on are kernel locks (the import-graph test pins the door's files).
+import { acquireSync, createLockScope } from '../../holder-lock/index.mjs';
+import { dispatchCwdHolder } from './cwd-lock.mjs';
 
 const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map(stable).join(',')}]` : `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`) : JSON.stringify(v);
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
-// Paren-aware /proc/<pid>/stat parser, deliberately kept as its own copy
-// rather than importing detached-run-supervisor.mjs's getProcessStartTime: that
-// module is the cli-spawn ADAPTER (it also owns child_process.spawn, worker
-// PGID signalling, receipt publication) and importing any one export from it
-// would put the whole adapter/process-control module on this file's import
-// graph, which the file-top comment and
-// test/runner/dispatch-reconciliation-import-graph.test.mjs's own static
-// import-graph walk both forbid. The algorithm below is intentionally
-// byte-identical to
-// getProcessStartTime's: split on the LAST ")" so a comm field containing
-// spaces or parens (e.g. "(some (weird) name)") never desyncs the fixed-index
-// fields that follow it, then take field 19 (starttime) of the
-// space-separated remainder. A regression test in
-// test/runner/dispatch-reconciliation.test.mjs pins the two parsers to
-// agreement on a comm-with-space fixture.
-function startTime(pid) {
-  let stat;
-  try {
-    stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
-  } catch (err) {
-    if (err && err.code === 'ENOENT') {
-      try {
-        process.kill.call(process, pid, 0);
-        return undefined;
-      } catch (killErr) {
-        if (killErr && killErr.code === 'EPERM') return undefined;
-      }
-    }
-    // ENOENT on a procfs-capable host proves the incarnation is gone; on
-    // hosts without /proc (macOS), a live `kill(pid, 0)` result means the
-    // stat path is unsupported, not dead proof.
-    return err && err.code === 'ENOENT' ? null : undefined;
-  }
-  const lastParen = stat.lastIndexOf(')');
-  if (lastParen === -1) return undefined;
-  const rest = stat.slice(lastParen + 2).split(' ');
-  // A truncated line (fewer than the 20 fixed-index fields starttime at
-  // index 19 requires) is a read/format anomaly this parser cannot
-  // interpret, not proof of anything -- it must return `undefined`
-  // (ambiguous) the same as any other unparseable line, never fall through
-  // to `rest[19] || null`, which would misread "field absent because the
-  // line was cut short" as "field present but empty" and collapse into the
-  // confirmed-dead `null` signal.
-  if (rest.length < 20) return undefined;
-  return rest[19] || null;
-}
-// USER_HZ (clock ticks per second) that /proc/<pid>/stat's starttime field
-// (index 19, clock ticks since boot) is expressed in. 100 is the value on
-// every mainstream Linux distro's default kernel config and is what this
-// host's own `getconf CLK_TCK` reports -- but it is a kernel build-time
-// constant this process cannot query directly, so `verifyUserHz` below is a
-// load-once tripwire against that specific assumption being wrong on some
-// other host, not a per-call check.
-const USER_HZ = 100;
-let userHzVerified;
-function readBtimeMs() {
-  let stat;
-  try {
-    stat = fs.readFileSync('/proc/stat', 'utf8');
-  } catch {
-    return undefined;
-  }
-  const match = /^btime (\d+)$/m.exec(stat);
-  return match ? Number(match[1]) * 1000 : undefined;
-}
-// Computes this OWN process's start time via /proc/self/stat + /proc/stat's
-// btime (the exact conversion cwdLockHolder below applies to a lock's
-// holder pid) and compares it against Node's own trusted
-// `Date.now() - process.uptime() * 1000` -- a value this process did not
-// derive from USER_HZ at all. Agreement within a few seconds is cheap
-// evidence the USER_HZ=100 assumption holds on this host; disagreement
-// means the conversion cannot be trusted for ANY pid, so every subsequent
-// call falls back to 'ambiguous' rather than risking a wrong dead/live
-// verdict off a silently-mistaken tick rate.
-function verifyUserHz() {
-  if (userHzVerified !== undefined) return userHzVerified;
-  const ticks = startTime(process.pid);
-  const btimeMs = readBtimeMs();
-  if (typeof ticks !== 'string' || !/^\d+$/.test(ticks) || btimeMs === undefined) {
-    userHzVerified = false;
-    return userHzVerified;
-  }
-  const computedStartMs = btimeMs + Number(ticks) * (1000 / USER_HZ);
-  const realStartMs = Date.now() - process.uptime() * 1000;
-  userHzVerified = Math.abs(computedStartMs - realStartMs) <= 2000;
-  return userHzVerified;
-}
-// Dead-margin (D05 fail-closed insurance, not a TTL): tick-rate rounding and
-// scheduling jitter between reading `now`/btime and the kernel's own
-// starttime sample can legitimately disagree by a small amount even for the
-// SAME incarnation -- 5s comfortably absorbs that noise without weakening
-// the reuse proof, which needs a materially LATER start time, not a
-// millisecond one.
-const CWD_LOCK_DEAD_MARGIN_MS = 5000;
-// Real production record shape for the per-cwd dispatch lock
-// (main-checkout-lock.mjs's own tryAcquireOnce, written under the filename
-// dispatchLockFile(cwd) computes): `{pid: "<pid>:<acquiredAtMs>:<rand>", ts:
-// <int>}`, where `pid` is a composite identity string, never a bare
-// integer. Distinct from holder() below, which parses withLocalLock's own
-// `{pid: integer, startTime: string}` reclaim-marker shape -- never reused
-// for a lock that DOES have a real, known production shape (H1's own class
-// of defect: matching a fixture instead of the real writer).
-const CWD_LOCK_IDENTITY_RE = /^(\d+):(\d+):[a-z0-9]+$/;
-function cwdLockHolder(lock) {
-  if (!lock || typeof lock !== 'object' || typeof lock.pid !== 'string') return { state: 'unparseable' };
-  const match = CWD_LOCK_IDENTITY_RE.exec(lock.pid);
-  if (!match) return { state: 'unparseable' };
-  const pid = Number(match[1]);
-  const identityTs = Number(match[2]);
-  if (!Number.isInteger(lock.ts) || lock.ts < identityTs) return { state: 'unparseable' };
-  const incarnation = `pid:${pid}:acquired:${identityTs}`;
-  const ticks = startTime(pid);
-  // ENOENT: the incarnation that acquired this lock is confirmed gone.
-  if (ticks === null) return { state: 'dead', pid, incarnation };
-  // Any other read/parse failure proves nothing either way -- same
-  // ambiguous-not-dead discipline as holder() above.
-  if (ticks === undefined) return { state: 'ambiguous', pid };
-  if (!verifyUserHz()) return { state: 'ambiguous', pid };
-  const btimeMs = readBtimeMs();
-  if (btimeMs === undefined || !/^\d+$/.test(ticks)) return { state: 'ambiguous', pid };
-  const startWallMs = btimeMs + Number(ticks) * (1000 / USER_HZ);
-  // A materially LATER start time than the identity's own acquisition ts is
-  // proof a different, later-started process now holds this pid -- reuse,
-  // not the same incarnation. NEVER lock age/TTL here (D04): a live,
-  // same-or-earlier-started incarnation is fail-closed live regardless of
-  // how long it has held the lock.
-  if (startWallMs > identityTs + CWD_LOCK_DEAD_MARGIN_MS) return { state: 'dead', pid, incarnation };
-  return { state: 'live', pid, incarnation };
-}
 // The Run's REAL control epoch, off run-lock.mjs's own generation ledger
 // (`control/generations/`) -- never a `controlEpoch` field copied onto some
 // OTHER JSON blob (run.json, a lock, a claim), which nothing fences against
@@ -186,42 +61,15 @@ const SETTLED_STATUS = 'settled';
 if (!RUN_STATUSES.includes(SETTLED_STATUS)) throw new Error('reconciliation-planner: repair-projection target status must be a member of visibility-session.mjs RUN_STATUSES');
 const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha256').update(stable({ snapshot, action, expiresAt })).digest('hex')}`;
 
-// Real production per-cwd dispatch lock file, matching
-// main-checkout-lock.mjs's own dispatchLockFile(cwd) filename computation --
-// a local one-liner, deliberately NOT importing dispatchLockFile itself
-// (main-checkout-lock.mjs is a lock-acquisition primitive, not one of this
-// module's own read-only guard/projection imports; see the file-top
-// comment). test/runner/dispatch-reconciliation.test.mjs pins this
-// computation to agreement with the real dispatchLockFile export so the two
-// can never silently drift apart.
-function lockFile(root, cwd) { return path.join(root, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
-function localLock(root) { return path.join(root, '.fgos', 'dispatch', 'reconcile.lock'); }
 function resultFile(runDir) { return path.join(runDir, 'result.json'); }
 // Plans arrive over a public CLI boundary.  A path in one is descriptive only;
 // apply derives its actual target from the trusted root and action kind.
-function canonicalAction(root, kind, cwd) {
-  if (kind === 'clear-cwd-lock') return { kind, path: lockFile(root, cwd), cwd };
+function canonicalAction(kind, cwd) {
+  if (kind === 'clear-cwd-lock') return { kind, cwd };
   return null;
 }
 function records(root) { try { return fs.readFileSync(actionLog(root), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse); } catch { return []; } }
-function holder(lock) {
-  if (!lock || typeof lock !== 'object' || !Number.isInteger(lock.pid) || lock.pid < 1) return { state: 'unparseable' };
-  const recorded = String(lock.startTime ?? lock.processStartTime ?? '');
-  const actual = startTime(lock.pid);
-  if (!recorded) return { state: 'ambiguous', pid: lock.pid };
-  // startTime() returning `undefined` means the read itself failed for a
-  // reason OTHER than the process being gone (EACCES, EIO, an unparseable
-  // /proc line) -- that is a fact we could not observe, not proof of death,
-  // so it must fall to the same 'ambiguous' -> needs-input outcome as a
-  // holder with no recorded start time at all. Only a confirmed absence
-  // (`null`, ENOENT) or a confirmed mismatch (a live but different
-  // incarnation reusing the pid) counts as proof of death.
-  if (actual === undefined) return { state: 'ambiguous', pid: lock.pid };
-  if (actual === null || actual !== recorded) return { state: 'dead', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
-  return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
-}
-
 export const RECONCILE_RUN_REQUIRES_ACTION = 'dispatch reconcile plan with --run requires --action (e.g. collect-result or repair-projection)';
 
 export function planReconciliation(root, { action = 'clear-cwd-lock', runId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {
@@ -231,21 +79,12 @@ export function planReconciliation(root, { action = 'clear-cwd-lock', runId, cwd
     }
     if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
     if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
-    const proposedAction = canonicalAction(root, action, cwd);
-    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
-    const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
-    if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
-    if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
-    const proof = cwdLockHolder(lock);
-    if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
-    if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
-    // No `controlEpoch` field here: the real production record
-    // ({pid, ts}, see lockFile's doc comment) never carries one, and the
-    // full-byte `digest` below already detects any successor rewrite of this
-    // exact file -- an inert, always-null field would add nothing a real
-    // writer could ever populate.
-    const snapshot = { digest: digest({ raw }), resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
-    return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
+    if (!canonicalAction(action, cwd)) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
+    // The per-cwd dispatch lock is a kernel lock: a holder that dies has
+    // already released it, so there is never a dead holder's lock to clear.
+    // The plan only reports whether a live dispatch holds it.
+    if (dispatchCwdHolder(path.join(root, '.fgos'), cwd)) return { outcome: 'refused', reason: 'cwd lock is held by a live dispatch' };
+    return { outcome: 'blocked', reason: 'no cwd lock is held' };
   });
 }
 
@@ -370,52 +209,23 @@ function planRepairProjection(root, { runId, now, ttlMs }) {
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['terminal-result-valid', 'status-stale', 'projection-epoch-matches'] };
 }
 
-// M9a: this module already has everything a dead-holder reclaim needs
-// (`startTime`/`holder`, the exact {pid, startTime} proof) -- withLocalLock
-// itself never used any of it. A crashed applyReconciliation/
-// applyCollectResult/applyRepairProjection call used to leave
-// reconcile.lock wedged FOREVER (no TTL, no reclaim at all), blocking every
-// future reconcile apply on this host. Reclaim only ever fires on
-// `holder(...).state === 'dead'` -- the same PID+startTime proof, never
-// elapsed time alone.
+// One reconcile apply at a time per repo: a kernel mutex at
+// `<fgosDir>/locks/reconcile.lock`, one try. A crashed apply released it when
+// it died, so nothing here ever judges a holder alive or dead.
 function withLocalLock(root, fn) {
-  const file = localLock(root); fs.mkdirSync(path.dirname(file), { recursive: true });
-  const record = { pid: process.pid, startTime: startTime(process.pid) };
-  let fd;
+  const res = acquireSync(createLockScope('reconcile'), 'reconcile', { fgosDir: path.join(root, '.fgos') });
+  if (res.result !== 'acquired') return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
   try {
-    fd = fs.openSync(file, 'wx');
-  } catch (e) {
-    if (e.code !== 'EEXIST') throw e;
-    let existing;
-    try {
-      existing = JSON.parse(fs.readFileSync(file, 'utf8'));
-    } catch {
-      return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
-    }
-    if (holder(existing).state !== 'dead') {
-      return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
-    }
-    try { fs.unlinkSync(file); } catch { /* raced with the dead holder's own cleanup -- fine either way */ }
-    try {
-      fd = fs.openSync(file, 'wx');
-    } catch (retryErr) {
-      if (retryErr.code === 'EEXIST') return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
-      throw retryErr;
-    }
-  }
-  try {
-    fs.writeSync(fd, JSON.stringify(record));
+    fs.mkdirSync(path.dirname(actionLog(root)), { recursive: true });
     return fn();
   } finally {
-    fs.closeSync(fd);
-    try { fs.unlinkSync(file); } catch {}
+    res.handle.release();
   }
 }
 
 // collect-result's own target (a specific run.json, keyed by runId) cannot be
-// re-derived from `root` and `action` kind alone the way clear-cwd-lock's
-// single global cwd-lock file can -- it needs the runId too. Kept as its own
-// apply path rather than folding into canonicalAction()'s (root, kind) shape.
+// re-derived from the action kind alone -- it needs the runId too. Kept as its
+// own apply path rather than folding into canonicalAction()'s (kind, cwd) shape.
 function applyCollectResult(root, plan, { now }) {
   const runId = plan?.proposedAction?.runId;
   if (!plan?.actionKey || !plan?.snapshot || typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
@@ -433,11 +243,9 @@ function applyCollectResult(root, plan, { now }) {
     const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
     if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
     const runDir = path.dirname(plan.proposedAction.path);
-    // Writer parity with clear-cwd-lock's own pre-mutation re-read (see
-    // below): unlike a lock's delete-semantics, collect-result's goal state
-    // (a persisted marker) is never satisfied by an absent file, so ENOENT
-    // here is always plan-stale (facts changed), never "goal already
-    // achieved" -- that shortcut only fits an action whose goal IS absence.
+    // Re-read before the write: collect-result's goal state (a persisted
+    // marker) is never satisfied by an absent file, so ENOENT here is always
+    // plan-stale (facts changed), never "goal already achieved".
     let raw;
     try {
       raw = fs.readFileSync(resultFile(runDir), 'utf8');
@@ -462,12 +270,11 @@ function applyCollectResult(root, plan, { now }) {
   });
 }
 
-// clear-cwd-lock's delete-semantics apply (below) unlinks a file;
-// repair-projection instead additively patches run.json.status the same way visibility-session.mjs's
+// repair-projection additively patches run.json.status the same way visibility-session.mjs's
 // own markRunSettled does (status + settledAt), the same shape as
 // applyCollectResult -- kept as its own function for the same reason
 // collect-result is: its target depends on a caller-supplied runId that
-// canonicalAction()'s (root, kind) shape cannot carry.
+// canonicalAction()'s (kind, cwd) shape cannot carry.
 //
 // This deliberately does NOT call markRunSettled itself, for two reasons:
 //   1. markRunSettled stamps `settledAt` from its own `new Date()`, not from
@@ -532,68 +339,12 @@ export function applyReconciliation(root, plan, { now = new Date().toISOString()
   return withRunsCache(runsCache, () => {
     if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
     if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
-    const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
+    const canonical = canonicalAction(plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
     if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
-    // Do this before looking up a prior record: a replay must not turn a
-    // caller-controlled path/action-key combination into an authorization.
     if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
-    return withLocalLock(root, () => {
-      const prior = records(root).find((r) => r.actionKey === plan.actionKey);
-    if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
-    if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
-    const fresh = planReconciliation(root, { action: canonical.kind, cwd: canonical.cwd, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
-    if (fresh.outcome !== 'planned' || stable(fresh.snapshot) !== stable(plan.snapshot)) return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'guard facts changed since planning' };
-    const expectedActionKey = actionKey(fresh.snapshot, canonical, fresh.snapshot.expiresAt);
-    if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
-    // no-active-run-for-holder (the second precondition planReconciliation
-    // already names): a dead cwd-lock holder does not mean the Run it was
-    // guarding is actually finished -- a successor process could be mid
-    // launch against this same cwd with no result.json written yet. Reuse
-    // the real read-only Run/admission view (runtime-inspection.mjs's own
-    // --cwd selector) instead of trusting the unverified precondition
-    // string. activeRunIds is populated purely from Run materialization
-    // (run.json present, result.json absent) and is computed before that
-    // view's own ownership/evidence-completeness checks, so it is reliable
-    // even when the rest of the view is only 'partial'.
-    // F1: `canonical.cwd` -- the specific cwd this per-cwd lock was
-    // acquired for -- not `root` (the repo/.fgos root, a different thing
-    // now that one root can hold many per-cwd locks). Using `root` here
-    // would check the wrong cwd's active-Run bindings whenever a caller's
-    // cwd differs from the repo root.
-    const runtimeView = inspectDispatchRuntime(root, { cwd: canonical.cwd });
-    const activeRunIds = runtimeView.observations?.[0]?.value?.activeRunIds ?? [];
-    if (activeRunIds.length > 0) return { outcome: 'blocked', reason: `active Run(s) still bound to this holder's cwd: ${activeRunIds.join(', ')}` };
-    if (runtimeView.inspectionStatus === 'partial' || runtimeView.inspectionStatus === 'conflicting' || runtimeView.inspectionStatus === 'ambiguous') {
-      return { outcome: 'needs-input', reason: 'dispatch runtime inspection for this cwd is incomplete or conflicting; no-active-run-for-holder cannot be verified' };
-    }
-    // Re-read the canonical guard bytes immediately before unlink -- writer
-    // parity with tryAcquireOnce's own reclaim (src/runner/main-checkout-lock.mjs
-    // lines 304-323): any successor guard visible at this re-read (changed
-    // digest) survives untouched (plan-stale below). The residual window
-    // between this read and the unlink syscall itself is the same accepted,
-    // inherent-to-POSIX-pathname-locks race tryAcquireOnce and
-    // releaseMainCheckoutLockIfOwn already carry for the identical
-    // dead-holder-reclaim scenario -- not closable without a writer-side
-    // protocol change (every dispatch-lock writer taking a sidecar
-    // meta-lock), recorded as accepted residual risk, not a defect.
-    let raw;
-    try {
-      raw = fs.readFileSync(canonical.path, 'utf8');
-    } catch (err) {
-      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'cwd lock was already removed by a concurrent cleanup' };
-      throw err;
-    }
-    if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'cwd lock changed since planning' };
-    try {
-      fs.unlinkSync(canonical.path);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-      // Goal state (guard absent) already achieved by a concurrent cleanup --
-      // same spirit as tryAcquireOnce's own unlink-ENOENT tolerance.
-    }
-    fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
-    clearAllRunsCache(root);
-    return { outcome: 'applied', actionKey: plan.actionKey };
-  });
+    // clear-cwd-lock never plans a mutation (a kernel lock has no dead
+    // holder's file to clear), so applying one only reports today's facts.
+    const fresh = planReconciliation(root, { action: canonical.kind, cwd: canonical.cwd, now });
+    return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason };
   });
 }
