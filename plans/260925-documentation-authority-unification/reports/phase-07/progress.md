@@ -197,7 +197,7 @@ resolved path, author, reviewer, digest and status here.
 | 2 | accepted | 28/28 independent semantic verdicts ok at `1d78440f9` | X-SEM-29/31 route to Step 6 duplicate handling | none |
 | 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
-| 5 | reviewing | Independent review 142/143 ok (parts 60/0, 59/1, 23/0; 94 deep); remainder 60-unit draw 0 substantive defects; rollup `review-a38-step-05-seed-and-rollup-01.md` | PARK-PROTECTED-01 import provenance; row-local | L11-17 applied (X-LOCK-05 deferred to P7-DOC-GAP-02; QF-01..13 and CONTROL-FRAME rebound); bounded re-review |
+| 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | reviewing | Four fully read copy groups; two semantic routes; six dispositions; 43 contextual bindings; one 58-entry independent request | Candidate UI compiler-root certification; generated drift routed to Phase 9; inherited protected-import proof / ratchet at Step 9 | Lead dispatches the single bounded review request |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
 | 8 | not-started | none | none | wait for sealed key |
