@@ -4,15 +4,15 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for how an fgOS event becomes durable, how it is sealed into git objects on per-machine refs, how it is shared across machines, and how it is read back
-Design status: Draft v2, amended after the reopen council (M1-M4) and after the two pre-signature proofs of section 23.1. Once the owner signs section 26, it is the contract for starting implementation under the gates of section 23. It does not claim the design is proven
+Design status: Signed by the owner on 2026-10-17 (D-ADR0055). It is the contract for starting implementation under the gates of section 23; it does not claim the design is proven.
 Implementation status: Not started
-Canonical: No (becomes canonical when the owner signs the decision in section 26)
+Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over an N-API addon of the crate
 Contracts (planned): packages/event-store/contracts/
 Last reviewed: 2026-10-17
-Supersedes on signature: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b); D-ADR0003 data layout
+Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
 - docs/platform/holder-lock/spec.md
@@ -605,7 +605,7 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 - A branch rename is not followed by the branch stream key.
 - Deleting a machine ref on the remote removes it from other clones at their next pruning fetch; the history then lives only on that machine.
 - Erasing a secret that reached a pushed ref needs a history rewrite on every clone; there is no tombstone protocol.
-- The chain grows with history, and a range walk does not make that free. In V-REF-01, on a DAG of 100,011 commits, a full `rev-list` took 224 ms and a range `A..B` took 190 ms for 90,011 commits (section 15). Ref-chain snapshot and compaction are a later item, opened when a full rebuild exceeds the budget V-SPAWN-01 fixes for reads.
+- The chain grows with history, and a range walk does not make that free. In V-REF-01, on a DAG of 100,011 commits, a full `rev-list` took 224 ms and a range `A..B` took 190 ms for 90,011 commits (section 15). Ref-chain snapshot and compaction are a later item, opened when a full rebuild exceeds the budget V-SPAWN-01 fixes for reads. Owner threshold (2026-10-17): open that item when a full rebuild exceeds 2 s on the slowest of the owner's machines.
 
 ## 23. Proof gates
 
@@ -713,7 +713,7 @@ Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The si
 
 ## 26. Decision record
 
-**D-ID `<to be minted by fgos decision; signed by the owner>` — Event truth is sealed changesets as git objects on per-machine refs.** An event is acknowledged when it is `fsync`ed in the store's open log outside the work tree, and becomes git truth when sealed, by compare-and-swap, into a commit on `refs/fgos/events/<machine-id>`; machines share by pushing the own ref and fetching the others; every view is a rebuildable cache. Supersedes L3 clause 1 ("truth = changeset JSONL committed in git, appended in the same transaction as the mutation") and clause 4 ("every write through one CLI door, single writer") of D-ID `ae461c8b`, and the data layout of D-ADR0003 (tracked `events.jsonl`, gitignored `state.json`). L3 clauses 2 and 3 (database is a view, graph store is a second-level view) stand. Review threshold: a recorded cross-machine conflict that a person had to resolve by hand more than once a month, or any acknowledged event lost while fgOS was running.
+**D-ADR0055 (signed by the owner 2026-10-17, decision log seq 65) — Event truth is sealed changesets as git objects on per-machine refs.** An event is acknowledged when it is `fsync`ed in the store's open log outside the work tree, and becomes git truth when sealed, by compare-and-swap, into a commit on `refs/fgos/events/<machine-id>`; machines share by pushing the own ref and fetching the others; every view is a rebuildable cache. Supersedes L3 clause 1 ("truth = changeset JSONL committed in git, appended in the same transaction as the mutation") and clause 4 ("every write through one CLI door, single writer") of D-ID `ae461c8b`, and the data layout of D-ADR0003 (tracked `events.jsonl`, gitignored `state.json`). L3 clauses 2 and 3 (database is a view, graph store is a second-level view) stand. Review threshold: a recorded cross-machine conflict that a person had to resolve by hand more than once a month, or any acknowledged event lost while fgOS was running.
 
 ## Changes from the draft
 
@@ -777,12 +777,7 @@ The model check ran against spec v2 before the amendment above. Each counterexam
 
 ## Open for the owner
 
-1. **Sign the decision of section 26** (supersedes L3 clauses 1 and 4 of `ae461c8b` and D-ADR0003). Nothing in this spec may be implemented as acknowledging at `fsync` before that signature. The agent tasks of section 23.1 have run, and their findings are folded into this text. The corrections they forced stay unproven until the gates of section 23.2.
-2. **Re-cut 4.3-S now** (P01, P02 and the capacity half of P04 before the Event Store cutover) to unblock 6.2 P09; the program board should record it.
-3. **Bind the claim-path item** (remaining `main-checkout` wait and any fan-out left after a4b1278ae, 4.3-S P04) on the program board as the user-visible outcome of the Event Store rollout, without making it an Event Store acceptance criterion.
-4. **Small confirmations:** machine id owned by Event Store until a machine-identity component exists; non-git directories refused; porting store scope (project or local); `eventStore.sync.intervalSec` default 300 with opportunistic push.
-
-Answered on 2026-10-17 15:13 and no longer open: cross-machine semantics (accepted), the Node-to-Rust route (N-API, no exception), the loss-budget numbers and the seal cadence (accepted as v2), and outside expertise (none; agent tasks and gates).
+Nothing in this spec is open for the owner. Signed on 2026-10-17 as D-ADR0055, with these confirmations: machine id owned by Event Store until a machine-identity component exists; non-git directories refused (to be reopened when a real non-git project needs fgOS); the porting store writes its own `project`-scope stream, never Work's; `eventStore.sync.intervalSec` 300 with opportunistic push; compaction opened when a full rebuild exceeds 2 s on the slowest machine. Earlier answers (15:13): cross-machine provisional success accepted, Node-to-Rust route N-API with no exec-guard exception, loss budget and seal cadence as written, no outside experts. The re-cut of 4.3-S and the claim-path item belong to the program board.
 
 ## Unresolved dissent
 
