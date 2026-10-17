@@ -6,16 +6,39 @@
 //!
 //! The supervisor never holds a pipe of the agent: the gate owns its IO, so a
 //! supervisor that dies mid-run changes nothing for the agent.
+//!
+//! One flow for every OS. What differs lives in `supervise/unix.rs` (the lock
+//! descriptions arrive inherited, the GO channel is a socketpair) and
+//! `supervise/windows.rs` (a `LockFileEx` lock is never inherited, so the
+//! supervisor takes it itself; the GO channel is a named pipe and the gate
+//! stops by polling `stop-requested.json`).
 
-#![cfg_attr(not(unix), allow(dead_code, unused_imports))]
-
+use std::fs::{self, File};
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
+
+use fgos_agent_protocol::direct::{adapter_for, DirectAdapter};
+use fgos_process::containment::{ContainmentDomain, ContainmentDriver, GuaranteeLevel, Spawned};
+use fgos_process::{facts, DomainState};
 
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
+use crate::envelope;
+use crate::gate::boottime_ns;
+use crate::go_channel::{read_frame, write_frame};
 use crate::publish::{iso_utc_now, publish_once};
-use crate::route::{refuse, report, Flags, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
+use crate::route::{emit, refuse, report, Flags, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
+
+#[cfg(unix)]
+mod unix;
+#[cfg(windows)]
+mod windows;
+#[cfg(unix)]
+use unix as os;
+#[cfg(windows)]
+use windows as os;
 
 /// Parsed argv of `fgos internal supervise`.
 #[derive(Debug, PartialEq, Eq)]
@@ -26,24 +49,6 @@ pub struct SuperviseArgs {
 pub fn parse_args(args: &[String]) -> Result<SuperviseArgs, crate::route::ArgsError> {
     let flags = Flags::parse(args, &["envelope"], 0)?;
     Ok(SuperviseArgs { envelope: PathBuf::from(flags.require("envelope")?) })
-}
-
-/// Run the supervisor; the return value is the process exit code.
-pub fn run(args: &[String]) -> i32 {
-    let args = match parse_args(args) {
-        Ok(args) => args,
-        Err(err) => return refuse("supervise", err),
-    };
-    #[cfg(unix)]
-    {
-        unix::run(&args)
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = args;
-        report("supervise", "unsupported-platform", "the supervisor has no Windows implementation yet");
-        EXIT_INTERNAL
-    }
 }
 
 /// The receipt outcome for what the gate left behind (`receipt.v1.json`).
@@ -118,449 +123,315 @@ pub(crate) fn publish_receipt_as(envelope: &Value, run_dir: &Path, synthesized_b
     Ok(published["outcome"].as_str().unwrap_or(outcome).to_string())
 }
 
-#[cfg(unix)]
-mod unix {
-    use std::collections::BTreeMap;
-    use std::fs::{self, File, OpenOptions};
-    use std::io::Write;
-    use std::os::fd::{AsRawFd, OwnedFd};
-    use std::os::unix::fs::OpenOptionsExt;
-    use std::os::unix::net::UnixStream;
-    use std::time::{Duration, Instant};
+/// A refusal before anything started: the exit code, the named code and the free text.
+pub(crate) struct Refusal {
+    pub exit: i32,
+    pub code: &'static str,
+    pub why: String,
+}
 
-    use fgos_agent_protocol::direct::{adapter_for, DirectAdapter};
-    use fgos_process::containment::{select, ContainmentDomain, ContainmentDriver, GuaranteeLevel, SelectEnv, SpawnSpec, Spawned, StartMode};
-    #[cfg(target_os = "linux")]
-    use fgos_process::containment::{BwrapPidns, LinuxPgroup};
-    use fgos_process::control::{signal_by_identity, take_inherited, Signal};
-    use fgos_process::{facts, DomainState, FdSlot};
-    use serde_json::{json, Value};
+impl Refusal {
+    fn internal(why: impl Into<String>) -> Refusal {
+        Refusal { exit: EXIT_INTERNAL, code: "internal", why: why.into() }
+    }
+}
 
-    use super::*;
-    use crate::route::emit;
-    use crate::envelope;
-    use crate::go_channel::{read_frame, write_frame};
+const TICK: Duration = Duration::from_millis(50);
+const HEARTBEAT_EVERY: Duration = Duration::from_secs(5);
+/// How long the gate has to say HELLO after it started.
+const HELLO_LIMIT: Duration = Duration::from_secs(15);
+/// Slack beyond `gateKillGraceMs` before the supervisor ends the domain itself.
+const GATE_STOP_SLACK: Duration = Duration::from_secs(5);
 
-    const ATTEMPT_LOCK_SLOT: u32 = 3;
-    const CWD_LEASE_SLOT: u32 = 4;
-    const GO_SLOT: u32 = 5;
-    const TICK: Duration = Duration::from_millis(50);
-    const HEARTBEAT_EVERY: Duration = Duration::from_secs(5);
-    /// How long the gate has to say HELLO after it started.
-    const HELLO_LIMIT: Duration = Duration::from_secs(15);
-    /// Slack beyond `gateKillGraceMs` before the supervisor ends the domain itself.
-    const GATE_STOP_SLACK: Duration = Duration::from_secs(5);
+/// What the watch needs from the envelope.
+struct Watch {
+    attempt_id: String,
+    digest: String,
+    run_dir: PathBuf,
+    soft_at: Option<(String, u64)>,
+    idle: Option<Duration>,
+    grace: Duration,
+    captures: [PathBuf; 2],
+    adapter: &'static dyn DirectAdapter,
+    boot_id: Option<String>,
+}
 
-    /// What the watch needs from the envelope.
-    struct Watch {
-        attempt_id: String,
-        digest: String,
-        run_dir: PathBuf,
-        soft_at: Option<(String, u64)>,
-        idle: Option<Duration>,
-        grace: Duration,
-        captures: [PathBuf; 2],
-        adapter: &'static dyn DirectAdapter,
-        boot_id: Option<String>,
+impl Watch {
+    fn from(envelope: &Value, run_dir: &Path) -> Result<Watch, String> {
+        let text = |v: &Value, what: &str| v.as_str().map(String::from).ok_or_else(|| format!("envelope field {what} missing"));
+        let soft_at = match (envelope["deadlines"]["softAt"]["bootId"].as_str(), envelope["deadlines"]["softAt"]["boottimeNs"].as_u64()) {
+            (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
+            _ => None,
+        };
+        Ok(Watch {
+            attempt_id: text(&envelope["attemptId"], "attemptId")?,
+            digest: text(&envelope["digest"], "digest")?,
+            run_dir: run_dir.to_path_buf(),
+            soft_at,
+            idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
+            grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
+            captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
+            adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
+            boot_id: facts::boot_id(),
+        })
     }
 
-    impl Watch {
-        fn from(envelope: &Value, run_dir: &Path) -> Result<Watch, String> {
-            let text = |v: &Value, what: &str| v.as_str().map(String::from).ok_or_else(|| format!("envelope field {what} missing"));
-            let soft_at = match (envelope["deadlines"]["softAt"]["bootId"].as_str(), envelope["deadlines"]["softAt"]["boottimeNs"].as_u64()) {
-                (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
-                _ => None,
-            };
-            Ok(Watch {
-                attempt_id: text(&envelope["attemptId"], "attemptId")?,
-                digest: text(&envelope["digest"], "digest")?,
-                run_dir: run_dir.to_path_buf(),
-                soft_at,
-                idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
-                grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
-                captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
-                adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
-                boot_id: facts::boot_id(),
-            })
-        }
-
-        fn soft_deadline_passed(&self) -> bool {
-            let Some((boot_id, at)) = &self.soft_at else { return false };
-            // Another boot than the recorded one: the instant is meaningless, treat it as past.
-            self.boot_id.as_ref().is_some_and(|current| current != boot_id) || boottime_ns() >= *at
-        }
-
-        fn cancel_requested(&self) -> bool {
-            fs::read_to_string(self.run_dir.join("cancel-requested.json"))
-                .ok()
-                .and_then(|t| serde_json::from_str::<Value>(&t).ok())
-                .is_some_and(|v| v["attemptId"] == self.attempt_id.as_str())
-        }
+    fn soft_deadline_passed(&self) -> bool {
+        let Some((boot_id, at)) = &self.soft_at else { return false };
+        // Another boot than the recorded one: the instant is meaningless, treat it as past.
+        self.boot_id.as_ref().is_some_and(|current| current != boot_id) || boottime_ns() >= *at
     }
 
-    fn boottime_ns() -> u64 {
-        let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
-        #[cfg(target_os = "linux")]
-        let clock = libc::CLOCK_BOOTTIME;
-        #[cfg(not(target_os = "linux"))]
-        let clock = libc::CLOCK_MONOTONIC;
-        // SAFETY: clock_gettime writes one timespec.
-        unsafe { libc::clock_gettime(clock, &mut ts) };
-        ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64
+    fn cancel_requested(&self) -> bool {
+        fs::read_to_string(self.run_dir.join("cancel-requested.json"))
+            .ok()
+            .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+            .is_some_and(|v| v["attemptId"] == self.attempt_id.as_str())
     }
+}
 
-    /// New capture bytes since the last look, judged by the adapter.
-    struct CaptureTail {
-        offsets: [u64; 2],
-    }
+/// New capture bytes since the last look, judged by the adapter.
+struct CaptureTail {
+    offsets: [u64; 2],
+}
 
-    impl CaptureTail {
-        fn active(&mut self, watch: &Watch) -> bool {
-            use std::io::{Read, Seek, SeekFrom};
-            let mut active = false;
-            for (offset, path) in self.offsets.iter_mut().zip(&watch.captures) {
-                let Ok(mut file) = File::open(path) else { continue };
-                if file.seek(SeekFrom::Start(*offset)).is_err() {
-                    continue;
-                }
-                let mut delta = Vec::new();
-                if file.take(64 * 1024).read_to_end(&mut delta).is_ok() && !delta.is_empty() {
-                    *offset += delta.len() as u64;
-                    active |= watch.adapter.activity_from(&String::from_utf8_lossy(&delta)).is_active();
-                }
+impl CaptureTail {
+    fn active(&mut self, watch: &Watch) -> bool {
+        use std::io::{Read, Seek, SeekFrom};
+        let mut active = false;
+        for (offset, path) in self.offsets.iter_mut().zip(&watch.captures) {
+            let Ok(mut file) = File::open(path) else { continue };
+            if file.seek(SeekFrom::Start(*offset)).is_err() {
+                continue;
             }
-            active
+            let mut delta = Vec::new();
+            if file.take(64 * 1024).read_to_end(&mut delta).is_ok() && !delta.is_empty() {
+                *offset += delta.len() as u64;
+                active |= watch.adapter.activity_from(&String::from_utf8_lossy(&delta)).is_active();
+            }
+        }
+        active
+    }
+}
+
+fn write_atomic(dir: &Path, name: &str, value: &Value) -> std::io::Result<()> {
+    let temp = dir.join(format!(".{name}.tmp.{}", std::process::id()));
+    let mut file = os::create_private(&temp)?;
+    file.write_all(&serde_json::to_vec(value).map_err(std::io::Error::other)?)?;
+    drop(file);
+    fs::rename(&temp, dir.join(name))
+}
+
+/// Run the supervisor; the return value is the process exit code.
+pub fn run(args: &[String]) -> i32 {
+    let args = match parse_args(args) {
+        Ok(args) => args,
+        Err(err) => return refuse("supervise", err),
+    };
+    match supervise(&args) {
+        Ok(code) => code,
+        Err(refusal) => {
+            report("supervise", refusal.code, &refusal.why);
+            refusal.exit
         }
     }
+}
 
-    /// An inherited descriptor handed to this process: close-on-exec first.
-    fn take_slot(slot: u32) -> Option<File> {
-        take_inherited(FdSlot(slot)).ok()
+fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
+    // Before any other syscall: nothing this process spawns may inherit a lock.
+    let mut locks = os::Locks::early()?;
+
+    let envelope = envelope::read_verified(&args.envelope).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
+    if !envelope::host_bin_is_current(&envelope) {
+        return Err(Refusal { exit: EXIT_VERSION_MISMATCH, code: "host-version-mismatch", why: "the envelope names another host binary than the one running".into() });
+    }
+    let invalid = |why: &str| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why: why.into() };
+    let run_dir = envelope["runDir"].as_str().map(PathBuf::from).ok_or_else(|| invalid("runDir missing"))?;
+    if envelope["mode"] != "direct" {
+        return Err(Refusal::internal("only the direct mode is supervised by this route"));
+    }
+    locks.complete(&envelope, &run_dir)?;
+    let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
+
+    let driver = open_driver(&envelope).map_err(Refusal::internal)?;
+    let mut domain = driver.create(&watch.attempt_id).map_err(|why| Refusal::internal(why.to_string()))?;
+    let mut link = os::GoLink::new(&domain).map_err(Refusal::internal)?;
+    let spec = os::gate_spec(&envelope, &run_dir, &locks, &mut link, &domain).map_err(Refusal::internal)?;
+    let mut spawned = driver.spawn_in(&mut domain, spec).map_err(|why| Refusal::internal(format!("gate did not start: {why}")))?;
+    let gate_started = Instant::now();
+
+    // The domain is on record before the gate may run anything.
+    if let Err(why) = bind(&envelope, &run_dir, &locks, &*driver, &domain, &spawned) {
+        let _ = driver.kill_all(&mut domain, 0);
+        return Err(Refusal::internal(why));
     }
 
-    fn poll_readable(fd: libc::c_int, timeout: Duration) -> bool {
-        let mut p = [libc::pollfd { fd, events: libc::POLLIN, revents: 0 }];
-        // SAFETY: poll over one valid pollfd.
-        unsafe { libc::poll(p.as_mut_ptr(), 1, timeout.as_millis().min(i32::MAX as u128) as libc::c_int) > 0 }
-    }
-
-    fn driver_for(preferred: &str, bwrap: Option<PathBuf>) -> Result<Box<dyn ContainmentDriver>, String> {
-        // The envelope names the driver; Linux builds it directly so a machine
-        // with bwrap can still run a `linux-pgroup` envelope.
-        #[cfg(target_os = "linux")]
-        let driver: Box<dyn ContainmentDriver> = match preferred {
-            "linux-pgroup" => Box::new(LinuxPgroup),
-            "linux-gate" if bwrap.is_some() => Box::new(BwrapPidns::new(bwrap.clone().unwrap())),
-            _ => select(&SelectEnv { bwrap }).map_err(|e| e.to_string())?,
-        };
-        #[cfg(not(target_os = "linux"))]
-        let driver: Box<dyn ContainmentDriver> = select(&SelectEnv { bwrap }).map_err(|e| e.to_string())?;
-        let name = match driver.name() {
-            "bwrap-pidns" => "linux-gate",
-            other => other,
-        };
-        if name != preferred {
-            return Err(format!("the envelope asks for {preferred} but this machine gives {name}"));
-        }
-        Ok(driver)
-    }
-
-    fn write_atomic(dir: &Path, name: &str, value: &Value) -> std::io::Result<()> {
-        let temp = dir.join(format!(".{name}.tmp.{}", std::process::id()));
-        let mut file = OpenOptions::new().write(true).create(true).truncate(true).mode(0o600).open(&temp)?;
-        file.write_all(&serde_json::to_vec(value).map_err(std::io::Error::other)?)?;
-        fs::rename(&temp, dir.join(name))
-    }
-
-    pub fn run(args: &SuperviseArgs) -> i32 {
-        // Before any other syscall: nothing this process spawns may inherit a lock.
-        let Some(attempt_lock) = take_slot(ATTEMPT_LOCK_SLOT) else {
-            report("supervise", "fd-invalid", "descriptor 3 (the attempt lock) was not handed over");
-            return EXIT_INTERNAL;
-        };
-
-        let envelope = match envelope::read_verified(&args.envelope) {
-            Ok(envelope) => envelope,
-            Err(why) => {
-                report("supervise", "envelope-invalid", &why);
-                return EXIT_ENVELOPE_INVALID;
-            }
-        };
-        if !envelope::host_bin_is_current(&envelope) {
-            report("supervise", "host-version-mismatch", "the envelope names another host binary than the one running");
-            return EXIT_VERSION_MISMATCH;
-        }
-        // Slot 4 is a lease only for a mutating attempt; anything else there is not ours.
-        let mut cwd_lease = if envelope["mutation"] == "mutating" { take_slot(CWD_LEASE_SLOT) } else { None };
-        let Some(run_dir) = envelope["runDir"].as_str().map(PathBuf::from) else {
-            report("supervise", "envelope-invalid", "runDir missing");
-            return EXIT_ENVELOPE_INVALID;
-        };
-        if envelope["mode"] != "direct" {
-            report("supervise", "internal", "only the direct mode is supervised by this route");
-            return EXIT_INTERNAL;
-        }
-        if envelope["mutation"] == "mutating" && cwd_lease.is_none() {
-            report("supervise", "fd-invalid", "a mutating attempt needs descriptor 4 (the cwd lease)");
-            return EXIT_INTERNAL;
-        }
-        let watch = match Watch::from(&envelope, &run_dir) {
-            Ok(watch) => watch,
-            Err(why) => {
-                report("supervise", "envelope-invalid", &why);
-                return EXIT_ENVELOPE_INVALID;
-            }
-        };
-
-        let driver = match open_driver(&envelope) {
-            Ok(driver) => driver,
-            Err(why) => {
-                report("supervise", "internal", &why);
-                return EXIT_INTERNAL;
-            }
-        };
-        let mut domain = match driver.create(&watch.attempt_id) {
-            Ok(domain) => domain,
-            Err(why) => {
-                report("supervise", "internal", &why.to_string());
-                return EXIT_INTERNAL;
-            }
-        };
-        let (mine, theirs) = match UnixStream::pair() {
-            Ok(pair) => pair,
-            Err(why) => {
-                report("supervise", "internal", &format!("socketpair: {why}"));
-                return EXIT_INTERNAL;
-            }
-        };
-
-        let spec = match gate_spec(&envelope, &run_dir, &attempt_lock, cwd_lease.as_ref(), theirs) {
-            Ok(spec) => spec,
-            Err(why) => {
-                report("supervise", "internal", &why);
-                return EXIT_INTERNAL;
-            }
-        };
-        let mut spawned = match driver.spawn_in(&mut domain, spec) {
-            Ok(spawned) => spawned,
-            Err(why) => {
-                report("supervise", "internal", &format!("gate did not start: {why}"));
-                return EXIT_INTERNAL;
-            }
-        };
-        let gate_started = Instant::now();
-
-        // The domain is on record before the gate may run anything.
-        if let Err(why) = bind(&envelope, &run_dir, &*driver, &domain, &spawned) {
-            let _ = driver.kill_all(&mut domain, 0);
-            report("supervise", "internal", &why);
-            return EXIT_INTERNAL;
-        }
-
-        let mut go = mine;
-        let hello = wait_for_hello(&mut go, &mut spawned, gate_started);
-        let mut sent_go = false;
-        if hello {
+    let mut sent_go = false;
+    if let Some(mut go) = link.open(&mut spawned.child, gate_started) {
+        if wait_for_hello(&mut go, &mut spawned, gate_started) {
             let tuple = spawned.root.to_record().to_json();
             sent_go = write_frame(&mut go, &json!({"type": "GO", "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "gateHostTuple": tuple})).is_ok();
-        }
-        if !sent_go {
-            // Without GO the gate runs nothing and leaves by itself; make sure.
-            let _ = driver.kill_all(&mut domain, 0);
         }
         if sent_go {
             watch_gate(&watch, &mut go, &*driver, &mut domain, &mut spawned);
         }
-        let _ = spawned.child.wait();
+    }
+    if !sent_go {
+        // Without GO the gate runs nothing and leaves by itself; make sure.
+        let _ = driver.kill_all(&mut domain, 0);
+    }
+    let _ = spawned.child.wait();
 
-        // The domain must be empty before the lease goes: the gate normally
-        // ended it; a best-effort driver may need one more sweep.
-        if driver.is_empty(&mut domain) != DomainState::Empty {
-            let _ = driver.kill_all(&mut domain, 0);
+    // The domain must be empty before the lease goes: the gate normally
+    // ended it; a best-effort driver may need one more sweep.
+    if driver.is_empty(&mut domain) != DomainState::Empty {
+        let _ = driver.kill_all(&mut domain, 0);
+    }
+    // The gate is gone: the cwd lease is released now, not after the steps.
+    locks.release_cwd();
+
+    let outcome = publish_receipt(&envelope, &run_dir).map_err(|why| Refusal::internal(format!("receipt.json not published: {why}")))?;
+    let steps = crate::steps::run_steps(&envelope, &run_dir);
+    let (result, pending) = match &steps {
+        crate::steps::StepsOutcome::Done(ids) => {
+            let closed = json!({"v": 1, "attemptId": watch.attempt_id, "closedBy": "supervisor", "steps": ids, "at": iso_utc_now()});
+            serde_json::to_vec(&closed).map_err(std::io::Error::other).and_then(|b| publish_once(&run_dir, "closed.json", &b)).map_err(|why| Refusal::internal(format!("closed.json not published: {why}")))?;
+            ("closed", None)
         }
-        // The gate is gone: the cwd lease is released now, not after the steps.
-        drop(cwd_lease.take());
-
-        let outcome = match publish_receipt(&envelope, &run_dir) {
-            Ok(outcome) => outcome,
-            Err(why) => {
-                report("supervise", "internal", &format!("receipt.json not published: {why}"));
-                return EXIT_INTERNAL;
+        other => {
+            if let crate::steps::StepsOutcome::Retry { reason, .. } | crate::steps::StepsOutcome::Failed { reason, .. } = other {
+                eprintln!("fgos internal supervise: step {} left open: {reason}", other.pending().unwrap_or("?"));
             }
-        };
-        let steps = crate::steps::run_steps(&envelope, &run_dir);
-        let (result, pending) = match &steps {
-            crate::steps::StepsOutcome::Done(ids) => {
-                let closed = json!({"v": 1, "attemptId": watch.attempt_id, "closedBy": "supervisor", "steps": ids, "at": iso_utc_now()});
-                if let Err(why) = serde_json::to_vec(&closed).map_err(std::io::Error::other).and_then(|b| publish_once(&run_dir, "closed.json", &b)) {
-                    report("supervise", "internal", &format!("closed.json not published: {why}"));
-                    return EXIT_INTERNAL;
-                }
-                ("closed", None)
-            }
-            other => {
-                if let crate::steps::StepsOutcome::Retry { reason, .. } | crate::steps::StepsOutcome::Failed { reason, .. } = other {
-                    eprintln!("fgos internal supervise: step {} left open: {reason}", other.pending().unwrap_or("?"));
-                }
-                ("open", other.pending().map(String::from))
-            }
-        };
-        let mut line = json!({"result": result, "outcome": outcome});
-        if let Some(step) = pending {
-            line["pendingStep"] = Value::String(step);
+            ("open", other.pending().map(String::from))
         }
-        emit(line);
-        drop(attempt_lock);
-        0
+    };
+    let mut line = json!({"result": result, "outcome": outcome});
+    if let Some(step) = pending {
+        line["pendingStep"] = Value::String(step);
     }
+    emit(line);
+    drop(locks);
+    Ok(0)
+}
 
-    fn open_driver(envelope: &Value) -> Result<Box<dyn ContainmentDriver>, String> {
-        let preferred = envelope["containment"]["preferred"].as_str().ok_or("containment.preferred missing")?;
-        let bwrap = envelope["containment"]["bwrapPrefix"].as_array().and_then(|p| p.first()).and_then(Value::as_str).map(PathBuf::from);
-        driver_for(preferred, bwrap)
-    }
+fn open_driver(envelope: &Value) -> Result<Box<dyn ContainmentDriver>, String> {
+    let preferred = envelope["containment"]["preferred"].as_str().ok_or("containment.preferred missing")?;
+    let bwrap = envelope["containment"]["bwrapPrefix"].as_array().and_then(|p| p.first()).and_then(Value::as_str).map(PathBuf::from);
+    os::driver_for(preferred, bwrap)
+}
 
-    fn gate_spec(envelope: &Value, run_dir: &Path, lock: &File, lease: Option<&File>, go_end: UnixStream) -> Result<SpawnSpec, String> {
-        let host_bin = envelope["hostBin"].as_str().ok_or("hostBin missing")?;
-        let mut argv = vec![host_bin.to_string(), "internal".into(), "gate".into(), "--protocol".into(), "1".into(), "--envelope".into(), run_dir.join("envelope.json").to_string_lossy().into_owned(), "--go-fd".into(), GO_SLOT.to_string()];
-        let mut fd_map = vec![(FdSlot(ATTEMPT_LOCK_SLOT), lock.try_clone().map_err(|e| e.to_string())?)];
-        let mut lock_fds = ATTEMPT_LOCK_SLOT.to_string();
-        if let Some(lease) = lease {
-            fd_map.push((FdSlot(CWD_LEASE_SLOT), lease.try_clone().map_err(|e| e.to_string())?));
-            lock_fds.push_str(&format!(",{CWD_LEASE_SLOT}"));
+/// `declare_domain` on the attempt lock, then `supervisor-binding.json`.
+fn bind(envelope: &Value, run_dir: &Path, locks: &os::Locks, driver: &dyn ContainmentDriver, domain: &ContainmentDomain, spawned: &Spawned) -> Result<(), String> {
+    let record = os::record_to_declare(domain.domain().ok_or("the driver returned no domain id")?);
+    // The supervisor holds the attempt lock exclusively.
+    let predecessor = fgos_holder_lock::predecessor::record_path(&run_dir.join("attempt.lock"));
+    fgos_holder_lock::predecessor::declare(&predecessor, &record).map_err(|e| format!("declare_domain: {e}"))?;
+    locks.declare_on_lease(&record).map_err(|e| format!("declare_domain on the cwd lease: {e}"))?;
+    let declared = fgos_holder_lock::predecessor::domain_json(&record);
+    let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
+    let guarantee = driver.guarantee();
+    let binding = json!({
+        "v": 1,
+        "attemptId": envelope["attemptId"],
+        "envelopeDigest": envelope["digest"],
+        "supervisor": me.to_record().to_json(),
+        "gate": spawned.root.to_record().to_json(),
+        "domain": {"kind": declared["domainKind"], "id": declared["domainId"]},
+        "guarantee": {
+            "containment": if guarantee.level == GuaranteeLevel::Kernel { "kernel" } else { "best-effort" },
+            "lock": "kernel",
+        },
+        "boundAt": iso_utc_now(),
+    });
+    publish_once(run_dir, "supervisor-binding.json", &serde_json::to_vec(&binding).map_err(|e| e.to_string())?).map_err(|e| format!("supervisor-binding.json: {e}"))?;
+    Ok(())
+}
+
+/// `true` when the gate said HELLO; `false` when it left first or took too long.
+fn wait_for_hello(go: &mut os::Go, spawned: &mut Spawned, since: Instant) -> bool {
+    loop {
+        if go.readable(TICK) {
+            return read_frame(go).is_ok_and(|f| f["type"] == "HELLO");
         }
-        fd_map.push((FdSlot(GO_SLOT), File::from(OwnedFd::from(go_end))));
-        argv.extend(["--lock-fds".to_string(), lock_fds]);
-
-        // The envelope's prefix ends with the `--` that separates bwrap's own
-        // options from its command; the driver appends `--info-fd N --` itself.
-        let bwrap_prefix = envelope["containment"]["bwrapPrefix"].as_array().map(|items| {
-            let mut prefix: Vec<String> = items.iter().filter_map(Value::as_str).map(String::from).collect();
-            if prefix.last().is_some_and(|last| last == "--") {
-                prefix.pop();
-            }
-            prefix
-        });
-        let log = || OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(run_dir.join("supervisor.log")).map_err(|e| format!("supervisor.log: {e}"));
-        Ok(SpawnSpec {
-            argv,
-            bwrap_prefix,
-            fd_map,
-            env: BTreeMap::new(),
-            cwd: envelope["cwd"].as_str().ok_or("cwd missing")?.into(),
-            stdin: None,
-            stdout: Some(log()?),
-            stderr: Some(log()?),
-            mode: StartMode::Direct,
-        })
-    }
-
-    /// `declare_domain` on the attempt lock, then `supervisor-binding.json`.
-    fn bind(envelope: &Value, run_dir: &Path, driver: &dyn ContainmentDriver, domain: &ContainmentDomain, spawned: &Spawned) -> Result<(), String> {
-        let record = domain.domain().ok_or("the driver returned no domain id")?;
-        // The supervisor holds the attempt lock exclusively through the inherited description.
-        let predecessor = fgos_holder_lock::predecessor::record_path(&run_dir.join("attempt.lock"));
-        fgos_holder_lock::predecessor::declare(&predecessor, record).map_err(|e| format!("declare_domain: {e}"))?;
-        let declared = fgos_holder_lock::predecessor::domain_json(record);
-        let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
-        let guarantee = driver.guarantee();
-        let binding = json!({
-            "v": 1,
-            "attemptId": envelope["attemptId"],
-            "envelopeDigest": envelope["digest"],
-            "supervisor": me.to_record().to_json(),
-            "gate": spawned.root.to_record().to_json(),
-            "domain": {"kind": declared["domainKind"], "id": declared["domainId"]},
-            "guarantee": {
-                "containment": if guarantee.level == GuaranteeLevel::Kernel { "kernel" } else { "best-effort" },
-                "lock": "kernel",
-            },
-            "boundAt": iso_utc_now(),
-        });
-        publish_once(run_dir, "supervisor-binding.json", &serde_json::to_vec(&binding).map_err(|e| e.to_string())?).map_err(|e| format!("supervisor-binding.json: {e}"))?;
-        Ok(())
-    }
-
-    /// `true` when the gate said HELLO; `false` when it left first or took too long.
-    fn wait_for_hello(go: &mut UnixStream, spawned: &mut Spawned, since: Instant) -> bool {
-        loop {
-            if poll_readable(go.as_raw_fd(), TICK) {
-                return read_frame(go).is_ok_and(|f| f["type"] == "HELLO");
-            }
-            if spawned.child.try_wait().ok().flatten().is_some() || since.elapsed() > HELLO_LIMIT {
-                return false;
-            }
+        if spawned.child.try_wait().ok().flatten().is_some() || since.elapsed() > HELLO_LIMIT {
+            return false;
         }
     }
+}
 
-    fn watch_gate(watch: &Watch, go: &mut UnixStream, driver: &dyn ContainmentDriver, domain: &mut ContainmentDomain, spawned: &mut Spawned) {
-        let started = Instant::now();
-        let mut last_active = started;
-        let mut tail = CaptureTail { offsets: [0, 0] };
-        let mut last_beat: Option<Instant> = None;
-        let mut stopped: Option<Instant> = None;
-        let mut ended_domain = false;
-        let gate = spawned.root.clone();
-        let mut channel_open = true;
-        let mut agent_bound = false;
-        loop {
-            if spawned.child.try_wait().ok().flatten().is_some() {
-                return;
-            }
-            if channel_open && poll_readable(go.as_raw_fd(), Duration::ZERO) {
-                match read_frame(go) {
-                    Ok(frame) if frame["type"] == "AGENT" && !agent_bound => {
-                        agent_bound = true;
-                        let body = json!({"v": 1, "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
-                        if let Ok(bytes) = serde_json::to_vec(&body) {
-                            let _ = publish_once(&watch.run_dir, "agent-binding.json", &bytes);
-                        }
+fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, domain: &mut ContainmentDomain, spawned: &mut Spawned) {
+    let started = Instant::now();
+    let mut last_active = started;
+    let mut tail = CaptureTail { offsets: [0, 0] };
+    let mut last_beat: Option<Instant> = None;
+    let mut stopped: Option<Instant> = None;
+    let mut ended_domain = false;
+    let gate = spawned.root.clone();
+    let mut channel_open = true;
+    let mut agent_bound = false;
+    loop {
+        let gate_gone = spawned.child.try_wait().ok().flatten().is_some();
+        // A gate that leaves within a tick of its AGENT frame must not lose it.
+        while channel_open && go.readable(Duration::ZERO) {
+            match read_frame(go) {
+                Ok(frame) if frame["type"] == "AGENT" && !agent_bound => {
+                    agent_bound = true;
+                    let body = json!({"v": 1, "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
+                    if let Ok(bytes) = serde_json::to_vec(&body) {
+                        let _ = publish_once(&watch.run_dir, "agent-binding.json", &bytes);
                     }
-                    Ok(_) => {}
-                    // The gate closed or broke the channel: it still reports through gate-exit.json.
-                    Err(_) => channel_open = false,
                 }
+                Ok(_) => {}
+                // The gate closed or broke the channel: it still reports through gate-exit.json.
+                Err(_) => channel_open = false,
             }
-            if tail.active(watch) {
-                last_active = Instant::now();
+            if !gate_gone {
+                break;
             }
-            if last_beat.is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY) {
-                last_beat = Some(Instant::now());
-                let _ = write_atomic(&watch.run_dir, "supervisor-heartbeat.json", &json!({"v": 1, "attemptId": watch.attempt_id, "at": iso_utc_now(), "agentBound": agent_bound}));
-            }
-            if stopped.is_none() {
-                let cause = if watch.cancel_requested() {
-                    Some("cancel")
-                } else if watch.soft_deadline_passed() {
-                    Some("soft-deadline")
-                } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {
-                    Some("idle")
-                } else {
-                    None
-                };
-                if let Some(cause) = cause {
-                    stopped = Some(Instant::now());
-                    request_stop(watch, go, &gate, cause);
-                }
-            } else if !ended_domain && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK) {
-                // The gate outlived its own grace: end the whole domain.
-                ended_domain = true;
-                let _ = driver.kill_all(domain, 0);
-            }
-            std::thread::sleep(TICK);
         }
+        if gate_gone {
+            return;
+        }
+        if tail.active(watch) {
+            last_active = Instant::now();
+        }
+        if last_beat.is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY) {
+            last_beat = Some(Instant::now());
+            let _ = write_atomic(&watch.run_dir, "supervisor-heartbeat.json", &json!({"v": 1, "attemptId": watch.attempt_id, "at": iso_utc_now(), "agentBound": agent_bound}));
+        }
+        if stopped.is_none() {
+            let cause = if watch.cancel_requested() {
+                Some("cancel")
+            } else if watch.soft_deadline_passed() {
+                Some("soft-deadline")
+            } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {
+                Some("idle")
+            } else {
+                None
+            };
+            if let Some(cause) = cause {
+                stopped = Some(Instant::now());
+                request_stop(watch, go, &gate, cause);
+            }
+        } else if !ended_domain && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK) {
+            // The gate outlived its own grace: end the whole domain.
+            ended_domain = true;
+            let _ = driver.kill_all(domain, 0);
+        }
+        std::thread::sleep(TICK);
     }
+}
 
-    /// `stop-requested.json` first, so the gate can name the cause, then STOP
-    /// on the channel and SIGTERM to the gate by identity.
-    fn request_stop(watch: &Watch, go: &mut UnixStream, gate: &facts::ProcTuple, cause: &str) {
-        let body = json!({"v": 1, "attemptId": watch.attempt_id, "cause": cause, "at": iso_utc_now()});
-        if let Ok(bytes) = serde_json::to_vec(&body) {
-            let _ = publish_once(&watch.run_dir, "stop-requested.json", &bytes);
-        }
-        let _ = write_frame(go, &json!({"type": "STOP", "cause": cause}));
-        let _ = signal_by_identity(gate, Signal::Term);
+/// `stop-requested.json` first, so the gate can name the cause, then STOP on
+/// the channel and the platform's own nudge to the gate (SIGTERM by identity on
+/// Unix; Windows has none, the gate polls the file).
+fn request_stop(watch: &Watch, go: &mut os::Go, gate: &facts::ProcTuple, cause: &str) {
+    let body = json!({"v": 1, "attemptId": watch.attempt_id, "cause": cause, "at": iso_utc_now()});
+    if let Ok(bytes) = serde_json::to_vec(&body) {
+        let _ = publish_once(&watch.run_dir, "stop-requested.json", &bytes);
     }
+    let _ = write_frame(go, &json!({"type": "STOP", "cause": cause}));
+    os::nudge_gate(gate);
 }
 
 #[cfg(test)]

@@ -261,6 +261,7 @@ pub(crate) fn stop_cause(config: &Config) -> Option<String> {
 }
 
 /// Why the agent is being stopped: the named cause, else the signal itself.
+#[cfg(unix)]
 pub(crate) fn read_stop(config: &Config) -> Stop {
     stop_for(stop_cause(config))
 }

@@ -9,6 +9,7 @@
 
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use fgos_holder_lock::{predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use fgos_process::{domain_watch, facts, DomainState};
@@ -116,6 +117,9 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         Err(err) => return Verdict::because("open", format!("lock probe failed: {err}")),
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
+    if binding.is_none() && !dir.join("receipt.json").exists() && still_starting(read_json(&dir.join("envelope.json")).as_ref(), START_GRACE) {
+        return Verdict::because("running", "starting");
+    }
     // Lock free is not enough: the domain must be provably empty.
     // A supervisor that died between declaring the domain and binding it left only the declared record.
     let declared = read_json(&predecessor::record_path(&lock_path));
@@ -219,17 +223,64 @@ fn read_json(path: &Path) -> Option<Value> {
     serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()
 }
 
+/// How long after the envelope was written an attempt with no binding may
+/// still be starting. Only Windows has the window: a `LockFileEx` lock cannot
+/// be inherited, so the controller lets go and the supervisor takes the lock
+/// itself, and in between the lock is free with no binding. Elsewhere the
+/// supervisor inherits the held lock, so the lock free with no binding already
+/// means it never started.
+#[cfg(windows)]
+const START_GRACE: Duration = Duration::from_secs(60);
+#[cfg(not(windows))]
+const START_GRACE: Duration = Duration::ZERO;
+
+/// Whether the envelope's `createdAt` (`{bootId, boottimeNs}`, written by the
+/// controller before it spawns the supervisor) is younger than `grace` on this
+/// boot: a supervisor that has not bound yet may still be starting. Another
+/// boot means the starter is gone; no `createdAt` means no grace. File times
+/// are never consulted.
+pub(crate) fn still_starting(envelope: Option<&Value>, grace: Duration) -> bool {
+    let created = envelope.map(|e| &e["createdAt"]);
+    let (Some(boot_id), Some(at)) = (created.and_then(|c| c["bootId"].as_str()), created.and_then(|c| c["boottimeNs"].as_u64())) else { return false };
+    if facts::boot_id().is_some_and(|current| current != boot_id) {
+        return false;
+    }
+    // A `createdAt` later than now can only come from before a reboot of a platform with no boot id.
+    crate::gate::boottime_ns().checked_sub(at).is_some_and(|age| u128::from(age) < grace.as_nanos())
+}
+
 /// Cheap check for a scan: the file is JSON with `v` 3. The digest is checked when the attempt is adopted.
 fn is_v3_envelope(path: &Path) -> bool {
     read_json(path).is_some_and(|envelope| envelope["v"] == 3)
 }
 
+/// The longest a probe polls a Windows domain whose job is already gone.
+#[cfg(windows)]
+const FALLBACK_SETTLE: Duration = Duration::from_millis(1500);
+
 /// Whether the domain a predecessor-style record names is empty; an unreadable one is not.
+///
+/// On Windows a job that no longer opens (every handle closed) is judged by
+/// the process tree, which needs consecutive quiet polls of one watch and the
+/// short orphan window to close: a single poll can never say `Empty`. So a
+/// watch is polled again, bounded, while the job could not be opened; a job
+/// that opens, or a record of another session, answers at once.
 fn domain_of(record: &Value) -> DomainState {
-    match predecessor::parse_record(record) {
-        Some(domain) => domain_watch(&domain).is_empty(),
-        None => DomainState::Unknown,
+    let Some(domain) = predecessor::parse_record(record) else { return DomainState::Unknown };
+    let mut watch = domain_watch(&domain);
+    #[cfg(windows)]
+    {
+        let started = std::time::Instant::now();
+        loop {
+            let state = watch.is_empty();
+            if state == DomainState::Empty || watch.trace().job_opened || watch.reason().is_some() || started.elapsed() >= FALLBACK_SETTLE {
+                return state;
+            }
+            std::thread::sleep(Duration::from_millis(25));
+        }
     }
+    #[cfg(not(windows))]
+    watch.is_empty()
 }
 
 #[cfg(test)]
@@ -238,6 +289,26 @@ mod tests {
 
     fn argv(items: &[&str]) -> Vec<String> {
         items.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn a_young_envelope_of_this_boot_is_still_starting_and_anything_else_is_not() {
+        let boot = facts::boot_id().unwrap_or_else(|| "no-boot-id".into());
+        let at = |boot_id: &str, ns: u64| json!({"createdAt": {"bootId": boot_id, "boottimeNs": ns}});
+        let grace = Duration::from_secs(60);
+        let now = crate::gate::boottime_ns();
+        assert!(still_starting(Some(&at(&boot, now)), grace));
+        assert!(!still_starting(Some(&at(&boot, now)), Duration::ZERO));
+        // Aged by waiting, not by arithmetic: a machine that booted a minute ago has no "two minutes ago".
+        std::thread::sleep(Duration::from_millis(30));
+        assert!(!still_starting(Some(&at(&boot, now)), Duration::from_millis(10)), "an old envelope");
+        // Another boot is only knowable where the platform has a boot id.
+        if facts::boot_id().is_some() {
+            assert!(!still_starting(Some(&at("another-boot", now)), grace), "another boot: the starter is gone");
+        }
+        assert!(!still_starting(Some(&at(&boot, now + 3_600_000_000_000)), grace), "later than now: the clock restarted");
+        assert!(!still_starting(Some(&json!({"v": 3})), grace), "no createdAt, no grace");
+        assert!(!still_starting(None, grace));
     }
 
     #[test]

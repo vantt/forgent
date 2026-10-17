@@ -23,6 +23,7 @@
         "stdio": "stdin /dev/null; stdout and stderr appended to <attemptDir>/supervisor.log by the controller"
       },
       "process": "the controller spawns it with setsid, detached, no IPC channel; it outlives the controller",
+      "windows": "one flow, platform parts only: no inherited lock (the supervisor takes attempt.lock, and the lease named by envelope.cwdLeaseFile when mutating, after reading the envelope; the controller must have released them); the GO channel is a named pipe the supervisor listens on before the gate starts (gate --go-socket, --job-name from the driver); the supervisor is the keeper in the declared windows-job record; the same record is declared on the cwd lease file, because both locks die with the supervisor while the agent lives on in the job and a later holder of either must wait for the domain to be empty; the stop is stop-requested.json only (the gate polls it, no signal); steps start through the handle-list spawn with their own kill-on-close job",
       "sequence": [
         "CLOEXEC fd 3 (and 4)",
         "containment.create(attemptId) -> domain",
@@ -68,7 +69,7 @@
         "reason": "string or absent"
       },
       "stateMeaning": {
-        "running": "the attempt lock is held and no adopting.json names the holder",
+        "running": "the attempt lock is held and no adopting.json names the holder; on Windows also reason `starting`: lock free, no binding or receipt, envelope `createdAt` younger than 60 s on this boot (the supervisor takes the lock itself, so the lock is free between the controller letting go and the binding)",
         "being-adopted": "the attempt lock is held by an adopter (adopting.json present)",
         "needs-adopt": "probe-only: lock free and domain empty, not closed",
         "held": "the lock is free but the domain its holder declared could not be emptied within the kill wait (reason predecessor-domain-not-empty): nothing was done",
