@@ -17,7 +17,7 @@ import { hostBin, routeEnv } from '../holder-lock/driver.mjs';
 import { PROTOCOL } from '../holder-lock/protocol.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
-import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError } from '../run-supervisor/runtime-dir.mjs';
+import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { resolveConfinementTempRoot } from '../runner/dispatch/confinement/cleanup.mjs';
@@ -26,6 +26,8 @@ import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem } from 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
 const PROBE_TIMEOUT_MS = 15_000;
 const MAX_LISTED = 5;
+/** `<16 hex chars>.sock`, as the runtime directory module sizes it. */
+const SOCKET_NAME_BYTES = 21;
 
 const warn = (text) => `warning: ${text}`;
 const info = (text) => `info: ${text}`;
@@ -121,6 +123,9 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
 
 function socketDirState({ uid, env }) {
   const dir = resolveRuntimeSocketDir({ env, uid });
+  if (Buffer.byteLength(dir) + 1 + SOCKET_NAME_BYTES > SOCKET_PATH_MAX_BYTES) {
+    return { dir, problem: `${dir} leaves no room for a socket name within ${SOCKET_PATH_MAX_BYTES} bytes (shorten XDG_RUNTIME_DIR)`, unfixable: true };
+  }
   let st;
   try {
     st = fs.lstatSync(dir);
@@ -138,7 +143,10 @@ function socketDirState({ uid, env }) {
 export function checkRuntimeSocketDir({ env = process.env, uid = process.getuid?.() } = {}) {
   if (uid === undefined) return { passed: true, message: info('no runtime socket directory on this platform') };
   const state = socketDirState({ uid, env });
-  if (state.problem) return { passed: false, message: `${state.problem} -- run "fgos doctor --fix"` };
+  if (state.problem) {
+    const fixable = state.loose === true;
+    return { passed: false, message: fixable ? `${state.problem} -- run "fgos doctor --fix"` : `${state.problem} -- fix it by hand, doctor --fix does not touch it` };
+  }
   if (state.missing) return { passed: true, message: warn(`${state.dir} does not exist yet (fgos setup creates it)`) };
   return { passed: true, message: `${state.dir} is 0700 and owned by uid ${uid}` };
 }

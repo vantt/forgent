@@ -249,6 +249,10 @@ pub fn run(args: &[String]) -> i32 {
 fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
     let Some(envelope) = std::fs::read_to_string(envelope_path).ok().and_then(|text| serde_json::from_str::<Value>(&text).ok()) else { return };
     let (Some(run_dir), Some(attempt_id)) = (envelope["runDir"].as_str(), envelope["attemptId"].as_str()) else { return };
+    // The note goes beside the envelope it names, never to a directory only the (unverified) envelope points at.
+    if envelope_path.parent().map(Path::to_path_buf) != Some(PathBuf::from(run_dir)) {
+        return;
+    }
     let note = json!({"v": 1, "attemptId": attempt_id, "code": refusal.code, "why": refusal.why, "at": iso_utc_now()});
     if let Ok(bytes) = serde_json::to_vec(&note) {
         let _ = publish_once(Path::new(run_dir), "start-refused.json", &bytes);
