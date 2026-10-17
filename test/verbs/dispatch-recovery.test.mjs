@@ -3,14 +3,48 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 import { plan, checkApply, collectEvidence, deriveRecoveryFacts, isActionLegal } from '../../src/runner/dispatch/recovery-planner.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
 import { acquireRunControl } from '../../src/runner/dispatch/run-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
+
+const HOLDER_LOCK_MOD = path.resolve(HERE, '../../src/holder-lock/index.mjs');
+
+function recoveryParams(root, runDir) {
+  return { runDir, fgosDir: path.join(root, '.fgos') };
+}
+
+function holdRecoveryHere(root, runDir) {
+  const res = acquireSync(createLockScope('test-recovery-holder'), 'recovery', recoveryParams(root, runDir));
+  assert.equal(res.result, 'acquired');
+  return res.handle;
+}
+
+/** Hold the run's recovery lock in a separate process; resolves once it holds it. */
+async function holdRecoveryInChild(root, runDir) {
+  const readyPath = path.join(root, 'recovery-holder-ready');
+  const child = spawn(process.execPath, ['--input-type=module', '-e', `
+    import fs from 'node:fs';
+    import { acquireSync, createLockScope } from ${JSON.stringify(HOLDER_LOCK_MOD)};
+    const res = acquireSync(createLockScope('holder'), 'recovery', ${JSON.stringify(recoveryParams(root, runDir))});
+    if (res.result !== 'acquired') process.exit(3);
+    fs.writeFileSync(${JSON.stringify(readyPath)}, 'held');
+    setInterval(() => {}, 1000);
+  `], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.once('exit', resolve));
+  const deadline = Date.now() + 10000;
+  while (!fs.existsSync(readyPath)) {
+    assert.ok(Date.now() < deadline, 'the holder never took the recovery lock');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return { child, exited };
+}
 
 function makeRepo({ runId = 'run_1', status = 'running', controlEpoch, outbox = [], controller = [] } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recover-'));
@@ -286,7 +320,8 @@ test('a run directory already mid-apply refuses a second concurrent apply rather
   const { root, runDir } = makeRepo();
   try {
     const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
-    fs.writeFileSync(path.join(runDir, '.recovery.lock'), 'held-by-someone-else');
+    // This test process stands in for the apply already in progress.
+    const held = holdRecoveryHere(root, runDir);
     try {
       assert.throws(
         () => recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)),
@@ -295,8 +330,9 @@ test('a run directory already mid-apply refuses a second concurrent apply rather
       const run = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
       assert.equal(run.controlEpoch, undefined, 'refused before ever touching run.json');
     } finally {
-      fs.unlinkSync(path.join(runDir, '.recovery.lock'));
+      held.release();
     }
+    assert.equal(recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)).outcome, 'applied', 'released, the next apply goes in');
   } finally { cleanup(root); }
 });
 
@@ -559,32 +595,22 @@ test('F3: a valid actionKey from a different recommendation cannot be replayed a
   } finally { cleanup(root); }
 });
 
-test('M1: a stale .recovery.lock left by a dead process is reclaimed, not left stuck forever', () => {
+test('M1: a recovery holder killed mid-apply does not leave the run stuck', async () => {
+  if (process.platform === 'win32') return;
   const { root, runDir } = makeRepo();
   try {
     const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
-    // Simulate a crash between lock-acquire and release: a lock file
-    // recording a pid that is provably not alive.
-    fs.writeFileSync(path.join(runDir, '.recovery.lock'), '999999999');
+    const { child, exited } = await holdRecoveryInChild(root, runDir);
+    assert.throws(
+      () => recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)),
+      (e) => e instanceof RecoveryError && e.code === 'lock-busy',
+      'a live holder is refused, never reclaimed out from under it',
+    );
+    child.kill('SIGKILL');
+    await exited;
 
     const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
-    assert.equal(result.outcome, 'applied', 'a dead holder\'s lock must be reclaimed, never block recovery forever');
-  } finally { cleanup(root); }
-});
-
-test('M1: a .recovery.lock held by a live process is still refused, never reclaimed out from under it', () => {
-  const { root, runDir } = makeRepo();
-  try {
-    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
-    fs.writeFileSync(path.join(runDir, '.recovery.lock'), String(process.pid));
-    try {
-      assert.throws(
-        () => recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)),
-        (e) => e instanceof RecoveryError && e.code === 'lock-busy',
-      );
-    } finally {
-      fs.unlinkSync(path.join(runDir, '.recovery.lock'));
-    }
+    assert.equal(result.outcome, 'applied', 'a dead holder releases the lock with its process');
   } finally { cleanup(root); }
 });
 

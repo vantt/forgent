@@ -18,6 +18,7 @@ seedFileLocalBwrapRegistry();
 // Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -1521,14 +1522,16 @@ test('a resume is refused while a live process holds the dispatch lock of the un
     runId: 'synthetic-resumed-run', settledAt: '2026-10-05T01:00:00Z',
     classification: { outcome: { category: 'ok' } },
   }));
-  // The lock name and the composite holder identity are exactly what a mutating dispatch writes.
-  const lockPath = path.join(repoRoot, '.fgos', `dispatch--${encodeURIComponent(path.resolve(worktreeDir))}.lock`);
   const resume = () => runUnit({ resumeUnitRunId: refused.unitRunId, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
 
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: `${process.pid}:${Date.now()}:live`, ts: Date.now() }));
-  await assert.rejects(resume, /holds lock/);
-
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: `2147483646:${Date.now()}:dead`, ts: Date.now() }));
+  // A mutating dispatch in another process holds the worktree's dispatch-cwd lock while its worker runs.
+  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
+  try {
+    await assert.rejects(resume, new RegExp(`another process \\(PID ${child.pid}\\) holds lock`));
+  } finally {
+    child.kill('SIGKILL');
+    await exited;
+  }
   assert.equal((await resume()).outcome, 'pass');
 });
 

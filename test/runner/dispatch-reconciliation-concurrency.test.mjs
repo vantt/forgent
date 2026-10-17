@@ -34,14 +34,17 @@ function runWorker(rootDir, planPath, readyFile, goFile, nowIso) {
   });
 }
 
-test('two real concurrent OS processes racing applyReconciliation against the same dead-holder plan: exactly one applies, the action log is never torn or double-written', async () => {
+test('two real concurrent OS processes racing applyReconciliation against the same repair-projection plan: exactly one applies, the action log is never torn or double-written', async () => {
   const dir = root();
-  // Real production per-cwd dispatch lock path/shape (see
-  // reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
-  const lockPath = path.join(dir, '.fgos', `dispatch--${encodeURIComponent(dir)}.lock`);
-  const ts = Date.now();
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+  const runDir = path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'assignment.json'), JSON.stringify({ assignmentId: 'a' }));
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ assignmentId: 'a', runId: 'run-race', status: 'running' }));
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'run-race', assignmentId: 'a', status: 'done', confidence: 'reported' }));
+  const generations = path.join(dir, '.fgos', 'assignments', 'a', 'admission', 'generations');
+  fs.mkdirSync(generations, { recursive: true });
+  fs.writeFileSync(path.join(generations, '0000000001.json'), JSON.stringify({ runId: 'run-race', attempt: 1 }));
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-race', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   const planPath = path.join(dir, 'plan.json');
   fs.writeFileSync(planPath, JSON.stringify(plan));
@@ -75,8 +78,8 @@ test('two real concurrent OS processes racing applyReconciliation against the sa
     assert.ok(['applied', 'already-applied', 'blocked'].includes(outcome), `unexpected/corrupted concurrent outcome: ${outcome}`);
   }
 
-  // The guard is gone exactly once -- never left half-removed.
-  assert.equal(fs.existsSync(lockPath), false);
+  // The projection was repaired, by exactly the winner.
+  assert.equal(JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8')).status, 'settled');
 
   // The action log holds exactly one well-formed 'applied' record for this
   // actionKey: JSON.parse throws on any torn/partial line from an
