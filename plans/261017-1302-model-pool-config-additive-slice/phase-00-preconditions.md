@@ -1,7 +1,7 @@
 ---
 phase: 0
 title: "Tiền đề: commit thay đổi config của anh, chụp baseline"
-status: pending
+status: done
 effort: 1h
 ---
 
@@ -37,3 +37,25 @@ phải vào lịch sử trước.
 ## Rủi ro
 
 Thấp. Không sửa code.
+
+## Kết quả (2026-10-17, HEAD `95885e6d3`)
+
+- Thay đổi config của anh đã commit thành `95885e6d3`.
+- Baseline: `.fgos/runtime/tmp/model-pool-baseline.json`, 608 dòng (38
+  capability × 4 rigor × có/không `writes` × headless/herdr), sinh bằng
+  `.fgos/runtime/tmp/model-pool-baseline.mjs` qua `loadRunnerConfigFromDir` và
+  `bind()`.
+- **Không binding nào ra model `default` hay `executor-entry-model`.** Phase 02
+  được bật luật "thiếu ô thì từ chối".
+- 48 dòng bị từ chối, đều đã có trước thay đổi này:
+  - `impact-analysis`: `posture-unavailable`;
+  - `pane-labeling` và `review`: `headless-no-executor` (headless) hoặc
+    `no-candidate` (herdr).
+- **Sửa một khẳng định của plan.** 26 capability trỏ `claude-herdr` **không bị
+  từ chối khi headless**. Hôm nay `bind()` bỏ qua `claude-herdr` (chỉ có
+  invocation herdr) và chuyển sang mục kế tiếp trong `prefer`: 192 dòng sang
+  `openai/codex-cli-bwrap`, 8 dòng sang `xai`, 8 dòng sang `gemini`. Trong
+  herdr, cả 184 dòng chạy `claude-herdr-bwrap`. Nếu gộp vào `claude` mà không
+  ghim, khi headless các capability này sẽ chuyển từ openai sang claude.
+- 21 capability có `glm` trong `prefer` chưa bao giờ chạy glm, vì `glm` đứng
+  cuối danh sách; đây không phải lỗi.
