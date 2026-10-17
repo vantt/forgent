@@ -322,7 +322,8 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('AGY/Gemini CLI family', () => {
       test('agy-cli: detects --mode and --model, excludes timeout/project mechanics', () => {
-        const template = cfg.executors.gemini.invocations.find((inv) => inv.id === 'agy-cli-mucdong').args;
+        // The Antigravity CLI headless template, kept literal: the committed config runs gemini through omp now.
+        const template = ['-p', '{prompt}', '--mode', 'accept-edits', '--new-project', '--print-timeout', '30m', '--model', '{model}'];
         const res = renderProviderInvocation({
           providerFamily: 'gemini',
           command: 'agy',

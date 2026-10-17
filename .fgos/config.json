@@ -1126,6 +1126,8 @@
             },
             "command": "omp",
             "args": [
+              "--model",
+              "{model}",
               "--thinking",
               "medium",
               "--tools",
@@ -1156,6 +1158,8 @@
             "adapter": "cli-spawn",
             "command": "omp",
             "args": [
+              "--model",
+              "{model}",
               "--thinking",
               "medium",
               "--tools",
