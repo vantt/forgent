@@ -169,9 +169,10 @@ fn borrowed_check_accepts_the_borrowed_description_and_refuses_a_sibling() {
         argv: vec!["sh".into(), "-c".into(), format!("'{}' internal lock-fd --protocol 1 --borrowed-check '{lock}' > '{}'", fgos().display(), marker.display())],
         cwd: None,
         env: Default::default(),
+        clear_env: false,
         stdio: BorrowStdio::Null,
     };
-    let outcome = run_borrowed(&owner, &spec).unwrap();
+    let outcome = run_borrowed(&owner, &spec, &fgos_holder_lock::HelperExe(fgos())).unwrap();
     assert_eq!(outcome.exit, Some(0), "{}", fs::read_to_string(&marker).unwrap_or_default());
     assert_eq!(serde_json::from_str::<Value>(fs::read_to_string(&marker).unwrap().trim()).unwrap()["result"], "borrower");
     // A sibling with the same env that opened the file itself.

@@ -23,3 +23,6 @@ fgos-process = { path = "../../packages/process/rust" }
 
 [target.'cfg(unix)'.dev-dependencies]
 libc = { workspace = true }
+
+[target.'cfg(windows)'.dev-dependencies]
+windows-sys = { workspace = true }

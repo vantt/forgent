@@ -6,6 +6,8 @@
 //! `internal-route.lock-hold.v1.json`), never through stdin, so synchronous
 //! Node code can wait without a turning event loop.
 //!
+//! `borrow` and `cancel` requests run a borrowed child inside a job (`crate::borrow_windows`).
+//!
 //! The loop is written over a "parent gone" wait, so the platform part is
 //! only how that wait is implemented (a `SYNCHRONIZE` handle on Windows).
 
@@ -75,18 +77,199 @@ fn request_number(name: &str) -> Option<u64> {
     digits.parse().ok()
 }
 
-/// Answer each request not seen before, in number order. Borrowing is not
-/// built into this helper yet, so every request is refused by name.
-fn answer_requests(work: &Path, seen: &mut BTreeSet<u64>) {
-    let Ok(entries) = fs::read_dir(work) else { return };
+/// The numbers of the requests not seen before, in order.
+fn new_requests(work: &Path, seen: &mut BTreeSet<u64>) -> Vec<u64> {
+    let Ok(entries) = fs::read_dir(work) else { return Vec::new() };
     let mut pending: Vec<u64> = entries
         .filter_map(|entry| request_number(&entry.ok()?.file_name().to_string_lossy()))
         .filter(|n| !seen.contains(n))
         .collect();
     pending.sort_unstable();
-    for n in pending {
-        seen.insert(n);
-        let _ = write_atomic(work, &format!("result-{n}.json"), &json!({ "error": "borrow-unsupported" }).to_string());
+    seen.extend(pending.iter().copied());
+    pending
+}
+
+fn answer(work: &Path, n: u64, body: Value) {
+    let _ = write_atomic(work, &format!("result-{n}.json"), &body.to_string());
+}
+
+/// The one borrow in flight, if any.
+#[cfg(not(windows))]
+struct Flight;
+
+#[cfg(not(windows))]
+impl Flight {
+    fn none() -> Self {
+        Flight
+    }
+
+    fn cancel(&self) {}
+}
+
+/// Borrowing is Windows-only: elsewhere every request is refused by name.
+#[cfg(not(windows))]
+fn serve<'scope, 'env>(work: &'env Path, seen: &mut BTreeSet<u64>, _handle: &'env port::Handle, _flight: &mut Flight, _scope: &'scope std::thread::Scope<'scope, 'env>) {
+    for n in new_requests(work, seen) {
+        answer(work, n, json!({ "error": "borrow-unsupported" }));
+    }
+}
+
+#[cfg(windows)]
+use borrow::{serve, Flight};
+
+#[cfg(windows)]
+mod borrow {
+    //! Requests that run a borrowed child (`borrow`) or end it (`cancel`).
+    //! One borrow runs at a time, on its own thread, so the helper keeps
+    //! watching its parent and its request directory while the child runs.
+
+    use std::collections::{BTreeMap, BTreeSet};
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
+
+    use serde_json::{json, Value};
+
+    use super::{answer, new_requests, write_atomic};
+    use crate::borrow_windows::{self, BorrowControl};
+    use crate::port::{self, BorrowError, BorrowSpec, BorrowStdio, HelperExe};
+
+    /// The borrow running now: its request number, a cancel flag, and a flag
+    /// its thread sets when it has written its result.
+    pub(in crate::route) struct Flight {
+        running: Option<(u64, Arc<AtomicBool>, Arc<AtomicBool>)>,
+        /// A borrow ended with processes it could not end: its record still
+        /// names them, so no new borrow may overwrite that record.
+        unemptied: Arc<AtomicBool>,
+    }
+
+    impl Flight {
+        pub(in crate::route) fn none() -> Self {
+            Flight { running: None, unemptied: Arc::new(AtomicBool::new(false)) }
+        }
+
+        /// End the running borrow's job at once (parent death, `cancel`).
+        pub(in crate::route) fn cancel(&self) {
+            if let Some((_, cancel, _)) = &self.running {
+                cancel.store(true, Ordering::SeqCst);
+            }
+        }
+
+        fn busy(&mut self) -> bool {
+            if self.running.as_ref().is_some_and(|(_, _, done)| done.load(Ordering::SeqCst)) {
+                self.running = None;
+            }
+            self.running.is_some()
+        }
+    }
+
+    /// The borrow a `borrow` request describes.
+    fn parse_borrow(request: &Value, work: &Path, n: u64) -> Result<BorrowSpec, String> {
+        let argv: Vec<String> = request
+            .get("argv")
+            .and_then(Value::as_array)
+            .ok_or("argv must be an array of strings")?
+            .iter()
+            .map(|a| a.as_str().map(str::to_string).ok_or("argv must be an array of strings"))
+            .collect::<Result<_, _>>()?;
+        if argv.first().is_none_or(|program| program.is_empty()) {
+            return Err("argv needs a program".into());
+        }
+        let cwd = match request.get("cwd") {
+            None | Some(Value::Null) => None,
+            Some(Value::String(cwd)) => Some(PathBuf::from(cwd)),
+            Some(_) => return Err("cwd must be a string".into()),
+        };
+        let env: BTreeMap<String, String> = match request.get("env") {
+            None | Some(Value::Null) => BTreeMap::new(),
+            Some(Value::Object(map)) => map.iter().map(|(k, v)| v.as_str().map(|v| (k.clone(), v.to_string())).ok_or("env values must be strings")).collect::<Result<_, _>>()?,
+            Some(_) => return Err("env must be a string map".into()),
+        };
+        if request.get("stdin").is_some_and(|s| s != "null") {
+            return Err("stdin must be \"null\"".into());
+        }
+        Ok(BorrowSpec {
+            argv,
+            cwd,
+            clear_env: request.get("env").is_some_and(|e| !e.is_null()),
+            env,
+            stdio: BorrowStdio::Files { out: work.join(format!("out-{n}.log")), err: work.join(format!("err-{n}.log")) },
+        })
+    }
+
+    fn result_of(outcome: Result<port::BorrowOutcome, BorrowError>) -> Value {
+        match outcome {
+            Ok(o) => json!({ "exit": o.exit, "leftoversKilled": o.leftovers_killed }),
+            Err(BorrowError::LeftoverNotKilled { outcome, pids }) => json!({ "error": "borrow-leftover-not-killed", "pids": pids, "exit": outcome.exit, "leftoversKilled": outcome.leftovers_killed }),
+            Err(err @ BorrowError::Spawn(_)) => json!({ "error": "borrow-spawn-failed", "message": err.to_string() }),
+            Err(err @ BorrowError::InvalidSpec(_)) => json!({ "error": "borrow-spec-invalid", "message": err.to_string() }),
+            Err(err) => json!({ "error": "borrow-failed", "message": err.to_string() }),
+        }
+    }
+
+    pub(in crate::route) fn serve<'scope, 'env>(work: &'env Path, seen: &mut BTreeSet<u64>, handle: &'env port::Handle, flight: &mut Flight, scope: &'scope std::thread::Scope<'scope, 'env>) {
+        for n in new_requests(work, seen) {
+            let request: Value = match fs::read_to_string(work.join(format!("req-{n}.json"))).ok().and_then(|text| serde_json::from_str(&text).ok()) {
+                Some(request) => request,
+                None => {
+                    answer(work, n, json!({ "error": "request-unreadable" }));
+                    continue;
+                }
+            };
+            match request.get("op").and_then(Value::as_str) {
+                Some("borrow") => {
+                    if flight.busy() {
+                        answer(work, n, json!({ "error": "borrow-busy" }));
+                        continue;
+                    }
+                    if flight.unemptied.load(Ordering::SeqCst) {
+                        answer(work, n, json!({ "error": "borrow-leftover-pending", "message": "an earlier borrow left processes the helper could not end" }));
+                        continue;
+                    }
+                    let spec = match parse_borrow(&request, work, n) {
+                        Ok(spec) => spec,
+                        Err(message) => {
+                            answer(work, n, json!({ "error": "borrow-spec-invalid", "message": message }));
+                            continue;
+                        }
+                    };
+                    let helper = match HelperExe::current() {
+                        Ok(helper) => helper,
+                        Err(err) => {
+                            answer(work, n, json!({ "error": "borrow-spawn-failed", "message": err.to_string() }));
+                            continue;
+                        }
+                    };
+                    let cancel = Arc::new(AtomicBool::new(false));
+                    let done = Arc::new(AtomicBool::new(false));
+                    flight.running = Some((n, cancel.clone(), done.clone()));
+                    let unemptied = flight.unemptied.clone();
+                    scope.spawn(move || {
+                        let started = |pid: u32| {
+                            let _ = write_atomic(work, &format!("started-{n}.json"), &json!({ "pid": pid }).to_string());
+                        };
+                        let control = BorrowControl { cancel: Some(&cancel), on_started: Some(&started) };
+                        let outcome = borrow_windows::run(handle, &spec, &helper, &control);
+                        if matches!(outcome, Err(BorrowError::LeftoverNotKilled { .. })) {
+                            unemptied.store(true, Ordering::SeqCst);
+                        }
+                        answer(work, n, result_of(outcome));
+                        done.store(true, Ordering::SeqCst);
+                    });
+                }
+                Some("cancel") => {
+                    // `n` names the borrow to end; a cancel for one that is not
+                    // running is stale and ignored.
+                    if let (Some(target), Some((running, _, _))) = (request.get("n").and_then(Value::as_u64), &flight.running) {
+                        if target == *running {
+                            flight.cancel();
+                        }
+                    }
+                }
+                _ => answer(work, n, json!({ "error": "request-unknown" })),
+            }
+        }
     }
 }
 
@@ -118,13 +301,19 @@ pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool
         return ready_failed(&err);
     }
     let mut seen = BTreeSet::new();
-    loop {
-        if parent_gone(TICK) {
-            break;
+    // The scope joins a running borrow before the lock is released: on parent
+    // death its job is ended at once and emptied (bounded by the kill wait).
+    std::thread::scope(|scope| {
+        let mut flight = Flight::none();
+        loop {
+            if parent_gone(TICK) {
+                flight.cancel();
+                break;
+            }
+            serve(&args.work, &mut seen, &handle, &mut flight, scope);
         }
-        answer_requests(&args.work, &mut seen);
-    }
-    // Unlock explicitly, then close: no domain exists to empty yet.
+    });
+    // Unlock explicitly, then close: every borrow's domain is empty by now.
     port::release(handle);
     EXIT_OK
 }

@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
-use fgos_process::{domain_watch, Domain, DomainState, KillOutcome, ProcId, WindowsJob};
+use fgos_process::{domain_watch, Domain, DomainState, KillOutcome, ProcId, WatchTrace, WindowsJob};
 use serde_json::{json, Value};
 
 /// `<lockFile>.predecessor.json`.
@@ -130,14 +130,29 @@ pub fn declare(path: &Path, domain: &Domain) -> io::Result<()> {
     })
 }
 
-fn remove_record(path: &Path) {
-    // The record is only ever removed by a holder (under the lock); a
-    // failure leaves it to be judged again next time, which is safe.
+/// Remove the record at `path`. Only ever called by a holder under the lock;
+/// a failure leaves the record to be judged again next time, which is safe.
+pub(crate) fn remove_record(path: &Path) {
     let _ = std::fs::remove_file(path);
 }
 
 /// Run the rule for the record at `path`, after the kernel lock is held.
 pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
+    admit_with_trace(path, kill_wait).0
+}
+
+/// [`admit`], plus what the domain watch saw while it judged (the sources
+/// that named each pid, whether the job opened). The same code path as
+/// `admit`; the trace is the one the watch already keeps. Used by the
+/// predecessor stress test to attribute a violation.
+#[doc(hidden)]
+pub fn admit_with_trace(path: &Path, kill_wait: Duration) -> (Admit, WatchTrace) {
+    let mut trace = WatchTrace::default();
+    let answer = admit_traced(path, kill_wait, &mut trace);
+    (answer, trace)
+}
+
+fn admit_traced(path: &Path, kill_wait: Duration, trace: &mut WatchTrace) -> Admit {
     let text = match std::fs::read_to_string(path) {
         Ok(text) => text,
         Err(err) if err.kind() == io::ErrorKind::NotFound => return Admit::Proceed,
@@ -155,6 +170,12 @@ pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
     // One watch for the whole wait: a Windows watch keeps the handle of every
     // member it has seen.
     let mut watch = domain_watch(&domain);
+    let answer = judge(path, &mut watch, named, kill_wait);
+    *trace = watch.trace();
+    answer
+}
+
+fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_wait: Duration) -> Admit {
     if watch.is_empty() == DomainState::Empty {
         remove_record(path);
         return Admit::Proceed;

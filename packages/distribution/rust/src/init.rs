@@ -984,7 +984,8 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> 
             .and_then(|helper| fgos_holder_lock::semantics::two_process_probe(dir, &helper))
             .map_err(|detail| InitError::LockKernelSemanticsFailed(format!("{}: {detail}", dir.display())))?;
     }
-    let report = borrow_vectors::run(git, &[], false).map_err(|err| {
+    let helper = fgos_holder_lock::HelperExe::current().map_err(|err| InitError::LockBorrowVectorsFailed(format!("the running executable is unknown: {err}")))?;
+    let report = borrow_vectors::run(git, &helper, &[], false).map_err(|err| {
         InitError::LockBorrowVectorsFailed(match err {
             RunError::Unavailable(detail) | RunError::Usage(detail) => detail,
         })

@@ -104,15 +104,15 @@ fn a_held_lock_is_answered_held_and_the_helper_exits_with_the_contract_code() {
 }
 
 #[test]
-fn a_request_is_refused_by_name_and_probe_sees_held_and_free() {
+fn an_unknown_request_is_refused_by_name_and_probe_sees_held_and_free() {
     let dir = temp_dir("req");
     let lock = dir.join("hold.lock");
     let work = dir.join("work");
     fs::create_dir_all(&work).unwrap();
     let mut helper = Command::new(fgos()).args(hold_args(&lock, &work, &["--try"])).stdin(Stdio::null()).stdout(Stdio::null()).spawn().unwrap();
     assert_eq!(wait_for(&work.join("ready.json"), "ready.json")["result"], "acquired");
-    fs::write(work.join("req-1.json"), r#"{"op":"borrow","argv":["git"],"cwd":".","env":{},"stdin":"null"}"#).unwrap();
-    assert_eq!(wait_for(&work.join("result-1.json"), "result-1.json")["error"], "borrow-unsupported");
+    fs::write(work.join("req-1.json"), r#"{"op":"nope"}"#).unwrap();
+    assert_eq!(wait_for(&work.join("result-1.json"), "result-1.json")["error"], "request-unknown");
 
     let probe_out = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "1", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
     assert_eq!(probe_out.status.code(), Some(10));

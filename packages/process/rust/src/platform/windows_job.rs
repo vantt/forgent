@@ -528,6 +528,9 @@ mod os {
     struct Core {
         job: Option<Owned>,
         tracked: BTreeMap<u32, Tracked>,
+        /// Every pid any poll named, with the sources that named it, kept for
+        /// the whole life of the view.
+        seen: BTreeMap<u32, Named>,
     }
 
     impl Core {
@@ -568,6 +571,12 @@ mod os {
                     // A holder tuple that cannot be read gives no tree to judge by.
                     Err(_) => unopenable.push(record.holder.pid.0),
                 }
+            }
+            for (pid, by) in &named {
+                let seen = self.seen.entry(*pid).or_default();
+                seen.in_list |= by.in_list;
+                seen.in_scan |= by.in_scan;
+                seen.in_tree |= by.in_tree;
             }
             for pid in named.keys().copied().collect::<Vec<_>>() {
                 if self.tracked.contains_key(&pid) {
@@ -630,6 +639,13 @@ mod os {
             decide(poll.acct, &poll.members, &poll.unopenable, 0, true)
         }
 
+        /// The members that are still live, as the id list and the member
+        /// handles show them now (for naming what a bounded wait left behind).
+        pub fn live_pids(&mut self) -> Vec<u32> {
+            let poll = self.core.poll(self.with_scan, None);
+            poll.members.iter().filter(|m| !m.signaled).map(|m| m.pid).collect()
+        }
+
         /// End every process in the job.
         pub fn kill_all(&mut self) -> KillOutcome {
             match self.core.job.as_ref() {
@@ -640,9 +656,41 @@ mod os {
         }
     }
 
+    /// The calling process's ancestors, nearest first, as `(pid, creation
+    /// FILETIME)`. A parent created after its child is a reused pid and ends
+    /// the chain.
+    pub fn ancestor_chain() -> Vec<(u32, u64)> {
+        let rows = snapshot(None);
+        let find = |pid: u32| rows.iter().find(|r| r.entry.pid == pid).map(|r| r.entry);
+        let mut chain = Vec::new();
+        let mut child = find(std::process::id());
+        while let Some(me) = child {
+            let Some(parent) = find(me.ppid) else { break };
+            let (Some(parent_created), Some(child_created)) = (parent.created, me.created) else { break };
+            if parent_created > child_created || chain.len() >= 64 {
+                break;
+            }
+            chain.push((parent.pid, parent_created));
+            child = Some(parent);
+        }
+        chain
+    }
+
     /// Open a job by name for the release rule and the keeper (no scan).
     pub fn job_view(name: &str) -> Option<JobView> {
         JobView::open(name, false)
+    }
+
+    /// Which sources named a domain member (the job's id list, the in-job
+    /// process scan, the holder's process tree).
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct NamedBy {
+        /// The job's `JobObjectBasicProcessIdList`.
+        pub list: bool,
+        /// A Toolhelp scan for processes `IsProcessInJob` says are members.
+        pub scan: bool,
+        /// A descendant of the recorded holder created at or after `declaredAt`.
+        pub tree: bool,
     }
 
     /// The contender view of a recorded `windows-job` domain, used by `admit`.
@@ -655,7 +703,8 @@ mod os {
         job_opened: bool,
     }
 
-    fn own_session() -> Option<u32> {
+    /// The Windows session of this process.
+    pub fn own_session() -> Option<u32> {
         let mut session = 0;
         // SAFETY: one out-pointer for this process's id.
         (unsafe { ProcessIdToSessionId(GetCurrentProcessId(), &mut session) } != 0).then_some(session)
@@ -676,6 +725,11 @@ mod os {
         /// Whether the job could be opened (by this or an earlier poll).
         pub fn job_opened(&self) -> bool {
             self.job_opened
+        }
+
+        /// Every pid the polls so far named, with the sources that named it.
+        pub fn trace(&self) -> Vec<(u32, NamedBy)> {
+            self.core.seen.iter().map(|(pid, n)| (*pid, NamedBy { list: n.in_list, scan: n.in_scan, tree: n.in_tree })).collect()
         }
 
         /// Set once a poll answered "not empty" because the record is from

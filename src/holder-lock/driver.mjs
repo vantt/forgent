@@ -31,6 +31,22 @@ export function lockTransport(platform = process.platform) {
   return platform === 'win32' ? 'hold' : 'fd';
 }
 
+/**
+ * How a borrow on the fd transport finds what its child left behind: `holders`
+ * lists the processes that hold the description (Linux /proc), `group`
+ * signals the child's process group (macOS). The hold transport never asks:
+ * its helper ends the borrow's job itself.
+ */
+export function leftoverSweep(platform = process.platform) {
+  return platform === 'linux' ? 'holders' : 'group';
+}
+
+/** Whether a borrowed child on the fd transport must lead its own process
+ * group: when the group sweep needs it, or the caller signals the group. */
+export function borrowLeadsGroup(spec, platform = process.platform) {
+  return spec.detached === true || (platform !== 'linux' && platform !== 'win32');
+}
+
 let resolvedBin = null;
 
 /**

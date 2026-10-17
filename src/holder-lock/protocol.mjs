@@ -17,6 +17,8 @@ export const PROTOCOL = 1;
  * that names it (`<lock name>:<slot>`). */
 export const LOCK_FD_SLOT = 3;
 export const LOCK_FD_ENV = 'FGOS_LOCK_FD';
+/** Names a borrow job on the hold transport: `<lock name>:<job name>`. */
+export const LOCK_JOB_ENV = 'FGOS_LOCK_JOB';
 
 export const DEFAULT_KILL_WAIT_MS = 2000;
 export const MAX_KILL_WAIT_MS = 60_000;

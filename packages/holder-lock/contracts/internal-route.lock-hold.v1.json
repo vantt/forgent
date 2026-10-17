@@ -25,7 +25,7 @@
       "started-<n>.json": "written by the helper: { pid }, the borrowed child's Windows pid",
       "out-<n>.log": "the child's stdout, appended as it writes",
       "err-<n>.log": "the child's stderr, appended as it writes",
-      "result-<n>.json": "written by the helper after the borrow ended: { exit, leftoversKilled } or { error: <name> }"
+      "result-<n>.json": "written by the helper after the borrow ended: { exit, leftoversKilled } or { error: <name> }, names: borrow-busy, borrow-leftover-pending (an earlier borrow left processes it could not end; its record is kept), borrow-leftover-not-killed, borrow-spawn-failed, borrow-spec-invalid, request-unknown, request-unreadable"
     },
     "n": "request number, an integer starting at 1; the helper handles one borrow at a time and answers a second with result { error: \"borrow-busy\" }"
   },
