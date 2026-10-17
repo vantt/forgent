@@ -107,6 +107,19 @@ for (const banned of BANNED_FILES) {
 const ALLOWED_BUILTINS = new Set(['fs', 'path', 'crypto', 'os', 'async_hooks', 'worker_threads', 'url', 'util']);
 const builtinName = (specifier) => specifier.replace(/^node:/, '').split('/')[0];
 
+// The lock door (src/holder-lock): the provider-capacity state that reconcile's
+// quarantine actions write is guarded by a kernel lock, and taking one means
+// running the short-lived `fgos internal lock-fd` helper on a description this
+// process owns. These files, and only these, may load child_process and contain
+// spawn/kill calls: the helper, the kill of a helper that hung past its bound,
+// and runBorrowed's sweep of a borrowed child's leftovers. Reconcile never calls
+// runBorrowed; no other file in the closure gets the exemption.
+const LOCK_DOOR_FILES = new Set([
+  'src/holder-lock/index.mjs',
+  'src/holder-lock/driver.mjs',
+].map((p) => path.join(root, p)));
+const LOCK_DOOR_BUILTINS = new Set(['child_process']);
+
 // Defense in depth: even a file legitimately in the graph must never itself
 // perform a process-control call. The scan runs on the lexed code view, so
 // prose in comments (reconciliation-planner.mjs discusses "child_process.spawn,
@@ -149,13 +162,15 @@ function walk(file, seen, lazy) {
   seen.add(file);
   const source = fs.readFileSync(file, 'utf8');
   const rel = path.relative(root, file);
-  assert.deepEqual(bannedCalls(source), [], `${rel} matched a banned process-control call pattern`);
+  const lockDoor = LOCK_DOOR_FILES.has(file);
+  if (!lockDoor) assert.deepEqual(bannedCalls(source), [], `${rel} matched a banned process-control call pattern`);
   const { staticSpecifiers, dynamicSpecifiers } = moduleSpecifiers(source);
   for (const specifier of dynamicSpecifiers) lazy.add(`${rel} -> ${specifier}`);
   for (const specifier of staticSpecifiers) {
     const { file: target, builtin } = resolveSpecifier(file, specifier);
     if (builtin) {
-      assert.ok(builtin.startsWith('node:') && ALLOWED_BUILTINS.has(builtinName(builtin)),
+      const allowed = ALLOWED_BUILTINS.has(builtinName(builtin)) || (lockDoor && LOCK_DOOR_BUILTINS.has(builtinName(builtin)));
+      assert.ok(builtin.startsWith('node:') && allowed,
         `${rel} imports "${builtin}"; the reconcile closure may only import relative modules and the builtins ${[...ALLOWED_BUILTINS].join(', ')}`);
       continue;
     }
@@ -199,6 +214,15 @@ const EXPECTED_CLOSURE = [
   // ... and /proc boot-id/start-time reads that decide lease holder
   // identity (node:fs only; no signals, no spawn).
   'src/runner/dispatch/process-identity.mjs',
+  // ... and the lock door guarding the provider-capacity state file
+  // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
+  'src/holder-lock/index.mjs',
+  'src/holder-lock/driver.mjs',
+  'src/holder-lock/protocol.mjs',
+  'src/holder-lock/registry.mjs',
+  'src/holder-lock/lock-scope.mjs',
+  'src/holder-lock/state-root.mjs',
+  'src/util/host-bin-path.mjs',
 ].map((p) => path.join(root, p)).sort();
 
 // The lazy edges inside the closure. These modules are not loaded by reconcile;
@@ -243,7 +267,9 @@ test('importing reconcile and the reconciliation planner in a fresh process load
   const others = loaded.filter((url) => !url.startsWith('file:'));
   for (const banned of BANNED_FILES) assert.ok(!files.includes(banned), `loading reconcile loaded ${path.relative(root, banned)}`);
   assert.deepEqual(files, EXPECTED_CLOSURE, 'the modules really loaded differ from the static closure; a load form the static walk cannot see was added');
-  const refused = others.filter((url) => !(url.startsWith('node:') && ALLOWED_BUILTINS.has(builtinName(url))));
+  // The runtime set cannot say which module loaded a builtin; the static walk
+  // above already pins child_process to LOCK_DOOR_FILES.
+  const refused = others.filter((url) => !(url.startsWith('node:') && (ALLOWED_BUILTINS.has(builtinName(url)) || LOCK_DOOR_BUILTINS.has(builtinName(url)))));
   assert.deepEqual(refused, [], 'loading reconcile loaded a module outside the closure and the allowed builtins');
 });
 

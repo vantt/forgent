@@ -17,6 +17,7 @@ import {
   parseQuotaResetWindowMs,
   parseQuotaResetClockTime,
   inspectProviderCapacity,
+  inspectProviderCapacityLock,
   ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -27,6 +28,10 @@ import {
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+
+// Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
+// the machine's real ones, and every child process started below inherits it.
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-state-root-'));
 
 const PROVIDER_CAPACITY_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/dispatch/provider-capacity.mjs');
 
@@ -353,35 +358,12 @@ process.send({ ready: true });
   };
 }
 
-// S3 (dispatch-engine-liveness-hardening Phase 4): the audit's own live
-// probe against the real module -- concurrent contenders racing a
-// pre-seeded stale lock (dead pid), no re-check before unlink -- lost a
-// lease 17/25 trials (`selected=12 leasesPersisted=10` example). Real
-// concurrency requires real OS processes (one event loop can never expose
-// a TOCTOU race against itself), so each contender is a genuine forked
-// child process calling the real `acquireProviderAccountLease`, matching
-// claim-port.test.mjs's own established real-cross-process-race pattern.
-//
-// Two adjustments beyond a plain "fork N children, race them" were needed
-// to actually reproduce the audit's own repro rate (verified empirically:
-// see this phase's own report) rather than passing vacuously:
-//  1. Each contender waits for an explicit 'go' IPC message before calling
-//     acquireProviderAccountLease, sent to every child only once ALL of
-//     them have finished importing/starting up. Fork/import startup jitter
-//     otherwise spreads contenders far enough apart in wall-clock time that
-//     they rarely actually contend for the same stale lock at once -- an
-//     unsynchronized version of this test measured only ~13% reproduction
-//     against the pre-fix code, vs. the audit's own 68% (17/25) and this
-//     synchronized version's measured 67% (10/15), a near-exact match.
-//  2. Each contender stays alive (an unref'd-equivalent keep-alive timer)
-//     after acquiring, until the parent explicitly kills it once the trial
-//     is scored. `acquireProviderAccountLease`'s own reclaim step
-//     (`reclaimDeadLeases`, Phase 2) correctly evicts a lease whose pid has
-//     ALREADY exited by the time a later contender checks -- a short-lived
-//     one-shot child that exits immediately after acquiring would trigger
-//     that (unrelated, correct) reclaim path and produce a false failure
-//     that has nothing to do with this phase's stale-lock TOCTOU fix.
-test('S3 (dispatch-engine-liveness-hardening Phase 4): concurrent contenders racing a pre-seeded stale lock (dead pid) never lose a lease', { timeout: 60_000 }, async (t) => {
+// Concurrent lease acquires from real OS processes never lose a lease: every
+// runId a contender reports "selected" is in state.json afterwards. Real
+// concurrency needs real processes (one event loop never races itself);
+// contenders are started once and released together by a 'go' message so
+// they really contend at the same moment.
+test('concurrent lease acquires from separate processes never lose a lease', { timeout: 60_000 }, async (t) => {
   const TRIALS = 10;
   const CONTENDERS = 10;
   const pool = await startContenders(t, CONTENDERS, `
@@ -407,16 +389,7 @@ function handle({ runtimeDir, runId, assignmentId }) {
   for (let trial = 0; trial < TRIALS; trial += 1) {
     const runtimeDir = mkTempDir();
     t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
-    const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
-    fs.mkdirSync(lockDir, { recursive: true });
-    // Pre-seed a stale generation-1 lock record left behind by a crashed
-    // holder: a dead pid, no re-checkable content -- exactly the audit's
-    // own probe shape, expressed in the generation-ledger's own on-disk
-    // format (dispatch-engine-liveness-hardening Phase 4 round 2).
-    fs.writeFileSync(
-      path.join(lockDir, '0000000001.json'),
-      JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
-    );
+    const { statePath } = providerCapacityStatePaths(runtimeDir);
 
     const results = await pool.race(
       Array.from({ length: CONTENDERS }, (_, i) => ({ runtimeDir, runId: `run_t${trial}_${i}`, assignmentId: `asgn-${i}` })),
@@ -430,38 +403,24 @@ function handle({ runtimeDir, runId, assignmentId }) {
     }
     persistedRunIds.sort();
 
-    assert.deepEqual(
-      persistedRunIds,
-      selectedRunIds,
-      `trial ${trial}: every runId reported "selected" must persist its lease in state.json -- a mismatch means a concurrent contender's write clobbered this one (the exact race the audit reproduced 17/25 trials before this fix)`,
-    );
+    assert.equal(selectedRunIds.length, CONTENDERS, `trial ${trial}: every contender is selected`);
+    assert.deepEqual(persistedRunIds, selectedRunIds, `trial ${trial}: every runId reported "selected" must persist its lease in state.json`);
   }
 });
 
-// S3 round 2: the state.json-loss assertion above only INFERS a double
-// critical-section entry from its downstream symptom (a clobbered write).
-// This is Lead's own direct-proof technique, made a permanent part of the
-// suite rather than a one-off debug script: each contender's `fn` (passed
-// to the real, exported `withFileLock`) first attempts an EXCLUSIVE marker
-// file create (`fs.openSync(markerPath, 'wx')`, the SAME atomic primitive
-// the lock itself relies on) before doing any work, and records a
-// violation if that create fails with EEXIST while it should be the sole
-// holder. This catches a double-entry directly, independent of whether
-// `state.json` happens to reveal it -- a future regression that somehow
-// stops corrupting `state.json` (e.g. a change to what `fn` does) would
-// still be caught here. The critical section briefly busy-waits (a few ms)
-// to widen the window enough for a genuine violation to matter, matching
-// what actually reproduced the round-1 regression during investigation.
-test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 300_000 }, async (t) => {
+// The lease test above only infers a double entry from a clobbered write.
+// This one sees it directly: each contender's critical section (inside the
+// real, exported withProviderStateLock) first creates a marker file
+// exclusively and records a violation if another holder's marker is there.
+test('withProviderStateLock never grants two processes the state lock at once (marker proof)', { timeout: 300_000 }, async (t) => {
   const TRIALS = 15;
   const CONTENDERS = 10;
   const pool = await startContenders(t, CONTENDERS, `
-import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+import { withProviderStateLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
 import fs from 'node:fs';
-function handle({ lockDir, markerPath, violationsPath }) {
-  // Mutual exclusion is the property under test, not how long a contender may wait: a bound that
-  // a loaded machine can exhaust would fail the trial for a reason unrelated to exclusivity.
-  withFileLock(lockDir, () => {
+function handle({ markerPath, violationsPath }) {
+  // Mutual exclusion is the property under test, not how long a contender may wait.
+  withProviderStateLock(() => {
     let mfd;
     try {
       mfd = fs.openSync(markerPath, 'wx');
@@ -479,16 +438,10 @@ function handle({ lockDir, markerPath, violationsPath }) {
   for (let trial = 0; trial < TRIALS; trial += 1) {
     const runtimeDir = mkTempDir();
     t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
-    const { lockDir } = providerCapacityStatePaths(runtimeDir);
-    fs.mkdirSync(lockDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(lockDir, '0000000001.json'),
-      JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
-    );
     const markerPath = path.join(runtimeDir, 'marker');
     const violationsPath = `${markerPath}.violations`;
 
-    await pool.race(Array.from({ length: CONTENDERS }, () => ({ lockDir, markerPath, violationsPath })));
+    await pool.race(Array.from({ length: CONTENDERS }, () => ({ markerPath, violationsPath })));
 
     const hasViolation = fs.existsSync(violationsPath);
     assert.equal(
@@ -501,6 +454,26 @@ function handle({ lockDir, markerPath, violationsPath }) {
   }
 });
 
+// A process that holds the state lock and is started with `holdMs` prints
+// "held" once it has it. `holdMs` 0 means hold until killed.
+function spawnStateLockHolder(t, holdMs) {
+  const holder = spawn(process.execPath, ['--input-type=module', '-e', `
+import fs from 'node:fs';
+import { withProviderStateLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+withProviderStateLock(() => {
+  fs.writeSync(1, 'held\\n');
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ${holdMs || 600_000});
+});
+`], { stdio: ['ignore', 'pipe', 'inherit'] });
+  t.after(() => holder.kill('SIGKILL'));
+  const exited = new Promise((resolve) => holder.once('exit', (code, signal) => resolve({ code, signal })));
+  const ready = new Promise((resolve, reject) => {
+    holder.stdout.once('data', resolve);
+    holder.once('exit', (code) => reject(new Error(`lock holder exited (code ${code}) before taking the lock`)));
+  });
+  return { holder, exited, ready };
+}
+
 // A real second process holds the state lock for HOLD_MS, then releases it.
 // An explicit short lockWaitMs must give up with ProviderCapacityLockError
 // well before the holder lets go; omitting lockWaitMs must keep the
@@ -509,35 +482,37 @@ test('lease acquire waits for a live lock holder only as long as lockWaitMs, and
   const HOLD_MS = 1500;
   const runtimeDir = mkTempDir();
   t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
-  const { lockDir } = providerCapacityStatePaths(runtimeDir);
-
-  const holder = spawn(process.execPath, ['--input-type=module', '-e', `
-import fs from 'node:fs';
-import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
-withFileLock(${JSON.stringify(lockDir)}, () => {
-  fs.writeSync(1, 'held\\n');
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ${HOLD_MS});
-});
-`], { stdio: ['ignore', 'pipe', 'inherit'] });
-  t.after(() => holder.kill());
-  const holderExited = new Promise((resolve) => holder.once('exit', resolve));
-  await new Promise((resolve, reject) => {
-    holder.stdout.once('data', resolve);
-    holder.once('exit', (code) => reject(new Error(`lock holder exited (code ${code}) before taking the lock`)));
-  });
+  const { holder, exited, ready } = spawnStateLockHolder(t, HOLD_MS);
+  await ready;
 
   const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_lock_wait', runtimeDir };
   const started = Date.now();
   assert.throws(
     () => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }),
-    (err) => err instanceof ProviderCapacityLockError && err.holderPid === holder.pid,
+    (err) => err instanceof ProviderCapacityLockError && err.code === 'provider-capacity-lock-stale' && err.holderPid === holder.pid,
   );
   assert.ok(Date.now() - started < HOLD_MS, `a 50ms lockWaitMs must give up before the ${HOLD_MS}ms hold ends`);
 
   const selected = acquireProviderAccountLease(args);
   assert.equal(selected?.status, 'selected');
   assert.ok(Date.now() - started >= HOLD_MS - 100, 'the default wait must have outlasted the holder rather than finding the lock free');
-  assert.equal(await holderExited, 0);
+  assert.equal((await exited).code, 0);
+});
+
+test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 30_000 }, async (t) => {
+  const runtimeDir = mkTempDir();
+  t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+  const { holder, exited, ready } = spawnStateLockHolder(t, 0);
+  await ready;
+  assert.equal(inspectProviderCapacityLock().holderPid, holder.pid, 'the kernel lists the live holder');
+  const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_after_kill', runtimeDir };
+  assert.throws(() => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }), ProviderCapacityLockError);
+  holder.kill('SIGKILL');
+  await exited;
+  const started = Date.now();
+  assert.equal(acquireProviderAccountLease({ ...args, lockWaitMs: 1000 })?.status, 'selected');
+  assert.ok(Date.now() - started < 1000, 'no wait for a dead holder');
+  assert.equal(inspectProviderCapacityLock().present, false);
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
@@ -782,12 +757,16 @@ test('the account lock is exclusive per account, independent of other accounts a
   const first = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
   assert.ok(first);
   assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'a live holder keeps it');
-  assert.ok(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'b' }), 'another account is not affected');
+  const other = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'b' });
+  assert.ok(other, 'another account is not affected');
   assert.ok(acquireProviderAccountLease({ runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-1', runtimeDir }), 'leasing does not wait for an account lock');
   first.release();
+  other.release();
   const again = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
   assert.ok(again, 'released, it can be taken again');
   assert.equal(again.dir, providerAccountDir(runtimeDir, 'xai', 'a'));
+  assert.equal(fs.statSync(again.dir).isDirectory(), true, 'the account directory exists while the lock is held');
+  again.release();
 });
 
 test('an unsafe provider or account id never becomes a path', () => {
@@ -813,14 +792,82 @@ test('the async acquire waits with timers, so the event loop keeps running, and 
   lock.release();
 });
 
-test('a lock whose holder died is reclaimed at once', async () => {
+// A process that takes the account lock of xai/a, optionally starts a child through
+// it (`node` sleeping `childMs`) and prints "held <childPid|0>", then waits to be killed.
+function spawnAccountLockHolder(t, runtimeDir, { childMs = 0, wrap = [] } = {}) {
+  const source = `
+import fs from 'node:fs';
+import { tryAcquireAccountLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+const lock = tryAcquireAccountLock({ runtimeDir: ${JSON.stringify(runtimeDir)}, provider: 'xai', accountId: 'a' });
+if (!lock) { fs.writeSync(1, 'busy\\n'); process.exit(3); }
+let childPid = 0;
+if (${childMs} > 0) {
+  const child = lock.spawnHolding(process.execPath, ['-e', 'setTimeout(() => {}, ${childMs})'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  childPid = child.pid;
+}
+fs.writeSync(1, 'held ' + childPid + '\\n');
+setInterval(() => {}, 1000);
+`;
+  const [command, ...prefix] = wrap.length > 0 ? [...wrap, process.execPath] : [process.execPath];
+  const holder = spawn(command, [...prefix, '--input-type=module', '-e', source], { stdio: ['ignore', 'pipe', 'inherit'] });
+  t.after(() => holder.kill('SIGKILL'));
+  const exited = new Promise((resolve) => holder.once('exit', (code, signal) => resolve({ code, signal })));
+  const ready = new Promise((resolve, reject) => {
+    holder.stdout.once('data', (chunk) => {
+      const m = /^held (\d+)/.exec(String(chunk));
+      if (m) resolve(Number(m[1]));
+      else reject(new Error(`holder did not take the lock: ${chunk}`));
+    });
+    holder.once('exit', (code) => reject(new Error(`lock holder exited (code ${code}) before taking the lock`)));
+  });
+  return { holder, exited, ready };
+}
+
+const pidAlive = (pid) => { try { process.kill(pid, 0); return true; } catch (err) { return err.code === 'EPERM'; } };
+
+test('an account-lock holder killed by SIGKILL with no child frees the lock at once', { timeout: 30_000 }, async (t) => {
   const runtimeDir = mkTempDir();
-  const dead = spawnSync(process.execPath, ['-e', '']);
-  const lockDir = path.join(providerAccountDir(runtimeDir, 'xai', 'a'), 'lock');
-  fs.mkdirSync(lockDir, { recursive: true });
-  fs.writeFileSync(path.join(lockDir, '0000000001.json'), JSON.stringify({ holder: { pid: dead.pid }, acquiredAt: new Date().toISOString() }));
-  const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: 100 });
-  assert.ok(lock);
+  const { holder, exited, ready } = spawnAccountLockHolder(t, runtimeDir);
+  await ready;
+  assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'a live holder keeps it');
+  holder.kill('SIGKILL');
+  await exited;
+  const lock = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
+  assert.ok(lock, 'the dead holder released it at once');
+  lock.release();
+});
+
+test('an account-lock holder killed while its probe child still runs keeps the lock until the child exits', { timeout: 30_000 }, async (t) => {
+  const runtimeDir = mkTempDir();
+  const CHILD_MS = 2000;
+  const { holder, exited, ready } = spawnAccountLockHolder(t, runtimeDir, { childMs: CHILD_MS });
+  const childPid = await ready;
+  t.after(() => { try { process.kill(childPid, 'SIGKILL'); } catch { /* already gone */ } });
+  assert.ok(childPid > 0 && pidAlive(childPid));
+  holder.kill('SIGKILL');
+  await exited;
+  assert.ok(pidAlive(childPid), 'precondition: the child outlives its holder');
+  assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'the live child keeps the lock for its dead holder');
+  // A waiting acquire gets it once the child has exited, and not before.
+  const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: CHILD_MS + 5000 });
+  assert.equal(pidAlive(childPid), false, 'acquired only after the child exited');
+  lock.release();
+});
+
+test('a process in its own PID namespace with the same pinned state root contends for the same account lock', { timeout: 30_000 }, async (t) => {
+  const probe = spawnSync('bwrap', ['--unshare-pid', '--dev-bind', '/', '/', 'true']);
+  if (probe.error || probe.status !== 0) {
+    t.skip('bwrap --unshare-pid is not usable on this machine');
+    return;
+  }
+  const runtimeDir = mkTempDir();
+  const { holder, exited, ready } = spawnAccountLockHolder(t, runtimeDir, { wrap: ['bwrap', '--unshare-pid', '--die-with-parent', '--dev-bind', '/', '/'] });
+  await ready;
+  assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'the sandboxed holder excludes the host');
+  holder.kill('SIGKILL');
+  await exited;
+  // bwrap's own init holds nothing: once the sandbox is gone the lock is free.
+  const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: 5000 });
   lock.release();
 });
 
@@ -876,21 +923,23 @@ test('an unlock probe that cannot get the account lock in time reports that and 
   holders.forEach((h) => h.release());
 });
 
-test('the unlock probe can report its child, which is recorded in the account lock record', async () => {
+test('the unlock probe starts its call through the account lock, so the call holds it', async () => {
   const { runtimeDir, config } = lockedAccountFixture();
-  let recorded = null;
+  let heldDuringCall = null;
   const tried = await probeQuarantinedAccounts({
     runnerConfig: config,
     provider: 'openai-codex',
     runtimeDir,
-    probe: async ({ accountId, onSpawn }) => {
-      onSpawn({ pid: process.pid });
-      const lockDir = path.join(providerAccountDir(runtimeDir, 'openai-codex', accountId), 'lock');
-      const file = fs.readdirSync(lockDir).filter((n) => /^\d+\.json$/.test(n)).sort().pop();
-      recorded = JSON.parse(fs.readFileSync(path.join(lockDir, file), 'utf8')).child;
+    probe: async ({ accountId, spawnHolding }) => {
+      const child = spawnHolding(process.execPath, ['-e', 'setTimeout(() => {}, 200)'], { stdio: ['ignore', 'pipe', 'pipe'] });
+      await child.borrowed;
+      heldDuringCall = child.pid > 0;
       return { ok: true };
     },
   });
   assert.equal(tried[0].unlocked, true);
-  assert.equal(recorded.pid, process.pid);
+  assert.equal(heldDuringCall, true);
+  const free = tryAcquireAccountLock({ runtimeDir, provider: 'openai-codex', accountId: tried[0].accountId });
+  assert.ok(free, 'released after the call');
+  free.release();
 });

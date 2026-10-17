@@ -396,7 +396,7 @@ function sweepProcessGroup(childPid) {
 
 /**
  * runBorrowed(handle, spec, { sync }) -- the one way a child command runs
- * with the holder's authority. `spec = { command, args, cwd, env, stdin }`.
+ * with the holder's authority. `spec = { command, args, cwd, env, stdin, detached }`.
  * The description goes to the child at slot 3 and `FGOS_LOCK_FD=<name>:3`
  * names it; a git command gets `-c gc.auto=0 -c maintenance.auto=false`
  * in front of its arguments. After the child exits, whatever still holds
@@ -417,8 +417,9 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   const argv = borrowedArgv(spec.command, spec.args);
   const childEnv = { ...(spec.env ?? process.env), [LOCK_FD_ENV]: `${handle.name}:${LOCK_FD_SLOT}` };
   const stdio = [spec.stdin ?? 'ignore', 'pipe', 'pipe', entry.fd];
-  // Off Linux the leftovers are the child's process group, so it must lead one.
-  const detached = process.platform !== 'linux' && process.platform !== 'win32';
+  // Off Linux the leftovers are the child's process group, so it must lead one;
+  // a caller that signals the child's group itself asks for one everywhere.
+  const detached = spec.detached === true || (process.platform !== 'linux' && process.platform !== 'win32');
 
   if (sync) {
     entry.borrows += 1;
