@@ -46,7 +46,7 @@ jobs:
         run: npm install
 
       - name: Rust tests
-        run: cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos -p fgctl
+        run: cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos -p fgctl --no-fail-fast
 
       - name: Build the host binary
         run: cargo build -p fgos

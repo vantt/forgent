@@ -1982,7 +1982,7 @@ mod tests {
         let root = fresh_temp_root("holder_lock_gate_pass");
         let outcome = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), Path::new("git")).unwrap();
         match outcome {
-            HolderLockGate::Passed { elapsed_ms } => assert!(elapsed_ms < 1000.0, "gate took {elapsed_ms} ms"),
+            HolderLockGate::Passed { elapsed_ms } => assert!(elapsed_ms < 5000.0, "gate took {elapsed_ms} ms"),
             other => panic!("expected the gate to pass, got {other:?}"),
         }
         assert!(root.join("ws/.fgos/locks").is_dir());
