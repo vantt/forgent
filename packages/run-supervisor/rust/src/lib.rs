@@ -25,3 +25,9 @@ pub mod go_channel;
 
 /// One-time publication of a layout file by hard link.
 pub mod publish;
+
+/// Flags, exit codes and dispatch shared by the `fgos internal` routes of this crate.
+pub mod route;
+
+/// The `fgos internal attempt-step` route: hands a step to the Node payload.
+pub mod attempt_step;

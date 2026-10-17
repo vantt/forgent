@@ -157,6 +157,13 @@ fn main() {
         if args.get(2).is_some_and(|a| a == "holder-lock-helper") {
             std::process::exit(fgos_holder_lock::helper::main(&args[3..]));
         }
+        // The run supervisor's routes: supervise, gate, adopt, attempt-step.
+        let rest: Vec<String> = args[2..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+        if let Some(route) = rest.first() {
+            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..]) {
+                std::process::exit(code);
+            }
+        }
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 

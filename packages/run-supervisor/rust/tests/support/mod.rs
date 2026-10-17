@@ -4,6 +4,8 @@
 //! named skip and ends.
 #![allow(dead_code)]
 
+pub mod supervisor;
+
 use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::os::fd::OwnedFd;
