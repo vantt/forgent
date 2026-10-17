@@ -27,7 +27,8 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, CREDENTIAL_HOME_KEPT, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -1899,4 +1900,92 @@ export async function finalizeConfinementResources({
     cleanupResult: updatedDesc.cleanupResult,
     descriptor: updatedDesc,
   };
+}
+
+const ATTEMPT_HOME_MARKER_CONTRACT = 'confinement-resource-ownership.v2';
+
+/** A home that does not belong to the attempt, or whose marker cannot be read: nothing is removed. */
+export class AttemptHomeError extends Error {
+  constructor(code, message) {
+    super(`${code}: ${message}`);
+    this.name = 'AttemptHomeError';
+    this.code = code;
+  }
+}
+
+function attemptFinalizationDescriptors(runDir) {
+  const dir = path.join(runDir, 'protected', 'confinement-finalization');
+  let names;
+  try { names = fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort(); } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw new AttemptHomeError('finalization-descriptor-unreadable', `${dir}: ${err.code ?? err.message}`);
+  }
+  const found = [];
+  for (const name of names) {
+    const file = path.join(dir, name);
+    try { found.push({ file, descriptor: JSON.parse(fs.readFileSync(file, 'utf8')) }); } catch {
+      throw new AttemptHomeError('finalization-descriptor-unreadable', `${name} cannot be read`);
+    }
+  }
+  return found;
+}
+
+function readAttemptHomeMarker(homeDir, attemptId, runDir) {
+  let marker;
+  try { marker = JSON.parse(fs.readFileSync(path.join(homeDir, OWNERSHIP_MARKER_FILE), 'utf8')); } catch {
+    throw new AttemptHomeError('home-marker-unreadable', `${homeDir} has no readable ownership marker`);
+  }
+  if (marker?.contract !== ATTEMPT_HOME_MARKER_CONTRACT || marker.creator !== 'fgos-confinement' || marker.attemptId !== attemptId || marker.runDir !== runDir) {
+    throw new AttemptHomeError('home-marker-mismatch', `${homeDir} is not a version 2 home of attempt ${attemptId} in ${runDir}`);
+  }
+  return marker;
+}
+
+/**
+ * Give the credential back and remove every private home of one attempt, whatever way the attempt
+ * ended. The caller (supervisor or adopt step) holds the attempt lock and the process domain is
+ * empty, so no agent still uses a home. Unlike `finalizeConfinementResources` this never keeps a home
+ * for the kind of ending; it keeps one only when its renewed login is not safe anywhere else yet.
+ *
+ * Every marker is checked before anything is removed: a marker that is not version 2 or names another
+ * attempt throws `AttemptHomeError` and leaves all homes in place.
+ *
+ * @returns {{state: 'cleaned'|'credential-home-kept', homes: number}}
+ */
+export function finalizeAttemptHome({ runDir, attemptId } = {}) {
+  if (typeof runDir !== 'string' || typeof attemptId !== 'string' || attemptId === '') {
+    throw new AttemptHomeError('invalid-arguments', 'runDir and attemptId are required');
+  }
+  const descriptors = attemptFinalizationDescriptors(runDir);
+  const homes = [];
+  for (const { descriptor } of descriptors) {
+    for (const res of descriptor.resources || descriptor.temporaryDirectories || []) {
+      const target = res.pathRef || res.path;
+      if (!target || homes.some((h) => h.target === target) || !fs.existsSync(target)) continue;
+      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir) });
+    }
+  }
+  let kept = 0;
+  for (const { target, marker } of homes) {
+    const result = writeBackRenewedCredential(target, marker);
+    if (result.status === 'failed' && result.keepHome) {
+      kept += 1;
+      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home kept for a later retry\n`);
+      continue;
+    }
+    if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+    fs.rmSync(target, { recursive: true, force: true });
+    removeEmptyDispatchParent(target, marker.dispatchId);
+  }
+  if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, homes: homes.length };
+  for (const { file, descriptor } of descriptors) {
+    if (descriptor.cleanupState === 'cleaned') continue;
+    publishMutableProjection(file, {
+      ...descriptor,
+      cleanupState: 'cleaned',
+      cleanupResult: { kind: 'cleaned' },
+      updatedAt: new Date().toISOString(),
+    });
+  }
+  return { state: 'cleaned', homes: homes.length };
 }
