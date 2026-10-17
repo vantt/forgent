@@ -117,8 +117,12 @@ const builtinName = (specifier) => specifier.replace(/^node:/, '').split('/')[0]
 const LOCK_DOOR_FILES = new Set([
   'src/holder-lock/index.mjs',
   'src/holder-lock/driver.mjs',
+  // The Windows transport: one `fgos internal lock-hold` helper per held lock,
+  // its release, and the borrowed child's sweep.
+  'src/holder-lock/hold-transport.mjs',
 ].map((p) => path.join(root, p)));
-const LOCK_DOOR_BUILTINS = new Set(['child_process']);
+// events and stream: the Windows transport hands back a ChildProcess-shaped borrow.
+const LOCK_DOOR_BUILTINS = new Set(['child_process', 'events', 'stream']);
 
 // Defense in depth: even a file legitimately in the graph must never itself
 // perform a process-control call. The scan runs on the lexed code view, so
@@ -218,6 +222,7 @@ const EXPECTED_CLOSURE = [
   // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
   'src/holder-lock/index.mjs',
   'src/holder-lock/driver.mjs',
+  'src/holder-lock/hold-transport.mjs',
   'src/holder-lock/protocol.mjs',
   'src/holder-lock/registry.mjs',
   'src/holder-lock/lock-scope.mjs',
