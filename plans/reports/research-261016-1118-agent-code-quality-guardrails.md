@@ -14,6 +14,30 @@ Tài liệu Claude Code nói thẳng: CLAUDE.md là "context, not enforced confi
 
 Báo cáo tổng hợp từ 4 lane đọc song song: bề mặt instruction, cơ chế kiểm tra tự động, forensics trên git, và thực hành bên ngoài.
 
+## 0. Vấn đề cốt lõi và thứ tự giải quyết (chủ repo chốt 2026-10-17)
+
+**Vấn đề cốt lõi là luật không đến được agent đúng lúc nó làm việc:**
+
+- **Có luật mà không được nạp**, vì cách tổ chức, vì bị tràn, vì bị lẫn, hoặc vì bị che:
+  - *tổ chức:* danh sách luật luôn nạp chép tay chỉ tới L8, nên L10 "một cửa" không bao giờ tới agent (mục 2a); luật "tìm cái đã có" chỉ có lúc lập plan, không có trong worker contract và brief mà worker thật sự đọc (mục 2);
+  - *tràn:* codex chỉ đọc 32 KiB đầu `AGENTS.md`, mọi luật sau ngưỡng biến mất không báo (mục 2d);
+  - *lẫn:* khoảng 15-17 KB luật bị Claude đọc hai lần, luật KISS/DRY nằm lọt giữa khối lặp; hai kit cùng tiêm hai khối Rules nói ngược nhau (mục 2b, điều tra 2026-10-06);
+  - *che:* hễ có `CLAUDE.md` thì Claude bỏ qua `AGENTS.md` (mục 2d); worktree không có `.claude/rules` vì bị gitignore.
+- **Thiếu luật:** 3 trong 7 nguyên tắc của chủ repo (phân tầng một chiều, hexagonal, ưu tiên Rust cho component nền) chưa có luật nào; chưa có luật "thay thế thì xoá" ở lúc implement (mục 2).
+
+Từ đó agent làm theo nguồn gần nhất nó thấy, không biết cơ chế nào đã có chủ, nên code mọc tràn lan (8 ca trùng ở mục 1), hệ thống phình ra, và mất kiểm soát. Các ca trùng, primitive đặt sai tầng và migration bỏ dở là **hậu quả**; dọn chúng mà không sửa nguồn thì chúng mọc lại.
+
+**Thứ tự giải quyết: kiểm soát ở nguồn trước, dọn hậu quả sau.**
+
+1. **Kiểm soát ở nguồn** (mục 4, nhóm A):
+   - *Một sổ luật:* mỗi luật có đúng một nguồn chuẩn (`core/instructions/` theo contract projection), có ID, phạm vi (agent nào, giai đoạn nào), và trỏ tới cơ chế kiểm của nó nếu có.
+   - *Bảo đảm giao luật:* chiếu sổ luật tới từng CLI qua đúng một đường theo bảng nạp đã đo (mục 2d), trong ngân sách dung lượng (dưới 32 KiB cho codex), không bị che (`CLAUDE.md` chỉ import `AGENTS.md`, đã làm ở `40c667c83`), không trùng, luật quan trọng đặt trước; và đưa luật cần lúc viết code vào worker contract cùng mẫu brief của lead.
+   - *Kiểm chứng giao luật:* một check máy móc (doctor và script `instruction-audit`) fail khi một luật đã đăng ký không tới được một CLI, tới hai lần, hoặc nằm sau ngưỡng cắt.
+   - *Phủ luật:* đối chiếu 7 nguyên tắc với sổ luật để thấy chỗ thiếu; luật nào cưỡng chế được thì gắn với test (P1, P2, P4) thay vì chỉ là văn xuôi.
+2. **Dọn hậu quả** (mục 4, nhóm B): chuyển primitive nền về một nhà ở tầng thấp, gom 8 ca trùng, hoàn tất các migration bỏ dở, dọn hook và bản sao luật thừa.
+
+Lưu ý từ điều tra 2026-10-06 (mục 7): luật đã nạp vẫn có lúc không đủ (lỗi "hỏi thừa" lặp lại khi luật đang được nạp). Vì vậy "kiểm soát ở nguồn" ở đây gồm cả giao luật đúng chỗ lẫn gắn luật với cơ chế kiểm, không chỉ là viết thêm hay chuyển chỗ văn xuôi.
+
 ## 1. Bằng chứng: các ca trùng thật và nguyên nhân gốc
 
 | # | Ca trùng | Vị trí | Nguyên nhân |
@@ -30,6 +54,18 @@ Báo cáo tổng hợp từ 4 lane đọc song song: bề mặt instruction, cơ
 Đính chính báo cáo herdr ngày 10-15: ý "launcher.sh trùng với cli-spawn" **không đúng**. Chỉ `herdr-round.mjs:96-102` sinh launcher. Phần trùng thật là `/proc` identity, liveness và poll.
 
 Không tìm thấy ca nào do các lane song song cùng xây một thứ. Tuy vậy, kế hoạch 3-lane trong báo cáo herdr chính là nơi rủi ro này sẽ xuất hiện.
+
+### 1a. Chuỗi nguyên nhân từ gốc tới hậu quả
+
+| Tầng | Nguyên nhân | Bằng chứng |
+|---|---|---|
+| Gốc (mục 0) | Luật không tới agent: không được nạp (tổ chức, tràn, lẫn, che) hoặc thiếu luật | Mục 2a-2d; nguyên tắc 1, 2 chưa có luật ở lúc implement |
+| Trực tiếp 1 | Primitive dùng chung không có nhà ở tầng thấp: hàm nền nằm rải trong module tính năng hoặc adapter, nên tìm cũng không có chỗ rõ ràng và không biết bản nào là chuẩn | Ca 4 (không có helper pid trong `src/util`, 12 bản), ca 1 (`process-identity.mjs` nằm ở tầng `dispatch`) |
+| Trực tiếp 2 | Phân tầng và guard import đẩy sang chép: bản có sẵn ở tầng không được import, guard chỉ cấm mà không chỉ module lá dùng chung | Ca 2 (`reconciliation-planner` chép parser `/proc/stat`), ca 7 (`setup` tự viết resolve repo root) — vi phạm nguyên tắc 2 |
+| Trực tiếp 3 | Thay cơ chế mới nhưng không có tiêu chí "xoá xong mới xong" | Ca 3 (`rename.sh` giữ resolver cũ sau khi chuyển sang Rust), ca 5 (bản fix chỉ áp vào vài bản sao) — vi phạm nguyên tắc 1 |
+| Sâu | Luật "tìm cái đã có" không ở trong brief, mà brief là nguồn quyết định thật (40/46 tên report lấy từ brief) | `conditions-261006.md` |
+| Sâu | Quy trình thưởng cho việc thêm, không cho việc bớt: tiêu chí "đủ hết mới xong", review luôn sinh thêm phase, không ai giữ tổng thể, cùng một việc bị xây hai lần | `prompt-261008-bloat-root-cause-discussion.md` mục 5 |
+| Ngoài phạm vi | Chính sản phẩm fgOS có nhiều cửa cho cùng một việc; khoảng một nửa số ca đến từ sản phẩm, công cụ, vận hành | `harness-investigation-261006-synthesis.md` mục 1 |
 
 ## 2. Bề mặt instruction: vì sao luật có mà không ăn
 
@@ -211,15 +247,29 @@ Thêm một dòng tương ứng vào phần Red flags.
 
 Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node và script ở hai đường dẫn không tồn tại. Thêm một check nhỏ vào `fgos doctor` (`src/setup/registrations.mjs`) để báo lệnh hook bị đăng ký trùng. Dọn tay chỉ có tác dụng tới lần `ak kit refresh` sau; cách bền là hợp đồng phân quyền sở hữu file giữa fgOS và các bộ cài khác (hook nhận diện theo đường dẫn script, mỗi tool chỉ sửa khối của mình) trong backlog `p-7eb9e65b`, cộng với `doctor --fix` an toàn (chạy từng fix, chạy thử, sửa ở mức key, có backup) trong backlog `p-68be2ae3`.
 
-## 5. Thứ tự làm
+### Đề xuất bổ sung theo chuỗi nguyên nhân (2026-10-17)
 
-1. P1 + P2: test trùng, owner trong manifest, allowlist ban đầu = 8 ca. Đây là cổng đã chặn được nguyên nhân chính.
-2. P3 + P4: sửa worker contract và skill implement/planning (render lại qua `npm run build:skills`).
-3. P5: chốt luật mới, mở rộng phần chiếu L1–L10, rút gọn instruction.
-4. P6: hook Stop/SubagentStop gọi lại chính test của P1.
-5. Dọn dần allowlist: gom ca 1 (`herdr-round` về `process-identity`), ca 4 (helper pid trong `src/util`), ca 3 (rename.sh qua facade Rust)… mỗi ca một item. Ca 1 nên đi cùng M5 trong báo cáo herdr.
+- **P8. Primitive nền có nhà ở tầng thấp** (nguyên tắc 2, 4): chuyển các hàm nền dùng chung (kiểm tra pid, đọc `/proc`, ghi file atomic, resolve `.fgos` và repo root) về một module `kernel`/`src/util`, hoặc component Rust nền theo nguyên tắc 4; P2 chỉ ghi tên chủ thì chưa đủ.
+- **P9. Guard import phải chỉ đường**: guard nào cấm một import thì thông báo và test phải nêu module lá dùng chung cần import, để guard không còn "cấp phép" chép code.
+- **P10. Mẫu brief của lead**: brief giao việc viết code có mục bắt buộc "cơ chế có sẵn đã tìm và quyết định dùng lại, mở rộng hay viết mới, lý do".
+- **P11. Cân bằng thêm và bớt** (từ báo cáo bloat 2026-10-08): một dòng ngân sách (dung lượng, thời gian, path được phép) ở đầu mỗi plan; mục bắt buộc "cần xoá hay cắt gì" trong mỗi review.
 
-Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P4 nằm đúng chỗ worker đọc, P5 giảm nhiễu để luật còn lại được tuân theo.
+## 5. Thứ tự làm (sắp lại 2026-10-17: kiểm soát ở nguồn trước)
+
+**Nhóm A: kiểm soát ở nguồn (mục 0).**
+
+1. Sổ luật một nguồn: chốt cách sinh danh sách luật vào `core/instructions/` (P5, Q6); đối chiếu 7 nguyên tắc để lộ luật còn thiếu và chốt chúng (Q4).
+2. Giao luật: giữ `AGENTS.md` là kênh chung dưới 32 KiB, không che, không trùng (P5, Q5, Q7); đưa luật cần lúc viết code vào worker contract và mẫu brief (P3, P10).
+3. Kiểm chứng giao luật: check trong doctor và `instruction-audit` cho từng CLI (tới đủ, tới một lần, không nằm sau ngưỡng cắt); xác nhận bảng nạp bằng canary cho pi và agy.
+4. Gắn luật cưỡng chế được với cơ chế: P2 (chủ của từng năng lực), P1 (test chống trùng), P4 (thay thế thì xoá), P9 (guard chỉ đường), P6 (hook phản hồi sớm), P11 (ngân sách và mục "xoá gì").
+
+**Nhóm B: dọn hậu quả.**
+
+5. P8: chuyển primitive nền về tầng thấp.
+6. Dọn dần allowlist của P1: ca 1 (`herdr-round` về nhà chung), ca 4 (helper pid), ca 3 (`rename.sh` qua facade Rust)… mỗi ca một item; ca 1 đi cùng M5 trong báo cáo herdr.
+7. P7 và phần ak: dọn hook trùng, bản sao luật thừa (theo Q7).
+
+Mỗi bước ở nhóm A ghi ước lượng trọng lượng (số dòng, số file) trước khi lập plan, để chính cơ chế kiểm soát không thành hệ thống nặng tiếp theo (mục 7).
 
 ## 6. Quan hệ với các plan và contract đã có (rà 2026-10-17)
 
