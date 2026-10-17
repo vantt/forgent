@@ -58,6 +58,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { StoreError } from '../state/store.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
+import { addWorktreeSync } from './repo-locks.mjs';
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
 import { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 
@@ -647,23 +649,11 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * function in this module that stands up a fresh checkout — `createWorktree`
  * and `createDetachedMergeWorktree` below.
  *
- * `beforeProvision` (tsk-1mn, optional, default none): called with no
- * arguments right after the fast `.fgos/` strip and immediately before the
- * slow, synchronous `provisionDependencies` (`npm ci`/`npm install`) call
- * below — the exact seam `claimWork` (claim-port.mjs) needs to release
- * `main-checkout.lock` at. Neither this strip nor `provisionDependencies`
- * ever touches `repoRoot`'s own `.git/index` (both operate entirely inside
- * `worktreePath`, a directory the lock's own STR65 concern never covers —
- * main-checkout-lock.mjs's own header: "two concurrent writers racing this
- * checkout's own `.git/index`"), and every `repoRoot`-touching git call this
- * module makes (`worktree add`, `branch`) already ran before this function
- * is ever called — so releasing right here, mid-function, is provably safe
- * regardless of which caller passes the callback. `createDetachedMergeWorktree`
- * below never passes one: that call site's own lock hold
- * (`withMergeTargetSlot`, merge.mjs) already has a working heartbeat, so it
- * has no TTL-starvation gap to close and stays byte-identical.
+ * Runs after `git worktree add` has returned, so it holds no repo lock:
+ * the slow, synchronous `provisionDependencies` (`npm ci`/`npm install`)
+ * works entirely inside `worktreePath` and never touches `repoRoot`'s index.
  */
-function finishWorktreeSetup(repoRoot, worktreePath, branch, { beforeProvision } = {}) {
+function finishWorktreeSetup(repoRoot, worktreePath, branch) {
   // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
   // checkout would carry a snapshot frozen at fork time — stale the moment
   // main gets another uncommitted event, and a live escape hatch into the
@@ -691,16 +681,16 @@ function finishWorktreeSetup(repoRoot, worktreePath, branch, { beforeProvision }
   // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
   // for THIS worktree's own declared dependencies instead, correct at the
   // cost of the install itself.
-  beforeProvision?.();
   provisionDependencies(worktreePath);
   runWorktreeSetupCommands(worktreePath, repoRoot);
 }
 
 /**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
- * inside `repoRoot`. `opts.beforeProvision` (tsk-1mn, optional): forwarded
- * verbatim to `finishWorktreeSetup` — see that function's own doc for what
- * it's for and why the seam is safe.
+ * inside `repoRoot`. `opts.scope` (a lock scope) carries the caller's held
+ * locks into the worktree-admin acquire; a fresh scope when absent.
+ * `opts.startSha` forks a new branch from that commit instead of reading
+ * HEAD again (ignored when `opts.baseRef` is set or the branch exists).
  *
  * Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
@@ -727,6 +717,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
   fs.mkdirSync(baseDir, { recursive: true });
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${id}-`));
 
+  const scope = opts.scope ?? createLockScope('worktree');
   const reused = branchExists(repoRoot, branch);
   let relocated = false;
   if (reused) {
@@ -745,11 +736,13 @@ export function createWorktree(repoRoot, id, opts = {}) {
   if (!relocated) {
     try {
       if (reused) {
-        git(repoRoot, ['worktree', 'add', worktreePath, branch]);
+        addWorktreeSync(scope, repoRoot, [worktreePath, branch]);
       } else if (opts.baseRef) {
-        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.baseRef]);
+      } else if (opts.startSha) {
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.startSha]);
       } else {
-        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath]);
       }
     } catch (err) {
       try {
@@ -780,7 +773,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
   // fails, so a cleanup failure never masks the real error the caller needs
   // to see.
   try {
-    finishWorktreeSetup(repoRoot, worktreePath, branch, { beforeProvision: opts.beforeProvision });
+    finishWorktreeSetup(repoRoot, worktreePath, branch);
   } catch (err) {
     try {
       removeWorktree(repoRoot, worktreePath, { force: true });
@@ -1280,7 +1273,7 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
  * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise
  * fail this exact fallback outright.
  */
-function createDetachedMergeWorktree(repoRoot, id) {
+function createDetachedMergeWorktree(repoRoot, id, scope = createLockScope('worktree')) {
   const branch = branchNameFor(id);
   if (!branchExists(repoRoot, branch)) {
     createBranchRef(repoRoot, id);
@@ -1291,7 +1284,7 @@ function createDetachedMergeWorktree(repoRoot, id) {
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${branch.replace(/\//g, '-')}-merge-`));
 
   try {
-    git(repoRoot, ['worktree', 'add', '--detach', worktreePath, startCommit]);
+    addWorktreeSync(scope, repoRoot, ['--detach', worktreePath, startCommit]);
   } catch (err) {
     try {
       fs.rmSync(worktreePath, { recursive: true, force: true });
@@ -1331,9 +1324,9 @@ function createDetachedMergeWorktree(repoRoot, id) {
   return { path: worktreePath, branch, startCommit };
 }
 
-export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
+export async function withMergeEphemeralWorktree(repoRoot, id, fn, { scope } = {}) {
   const branch = branchNameFor(id);
-  const worktree = createDetachedMergeWorktree(repoRoot, id);
+  const worktree = createDetachedMergeWorktree(repoRoot, id, scope);
   try {
     const result = await fn(worktree);
     // fn committed on top of startCommit (a successful merge) -- land it on

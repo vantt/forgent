@@ -9,11 +9,15 @@
 // `withMainCheckout` gives its callback.
 
 import { spawnSync } from 'node:child_process';
-import { acquire, lockHolders, HolderLockError } from '../holder-lock/index.mjs';
+import { acquire, acquireSync, lockHolders, HolderLockError } from '../holder-lock/index.mjs';
 
 const MAIN_CHECKOUT = 'main-checkout';
 const MERGE_SLOT = 'merge-slot';
 const WORKTREE_ADMIN = 'worktree-admin';
+
+// `git worktree add` is short; the synchronous creation helpers wait for the
+// holder rather than failing, so concurrent adds queue instead of erroring.
+const DEFAULT_WORKTREE_ADMIN_WAIT_MS = 30_000;
 
 /** Hold the lock `name` across `fn(handle)`, release in `finally`. `held`
  * and `timeout` answers become one named error, `lock-held`, which carries
@@ -71,15 +75,41 @@ export function withWorktreeAdmin(scope, fgosDir, fn, { waitMs } = {}) {
   return withRepoLock(scope, WORKTREE_ADMIN, { fgosDir }, 'worktree admin', () => fn(), { waitMs });
 }
 
+function lockHeldError(res, label, fgosDir) {
+  const holders = lockHolders(WORKTREE_ADMIN, { fgosDir });
+  const pids = holders.kind === 'list' ? holders.pids : [];
+  return new HolderLockError(
+    'lock-held',
+    `${label} is held by another process${pids.length ? ` (pid ${pids.join(', ')})` : ''}${res.result === 'timeout' ? ` after waiting ${res.waitedMs} ms` : ''}`,
+    { lock: WORKTREE_ADMIN, label, holders: pids, timedOut: res.result === 'timeout' },
+  );
+}
+
+function runWorktreeAdd(repoRoot, args) {
+  const res = spawnSync('git', ['worktree', 'add', ...args], { cwd: repoRoot, encoding: 'utf8' });
+  if (res.error) throw res.error;
+  if (res.status !== 0) {
+    throw new Error(`git worktree add ${args.join(' ')} failed (exit ${res.status}): ${String(res.stderr).trim()}`);
+  }
+  return res.stdout;
+}
+
 /** addWorktree(scope, repoRoot, args) — `git worktree add <args>` under the
  * worktree-admin mutex; returns git's stdout, throws on a non-zero exit. */
 export function addWorktree(scope, repoRoot, args, { waitMs } = {}) {
-  return withWorktreeAdmin(scope, `${repoRoot}/.fgos`, () => {
-    const res = spawnSync('git', ['worktree', 'add', ...args], { cwd: repoRoot, encoding: 'utf8' });
-    if (res.error) throw res.error;
-    if (res.status !== 0) {
-      throw new Error(`git worktree add ${args.join(' ')} failed (exit ${res.status}): ${String(res.stderr).trim()}`);
-    }
-    return res.stdout;
-  }, { waitMs });
+  return withWorktreeAdmin(scope, `${repoRoot}/.fgos`, () => runWorktreeAdd(repoRoot, args), { waitMs });
+}
+
+/** addWorktreeSync(scope, repoRoot, args) — the same, for callers that are
+ * synchronous end to end (worktree creation helpers). Blocks the process for
+ * at most `waitMs` while another process holds worktree-admin. */
+export function addWorktreeSync(scope, repoRoot, args, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS } = {}) {
+  const fgosDir = `${repoRoot}/.fgos`;
+  const res = acquireSync(scope, WORKTREE_ADMIN, { fgosDir }, { waitMs });
+  if (res.result !== 'acquired') throw lockHeldError(res, 'worktree admin', fgosDir);
+  try {
+    return runWorktreeAdd(repoRoot, args);
+  } finally {
+    res.handle.release();
+  }
 }
