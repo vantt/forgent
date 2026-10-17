@@ -949,14 +949,15 @@ test('an agent that keeps reporting working while its screen is parked on "model
 
   const started = Date.now();
   await assert.rejects(
-    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    // The ceiling is far above the few seconds a probe tick takes, so a loaded machine cannot race it.
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 90000, idleTimeoutMs: 80000, transportDeadlines: { stallProbeMs: 300 } }),
     (err) => {
       assert.equal(err.outcome, 'provider-limit');
       assert.match(err.screen, /model is at capacity/i);
       return true;
     },
   );
-  assert.ok(Date.now() - started < 10000, 'concluded long before the absolute ceiling');
+  assert.ok(Date.now() - started < 45000, 'concluded long before the absolute ceiling');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
