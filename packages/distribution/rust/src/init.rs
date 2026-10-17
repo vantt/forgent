@@ -1081,7 +1081,8 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> 
 
 /// Holder-lock gate, preflight, capsule creation, atomic activation publishing, and post-activation tail.
 pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
-    // Before anything of the activation is written, so a refusal leaves no capsule behind.
+    // Before the capsule is written, so a refusal leaves no capsule behind
+    // (only the two lock directories the gate probed).
     if holder_lock_gate(args.workspace_root, &args.store_root.join("locks"), Path::new("git"))? == HolderLockGate::Unsupported {
         eprintln!("holder-lock: unsupported on Windows until its Windows driver lands");
     }
@@ -2041,7 +2042,7 @@ mod tests {
              if [ \"$a\" = -c ] && {{ [ \"$1\" = gc.auto=0 ] || [ \"$1\" = maintenance.auto=false ]; }}; then shift; n=$((n-1)); continue; fi\n\
              set -- \"$@\" \"$a\"\n\
              done\n\
-             exec {real} \"$@\"\n"
+             exec '{real}' \"$@\"\n"
         );
         std::fs::write(&wrapper, script).unwrap();
         std::fs::set_permissions(&wrapper, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -2060,7 +2061,7 @@ mod tests {
         let root = fresh_temp_root("holder_lock_gate_pass");
         let outcome = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), Path::new("git")).unwrap();
         match outcome {
-            HolderLockGate::Passed { elapsed_ms } => assert!(elapsed_ms < 5000.0, "gate took {elapsed_ms} ms"),
+            HolderLockGate::Passed { elapsed_ms } => assert!(elapsed_ms < 1000.0, "gate took {elapsed_ms} ms"),
             other => panic!("expected the gate to pass, got {other:?}"),
         }
         assert!(root.join("ws/.fgos/locks").is_dir());

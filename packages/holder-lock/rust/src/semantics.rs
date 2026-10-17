@@ -19,6 +19,10 @@ use crate::port::{self, Mode, Probe, Resource};
 /// another thread of the caller that copied the description before its exec.
 const FREE_WAIT: Duration = Duration::from_millis(500);
 
+/// A probe file this old belongs to a probe whose process died before it
+/// could remove it (its holder child sleeps 60 s at most).
+const STALE_PROBE: Duration = Duration::from_secs(120);
+
 /// Run the probe in `dir` (created when missing). `Ok` carries the wall time
 /// in ms; `Err` says which half failed.
 pub fn two_process_probe(dir: &Path) -> Result<f64, String> {
@@ -28,10 +32,26 @@ pub fn two_process_probe(dir: &Path) -> Result<f64, String> {
         return Err(drv.unsupported_detail().to_string());
     }
     fs::create_dir_all(dir).map_err(|e| format!("create {}: {e}", dir.display()))?;
+    sweep_stale_probes(dir);
     let path = dir.join(format!(".semantics-probe-{}.lock", std::process::id()));
     let result = probe_at(&path);
     let _ = fs::remove_file(&path);
     result.map(|()| (started.elapsed().as_secs_f64() * 1000.0 * 100.0).round() / 100.0)
+}
+
+fn sweep_stale_probes(dir: &Path) {
+    let Ok(entries) = fs::read_dir(dir) else { return };
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if !(name.starts_with(".semantics-probe-") && name.ends_with(".lock")) {
+            continue;
+        }
+        let age = entry.metadata().and_then(|m| m.modified()).ok().and_then(|t| t.elapsed().ok());
+        if age.is_some_and(|age| age > STALE_PROBE) {
+            let _ = fs::remove_file(entry.path());
+        }
+    }
 }
 
 fn probe_at(path: &Path) -> Result<(), String> {
@@ -63,7 +83,7 @@ fn probe_at(path: &Path) -> Result<(), String> {
         .stdout(Stdio::null())
         .stderr(Stdio::null());
     let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(3), &file)])
-        .map_err(|e| format!("spawn the holder child: {e}"))?;
+        .map_err(|e| format!("holder child program `sleep` could not be started: {e}"))?;
     drop(file);
     let while_alive = port::probe(&resource);
     let _ = child.kill();
