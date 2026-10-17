@@ -56,16 +56,7 @@ import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
 // the dispatch root instead.
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
-import {
-  acquireMainCheckoutLock,
-  renewMainCheckoutLockIfOwn,
-  dispatchLockFile,
-  ACQUIRED,
-  HELD,
-  AMBIGUOUS,
-  formatLockDurationMs,
-  lockRefusalDetail,
-} from '../main-checkout-lock.mjs';
+import { acquireDispatchCwdLock } from './cwd-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
 
 // Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in
@@ -723,56 +714,7 @@ export async function executeExecutorCli(
   // One dispatch at a time per working directory, because two writers in one tree race. A caller that
   // knows the dispatch cannot write the workspace (a read-only posture) shares the directory instead:
   // the panelists of one panel run side by side in the same checkout.
-  const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-  const lockFile = dispatchLockFile(cwd);
-  const lockRes = sharedCwd ? null : acquireMainCheckoutLock(fgosDir, {
-    identity,
-    ttlMs: timeoutMs,
-    now: Date.now(),
-    releaseOnExit: true,
-    lockFile,
-  });
-
-  if (lockRes?.status === HELD) {
-    const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
-    throw new DispatchError(
-      'dispatch-in-flight',
-      `dispatch for cwd "${cwd}" is already in flight (held for ${ageStr})${lockRefusalDetail(lockRes)}.`,
-      { cwd, lockAgeMs: lockRes.lockAgeMs, remainingTtlMs: lockRes.remainingTtlMs, holderPid: lockRes.holderPid },
-    );
-  }
-  if (lockRes?.status === AMBIGUOUS) {
-    throw new DispatchError(
-      'dispatch-in-flight',
-      `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
-      { cwd, lockAgeMs: lockRes.lockAgeMs },
-    );
-  }
-  if (lockRes && lockRes.status !== ACQUIRED) {
-    throw new DispatchError(
-      'dispatch-in-flight',
-      `dispatch lock for cwd "${cwd}" could not be acquired (status: ${lockRes.status}).`,
-      { cwd },
-    );
-  }
-
-  // S2 fix (dispatch-engine-liveness-hardening Phase 3): a run's total hold
-  // time is pre-spawn prep + up to timeoutMs + settlement, so any run that
-  // uses close to its full timeout used to lose exclusivity to a contender
-  // before finishing (the lock's own `ttlMs: timeoutMs` window expiring
-  // mid-run). Heartbeat renews this SAME lock's timestamp on a fraction of
-  // its own ttlMs, mirroring merge.mjs's own withMergeTargetSlot/
-  // mergeRunnerItem heartbeat (tsk-4l8) against the identical primitive.
-  // renewMainCheckoutLockIfOwn is a no-op (not an error) once this identity
-  // no longer owns the lock, so it is safe to call on every tick regardless
-  // of how the run ends.
-  const heartbeatIntervalMs = Math.max(250, Math.floor(timeoutMs / 3));
-  const heartbeat = lockRes
-    ? setInterval(() => {
-      renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
-    }, heartbeatIntervalMs)
-    : null;
-  heartbeat?.unref();
+  const cwdLock = sharedCwd ? null : acquireDispatchCwdLock(fgosDir, cwd);
 
   try {
     process.stderr.write(
@@ -918,8 +860,7 @@ export async function executeExecutorCli(
     };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
-    if (heartbeat) clearInterval(heartbeat);
-    lockRes?.release();
+    cwdLock?.release();
   }
 
 }

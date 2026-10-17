@@ -223,6 +223,11 @@ const EXPECTED_CLOSURE = [
   'src/holder-lock/lock-scope.mjs',
   'src/holder-lock/state-root.mjs',
   'src/util/host-bin-path.mjs',
+  // The per-cwd dispatch lock the planner reports on (holder list or probe
+  // through the door; no process control of its own) and the leaf error type
+  // its acquire raises.
+  'src/runner/dispatch/cwd-lock.mjs',
+  'src/runner/dispatch/dispatch-error.mjs',
 ].map((p) => path.join(root, p)).sort();
 
 // The lazy edges inside the closure. These modules are not loaded by reconcile;
