@@ -89,7 +89,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
@@ -122,6 +122,8 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2232,40 +2234,45 @@ registerCheck({
   check: () => checkProviderCapacityState(),
 });
 
-// C2c: withFileLock's own runtime reclaim handles a dead-holder lock the
-// moment the NEXT lease/release/quarantine call contends for it, but doctor
-// gets a passive, standalone signal so an operator sees a stuck lock (a
-// SIGKILL between openSync and unlinkSync leaves every future provider-
-// capacity call blocked for waitMs until the next contender happens to
-// reclaim it) without needing to wait for that next real call. Read-only;
-// never reclaims the lock itself -- pure inspection.
-export function checkProviderCapacityLockStale() {
-  let lock;
-  try {
-    lock = inspectProviderCapacityLock(defaultProviderCapacityRuntimeDir());
-  } catch (err) {
-    return { passed: false, message: `provider-capacity lock unreadable: ${err.message}` };
-  }
-  if (!lock.present) {
-    return { passed: true, message: 'no provider-capacity lock file present' };
-  }
-  if (lock.holderAlive === false) {
-    return {
-      passed: false,
-      message: `provider-capacity lock at ${lock.lockPath} is held by dead pid ${lock.holderPid} -- will self-heal on the next lease/release/quarantine call, or remove the file manually`,
-    };
-  }
-  if (lock.holderAlive === null) {
-    return { passed: true, message: `provider-capacity lock present but unreadable/unattributed at ${lock.lockPath} -- treated as live, not stale` };
-  }
-  return { passed: true, message: `provider-capacity lock held by live pid ${lock.holderPid} -- expected under real contention` };
-}
-
+// Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
+// of both lock directories, the borrow vectors, who holds each lock, the
+// cutover fences, the predecessor kill wait and the one state root. Bodies
+// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
+// directories; the `lock-fences` fix is the cutover step and acts only in a
+// workspace whose activated release already runs these locks.
 registerCheck({
-  id: 'provider-capacity-lock-stale',
-  description: 'provider-capacity lock file (if any) is not held by a dead process',
-  check: () => checkProviderCapacityLockStale(),
+  id: 'lock-kernel-semantics',
+  description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
+  check: (cwd) => checkLockKernelSemantics(cwd),
 });
+registerCheck({
+  id: 'lock-borrow-vectors',
+  description: 'a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)',
+  check: (cwd) => checkLockBorrowVectors(cwd),
+});
+registerCheck({
+  id: 'lock-holders',
+  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',
+  check: (cwd) => checkLockHolders(cwd),
+});
+registerCheck({
+  id: 'lock-fences',
+  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',
+  check: (cwd) => checkLockFences(cwd),
+});
+registerCheck({
+  id: 'lock-predecessor-kill-wait',
+  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',
+  check: (cwd) => checkLockPredecessorKillWait(cwd),
+});
+registerCheck({
+  id: 'state-root',
+  description: 'Node and the Rust host resolve the same state root and lock root',
+  check: (cwd) => checkStateRoot(cwd),
+});
+registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
+registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
+registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md D2): the two role-by-intelligence capability slots --

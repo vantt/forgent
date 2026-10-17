@@ -807,18 +807,6 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
   return { contract: 'provider-capacity-inspect.v1', providers };
 }
 
-// Doctor support: who holds the state lock right now, as the kernel lists it (a pure read, takes no
-// lock). A kernel lock is released when its holder dies, so a listed holder is always alive.
-// `runtimeDir` is unused: the lock is machine-scoped, not per state file.
-export function inspectProviderCapacityLock() {
-  const params = lockParams();
-  const lockPath = resolveLock('provider-state', params).v3Path;
-  const holderPid = firstHolderPid('provider-state', params);
-  return holderPid === null
-    ? { present: false, lockPath, holderPid: null, holderAlive: null }
-    : { present: true, lockPath, holderPid, holderAlive: true };
-}
-
 // Pre-Phase-05 gate H1 / post-review-recut.md "Fault classifier correction":
 // "quota/rate-limit -> account quarantine with parsed reset window when
 // available, otherwise conservative long TTL". A quota quarantine must never

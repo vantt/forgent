@@ -17,7 +17,6 @@ import {
   parseQuotaResetWindowMs,
   parseQuotaResetClockTime,
   inspectProviderCapacity,
-  inspectProviderCapacityLock,
   ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -28,6 +27,7 @@ import {
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 
 // Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
 // the machine's real ones, and every child process started below inherits it.
@@ -504,7 +504,7 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
   t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
   const { holder, exited, ready } = spawnStateLockHolder(t, 0);
   await ready;
-  assert.equal(inspectProviderCapacityLock().holderPid, holder.pid, 'the kernel lists the live holder');
+  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, [holder.pid], 'the kernel lists the live holder');
   const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_after_kill', runtimeDir };
   assert.throws(() => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }), ProviderCapacityLockError);
   holder.kill('SIGKILL');
@@ -512,7 +512,7 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
   const started = Date.now();
   assert.equal(acquireProviderAccountLease({ ...args, lockWaitMs: 1000 })?.status, 'selected');
   assert.ok(Date.now() - started < 1000, 'no wait for a dead holder');
-  assert.equal(inspectProviderCapacityLock().present, false);
+  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, []);
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
