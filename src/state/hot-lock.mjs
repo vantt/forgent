@@ -23,8 +23,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import childProcess from 'node:child_process';
 import nodeModule from 'node:module';
-import { judge, getBootId, getPidNs, getProcessStartTime } from '../runner/dispatch/process-identity.mjs';
-import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
+import { judge, getBootId, getPidNs, getProcessStartTime, observeProcess, pidExists } from '../runner/dispatch/process-identity.mjs';
+import { acquireSync, createLockScope, runProcessObserveRoute } from '../holder-lock/index.mjs';
 import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { appendEventCore } from './event-log.mjs';
@@ -34,6 +34,8 @@ const WAIT_TIMEOUT_MS = 5000;
 const POLL_MS = 10;
 const RECLAIM_WAIT_MS = 1000;
 const WINDOWS_RETRYABLE = new Set(['EPERM', 'EBUSY']);
+/** How long a host reading of a live holder is reused while a waiter polls. */
+const HOST_OBSERVE_TTL_MS = 250;
 
 /** Error raised by this module. `code` is the contract name; `category` feeds
  * the CLI's exit-code table (a timeout is `lock-timeout`, the rest are
@@ -107,19 +109,70 @@ export function hotPaths(fgosDir, resource = 'state') {
   return { dir, record: path.join(dir, `${resource}.hot`) };
 }
 
+/** One look at `pid` through the host's process facts: the creation time
+ * Windows keeps in the process object, which Node cannot read itself. A pid
+ * that does not exist is absent without asking. A host that cannot be run or
+ * answers badly is `unreadable`, never absent: the record stays unjudged. */
+export function observeViaHost(pid, { fgosDir } = {}) {
+  if (!pidExists(pid)) return { kind: 'absent' };
+  try {
+    const line = runProcessObserveRoute({ fgosDir, pid });
+    if (line.state === 'live') return { kind: 'live', startTime: line.startTime };
+    if (line.state === 'zombie') return { kind: 'zombie' };
+    if (line.state === 'absent') return { kind: 'absent' };
+    return { kind: 'unreadable', cause: line.cause ?? 'driver-missing' };
+  } catch {
+    return { kind: 'unreadable', cause: 'driver-missing' };
+  }
+}
+
+const liveReadings = new Map();
+
+/** The process table the judge reads for `fgosDir`: /proc where there is
+ * one, the host's process facts on Windows. A live reading is reused for a
+ * moment, since a waiter judges the same holder every few milliseconds; the
+ * existence check still runs every time, so a holder that dies is seen at
+ * once. A cached reading can outlive a holder whose pid was reused, so it may
+ * only ever be used to keep a record (`alive`), never to reclaim one: the
+ * reclaim judges with `cache: false`. */
+export function hotObserver(fgosDir, { platform = process.platform, cache = true } = {}) {
+  if (platform !== 'win32') return (pid) => observeProcess(pid);
+  return (pid) => {
+    if (!pidExists(pid)) {
+      liveReadings.delete(pid);
+      return { kind: 'absent' };
+    }
+    const cached = cache ? liveReadings.get(pid) : undefined;
+    const now = Date.now();
+    if (cached && now - cached.at < HOST_OBSERVE_TTL_MS) return cached.seen;
+    const seen = observeViaHost(pid, { fgosDir });
+    if (seen.kind === 'live') liveReadings.set(pid, { at: now, seen });
+    else liveReadings.delete(pid);
+    return seen;
+  };
+}
+
+/** Judge a hot record's holder: `alive`, `dead` or `unknown`. The one door
+ * the store, the reclaim and the doctor check read the table through. */
+export function judgeHotRecord(record, fgosDir, options) {
+  return judge(record, { observe: hotObserver(fgosDir, options) });
+}
+
 let selfRecord = null;
 const recordText = new Map();
 
-/** This process's record as the bytes written to disk, built once per writer
- * (fs-only: no exec). Without /proc the start time and namespace are left out
- * and the judge answers `unknown` for a live pid. */
-function recordOfSelf(writer) {
+/** This process's record as the bytes written to disk, built once per writer.
+ * Without a readable start time (no /proc, no host) the start time and
+ * namespace are left out and the judge answers `unknown` for a live pid.
+ * On Windows the start time is the creation time the host reads, asked once
+ * per process, here, before any critical section. */
+function recordOfSelf(writer, fgosDir) {
   const key = writer ? String(writer) : '';
   let text = recordText.get(key);
   if (text === undefined) {
     if (!selfRecord) {
       const bootId = getBootId();
-      const startTime = getProcessStartTime(process.pid);
+      const startTime = process.platform === 'win32' ? hostStartTimeOfSelf(fgosDir) : getProcessStartTime(process.pid);
       const pidNs = getPidNs();
       selfRecord = {
         v: 1,
@@ -133,6 +186,11 @@ function recordOfSelf(writer) {
     recordText.set(key, text);
   }
   return text;
+}
+
+function hostStartTimeOfSelf(fgosDir) {
+  const seen = observeViaHost(process.pid, { fgosDir });
+  return seen.kind === 'live' ? seen.startTime : null;
 }
 
 /** One look at the record file: `{state: 'absent'}`, `{state: 'unreadable',
@@ -182,7 +240,7 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   try {
     const again = readHotRecord(record);
     if (again.state !== 'ok' || again.raw !== observed.raw) return 'changed';
-    if (judge(again.record) !== 'dead') return 'changed';
+    if (judgeHotRecord(again.record, fgosDir, { cache: false }) !== 'dead') return 'changed';
     return unlinkRecordIfUnchanged(record, observed.raw) ? 'cleaned' : 'changed';
   } finally {
     attempt.handle.release();
@@ -235,7 +293,7 @@ function acquireRecord(fgosDir, resource, recordBytes) {
   for (;;) {
     if (tryLinkRecord(paths, recordBytes)) return paths;
     seen = readHotRecord(paths.record);
-    if (seen.state === 'ok' && judge(seen.record) === 'dead') {
+    if (seen.state === 'ok' && judgeHotRecord(seen.record, fgosDir) === 'dead') {
       // After a cleanup the next pass tries the link at once.
       if (reclaimDeadHolder(fgosDir, resource, seen) === 'cleaned') continue;
     }
@@ -359,7 +417,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     throw new HotLockError('hot-lock-reentry', `${resource}: this process already holds a hot mutex; a transaction may not open another`);
   }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
-  const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer));
+  const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
   depth += 1;
   noteLockHeld();
   const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });

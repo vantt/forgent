@@ -9,15 +9,16 @@
 //! the job name alive and polls it after a holder that died mid-borrow, so
 //! the next contender finds a job it can open and judge.
 
+use std::ffi::OsString;
+use std::fs::File;
 use std::io::{self, Read, Write};
-use std::os::windows::process::CommandExt;
-use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::platform::windows_job::{ancestor_chain, assign_and_resume, create_kill_job, filetime_now, job_name, open_job, own_session, JobView};
+use fgos_process::platform::windows_job::{ancestor_chain, create_kill_job, filetime_now, job_name, open_job, own_session, JobView};
+use fgos_process::platform::windows_spawn::{spawn, ChildStdio, SpawnSpec, Spawned};
 use fgos_process::{Domain, DomainState, ProcId, WindowsJob};
 
 use crate::driver;
@@ -57,15 +58,23 @@ fn setup_error(message: impl Into<String>) -> BorrowError {
     BorrowError::Spawn(io::Error::other(message.into()))
 }
 
-/// The job-keeper, started outside the job and not inheriting anything but
-/// its own pipes. `Err` when it did not acknowledge within the bound; the
-/// keeper is then ended.
-fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::Result<(Child, ChildStdin)> {
+/// The job-keeper, started outside the job and inheriting nothing but its own
+/// pipes. `Err` when it did not acknowledge within the bound; the keeper is
+/// then ended.
+fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::Result<(Spawned, File)> {
     let argv = helper.argv();
-    let mut cmd = Command::new(&argv[0]);
-    cmd.args(&argv[1..]).arg("job-keeper").arg("--job").arg(job).arg("--record").arg(record);
-    cmd.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null()).creation_flags(CREATE_NO_WINDOW);
-    let mut keeper = cmd.spawn()?;
+    let mut args: Vec<OsString> = argv[1..].iter().map(OsString::from).collect();
+    args.extend(["job-keeper".into(), "--job".into(), job.into(), "--record".into(), record.as_os_str().to_os_string()]);
+    let mut keeper = spawn(SpawnSpec {
+        program: OsString::from(&argv[0]),
+        args,
+        cwd: None,
+        env: None,
+        creation_flags: CREATE_NO_WINDOW,
+        stdin: ChildStdio::Piped,
+        stdout: ChildStdio::Piped,
+        stderr: ChildStdio::Null,
+    })?;
     let (Some(stdin), Some(mut stdout)) = (keeper.stdin.take(), keeper.stdout.take()) else {
         let _ = keeper.kill();
         let _ = keeper.wait();
@@ -84,40 +93,49 @@ fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::
     Err(io::Error::other("job-keeper did not acknowledge that it opened the job"))
 }
 
-/// The suspended child: std's own quoting and handle rules, `CREATE_SUSPENDED`
-/// so it cannot run, or create a process outside the job, before assignment.
-fn child_command(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, args: &[String]) -> io::Result<Command> {
-    let mut cmd = Command::new(program);
-    cmd.args(args);
-    if let Some(cwd) = &spec.cwd {
-        cmd.current_dir(cwd);
-    }
-    if spec.clear_env {
-        cmd.env_clear();
-    }
-    cmd.envs(&spec.env);
-    cmd.env(LOCK_JOB_ENV, format!("{}:{job}", handle.name()));
-    match &spec.stdio {
-        BorrowStdio::Inherit => {}
-        BorrowStdio::Null => {
-            cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
-        }
-        BorrowStdio::Files { out, err } => {
-            let open = |path: &std::path::Path| std::fs::OpenOptions::new().create(true).append(true).open(path);
-            cmd.stdin(Stdio::null()).stdout(open(out)?).stderr(open(err)?);
+/// The suspended child: `CREATE_SUSPENDED` so it cannot run, or create a
+/// process outside the job, before assignment. It inherits the handles of its
+/// three streams and nothing else the holder owns.
+fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, args: &[String]) -> io::Result<Spawned> {
+    // Names compare without case, as Windows reads them: a caller's `PATH` replaces the parent's `Path`.
+    let mut env: std::collections::BTreeMap<String, (OsString, OsString)> = std::collections::BTreeMap::new();
+    let mut set = |name: OsString, value: OsString| {
+        env.insert(name.to_string_lossy().to_uppercase(), (name, value));
+    };
+    if !spec.clear_env {
+        for (name, value) in std::env::vars_os() {
+            set(name, value);
         }
     }
-    cmd.creation_flags(CREATE_SUSPENDED | CREATE_NO_WINDOW);
-    Ok(cmd)
+    for (name, value) in &spec.env {
+        set(OsString::from(name), OsString::from(value));
+    }
+    set(OsString::from(LOCK_JOB_ENV), OsString::from(format!("{}:{job}", handle.name())));
+    let open = |path: &std::path::Path| std::fs::OpenOptions::new().create(true).append(true).open(path);
+    let (stdin, stdout, stderr) = match &spec.stdio {
+        BorrowStdio::Inherit => (ChildStdio::Inherit, ChildStdio::Inherit, ChildStdio::Inherit),
+        BorrowStdio::Null => (ChildStdio::Null, ChildStdio::Null, ChildStdio::Null),
+        BorrowStdio::Files { out, err } => (ChildStdio::Null, ChildStdio::File(open(out)?), ChildStdio::File(open(err)?)),
+    };
+    spawn(SpawnSpec {
+        program: OsString::from(program),
+        args: args.iter().map(OsString::from).collect(),
+        cwd: spec.cwd.clone(),
+        env: Some(env.into_values().collect()),
+        creation_flags: CREATE_SUSPENDED | CREATE_NO_WINDOW,
+        stdin,
+        stdout,
+        stderr,
+    })
 }
 
 /// Wait for the child, ending the job when a cancel arrives.
-fn wait_child(child: &mut Child, job: &fgos_process::platform::windows_job::Job, control: &BorrowControl<'_>) -> io::Result<std::process::ExitStatus> {
+fn wait_child(child: &Spawned, job: &fgos_process::platform::windows_job::Job, control: &BorrowControl<'_>) -> io::Result<u32> {
     let Some(cancel) = control.cancel else { return child.wait() };
     let mut cancelled = false;
     loop {
-        if let Some(status) = child.try_wait()? {
-            return Ok(status);
+        if let Some(code) = child.try_wait()? {
+            return Ok(code);
         }
         if !cancelled && cancel.load(Ordering::SeqCst) {
             cancelled = true;
@@ -179,7 +197,7 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
             return Err(BorrowError::Spawn(err));
         }
     };
-    let (mut keeper, keeper_stdin) = match start_keeper(helper, &name, &record) {
+    let (keeper, keeper_stdin) = match start_keeper(helper, &name, &record) {
         Ok(started) => started,
         Err(err) => {
             // No member exists and we hold the lock: nothing to leave behind.
@@ -195,12 +213,12 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
         predecessor::remove_record(&record);
         return Err(setup_error("cannot record the job-keeper"));
     }
-    let finish = |stdin: ChildStdin| {
+    let finish = |stdin: File| {
         let mut stdin = stdin;
         let _ = stdin.write_all(b"finished\n").and_then(|()| stdin.flush());
     };
 
-    let mut child = match child_command(handle, spec, &name, program, args).and_then(|mut cmd| cmd.spawn()) {
+    let child = match start_child(handle, spec, &name, program, args) {
         Ok(child) => child,
         Err(err) => {
             let outcome = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
@@ -211,7 +229,7 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
             return Err(BorrowError::Spawn(err));
         }
     };
-    if let Err(err) = assign_and_resume(&job, &child) {
+    if let Err(err) = child.assign_and_resume(&job) {
         let _ = child.wait();
         let outcome = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
         finish(keeper_stdin);
@@ -223,14 +241,14 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
     if let Some(started) = control.on_started {
         started(child.id());
     }
-    let waited = wait_child(&mut child, &job, control);
+    let waited = wait_child(&child, &job, control);
     let emptied = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
     finish(keeper_stdin);
-    let status = match waited {
-        Ok(status) => status,
+    let exit_code = match waited {
+        Ok(code) => code,
         Err(err) => return Err(BorrowError::Wait(err)),
     };
-    let mut outcome = BorrowOutcome { exit: status.code(), signal: None, leftovers_killed: 0 };
+    let mut outcome = BorrowOutcome { exit: Some(exit_code as i32), signal: None, leftovers_killed: 0 };
     match emptied {
         Ok(killed) => {
             predecessor::remove_record(&record);

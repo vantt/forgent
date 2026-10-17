@@ -38,6 +38,8 @@ before(() => {
   for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
     fs.copyFileSync(path.join(ROOT, file), path.join(tree, file));
   }
+  // The lock door the hot lock calls through, whole, so its modules agree with each other.
+  fs.cpSync(path.join(ROOT, 'src/holder-lock'), path.join(tree, 'src/holder-lock'), { recursive: true });
   // The baseline callers still use the pre-cutover names; give them to the
   // copied events module as thin wrappers over the real hot lock.
   fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `
