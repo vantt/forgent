@@ -51,3 +51,11 @@ Sau đó đọc hai JSON result bằng `jq`. Để chỉ kiểm tra process cost
 env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:e5e7c2f988b1ce252ecfa6d1de8174db22c1c07fb11f5578cb85705290c96b4f/bin/fgos \
   FGOS_SESSION_ID=proc-count strace -f -e trace=process -c node /tmp/vspawn-p4Z3WG/repo/bin/fgos.mjs take --id proc-count-2
 ```
+
+## Nguyên nhân của 983 process (điều tra sau, 2026-10-17 14:45)
+
+Không phải chi phí của event log. Gần như toàn bộ là lệnh `git rev-parse --path-format=absolute --git-common-dir`, sinh từ `getMainFgosDir` (`src/state/runtime-coordination.mjs:14`). `readClaims` (`:159`) đã tự giải thư mục `.fgos` chính một lần, rồi vẫn gọi `readClaim(fgosDir, id)` cho từng file claim, và `readClaim` (`:133`) giải lại thư mục đó bằng một lần spawn git nữa. Một `take` gọi `readClaims` bốn lần: hai lần qua `listWork` trong `runVerb` (`bin/fgos.mjs:3068`, `:3104`), một lần qua `isDepsAndLineageReady` (`:3072`), một lần trong `claimWork` (`src/runner/claim-port.mjs:167`). Vì vậy số process là khoảng 4 × (số claim đang mở + 1) cộng chừng 13 lệnh cố định.
+
+Đo lại trên fixture riêng: 0 claim mở thì một `take` sinh 21 process; 60 claim mở thì 261, trong đó 248 là lệnh trên. Fixture của lần đo chính có khoảng 240 claim mở, nên ra 983. Mỗi spawn từ Node tốn khoảng 3,3 ms, tức khoảng 3,2 giây cho một `take` ở 240 claim, và 20 phiên cùng spawn thì tranh CPU với nhau. Đây là phần lớn độ trễ của `claim` trong bảng trên. `move` và `return` không đi qua `readClaims` nhiều lần như vậy nên nhẹ hơn hẳn.
+
+Cách sửa nhỏ: giải thư mục chính một lần rồi đọc file claim trực tiếp, không đi qua `readClaim` công khai. Đoạn này trùng phạm vi của 4.3 P02 (`phase-02-state-cutover-claims-merge.md` viết lại `readClaim`/`readClaims` quanh `withStateTx`), nên sửa ở đâu phải theo thứ tự trên bảng chương trình.
