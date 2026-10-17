@@ -24,6 +24,7 @@ import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -434,16 +435,25 @@ export function runTests({
 
 /**
  * The CLI door's queue: the full-suite queue is a kernel lock and needs the
- * host binary, so resolve (or build) it first and export it on this
- * process's env, where the lock driver looks. A fresh clone or CI with no
- * activation and no FGOS_HOST_BIN then queues too.
+ * host binary. When none resolves (no FGOS_HOST_BIN, no activation above the
+ * checkout: a fresh clone, CI), build one first and export it on this
+ * process's env, where the lock driver looks. When one resolves, nothing is
+ * built before the queue: a build here, outside the queue, could replace the
+ * binary a queued run in another worktree sharing the cargo target is using.
  */
-export function queueWithHostBin(options, { ensure = ensureHostBin, queue = acquireFullSuiteQueue, log = (msg) => console.error(msg) } = {}) {
-  try {
-    const hostBin = ensure(process.env, REPO_ROOT);
-    if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
-  } catch (err) {
-    log(`run-tests: warning: failed to ensure host binary: ${err.message}`);
+export function queueWithHostBin(options, {
+  resolve = () => resolveActiveHostBin().bin,
+  ensure = ensureHostBin,
+  queue = acquireFullSuiteQueue,
+  log = (msg) => console.error(msg),
+} = {}) {
+  if (!resolve()) {
+    try {
+      const hostBin = ensure(process.env, REPO_ROOT);
+      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
+    } catch (err) {
+      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);
+    }
   }
   return queue(options);
 }
