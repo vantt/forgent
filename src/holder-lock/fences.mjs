@@ -31,10 +31,28 @@ import { resolveHostBin } from '../util/host-bin.mjs';
 
 const REGISTRY_URL = new URL('../../packages/holder-lock/contracts/lock-registry.v1.json', import.meta.url);
 
-/** The release whose cutover places these fences; also the registry `owner` of the fenced locks. */
+/** The release whose cutover places the first fences; also the registry `owner` of the locks it fences. */
 export const CUTOVER_RELEASE = '4.2';
+/**
+ * The repo locks the main checkout cutover fences, by registry name. The
+ * state store locks (`state`, `porting-events`) carry the same owner but
+ * stay on their old files until the event store decision, so they are not
+ * fenced here.
+ */
+const MAIN_DOOR_RELEASE = '4.3';
+/** The repo locks of the main checkout cutover; `worktree-admin` is new and has no old path to fence. */
+export const MAIN_DOOR_LOCKS = ['main-checkout', 'merge-slot', 'worktree-admin'];
+const MAIN_DOOR_FENCED = new Set(MAIN_DOOR_LOCKS);
+
+/** Whether a registry row is a lock this cutover moved onto a kernel lock. */
+export function isCutOverLock(lock) {
+  return lock.owner === CUTOVER_RELEASE || (lock.owner === MAIN_DOOR_RELEASE && MAIN_DOOR_FENCED.has(lock.name));
+}
 /** Written as `by` in every tombstone and as `fence` in every blocking generation. */
-export const FENCE_BY = `fgos ${CUTOVER_RELEASE}`;
+export function fenceBy(owner) {
+  return `fgos ${owner}`;
+}
+export const FENCE_BY = fenceBy(CUTOVER_RELEASE);
 export const TOMBSTONE_FILE = 'TOMBSTONE';
 export const V1_LOCK_PRESENT = 'v1-lock-present';
 
@@ -126,11 +144,30 @@ function accountLockDirs(providerRuntimeDir) {
   return dirs;
 }
 
+/**
+ * Every target ref an old merge could have taken a slot for: each local
+ * branch. The slot name is `merge-slot--<encodeURIComponent(ref)>.lock`
+ * (the formula of the deleted `mergeSlotLockFile`, recorded in the registry
+ * row so this module does not depend on the deleted code).
+ */
+function mergeSlotCandidates(workspaceRoot) {
+  let listing = '';
+  try {
+    listing = execFileSync('git', ['for-each-ref', 'refs/heads', '--format=%(refname:short)'], {
+      cwd: workspaceRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'],
+    });
+  } catch {
+    // Not a git checkout: no branch, so no merge slot was ever taken.
+  }
+  return [...new Set(listing.split('\n').map((line) => line.trim()).filter(Boolean))].sort();
+}
+
 // Old paths that depend on what exists at cutover time; fixed paths come
 // straight from the registry's `v1Path`.
 const ENUMERATED_V1_PATHS = {
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).map((runDir) => path.join(runDir, 'advance.lock')),
   recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)].map(({ runDir }) => path.join(runDir, '.recovery.lock')),
+  'merge-slot': ({ fgosDir, workspaceRoot }) => mergeSlotCandidates(workspaceRoot).map((ref) => path.join(fgosDir, `merge-slot--${encodeURIComponent(ref)}.lock`)),
   'dispatch-cwd': ({ fgosDir, workspaceRoot }) => dispatchCwds(workspaceRoot).map((cwd) => path.join(fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`)),
   'provider-account': ({ providerRuntimeDir }) => accountLockDirs(providerRuntimeDir),
   'provider-state': ({ providerRuntimeDir }) => (isDirectory(providerRuntimeDir) ? [path.join(providerRuntimeDir, 'state-lock')] : []),
@@ -155,8 +192,8 @@ export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defa
   const context = { fgosDir: path.resolve(fgosDir), workspaceRoot: path.resolve(workspaceRoot ?? path.dirname(fgosDir)), providerRuntimeDir };
   const targets = [];
   for (const lock of readRegistry().locks) {
-    if (lock.owner !== CUTOVER_RELEASE || !lock.fence || lock.fence === 'none') continue;
-    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, path: p });
+    if (!isCutOverLock(lock) || !lock.fence || lock.fence === 'none') continue;
+    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p });
   }
   return targets;
 }
@@ -197,7 +234,7 @@ function placeTombstone(target, now) {
     if (state === 'fenced') return 'already';
     if (state !== 'empty-dir') throw v1LockPresent(target);
   }
-  fs.writeFileSync(path.join(target.path, TOMBSTONE_FILE), `${JSON.stringify({ lock: target.lock, at: now, by: FENCE_BY })}\n`);
+  fs.writeFileSync(path.join(target.path, TOMBSTONE_FILE), `${JSON.stringify({ lock: target.lock, at: now, by: fenceBy(target.owner) })}\n`);
   return 'placed';
 }
 
@@ -278,7 +315,7 @@ function publishBlockingGeneration(target, now) {
     const tmpPath = path.join(lockDir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     const fd = fs.openSync(tmpPath, 'w');
     try {
-      fs.writeSync(fd, JSON.stringify({ holder: { pid: 1 }, fence: FENCE_BY, lock: target.lock, at: now }));
+      fs.writeSync(fd, JSON.stringify({ holder: { pid: 1 }, fence: fenceBy(target.owner), lock: target.lock, at: now }));
       fs.fsyncSync(fd);
     } finally {
       fs.closeSync(fd);

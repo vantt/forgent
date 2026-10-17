@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { extractV1Source, probeV1 } from './fixtures/extract-v1.mjs';
-import { placeFences, fenceStatus, fenceTargets, TOMBSTONE_FILE, FENCE_BY, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
+import { placeFences, fenceStatus, fenceTargets, fenceBy, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
 
 const PROBE_TIMEOUT_MS = 15_000;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
@@ -50,6 +50,10 @@ function makeWorkspace(name) {
   return { root, worktree, fgosDir, workflowRunDir, runDir, providerRuntimeDir };
 }
 
+function branchesOf(root) {
+  return git(['for-each-ref', 'refs/heads', '--format=%(refname:short)'], root).split('\n').filter(Boolean);
+}
+
 function tombstoneRecord(lockPath) {
   return JSON.parse(fs.readFileSync(path.join(lockPath, TOMBSTONE_FILE), 'utf8'));
 }
@@ -64,6 +68,7 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
     'gateway.lock', 'runner.lock', 'sessions.lock', path.join('dispatch', 'reconcile.lock'),
     path.join('workflow-runs', 'wf-1', 'advance.lock'),
     path.join('assignments', 'a1', 'runs', '01', '.recovery.lock'),
+    'main-checkout.lock', ...branchesOf(ws.root).map((ref) => `merge-slot--${encodeURIComponent(ref)}.lock`),
   ].map((rel) => path.join(ws.fgosDir, rel));
   const cwds = new Set();
   for (const dir of [ws.root, ws.worktree]) {
@@ -76,12 +81,12 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
   for (const lockPath of expected) {
     assert.ok(fs.statSync(lockPath).isDirectory(), `${lockPath} is a directory`);
     const record = tombstoneRecord(lockPath);
-    assert.equal(record.by, FENCE_BY);
+    assert.equal(record.by, fenceBy(['main-checkout', 'merge-slot'].includes(record.lock) ? '4.3' : '4.2'));
     assert.ok(typeof record.lock === 'string' && record.lock, 'names its lock');
     assert.ok(!Number.isNaN(Date.parse(record.at)), 'records when');
   }
   const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).map((t) => t.lock));
-  assert.deepEqual([...locks].sort(), ['advance', 'dispatch-cwd', 'gateway', 'reconcile', 'recovery', 'runner', 'sessions']);
+  assert.deepEqual([...locks].sort(), ['advance', 'dispatch-cwd', 'gateway', 'main-checkout', 'merge-slot', 'reconcile', 'recovery', 'runner', 'sessions']);
   assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).complete, true);
 });
 

@@ -1293,7 +1293,7 @@ function checkMainCheckoutHookWired(cwd) {
     return { passed: true, message: 'not applicable -- this project ships no .githooks/ directory' };
   }
   if (mainCheckoutHookWired(cwd)) {
-    return { passed: true, message: 'core.hooksPath = .githooks — main-checkout lock guards every commit here' };
+    return { passed: true, message: 'core.hooksPath = .githooks — the hook checks the main-checkout kernel lock on every commit here (a fgOS child borrows it through its description)' };
   }
   return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
 }
@@ -1520,7 +1520,7 @@ registerCheck({
 
 registerCheck({
   id: 'main-checkout-hook-wired',
-  description: 'core.hooksPath wired to .githooks (main-checkout lock and source-checkout new-root-file guards)',
+  description: 'core.hooksPath wired to .githooks (main-checkout kernel lock check, borrowed through the description, and source-checkout new-root-file guards)',
   check: (cwd) => checkMainCheckoutHookWired(cwd),
 });
 

@@ -196,7 +196,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
   fixLockDirs(root);
   const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
   fs.writeFileSync(gateway, '');
-  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 10 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 13 locks, 0 held, every holder a fgOS process or a borrowed child$/);
 
   const foreign = await holdWithFlock(gateway, foreignEnv());
   const warned = checkLockHolders(root);
@@ -206,8 +206,33 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
 
   const borrowed = await holdWithFlock(gateway, foreignEnv({ FGOS_LOCK_FD: 'gateway:3' }));
   const clean = checkLockHolders(root);
-  assert.match(clean.message, /^\d+ lock file\(s\) of 10 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
+  assert.match(clean.message, /^\d+ lock file\(s\) of 13 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
   await stop(borrowed);
+});
+
+test('lock-holders covers the main checkout, merge slot and worktree-admin files: a foreign holder warns, a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
+  const root = workspace('holders-main-door');
+  fixLockDirs(root);
+  const locks = path.join(root, '.fgos', 'locks');
+  const mainLock = path.join(locks, 'main-checkout.lock');
+  const slot = path.join(locks, 'merge-slot--main.lock');
+  const admin = path.join(locks, 'worktree-admin.lock');
+  for (const file of [mainLock, slot, admin]) fs.writeFileSync(file, '');
+  assert.match(checkLockHolders(root).message, /^3 lock file\(s\) of 13 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+
+  const foreign = await holdWithFlock(mainLock, foreignEnv());
+  const warned = checkLockHolders(root);
+  assert.equal(warned.passed, true);
+  assert.match(warned.message, new RegExp(`^warning: main-checkout .*main-checkout\\.lock held by pid ${foreign.pid} .*not a fgOS process nor a borrowed child`));
+  await stop(foreign);
+
+  const borrowed = await holdWithFlock(mainLock, foreignEnv({ FGOS_LOCK_FD: 'main-checkout:3' }));
+  const heldSlot = await holdWithFlock(slot, foreignEnv());
+  const mixed = checkLockHolders(root);
+  assert.match(mixed.message, new RegExp(`^warning: merge-slot .*merge-slot--main\\.lock held by pid ${heldSlot.pid} `));
+  assert.ok(!mixed.message.includes('main-checkout.lock held'), 'a borrowed git child of the main checkout lock is a member');
+  await stop(borrowed);
+  await stop(heldSlot);
 });
 
 test('lock-holders: a predecessor domain that is still running warns with the domain; a dead one does not', async () => {
@@ -259,7 +284,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
   const before = checkLockFences(root, { providerRuntimeDir });
   assert.equal(before.passed, true);
-  assert.match(before.message, /^warning: 5 of 5 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
+  assert.match(before.message, /^warning: 7 of 7 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
 
   const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
   assert.equal(noActivation.changed, false);
@@ -278,9 +303,9 @@ test('lock-fences sees the missing fences, and the fix places them only under an
     if (fixed.changed || !/still running/.test(fixed.message)) break;
   }
   assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /^placed 5 fence\(s\)/);
-  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 5 legacy lock path(s) fenced' });
-  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 5 legacy lock path(s) already fenced' });
+  assert.match(fixed.message, /^placed 7 fence\(s\)/);
+  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 7 legacy lock path(s) fenced' });
+  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 7 legacy lock path(s) already fenced' });
 });
 
 test('the fence fix refuses while an fgOS payload of the workspace runs, and names it', async () => {

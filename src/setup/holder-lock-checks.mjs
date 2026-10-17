@@ -19,7 +19,7 @@ import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, description
 import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
-import { CUTOVER_RELEASE, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
+import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
@@ -301,6 +301,9 @@ function existing(file) {
 // row. Rows with a parameter (a run, a cwd, an account) are enumerated from
 // the directories their v3 path lives in.
 const LOCK_FILES = {
+  'main-checkout': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'main-checkout.lock')),
+  'merge-slot': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('merge-slot--') && name.endsWith('.lock')),
+  'worktree-admin': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'worktree-admin.lock')),
   gateway: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'gateway.lock')),
   runner: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'runner.lock')),
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),
@@ -315,10 +318,10 @@ const LOCK_FILES = {
 
 /** The registry rows this release cut over, with every lock file of each that exists. */
 export function cutOverLockFiles({ fgosDir, lockRoot }) {
-  const rows = loadLockRegistry().locks.filter((lock) => lock.owner === CUTOVER_RELEASE);
+  const rows = loadLockRegistry().locks.filter(isCutOverLock);
   return rows.map((lock) => {
     const enumerate = LOCK_FILES[lock.name];
-    if (!enumerate) throw new Error(`lock "${lock.name}" of release ${CUTOVER_RELEASE} has no lock-file enumeration in holder-lock-checks.mjs`);
+    if (!enumerate) throw new Error(`lock "${lock.name}" has no lock-file enumeration in holder-lock-checks.mjs`);
     return { lock: lock.name, files: enumerate({ fgosDir, lockRoot }) };
   });
 }
