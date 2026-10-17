@@ -116,7 +116,7 @@ test('a second run waits on a live holder, announcing its pid once; the holder S
   // Two more polls go by: still waiting, still announced once.
   await new Promise((resolve) => setTimeout(resolve, POLL_MS * 2));
   assert.equal(waiter.out.stdout, '', 'waits while the holder lives');
-  assert.equal(waiter.out.stderr.match(/another full-suite run holds/g).length, 1, 'holder announced once, not every poll');
+  assert.equal(waiter.out.stderr.match(new RegExp(`holds the machine-wide queue \\(pid ${pid}\\)`, 'g')).length, 1, 'holder announced once, not every poll');
 
   const killedAt = Date.now();
   process.kill(pid, 'SIGKILL');
@@ -124,7 +124,8 @@ test('a second run waits on a live holder, announcing its pid once; the holder S
   const { acquiredAt } = await waitFor(() => firstLine(waiter.out.stdout), 'the waiter to take the queue');
   // The holder's child is still alive here, so the lock was never its.
   assert.doesNotThrow(() => process.kill(childPid, 0), 'the holder\'s child outlived it');
-  assert.ok(acquiredAt - killedAt <= POLL_MS + 1000, `waiter entered ${acquiredAt - killedAt} ms after the kill, more than one ${POLL_MS} ms poll`);
+  // One poll at most, plus room for the helper spawn under a loaded suite.
+  assert.ok(acquiredAt - killedAt <= 2 * POLL_MS, `waiter entered ${acquiredAt - killedAt} ms after the kill; one ${POLL_MS} ms poll plus spawn time is the bound`);
   assert.match(waiter.out.stderr, /queue acquired after \d+s/);
   assert.equal((await waiter.exited).code, 0);
   assert.equal(probe('full-suite', { lockRoot }).result, 'free', 'the waiter released on exit');
