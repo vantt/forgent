@@ -14,6 +14,30 @@ Tài liệu Claude Code nói thẳng: CLAUDE.md là "context, not enforced confi
 
 Báo cáo tổng hợp từ 4 lane đọc song song: bề mặt instruction, cơ chế kiểm tra tự động, forensics trên git, và thực hành bên ngoài.
 
+## 0. Vấn đề cốt lõi và thứ tự giải quyết (chủ repo chốt 2026-10-17)
+
+**Vấn đề cốt lõi là luật không đến được agent đúng lúc nó làm việc:**
+
+- **Có luật mà không được nạp**, vì cách tổ chức, vì bị tràn, vì bị lẫn, hoặc vì bị che:
+  - *tổ chức:* danh sách luật luôn nạp chép tay chỉ tới L8, nên L10 "một cửa" không bao giờ tới agent (mục 2a); luật "tìm cái đã có" chỉ có lúc lập plan, không có trong worker contract và brief mà worker thật sự đọc (mục 2);
+  - *tràn:* codex chỉ đọc 32 KiB đầu `AGENTS.md`, mọi luật sau ngưỡng biến mất không báo (mục 2d);
+  - *lẫn:* khoảng 15-17 KB luật bị Claude đọc hai lần, luật KISS/DRY nằm lọt giữa khối lặp; hai kit cùng tiêm hai khối Rules nói ngược nhau (mục 2b, điều tra 2026-10-06);
+  - *che:* hễ có `CLAUDE.md` thì Claude bỏ qua `AGENTS.md` (mục 2d); worktree không có `.claude/rules` vì bị gitignore.
+- **Thiếu luật:** 3 trong 7 nguyên tắc của chủ repo (phân tầng một chiều, hexagonal, ưu tiên Rust cho component nền) chưa có luật nào; chưa có luật "thay thế thì xoá" ở lúc implement (mục 2).
+
+Từ đó agent làm theo nguồn gần nhất nó thấy, không biết cơ chế nào đã có chủ, nên code mọc tràn lan (8 ca trùng ở mục 1), hệ thống phình ra, và mất kiểm soát. Các ca trùng, primitive đặt sai tầng và migration bỏ dở là **hậu quả**; dọn chúng mà không sửa nguồn thì chúng mọc lại.
+
+**Thứ tự giải quyết: kiểm soát ở nguồn trước, dọn hậu quả sau.**
+
+1. **Kiểm soát ở nguồn** (mục 4, nhóm A):
+   - *Một sổ luật:* mỗi luật có đúng một nguồn chuẩn (`core/instructions/` theo contract projection), có ID, phạm vi (agent nào, giai đoạn nào), và trỏ tới cơ chế kiểm của nó nếu có.
+   - *Bảo đảm giao luật:* chiếu sổ luật tới từng CLI qua đúng một đường theo bảng nạp đã đo (mục 2d), trong ngân sách dung lượng (dưới 32 KiB cho codex), không bị che (`CLAUDE.md` chỉ import `AGENTS.md`, đã làm ở `40c667c83`), không trùng, luật quan trọng đặt trước; và đưa luật cần lúc viết code vào worker contract cùng mẫu brief của lead.
+   - *Kiểm chứng giao luật:* một check máy móc (doctor và script `instruction-audit`) fail khi một luật đã đăng ký không tới được một CLI, tới hai lần, hoặc nằm sau ngưỡng cắt.
+   - *Phủ luật:* đối chiếu 7 nguyên tắc với sổ luật để thấy chỗ thiếu; luật nào cưỡng chế được thì gắn với test (P1, P2, P4) thay vì chỉ là văn xuôi.
+2. **Dọn hậu quả** (mục 4, nhóm B): chuyển primitive nền về một nhà ở tầng thấp, gom 8 ca trùng, hoàn tất các migration bỏ dở, dọn hook và bản sao luật thừa.
+
+Lưu ý từ điều tra 2026-10-06 (mục 7): luật đã nạp vẫn có lúc không đủ (lỗi "hỏi thừa" lặp lại khi luật đang được nạp). Vì vậy "kiểm soát ở nguồn" ở đây gồm cả giao luật đúng chỗ lẫn gắn luật với cơ chế kiểm, không chỉ là viết thêm hay chuyển chỗ văn xuôi.
+
 ## 1. Bằng chứng: các ca trùng thật và nguyên nhân gốc
 
 | # | Ca trùng | Vị trí | Nguyên nhân |
@@ -30,6 +54,18 @@ Báo cáo tổng hợp từ 4 lane đọc song song: bề mặt instruction, cơ
 Đính chính báo cáo herdr ngày 10-15: ý "launcher.sh trùng với cli-spawn" **không đúng**. Chỉ `herdr-round.mjs:96-102` sinh launcher. Phần trùng thật là `/proc` identity, liveness và poll.
 
 Không tìm thấy ca nào do các lane song song cùng xây một thứ. Tuy vậy, kế hoạch 3-lane trong báo cáo herdr chính là nơi rủi ro này sẽ xuất hiện.
+
+### 1a. Chuỗi nguyên nhân từ gốc tới hậu quả
+
+| Tầng | Nguyên nhân | Bằng chứng |
+|---|---|---|
+| Gốc (mục 0) | Luật không tới agent: không được nạp (tổ chức, tràn, lẫn, che) hoặc thiếu luật | Mục 2a-2d; nguyên tắc 1, 2 chưa có luật ở lúc implement |
+| Trực tiếp 1 | Primitive dùng chung không có nhà ở tầng thấp: hàm nền nằm rải trong module tính năng hoặc adapter, nên tìm cũng không có chỗ rõ ràng và không biết bản nào là chuẩn | Ca 4 (không có helper pid trong `src/util`, 12 bản), ca 1 (`process-identity.mjs` nằm ở tầng `dispatch`) |
+| Trực tiếp 2 | Phân tầng và guard import đẩy sang chép: bản có sẵn ở tầng không được import, guard chỉ cấm mà không chỉ module lá dùng chung | Ca 2 (`reconciliation-planner` chép parser `/proc/stat`), ca 7 (`setup` tự viết resolve repo root) — vi phạm nguyên tắc 2 |
+| Trực tiếp 3 | Thay cơ chế mới nhưng không có tiêu chí "xoá xong mới xong" | Ca 3 (`rename.sh` giữ resolver cũ sau khi chuyển sang Rust), ca 5 (bản fix chỉ áp vào vài bản sao) — vi phạm nguyên tắc 1 |
+| Sâu | Luật "tìm cái đã có" không ở trong brief, mà brief là nguồn quyết định thật (40/46 tên report lấy từ brief) | `conditions-261006.md` |
+| Sâu | Quy trình thưởng cho việc thêm, không cho việc bớt: tiêu chí "đủ hết mới xong", review luôn sinh thêm phase, không ai giữ tổng thể, cùng một việc bị xây hai lần | `prompt-261008-bloat-root-cause-discussion.md` mục 5 |
+| Ngoài phạm vi | Chính sản phẩm fgOS có nhiều cửa cho cùng một việc; khoảng một nửa số ca đến từ sản phẩm, công cụ, vận hành | `harness-investigation-261006-synthesis.md` mục 1 |
 
 ## 2. Bề mặt instruction: vì sao luật có mà không ăn
 
@@ -211,15 +247,29 @@ Thêm một dòng tương ứng vào phần Red flags.
 
 Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node và script ở hai đường dẫn không tồn tại. Thêm một check nhỏ vào `fgos doctor` (`src/setup/registrations.mjs`) để báo lệnh hook bị đăng ký trùng. Dọn tay chỉ có tác dụng tới lần `ak kit refresh` sau; cách bền là hợp đồng phân quyền sở hữu file giữa fgOS và các bộ cài khác (hook nhận diện theo đường dẫn script, mỗi tool chỉ sửa khối của mình) trong backlog `p-7eb9e65b`, cộng với `doctor --fix` an toàn (chạy từng fix, chạy thử, sửa ở mức key, có backup) trong backlog `p-68be2ae3`.
 
-## 5. Thứ tự làm
+### Đề xuất bổ sung theo chuỗi nguyên nhân (2026-10-17)
 
-1. P1 + P2: test trùng, owner trong manifest, allowlist ban đầu = 8 ca. Đây là cổng đã chặn được nguyên nhân chính.
-2. P3 + P4: sửa worker contract và skill implement/planning (render lại qua `npm run build:skills`).
-3. P5: chốt luật mới, mở rộng phần chiếu L1–L10, rút gọn instruction.
-4. P6: hook Stop/SubagentStop gọi lại chính test của P1.
-5. Dọn dần allowlist: gom ca 1 (`herdr-round` về `process-identity`), ca 4 (helper pid trong `src/util`), ca 3 (rename.sh qua facade Rust)… mỗi ca một item. Ca 1 nên đi cùng M5 trong báo cáo herdr.
+- **P8. Primitive nền có nhà ở tầng thấp** (nguyên tắc 2, 4): chuyển các hàm nền dùng chung (kiểm tra pid, đọc `/proc`, ghi file atomic, resolve `.fgos` và repo root) về một module `kernel`/`src/util`, hoặc component Rust nền theo nguyên tắc 4; P2 chỉ ghi tên chủ thì chưa đủ.
+- **P9. Guard import phải chỉ đường**: guard nào cấm một import thì thông báo và test phải nêu module lá dùng chung cần import, để guard không còn "cấp phép" chép code.
+- **P10. Mẫu brief của lead**: brief giao việc viết code có mục bắt buộc "cơ chế có sẵn đã tìm và quyết định dùng lại, mở rộng hay viết mới, lý do".
+- **P11. Cân bằng thêm và bớt** (từ báo cáo bloat 2026-10-08): một dòng ngân sách (dung lượng, thời gian, path được phép) ở đầu mỗi plan; mục bắt buộc "cần xoá hay cắt gì" trong mỗi review.
 
-Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P4 nằm đúng chỗ worker đọc, P5 giảm nhiễu để luật còn lại được tuân theo.
+## 5. Thứ tự làm (sắp lại 2026-10-17: kiểm soát ở nguồn trước)
+
+**Nhóm A: kiểm soát ở nguồn (mục 0).**
+
+1. Sổ luật một nguồn: dùng registry đã có từ packaging-distribution P3-P5 (mục 6); chuyển dần luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` theo mẫu plan 261008; chốt cách sinh danh sách luật (P5, Q6); đối chiếu 7 nguyên tắc để lộ luật còn thiếu và chốt chúng (Q4).
+2. Giao luật theo các tầng của proposal §4.6: `AGENTS.md` chỉ giữ L0 (câu chỉ đường và luật luôn cần), dưới 32 KiB, không che, không trùng (P5, Q5, Q7); luật cần lúc viết code (L1) đi vào worker contract và mẫu brief theo phạm vi việc (P3, P10); bộ chiếu có ngân sách theo host, giảm theo độ sâu thay vì cắt, fail closed khi tập luật bắt buộc vượt ngân sách.
+3. Kiểm chứng giao luật: bổ sung vào nghĩa vụ ở contract mục 11 và check doctor đã có, dùng lại `instruction-audit` (tới đủ, tới một lần, không nằm sau ngưỡng cắt của host); xác nhận bảng nạp bằng canary cho pi và agy.
+4. Gắn luật cưỡng chế được với cơ chế: P2 (chủ của từng năng lực), P1 (test chống trùng), P4 (thay thế thì xoá), P9 (guard chỉ đường), P6 (hook phản hồi sớm), P11 (ngân sách và mục "xoá gì").
+
+**Nhóm B: dọn hậu quả.**
+
+5. P8: chuyển primitive nền về tầng thấp.
+6. Dọn dần allowlist của P1: ca 1 (`herdr-round` về nhà chung), ca 4 (helper pid), ca 3 (`rename.sh` qua facade Rust)… mỗi ca một item; ca 1 đi cùng M5 trong báo cáo herdr.
+7. P7 và phần ak: dọn hook trùng, bản sao luật thừa (theo Q7).
+
+Mỗi bước ở nhóm A ghi ước lượng trọng lượng (số dòng, số file) trước khi lập plan, để chính cơ chế kiểm soát không thành hệ thống nặng tiếp theo (mục 7).
 
 ## 6. Quan hệ với các plan và contract đã có (rà 2026-10-17)
 
@@ -230,6 +280,42 @@ Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P
 | Contract `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` và `src/setup/instruction-projections.mjs` | Đã chạy; chỉ ghi `AGENTS.md` | Cơ chế sinh khối "fgOS Effective Instructions". Mục 10 cấm tạo `CLAUDE.md` chỉ để nhân bản `AGENTS.md`, nên commit `40c667c83` khớp contract. |
 | `plans/261006-1415-fgos-single-door-mechanisms/` phase 06 "AGENTS.md single writer" | Xong (`a004bb598`) | Luật một bên ghi chỉ áp cho phần viết tay của `AGENTS.md`. Tiền đề "CLAUDE.md chỉ import `@AGENTS.md`" của phase này sai ở thời điểm đó; đã ghi chú trong file phase. |
 | Backlog `p-7eb9e65b`, `p-68be2ae3` | proposed | Sở hữu phần chồng lấn với ak và `doctor --fix`. |
+
+**Các plan và tài liệu khác về sinh, chống trùng và sắp xếp instruction (rà lại 2026-10-17, gồm `archive/` và `docs/history/`):**
+
+| Mục | Trạng thái | Phạm vi |
+|---|---|---|
+| `docs/platform/packaging-distribution/code-panel-rollout-plan.md`, các dòng P3 `pd-instruction-source-registry`, P4 `pd-instruction-merge-policy`, P5 `pd-instruction-renderers` (dòng 74-76, 185-240) | Done (dòng 8; commit `04be428b6`, `2e03118c3`, `caebec897`, `be24172ad`, `19d0640dc`, `9def51380`) | Đã xây: registry nguồn luật (`src/setup/instruction-registry.mjs`, `InstructionRegistry`, `discoverInstructionSources`), thứ tự ghép theo loại `COMPOSITION_KIND_ORDER` law → boundary → procedure → preference → host-adapter (`src/setup/instruction-composition.mjs:46`), mã xung đột và trùng id `COMPOSITION_CONFLICT_CODES` (`:54`), bộ chiếu `AGENTS.md` có khối quản lý (`src/setup/instruction-projections.mjs:19-22,139`). Chỉ chiếu ra `AGENTS.md`; adapter cho host khác để "khi có nhu cầu"; `README.md:98` ghi độ phủ ledger mới một phần |
+| `plans/261008-1353-decision-question-template-and-cleanup/` | completed (commit `c6078e1b5`, `9c9514f41`, `3d3d32648`) | Ca chống trùng instruction duy nhất đã làm xong: đưa mẫu câu hỏi quyết định vào `core/instructions/decision-question.md` rồi gỡ các đoạn nói trùng ở `AGENTS.md`, skill, prompt (phase 02) |
+| `docs/history/instruction-prose-change-governance/DISCUSSION.md` | Đề xuất, vòng 1, chưa có D-ID | Ai được sửa `AGENTS.md`/`CLAUDE.md`/văn xuôi skill và lúc nào; nửa "chạy lại độc lập tự động" đã bị bác, nửa "cổng cấm sửa ngoài đường tường minh" còn mở |
+| `docs/history/dispatch-contract-agents-md/` (tsk-2te) | Đã làm (`a54ae66e2`) | Thêm mục `## Dispatch` vào `AGENTS.md`; không chống trùng |
+| `archive/plans/261006-1415-fgos-convention-component/phase-06-agents-line.md` | done (`461e12d12`) | Một dòng `AGENTS.md` trỏ tới `fgos convention`, theo nguyên tắc một nguồn |
+| `docs/history/canonical-decision-projection/` (tsk-1lv) | Chưa kiểm trạng thái | Mô hình chiếu quyết định ra index sinh tự động (`docs/decisions/index.md`); tiền lệ cho cách sinh và chống lệch |
+| `archive/plans/260825-1841-knowledge-registry/phase-08-projections-doctor.md` | completed | Tiền lệ projection kèm check doctor cho artifact tri thức |
+
+**Thiết kế đích đã có trong proposal document-unification** (`docs/platform/proposals/documentation-system-unification.md`, H3, kiến trúc giữ lại cho tương lai, "never a blocker"; plan `plans/260925-documentation-authority-unification/plan.md:547,579` cấm âm thầm mở rộng sang nó):
+
+- **§4.4 One authoring door (dòng 404-415):** tầng luôn nạp chỉ giữ một câu chỉ đường ổn định; luật chi tiết nằm trong governance, constitution và skill "để chúng không trôi dạt trong mọi file AGENTS được sinh ra".
+- **§4.6 Dynamic agent context (dòng 484-620):** năm tầng nạp dần: L0 câu kích hoạt (luôn nạp), L1 effective brief (văn xuôi, RULES, quyết định đang hiệu lực, tách ba phần), L2 gói context theo việc, L3 nguồn chuẩn, L4 lịch sử. Mỗi brief khai phạm vi, host, ID nguồn, digest, **ngân sách byte hoặc token**, phần bị lược kèm link, và fail closed khi có xung đột. Khi vượt ngân sách thì *"degrade by depth, not by arbitrary truncation"* — đúng lời giải cho việc codex cắt cụt `AGENTS.md` (mục 2d). Bề mặt dự kiến: `fgos doc context --for <op> --area <a> --paths <p> --stage <s> --budget <n>` trả về `mustRead`, `inlineBrief`, `readOnDemand`, `historyOnDemand`, `excluded`. Proposal cũng ghi nhận nền hiện tại "implemented but not yet sufficient": effective set chỉ có một đơn vị luật, chưa có brief theo phạm vi kèm ngân sách.
+- **§4.7.2 Agent Context Engine (dòng 680-713):** sở hữu Instruction Composer, Effective Decision Reducer, Reading Plan Compiler, Context Budgeter và Context Explainability; fail closed khi tập luật bắt buộc vượt ngân sách. Registry và composition trong `src/setup/` là "mầm" của engine này. Packaging-Distribution chỉ render gói context ra file theo host và giữ ledger, không quyết ghép luật (§4.7.3).
+
+Vì vậy nhóm A nên được đóng khung là **lát cắt đầu tiên của Agent Context Engine theo đúng thiết kế đó**, không phải một cơ chế riêng: giữ L0 trong `AGENTS.md` nhỏ (chỉ câu chỉ đường và luật thật sự luôn cần), đưa L1 vào brief và worker contract theo phạm vi việc, thêm ngân sách theo host vào bộ chiếu với quy tắc giảm theo độ sâu thay vì cắt, và dùng tiêu chí fail closed khi tập luật bắt buộc vượt ngân sách. Làm như vậy vẫn khớp với ranh giới của plan document-unification (không âm thầm mở rộng sang engine đầy đủ), vì chỉ chạm phần đã có mầm trong `src/setup/`.
+
+**Quyền ghép luật: một chủ (RUL102, chốt 2026-10-17).** Trước đó contract packaging-distribution §2 giao "composition engine, registry shape" cho packaging-distribution, còn proposal §4.7.2-4.7.3 giao Instruction Composer cho Agent Context Engine; contract không nhắc tới engine này. Để nguyên thì engine tương lai sẽ được dựng cạnh `src/setup/instruction-composition.mjs`, thành hai composer. Chủ repo chọn: **Agent Context Engine sở hữu việc ghép và chọn luật** (thứ tự theo loại, override, xung đột, chọn theo việc, ngân sách theo host, nạp theo tầng); **packaging-distribution giữ phần giao hàng** (tìm và cài nguồn luật, adapter render theo host, ledger, doctor sửa chữa). Lý do: ngân sách cần biết loại và hiệu lực của luật, nên composer và budgeter phải cùng chủ; packaging-distribution là component cài đặt và giao hàng, để nó quyết nội dung là đặt quyền sai chỗ. Có hai lúc giao luật:
+
+- *Giao tĩnh (ghi file):* khi nguồn luật đổi hoặc lúc setup, cài, nâng cấp, packaging-distribution hỏi engine effective set cho từng host rồi render ra `AGENTS.md` và các file host khác.
+- *Giao động (theo việc):* runner hỏi engine một gói context L1/L2 cho việc cụ thể và chèn vào brief của worker; không ghi file, packaging-distribution không tham gia.
+
+Engine không biết host hay file. Chặn trọng lượng: chưa dựng component mới; code trong `src/setup/instruction-registry.mjs` và `instruction-composition.mjs` là mầm của engine và chỉ chuyển sang module riêng khi lát cắt ngân sách và chia tầng đầu tiên được làm, trong cùng thay đổi, không giữ hai nơi. Đã ghi vào `docs/specs/distribution.md` (RUL102) và sửa contract §2.
+
+**Hệ quả cho nhóm A: không dựng mới, mở rộng cái đã có.** Cơ chế sổ luật, thứ tự và bộ chiếu đã có từ P3-P5; chỗ hở là gần như không dùng: `core/instructions/` mới có 2 đơn vị luật (`decision-question.md`, `platform-laws.md`), còn phần lớn luật vẫn viết tay trong `AGENTS.md` ngoài registry. Vì vậy:
+
+- *Sổ luật:* chuyển dần các luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` (theo mẫu của plan 261008), để registry có kind, scope và id cho từng luật; không dựng sổ thứ hai.
+- *Thứ tự:* "luật quan trọng đặt trước" lấy từ `COMPOSITION_KIND_ORDER`, không sắp tay.
+- *Giao luật theo CLI:* thêm ngân sách dung lượng theo host (32 KiB cho codex) vào bộ chiếu và vào contract; adapter cho host khác chỉ thêm khi bảng nạp (mục 2d) cho thấy `AGENTS.md` không đủ.
+- *Kiểm chứng:* bổ sung vào danh sách nghĩa vụ ở contract mục 11 (đã có: projection cũ, registry sai, trùng id, adapter bỏ sót luật, sửa tay vùng quản lý) ba mục mới: vượt ngân sách của host, nạp đúng một lần theo bảng nạp, kiểm chứng bằng canary; dùng lại script `instruction-audit`.
+- *Cổng sửa văn xuôi:* nối với `docs/history/instruction-prose-change-governance` thay vì mở một thảo luận mới.
+- *Rủi ro cần kiểm trước:* plan 261008 có sửa tay trong vùng `AGENTS.md`; cần xác minh vùng khối quản lý có bị ghi đè khi chiếu lại không; khối AGENTKIT của ak nằm ngoài projection và phải được tính vào khi đếm trùng và dung lượng.
 
 **Phân bổ việc:**
 
@@ -275,4 +361,5 @@ Hai lần điều tra trước đã hỏi đúng câu hỏi của báo cáo này
 - **Q4.** 7 nguyên tắc nên chốt thành luật khoá mới (L11+, có decision ID) hay đưa vào spec dưới dạng guideline không khoá?
 - **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
 - **Q6.** P5: sinh danh sách luật thành fragment trong `core/instructions/` kèm test chống lệch (đề xuất, khớp contract mục 4), hay sửa contract để cho phép đọc từ `docs/platform-foundations.md`?
+- **Q8.** ~~Quyền ghép luật thuộc Agent Context Engine hay packaging-distribution?~~ Đã chốt 2026-10-17: Agent Context Engine ghép và chọn luật, packaging-distribution giao hàng (RUL102, mục 6).
 - **Q7.** Quyết định ngày 2026-10-06 ("ak và ck là ràng buộc môi trường, không sửa, xoá hay dedupe") còn hiệu lực không? Nếu còn, phía fgOS chỉ chọn cách đặt luật để tránh trùng, và các bước động vào cấu hình cài của ak (P5, `p-7eb9e65b`) thành đề xuất gửi ak. Nếu thay, ghi một quyết định mới có ID cho phép fgOS cấu hình đích cài của ak trong repo này.
