@@ -243,6 +243,43 @@ test('finalize-home keeps the home and asks for a retry while the renewed login 
   } finally { w.cleanup(); }
 });
 
+test('finalize-home stops retrying after the kept-home budget: a named outcome, the home stays, the count is per home', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'timeout', gateExit: gateExit({ exitCode: null, signal: 'SIGKILL', stoppedBy: 'idle' }) } });
+    const { home, runtimeDir } = homeOf(w, runDir);
+    const accountDir = providerAccountDir(runtimeDir, 'xai', 'acct');
+    fs.mkdirSync(accountDir, { recursive: true });
+    fs.writeFileSync(path.join(accountDir, 'pending'), 'in the way');
+    const markerFile = path.join(home, '.fgos-confinement-owner.json');
+    const counted = () => JSON.parse(fs.readFileSync(markerFile, 'utf8')).credentialKept;
+    // Two runs closer together than the spacing count once.
+    assert.equal((await run('finalize-home', w, runDir)).exit, 75);
+    assert.equal((await run('finalize-home', w, runDir)).exit, 75);
+    assert.equal(counted().attempts, 1);
+    for (let attempts = 2; attempts < 5; attempts += 1) {
+      const marker = JSON.parse(fs.readFileSync(markerFile, 'utf8'));
+      marker.credentialKept.lastCountedAt -= 60 * 60 * 1000;
+      fs.writeFileSync(markerFile, JSON.stringify(marker));
+      assert.equal((await run('finalize-home', w, runDir)).exit, 75, `attempt ${attempts}`);
+      assert.equal(counted().attempts, attempts);
+    }
+    const marker = JSON.parse(fs.readFileSync(markerFile, 'utf8'));
+    marker.credentialKept.lastCountedAt -= 60 * 60 * 1000;
+    fs.writeFileSync(markerFile, JSON.stringify(marker));
+    const held = await run('finalize-home', w, runDir);
+    assert.equal(held.exit, 0, JSON.stringify(held.out));
+    assert.equal(held.out.detail.outcome, 'credential-home-held');
+    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true, 'the home is kept for the owner');
+    const descriptor = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), 'utf8'));
+    assert.equal(descriptor.cleanupState, 'retained');
+    const again = await run('finalize-home', w, runDir);
+    assert.equal(again.exit, 0);
+    assert.equal(again.out.detail.outcome, 'credential-home-held');
+    assert.equal(counted().attempts, 5, 'a held home is not tried or counted again');
+  } finally { w.cleanup(); }
+});
+
 test('finalize-home refuses a home whose marker is another attempt or version 1, and removes nothing', async () => {
   for (const marker of [{ attemptId: 'some-other-attempt' }, { contract: 'confinement-resource-ownership.v1' }]) {
     const w = workspace();

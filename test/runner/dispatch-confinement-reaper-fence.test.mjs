@@ -43,6 +43,8 @@ import {
   LAUNCH_GRACE_MS,
   bindOwnershipMarker,
   markOwnershipLaunched,
+  writeOwnershipMarkerV2,
+  removeConfinementDir,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { finalizeConfinementResources, bindingForPrepared } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
@@ -675,7 +677,7 @@ function cliSpawnBinding(dir) {
   }]);
 }
 
-test('S2(9) controller dead, run supervisor alive: the reaper keeps the cli-spawn home; supervisor dead: reaped', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
+test('S2(9) a pane-less binding (the old cli-spawn supervisor) is kept for doctor, whoever is alive and however old', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
   const w = workspace();
   const supervisor = spawnSupervisorStandIn();
   try {
@@ -686,40 +688,33 @@ test('S2(9) controller dead, run supervisor alive: the reaper keeps the cli-spaw
     assert.ok(marker.binderStartTime, 'the supervisor start time is recorded');
     assert.equal(marker.paneId, undefined);
 
-    const kept = reapOrphanedConfinementResources({ tempRoot: w.root });
+    const alive = reapOrphanedConfinementResources({ tempRoot: w.root });
     assert.equal(exists(dir), true, 'the home of a worker still run by its supervisor was removed');
-    assert.equal(kept.skipped.find((s) => s.path === dir)?.reason, 'binder-alive-in-window');
+    assert.equal(alive.skipped.find((s) => s.path === dir)?.reason, 'unpaned-binding-kept-for-doctor');
 
     supervisor.kill('SIGKILL');
     await waitExit(supervisor);
-    const gone = reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(dir), false);
-    assert.equal(gone.reaped[0]?.reason, 'process-dead');
+    const dead = reapOrphanedConfinementResources({ tempRoot: w.root });
+    assert.equal(exists(dir), true, 'no pid rule removes a pane-less binding any more');
+    assert.equal(dead.skipped.find((s) => s.path === dir)?.reason, 'unpaned-binding-kept-for-doctor');
+    assert.deepEqual(dead.reaped, []);
   } finally { try { supervisor.kill('SIGKILL'); } catch {} w.cleanup(); }
 });
 
-test('S2(9) run supervisor alive but past its bind-anchored window: reaped as expired', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
+test('S2(9) a pane-less binding past its old window or on a reused pid is kept as well', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
   const w = workspace();
   const supervisor = spawnSupervisorStandIn();
   try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 3 * HOUR });
     const past = Date.now() - (LAUNCH_GRACE_MS + HOUR + RUN_SETTLE_GRACE_MS + MIN);
-    bindOwnershipMarker(dir, { binderPid: supervisor.pid, boundAt: new Date(past).toISOString() });
+    const expired = preparedHome(w, { dispatchId: 'disp_exp', timeoutMs: HOUR, ageMs: 3 * HOUR });
+    bindOwnershipMarker(expired, { binderPid: supervisor.pid, boundAt: new Date(past).toISOString() });
+    const reused = preparedHome(w, { dispatchId: 'disp_reuse', timeoutMs: HOUR, ageMs: 2 * HOUR });
+    bindOwnershipMarker(reused, { binderPid: supervisor.pid, binderStartTime: '1' });
     const result = reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(dir), false);
-    assert.equal(result.reaped[0]?.reason, 'expired');
+    assert.equal(exists(expired), true);
+    assert.equal(exists(reused), true);
+    assert.deepEqual(result.reaped, []);
   } finally { supervisor.kill('SIGKILL'); await waitExit(supervisor); w.cleanup(); }
-});
-
-test('S2(9) a recorded supervisor pid now held by another process (start time differs) counts as dead', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
-  const w = workspace();
-  const other = spawnSupervisorStandIn();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-    bindOwnershipMarker(dir, { binderPid: other.pid, binderStartTime: '1' });
-    reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(dir), false);
-  } finally { other.kill('SIGKILL'); await waitExit(other); w.cleanup(); }
 });
 
 test('S2(9) a cli-spawn bind that cannot be written leaves the run going and the home as prepared', () => {
@@ -734,5 +729,43 @@ test('S2(9) a cli-spawn bind that cannot be written leaves the run going and the
     } finally { process.stderr.write = saved; }
     assert.match(said, /confinement-bind-failed/);
     assert.equal(bindConfinedHomesToSupervisor(null, { pid: 4242 }), false, 'an unconfined run has nothing to bind');
+  } finally { w.cleanup(); }
+});
+
+test('an attempt home (marker version 2) is never judged by the reaper: dead pid, closed pane, any age', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_v2', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
+    extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * HOUR).toISOString() });
+    fs.writeFileSync(path.join(dir, 'auth.json'), '{"fake":"login copy"}');
+    const result = reap(w, { alive: false, pane: false });
+    assert.equal(exists(dir), true);
+    assert.deepEqual(result.reaped, []);
+    assert.equal(result.skipped.find((s) => s.path === dir)?.reason, 'attempt-home-owned-by-adopt');
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos-confinement-owner.json'), 'utf8')).attemptId, 'att-1', 'extending keeps the version 2 marker');
+  } finally { w.cleanup(); }
+});
+
+test('writeOwnershipMarkerV2 refuses a missing attempt or run directory and leaves no marker', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_bad', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    assert.throws(() => writeOwnershipMarkerV2(dir, { runDir: '/r' }), /attemptId/);
+    assert.throws(() => writeOwnershipMarkerV2(dir, { attemptId: 'a' }), /runDir/);
+    assert.equal(exists(path.join(dir, '.fgos-confinement-owner.json')), false);
+  } finally { w.cleanup(); }
+});
+
+test('removeConfinementDir refuses an attempt home and removes nothing', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_v2b', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    writeOwnershipMarkerV2(dir, { attemptId: 'att-2', runDir: path.join(w.tmp, 'run') });
+    assert.throws(() => removeConfinementDir(dir), /attempt-home-owned-by-adopt/);
+    assert.equal(exists(dir), true);
   } finally { w.cleanup(); }
 });

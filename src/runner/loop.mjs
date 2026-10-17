@@ -101,7 +101,8 @@ import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './dispatch/confinement/cleanup.mjs';
+import { resolveConfinementTempRoot } from './dispatch/confinement/cleanup.mjs';
+import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 
@@ -1328,7 +1329,7 @@ export async function runOnce(options = {}) {
     // above, since a dry run must never mutate the filesystem.
     if (!dryRun) {
       try {
-        const confinementReap = reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() });
+        const confinementReap = sweepAttempts({ assignmentsRoot: path.join(dir, 'assignments'), tempRoot: resolveConfinementTempRoot() }).reap;
         if (confinementReap.reaped.length > 0) {
           log(`fgos-runner: reaped ${confinementReap.reaped.length} orphaned confinement resource dir(s)`);
         }

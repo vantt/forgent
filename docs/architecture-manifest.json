@@ -231,6 +231,7 @@
     "src/run-supervisor/step-support.mjs": "infra",
     "src/run-supervisor/steps/finalize-home.mjs": "infra",
     "src/run-supervisor/steps/settle-attempt.mjs": "infra",
+    "src/run-supervisor/sweep.mjs": "infra",
     "src/state/fgos-file-registry.mjs": "kernel",
     "src/state/runtime-coordination.mjs": "infra",
     "src/runner/dispatch/brief.mjs": "infra",

@@ -27,7 +27,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, CREDENTIAL_HOME_KEPT, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
 import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
@@ -1902,7 +1902,6 @@ export async function finalizeConfinementResources({
   };
 }
 
-const ATTEMPT_HOME_MARKER_CONTRACT = 'confinement-resource-ownership.v2';
 
 /** A home that does not belong to the attempt, or whose marker cannot be read: nothing is removed. */
 export class AttemptHomeError extends Error {
@@ -1950,7 +1949,7 @@ function readAttemptHomeMarker(homeDir, attemptId, runDir) {
  * Every marker is checked before anything is removed: a marker that is not version 2 or names another
  * attempt throws `AttemptHomeError` and leaves all homes in place.
  *
- * @returns {{state: 'cleaned'|'credential-home-kept', homes: number}}
+ * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number}}
  */
 export function finalizeAttemptHome({ runDir, attemptId } = {}) {
   if (typeof runDir !== 'string' || typeof attemptId !== 'string' || attemptId === '') {
@@ -1966,11 +1965,16 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
     }
   }
   let kept = 0;
+  let held = 0;
   for (const { target, marker } of homes) {
+    // A home whose staging already failed the allowed number of times is not tried again; adopt stops
+    // retrying and `fgos doctor` reports it.
+    if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
     const result = writeBackRenewedCredential(target, marker);
     if (result.status === 'failed' && result.keepHome) {
-      kept += 1;
-      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home kept for a later retry\n`);
+      const isHeld = countCredentialKeep(target, marker) >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
+      if (isHeld) held += 1; else kept += 1;
+      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${isHeld ? 'held for the owner' : 'kept for a later retry'}\n`);
       continue;
     }
     if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
@@ -1978,14 +1982,15 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
     removeEmptyDispatchParent(target, marker.dispatchId);
   }
   if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, homes: homes.length };
+  const cleanupState = held > 0 ? 'retained' : 'cleaned';
   for (const { file, descriptor } of descriptors) {
-    if (descriptor.cleanupState === 'cleaned') continue;
+    if (descriptor.cleanupState === cleanupState) continue;
     publishMutableProjection(file, {
       ...descriptor,
-      cleanupState: 'cleaned',
-      cleanupResult: { kind: 'cleaned' },
+      cleanupState,
+      cleanupResult: { kind: cleanupState },
       updatedAt: new Date().toISOString(),
     });
   }
-  return { state: 'cleaned', homes: homes.length };
+  return { state: held > 0 ? CREDENTIAL_HOME_HELD : 'cleaned', homes: homes.length };
 }

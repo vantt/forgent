@@ -35,7 +35,8 @@ import { buildDispatchResult } from './result-ladder.mjs';
 import { collectModelWarnings } from './provider-adapter.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
+import { resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
+import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
 import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
 import { createHerdrClient } from './herdr-agent.mjs';
 import { resolveHerdrBin } from './transport.mjs';
@@ -1169,9 +1170,10 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         // sweep; every other home is judged exactly as the regular sweep judges it.
         if (closedPanes.size) {
           try {
-            reapOrphanedConfinementResources({
+            sweepAttempts({
+              assignmentsRoot: assignmentsDir,
               tempRoot: resolveConfinementTempRoot(),
-              checkPaneOpen: paneOpenUnlessClosed(closedPanes),
+              reaperOptions: { checkPaneOpen: paneOpenUnlessClosed(closedPanes) },
             });
           } catch { /* the regular sweep removes it later */ }
         }
