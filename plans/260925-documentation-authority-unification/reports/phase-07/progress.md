@@ -197,7 +197,7 @@ resolved path, author, reviewer, digest and status here.
 | 2 | accepted | 28/28 independent semantic verdicts ok at `1d78440f9` | X-SEM-29/31 route to Step 6 duplicate handling | none |
 | 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
-| 5 | reviewing | 109 statements; 28 A34 preservation bindings; 143-entry review plus compact remainder frame (60-unit draw, L11-16) | PARK-PROTECTED-01 import provenance; row-local | Lead starts the one independent request; reviewer chooses/holds seed and draw |
+| 5 | reviewing | Independent review 142/143 ok (parts 60/0, 59/1, 23/0; 94 deep); remainder 60-unit draw 0 substantive defects; rollup `review-a38-step-05-seed-and-rollup-01.md` | PARK-PROTECTED-01 import provenance; row-local | rework X-LOCK-05, Lead rebinds QF-01..13 and CONTROL-FRAME, then one-row re-review |
 | 6 | not-started | none | none | wait for Step 1 |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
 | 8 | not-started | none | none | wait for sealed key |
