@@ -15,7 +15,9 @@
       "input": {
         "domain": "domain",
         "spec": {
-          "argv": "string[] (linux-gate: the full bwrap argv including --unshare-pid --as-pid-1, ending with the gate command)",
+          "argv": "string[], the gate command",
+          "bwrapPrefix": "string[] | null (linux-gate only): the confinement's bwrap argv, absolute program first, up to but not including --info-fd; must carry --unshare-pid, --as-pid-1 and --proc /proc; --die-with-parent is required when mode is terminal and refused when it is direct; null builds the default prefix. The driver appends --info-fd N -- and argv, and never edits a given prefix (its digest is attested)",
+          "mode": "direct | terminal",
           "fdMap": "map child fd -> parent fd; every other fd >= 3 is closed in the child (spawn_with_fds of fgos-process)",
           "env": "object string -> string, exact environment (no inheritance)",
           "cwd": "absolute path",
