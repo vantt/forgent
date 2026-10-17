@@ -1255,3 +1255,17 @@ Catalogue trích 463/813 T-id của lane tests. 350 T-id còn lại phần lớn
 9. Handler `releaseOnExit` hiện kết thúc cả process (CG-9): component Rust có nhận trách nhiệm xử lý tín hiệu hay giao lại cho process chủ?
 10. Cần có thêm một bản đối chiếu lane tests còn thiếu (các suite ở mục 6) để T-id phủ hết các test đang được trích, không chỉ 50 file hiện có?
 
+
+## Phụ lục v2.1 — kiểm kê T3 và đóng băng (2026-10-17 10:40)
+
+Vòng T3 (`git-lessons-sweep-261017/sweep4-tests-t3.md`, unit `unit-run-1792208027975-18e12743`) kiểm kê **133 test** của 9 file mà v2 mới chỉ nhắc tới: `fgos-return.test.mjs` (58), `fgos-iron-law-gate.test.mjs` (12), `main-checkout-lock.test.mjs` phần run-lock (14), `util/session-identity.test.mjs` (14), `run-lock-identity.test.mjs` (10), `install-git-hooks.test.mjs` (10), `process-identity.test.mjs` (9), `session-identity/rust/tests/golden.rs` (4), `fgos-return-quoted-paths.test.mjs` (2). Hai file test Rust của `distribution` không có test git hoặc lock.
+
+**Mục được bổ sung test T3:** G-004, G-010, G-195, G-205, G-215, G-216, G-217, G-219, G-220, G-222, G-225, G-230 (xem cột G-id trong báo cáo T3; trạng thái test tăng theo các assertion được trích ở đó).
+
+**Mục mới:**
+
+| Id | Họ | Bài học | Hành vi phải giữ | Kind | Nguồn | Test hiện có | P |
+|---|---|---|---|---|---|---|---|
+| G-234 (mới v2.1) | H7 Land | Cổng an toàn (Iron Law) đặt sai chỗ sẽ hoặc chặn mọi land vào nhánh gom của root, hoặc để lọt thay đổi vào trunk; cấu hình thiếu hoặc lạ mà được đọc là "warn" sẽ tắt cổng âm thầm; bản ghi bỏ qua cổng mà ghi cả khi bị từ chối sẽ làm sai lịch sử. | Land vào **trunk** (approve của root, sync-root của root không có cha) mà diff chạm module được gác thì bị từ chối trừ khi có xác nhận tường minh; land vào nhánh `fgw/<root>` không bị cổng chặn; phân biệt theo việc item có cha hay không, không theo việc tra được root; cấu hình thiếu hoặc không nhận ra thì coi là `ask` (fail-closed); `warn` cho qua và ghi đúng một bản ghi `engine`; xác nhận tường minh ghi đúng một bản ghi `acknowledged`, không bao giờ `skipped`; lượt từ chối không ghi bản ghi nào; tiền kiểm của `merge next` đọc cùng mức với cổng thật. Cổng là **chính sách của consumer** cắm vào thao tác land, không phải logic của component git. | verify | T3-048..T3-059, tsk-sdr | T3-048..T3-059 (khớp assertion) | P1 |
+
+**Đóng băng.** Từ phụ lục này, catalogue là đầu vào cố định cho spec G0: **234 mục** (G-001..G-234). Mọi bổ sung sau đó đi vào spec hoặc vào một phụ lục có ngày, không sửa nội dung các mục đã có. Lane quét project mdview đã chạy nhưng không được gộp, theo quyết định của owner chỉ giữ phạm vi repo này.
