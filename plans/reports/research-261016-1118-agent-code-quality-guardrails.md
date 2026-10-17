@@ -238,11 +238,41 @@ Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P
 - **Bổ sung vào contract projection:** giới hạn nạp của từng CLI, trước hết là codex chỉ đọc 32 KiB đầu `AGENTS.md`. Contract, code và các plan hiện chưa nói gì về điều này.
 - **Vướng contract:** P5 đề xuất sinh danh sách L1–L10 từ `docs/platform-foundations.md`, nhưng mục 4 của contract (dòng 54-56) cấm dùng `docs/**` làm nguồn instruction lúc chạy; nguồn chỉ nằm trong `core/instructions/`, `components/*/instructions/`, `domains/*/instructions/`. Cách khớp contract: sinh danh sách thành một fragment trong `core/instructions/` bằng generator, kèm test fail khi fragment lệch so với các heading `## Lx`. Xem Q6.
 
+## 7. Bằng chứng từ các lần điều tra trước và tác động lên báo cáo này
+
+Hai lần điều tra trước đã hỏi đúng câu hỏi của báo cáo này nhưng bản đầu không dẫn tới:
+
+| Nguồn | Ngày | Nội dung |
+|---|---|---|
+| `plans/reports/harness-investigation-261006-synthesis.md` và thư mục `plans/reports/harness-investigation-261006/` (`instruction-audit-261006.md`, `enforcement-audit-261006.md`, `conditions-261006.md`, `critic-261006.md`, `fatal-flaws-261006.md`, 57 ca chấm độc lập) | 2026-10-06 | Vì sao agent vẫn làm tùm lum dù đã có RUL11 |
+| `plans/reports/prompt-261008-bloat-root-cause-discussion.md`, bằng chứng chính `plans/reports/opus-genesis-drift-forensics-261008.md` | 2026-10-08 | Vì sao hệ thống đi chệch hướng và phình to, nhìn từ genesis |
+| `plans/reports/research-261015-1116-herdr-tab-pane-layout-and-naming.md` | 2026-10-15 | Báo cáo khởi đầu cuộc thảo luận này; mục 1 đính chính ý "launcher.sh trùng" của nó |
+
+**Kết luận của các lần trước đáng giữ:**
+
+- Chỉ khoảng một nửa số ca là lỗi instruction; nửa còn lại là lỗi sản phẩm fgOS, công cụ, hạ tầng hoặc model. Chỉ khoảng 30% ca cần sửa bằng instruction hay cơ chế (synthesis mục 1).
+- "Luật rõ mà agent làm trái" gần như không có (1-3/57): agent sai vì không có nguồn đúng, hai nguồn mâu thuẫn, hoặc đi nhầm cửa.
+- Quy ước có đúng một nguồn cộng một cơ chế kiểm thì không lệch (3/15); quy ước không chủ, không kiểm thì đều lệch (9/15) (`conditions-261006.md`).
+- Dữ liệu bác bỏ cách sửa bằng thêm văn xuôi vào tầng luôn nạp: lỗi "hỏi thừa" lặp 3 lần trong khi luật tương ứng đang được nạp (`fatal-flaws-261006.md` mục 0).
+- 0/57 ca được chứng minh là do hai kit (ck, ak) nói ngược nhau; nạp trùng là nợ vệ sinh và tốn token, chưa phải nguyên nhân hành vi đã chứng minh (`critic-261006.md`, `fatal-flaws-261006.md`).
+- Guardrail có thể thành hệ thống nặng tiếp theo; mỗi đề xuất phải nêu trọng lượng của chính nó. Bộ tối thiểu được gợi ý: một dòng ngân sách (dung lượng, thời gian, path được phép) ở đầu mỗi plan, một script dưới 100 dòng kiểm diff trước khi merge, và mục bắt buộc "cần xoá hay cắt gì" trong mỗi review (`prompt-261008-bloat-root-cause-discussion.md` mục 6-7).
+
+**Tác động lên báo cáo này:**
+
+| Điểm | Tác động |
+|---|---|
+| Một nguồn cộng một cơ chế kiểm thì không lệch | Ủng hộ P1 và P2; đây là hướng chính |
+| Văn xuôi luôn nạp không sửa được hành vi | P5 không thêm luật văn xuôi mới vào `AGENTS.md` ngoài mức tối thiểu; ưu tiên cơ chế (P1, P2, P4) và đặt luật đúng chỗ worker đọc (P3) |
+| Nạp trùng chưa chứng minh là nguyên nhân hành vi | Chống trùng instruction (mục 2b-2d, P5, P7) được xếp là vệ sinh và tiết kiệm token, không phải lời giải chính cho việc code bị sinh trùng. Ngoại lệ là codex cắt cụt `AGENTS.md` ở 32 KiB (mục 2d): đó là luật bị mất thật, không chỉ là tốn token |
+| Guardrail có thể thành hệ thống nặng | Mỗi đề xuất P1-P7 cần ghi ước lượng trọng lượng (số dòng, số file) trước khi lập plan; cân nhắc thêm dòng ngân sách cho mỗi plan |
+| Quyết định phạm vi của chủ repo ngày 2026-10-06 lúc 12:26: skill, hook và rules của ak và ck là sản phẩm của người khác, chỉ là ràng buộc môi trường, không phải đối tượng để sửa, xoá hay dedupe (synthesis mục 0) | Mâu thuẫn với phần P5 bỏ `.claude/rules` và `.omp/rules` và với backlog `p-7eb9e65b`. Chờ chủ repo xác nhận quyết định đó còn hiệu lực hay được thay (Q7); trong lúc chờ, các bước động vào cấu hình cài của ak không được thực hiện |
+
 ## Câu hỏi chưa giải quyết
 
 - **Q1.** ~~Có phải lần chạy `ak` lúc 16/10 11:19 không, và nên giữ đích nào?~~ Đã trả lời: đúng là chủ repo vừa cài ak; nhưng vì 5 CLI được dùng cùng lúc nên không gỡ đích nào (mục 2c). Đã đo cho Claude, codex, omp và pi (mục 2d). Còn mở: agy (chưa cài), và xác nhận pi cùng `.omp/rules` bằng canary.
-- **Q6.** P5: sinh danh sách luật thành fragment trong `core/instructions/` kèm test chống lệch (đề xuất, khớp contract mục 4), hay sửa contract để cho phép đọc từ `docs/platform-foundations.md`?
-- **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
-- **Q2.** Các worker ngoài tiến trình (pi, agy, Codex) có nạp AGENTS.md không? Nếu không, P3 bắt buộc phải nằm trong worker contract (báo cáo đã đề xuất như vậy).
+- **Q2.** Các worker ngoài tiến trình (pi, agy, Codex) có nạp AGENTS.md không? Đã đo một phần (mục 2d): codex, omp và pi đều nạp `AGENTS.md`, nhưng codex chỉ đọc 32 KiB đầu; agy chưa đo. Dù vậy P3 vẫn nên nằm trong worker contract, vì brief là nguồn gần nhất có thẩm quyền mà worker chắc chắn đọc.
 - **Q3.** Checker của P1 có đang nằm trong bộ test hoặc canary mà runner chạy trước khi commit mỗi Unit không? Nếu không, cần đưa vào để `--no-verify` và việc commit thẳng lên `main` không lách được.
 - **Q4.** 7 nguyên tắc nên chốt thành luật khoá mới (L11+, có decision ID) hay đưa vào spec dưới dạng guideline không khoá?
+- **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
+- **Q6.** P5: sinh danh sách luật thành fragment trong `core/instructions/` kèm test chống lệch (đề xuất, khớp contract mục 4), hay sửa contract để cho phép đọc từ `docs/platform-foundations.md`?
+- **Q7.** Quyết định ngày 2026-10-06 ("ak và ck là ràng buộc môi trường, không sửa, xoá hay dedupe") còn hiệu lực không? Nếu còn, phía fgOS chỉ chọn cách đặt luật để tránh trùng, và các bước động vào cấu hình cài của ak (P5, `p-7eb9e65b`) thành đề xuất gửi ak. Nếu thay, ghi một quyết định mới có ID cho phép fgOS cấu hình đích cài của ak trong repo này.

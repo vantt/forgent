@@ -23,7 +23,11 @@ created: 2026-10-16
 > **QUYẾT ĐỊNH CỦA ANH 2026-10-17 10:55 — thay mọi ghi chú tạm giữ trước đây.**
 > - **Phần khoá repo làm theo plan cũ, bắt đầu khi 4.2 land:** P03 (main door, checkpoint nhận handle, mượn fd, hook), P05 (merge/land/promote/sync-root/approve dưới slot), P06 (`worktree-admin`), P07, P08, cùng phần tương ứng của P00/P09/P10. Ba khoá (main checkout 50, merge target slot 20, worktree-admin 40) và luật thứ tự, mượn fd, hàng rào, check doctor sẽ được component Git (Rust, làm sau) **dùng lại nguyên vẹn**; component Git chỉ chuyển chính sách "thao tác nào lấy khoá nào" vào nó và xoá facade Node `repo-locks.mjs` cùng các chỗ bọc khoá trong các file merge/worktree mà nó thay. Không thiết kế lại khoá.
 > - **Phần state tạm giữ, chờ hội đồng event store (đang chạy):** phần state của P00, P01 (hot-lock core), P02 (gộp claims vào `state`), P04. Lý do: luật L3 đã chạm ngưỡng xem lại (nhiều agent ghi đồng thời) và hình dạng event store quyết định `events.lock`/`claims.lock`/`stateTx` còn cần ở dạng nào. Khi có kết luận, cắt lại các phase này **một lần**, và sắp lại thứ tự để P01 + P02 merge được vào main sớm mà không để nhánh tích hợp đỏ (plan 6.2 P09 cần P01 + P02 đã land).
-> - **Checkpoint `.fgos` dưới main mutex (trong P03)** có thể đổi dạng theo kết luận event store; làm P03 sao cho checkpoint là một bên gọi tách rời của main door, không trộn vào lõi khoá.
+> - **RÀO CHẮN BẮT BUỘC cho phần khoá repo (hội đồng event store `wf-run-1792209767959-7424ddf9`, finding F10; anh duyệt 2026-10-17 12:09).** Phần khoá repo không được chốt hộ thiết kế event store:
+>   1. Checkpoint `.fgos` trong P03 là **adapter tuỳ chọn, tháo rời được**, gắn vào main door từ bên ngoài; lõi khoá (main mutex, merge slot, worktree-admin, mượn fd, hook) không import hay biết gì về event log, shard, `events.lock` hay `stateTx`.
+>   2. Toàn bộ test của P03, P05, P06, P07, P08 phải **pass khi adapter checkpoint là adapter rỗng** (null adapter).
+>   3. Bằng chứng git ở P09/P10 **không dựa vào** `events.jsonl`, shard `.fgos/events/`, hot-lock hay `stateTx`.
+>   4. Không đưa vào P00 bảng kê `stateTx` hay call site của state, không đổi `merge=union`, `.gitattributes` hay luật strip `.fgos` trong phần này: các thứ đó chờ kết luận event store.
 > - Bối cảnh: [roadmap](../reports/roadmap-261016-2212-fgos-cook-and-git-component.md), [danh mục bài học git](../reports/research-261017-1032-git-lessons-catalogue.md), [probe event store](../reports/investigation-261017-1027-fgos-event-store-git-coupling.md).
 
 ## Phạm vi
