@@ -198,8 +198,8 @@ resolved path, author, reviewer, digest and status here.
 | 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
-| 6 | reviewing | Four fully read copy groups; two semantic routes; six dispositions; 43 contextual bindings; one 58-entry independent request | Candidate UI compiler-root certification; generated drift routed to Phase 9; inherited protected-import proof / ratchet at Step 9 | Lead dispatches the single bounded review request |
-| 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
+| 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
+| 7 | ready | none | none | wait for owner go-ahead |
 | 8 | not-started | none | none | wait for sealed key |
 | 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
 
