@@ -1,8 +1,16 @@
 name: process-containment
 
-# Manual only: runs the process-containment driver tests on real Windows,
+# Runs on pushes to run-supervisor branches and on demand: runs the process-containment driver tests on real Windows,
 # macOS and Linux runners (Job Objects, process groups, pid namespaces).
 on:
+  push:
+    branches: ['run-supervisor/**']
+    paths:
+      - 'packages/process/**'
+      - 'packages/run-supervisor/**'
+      - 'packages/holder-lock/**'
+      - 'Cargo.lock'
+      - '.github/workflows/process-containment.yml'
   workflow_dispatch:
 
 permissions:
