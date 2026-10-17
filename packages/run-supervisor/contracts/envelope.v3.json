@@ -7,7 +7,7 @@
     "envelope": "<attemptDir>/envelope.json",
     "sideFile": "<attemptDir>/protected/attempt-secrets.json, mode 0600, directory 0700",
     "binding": "<attemptDir>/supervisor-binding.json",
-    "gateExit": "<attemptDir>/gate-exit.json",
+    "gateExit": "<attemptDir>/gate-exit.json (in a sandbox whose root is read-only the controller creates it empty and binds it writable; the gate fills it in place)",
     "receipt": "<attemptDir>/receipt.json",
     "stepReceipts": "<attemptDir>/steps/<stepId>.json",
     "stopRequested": "<attemptDir>/stop-requested.json",
@@ -74,10 +74,11 @@
       "idleMs": "integer >= 1 or null; the supervisor stops the agent after this long without activity (agent-protocol activity source)",
       "hardCeiling": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds" },
       "gateKillGraceMs": "integer >= 0, SIGTERM -> SIGKILL grace used by the gate and by kill_all; source config dispatch.gateKillGraceMs (default 10000)",
+      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (config lock.predecessorKillWaitMs); absent means 5000",
       "rule": "deadlines are absolute; a later start, an adopt or a resume never extends them. A bootId that differs from the current boot means every process of the attempt is already dead"
     },
     "agentProtocol": {
-      "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"] },
+      "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"], "other": "any other command name selects the generic adapter (exit and outbox only)" },
       "mode": { "enum": ["direct", "terminal"], "meaning": "always equal to the top-level mode" }
     },
     "slot": "object {key} or absent; terminal mode only (terminal-control key, equal to attemptId)",

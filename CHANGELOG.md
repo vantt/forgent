@@ -120,6 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- The Node run supervisor (`detached-run-supervisor.mjs`), its IPC channel to the controller and its pane-less home binding (`bindConfinedHomesToSupervisor`), the old cli-spawn reconciler (`reconcile-cli-spawn.mjs`), the `legacySpawn` option and the `protected/supervisor-binding` and `protected/adapter-receipts` files of cli-spawn runs. Runs started before this release keep their files and are read as `legacy-run`.
 - `fgos doctor` check `provider-capacity-lock-stale`: the provider-capacity state is no longer guarded by a lock file a dead process can leave behind.
 - `fgos-runner --config <path>`: the runner and its workers always use the repo's own `.fgos/config.json`.
 - `fgos dispatch execute` is gone, together with its `--contract` and `--assignment` forms and the `node src/runner/dispatch.mjs execute` alias. Run one task with `fgos run "<prompt>" --provider <executor>` (`--provider` takes an agent executor; a `kind: "tool"` executor is called directly) (add `--writes <paths> --worktree <linked-worktree>` for work that changes files; the runner commits them), or a Unit file with `fgos run --unit <file>`; planned work goes through `fgos workflow start`. Calling the old door returns an error naming the replacement, and the dispatch-decide hook's BLOCKED message names the same `fgos run` form.
@@ -172,6 +173,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos run` gives a unit's agent to the run supervisor instead of running it as a child of the controller: the controller takes the attempt lock (and the cwd lease when the agent writes), starts `fgos internal supervise` detached and from then on only reads progress and the result, so killing or losing the controller no longer loses the run. Live output (`onChunk`) is read from the capture files. A run resumed after a controller crash asks the adopt door about its attempt and never starts a second agent over it.
+- `fgos dispatch reconcile <runDir>` asks the adopt door and prints its answer (`running`, `being-adopted`, `adopted`, `closed`, `held`, `legacy-run`); a run from before the run supervisor answers `legacy-run`. The `--control-epoch` and `--control-token` flags are gone.
 - Confined Codex accounts now fail closed when `auth.json` is a symlink that resolves outside the Codex home, or when the configured `home` is a relative path; the dispatch stops before the worker starts. Both used to be accepted (the symlink was followed, a relative home was resolved against the working directory).
 
 ### Fixed

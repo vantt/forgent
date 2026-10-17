@@ -11,7 +11,8 @@
       "2": "usage",
       "3": "host-version-mismatch",
       "65": "envelope-invalid (missing, v != 3, digest mismatch, GO mismatch)",
-      "70": "internal or io error"
+      "70": "internal or io error",
+    "71": "supervise only: attempt-already-bound (supervisor-binding.json or receipt.json exists; nothing was touched, the attempt is left to adopt)"
     }
   },
   "routes": {
