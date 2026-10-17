@@ -5,12 +5,12 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "which pane does this key run in" on a terminal multiplexer
 Design status: Accepted
-Implementation status: In progress (Rust core and herdr driver landing; Node migration not done)
+Implementation status: Built (Rust core, herdr driver, internal route, Node client and dispatch migration, setup and doctor); `/fgOS:terminal` migrated; tmux and herdr-dashboard deferred
 Canonical: Yes
 Owner: Terminal Control component
 Source: packages/terminal-control/rust
 Contracts: packages/terminal-control/contracts/
-Last reviewed: 2026-10-16
+Last reviewed: 2026-10-18
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/session-identity/spec.md
@@ -108,7 +108,7 @@ Measured on a real herdr (details in the [measurement report](../../../plans/rep
 
 ## 9. Configuration
 
-Configuration keys are listed here for readers; registration into `fgos setup` and the doctor checks that print each value with its source are separate work and are not described as done by this spec.
+Configuration lives in one top-level section, `terminal`, registered through `registerConfigDefault` so `fgos setup` adds it when missing and never overwrites a value (project over global over default). Node reads it through `src/terminal-control/config.mjs`: the same function feeds the doctor checks below and the route (a herdr round sends the explicitly set values as the `config` field of the route envelope; the Rust core keeps its own defaults for the rest, and a test keeps the two default sets equal). `retainFailedPaneMs` is the round's own concern: it decides whether a failed attempt's pane is released with `retain` or kept.
 
 | Key | Default | Source of the number |
 |---|---|---|
@@ -122,6 +122,19 @@ Configuration keys are listed here for readers; registration into `fgos setup` a
 **Hard floor.** `minCols` below 40 or `minRows` below 8 is refused by doctor. The floor is measured: claude, agy, pi and omp are ready and show their composer and paste chip at 40 columns and at 8 rows; codex was only measurable at 120×30 because an update dialog blocked its later starts. Measured data and the size table: [measurement report](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md).
 
 The research's 85×20 and "at most 4" are not used; nobody measured them.
+
+### Setup and doctor
+
+- **Directory.** `fgos setup` creates `<stateRoot>/terminal` (mode 0700; the `terminal-dir` fix), the parent of one record directory per driver. The state root is the single resolution of the holder-lock spec. Deleting it closes no pane: nobody closes a pane that has no record.
+- **No new environment variable.** `FGOS_HERDR_ANCHOR_PANE` stays as the input of `attach`; `FGOS_HERDR_BIN` stays as the herdr binary the caller resolved.
+- **Other releases.** Checked 2026-10-18: the release active in the forgentX, mdview and mcp-skill-hub workspaces (one digest) accepts a `terminal` section in the global and in the project config, so setup writes the key like `lock`. A release that refused unknown keys would have to be given the key in the project config only, until every workspace ran the new release.
+- **Doctor checks** (`src/setup/terminal-control-checks.mjs`; all read-only):
+
+| Check | What it does | Result |
+|---|---|---|
+| `terminal-control` | Calls the `capabilities` route and prints driver, declared capabilities and server incarnation; also checks `FGOS_HERDR_ANCHOR_PANE` when set | herdr missing: warning "terminal mode unsupported ... direct mode unaffected" (on Windows it says herdr has no Windows build); herdr without `layout.geometry`: information (the fixed split applies); empty or unresolvable anchor pane: fail |
+| `terminal-config` | Prints each `terminal.*` value with its source | `allocationGraceMs` below the 30000 ms ready timeout plus 30000, `retainFailedPaneMs` neither `null` nor a positive integer, an unregistered policy, a limit that is not a positive integer or sits below the 40x8 floor: fail, by name |
+| `terminal-allocations` | Calls `reconcile-scan` with `olderThanMs` = `allocationGraceMs` | Findings: warning listing each key; nothing is closed |
 
 ## 10. Internal route only
 
@@ -148,7 +161,7 @@ Two coordinators with the same `groupKey` (only when set by hand) can create two
 
 The dispatch path has moved: `src/runner/dispatch/herdr-round.mjs`, `herdr-reconcile.mjs`, `worker-session-boot.mjs`, the account probe and the confinement reaper reach herdr only through `fgos internal terminal-control`. `createHerdrClient`, `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-*` labels are deleted; `FGOS_HERDR_ANCHOR_PANE` is an `attach` into the round's group. A round's slot key is its agent name (the normalized `fgos-<runId>-<launchCommandId>` for an assignment run); its group key is the batch key, else the unit run id. The reaper reads `terminalKey` from the home marker; a marker without one names no slot and its pane is never closed on a guess.
 
-Still to move: `/fgOS:terminal` (`rename.sh`) becomes `attach` plus `label`. Starting a herdr server process for a confined worker session (`herdr --session <name> server`) stays in `worker-session-boot.mjs`: it is a server lifecycle, not a pane operation, and every question asked of a running server goes through the port.
+`/fgOS:terminal` and `/fgOS:terminal-close` act through `attach`, `label` and `release` of the caller's own pane.
 
 ## 13. Known limits
 
@@ -159,9 +172,19 @@ Still to move: `/fgOS:terminal` (`rename.sh`) becomes `attach` plus `label`. Sta
 - Windows and a missing herdr binary give `unsupported` for every pane operation.
 - A live handoff of herdr (`capabilities.live_handoff`) was not measured; it would change the server pid, so a close answers `unknown` and the pane is kept.
 
-## 14. Lịch sử quyết định
+## 14. The six questions (platform L5)
+
+1. **What to read first?** `docs/specs/reading-map.md`, then this spec; the contracts under `packages/terminal-control/contracts/`; the measurement report for every number.
+2. **What kind of work is this?** Pane placement and lifecycle for a key. Anything about the agent process, a deadline or a receipt belongs to the run supervisor; a user-facing terminal verb is refused (section 10).
+3. **What contract does it touch?** The upper port (`terminal-control.port.v1.json`), the lower driver capabilities, the record shape, the internal route, and the `terminal` config section. A new driver changes none of the first four.
+4. **How much risk?** A destructive `close` rests on the incarnation check and its known gap (section 7); a wrong layout only costs a tab. Changing a closing rule raises the bar to the Rust core tests plus a run on a real herdr.
+5. **What proof means done?** `cargo test -p fgos-terminal-control`, the fixture tests of the placement policy, `node --test test/terminal-control/*.test.mjs test/setup/terminal-control-checks.test.mjs` against a host built from the checkout, and `npm test`. The doctor tests run the real route against a recorded herdr stand-in; a live herdr test uses its own workspace.
+6. **What learning gets left behind?** Section 15 below and the measurement report; a settled spec fact goes here, a repo-wide decision into `docs/decisions/`.
+
+## 15. Lịch sử quyết định
 
 - 2026-10-15 — The architecture council keeps the tab grouping and the removal of the empty root pane as rules of the core (council sections 2.3 and 2.4, measured on a real herdr with five CLIs), rejects a user verb `fgos terminal`, a layout engine by screen ratio, a layout lock file inside the repo and reading pane labels for state, and keeps the lock for terminal placement as a kind of the shared lock component if it is ever needed. Source: [council](../../../plans/reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md).
 - 2026-10-15 — The owner makes terminal-control a real foundation component (package `packages/terminal-control`, crate `fgos-terminal-control`), usable outside a run, with a key-addressed upper port and a driver port with declared capabilities; supervisor → terminal-control is one way, and the supervisor never knows panes. The layout becomes measured state plus a pluggable policy. Source: [design, section 7](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md).
 - 2026-10-16 — The terminal-control plan fixes: the incarnation is checked before and after a close because herdr cannot bind a close to a server instance (D1); the route is internal only and no user verb is added (D2, standing STR40 decision); `maxPanesPerTab` is 8 (D6). Measured numbers and the Lead's chosen defaults: [measurements](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md). Plan: [terminal-control plan](../../../plans/261016-1306-terminal-control-rust-core-herdr-driver/plan.md) (decisions D1-D7, prior art).
 - Prior art removed by the dispatch migration: `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-<key>-<ts>` labels in `src/runner/dispatch/herdr-round.mjs` and `herdr-agent.mjs`; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` plus `groupKey`. The removal landed with the dispatch migration (2026-10-18).
+- 2026-10-18 — Setup and doctor. `terminal` is one config section registered like `lock`; `herdr-available` is replaced by `terminal-control`, which asks the port for capabilities and keeps the anchor-pane diagnosis; a missing herdr is a warning because direct mode needs no terminal. `terminal-config` enforces the D4 rule (grace at least ready timeout plus 30 s) and the measured 40x8 floor; `terminal-allocations` only reports (r6 section 7.7). The settings reach the route and the failed-pane retention through one module (`src/terminal-control/config.mjs`) so a value doctor accepts is the value a round uses. The 40x8 floor and the 80x20, 8-pane defaults come from the measurement report and the P04 fixtures, not from the research. Not done, deferred by name: the herdr-dashboard workspace and a tmux driver (D7).

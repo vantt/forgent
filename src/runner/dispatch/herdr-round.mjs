@@ -33,6 +33,8 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { DispatchError } from './dispatch-error.mjs';
+import { READY_TIMEOUT_MS } from './herdr-deadlines.mjs';
+import { terminalRouteConfig, retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { createRoundTerminalControl, createSlotIo, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
@@ -393,8 +395,6 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
  * basis to choose a different value. What is genuinely a person's decision --
  * how long the WORK may take -- stays in `timeoutMs`/`idleTimeoutMs`.
  */
-/** `agent start`'s own documented default. */
-const READY_TIMEOUT_MS = 30000;
 /** How long herdr gets to recognise an agent that fgos launched itself (a confined one) before a
  * state is reported for it. A real agent is recognised within a poll or two; only a process herdr
  * has no manifest for waits all of it. */
@@ -1660,8 +1660,10 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // never a live handle. It is the group key: every round of one batch
     // shares a tab, which terminal-control owns.
     dispatchBatchKey,
-    retainFailedPaneMs,
+    retainFailedPaneMs: ctxRetainFailedPaneMs,
   } = ctx;
+  const projectRoot = repoRoot ?? cwd;
+  const retainFailedPaneMs = ctxRetainFailedPaneMs ?? retainFailedPaneMsOf(projectRoot);
 
   // The slot key is the round's own agent name: deterministic per launch
   // command for an assignment run, unique per ad-hoc round, and already in the
@@ -1675,7 +1677,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     herdrEnv: sessionEnv,
     // How long a launched worker may take to show up in its pane: a loaded machine or a slow shell startup
     // can need more than a few seconds, and a worker that is late is not a tampered one.
-    config: { launchIdentifyTimeoutMs: Math.min(deadlines.startup.readyMs || 10000, 10000), ...(ctx.terminalConfig ?? {}) },
+    config: { launchIdentifyTimeoutMs: Math.min(deadlines.startup.readyMs || 10000, 10000), ...terminalRouteConfig(projectRoot), ...(ctx.terminalConfig ?? {}) },
   });
   const io = createSlotIo({ tc, key, groupKey });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for

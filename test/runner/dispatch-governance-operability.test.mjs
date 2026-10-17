@@ -27,7 +27,6 @@ import {
   INSPECTION_STATUSES,
 } from '../../src/runner/dispatch/runtime-inspection.mjs';
 import {
-  checkHerdrAvailable,
 } from '../../src/setup/registrations.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 
@@ -333,63 +332,6 @@ test('RunObservation fields strictly adhere to closed vocabularies', () => {
   }
 
   fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-// ─── 6. Anchor Pane Empty/Unresolvable/Valid ───────────────────────────────────
-
-test('checkHerdrAvailable diagnoses empty, unresolvable, and valid FGOS_HERDR_ANCHOR_PANE', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-anchor-'));
-  const mockScript = path.join(tmp, 'mock-herdr.mjs');
-  fs.writeFileSync(
-    mockScript,
-    `#!/usr/bin/env node
-    if (process.argv[2] === '--version') {
-      process.stdout.write('herdr 0.8.0\\n');
-      process.exit(0);
-    }
-    if (process.argv[2] === 'pane' && process.argv[3] === 'get') {
-      if (process.argv[4] === 'valid-pane-42') {
-        process.stdout.write(JSON.stringify({ id: 'valid-pane-42', status: 'alive' }));
-        process.exit(0);
-      }
-      process.stderr.write('error: pane not found\\n');
-      process.exit(1);
-    }
-    process.exit(0);
-    `,
-    { mode: 0o755 },
-  );
-
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-
-  try {
-    process.env.FGOS_HERDR_BIN = mockScript;
-
-    // 6a. Empty / whitespace anchor pane fails closed
-    process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
-    const resEmpty = checkHerdrAvailable();
-    assert.equal(resEmpty.passed, false);
-    assert.match(resEmpty.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
-
-    // 6b. Unresolvable anchor pane fails closed
-    process.env.FGOS_HERDR_ANCHOR_PANE = 'ghost-pane-999';
-    const resUnres = checkHerdrAvailable();
-    assert.equal(resUnres.passed, false);
-    assert.match(resUnres.message, /cannot be resolved/);
-
-    // 6c. Valid anchor pane succeeds
-    process.env.FGOS_HERDR_ANCHOR_PANE = 'valid-pane-42';
-    const resValid = checkHerdrAvailable();
-    assert.equal(resValid.passed, true);
-    assert.match(resValid.message, /anchor pane "valid-pane-42" verified/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
-    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
 });
 
 // ─── 7. Provider Warning for All-non-CLI vs Mixed ─────────────────────────────

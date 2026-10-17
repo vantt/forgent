@@ -13,6 +13,7 @@
 // tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import { test } from 'node:test';
+import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
   DEFAULT_CLEANUP_TTL_DAYS,
@@ -132,7 +133,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
-      'herdr-available',
+      'terminal-control',
+      'terminal-config',
+      'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
       // no doctor coverage at all -- only claude-json's default path did.
@@ -1027,6 +1030,7 @@ test('config-not-stale passes when the existing config already has every default
       worktreeSetup: { commands: [] },
       workerSlots: { ceiling: null },
       lock: { predecessorKillWaitMs: 2000 },
+      terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
