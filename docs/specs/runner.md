@@ -3044,7 +3044,7 @@ Mọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `ex
   - Khóa (lock) thời gian dài không còn cần thiết cho việc thao tác file, chỉ cần cho việc update-ref (nhưng update-ref đã có cơ chế CAS an toàn).
   - Lỗi test hoặc timeout tự động dọn dẹp worktree mà không rò rỉ state vào nhánh chính.
 
-### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor [PHẦN `detached-run-supervisor` ĐÃ BỊ THAY bởi D-ADR-run-supervisor (id chưa cấp), cuối mục này]
+### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor [PHẦN `detached-run-supervisor` ĐÃ BỊ THAY bởi D-ADR0056, cuối mục này]
 
 > Phần `bound-invocation-supervisor` vẫn hiệu lực. Vai `detached-run-supervisor` (`cli-spawn-supervisor.mjs`, Node, cầm pipe và kênh IPC) không còn: thay bằng run supervisor Rust ở bản ghi cuối mục này.
 
@@ -3366,9 +3366,9 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Ranh giới:** No component-boundary change (đèn là một file mới trong `.fgos/runtime/` của runner; mutex giữ chủ cũ).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### D-ADR-run-supervisor (id chưa cấp) — Run supervisor Rust thay `detached-run-supervisor`: cách `direct` không pipe, không IPC, receipt qua file (thay phần `detached-run-supervisor` của 0043)
+### D-ADR0056 — Run supervisor Rust thay `detached-run-supervisor`: cách `direct` không pipe, không IPC, receipt qua file (thay phần `detached-run-supervisor` của 0043)
 
-- **Trạng thái:** Settled cho cách `direct` (2026-10-18). Cách `terminal` là plan 6.3. Số ADR chưa cấp: repo chưa có quy ước cấp số kiểm được (số `00xx` của mục này và `D-ADR00xx` ở các spec khác đã từng trùng nhau, ví dụ 0055), nên bản ghi này dùng tên tạm, cấp id khi lead chốt.
+- **Trạng thái:** Settled cho cách `direct` (2026-10-18). Cách `terminal` là plan 6.3. Id `D-ADR0056` là số kế tiếp sau D-ADR0055 (event store), kiểm trên mọi nhánh cục bộ ngày 2026-10-18 chưa nơi nào dùng.
 - **Bối cảnh:** `detached-run-supervisor.mjs` (Node, 1234 dòng) cầm pipe của agent và kênh `ipc` tới controller. Controller chết thì kênh đóng (`ERR_IPC_CHANNEL_CLOSED`), supervisor và agent chết theo; kết quả cli mất dù agent đã làm xong. Reaper `reapOrphanedConfinementResources` quyết quyền dọn home bằng pid/pane, hai thẩm quyền trên cùng một attempt.
 - **Quyết định:**
   1. Mỗi attempt một supervisor Rust (`fgos internal supervise`) và một gate (`fgos internal gate`) là gốc process của agent trong miền chứa chứng minh được rỗng (cổng chứa của `fgos-process`; Linux: gate là pid 1 của PID namespace). Supervisor không cầm pipe của agent: gate làm chủ IO (capture, stdin).
