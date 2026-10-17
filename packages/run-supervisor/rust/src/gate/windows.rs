@@ -22,7 +22,7 @@ use serde_json::{json, Value};
 use windows_sys::Win32::System::Console::{GenerateConsoleCtrlEvent, CTRL_BREAK_EVENT};
 use windows_sys::Win32::System::Threading::{CREATE_NEW_PROCESS_GROUP, CREATE_SUSPENDED};
 
-use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, report, stop_cause, Config, GateArgs, GoEnd, Stop, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_NO_GO, EXIT_USAGE};
+use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, report, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_NO_GO, EXIT_USAGE};
 use crate::go_channel::{read_frame, write_frame};
 use crate::go_pipe;
 
@@ -148,10 +148,12 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
             }
             None => {}
         }
-        if stop.is_none() && stop_cause(config).is_some() {
-            stop = Some(read_stop(config));
-            grace_ends = Some(Instant::now() + config.grace);
-            ask_agent_to_stop(running);
+        if stop.is_none() {
+            if let Some(cause) = stop_cause(config) {
+                stop = Some(stop_for(Some(cause)));
+                grace_ends = Some(Instant::now() + config.grace);
+                ask_agent_to_stop(running);
+            }
         }
         if stop.is_none() && ceiling_left(config) == Some(Duration::ZERO) {
             stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
@@ -159,8 +161,8 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
             ask_agent_to_stop(running);
         }
         if !escalated && grace_ends.is_some_and(|at| Instant::now() >= at) {
-            escalated = true;
-            let _ = nested.terminate();
+            // Retried on the next poll when the kill was refused.
+            escalated = nested.terminate().is_ok();
         }
         std::thread::sleep(POLL);
     }

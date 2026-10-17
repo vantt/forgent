@@ -262,7 +262,12 @@ pub(crate) fn stop_cause(config: &Config) -> Option<String> {
 
 /// Why the agent is being stopped: the named cause, else the signal itself.
 pub(crate) fn read_stop(config: &Config) -> Stop {
-    match stop_cause(config).as_deref() {
+    stop_for(stop_cause(config))
+}
+
+/// [`read_stop`] for a cause already read.
+pub(crate) fn stop_for(cause: Option<String>) -> Stop {
+    match cause.as_deref() {
         Some("soft-deadline") => Stop { stopped_by: "soft-deadline", cause: "soft-deadline".into() },
         Some("idle") => Stop { stopped_by: "idle", cause: "idle".into() },
         Some("cancel") => Stop { stopped_by: "cancel", cause: "cancel".into() },

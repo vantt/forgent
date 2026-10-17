@@ -427,6 +427,11 @@ fn end_domain(agent: Option<libc::pid_t>, tuple: Option<&facts::ProcTuple>, pid1
             return;
         }
         kill_everything(agent, tuple, pid1);
+        #[cfg(not(target_os = "linux"))]
+        if started.elapsed() >= NON_LINUX_EMPTY_WAIT {
+            eprintln!("fgos internal gate: processes still in the agent's tree after {NON_LINUX_EMPTY_WAIT:?}");
+            return;
+        }
         std::thread::sleep(Duration::from_millis(5));
     }
 }
