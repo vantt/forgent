@@ -68,6 +68,17 @@ Machine: the Windows 10.0.26200 machine of probe runs 1-3.
 4. Red: do not land; send the JSON back, fix by the owning phase (`violationDetails` names the source).
 5. Green: commit the JSON as `plans/reports/evidence-<stamp>-windows-driver-stress-report.json` (name via `fgos convention path`) and add a "Stress gate" section to the integration report.
 
+## Stress gate (owner's machine, 2026-10-18 00:15)
+Artifact `windows-predecessor-stress` of run `39044432620` (tree `6cf430051`), run by the owner from Git Bash with 500 repeats. All three tests `ok`. Evidence: [evidence-261018-0015-windows-driver-stress-report.json](evidence-261018-0015-windows-driver-stress-report.json).
+
+| Scenario | Repeats | Violations | jobOpened | Extra wait p50 / p95 / max (ms) |
+|---|---|---|---|---|
+| all-owners-dead | 500 | 0 | 0 (job always gone: fallback path every time) | 96.6 / 122.2 / 184.9 |
+| borrow-hook-predecessor-check | 500 | 0 | 500 | 109.1 / 158.8 / 208.3 |
+| dying-job-open | 500 | 0 | 500 (bar 250) | 101.0 / 142.9 / 171.3 |
+
+`namedByOneSourceOnly` 0 everywhere; every contender was admitted (no `Held`). The 200 ms orphan window held on this machine at 500 repeats. Extra wait is about 100 ms at p50 here against about 15 ms on the CI runner.
+
 ## Landing readiness (Section C, not started)
 - [x] main merged into integration (`186c257a5`); `--ff-only` into main then possible.
 - [x] Linux cargo (457) and npm (3 non-branch failures, listed above) done; cross-checks green; Windows and macOS CI green on the head.
