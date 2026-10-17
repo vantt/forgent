@@ -30,8 +30,9 @@ fs.writeFileSync(path.join(dir, 'agent-fds.txt'), `${descriptors(process.pid).jo
 if (opts.writeFile) fs.writeFileSync(path.join(process.cwd(), opts.writeFile), 'written by the agent\n');
 
 if (opts.grandchildToken) {
-  // A grandchild in its own session that lists its own descriptors, then sleeps.
-  const script = `for f in /proc/$$/fd/*; do readlink "$f"; done > "${path.join(dir, 'grandchild-fds.txt')}"; exec sleep 600`;
+  // A grandchild in its own session that lists its own descriptors, then lives on as a shell (so its
+  // command line keeps the token the test looks for; `exec sleep` would drop it).
+  const script = `for f in /proc/$$/fd/*; do readlink "$f"; done > "${path.join(dir, 'grandchild-fds.txt')}"; while :; do sleep 1; done`;
   const grandchild = spawn('setsid', ['sh', '-c', script, opts.grandchildToken], { stdio: 'ignore', detached: true });
   grandchild.unref();
 }

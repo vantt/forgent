@@ -68,7 +68,9 @@ test('2. a controller that gets SIGTERM does not stop the attempt either: the co
 /** Kill the controller, then the supervisor, once the agent runs; returns the attempt directory. */
 async function orphanTheAttempt(project, unitId) {
   const run = startRun(project, project.unitFile(unitId));
-  const dir = await attemptWhere(project, (d) => exists(d, 'supervisor-binding.json'), { what: 'the supervisor binding' });
+  // The agent has started (the supervisor writes agent-binding.json from the gate's AGENT frame): a supervisor
+  // that dies before GO leaves a gate that never runs the agent, which is another case.
+  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'), { what: 'the agent to start' });
   const { supervisor } = readJson(here(dir, 'supervisor-binding.json'));
   run.child.kill('SIGKILL');
   await run.exited;
