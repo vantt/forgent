@@ -70,13 +70,14 @@
       "input": {
         "key": "key",
         "disposition": { "enum": ["close", "retain"] },
-        "until": "retain only: epoch ms, or null for kept until a person closes it"
+        "until": "retain only: epoch ms, or null for kept until a person closes it",
+        "callerPane": "optional driver pane id: the pane the caller itself runs in; only a close of an attached slot whose pane equals it closes the pane"
       },
       "results": ["released", "kept-unknown", "unsupported"],
       "effects": [
         "close: closes only the pane this key allocated, only when the server incarnation matches right before and right after the close; never closes a tab",
         "retain: records released{retain, until}; a later reconcile closes only past until, same incarnation, foreground not foreign",
-        "attached slots: release removes label and link only"
+        "attached slots: release removes label and link only, except a close whose callerPane is the slot's own pane (a person closing their own pane through /fgOS:terminal-close), which closes it like an allocated pane (same incarnation checks); the only exception"
       ]
     },
     "label": {
@@ -131,6 +132,6 @@
     "unknown is never turned into gone or closed",
     "the core closes only panes it allocated, by key, and never closes a tab",
     "labels are display only; no code reads a label to decide",
-    "a pane taken with attach is never closed by the core"
+    "a pane taken with attach is never closed by the core, except on a close that names that pane as the caller's own (callerPane)"
   ]
 }

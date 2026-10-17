@@ -532,6 +532,14 @@ impl<'a> Core<'a> {
     // ---- release -----------------------------------------------------------
 
     pub fn release(&self, key: &str, disposition: Disposition, until: Option<u64>) -> Result<ReleaseOutcome, Refusal> {
+        self.release_as(key, disposition, until, None)
+    }
+
+    /// `release` with the pane the caller itself runs in. The one exception to
+    /// "the core never closes an attached pane": a `close` of an attached slot
+    /// whose pane is the caller's own pane, because a person asked to close
+    /// their own pane. Any other caller, or none, only unlinks.
+    pub fn release_as(&self, key: &str, disposition: Disposition, until: Option<u64>, caller_pane: Option<&str>) -> Result<ReleaseOutcome, Refusal> {
         let (store, incarnation) = self.open()?;
         let record = match self.record_of(&store, key) {
             Ok(record) => record,
@@ -555,7 +563,15 @@ impl<'a> Core<'a> {
             outcome,
         };
         let outcome = match (record.origin, disposition) {
-            // An attached pane is never closed by the core.
+            (Origin::Attached, Disposition::Close) if caller_pane == Some(record.pane_id.as_str()) => {
+                self.need("pane.close")?;
+                match self.driver.pane_close(&record.pane_id, &incarnation) {
+                    Ok(CloseOutcome::Closed | CloseOutcome::AlreadyGone) => ReleaseMarkerOutcome::Closed,
+                    Err(Refusal::Unknown { reason }) => return Ok(ReleaseOutcome::KeptUnknown { reason }),
+                    Err(other) => return Err(other),
+                }
+            }
+            // Any other attached release only drops the label and the link.
             (Origin::Attached, _) => ReleaseMarkerOutcome::Unlinked,
             (Origin::Allocated, Disposition::Retain) => ReleaseMarkerOutcome::Retained,
             (Origin::Allocated, Disposition::Close) => {

@@ -16,7 +16,11 @@ const renameSh = join(repo, 'plugins/fgOS/skills/terminal/rename.sh');
 const closeSh = join(repo, 'plugins/fgOS/skills/terminal-close/close.sh');
 
 // Fake herdr: process-info answers from FAKE_SHELL_PID (or pane_not_found
-// when it is "dead"); rename/close are appended to FAKE_HERDR_LOG.
+// when it is "dead"); any other call is appended to FAKE_HERDR_LOG. Fake fgos:
+// the terminal-control route, which logs "<op> <stdin>" and answers with a
+// slot. What the real port does with the requests is covered by
+// test/plugins/terminal-skill-attach.test.mjs; this test is about which pane
+// the scripts are willing to name to it.
 function setup(t) {
   const dir = mkdtempSync(join(tmpdir(), 'fgos-terminal-pane-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
@@ -33,6 +37,12 @@ fi
 echo "$*" >> "$FAKE_HERDR_LOG"
 `);
   chmodSync(join(bin, 'herdr'), 0o755);
+  writeFileSync(join(bin, 'fgos'), `#!/usr/bin/env bash
+[ "$1 $2" = "internal terminal-control" ] || exit 2
+echo "$3 $(cat)" >> "$FAKE_HERDR_LOG"
+echo '{"v":1,"protocol":1,"op":"'"$3"'","result":"slot","slot":{"tabId":"t","paneId":"p"},"origin":"attached"}'
+`);
+  chmodSync(join(bin, 'fgos'), 0o755);
   // Project root whose capability query reports a pane-labeling provider.
   const root = join(dir, 'root');
   mkdirSync(join(root, 'bin'), { recursive: true });
@@ -81,7 +91,11 @@ test('rename labels the pane whose shell is an ancestor of the caller', (t) => {
   const { root, run, calls } = setup(t);
   const r = run(renameSh, ['tsk-1', root], process.pid);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(calls(), 'pane rename wS:p4YF tsk-1 | fg.ssid:fg-1\n');
+  assert.equal(calls(), [
+    'attach {"v":1,"request":{"key":"fg-1","pane":"wS:p4YF"}}',
+    'label {"v":1,"request":{"key":"fg-1","display":{"label":"tsk-1 | fg.ssid:fg-1"}}}',
+    '',
+  ].join('\n'));
 });
 
 test('close refuses a dead pane and a stranger pane, closes its own', (t) => {
@@ -91,5 +105,9 @@ test('close refuses a dead pane and a stranger pane, closes its own', (t) => {
   assert.equal(calls(), '');
   const r = run(closeSh, [], process.pid);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(calls(), 'pane close wS:p4YF\n');
+  assert.equal(calls(), [
+    'attach {"v":1,"request":{"key":"fg-1","pane":"wS:p4YF"}}',
+    'release {"v":1,"request":{"key":"fg-1","disposition":"close","callerPane":"wS:p4YF"}}',
+    '',
+  ].join('\n'));
 });
