@@ -175,7 +175,8 @@ impl Rig {
             let started = Instant::now();
             let (answer, trace) = acquire_with_trace(&resource, Mode::Ex, Wait::Ms(30_000), KILL_WAIT_MS);
             let waited = started.elapsed();
-            let Acquire::Acquired(handle) = answer else { return (waited, trace, Err(format!("the contender was not admitted: {answer:?}"))) };
+            let Acquire::Acquired(handle) = answer else { let why = format!("the contender was not admitted: {answer:?}; job opened: {}; named (pid, listed, scanned, tree): {:?}; hook pids: {:?}", trace.job_opened, trace.named, judged);
+            return (waited, trace, Err(why)) };
             // As soon as acquire returns: every pid that was in the borrow.
             let still_running: Vec<u32> = judged.iter().copied().filter(|pid| ended(*pid) != Some(true)).collect();
             release(handle);
