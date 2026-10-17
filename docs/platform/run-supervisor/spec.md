@@ -103,6 +103,7 @@ The controller does not settle while a supervisor lives. The controller reads re
 
 | Event at the gate | Result |
 |---|---|
+| Working directory not visible in the sandbox | The agent starts at `/` (as a process started by bwrap itself would) and the gate says so in the capture stderr. A read-only attempt whose worktree lies under `/tmp` hits this: the sandbox's private tmpfs hides it |
 | Agent cannot start | `gate-exit.json` with `exitCode` 127 (program not found) or 126 (cannot be run), `stoppedBy: agent`; the reason is appended to the capture stderr. The settle step sees an ordinary failed execution; `spawnWorker` reads 127 as `worker-spawn-fail` |
 | Agent exits | `kill(-1, SIGKILL)` for the rest of the domain, `waitpid(-1)` until `ECHILD`, then `gate-exit.json {exitCode, signal, stoppedBy: agent}`; the lock is held until the namespace is empty |
 | SIGTERM or SIGINT | The gate is pid 1 and installs handlers (pid 1 ignores a signal without one). Forward SIGTERM to the agent group; SIGKILL after `gateKillGraceMs`. `stoppedBy` and `cause` come from `stop-requested.json`; the signal without the file is `cancel` with cause `signal` |

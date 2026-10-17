@@ -1457,8 +1457,8 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
     fs.writeFileSync(target, JSON.stringify(claim));
   `);
   const dispatchedPrompt = (dir, role) => {
-    const envelope = JSON.parse(fs.readFileSync(path.join(dir, role, '1', 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
-    const prompt = envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+    const envelope = JSON.parse(fs.readFileSync(path.join(dir, role, '1', 'runs', '01', 'envelope.json'), 'utf8'));
+    const prompt = envelope.launch.args.find((arg) => arg.includes('Write structured JSON to'));
     assert.equal(typeof prompt, 'string', 'the real CLI launch envelope contains the delivered brief');
     return prompt;
   };
@@ -1875,8 +1875,8 @@ test('workflow start --seats through the real CLI stores the expanded definition
   // Each seat was briefed with its own lens only, and the synthesizer got no lens.
   const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
   const prompt = (role) => {
-    const envelope = JSON.parse(fs.readFileSync(path.join(unitDir, role, '1', 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
-    return envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+    const envelope = JSON.parse(fs.readFileSync(path.join(unitDir, role, '1', 'runs', '01', 'envelope.json'), 'utf8'));
+    return envelope.launch.args.find((arg) => arg.includes('Write structured JSON to'));
   };
   lenses.forEach((lens, i) => {
     const brief = prompt(`panelist-${i + 1}`);

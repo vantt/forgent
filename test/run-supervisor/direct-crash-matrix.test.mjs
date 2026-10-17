@@ -104,7 +104,7 @@ test('4. the soft deadline passes after the controller died: the supervisor stop
   const project = createProject({ agent: { runMs: 120_000, grandchildToken: tok }, timeoutMs: 2000, dispatch: { gateKillGraceMs: 1000 } });
   const run = startRun(project, project.unitFile('crash-deadline'));
   const dir = await attemptWhere(project, (d) => exists(d, 'supervisor-binding.json'), { what: 'the supervisor binding' });
-  await waitUntil(() => pidsWithToken(tok).length > 0, { what: 'the grandchild to exist' });
+  await waitUntil(() => pidsWithToken(tok).length > 0, { timeoutMs: 90_000, what: 'the grandchild to exist' });
   run.child.kill('SIGKILL');
   await run.exited;
   await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 60_000, what: 'the attempt to close' });

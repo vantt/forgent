@@ -301,7 +301,15 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         None => Stdio::null(),
     };
     let mut cmd = Command::new(&config.command);
-    cmd.args(&config.args).env_clear().envs(&config.env).envs(&secrets).current_dir(&config.cwd);
+    // A sandbox hides some directories (a worktree under /tmp behind its private tmpfs): the agent then
+    // starts at the root, as a process started by bwrap itself would.
+    if config.cwd.is_dir() {
+        cmd.current_dir(&config.cwd);
+    } else {
+        crate::gate::note_in_capture(config, &format!("working directory {} is not visible here, starting in /", config.cwd.display()));
+        cmd.current_dir("/");
+    }
+    cmd.args(&config.args).env_clear().envs(&config.env).envs(&secrets);
     match go_frame.get("gateHostTuple").filter(|t| !t.is_null()) {
         Some(anchor) => cmd.env("FGOS_PIDNS_ANCHOR", anchor.to_string()),
         None => cmd.env_remove("FGOS_PIDNS_ANCHOR"),
