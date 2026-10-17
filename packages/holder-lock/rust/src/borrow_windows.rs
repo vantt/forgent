@@ -17,8 +17,8 @@ use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::platform::windows_job::{ancestor_chain, assign_and_resume, create_kill_job, filetime_now, job_name, open_job, own_session};
-use fgos_process::{job_view, Domain, DomainState, ProcId, WindowsJob};
+use fgos_process::platform::windows_job::{ancestor_chain, assign_and_resume, create_kill_job, filetime_now, job_name, open_job, own_session, JobView};
+use fgos_process::{Domain, DomainState, ProcId, WindowsJob};
 
 use crate::driver;
 use crate::port::{borrowed_argv, probe, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Handle, HelperExe, Mode, NotBorrowerReason, Probe, Resource};
@@ -35,7 +35,7 @@ const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 /// How often the wait for the child looks at a cancel request.
 const CANCEL_POLL: Duration = Duration::from_millis(2);
 /// How often the job view is re-read while the release rule waits for it.
-const EMPTY_POLL: Duration = Duration::from_micros(500);
+const EMPTY_POLL: Duration = Duration::from_millis(1);
 
 /// What a caller that does more than wait can do to a running borrow.
 pub(crate) struct BorrowControl<'a> {
@@ -128,12 +128,17 @@ fn wait_child(child: &mut Child, job: &fgos_process::platform::windows_job::Job,
 }
 
 /// Release rule step 0: end the job and wait for the job view to show it
-/// empty, at most `kill_wait`. `Ok(members that were still live)`; `Err(pids
-/// left)` when the bound passes.
+/// empty, at most `kill_wait`. The view adds the in-job process scan to the id
+/// list, because the list alone can omit a member that is still running and
+/// the job's count can drop before the process object is signaled. `Ok(members
+/// that were still running)`; `Err(pids left)` when the bound passes.
 fn empty_the_job(job: &fgos_process::platform::windows_job::Job, name: &str, kill_wait: Duration) -> Result<u32, Vec<u32>> {
-    let live = job.active_processes().unwrap_or(0);
+    let Some(mut view) = JobView::open(name, true) else {
+        let _ = job.terminate();
+        return Err(Vec::new());
+    };
+    let live = view.live_pids().len() as u32;
     let _ = job.terminate();
-    let Some(mut view) = job_view(name) else { return Err(Vec::new()) };
     let deadline = Instant::now() + kill_wait;
     loop {
         if view.is_empty() == DomainState::Empty {
