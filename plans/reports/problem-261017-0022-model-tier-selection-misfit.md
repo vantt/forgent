@@ -479,6 +479,35 @@ core change in wave B depends on them.
    (`src/runner/dispatch/provider-adapter.mjs:82-101`), which maps `openai` to
    `openai-codex` and `glm` to `z-ai`.
 
+**Wave-0 answers (2026-10-17).** Questions 1, 2, 6 and 7 were decided by
+analysis and reported to the owner; 3, 4 and 5 were decided by the owner.
+
+1. `bind()` stays config-only and returns the tier's ordered candidate list, each
+   candidate `(model id, pool, invocation)`. The lease walks the list and takes
+   the first candidate with a usable account; the binding records the candidate
+   it took. The model id travels with its candidate, so nothing is recomputed,
+   and health stays in the lease.
+2. Yes, per candidate. `bind()` picks the invocation by today's rules (herdr,
+   posture), but only among invocations whose `credentialStore.use` matches a
+   store held by an account of that candidate's pool. Store presence is config,
+   not health, so `bind()` can decide it.
+3. Owner: no billing field. Writing a pay-per-token pool into a tier cell is the
+   consent; `explain` and provenance show which pool ran.
+4. Owner: a `prefer` entry is a family name, or the object
+   `{ "family": <name>, "invocation": <id> }` for a pin. The 27 pins keep their
+   behaviour; only `executor` becomes `family`.
+5. Owner: every account is a store directory, and the API key lives in that
+   CLI's own config (pi `settings.json` already holds the OpenRouter key). No
+   environment-variable accounts; invocations stop carrying key variables in
+   `env`. Each CLI must be checked to read its key from the store.
+6. A credential fault excludes the faulty account's pool, not the family; other
+   pools of the same tier stay eligible.
+7. Pool names are used verbatim, never normalized. Validation refuses a pool
+   name that is an alias in `normalizeProviderFamily` (`codex`, `openai-codex`,
+   `glm`, `agy`). During the transition a pool that replaces a legacy provider
+   uses that provider's legacy state key (pool `openai` uses `openai-codex`), so
+   old and new releases see the same leases and never lease one account twice.
+
 **Wave A. Start now, additive, no file owned by an in-flight plan.**
 
 - **A1. Config cleanup so "one family, one executor" holds.** Merge `glm-herdr`
