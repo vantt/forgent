@@ -12,16 +12,18 @@
 // field the config declared was dropped between those two ends with the whole
 // suite green. These tests start where a real dispatch starts -- at the file.
 
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import net from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 const WORKER_SESSION = 'fgos-worker';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
@@ -31,6 +33,11 @@ if (originalHome && fs.existsSync(path.join(originalHome, '.fgos', 'confinement-
   fs.copyFileSync(path.join(originalHome, '.fgos', 'confinement-backends.json'), path.join(testHome, '.fgos', 'confinement-backends.json'));
 }
 process.env.HOME = testHome;
+
+// The terminal-control route finds the herdr server by the process listening on its socket.
+let harness;
+before(async () => { harness = await startTerminalHarness(); });
+after(() => { harness?.stop(); });
 
 /** What `executorIdForWork` resolves for a coding item at the executing stage
  * -- the capability a real implement dispatch goes through. */
@@ -42,26 +49,33 @@ const IMPLEMENT_CAPABILITY = 'fgos-coding-implement';
  * Deliberately smaller than the adapter suite's mock: these tests ask what
  * reached herdr, not what the round did with the answers.
  */
-function mockHerdr(dir, { failWorkspaceCreate = false, silentWorker = false, writesTo = null } = {}) {
+function mockHerdr(dir, { failTabCreate = false, silentWorker = false, writesTo = null } = {}) {
   const logPath = path.join(dir, 'herdr-calls.log');
   const exitedPath = path.join(dir, 'agent-exited');
+  const envLogPath = path.join(dir, 'herdr-envs.log');
+  const agentPidPath = path.join(dir, 'agent-pid');
   const scriptPath = path.join(dir, 'mock-herdr.mjs');
   const wrapperPath = path.join(dir, 'herdr');
   fs.writeFileSync(logPath, '');
+  fs.writeFileSync(envLogPath, '');
 
   fs.writeFileSync(scriptPath, `
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 const args = process.argv.slice(2);
 fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + '\\n');
+fs.appendFileSync(${JSON.stringify(envLogPath)}, JSON.stringify({ session: process.env.HERDR_SESSION ?? null, socket: process.env.HERDR_SOCKET_PATH ?? null }) + '\\n');
 const ok = (result) => { console.log(JSON.stringify({ id: 'cli:mock', result })); process.exit(0); };
 const fail = (code) => { console.log(JSON.stringify({ error: { code, message: code }, id: 'cli:mock' })); process.exit(1); };
 const [group, action] = args;
 
-if (group === 'workspace' && action === 'create') {
-  if (${JSON.stringify(failWorkspaceCreate)}) fail('workspace_create_failed');
-  ok({ workspace: { workspace_id: 'ws-mock' }, pane: { pane_id: 'mock-root-pane' } });
+if (args[0] === '--version') { console.log('herdr 0.9.1-mock'); process.exit(0); }
+if (group === 'tab' && action === 'create') {
+  if (${JSON.stringify(failTabCreate)}) fail('tab_create_failed');
+  ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-pane-1' } });
 }
+if (group === 'pane' && action === 'read') { console.log(''); process.exit(0); }
 if (group === 'pane' && action === 'list') ok({ panes: [] });
 if (group === 'pane' && action === 'split') ok({ pane: { pane_id: 'mock-pane-1' } });
 if (group === 'pane' && action === 'close') ok({ closed: true });
@@ -69,16 +83,33 @@ if (group === 'pane' && action === 'process-info') {
   // A real pane always lists its own shell; "the agent is there" means a
   // foreground process that is not it. After /exit the agent is gone, which
   // is what lets the exit drain finish instead of waiting out its deadline.
+  // The agent is a real process, because the port identifies it by its pid.
   const gone = fs.existsSync(${JSON.stringify(exitedPath)});
-  const foreground = gone ? [{ pid: 100, name: 'zsh' }] : [{ pid: 200, name: 'agy' }, { pid: 100, name: 'zsh' }];
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : 200, foreground_processes: foreground } });
+  const shell = { pid: 100, name: 'zsh', argv: ['zsh'] };
+  let agent = null;
+  try {
+    const pid = Number(fs.readFileSync(${JSON.stringify(agentPidPath)}, 'utf8'));
+    process.kill(pid, 0);
+    const argv = fs.readFileSync('/proc/' + pid + '/cmdline', 'utf8').split('\\0').filter(Boolean);
+    agent = { pid, name: argv[0], argv };
+  } catch { /* not started, or ended */ }
+  const foreground = gone || !agent ? [shell] : [agent, shell];
+  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone || !agent ? 100 : agent.pid, foreground_processes: foreground } });
 }
-if (group === 'agent' && action === 'start') ok({ agent: { agent_status: 'idle' } });
+if (group === 'agent' && action === 'start') {
+  const child = spawn('bash', ['-c', 'exec -a agy sleep 600'], { detached: true, stdio: 'ignore' });
+  child.unref();
+  fs.writeFileSync(${JSON.stringify(agentPidPath)}, String(child.pid));
+  ok({ agent: { agent_status: 'idle' } });
+}
 if (group === 'agent' && action === 'read') ok({ read: { text: '' } });
-if (group === 'agent' && action === 'get') ok({ agent: { agent_status: 'working', pane_id: 'mock-pane-1', state_change_seq: 1 } });
+if (group === 'agent' && action === 'get') ok({ agent: { agent: 'agy', agent_status: 'working', pane_id: 'mock-pane-1', state_change_seq: 1 } });
 if (group === 'agent' && action === 'prompt') {
   const text = args[3];
-  if (text.startsWith('/')) fs.writeFileSync(${JSON.stringify(exitedPath)}, '');
+  if (text.startsWith('/')) {
+    fs.writeFileSync(${JSON.stringify(exitedPath)}, '');
+    try { process.kill(Number(fs.readFileSync(${JSON.stringify(agentPidPath)}, 'utf8')), 'SIGKILL'); } catch { /* already gone */ }
+  }
   if (!text.startsWith('/') && !${JSON.stringify(silentWorker)}) {
     // Play the worker: follow the pointer to the brief, write what it asks for.
     let brief = text;
@@ -108,6 +139,7 @@ ok({});
   return {
     herdrBin: wrapperPath,
     calls: () => fs.readFileSync(logPath, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)),
+    envs: () => fs.readFileSync(envLogPath, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)),
   };
 }
 
@@ -139,7 +171,7 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   // root. Those are the harness, not the worker, so they are ignored the way a
   // real repo ignores its own noise -- otherwise the stray-write guard would
   // correctly report the test's own scaffolding.
-  fs.writeFileSync(path.join(root, '.gitignore'), ['herdr', 'mock-herdr.mjs', 'herdr-calls.log', 'agent-exited', ''].join('\n'));
+  fs.writeFileSync(path.join(root, '.gitignore'), ['herdr', 'mock-herdr.mjs', 'herdr-calls.log', 'herdr-envs.log', 'agent-exited', 'agent-pid', ''].join('\n'));
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({
     runner: {
@@ -154,17 +186,21 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   return root;
 }
 
+const workerServers = [];
+after(() => { for (const server of workerServers) server.close(); });
+
 /**
- * A worker session that already looks up: its socket file exists under a HOME
+ * A worker session that already looks up: a socket is listening under a HOME
  * inside the fixture, so `ensureWorkerSession` skips spawning a server and
- * goes straight to the workspace call. That call is the observable proof the
- * declaration travelled -- and the operator's real HOME is never touched.
+ * every herdr call of the round is made under that session. The session name
+ * and socket on those calls are the observable proof the declaration
+ * travelled -- and the operator's real HOME is never touched.
  */
 function confinedExecutor(root) {
   const home = path.join(root, 'worker-home');
   const socket = path.join(home, '.config', 'herdr', 'sessions', WORKER_SESSION, 'herdr.sock');
   fs.mkdirSync(path.dirname(socket), { recursive: true });
-  fs.writeFileSync(socket, '');
+  workerServers.push(net.createServer().listen(socket));
   return {
     ...HERDR_EXECUTOR,
     env: { HOME: home },
@@ -218,9 +254,11 @@ test('the in-session entry point carries confinement too -- both call sites or n
       cwd: root,
       tier: 'standard',
     }));
+    const envs = mock.envs();
+    assert.ok(envs.length > 0, 'the round reached herdr');
     assert.ok(
-      mock.calls().some((c) => c[0] === 'workspace' && c[1] === 'create'),
-      'executeExecutorCli confines its worker as well',
+      envs.every((e) => e.session === WORKER_SESSION && e.socket?.endsWith(`sessions/${WORKER_SESSION}/herdr.sock`)),
+      `executeExecutorCli confines its worker as well: every herdr call is made in the worker session, got ${JSON.stringify(envs.slice(0, 3))}`,
     );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -389,7 +427,7 @@ test('production dispatch takes its posture from the requested capability, never
     assert.equal(res.status, 0);
     assert.equal(res.attestation.outcome, 'unconfined');
     assert.equal(res.attestation.requested.mode, 'unconfined');
-    assert.ok(mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'));
+    assert.ok(mock.calls().some((c) => c[0] === 'tab' && c[1] === 'create'), 'the round opened its pane');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
