@@ -8,7 +8,7 @@ created: 2026-10-17
 
 # Bảng chương trình nền tảng fgOS
 
-Cập nhật lần cuối: **2026-10-17 13:15**, phiên `forgentx-95` (big lead, máy của owner).
+Cập nhật lần cuối: **2026-10-17 13:55**, phiên `forgentx-95` (big lead, máy của owner).
 
 ## Đọc gì trước, sửa gì
 
@@ -31,11 +31,11 @@ Trạng thái: `landed` · `running` · `ready` (chạy được, chưa ai nhậ
 | ID | Luồng | Plan | Trạng thái | Đang ở đâu / ai làm | Chờ gì | Mở khoá cho |
 |---|---|---|---|---|---|---|
 | 4.2 | Holder-lock: cổng lock, kernel lock cho các lock lạnh | [plan](../261016-1104-holder-lock-kernel-lock-foundation/plan.md) | **landed** 10-17 12:30, main `0d6da9033`, release `af277e02…` ở forgentX, mdview, mcp-skill-hub | xong; [báo cáo landing](../reports/landing-261017-1219-holder-lock-stop-everything-landing.md) | — | 4.3, 4.4a, 6.2, 6.5 |
-| 4.4a | Rust callers lên holder-lock (`fgctl`, `install.lock`, observe) | [plan](../261016-1306-fgctl-rust-callers-on-holder-lock/plan.md) | **running** | nhánh `rust-callers/integration`; chuỗi lead P00 ✓ → P01 (đang chạy) → P02 → P03 → P04 → P05 phần A; máy owner, big lead `forgentx-95` | landing phần B: owner chọn giờ (dừng toàn bộ, cài `fgctl` mới) | 4.3 P08 + landing 4.3 |
-| 4.3-R | Main checkout một cửa: **phần khoá repo** | [plan](../261016-1306-main-checkout-single-door-hot-lock/plan.md), rào chắn F10 | **running** | nhánh `main-door/integration`; P00r ✓, P03 ✓ → P05 (đang chạy) → P04r → P06 → P07 → P09r; máy owner | P08 và P10 chờ 4.4a đã activate | component Git (dùng lại nguyên các khoá) |
+| 4.4a | Rust callers lên holder-lock (`fgctl`, `install.lock`, observe) | [plan](../261016-1306-fgctl-rust-callers-on-holder-lock/plan.md) | **running** | nhánh `rust-callers/integration`; chuỗi lead P00 ✓ P01 ✓ P02 ✓ → P03 (đang chạy) → P04 → P05 phần A; máy owner, big lead `forgentx-95` | landing phần B: owner chọn giờ (dừng toàn bộ, cài `fgctl` mới) | 4.3 P08 + landing 4.3 |
+| 4.3-R | Main checkout một cửa: **phần khoá repo** | [plan](../261016-1306-main-checkout-single-door-hot-lock/plan.md), rào chắn F10 | **running** | nhánh `main-door/integration`; P00r ✓ P03 ✓ P05 ✓ P04r ✓ P06 ✓ → P07 (đang chạy) → P09r; máy owner | P08 và P10 chờ 4.4a đã activate | component Git (dùng lại nguyên các khoá) |
 | 4.3-S | Main checkout: **phần state** (hot-lock, `stateTx`, gộp `claims.lock`, trần claim + thu hẹp) | cùng plan; P01, P02, P04 + phần state của P00/P09 | **held** | — | **hội đồng event store** | 6.2 P09 |
 | ES | Hội đồng event store (luật L3 chạm ngưỡng xem lại) | [final packet](../reports/council-261017-1210-event-store-final-packet.md), [thí nghiệm 1](../reports/experiment-261017-1220-event-store-exp1-relocate-open-shards.md), [thí nghiệm 2](../reports/experiment-261017-1220-event-store-exp2-seal-first-merge-crash.md) | **running** | 2 phương án ngang nhau: A (hai tầng, SQLite vận hành ngoài cây code) và B (seal-first); chưa có prototype | hội đồng chọn, rồi owner duyệt | 4.3-S → 6.2 P09 → 6.3 → 6.4 |
-| 4.4b | Driver Windows (`LockFileEx` + Job Object), bàn giao macOS | `plans/261017-1256-windows-lockfileex-driver-and-macos-handoff/` (đang viết) | **planning** | lead `lead-44b-plan` trên nhánh `plan/4.4b-windows-driver`; cổng probe đã đạt ([probe](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md), 0/500) | big lead duyệt plan | `fgos run` trên Windows (6.2 D7) |
+| 4.4b | Driver Windows (`LockFileEx` + Job Object), bàn giao macOS | [plan](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) (7 phase, khoảng 36 giờ; D3 đã duyệt 13:53: domain `windows-job` chuyển từ 6.2 P02 sang đây) | **ready** sau khi 4.4a và 4.3-R land | plan trên main `703f0b130`; cổng probe đã đạt ([probe](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md), 0/500) | 4.4a và 4.3-R land; trước khi land 4.4b, owner chạy stress 500 lần trên máy Windows | `fgos run` trên Windows (6.2 D7) |
 | 6.5 | terminal-control: lõi Rust, driver herdr | [plan](../261016-1306-terminal-control-rust-core-herdr-driver/plan.md) | **ready** | xếp hàng sau 4.4a / 4.3-R trên máy owner | — (song song được với 4.3, 4.4a) | 6.3 |
 | 6.2 | Run supervisor: lõi Rust, cách khởi động direct | [plan](../261016-1351-run-supervisor-rust-core-direct-mode/plan.md) | **ready** P00–P08; **held** P09 | nhánh nháp `run-supervisor/p02-containment-win-mac` (10-16) | P09 chờ 4.3-S P01+P02 | 6.3, 6.4 |
 | 6.3 | Terminal mode + nửa launcher của identity | [plan](../261016-1351-terminal-mode-and-launcher-identity/plan.md) | **held** | — | 6.2 **và** 6.5 land | 6.4 |
@@ -78,7 +78,7 @@ flowchart LR
 | D2 | Giờ landing phần B của 4.4a (dừng toàn bộ, cài `fgctl`, activate 3 workspace) | owner | 4.3 P08, landing 4.3-R |
 | D3 | Giờ landing 4.3-R (đặt tombstone `main-checkout.lock`) | owner | — |
 | D4 | Lập plan component Git (G0) và plan nhỏ cho cook P1/P3 | owner giao | GIT, COOK |
-| D5 | Duyệt plan 4.4b khi lead viết xong | big lead, owner xem | 4.4b code |
+| D5 | ~~Duyệt plan 4.4b~~: đã duyệt 13:53, gồm D3 | — | — |
 
 ## File chung dễ va
 
@@ -99,10 +99,11 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 
 - **Landing dừng-toàn-bộ** (4.4a, 4.3-R, 6.x) chạy **tuần tự**, mỗi lần một luồng, ở cả ba workspace: forgentX, mdview, mcp-skill-hub. Owner chọn giờ.
 - **Bước kiểm dừng của hàng rào** hiện bắt mọi tiến trình có cwd trong workspace, kể cả tiến trình không phải fgOS. Xem mục "Two deviations" trong [báo cáo landing 4.2](../reports/landing-261017-1219-holder-lock-stop-everything-landing.md).
-- **Tier:** việc code dùng tier `advanced` (Sonnet). `flagship` (Opus) chỉ dùng cho review rủi ro cao hoặc lập plan. Không dùng `frontier`.
+- **Tier:** config project đặt `runner.maxTier: flagship` (owner duyệt 13:53). Không override thì việc chạy Sonnet; rigor high, rigor critical và mọi override đều dừng ở Opus. `frontier` (Fable) bị chặn. Việc code nên ở tier `advanced`.
 - **Tên báo cáo và plan** lấy từ `fgos convention path`, không tự đặt.
 - **Chuỗi lead trên máy owner:** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
 
 ## Nhật ký
 
+- 2026-10-17 13:55: đặt `maxTier` là flagship; plan 4.4b đã lên main. 4.4a xong P00–P02; 4.3-R xong P00, P03, P05, P04r và P06.
 - 2026-10-17 13:15: tạo bảng. 4.2 đã land. 4.4a và 4.3-R đang chạy. 4.4b đang viết plan. Phần state của 4.3 chờ hội đồng event store.
