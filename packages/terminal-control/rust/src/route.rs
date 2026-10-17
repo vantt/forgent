@@ -6,7 +6,7 @@
 //! JSON line on stdout. A port result, `unsupported` and `unknown` included,
 //! exits 0: the route decides nothing, it only carries the core's answer.
 
-use crate::core::{Core, CoreConfig};
+use crate::core::{Core, CoreConfig, Want};
 use crate::driver::herdr::{HerdrConfig, HerdrDriver};
 use crate::policy::{policy_by_name, Limits};
 use crate::port::*;
@@ -217,7 +217,9 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "inspect" => {
             let key: String = field(request, "key")?;
             let detail: Option<bool> = optional(request, "detail")?;
-            let inspection = core.inspect(&key, detail.unwrap_or(false));
+            let foreground: Option<bool> = optional(request, "foreground")?;
+            let activity: Option<bool> = optional(request, "activity")?;
+            let inspection = core.inspect_parts(&key, Want { detail: detail.unwrap_or(false), foreground: foreground.unwrap_or(true), activity: activity.unwrap_or(true) });
             let mut fields = json!({ "pane": inspection.pane });
             if let Some(foreground) = inspection.foreground {
                 fields["foreground"] = json!(foreground);

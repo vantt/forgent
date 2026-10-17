@@ -78,8 +78,9 @@ export function groupLabel(groupKey) {
 export function createSlotIo({ tc, key }) {
   const call = (op, request = {}) => tc[op]({ key, ...request });
 
-  const inspect = (detail = false) => {
-    const seen = call('inspect', detail ? { detail: true } : {});
+  // `want` leaves parts out so a poll costs only the driver calls it needs.
+  const inspect = (want = {}) => {
+    const seen = call('inspect', want);
     must(seen, 'inspection', `inspect ${key}`);
     return seen;
   };
@@ -103,7 +104,7 @@ export function createSlotIo({ tc, key }) {
     /** The agent's status as the driver reports it; `unknown` when it reports none.
      * `recognised` says the driver knows an agent runs in the pane. */
     state() {
-      const seen = livePane(inspect());
+      const seen = livePane(inspect({ foreground: false }));
       const activity = seen.activity ?? null;
       return {
         agentStatus: activity?.state || 'unknown',
@@ -115,7 +116,7 @@ export function createSlotIo({ tc, key }) {
 
     /** The driver's screen detector: a verdict, or `{ state: null }` when it gave none. */
     explain() {
-      const seen = livePane(inspect(true));
+      const seen = livePane(inspect({ foreground: false, detail: true }));
       const detail = seen.activity?.detail;
       if (!detail) return { state: null, visibleBlocker: false, visibleIdle: false, visibleWorking: false, matchedRule: null, promptText: '', raw: null };
       return {
@@ -131,7 +132,7 @@ export function createSlotIo({ tc, key }) {
 
     /** `{ pane: 'live'|'gone'|'unknown', foreground: identity|null }`. */
     foreground() {
-      const seen = inspect();
+      const seen = inspect({ activity: false });
       return { pane: seen.pane, foreground: seen.foreground ?? null };
     },
 

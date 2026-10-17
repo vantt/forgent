@@ -20,6 +20,21 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 const FALLBACK_SPLIT_RATIO: f64 = 0.3;
 const IDENTIFY_POLL: Duration = Duration::from_millis(50);
 
+/// Which parts of an inspection the caller wants (the pane state is always given).
+#[derive(Debug, Clone, Copy)]
+pub struct Want {
+    pub foreground: bool,
+    pub activity: bool,
+    /// The driver's detector verdict inside `activity`.
+    pub detail: bool,
+}
+
+impl Default for Want {
+    fn default() -> Self {
+        Want { foreground: true, activity: true, detail: false }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct CoreConfig {
     pub state_root: PathBuf,
@@ -445,6 +460,12 @@ impl<'a> Core<'a> {
     }
 
     pub fn inspect(&self, key: &str, detail: bool) -> Inspection {
+        self.inspect_parts(key, Want { detail, ..Want::default() })
+    }
+
+    /// `inspect` for a caller that needs only some of the answer: each part
+    /// left out saves a driver call per poll.
+    pub fn inspect_parts(&self, key: &str, want: Want) -> Inspection {
         let unknown_pane = || Inspection { pane: PaneState::Unknown, foreground: None, activity: None };
         let Ok((store, _)) = self.open() else { return unknown_pane() };
         let Ok(record) = self.record_of(&store, key) else { return unknown_pane() };
@@ -456,9 +477,9 @@ impl<'a> Core<'a> {
         if pane != PaneState::Live {
             return Inspection { pane, foreground: None, activity: None };
         }
-        let foreground = if self.has("process.info") { self.foreground_identity(&record.pane_id) } else { None };
-        let mut activity = if self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
-        if detail && self.has("activity.state") {
+        let foreground = if want.foreground && self.has("process.info") { self.foreground_identity(&record.pane_id) } else { None };
+        let mut activity = if want.activity && self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
+        if want.detail && want.activity && self.has("activity.state") {
             // The detector may know a state the pane's own report does not.
             if let Ok(seen) = self.driver.activity_detail(&record.pane_id) {
                 let base = activity.get_or_insert_with(Default::default);

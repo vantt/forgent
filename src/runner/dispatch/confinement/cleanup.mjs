@@ -75,12 +75,12 @@ export function ensurePrivateDir(dir, { root } = {}) {
  * home (and the login copy in it) must outlive the failed run. The reaper
  * reclaims it once the pane is gone.
  */
-export function markResourceRetained(dirPath, { paneId, herdrSession } = {}) {
+export function markResourceRetained(dirPath, { paneId, terminalKey, herdrSession } = {}) {
   const marker = readOwnershipMarker(dirPath);
   if (!marker || !paneId) return false;
   fs.writeFileSync(
     path.join(dirPath, OWNERSHIP_MARKER_FILE),
-    JSON.stringify({ ...marker, paneId: String(paneId), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
+    JSON.stringify({ ...marker, paneId: String(paneId), ...(terminalKey ? { terminalKey: String(terminalKey) } : {}), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
     { encoding: 'utf8', mode: 0o600 },
   );
   return true;

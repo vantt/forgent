@@ -37,6 +37,7 @@ const logPath = path.join(dir, 'calls.jsonl');
 const scenario = JSON.parse(fs.readFileSync(path.join(dir, 'scenario.json'), 'utf8'));
 const args = process.argv.slice(2);
 fs.appendFileSync(logPath, JSON.stringify(args) + '\n');
+fs.appendFileSync(path.join(dir, 'envs.jsonl'), JSON.stringify({ socket: process.env.HERDR_SOCKET_PATH ?? null, session: process.env.HERDR_SESSION ?? null }) + '\n');
 
 const readState = () => JSON.parse(fs.readFileSync(statePath, 'utf8'));
 const writeState = (s) => fs.writeFileSync(statePath, JSON.stringify(s));
@@ -316,6 +317,7 @@ export function createFakeHerdr(dir, scenario = {}) {
   const wrapperPath = path.join(dir, 'fake-herdr.sh');
   fs.writeFileSync(path.join(dir, 'state.json'), JSON.stringify({ panes: {} }));
   fs.writeFileSync(path.join(dir, 'calls.jsonl'), '');
+  fs.writeFileSync(path.join(dir, 'envs.jsonl'), '');
   fs.writeFileSync(path.join(dir, 'scenario.json'), JSON.stringify(scenario));
   fs.writeFileSync(scriptPath, MOCK);
   fs.writeFileSync(wrapperPath, `#!/bin/sh\nFAKE_HERDR_DIR=${JSON.stringify(dir)} exec node "${scriptPath}" "$@"\n`);
@@ -325,6 +327,8 @@ export function createFakeHerdr(dir, scenario = {}) {
   return {
     herdrBin: wrapperPath,
     calls: () => fs.readFileSync(path.join(dir, 'calls.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)),
+    /** The herdr server each call addressed, in call order: `{ socket, session }`. */
+    envs: () => fs.readFileSync(path.join(dir, 'envs.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)),
     panes: () => readState().panes,
     /** Argv of every `pane close` call, i.e. the panes the runner closed. */
     closedPaneIds() {

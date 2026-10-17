@@ -63,7 +63,7 @@
       "results": ["screen", "unsupported", "unknown"]
     },
     "inspect": {
-      "input": { "key": "key", "detail": "optional boolean: add the driver's detector verdict to activity.detail" },
+      "input": { "key": "key", "detail": "optional boolean: add the driver's detector verdict to activity.detail", "foreground": "optional boolean, default true: false skips reading the foreground process", "activity": "optional boolean, default true: false skips reading the agent state" },
       "results": ["inspection"]
     },
     "release": {
