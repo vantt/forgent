@@ -9,7 +9,8 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
+import { parseTierCell } from './tier-cell.mjs';
 
 /**
  * Canonical capability identity for a dispatch, independent of any Work item.
@@ -130,10 +131,13 @@ export function resolveCapabilityDetailsFromHints({
 }
 
 /**
- * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].
+ * Every entry of the cell cfg.modelPolicies[provider][tier], in order, as
+ * `{model, pool, explicitPool}` (see `parseTierCell`). Entries served by a
+ * pool other than the provider family's own are listed too; the lease cannot
+ * run them yet, so only `explain` and doctor read them.
  * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
  */
-export function resolveTierModel(cfg, tier, provider = 'claude') {
+export function resolveTierCandidates(cfg, tier, provider = 'claude') {
   if (!MODEL_POLICY_TIERS.includes(tier)) {
     throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
@@ -145,11 +149,28 @@ export function resolveTierModel(cfg, tier, provider = 'claude') {
   if (!providerPolicy || typeof providerPolicy !== 'object') {
     throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
   }
-  const model = providerPolicy[tier];
-  if (typeof model !== 'string' || !model.trim()) {
+  const cell = providerPolicy[tier];
+  if (cell === undefined) {
     throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}".`);
   }
-  return model;
+  try {
+    return parseTierCell(cell, provider);
+  } catch (err) {
+    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}": ${err.message}.`);
+  }
+}
+
+/**
+ * Resolve a tier to the model name the provider family runs: the first entry
+ * of cfg.modelPolicies[provider][tier] served by the family's own pool. A cell
+ * that names only other pools has no model for this family yet.
+ */
+export function resolveTierModel(cfg, tier, provider = 'claude') {
+  const own = resolveTierCandidates(cfg, tier, provider).find((entry) => entry.pool === provider);
+  if (!own) {
+    throw new RunnerConfigError(`no model for tier "${tier}" in pool "${provider}"; the cell names only other pools.`);
+  }
+  return own.model;
 }
 
 /**

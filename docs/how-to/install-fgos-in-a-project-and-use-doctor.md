@@ -235,6 +235,12 @@ file or key in their message; the message always names the exact target.
 | `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
 | `tier-vocabulary-dead-keys` | No retired tier keys (`runner.models`, `minTier`, `rigorOverrides`) | names the dead key | you | Delete or migrate the named key |
 | `model-policy-tier-coverage` | `runner.modelPolicies` has a model for every tier `rigorToTier` produces, for every provider | `global provider "openai" missing model for tier "standard"` | you | Add the model for that provider and tier under `runner.modelPolicies` in the named config file |
+| `executor-family-unique` | Each agent family has one executor | `one family, several executors: claude (claude, claude-herdr)` | you | Merge them: keep one executor and move the other's transports into it as invocations |
+| `model-policy-pools` | Every pool a tier cell names (`model@pool`) has accounts in `runner.llmAccounts` | `warning: tier cells name pools runner.llmAccounts does not declare: deepseek.standard@openrouter` | you | Declare the pool's accounts under `runner.llmAccounts` in `~/.fgos/config.json` |
+| `llm-accounts-shape` | `runner.llmAccounts` is in the global config only and well formed | `runner.llmAccounts.codex: "codex" is another spelling of the family "openai"` | you | Fix the named key in `~/.fgos/config.json` |
+| `llm-accounts-vs-legacy` | `runner.llmAccounts` and `runner.providers` list the same accounts and login directories | `warning: the lease still reads runner.providers; only in runner.providers: gemini/tetcu72` | you | Add the missing account to the side that lacks it |
+| `capability-rigor-ceiling` | Which capabilities run above `runner.maxTier` because they declare a higher `rigor` themselves (informational) | `above runner.maxTier flagship by their own rigor: architecture:synthesize (rigor critical) runs at frontier: claude fable` | you | Lower that capability's `rigor` if the cost is not wanted |
+| `global-model-policies-portable` | Global `runner.modelPolicies` uses plain model names | `~/.fgos/config.json runner.modelPolicies has list or "model@pool" cells (deepseek.standard)` | you | Move those cells to the project config |
 | `advise-execute-capabilities-configured` | `runner.capabilities` declares `advise`, `execute`, `code:implement` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
 | `workflow-capabilities-configured` | Every capability a Workflow unit names is declared, and has a `prefer` pool | `no entry for Workflow capabilities: ...`; `warning: ... no "prefer" pool, so a headless run of those units is refused` | setup, you | `fgos setup` declares the capabilities. The `prefer` pool is yours to fill (section 5.2) |
 | `capability-serves-valid` | The `serves` sets are well formed, distinct and include `review` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
@@ -374,7 +380,7 @@ runner picks executors from that capability's pool in
 ```json
 "runner": { "capabilities": { "nominal-group:generate": {
   "prefer": [
-    { "executor": "claude-herdr" },
+    { "executor": "claude" },
     { "executor": "xai", "invocation": "pi-herdr-vantt" },
     { "executor": "openai" },
     { "executor": "glm", "invocation": "pi-cli-bwrap-openrouter" }

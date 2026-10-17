@@ -124,10 +124,11 @@ test('every lock owned by 4.2 has a fence and a v1 shape that agrees with it', (
 });
 
 test('a tombstoned lock never takes its v3 lock at the path its tombstone occupies', () => {
+  // Compare both paths in one spelling: <lockRoot> is <stateRoot>/locks and <fgosDir> is the repo's .fgos.
+  const spell = (template) => template.replace('<lockRoot>', '<stateRoot>/locks').replace('<fgosDir>', '.fgos');
   for (const lock of registry.locks.filter((row) => row.fence === 'tombstone' && typeof row.v3Path === 'string')) {
-    const v3Tail = lock.v3Path.replace(/^<[^>]+>/, '');
     for (const v1 of [lock.v1Path].flat().filter((value) => typeof value === 'string')) {
-      assert.ok(!v1.endsWith(v3Tail), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
+      assert.notEqual(spell(lock.v3Path), spell(v1), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
     }
   }
 });
@@ -194,5 +195,22 @@ test('the repo lock family keeps its ranks, v3 paths and tombstone fences', () =
     assert.equal(lock.owner, '4.3', `${name}: owner`);
     assert.equal(lock.scope, 'repo', `${name}: scope`);
     for (const [key, value] of Object.entries(want)) assert.deepEqual(lock[key], value, `${name}: ${key}`);
+  }
+});
+
+test('the Rust-owned activation, install and observe locks are leaf mutexes fenced by tombstone', () => {
+  const rustOwned = registry.locks.filter((lock) => lock.owner === '4.4');
+  assert.deepEqual(rustOwned.map((lock) => lock.name).sort(), ['activation', 'install', 'observe']);
+  const expected = {
+    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation.lock', v1Shape: 'file-link', v1Path: '.fgos/installation/activation.lock' },
+    install: { scope: 'machine', v3Path: '<lockRoot>/install.lock', v1Shape: 'file-wx', v1Path: '<stateRoot>/install.lock' },
+    observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock', v1Shape: 'file-wx', v1Path: '.fgos/observe/.lock' },
+  };
+  for (const lock of rustOwned) {
+    assert.equal(lock.kind, 'mutex', `${lock.name}: kind`);
+    assert.equal(lock.rank, 80, `${lock.name}: rank`);
+    assert.equal(lock.fence, 'tombstone', `${lock.name}: fence`);
+    const want = expected[lock.name];
+    for (const key of Object.keys(want)) assert.equal(lock[key], want[key], `${lock.name}: ${key}`);
   }
 });

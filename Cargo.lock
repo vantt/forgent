@@ -164,6 +164,7 @@ dependencies = [
 name = "fgos-observe"
 version = "0.2.0"
 dependencies = [
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-session-identity",
  "libc",
