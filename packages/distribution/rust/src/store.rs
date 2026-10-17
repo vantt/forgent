@@ -56,23 +56,11 @@ impl Drop for InstallLockGuard {
     }
 }
 
-/// Resolves the machine release store root per R5:
-/// `${FGOS_STATE_HOME:-${XDG_STATE_HOME:-$HOME/.local/state}/fgos}/`
+/// Resolves the machine release store root: the fgOS state root, from the
+/// one resolution in `fgos_holder_lock::state_root` (`FGOS_STATE_ROOT`
+/// pinned, else `${FGOS_STATE_HOME:-${XDG_STATE_HOME:-$HOME/.local/state}/fgos}`).
 pub fn resolve_machine_release_store_root() -> PathBuf {
-    if let Ok(val) = std::env::var("FGOS_STATE_HOME") {
-        if !val.trim().is_empty() {
-            return PathBuf::from(val);
-        }
-    }
-    if let Ok(val) = std::env::var("XDG_STATE_HOME") {
-        if !val.trim().is_empty() {
-            return PathBuf::from(val).join("fgos");
-        }
-    }
-    if let Ok(home) = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")) {
-        return PathBuf::from(home).join(".local/state/fgos");
-    }
-    PathBuf::from(".local/state/fgos")
+    fgos_holder_lock::state_root::state_root().0
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -353,6 +341,7 @@ mod tests {
 
     #[test]
     fn test_resolve_store_root_precedence() {
+        std::env::remove_var("FGOS_STATE_ROOT");
         std::env::set_var("FGOS_STATE_HOME", "/custom/fgos/state");
         std::env::set_var("XDG_STATE_HOME", "/custom/xdg/state");
         let resolved = resolve_machine_release_store_root();

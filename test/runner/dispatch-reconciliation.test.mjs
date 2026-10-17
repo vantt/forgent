@@ -4,20 +4,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { planReconciliation, applyReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
-import { dispatchLockFile } from '../../src/runner/main-checkout-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 
 function root() { const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-')); fs.mkdirSync(path.join(out, '.fgos'), { recursive: true }); return out; }
-function hasProcfsStat() { return fs.existsSync(`/proc/${process.pid}/stat`); }
-// Real production per-cwd dispatch lock path and record shape (see
-// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments):
-// `dispatch--<encodeURIComponent(cwd)>.lock`, `{pid: "<pid>:<acquiredAtMs>:
-// <rand>", ts: <int>}`. `dir` doubles as the cwd under test unless a
-// different `cwd` is supplied.
-function lockPathFor(dir, cwd = dir) { return path.join(dir, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
-function deadLock(dir, cwd = dir, extra = {}) {
-  const ts = Date.now();
-  fs.writeFileSync(lockPathFor(dir, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts, ...extra }));
-}
+const cwdLockParams = (dir, cwd = dir) => ({ fgosDir: path.join(dir, '.fgos'), cwd });
 
 // collect-result fixture helpers -- same shapes as test/runner/dispatch-runtime-inspect.test.mjs,
 // since collect-result's own plan/apply is built entirely on top of inspectDispatchRuntime's
@@ -36,170 +27,70 @@ function publishControlGeneration(runDir, epoch) {
   fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify({ epoch }));
 }
 
-test('reconcile clears only a dead-proven cwd lock and replay is idempotent', () => {
-  const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned'); assert.match(plan.snapshot.resourceIncarnation, /^pid:/);
-  assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'applied');
-  assert.equal(fs.existsSync(lockPathFor(dir)), false);
-  assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' }).outcome, 'already-applied');
-});
-
-test('reconcile refuses a live holder proof and never unlinks a successor', () => {
-  if (!hasProcfsStat()) return;
+test('clear-cwd-lock has nothing to clear when no dispatch holds the cwd, and a forged clear plan applies nothing', () => {
   const dir = root();
-  const now = Date.now();
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
-  // The real process (self) is live and started before `now`, so this is
-  // proof of a live incarnation, not dead proof.
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' }); assert.equal(plan.outcome, 'refused');
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /no cwd lock is held/);
+  const forged = { actionKey: 'reconcile_forged', snapshot: { expiresAt: '2099-01-01T00:00:00.000Z' }, proposedAction: { kind: 'clear-cwd-lock', cwd: dir } };
+  assert.equal(applyReconciliation(dir, forged, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'blocked');
+  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch', 'reconciliation-actions.jsonl')), false, 'nothing is recorded for a clear that has nothing to do');
   assert.equal(planReconciliation(dir, { action: 'kill-process' }).outcome, 'refused');
 });
 
-test('planReconciliation refuses a live holder (real resource-incarnation match) and never produces a plan', () => {
-  if (!hasProcfsStat()) return;
+test('clear-cwd-lock refuses while a live dispatch in another process holds the cwd, also through a symlink, and has nothing to clear once that holder is SIGKILLed', async () => {
+  if (process.platform === 'win32') return;
   const dir = root();
-  const now = Date.now();
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'refused');
-  assert.match(plan.reason, /live/);
-});
-
-test('cwdLockHolder refuses/unparses any record not matching the real production composite-identity shape, including the old fixture-only {pid: integer, startTime} shape', () => {
-  const dir = root();
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, startTime: '1' }));
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'needs-input');
-  assert.match(plan.reason, /verifiable resource incarnation/);
-});
-
-test('clear-cwd-lock plans against the exact file the real production dispatchLockFile export names, proving reconciliation-planner.mjs\'s own local path computation can never silently drift from it', () => {
-  for (const cwd of ['/path/to/worktree-a', '/tmp/has spaces/and?query=1']) {
-    const dir = root();
-    const ts = Date.now();
-    const realPath = path.join(dir, '.fgos', dispatchLockFile(cwd));
-    fs.writeFileSync(realPath, JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
-    const plan = planReconciliation(dir, { cwd, now: '2026-09-15T00:00:00.000Z' });
-    assert.equal(plan.outcome, 'planned', `reconciliation-planner.mjs's own lock-path computation must resolve to the exact file dispatchLockFile(${JSON.stringify(cwd)}) names`);
-    assert.equal(plan.proposedAction.path, realPath);
-  }
-});
-
-test('holder() start-time parser is paren-aware: a comm field containing a space does not desync the starttime column, so a live holder with such a comm is still detected live', () => {
-  if (!hasProcfsStat()) return;
-  const dir = root();
-  const original = fs.readFileSync;
-  const realStat = original.call(fs, `/proc/${process.pid}/stat`, 'utf8');
-  const realLastParen = realStat.lastIndexOf(')');
-  const realRest = realStat.slice(realLastParen + 2);
-  // Splice in a comm field containing a space -- if the parser naively
-  // split(' ') the whole line from the start, this would desync every
-  // fixed-index field after it (including starttime) by one or more
-  // positions; the paren-aware parser must still agree with the real
-  // starttime because it anchors on the LAST ')', which this synthetic
-  // stat line still has exactly one of.
-  const syntheticStat = `${process.pid} (some weird name)${realRest}`;
-  fs.readFileSync = function patchedReadFileSync(file, ...rest) {
-    if (file === `/proc/${process.pid}/stat`) return syntheticStat;
-    return original.call(fs, file, ...rest);
-  };
-  let plan;
+  const link = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-link-')), 'cwd');
+  fs.symlinkSync(dir, link);
+  const { child, exited } = await holdLockInChild('dispatch-cwd', cwdLockParams(dir));
   try {
-    const realStartTime = Number(realRest.split(' ')[19]);
-    const identityTs = Date.now();
-    fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${identityTs}:x`, ts: identityTs }));
-    plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-    void realStartTime; // the synthetic stat above already carries the real ticks verbatim
+    const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+    assert.equal(plan.outcome, 'refused');
+    assert.match(plan.reason, /live dispatch/);
+    assert.equal(planReconciliation(dir, { cwd: link, now: '2026-09-15T00:00:00.000Z' }).outcome, 'refused', 'the same directory through a symlink is the same lock');
   } finally {
-    fs.readFileSync = original;
+    child.kill('SIGKILL');
+    await exited;
   }
-  assert.equal(plan.outcome, 'refused', 'a comm-with-space live holder must still be detected live, not miscounted as a different/dead incarnation');
-  assert.match(plan.reason, /live/);
+  const after = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(after.outcome, 'blocked', 'a killed holder released the lock at once: nothing is left to clear');
 });
 
-test('cwdLockHolder treats an unreadable (non-ENOENT) /proc read as ambiguous, never as proof of death', () => {
+test('a reconcile apply is refused while another process holds reconcile.lock, and proceeds the moment that holder is SIGKILLed', async () => {
+  if (process.platform === 'win32') return;
   const dir = root();
-  const identityTs = Date.now();
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${identityTs}:x`, ts: identityTs }));
-  const original = fs.readFileSync;
-  fs.readFileSync = function patchedReadFileSync(file, ...rest) {
-    if (file === `/proc/${process.pid}/stat`) {
-      const err = new Error('EACCES: permission denied');
-      err.code = 'EACCES';
-      throw err;
-    }
-    return original.call(fs, file, ...rest);
-  };
-  let plan;
+  const runId = 'run_lock';
+  assignmentDir(dir, 'asgn_lock');
+  runDirFor(dir, 'asgn_lock', '01', { runId, status: 'running' }, legacyResult(runId, 'asgn_lock'));
+  admitGen(dir, 'asgn_lock', 1, { runId, attempt: 1 });
+  const now = '2026-09-15T00:00:00.000Z';
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId, now });
+  assert.equal(plan.outcome, 'planned');
+  const { child, exited } = await holdLockInChild('reconcile', { fgosDir: path.join(dir, '.fgos') });
   try {
-    plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+    const refused = applyReconciliation(dir, plan, { now });
+    assert.equal(refused.outcome, 'blocked');
+    assert.match(refused.reason, /another reconcile apply is in progress/);
   } finally {
-    fs.readFileSync = original;
+    child.kill('SIGKILL');
+    await exited;
   }
-  // Must NOT be 'refused' (dead-cleared) or 'planned' (would let the caller
-  // proceed to unlink a holder we could not actually prove is dead) -- an
-  // unreadable /proc entry proves nothing either way.
-  assert.notEqual(plan.outcome, 'planned', 'an unreadable /proc entry must never be treated as proven-dead');
-  assert.equal(plan.outcome, 'needs-input');
+  assert.equal(applyReconciliation(dir, plan, { now }).outcome, 'applied');
 });
 
-test('apply against a dead holder proves plan-stale when a successor guard replaces it, and the successor bytes survive intact', () => {
-  const dir = root(); deadLock(dir);
-  const lockPath = lockPathFor(dir);
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  const successorTs = Date.now();
-  const successorBytes = JSON.stringify({ pid: `12345:${successorTs}:z`, ts: successorTs });
-  fs.writeFileSync(lockPath, successorBytes);
-  const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(result.outcome, 'plan-stale');
-  assert.equal(fs.readFileSync(lockPath, 'utf8'), successorBytes, "successor's own bytes must survive intact");
-});
-
-test('a cwd lock removed by a concurrent cleanup before apply\'s final re-read returns plan-stale, not a throw', () => {
-  const dir = root(); deadLock(dir);
-  const lockPath = lockPathFor(dir);
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  const original = fs.readFileSync;
-  // applyReconciliation reads lockPath twice before its own explicit final
-  // re-read: inside the internal `fresh = planReconciliation(...)`
-  // re-verify (its own `raw` read, then `json(file)`'s internal read).
-  // Only the 3rd read is the actual target this test races against --
-  // delete the file BEFORE that read runs (not after, which would let the
-  // read still succeed and only make the later unlink hit ENOENT instead, a
-  // different, already-tolerated branch), so the read itself genuinely
-  // throws ENOENT.
-  let lockPathReads = 0;
-  fs.readFileSync = function patchedReadFileSync(file, ...rest) {
-    if (file === lockPath) {
-      lockPathReads += 1;
-      if (lockPathReads === 3) fs.unlinkSync(lockPath); // simulate a concurrent cleanup racing the final re-read
-    }
-    return original.call(fs, file, ...rest);
-  };
-  let result;
-  try {
-    result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  } finally {
-    fs.readFileSync = original;
-  }
-  assert.equal(result.outcome, 'plan-stale');
-  assert.match(result.reason, /already removed/);
-  assert.equal(fs.existsSync(lockPath), false);
-});
-
-test('apply blocks a dead-holder cleanup when an active assignment Run is still bound to this cwd', () => {
-  const dir = root(); deadLock(dir);
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  const runDir = path.join(dir, '.fgos', 'assignments', 'asgn-x', 'runs', '01');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run-x', assignmentId: 'asgn-x', cwd: dir }));
-  const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(result.outcome, 'blocked');
-  assert.match(result.reason, /active Run/);
-  assert.equal(fs.existsSync(lockPathFor(dir)), true);
+test('a reconcile apply holds reconcile.lock only while it runs', () => {
+  const dir = root();
+  const runId = 'run_release';
+  assignmentDir(dir, 'asgn_release');
+  runDirFor(dir, 'asgn_release', '01', { runId, status: 'running' }, legacyResult(runId, 'asgn_release'));
+  admitGen(dir, 'asgn_release', 1, { runId, attempt: 1 });
+  const now = '2026-09-15T00:00:00.000Z';
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId, now });
+  assert.equal(applyReconciliation(dir, plan, { now }).outcome, 'applied');
+  const res = acquireSync(createLockScope('test'), 'reconcile', { fgosDir: path.join(dir, '.fgos') });
+  assert.equal(res.result, 'acquired', 'the apply released reconcile.lock when it returned');
+  res.handle.release();
 });
 
 test('reconcile collect-result links an already-written valid result for a standalone Assignment Run', () => {

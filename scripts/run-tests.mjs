@@ -24,6 +24,7 @@ import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -115,10 +116,13 @@ export function buildTestArgv(files, forwardedArgs = []) {
  * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
  *   nested run that inherits it reports to a parent that is not listening
  *   and exits 0 without running a single test;
+ * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it
+ *   runs, and a suite started under fgOS would otherwise send every fixture
+ *   that sets only FGOS_STATE_HOME to the real machine state root;
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
-  const { NODE_TEST_CONTEXT: _enclosingRunner, ...rest } = env;
+  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
   const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();
@@ -429,8 +433,33 @@ export function runTests({
   }
 }
 
+/**
+ * The CLI door's queue: the full-suite queue is a kernel lock and needs the
+ * host binary. When none resolves (no FGOS_HOST_BIN, no activation above the
+ * checkout: a fresh clone, CI), build one first and export it on this
+ * process's env, where the lock driver looks. When one resolves, nothing is
+ * built before the queue: a build here, outside the queue, could replace the
+ * binary a queued run in another worktree sharing the cargo target is using.
+ */
+export function queueWithHostBin(options, {
+  resolve = () => resolveActiveHostBin().bin,
+  ensure = ensureHostBin,
+  queue = acquireFullSuiteQueue,
+  log = (msg) => console.error(msg),
+} = {}) {
+  if (!resolve()) {
+    try {
+      const hostBin = ensure(process.env, REPO_ROOT);
+      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
+    } catch (err) {
+      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);
+    }
+  }
+  return queue(options);
+}
+
 if (isMainModule(import.meta.url)) {
-  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2), queue: acquireFullSuiteQueue });
+  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2), queue: queueWithHostBin });
   if (message) console.error(message);
   process.exitCode = status;
 }

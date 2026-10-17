@@ -90,6 +90,7 @@ import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
+import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -2657,10 +2658,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         if ((positional[1] ?? 'plan') === 'plan') {
           // F1: --cwd names the specific working directory whose per-cwd
-          // dispatch lock clear-cwd-lock targets -- distinct from --dir
-          // above (the main checkout root). Omitted, the use case's own
-          // default (the CLI process's real process.cwd()) applies, same
-          // ergonomics as running the command from inside the stuck cwd.
+          // dispatch lock clear-cwd-lock reports on (held or free; it never
+          // clears a kernel lock) -- distinct from --dir above (the main
+          // checkout root). Omitted, the use case's own default (the CLI
+          // process's real process.cwd()) applies, same ergonomics as
+          // running the command from inside the cwd in question.
           const runParam = flags.run ?? flags['run-id'];
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({
@@ -4987,6 +4989,11 @@ async function main() {
     if ((rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
       return;
     }
+
+    faultClass = 'unknown-flag';
+    const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+    if (unknownFlag) throw new StoreError('validation', unknownFlag);
 
     faultClass = 'dir-invalid';
     dir = dataDir(flags.dir);

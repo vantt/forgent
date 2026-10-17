@@ -4,17 +4,14 @@
 // eligibility-inversion resolution (resolveAgentTypeForTaskSpec, src/runner/dispatch/cli.mjs). LAYER: infra
 // (same tier as dispatch/cli.mjs, which is the runtime consumer this
 // module exists for) -- one-directional-layer forbids dispatch/cli.mjs
-// (infra) importing src/setup/registrations.mjs (use-case, shallower),
-// which already has near-identical private parsing for its own doctor
-// check (`checkAgentClaimsResolve`). This module is a fresh, minimal,
-// infra-layer-legal home for the same two reads, not a refactor of that
-// already-tested doctor-check code -- some duplication with
-// registrations.mjs's own private helpers is the accepted tradeoff (tsk-397
-// review round-1/round-2 H1 wiring) over risking either one while fixing
-// dead code.
+// (infra) importing src/setup/registrations.mjs (use-case, shallower). Both
+// read an agent file through `readAgentDefinition` (agent-definitions.mjs),
+// so the name and skills of an agent have one reader.
 
 import fs from 'node:fs';
 import path from 'node:path';
+
+import { readAgentDefinition } from './agent-definitions.mjs';
 
 /**
  * Every real agent-type's `{name, skills}` across `core/agents/`,
@@ -23,11 +20,14 @@ import path from 'node:path';
  * of a name wins -- same order `registrations.mjs`'s own
  * `allAgentYamlFiles` uses). Sorted directory scans throughout (D32,
  * review finding M2) so the roster is identical on every machine/run.
- * Never throws on a malformed individual file — skipped, not fatal, same
- * "a bad file degrades, doesn't crash the caller" posture every other
- * doctor-adjacent scan in this repo already follows.
+ * Never throws on a malformed individual file: a file that is unreadable or
+ * not valid YAML is left out of the roster and named in `problems`
+ * (`<file>: cannot be parsed: <reason> (line L, column C)`), so the caller
+ * can surface it instead of losing the agent silently.
+ *
+ * @returns {{ defs: Array<{ name: string, skills: string[] }>, problems: string[] }}
  */
-export function loadAgentDefs(cwd) {
+export function loadAgentRoster(cwd) {
   const files = [];
   const seen = new Set();
 
@@ -52,46 +52,28 @@ export function loadAgentDefs(cwd) {
   scanDir(path.join(cwd, 'agents'));
 
   const defs = [];
+  const problems = [];
   const namesSeen = new Set();
   for (const filePath of files) {
+    const rel = path.relative(cwd, filePath).split(path.sep).join('/');
     let text;
     try {
       text = fs.readFileSync(filePath, 'utf8');
-    } catch {
+    } catch (error) {
+      problems.push(`${rel}: cannot be read (${error.message})`);
       continue;
     }
-    const nameMatch = text.match(/^name:\s*(\S+)/m);
-    const name = nameMatch ? nameMatch[1] : path.basename(filePath).replace(/\.ya?ml$/, '');
+    const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });
+    if (error) {
+      problems.push(`${rel}: ${error}`);
+      continue;
+    }
+    const name = declared ?? path.basename(filePath).replace(/\.ya?ml$/, '');
     if (namesSeen.has(name)) continue; // first occurrence wins, D33's own precedence
     namesSeen.add(name);
-    defs.push({ name, skills: extractSkillsFromYamlText(text) });
+    defs.push({ name, skills });
   }
-  return defs;
-}
-
-function extractSkillsFromYamlText(text) {
-  const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
-  if (inlineMatch) {
-    return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
-  }
-  const lines = text.split('\n');
-  const skills = [];
-  let inBlock = false;
-  for (const line of lines) {
-    if (/^skills:\s*$/.test(line)) {
-      inBlock = true;
-      continue;
-    }
-    if (!inBlock) continue;
-    const item = line.match(/^\s+-\s*(\S+)\s*$/);
-    if (item) {
-      skills.push(item[1]);
-      continue;
-    }
-    if (line.trim() === '') continue;
-    break;
-  }
-  return skills;
+  return { defs, problems };
 }
 
 /**

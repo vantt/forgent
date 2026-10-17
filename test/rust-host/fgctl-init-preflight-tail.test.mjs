@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -295,3 +295,52 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
   }
 });
 
+
+test('holder-lock gate: a git that leaves a background gc while it borrows a lock refuses init before anything of the activation is written', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-red-'));
+  const tempHome = path.join(root, 'home');
+  const tempState = path.join(root, 'state');
+  const tempProj = path.join(root, 'proj');
+  try {
+    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir);
+    execFileSync('git', ['init'], { cwd: tempProj });
+
+    const res = runFgctl(['init', '--from', fixture.releaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome, PATH: pathWithGcLeakingGit(root) },
+    });
+
+    assert.notEqual(res.status, 0, 'init must be refused when a borrow vector is red');
+    assert.match(res.stderr, /lock-borrow-vectors-failed: /);
+    assert.match(res.stderr, /gc-auto-loose-objects/);
+    const installation = path.join(tempProj, '.fgos', 'installation');
+    assert.ok(!fs.existsSync(path.join(installation, 'activation.json')), 'activation.json must not exist');
+    assert.ok(!fs.existsSync(path.join(installation, 'bin', 'fgos')), 'bin/fgos shim must not exist');
+    assert.ok(!fs.existsSync(path.join(installation, 'root.json')), 'root.json must not exist');
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'distribution.json must not exist');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('holder-lock gate: init with the real git passes the gate and checks both lock directories', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-green-'));
+  const tempHome = path.join(root, 'home');
+  const tempState = path.join(root, 'state');
+  const tempProj = path.join(root, 'proj');
+  try {
+    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir);
+    execFileSync('git', ['init'], { cwd: tempProj });
+
+    const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });
+
+    assert.equal(res.status, 0, `init must pass the gate: ${res.stderr}`);
+    assert.doesNotMatch(res.stderr, /lock-(kernel-semantics|borrow-vectors)-failed/);
+    assert.ok(fs.statSync(path.join(tempProj, '.fgos', 'locks')).isDirectory(), 'workspace lock directory probed');
+    assert.ok(fs.statSync(path.join(tempState, 'locks')).isDirectory(), 'lock root probed');
+    assert.deepEqual(fs.readdirSync(path.join(tempState, 'locks')).filter((f) => f.startsWith('.semantics-probe-')), [], 'probe files removed');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

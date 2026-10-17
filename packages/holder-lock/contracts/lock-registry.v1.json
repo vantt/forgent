@@ -54,7 +54,7 @@
       "kind": "mutex",
       "scope": "run",
       "rank": 80,
-      "v3Path": "<workflowRunDir>/advance.lock",
+      "v3Path": "<workflowRunDir>/locks/advance.lock",
       "v1Shape": "file-wx",
       "v1Path": ".fgos/workflow-runs/<id>/advance.lock",
       "fence": "tombstone",
@@ -79,7 +79,7 @@
       "kind": "mutex",
       "scope": "run",
       "rank": 80,
-      "v3Path": "<runDir>/recovery.lock",
+      "v3Path": "<runDir>/locks/recovery.lock",
       "v1Shape": "file-wx",
       "v1Path": "<runDir>/.recovery.lock",
       "fence": "tombstone",
@@ -130,13 +130,13 @@
       "kind": "lease",
       "scope": "repo",
       "rank": 30,
-      "v3Path": "<fgosDir>/locks/dispatch--<encodeURIComponent(cwd)>.lock",
+      "v3Path": "<fgosDir>/locks/dispatch-cwd--<cwdDevIno>.lock",
       "v1Shape": "file-by-cwd",
       "v1Path": ".fgos/dispatch--<encodeURIComponent(cwd)>.lock",
       "fence": "tombstone",
       "fenceNote": "both the path.resolve form and the realpath form, for every worktree and claim that exists at cutover; scope stays fgosDir",
       "owner": "4.2",
-      "note": "v1 source: src/runner/main-checkout-lock.mjs dispatchLockFile"
+      "note": "v3 key <cwdDevIno> is dev-ino of the cwd after realpath, so every spelling of one directory (symlinks included) names one lock. v1 source: src/runner/main-checkout-lock.mjs dispatchLockFile"
     },
     {
       "name": "main-checkout",

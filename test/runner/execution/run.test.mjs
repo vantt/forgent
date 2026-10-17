@@ -18,6 +18,7 @@ seedFileLocalBwrapRegistry();
 // Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -1521,14 +1522,16 @@ test('a resume is refused while a live process holds the dispatch lock of the un
     runId: 'synthetic-resumed-run', settledAt: '2026-10-05T01:00:00Z',
     classification: { outcome: { category: 'ok' } },
   }));
-  // The lock name and the composite holder identity are exactly what a mutating dispatch writes.
-  const lockPath = path.join(repoRoot, '.fgos', `dispatch--${encodeURIComponent(path.resolve(worktreeDir))}.lock`);
   const resume = () => runUnit({ resumeUnitRunId: refused.unitRunId, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
 
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: `${process.pid}:${Date.now()}:live`, ts: Date.now() }));
-  await assert.rejects(resume, /holds lock/);
-
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: `2147483646:${Date.now()}:dead`, ts: Date.now() }));
+  // A mutating dispatch in another process holds the worktree's dispatch-cwd lock while its worker runs.
+  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
+  try {
+    await assert.rejects(resume, new RegExp(`another process \\(PID ${child.pid}\\) holds lock`));
+  } finally {
+    child.kill('SIGKILL');
+    await exited;
+  }
   assert.equal((await resume()).outcome, 'pass');
 });
 
@@ -1774,4 +1777,21 @@ test('a unit persona defined in the workspace tier reaches the prompt as text pi
   assert.equal(assignment.policy.personaPin?.text, personaText);
   // The pin is recorded once, so an edit to the file after the start never reaches a resume.
   assert.equal(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).personaPin.text, personaText);
+});
+
+test('a unit persona whose file cannot be parsed or has the wrong shape refuses the run and leaves no unit directory', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(repoRoot, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'broken-keeper.yaml'), 'name: broken-keeper\ndescription: fine\npersona:\n  voice: direct: no hedging\n');
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'mapping-keeper.yaml'), 'name: mapping-keeper\ndescription: fine\ndecision_boundary:\n  must_escalate:\n    - Escalate when: budget exceeded\n');
+  const attempt = (persona) => runUnit({
+    unitData: { id: 'u-bad-persona', objective: 'Write docs', capability: 'docs:write', writes: [], persona },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  await assert.rejects(attempt('broken-keeper'), /persona "broken-keeper" \(fgos\/agents\/broken-keeper\.yaml\) cannot be parsed: .*line 4/);
+  await assert.rejects(attempt('mapping-keeper'), /persona "mapping-keeper" \(fgos\/agents\/mapping-keeper\.yaml\) decision_boundary\.must_escalate\[0\] is a mapping/);
+  const assignments = path.join(repoRoot, '.fgos', 'assignments');
+  assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
 });
