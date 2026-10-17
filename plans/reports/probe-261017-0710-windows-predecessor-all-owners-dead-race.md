@@ -79,3 +79,14 @@ When the job does not open, the existing Toolhelp fallback applies.
 Probe v3 also records, per event, whether `IsProcessInJob(git, job)` is true when git is missing from the list. That shows whether source 2 alone closes the gap.
 
 The 4.4b driver stays blocked until v3 shows 0 violations in at least 500 repeats on the owner's machine.
+
+## Probe v3 (union rule) merged; review note for the 4.4b driver
+Probe v3 (`1ba9cb76a`, exe sha256 `09f7248c…`):
+- waits on the union of the job list, the `IsProcessInJob` scan and the holder tree;
+- adds `predecessor-dying-job-open`;
+- runs 500 repeats by default;
+- drops the list-empty-toolhelp variant, because the union rule covers it.
+
+Review note:
+- In the probe, a named pid whose `OpenProcess(SYNCHRONIZE)` fails is skipped (`Dom::refresh`). That is fine for a probe, where it almost always means "already gone".
+- The driver must **fail closed**: a pid still present in the snapshot but not openable keeps the domain non-empty.
