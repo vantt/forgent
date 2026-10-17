@@ -23,6 +23,8 @@ export const EMPTY_SHELL_GRACE_MS = 600000;
 export const RUN_SETTLE_GRACE_MS = 600000;
 export const OWNERSHIP_CONTRACT = 'confinement-resource-ownership.v1';
 export const OWNERSHIP_CREATOR = 'fgos-confinement';
+/** The marker of a home that belongs to one supervised attempt: its owner is that attempt, not a process. */
+export const ATTEMPT_HOME_MARKER_CONTRACT = 'confinement-resource-ownership.v2';
 
 const ROOT_DIR_NAME = 'fgos-confinement';
 
@@ -114,6 +116,36 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
   return markerPath;
 }
 
+/**
+ * Write the ownership marker of a home that belongs to one supervised attempt. Only adopt's
+ * finalize-home step removes such a home; the orphan reaper never judges it. Written atomically.
+ */
+export function writeOwnershipMarkerV2(dirPath, { attemptId, runDir, dispatchId, resource = 'private-home' } = {}) {
+  if (!dirPath || typeof dirPath !== 'string') throw new Error('dirPath is required for writeOwnershipMarkerV2.');
+  if (typeof attemptId !== 'string' || attemptId === '') throw new Error('attemptId is required for writeOwnershipMarkerV2.');
+  if (typeof runDir !== 'string' || runDir === '') throw new Error('runDir is required for writeOwnershipMarkerV2.');
+  const markerPath = path.join(dirPath, OWNERSHIP_MARKER_FILE);
+  writeFileAtomic(markerPath, JSON.stringify({
+    contract: ATTEMPT_HOME_MARKER_CONTRACT,
+    creator: OWNERSHIP_CREATOR,
+    attemptId,
+    runDir,
+    ...(typeof dispatchId === 'string' && dispatchId !== '' ? { dispatchId } : {}),
+    resource,
+    createdAt: new Date().toISOString(),
+  }, null, 2));
+  return markerPath;
+}
+
+/** The marker of an attempt home (version 2), or null when the directory has none of ours. */
+export function readAttemptOwnershipMarker(dirPath) {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), 'utf8'));
+    if (parsed?.contract === ATTEMPT_HOME_MARKER_CONTRACT && parsed.creator === OWNERSHIP_CREATOR) return parsed;
+  } catch { /* absent or malformed: not an attempt home */ }
+  return null;
+}
+
 /** Removal attempts a home with an unstaged renewed login gets before it is held for the owner. */
 export const CREDENTIAL_KEEP_MAX_ATTEMPTS = 5;
 export const CREDENTIAL_HOME_KEPT = 'credential-home-kept';
@@ -126,7 +158,7 @@ export const CREDENTIAL_KEEP_MIN_INTERVAL_MS = 15 * 60 * 1000;
  * filled (which account login it was copied from).
  */
 export function extendOwnershipMarker(dirPath, fields) {
-  const marker = readOwnershipMarker(dirPath);
+  const marker = readOwnershipMarker(dirPath) ?? readAttemptOwnershipMarker(dirPath);
   if (!marker) return false;
   // Temp file and rename: a remover in another process that reads the marker meanwhile sees the old or the
   // new content, never a half-written one (an unreadable marker would make the home look unowned).
@@ -228,6 +260,24 @@ function markerIsUnrecognisable(dirPath) {
 }
 
 /**
+ * Count one failed removal of a home whose renewed login could not be staged, in its marker. An attempt
+ * close after the last counted one is not counted again, so a transient fault cannot use up the budget.
+ * Returns the number of counted attempts.
+ */
+export function countCredentialKeep(dirPath, marker, now = Date.now) {
+  const kept = marker.credentialKept;
+  const at = now();
+  const spaced = !Number.isFinite(kept?.lastCountedAt) || at - kept.lastCountedAt >= CREDENTIAL_KEEP_MIN_INTERVAL_MS;
+  const attempts = (kept?.attempts ?? 0) + (spaced ? 1 : 0);
+  if (spaced) {
+    try {
+      extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: kept?.since ?? new Date(at).toISOString(), lastCountedAt: at } });
+    } catch { /* the home is kept either way; the next removal counts again */ }
+  }
+  return attempts;
+}
+
+/**
  * Delete a confinement directory. The one removal every path goes through (the driver's cleanup, the
  * finalizer of a settled dispatch and the orphan reaper), so a login renewed inside a private home is
  * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
@@ -260,15 +310,7 @@ export function removeConfinementDir(dirPath, { stopProcesses = false, now = Dat
         // The home may hold the only good refresh token and no copy of it is safe yet: leave it and its
         // marker so a later removal retries (up to the bound), and say so with a fixed code (no paths, no
         // values). An attempt close after the last counted one is not counted again.
-        const kept = marker.credentialKept;
-        const at = now();
-        const spaced = !Number.isFinite(kept?.lastCountedAt) || at - kept.lastCountedAt >= CREDENTIAL_KEEP_MIN_INTERVAL_MS;
-        const attempts = (kept?.attempts ?? 0) + (spaced ? 1 : 0);
-        if (spaced) {
-          try {
-            extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: kept?.since ?? new Date(at).toISOString(), lastCountedAt: at } });
-          } catch { /* the home is kept either way; the next removal counts again */ }
-        }
+        const attempts = countCredentialKeep(dirPath, marker, now);
         const held = attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
         process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${held ? 'held for the owner' : 'kept for a later retry'}\n`);
         throw new Error(held ? CREDENTIAL_HOME_HELD : CREDENTIAL_HOME_KEPT);
@@ -327,7 +369,7 @@ export function listKeptCredentialHomes(tempRoot) {
       }
     } catch { /* vanished meanwhile */ }
     for (const cand of candidates) {
-      const marker = readOwnershipMarker(cand);
+      const marker = readOwnershipMarker(cand) ?? readAttemptOwnershipMarker(cand);
       const attempts = marker?.credentialKept?.attempts;
       if (!Number.isInteger(attempts) || attempts < 1) continue;
       found.push({
@@ -517,7 +559,9 @@ export function reapOrphanedConfinementResources({
     for (const cand of candidates) {
       const marker = readOwnershipMarker(cand);
       if (!marker) {
-        // Not created by us; do not touch
+        // An attempt home belongs to adopt (finalize-home), whatever its age or whoever is alive.
+        if (readAttemptOwnershipMarker(cand)) skipped.push({ path: cand, reason: 'attempt-home-owned-by-adopt' });
+        // Anything else: not created by us; do not touch
         continue;
       }
 
@@ -539,11 +583,17 @@ export function reapOrphanedConfinementResources({
 
       let reason;
       let closeEmptyPane = false;
+      if (marker.boundAt && !marker.retainedAt && !marker.paneId) {
+        // A binding with no pane is a detached run supervisor's (the pre-adopt cli-spawn way). No new
+        // home is written this way; a leftover is never removed on a pid rule: it is kept and `fgos doctor` names it.
+        skipped.push({ path: cand, reason: 'unpaned-binding-kept-for-doctor' });
+        continue;
+      }
+
       if (marker.boundAt && !marker.retainedAt) {
         // An active binding (bindOwnershipMarker): while its binder is alive, the home is kept for a window
         // anchored at binding, whatever the pane answers (a wrong or other server's socket answers false).
-        // Past that window, or once the binder is dead, a pane decides; a binding without a pane (a
-        // cli-spawn run supervisor) has nothing else keeping it.
+        // Past that window, or once the binder is dead, the pane decides.
         const boundTime = Date.parse(marker.boundAt);
         const binderAlive = checkLiveness(marker.binderPid ?? marker.pid, marker.binderStartTime ?? null);
         const keepUntil = boundTime + Math.max(maxAgeMs, LAUNCH_GRACE_MS + runTimeoutMs + RUN_SETTLE_GRACE_MS);
@@ -551,9 +601,7 @@ export function reapOrphanedConfinementResources({
           skipped.push({ path: cand, reason: 'binder-alive-in-window' });
           continue;
         }
-        if (!marker.paneId) {
-          reason = binderAlive ? 'expired' : 'process-dead';
-        } else if (!binderAlive && !marker.launchedAt) {
+        if (!binderAlive && !marker.launchedAt) {
           // The binder died before it launched anything: the pane is empty and the home unused.
           reason = 'bound-never-launched';
           closeEmptyPane = true;

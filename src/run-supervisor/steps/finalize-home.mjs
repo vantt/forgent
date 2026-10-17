@@ -7,5 +7,7 @@ import { finalizeAttemptHome } from '../../runner/dispatch/confinement/authority
 export async function finalizeHome({ envelope }) {
   const finalized = finalizeAttemptHome({ runDir: envelope.runDir, attemptId: envelope.attemptId });
   if (finalized.state === 'credential-home-kept') return { result: 'retry', reason: 'credential-home-kept' };
+  // The retry budget is used up: the home stays for the owner, adopt does not run the step again.
+  if (finalized.state === 'credential-home-held') return { result: 'done', detail: { homes: finalized.homes, outcome: 'credential-home-held' } };
   return { result: 'done', detail: { homes: finalized.homes } };
 }

@@ -28,7 +28,8 @@ import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { resolveConfinementTempRoot, createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -314,11 +315,10 @@ export async function runUnit(options = {}) {
   // hold a copy of an account login; `fgos run` is the one door every such run
   // goes through, so it is also where the ones whose pane has since closed are
   // reclaimed. Best effort: a reap problem never blocks the run.
-  try { reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
-
   const cwd = options.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
+  try { sweepAttempts({ assignmentsRoot: path.join(mainRoot, '.fgos', 'assignments'), tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const workflowLink = normalizeWorkflowLink(options.workflow);
 
