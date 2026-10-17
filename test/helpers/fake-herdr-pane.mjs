@@ -39,8 +39,19 @@ const args = process.argv.slice(2);
 fs.appendFileSync(logPath, JSON.stringify(args) + '\n');
 fs.appendFileSync(path.join(dir, 'envs.jsonl'), JSON.stringify({ socket: process.env.HERDR_SOCKET_PATH ?? null, session: process.env.HERDR_SESSION ?? null }) + '\n');
 
+// Rounds of one batch run concurrently, and every herdr call is its own process: the state file is
+// read-modified-written under a lock held for the whole call, and written atomically.
+const lockPath = path.join(dir, 'state.lock');
+const sleepBlock = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+for (let tries = 0; ; tries += 1) {
+  try { fs.mkdirSync(lockPath); break; } catch (err) {
+    if (err.code !== 'EEXIST' || tries > 4000) throw err;
+    sleepBlock(5);
+  }
+}
+process.on('exit', () => { try { fs.rmdirSync(lockPath); } catch { /* released */ } });
 const readState = () => JSON.parse(fs.readFileSync(statePath, 'utf8'));
-const writeState = (s) => fs.writeFileSync(statePath, JSON.stringify(s));
+const writeState = (s) => { const tmp = statePath + '.' + process.pid; fs.writeFileSync(tmp, JSON.stringify(s)); fs.renameSync(tmp, statePath); };
 const ok = (result) => { console.log(JSON.stringify({ id: 'cli:mock', result })); process.exit(0); };
 const fail = (code, message) => { console.log(JSON.stringify({ error: { code, message: message ?? code }, id: 'cli:mock' })); process.exit(1); };
 const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };

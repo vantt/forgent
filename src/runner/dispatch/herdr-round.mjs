@@ -1373,7 +1373,10 @@ async function concludeFailure({ io, round, decision, closeAlways, retainFailedP
   const fate = paneFateFor(decision.outcome, { closeAlways });
   try {
     if (fate === 'close') await io.release('close');
-    else await io.release('retain', { until: Number.isFinite(retainFailedPaneMs) ? Date.now() + retainFailedPaneMs : null });
+    // A pane kept for a person is left allocated: a slot released as retained refuses a later explicit
+    // close by key (the account probe and the reaper close by key), and an unreleased slot is exactly
+    // "kept until a person closes it". An explicit retention window records it as retained.
+    else if (Number.isFinite(retainFailedPaneMs)) await io.release('retain', { until: Date.now() + retainFailedPaneMs });
   } catch { /* closing or keeping a pane is cleanup, never a dispatch result */ }
 
   return round.fail(

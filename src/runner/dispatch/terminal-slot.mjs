@@ -47,6 +47,11 @@ function must(result, expected, what) {
   throw new TerminalSlotError('terminal_bad_answer', `${what}: the port answered ${result.result}`);
 }
 
+// One client per route configuration for the life of the process: the client's promise queue per
+// group key is what keeps two rounds of one batch from both opening the batch's tab, so rounds that
+// run side by side in this process must share it.
+const clients = new Map();
+
 /**
  * The terminal-control client a round talks to. `herdrEnv` is the driver
  * environment of the herdr server the round lives in (HERDR_SESSION and
@@ -57,13 +62,19 @@ export function createRoundTerminalControl({ herdrBin, herdrEnv, config, hostBin
   for (const [name, value] of Object.entries(herdrEnv ?? {})) {
     if (name.startsWith('HERDR_') && typeof value === 'string') env[name] = value;
   }
-  return createTerminalControl({
-    ...(hostBin ? { hostBin } : {}),
-    ...(herdrBin ? { herdrBin } : {}),
-    ...(Object.keys(env).length ? { env } : {}),
-    ...(config ? { config } : {}),
-    ...(timeoutMs ? { timeoutMs } : {}),
-  });
+  const identity = JSON.stringify([hostBin ?? null, herdrBin ?? null, env, config ?? null, timeoutMs ?? null]);
+  let client = clients.get(identity);
+  if (!client) {
+    client = createTerminalControl({
+      ...(hostBin ? { hostBin } : {}),
+      ...(herdrBin ? { herdrBin } : {}),
+      ...(Object.keys(env).length ? { env } : {}),
+      ...(config ? { config } : {}),
+      ...(timeoutMs ? { timeoutMs } : {}),
+    });
+    clients.set(identity, client);
+  }
+  return client;
 }
 
 /** Tab label for a group: short and readable, never read back. */
@@ -75,7 +86,7 @@ export function groupLabel(groupKey) {
  * Bind `key` on `tc`. The returned object is the only thing the wait, brief
  * and settle logic of a round sees of the terminal.
  */
-export function createSlotIo({ tc, key }) {
+export function createSlotIo({ tc, key, groupKey }) {
   const call = (op, request = {}) => tc[op]({ key, ...request });
 
   // `want` leaves parts out so a poll costs only the driver calls it needs.
@@ -155,9 +166,10 @@ export function createSlotIo({ tc, key }) {
       must(call('label', { display: { label, agent }, reportState: state }), 'ok', `report agent of ${key}`);
     },
 
-    /** Close the pane (or keep it for a person) and forget the slot. */
+    /** Close the pane (or retain it) behind the earlier calls of its group, so a close never runs while
+     * a seat of the same group is still choosing a pane next to it. */
     release(disposition, { until = null } = {}) {
-      return call('release', disposition === 'retain' ? { disposition, until } : { disposition });
+      return tc.releaseAsync({ key, ...(groupKey ? { groupKey } : {}), ...(disposition === 'retain' ? { disposition, until } : { disposition }) });
     },
   };
 }
