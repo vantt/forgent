@@ -81,7 +81,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, readAttemptOwnershipMarker, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readAttemptOwnershipMarker, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';

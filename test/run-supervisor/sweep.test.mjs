@@ -132,9 +132,8 @@ test('production call sites reach the reaper only through sweepAttempts', () => 
   assert.deepEqual(out, [
     'src/run-supervisor/sweep.mjs',
     'src/runner/dispatch/confinement/cleanup.mjs',
-    'src/setup/registrations.mjs',
   ]);
-  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs', 'src/runner/dispatch/cli.mjs']) {
+  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs', 'src/runner/dispatch/cli.mjs', 'src/setup/registrations.mjs']) {
     assert.match(fs.readFileSync(path.join(REPO, file), 'utf8'), /sweepAttempts\(/, file);
   }
 });
