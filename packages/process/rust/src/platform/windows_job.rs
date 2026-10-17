@@ -133,6 +133,12 @@ pub fn tree_from(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u
 /// finishes; the parent chain alone would miss it. These are only candidates
 /// to wait for, never to signal: an unrelated orphan looks the same.
 pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u64)>, declared_at: u64, tree: &Tree) -> Vec<(u32, u64)> {
+    // A holder pid that now belongs to a newer process means the holder died a while ago
+    // (a pid is not reused within the milliseconds a closing job needs to tear down), so
+    // nothing is tearing down on its behalf.
+    if procs.iter().any(|p| p.pid == holder.0 && p.created.is_some_and(|c| c != holder.1)) {
+        return Vec::new();
+    }
     let in_tree: BTreeSet<u32> = tree.members.iter().map(|(pid, _)| *pid).chain(tree.unopenable.iter().copied()).collect();
     let by_pid: BTreeMap<u32, &ProcEntry> = procs.iter().map(|p| (p.pid, p)).collect();
     let mut found: BTreeMap<u32, u64> = BTreeMap::new();
@@ -978,6 +984,14 @@ mod tests {
         let tree = Tree::default();
         let found = orphans_since(&procs, (10, 100), None, 200, &tree);
         assert!(found.iter().any(|(pid, _)| *pid == 30), "{found:?}");
+    }
+
+    #[test]
+    fn a_reused_holder_pid_means_nothing_is_tearing_down() {
+        // The holder's pid belongs to a newer process: the record is stale, so no orphan is waited for.
+        let procs = [row(10, 2, 900), row(30, 20, 300)];
+        let tree = tree_from(&procs, (10, 100), None, 200);
+        assert!(orphans_since(&procs, (10, 100), None, 200, &tree).is_empty());
     }
 
     #[test]
