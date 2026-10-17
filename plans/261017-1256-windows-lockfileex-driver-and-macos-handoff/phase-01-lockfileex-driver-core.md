@@ -3,134 +3,126 @@
 - **Wave:** 1.
 - **Branch:** `win-driver/p01-lockfileex`, worktree `.claude/worktrees/wd-p01`.
 - **Depends on:** P00.
-- **Runs in parallel with:** P02 (different crate files).
+- **Runs in parallel with:** P02 (disjoint files; see the plan.md ownership table).
 
 ## Read first
 - plan.md D1, D8, D9, D12.
 - r6 §6.0 (the Windows `lockfileex` row) and §12.10.
-- Measured calls in [`tools/platform-probe/src/windows.rs:64-102`](../../tools/platform-probe/src/windows.rs):
-  - `open_lock`;
-  - `try_lock` (`LockFileEx(h, EXCLUSIVE|FAIL_IMMEDIATELY, 0, 1, 0)`);
-  - `lock_free`.
+- The measured calls in [`tools/platform-probe/src/windows.rs:64-102`](../../tools/platform-probe/src/windows.rs): `open_lock`, `try_lock`, `lock_free`.
 - The current code:
-  - [`driver/windows.rs`](../../packages/holder-lock/rust/src/driver/windows.rs) and [`driver/mod.rs`](../../packages/holder-lock/rust/src/driver/mod.rs) (the `LockDriver` trait);
-  - [`port.rs`](../../packages/holder-lock/rust/src/port.rs): `same_file` `:358`, `acquire` `:376`, `probe`, `release`;
+  - [`driver/windows.rs`](../../packages/holder-lock/rust/src/driver/windows.rs) and [`driver/mod.rs`](../../packages/holder-lock/rust/src/driver/mod.rs);
+  - [`port.rs`](../../packages/holder-lock/rust/src/port.rs): `same_file`, `acquire`, `probe`, `borrowed_check`, `release`;
   - [`semantics.rs`](../../packages/holder-lock/rust/src/semantics.rs);
-  - [`facts.rs:300-315`](../../packages/process/rust/src/facts.rs) (`file_key`).
+  - [`tests/common/mod.rs`](../../packages/holder-lock/rust/tests/common/mod.rs) (the re-exec pattern);
+  - `apps/fgos/src/main.rs:146-160` (the `internal` dispatch) and `apps/fgctl/src/main.rs:24-35`.
 
 ## Requirements
 
-**`WindowsDriver`** (rename the struct to `LockFileExDriver`; module `driver/windows.rs`):
-
+**Driver** (`driver/windows.rs`; rename the struct to `LockFileExDriver`):
 1. `supported() = true`.
-
 2. `try_lock(file, mode)`:
-   - call `LockFileEx` on `file.as_raw_handle()`, offset 0, length 1;
+   - `LockFileEx` on `file.as_raw_handle()`, offset 0, length 1, with a zeroed `OVERLAPPED`;
    - flags: `LOCKFILE_FAIL_IMMEDIATELY`, plus `LOCKFILE_EXCLUSIVE_LOCK` for `Ex`;
-   - map `ERROR_LOCK_VIOLATION` (33) and `ERROR_IO_PENDING` to `WouldBlock`;
-   - map every other error to `Err`.
-
+   - `ERROR_LOCK_VIOLATION` (33) → `WouldBlock`;
+   - every other error, `ERROR_IO_PENDING` included → `Err`.
 3. `guarantee(dir)` and `file_guarantee(file)`:
-   - find the volume of the nearest existing ancestor (`GetVolumePathNameW` + `GetDriveTypeW`; for an open file, `GetFileInformationByHandleEx(FileRemoteProtocolInfo)`, which succeeds only on a remote volume);
+   - **remote** = `GetDriveTypeW(GetVolumePathNameW(nearest existing ancestor)) == DRIVE_REMOTE`, or `GetFileInformationByHandleEx(FileRemoteProtocolInfo)` succeeds on the open file;
    - remote → `exclusion: None`, with a note;
-   - local → D1 levels (`Kernel`, `JobScoped`, `Unsupported`), `driver: "lockfileex"`, `platform: "windows"`.
-
-4. `description_path(file)` = `GetFinalPathNameByHandleW`, with the `\\?\` prefix stripped.
-
+   - local → D1 levels, `driver: "lockfileex"`, `platform: "windows"`.
+4. `description_path` = `GetFinalPathNameByHandleW`, with the `\\?\` prefix stripped.
 5. `holders` = `Unlistable("Windows has no API that lists byte-range lock holders")`.
-
 6. New trait method `before_close(&self, file: &File)`:
-   - default no-op (POSIX);
+   - POSIX: no-op;
    - Windows: `UnlockFileEx(0, 1)`, ignoring `ERROR_NOT_LOCKED`.
-   - `Handle` gets `impl Drop` that calls `driver::current().before_close(&self.file)`; the file then closes as before.
-   - The port doc comment says why this is safe on Windows only (D8).
-
-7. `prepare_borrow`, `end_leftovers`: leave unimplemented here (`Err` with detail `"borrowing lands with the job driver"`). P04 replaces them.
+7. `prepare_borrow` and `end_leftovers` stay unimplemented on Windows (`Err`, detail `"borrowing lands with the job driver"`). P04 replaces them.
 
 **Port** (`port.rs`):
+- **`Locked<'a>(&'a File)` guard:**
+  - every successful `try_lock` in the port goes through it, including `lock_until`, `probe`, `borrowed_check` and `semantics`;
+  - its `Drop` calls `driver::current().before_close(file)`;
+  - `Handle` keeps the file plus a flag and calls `before_close` in its own `Drop` before the file closes;
+  - every early `drop(file)` after a successful lock (the `same_file` mismatch, `admit → NotEmpty`) unlocks first (D8).
+  - The doc comment states why explicit unlock is safe on Windows only.
+- **`same_file` on Windows:**
+  - read `GetFileInformationByHandleEx(FileIdInfo)` (volume serial + 128-bit id) for the locked handle and for a fresh `CreateFileW(path, 0, FILE_SHARE_READ|WRITE|DELETE)` handle;
+  - compare them in full;
+  - keep it a private helper in `driver/windows.rs` (`fn same_file_id(&File, &Path)`), exposed through a new trait method `same_file(&self, file, path) -> bool`. The POSIX impl moves the existing code there.
+  - `fgos_process::facts::file_key` is not changed.
+- **`HelperExe`:** `pub struct HelperExe(pub PathBuf)` with `HelperExe::current()` (= `current_exe()`), and the argv prefix `[exe, "internal", "holder-lock-helper"]`. `semantics::two_process_probe` takes it as a parameter, and callers pass `HelperExe::current()`.
+- **Role entry:** new module `helper.rs`. `pub fn main(args: &[OsString]) -> i32` dispatches:
+  - `probe-holder --path P`: open P, lock `Ex`, write `R` to stdout, flush, sleep up to 60 s;
+  - any unknown role: exit 64.
+  - P04 adds `job-keeper`.
+- **Binaries:**
+  - `apps/fgos/src/main.rs`: inside the existing `internal` dispatch, route `holder-lock-helper` to `fgos_holder_lock::helper::main`;
+  - `apps/fgctl/src/main.rs`: add a hidden arm `"internal"` → `holder-lock-helper` that the help text does not list;
+  - add direct dependencies if missing.
 
-- `same_file`: add a `#[cfg(windows)]` arm comparing `fgos_process::facts::file_key(file)` with the key of a freshly opened handle to `path`. `std::fs::metadata` has no stable file index on Windows, so the comparison opens the path with `FILE_SHARE_READ|WRITE|DELETE` and reads its key.
-- Keep `open_lock_file`. std on Windows opens files non-inheritable and with share `READ|WRITE|DELETE`. Assert both in a test.
-
-**`fgos-process` `facts::file_key`** (`#[cfg(windows)]` arm):
-- `GetFileInformationByHandle`;
-- return `(dwVolumeSerialNumber as u64, (nFileIndexHigh << 32) | nFileIndexLow)`.
-- Only this function changes in `facts.rs`.
-
-**Helper entry (D9)**: new module `packages/holder-lock/rust/src/helper.rs`.
-- `pub fn run_if_requested() -> Option<i32>`: returns `None` unless `argv[1] == "--fgos-holder-lock-helper"`.
-- Role `probe-holder --path P`: open P, lock `Ex`, write one byte `R` to stdout, flush, then sleep up to 60 s (the parent kills it).
-- An unknown role → exit 64 with a message.
-- P04 adds `job-keeper` here.
-- `apps/fgos/src/main.rs` and `apps/fgctl/src/main.rs` call it first: `if let Some(code) = fgos_holder_lock::helper::run_if_requested() { std::process::exit(code) }`.
-- Check that both binaries already depend on the crate. `fgctl` does through `fgos-distribution`; add a direct dependency if needed.
-
-**Semantics probe (Windows half)** in `semantics.rs` (`#[cfg(windows)]`):
-- spawn `std::env::current_exe()` with `--fgos-holder-lock-helper probe-holder --path <probe file>`, stdout piped;
+**Semantics probe (Windows half):**
+- spawn `helper.argv() + ["probe-holder", "--path", <file>]` with stdout piped;
 - wait for `R` (bounded 2 s);
-- `port::probe` must say `Held`;
-- kill the child; `Free` within `FREE_WAIT`.
-- The POSIX half stays as it is.
+- `port::probe` → `Held`;
+- kill the child → `Free` within `FREE_WAIT`.
+- The POSIX half is unchanged.
 
-**CI (D12)**: create `.github/workflows/holder-lock-cross-platform.yml`.
-- Triggers: `push` (all branches) with `paths:` covering:
-  - `packages/holder-lock/**`, `packages/process/**`
-  - `packages/distribution/rust/src/init.rs`
-  - `apps/fgos/src/main.rs`, `apps/fgctl/src/main.rs`
-  - `src/holder-lock/**`, `src/setup/holder-lock-checks.mjs`
-  - `test/holder-lock/**`
-  - the workflow file itself
-- Also `workflow_dispatch`.
-- Job `crates`, matrix `[windows-latest, macos-latest]`, `fail-fast: false`, timeout 30 min:
-  1. checkout;
-  2. Rust toolchain as in `ci.yml`;
-  3. `cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution`;
-  4. `cargo build -p fgos`;
-  5. setup-node as in `ci.yml`, `npm ci`;
-  6. `node --test test/holder-lock/windows-*.test.mjs` with `FGOS_HOST_BIN` set to the built binary (`fgos.exe` on Windows).
-- The Node step is a no-op glob until P03 adds files. Use `shell: bash` and guard: `ls test/holder-lock/windows-*.test.mjs >/dev/null 2>&1 && node --test ... || echo "no Windows facade tests yet"`.
+**CI** — create `.github/workflows/holder-lock-cross-platform.yml`.
+- `push` with `paths:` covering:
+  - `packages/holder-lock/**`, `packages/process/**`;
+  - `packages/distribution/rust/src/init.rs`;
+  - `apps/fgos/**`, `apps/fgctl/**`;
+  - `src/holder-lock/**`, `src/setup/holder-lock-checks.mjs`;
+  - `test/holder-lock/**`, `test/setup/holder-lock-checks.test.mjs`;
+  - the workflow itself.
+- Plus `workflow_dispatch`.
+- Job `crates`: matrix `[windows-latest, macos-latest]`, `fail-fast: false`, 40 min, `shell: bash`. Steps:
+  1. Rust toolchain and setup-node as in `ci.yml`; `npm ci`.
+  2. `cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos -p fgctl`.
+  3. `cargo build -p fgos`.
+  4. `if compgen -G 'test/holder-lock/windows-*.test.mjs' >/dev/null; then FGOS_HOST_BIN=… node --test test/holder-lock/windows-*.test.mjs; else echo "no Windows facade tests yet"; fi`. A failing test fails the step.
+  5. Windows only: print whether the step process runs inside a job, using a PowerShell one-liner (`Add-Type` + `IsProcessInJob`). This answers red-team open question 1. It is informational and never fails the job.
 
 ## Owned files
 
 | Action | File |
 |---|---|
-| edit | `packages/holder-lock/rust/src/driver/{windows.rs,mod.rs}`, `packages/holder-lock/rust/src/port.rs` (only `same_file`, `Handle` `Drop`, `release` doc), `packages/holder-lock/rust/src/semantics.rs`, `packages/holder-lock/rust/src/lib.rs` |
-| create | `packages/holder-lock/rust/src/helper.rs`, `packages/holder-lock/rust/tests/windows_lockfileex.rs` |
-| edit | `packages/process/rust/src/facts.rs` (only `file_key`) |
-| edit | `apps/fgos/src/main.rs`, `apps/fgctl/src/main.rs` (one call each), `apps/fgctl/Cargo.toml` only if the direct dependency is missing |
+| edit | `packages/holder-lock/rust/src/driver/{windows.rs,mod.rs,flock.rs}` (`same_file`, `before_close` in the trait), `port.rs` (`Locked`, `Handle` `Drop`, `HelperExe`), `semantics.rs`, `lib.rs` |
+| create | `packages/holder-lock/rust/src/helper.rs` |
+| edit | `packages/holder-lock/rust/tests/common/mod.rs` (portable where needed) |
+| create | `packages/holder-lock/rust/tests/windows_lockfileex.rs`, `apps/fgos/tests/windows_semantics_probe.rs` |
+| edit | `apps/fgos/src/main.rs`, `apps/fgctl/src/main.rs`, their `Cargo.toml` if a direct dependency is missing |
 | create | `.github/workflows/holder-lock-cross-platform.yml` |
 
 ## Tests
 
-`tests/windows_lockfileex.rs`, `#![cfg(windows)]`, with real processes. Reuse the existing re-exec pattern of [`tests/common/mod.rs`](../../packages/holder-lock/rust/tests/common/mod.rs) (`HL_TEST_ROLE`, `child_entry`), extended with Windows roles. Make its `#![cfg(unix)]` parts portable where needed.
-
-1. A child holds `Ex`; the parent's `acquire(Try)` → `Held`. `TerminateProcess` the child → the parent's `acquire` → `Acquired` within 50 ms (r6 measured 0.1 ms).
-2. Two `File`s in one process: the second `Ex` try → `WouldBlock` (two scopes exclude each other).
-3. `Sh` + `Sh` → both locked; `Sh` held + `Ex` try → `WouldBlock`.
-4. Release (`drop(handle)`) → another process acquires within 50 ms, with no wait for the OS to unlock on close.
-5. `same_file`: the lock file is renamed away and recreated between open and lock → `acquire` retries and locks the new file.
-6. The lock handle is not inherited: spawn `cmd /c exit` with inherit on; the child holds nothing (the parent then releases, and a third process acquires at once).
-7. `semantics::two_process_probe(tmp)` → `Ok`, under 1000 ms.
+**`packages/holder-lock/rust/tests/windows_lockfileex.rs`** (`#![cfg(windows)]`, the `HL_TEST_ROLE` re-exec pattern, no helper roles needed):
+1. A child holds `Ex`; the parent's `acquire(Try)` → `Held`. `TerminateProcess` the child → `Acquired` within 50 ms.
+2. Two `File`s in one process: the second `Ex` → `WouldBlock`.
+3. `Sh` + `Sh` lock; `Sh` + `Ex` → `WouldBlock`.
+4. Release by `drop(handle)` → another process acquires within 50 ms.
+5. `probe` while nobody holds, followed immediately by an `Ex` try from another process → `Locked` (no lingering `Sh`).
+6. `same_file`: rename the lock file away and recreate it between open and lock → `acquire` relocks the new file.
+7. The lock handle is not inherited: a child spawned with inheritance holds nothing.
 8. `guarantee(tmp)` = `lockfileex` / `kernel` / `job-scoped` / `unsupported`.
-9. `file_key` is equal for two handles of one file and different for two files.
 
-Linux: the existing tests stay green (`cargo test -p fgos-holder-lock -p fgos-process`).
+**`apps/fgos/tests/windows_semantics_probe.rs`** (`#![cfg(windows)]`):
+9. `two_process_probe(tmp, HelperExe(env!("CARGO_BIN_EXE_fgos")))` → `Ok`, under 1000 ms.
+10. `fgos internal holder-lock-helper nope` → exit 64.
+
+**Linux:** existing tests stay green, and `semantics` keeps its unix test.
 
 **Commands:**
-- Local:
-  - `cargo test -p fgos-holder-lock -p fgos-process`
-  - `cargo check -p fgos-holder-lock -p fgos-process -p fgos -p fgctl --target x86_64-pc-windows-msvc --target aarch64-apple-darwin`
-  - `cargo clippy` for the Windows target.
-- **Windows proof:** commit, then SendMessage `forgentx-95` asking for a push of `win-driver/p01-lockfileex`. The workflow runs on push. Record the run id; red → fix and ask again.
+- `cargo test -p fgos-holder-lock -p fgos-process -p fgos`;
+- `cargo check -p fgos-holder-lock -p fgos-process -p fgos -p fgctl --target x86_64-pc-windows-msvc --target aarch64-apple-darwin`;
+- `cargo clippy` for the Windows target.
+
+**Windows proof:** commit, then ask `forgentx-95` to push `win-driver/p01-lockfileex`. Record the run id; on red, fix and ask again.
 
 ## Acceptance
-- Tests 1–9 are green on `windows-latest`.
-- The macOS leg is green.
-- Linux is green.
-- The run id is in the phase report.
-- `fgos --fgos-holder-lock-helper nope` exits 64.
-- `fgos --help` is unchanged.
+- Tests 1–10 are green on `windows-latest`.
+- macOS and Linux are green.
+- The run id is in the report.
+- `fgos --help` and `fgctl` help are unchanged.
 
 ## Risk / rollback
-- **`LockFileEx` on a handle opened by std with `FILE_FLAG_OVERLAPPED` absent:** a synchronous handle plus `FAIL_IMMEDIATELY` returns at once, which the probe measured. Keep `OVERLAPPED` zeroed.
-- **Rollback:** revert. Windows goes back to `unsupported`.
+- **The `Locked` guard touches every lock path on POSIX too:** `before_close` is a no-op there, and the existing Linux tests cover the paths.
+- **Rollback:** revert.

@@ -8,22 +8,25 @@ Wave 1. Nhánh `run-supervisor/p02-containment-win-mac`, worktree `.claude/workt
 - Code đã đo xanh: [`tools/platform-probe/src/windows.rs`](../../tools/platform-probe/src/windows.rs), [`predecessor.rs`](../../tools/platform-probe/src/predecessor.rs), [`unix.rs`](../../tools/platform-probe/src/unix.rs); JSON [Windows lần ba](../reports/evidence-261016-1247-platform-probe-all-owners-dead-report-windows.json).
 - Bàn giao 4.4a P06 dòng "Driver chứa process" (plan.md D6: chuyển sang đây).
 
-## Amendment from plan 4.4b (2026-10-17; pending owner confirmation, 4.4b open question 1)
+## Amendment from plan 4.4b (2026-10-17; pending owner confirmation, 4.4b open question 1; do not merge to main unconfirmed)
 
-Plan [4.4b](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) D3 moves ownership of the `windows-job` domain into 4.4b P02 (`packages/process/rust/src/platform/windows_job.rs`). That covers `domain_is_empty`, `domain_kill_all`, `domain_watch`, `create_kill_job`, `open_job` and `unique_job_name`. Changes to this phase:
+Plan [4.4b](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) D3 moves ownership of the `windows-job` domain into 4.4b P02, in the new file `packages/process/rust/src/platform/windows_job.rs`:
+- `domain_watch`, `domain_is_empty`, `domain_kill_all`, `job_view`;
+- `create_kill_job`, `open_job`, `job_name`, `assign_and_resume`.
 
-- **What stays here:**
-  - Windows `create`, `spawn_in` and `guarantee`, which **call** the 4.4b functions and never reimplement them;
-  - the whole of macOS `pgroup-tree`;
-  - the CI workflow.
-- **Out of the "Files owned" table:** `packages/process/rust/src/platform/windows.rs` (domain part) and the Windows half of `domain_is_empty`/`domain_kill_all` in `lib.rs`.
-- **The Windows empty rule below is superseded.** It now follows the owner-machine probe runs 2–3 ([report](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md)):
-  - the union of the job list, the `IsProcessInJob` Toolhelp scan and the recorded root's tree, re-read on every poll;
-  - fail closed on a live, unopenable pid.
-- **Record shape:** `windows-job` `domainId` is `{job, holder: {host, pid, startTime}}`. For an attempt, `holder` is the gate.
+**What changes for this phase:**
+- **Stays here:** the Windows `create`, `spawn_in` and `guarantee` (they **call** the 4.4b functions and never reimplement them), the whole of macOS `pgroup-tree`, and the CI workflow.
+- **Leaves this phase:** the Windows half of `domain_is_empty`/`domain_kill_all` in `lib.rs`. `platform/windows.rs` is not touched for the domain.
+- **The Windows empty rule below is superseded** by 4.4b D5, which follows probe runs 2–3 ([report](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md)):
+  - a **job view** for the holder and keeper;
+  - a **contender view**: if the recorded root is alive, judge by the job only; if it is dead, use the union of the job list, the `IsProcessInJob` scan and the root's tree (processes created at or after `declaredAt`, excluding the keeper), re-read on every poll and failing closed on an unopenable member;
+  - a Toolhelp fallback with two quiet snapshots;
+  - a cross-session record fails closed.
+- **Record shape:** `windows-job.domainId` = `{job, sessionId, declaredAt, holder: {host, pid, startTime}, keeper: {host, pid, startTime} | null}`. For an attempt, `holder` is the gate; `keeper` is the supervisor's tuple, or `null` when the supervisor creates the job itself.
 - **Tests:** tests (4)–(6) below move to 4.4b P02. This phase keeps (1)–(3) and (7)–(8).
+- **Open question for 6.2's owner:** is the gate always a job member? If so, the root-alive split never changes an attempt's outcome.
 
-If the owner rejects the move, delete this block. 4.4b P04 then waits for this phase.
+**If the owner rejects the move:** delete this block. 4.4b P02's content becomes this phase's Windows domain work, and **this phase lands on main alone and early**, ahead of the rest of 6.2, so that 4.4b P04 is not blocked on all of 6.2.
 
 ## Yêu cầu
 
