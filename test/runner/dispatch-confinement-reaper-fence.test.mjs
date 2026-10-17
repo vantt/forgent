@@ -44,6 +44,7 @@ import {
   bindOwnershipMarker,
   markOwnershipLaunched,
   writeOwnershipMarkerV2,
+  removeConfinementDir,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { finalizeConfinementResources, bindingForPrepared } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
@@ -755,5 +756,16 @@ test('writeOwnershipMarkerV2 refuses a missing attempt or run directory and leav
     assert.throws(() => writeOwnershipMarkerV2(dir, { runDir: '/r' }), /attemptId/);
     assert.throws(() => writeOwnershipMarkerV2(dir, { attemptId: 'a' }), /runDir/);
     assert.equal(exists(path.join(dir, '.fgos-confinement-owner.json')), false);
+  } finally { w.cleanup(); }
+});
+
+test('removeConfinementDir refuses an attempt home and removes nothing', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_v2b', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    writeOwnershipMarkerV2(dir, { attemptId: 'att-2', runDir: path.join(w.tmp, 'run') });
+    assert.throws(() => removeConfinementDir(dir), /attempt-home-owned-by-adopt/);
+    assert.equal(exists(dir), true);
   } finally { w.cleanup(); }
 });

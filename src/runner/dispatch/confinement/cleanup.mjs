@@ -290,6 +290,8 @@ export function countCredentialKeep(dirPath, marker, now = Date.now) {
  * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
  */
 export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
+  // An attempt home is removed only by adopt's finalize-home step, never through this door.
+  if (readAttemptOwnershipMarker(dirPath)) throw new Error('attempt-home-owned-by-adopt');
   if (stopProcesses) stopProcessesInside(dirPath);
   const marker = readOwnershipMarker(dirPath);
   // A marker file that is there but cannot be recognised (a writer died half-way, or it holds something
