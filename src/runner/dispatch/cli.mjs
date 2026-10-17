@@ -21,7 +21,7 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { WORK_ITEM_KEYS, refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
@@ -464,14 +464,7 @@ export async function executeExecutorCli(
     } catch {}
   }
   const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(configRoot);
-  const cfg = { ...rawCfg };
-  if (rawCfg.executor) {
-    cfg.executors = {
-      ...(rawCfg.executors || {}),
-      claude: rawCfg.executor,
-      ...(rawCfg.executor.command ? { [rawCfg.executor.command]: rawCfg.executor } : {}),
-    };
-  }
+  const cfg = withDefaultExecutor(rawCfg);
   const resolvedByPurpose = !executorIdArg;
   // Resolve through the shared resolver on the supplied capability or
   // executor id. A capability contributes its rigor floor through the
