@@ -122,6 +122,8 @@ fn two_guards_in_one_process_exclude_each_other_and_drop_releases() {
     fs::remove_dir_all(&ws).ok();
 }
 
+// Linux only: it lists the child's open descriptors through /proc.
+#[cfg(target_os = "linux")]
 #[test]
 fn the_activation_description_does_not_leak_into_a_spawned_child() {
     let _serial = serial();

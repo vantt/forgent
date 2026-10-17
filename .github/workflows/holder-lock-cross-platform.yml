@@ -1,0 +1,83 @@
+name: holder-lock-cross-platform
+
+# The holder-lock port runs on three platforms; the Linux dev box cannot run
+# the Windows or macOS drivers, so every change to the lock code gets a run on
+# a real Windows and macOS runner. `ci.yml` stays Linux-only.
+
+on:
+  push:
+    paths:
+      - 'packages/holder-lock/**'
+      - 'packages/process/**'
+      - 'packages/distribution/rust/src/init.rs'
+      - 'apps/fgos/**'
+      - 'apps/fgctl/**'
+      - 'src/holder-lock/**'
+      - 'src/setup/holder-lock-checks.mjs'
+      - 'test/holder-lock/**'
+      - 'test/setup/holder-lock-checks.test.mjs'
+      - '.github/workflows/holder-lock-cross-platform.yml'
+  workflow_dispatch:
+
+jobs:
+  crates:
+    name: crates (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Rust toolchain
+        run: rustup show
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rust tests
+        run: cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos -p fgctl --no-fail-fast
+
+      - name: Build the host binary
+        run: cargo build -p fgos
+
+      # The Node tests for the Windows facade land with the facade; until
+      # then the glob matches nothing. A failing test still fails the step.
+      - name: Node Windows facade tests
+        run: |
+          host=target/debug/fgos
+          if [ "$RUNNER_OS" = "Windows" ]; then host="$host.exe"; fi
+          if compgen -G 'test/holder-lock/windows-*.test.mjs' >/dev/null; then
+            FGOS_HOST_BIN="$PWD/$host" node --test test/holder-lock/windows-*.test.mjs
+          else
+            echo "no Windows facade tests yet"
+          fi
+
+      - name: Report whether the step runs inside a job
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Add-Type -TypeDefinition @"
+          using System;
+          using System.Runtime.InteropServices;
+          public static class JobProbe {
+            [DllImport("kernel32.dll", SetLastError=true)]
+            public static extern bool IsProcessInJob(IntPtr process, IntPtr job, out bool result);
+            [DllImport("kernel32.dll")]
+            public static extern IntPtr GetCurrentProcess();
+          }
+          "@
+          $inJob = $false
+          [void][JobProbe]::IsProcessInJob([JobProbe]::GetCurrentProcess(), [IntPtr]::Zero, [ref]$inJob)
+          Write-Host "step process runs inside a job: $inJob"

@@ -88,6 +88,7 @@ name = "fgctl"
 version = "0.2.0"
 dependencies = [
  "fgos-distribution",
+ "fgos-holder-lock",
  "serde_json",
 ]
 
