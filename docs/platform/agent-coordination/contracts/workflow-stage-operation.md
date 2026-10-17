@@ -24,6 +24,10 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ## Contract
 
+Registry identity: **CTR012 · `workflow-step-operation`**. This names the live
+Workflow-definition-to-Assignment seam; the current payload carries no version
+field, and this registry allocation does not invent one.
+
 A Workflow step may define multiple semantic operations. Each declared
 operation has an identity and may reference:
 

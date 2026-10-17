@@ -43,8 +43,8 @@
       "targetDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
       "implementationEvidence": "Step 6 full-read plus declared generator/manual rule",
       "readerGapId": null,
-      "disposition": "park-dependent-rows",
-      "blockedDecision": "owner CTR010 choice sent by Lead; same park as X-CTR010-01",
+      "disposition": "proceed-Step-6-after-A45",
+      "blockedDecision": null,
       "targetStep": "Step 6"
     },
     {
@@ -1759,8 +1759,8 @@
       "targetDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
       "implementationEvidence": "docs/platform/component-boundary.md + gateway YAML + architecture registry",
       "readerGapId": null,
-      "disposition": "park-dependent-rows",
-      "blockedDecision": "owner CTR010 choice sent by Lead",
+      "disposition": "resolved-owner-A45-option-A",
+      "blockedDecision": null,
       "targetStep": "Step 3; Step 9 close"
     },
     {

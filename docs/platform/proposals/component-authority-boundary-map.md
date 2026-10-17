@@ -426,6 +426,10 @@ resolves actual executor/provider/model/tier/soul/profile under governance.
 
 ## 11. Four Coordination Rings
 
+The adopted A43 guard is stated in
+[concept relationships](../agent-coordination/vocabulary/concept-relationships.md#coordination-rings):
+these rings are responsibility boundaries and do not imply classes or entities.
+
 The four rings should be preserved by a shared orchestration spine, not by
 turning each ring into an unrelated module and not by collapsing all rings into
 Agent Coordination:

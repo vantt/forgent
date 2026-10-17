@@ -5,13 +5,18 @@
   "A": {"workingPathsWithinAllowedPrefixes":true,"violations":[],"ok":true},
   "B": {"actualGitBlobHashes":["a52981ff2862cc2c553dbb3181e4e822a26b146b","1e6b7bdad954fad1f7c67a4ba6c850c02304ac64","0f1cd7e1cee308772c0b56c37f3190333039cfb3","8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d","680570946fa1381474900c9192795514b5b88f48"],"matchPhase6ExtractorBlobs":true,"ok":true},
   "C": {"switchboardSha256":"a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa","changedAreaStatuses":[],"ok":true},
-  "G": {"baseGate":"plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-both.json","baseClaimIdNotConserved":0,"baseDecisionSelfReview":0,"changedCandidateUnits":3,"postReviewLog":"plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md","disposition":"changed units explicitly return to pending; L11-2 schedules the single fresh native carry/rebind in Step 9","okForBoundedAuthoring":true,"freshNativeCloseClaim":false},
+  "G": {"baseGate":"plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-both.json","baseClaimIdNotConserved":0,"baseDecisionSelfReview":0,"changedCandidateUnits":8,"postReviewLog":"plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md","disposition":"all eight changed units explicitly return to pending; L11-2 schedules the single fresh native carry/rebind in Step 9","okForBoundedAuthoring":true,"freshNativeCloseClaim":false},
   "H": {"command":"env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json","exit":0,"files":609,"checked":217,"findings":0,"ok":true},
   "I": {"baselineSha256":"7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1","rootInstructionOrSwitchboardChanges":[],"disclosedHistoricalDelta":["docs/platform/session-identity/spec.md"],"ok":true},
   "changedAnchors": [
     {"row":"TRUTH-15","path":"docs/platform/runner/architecture/h-7af1f0242611.md","proof":"docs/specs/runner.md lines 2470/2602/2890 opened"},
     {"row":"TRUTH-26","path":"docs/platform/host-invocation-routing/architecture/host-use-cases.md","proof":"archive/plans/260918-host-invocation-r3-remote-peer/plan.md exists; link destination unchanged"},
-    {"row":"TRUTH-27","path":"docs/platform/runner/operations/h-51f5cd7279fd.md","proof":"bin/fgos.mjs lines 4410/4498 opened"}
+    {"row":"TRUTH-27","path":"docs/platform/runner/operations/h-51f5cd7279fd.md","proof":"bin/fgos.mjs lines 4410/4498 opened"},
+    {"row":"S3-02/S3-04/S3-14/S3-15","path":"docs/platform/architecture-map.md","proof":"CTR010-CTR013 registry rows present; version absences explicit"},
+    {"row":"S3-14","path":"docs/platform/agent-confinement/history/rollout-and-settled-facts.md","proof":"CTR011 and documentation-only label explicit"},
+    {"row":"S3-02","path":"docs/platform/agent-coordination/contracts/workflow-stage-operation.md","proof":"CTR012 and absent payload version explicit"},
+    {"row":"S3-04","path":"docs/platform/agent-coordination/contracts/assignment-run-runresult.md","proof":"CTR013, absent payload version and assignment-run.v2 DispatchPlan carriage explicit"},
+    {"row":"V-05","path":"docs/platform/proposals/component-authority-boundary-map.md","proof":"ring-to-entity section links A43 guard in concept-relationships.md:95-110"}
   ],
   "protectedBoundary": {"diffFromB0":[],"ok":true},
   "diffCheck": {"command":"git diff --check","exit":0,"ok":true},

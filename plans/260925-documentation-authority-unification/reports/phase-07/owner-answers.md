@@ -260,7 +260,79 @@ the independent findings without authorizing promotion, cutover or retirement.
 - **Evidence:** `review-a38-cross-area-inventory-01.md` Notes 2-4.
 - **Affected rows/steps:** X-DEFECT-01..14, X-NAV-01..04, QF-01..13; Steps 1 and 9.
 
-## Open owner question — CTR010 (sent)
+### L11-12 — Classify S3-01 as historical/deferred intent
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** S3-01 treated the preserved Team Cognition Engine advisory
+  chain as a current cross-area seam missing a contract id.
+- **Cause:** the engine is retired, and current `runPattern` has no cognition producer;
+  the surviving current owners are CollaborationPattern and Workflow.
+- **Options and costs:** mint a contract for a nonexistent producer (false current
+  architecture); delete preserved intent (loses history); or classify it as
+  historical/deferred intent with no id and route the visible superseded label to
+  Step 5.
+- **Recommendation:** use the historical/deferred classification and Step 5 route.
+- **Scope of answer:** S3-01 matrix/check classification only; Step 5 owns any visible
+  candidate relabeling.
+- **Lead decision:** apply the recommendation; allocate no contract id.
+- **Reason:** a retired advisory with no runtime producer is not a live contract seam.
+- **Evidence:** `review-a38-step-03-04-architecture-01.md` R1;
+  `docs/platform/agent-coordination/spec.md:24-42`;
+  `src/runner/execution/patterns/index.mjs:34-46`.
+- **Affected rows/steps:** S3-01; Steps 3 and 5.
+
+### L11-13 — Treat S3-09 as covered and queue the internal policy gap
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** S3-09 claimed a missing cross-area contract between
+  RunResult and lifecycle action.
+- **Cause:** the write side already crosses CTR001/CTR002 and the read side consumes
+  the run-result contract recorded by S3-08; only the driver's undocumented
+  confidence/category-to-action mapping remains.
+- **Options and costs:** mint a redundant id (duplicates existing boundaries); ignore
+  the undocumented decision mapping (leaves a reader gap); or mark the seam covered
+  and carry the internal mapping as an owner-queue documentation gap.
+- **Recommendation:** mark S3-09 covered by CTR001, CTR002 and S3-08, and queue the
+  driver-policy documentation gap without creating a contract.
+- **Scope of answer:** S3-09 classification plus the documentation-gap queue entry;
+  no runner-spec edit in this turn.
+- **Lead decision:** apply the recommendation.
+- **Reason:** an internal decision arrow is not a new wire contract, but its mapping
+  still needs an explicit owner-readable explanation.
+- **Evidence:** `review-a38-step-03-04-architecture-01.md` R4;
+  `src/runner/loop.mjs:1011-1030`; `src/workflow/runner.mjs:83-97,164-166`.
+- **Affected rows/steps:** S3-09; Step 3; owner queue item
+  `P7-DOC-GAP-01` below.
+
+### L11-14 — Allocate live-seam registry ids without inventing payload versions
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** S3-02 and S3-04 are live public/persisted seams but lacked
+  registry ids; CTR011-CTR013 were verified unused before this application.
+- **Cause:** the documents survived the engine retirement, while their present
+  payloads carry no version field of their own.
+- **Options and costs:** leave both unregistered (Step 3 stop remains); invent payload
+  versions (false implementation claim); allocate registry ids and state the missing
+  fields honestly.
+- **Recommendation:** CTR012 for `workflow-step-operation`, CTR013 for Assignment;
+  leave DispatchPlan inside `assignment-run.v2`.
+- **Scope of answer:** candidate registry/docs and Step 3 evidence only; no code,
+  payload, checker, vocabulary or shipped-contract change.
+- **Lead decision:** apply the recommendation.
+- **Reason:** it closes the live registry seams while keeping implementation truth
+  explicit and avoiding an unnecessary DispatchPlan id.
+- **Evidence:** `review-a38-step-03-04-architecture-01.md` R2/R3;
+  `src/workflow/definition.mjs:241-253`; `src/workflow/steps.mjs:57-85`;
+  `src/runner/execution/run.mjs:555-580`;
+  `src/runner/dispatch/assignment.mjs:443-444,626-628`;
+  `src/runner/dispatch/plan.mjs:56`;
+  `src/runner/dispatch/assignment-runner.mjs:1570-1583`.
+- **Affected rows/steps:** S3-02, S3-04; Step 3.
+
+## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
   the other contract receive?
@@ -277,9 +349,31 @@ the independent findings without authorizing promotion, cutover or retirement.
 - **Dispatch fact:** Lead sent this question before Step 1 execution. Step 1 found no
   additional owner-only question; `owner-batch-01.md` records the complete five-part
   sent form.
+- **Owner answer A45:** option A. Gateway REST `/v1` (`fgos-gateway.v1`) keeps CTR010;
+  `confinement-authority.v1` takes verified-free CTR011; add the missing Gateway REST
+  registry row. No code or shipped-contract change. Legacy `docs/architecture-map.md`
+  waits for Phase 9 cutover.
+- **Reason:** Gateway held CTR010 first on 2026-08-13 and the number is already present
+  in the shipped OpenAPI, Gateway source, doc registry, end-user index and knowledge
+  article.
+- **Evidence:** owner answer A45; candidate Gateway OpenAPI; candidate architecture
+  registry; the independent Steps 3-4 architecture review confirmed CTR011 unused.
+- **Affected rows/steps:** S3-14, S3-15, X-DUP-01, X-CTR010-01; Steps 3, 6 and 9.
 
 An L11 decision settles only its stated scope. It cannot authorize promotion, alias
 adoption, retirement, deletion, cutover, main landing, push, locked-law change or the
-CTR010 renumbering that remains with the owner.
+remaining owner-only actions named above.
 
-A45 (owner-decided 2026-10-17 ~11:00, option A of the CTR010 numbering question sent under L11-7): the Gateway REST API `/v1` (`fgos-gateway.v1`) keeps `CTR010`, because it held the number first (2026-08-13) and the number is already in the shipped OpenAPI `x-contract`, `apps/fgos-gateway/src/gateway.rs`, the doc registry, the end-user index and the knowledge article. `confinement-authority.v1` takes the next verified-free number (`CTR011` is unused at the time of the answer) and the platform contract registry gains the missing Gateway REST row. No code or shipped contract changes. Scope: this numbering and the registry row only; the legacy `docs/architecture-map.md` on main is updated at the Phase 9 cutover.
+## Phase 7 owner queue
+
+### P7-DOC-GAP-01 — Document the Work driver's confidence/category-to-action mapping
+
+- **Status:** queued; not a contract-id gap.
+- **Gap:** current code maps `runOutcome()` confidence/category and `satisfied` into
+  Work/Workflow lifecycle action, but the policy is not explained in the runner
+  documentation.
+- **Expected owner:** runner specification owner.
+- **Evidence:** S3-09; `src/runner/loop.mjs:1011-1030`;
+  `src/workflow/runner.mjs:83-97,164-166`.
+- **Boundary:** document the mapping in its owner document; do not mint another
+  contract or imply the Run Result Evaluator mutates Work.

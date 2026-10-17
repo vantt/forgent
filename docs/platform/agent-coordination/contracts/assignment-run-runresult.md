@@ -41,6 +41,11 @@ The implementation column below bounds the retained text. Proposed typed interfa
 
 ## Assignment
 
+Registry identity: **CTR013 · `Assignment`**. The current persisted Assignment
+payload carries no contract/schema version field; its policy and normalizer
+stamps are not a substitute for one. `DispatchPlan` remains inside the existing
+`assignment-run.v2` carriage and receives no separate registry id here.
+
 Assignment is an immutable semantic request. It should identify:
 
 - Assignment ID and schema version;

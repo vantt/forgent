@@ -7,7 +7,8 @@ prohibited conflations and candidate citations.
 
 A43 is explicit in V-05: responsibility rings are descriptive responsibility
 groupings. They never imply a class, entity, schema type, mandatory module or
-runtime object.
+runtime object. The direct candidate citation is
+`docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-110`.
 
 ## Candidate corrections
 
