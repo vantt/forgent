@@ -1,6 +1,6 @@
 # Reading Map (sản phẩm)
 
-- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md
+- `docs/platform-foundations.md` — văn bản gốc 10 luật nền platform (L1–L10); spec: docs/specs/platform-foundations.md
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)
 - `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code
 - `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18

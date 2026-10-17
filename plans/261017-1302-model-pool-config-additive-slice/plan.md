@@ -1,9 +1,9 @@
 ---
 title: "Đợt A: lát bổ sung cho hình dạng config model/pool/account"
-description: "Dọn config để mỗi họ một executor; đọc ô tier dạng model hoặc model@pool; đọc runner.llmAccounts chỉ để kiểm tra; thêm dispatch explain và các check doctor chỉ đọc. Không đổi lease, confinement hay prefer."
+description: "Sửa test vỡ khi gemini chuyển sang omp; dọn config để mỗi họ một executor; đọc ô tier dạng model hoặc model@pool; đọc runner.llmAccounts chỉ để kiểm tra; thêm dispatch explain và các check doctor chỉ đọc; rigor do capability khai thì nâng trần tier. Không đổi lease, confinement hay prefer."
 status: pending
 priority: P1
-effort: 19h
+effort: 33h
 branch: plan/model-pool-config-additive-slice
 tags: [runner, config, model-policies, llm-accounts, explain, doctor]
 created: 2026-10-17
@@ -48,25 +48,35 @@ Trong đợt A: dọn executor claude/glm, model cho gemini; bộ đọc ô tier
 bộ đọc `llmAccounts` chỉ đọc; verb `fgos dispatch explain`; các check doctor
 chỉ đọc; spec và CHANGELOG.
 
+Cũng trong đợt A (gom thêm 2026-10-17):
+- sửa 35 test vỡ khi gemini chuyển từ agy sang omp (phase 05);
+- rigor do capability khai thì nâng trần tier của capability đó, và kiểm hai
+  bộ tính tier `bind()` / `assignment-policy` (phase 06). Gom từ brief
+  `brief-261017-1350-capability-tier-cap.md` (commit `f84fcc02e`), đã xoá.
+
 Ngoài (đợt B, C và item riêng): lease, state và quarantine theo pool; lọc
 account theo store; `credentialStore` trên invocation và trong confinement;
-bước dự phòng nguồn; `prefer` theo họ; chuyển global config; xoá
-`runner.providers`; trần tier, luật lên tier, `maxTier` ở `assignment-policy`,
-model của agent in-process.
+bước dự phòng nguồn; `prefer` theo họ, và việc luật transport chưa coi ghim
+invocation trong `prefer` của capability là ghim (`advise` ghim
+`claude-cli-bwrap` nhưng trong herdr vẫn chạy pane); chuyển global config; xoá
+`runner.providers`; luật lên tier; model của agent in-process; restage release
+để nhóm test `rust-host` chạy được.
 
 ## Phase và phụ thuộc
 
-| Phase | Nội dung | Phụ thuộc | Giờ |
-|---|---|---|---|
-| [00](phase-00-preconditions.md) | Thay đổi config chưa commit của anh được commit; chụp baseline `dispatch decide` | — | 1 |
-| [01](phase-01-config-one-executor-per-family.md) | Gộp `glm-herdr` vào `glm`, `claude-herdr` vào `claude`; `--model {model}` cho gemini | 00 | 4 |
-| [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 00 | 5 |
-| [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 00 | 3 |
-| [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 |
+| Phase | Nội dung | Phụ thuộc | Giờ | Trạng thái |
+|---|---|---|---|---|
+| [00](phase-00-preconditions.md) | Commit config của anh; chụp baseline `bind()` | — | 1 | xong |
+| [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp | 00 | 3 | chờ |
+| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr`; `--model {model}` cho gemini | 00, 05 | 4 | config và test đã sửa trong working tree, chưa commit; gemini chờ kết quả 05 |
+| [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | chờ |
+| [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | chờ |
+| [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | chờ |
+| [06](phase-06-capability-tier-cap.md) | Rigor của capability nâng trần tier; kiểm hai bộ tính tier | 02, 04 | 5 | chờ |
 
-01, 02, 03 chạy song song được: 01 chỉ sửa `.fgos/config.json`; 02 sửa
-`resolve.mjs`, `dispatch/config.mjs`, đoạn chọn model của `bind.mjs`; 03 là
-file mới. 04 cần cả ba.
+Thứ tự: 05 trước tiên, để main xanh lại; rồi commit 01; 02 và 03 song song;
+04; cuối cùng 06, vì 06 sửa đoạn tính tier ngay trên đoạn chọn model của 02 và
+dùng `explain` của 04.
 
 ## Thứ tự commit và va chạm
 
