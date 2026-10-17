@@ -127,17 +127,34 @@ export function readyBoundMs(wait, killWaitMs, slackMs) {
   return (wait.kind === 'ms' ? wait.ms : 0) + killWaitMs + slackMs;
 }
 
+/** libuv sets these exactly when it has reaped the child and freed its
+ * handle; from then on the pid may belong to someone else, so `pidAlive`
+ * must not be asked about it. */
+function reaped(child) {
+  return child.exitCode !== null || child.signalCode !== null;
+}
+
+/** Is the helper process still running? */
+function helperAlive(hold) {
+  return !reaped(hold.child) && pidAlive(hold.pid);
+}
+
 /** One look at the helper: its answer, or null while it is still working.
- * Throws when it died without answering. */
+ * Throws when it died without answering or answered with an error; the work
+ * directory is removed first. */
 function pollReady(hold, bin) {
-  const line = readReady(hold, bin);
-  if (line) return line;
-  if (pidAlive(hold.pid)) return null;
-  // It may have answered and exited between the two looks.
-  const last = readReady(hold, bin);
-  if (last) return last;
-  removeWorkDir(hold.work);
-  throw new HolderLockError('lock-route-bad-output', `${bin} lock-hold exited before it answered`, { pid: hold.pid });
+  try {
+    const line = readReady(hold, bin);
+    if (line) return line;
+    if (helperAlive(hold)) return null;
+    // It may have answered and exited between the two looks.
+    const last = readReady(hold, bin);
+    if (last) return last;
+    throw new HolderLockError('lock-route-bad-output', `${bin} lock-hold exited before it answered`, { pid: hold.pid });
+  } catch (err) {
+    removeWorkDir(hold.work);
+    throw err;
+  }
 }
 
 /** The helper ran past its bound: end it and remove its directory. */
@@ -183,7 +200,7 @@ export async function waitReady(hold, bin, boundMs) {
 export function terminateSync(hold) {
   hold.child.kill();
   const deadline = Date.now() + HELPER_EXIT_BOUND_MS;
-  while (pidAlive(hold.pid)) {
+  while (helperAlive(hold)) {
     if (Date.now() >= deadline) {
       throw new HolderLockError('lock-release-stuck', `lock-hold helper ${hold.pid} did not end within ${HELPER_EXIT_BOUND_MS} ms of being terminated`, { pid: hold.pid });
     }
