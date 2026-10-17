@@ -12,7 +12,17 @@ import { checkStopped, placeFences, fenceStatus, fenceCutover, ownPidChain } fro
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const READY_WAIT_MS = 10_000;
-const SETTLE_ATTEMPTS = 20;
+// Other fgOS processes on the machine (a parallel suite file, another
+// session) come and go between the probe and a scan; retry for this long,
+// pausing between tries, while only those block the scan.
+const SETTLE_BUDGET_MS = 60_000;
+const SETTLE_PAUSE_MS = 250;
+
+function settling(startedAt) {
+  if (Date.now() - startedAt >= SETTLE_BUDGET_MS) return false;
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, SETTLE_PAUSE_MS);
+  return true;
+}
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
 
 let scratch;
@@ -99,11 +109,12 @@ function scan(ws) {
 
 /** A scan that is not blocked by other sessions' processes coming and going: retried while only those block it. */
 function settledScan(ws) {
+  const startedAt = Date.now();
   let result;
-  for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt += 1) {
+  do {
     result = scan(ws);
     if (result.status !== 'blocked' || !onlyForeign(result)) return result;
-  }
+  } while (settling(startedAt));
   return result;
 }
 
@@ -177,8 +188,9 @@ test('a process that starts after the first scan is seen by the scan after place
 test('a clean workspace is fenced and scanned clean again by the whole cutover step', () => {
   const ws = makeWorkspace('clean-cutover');
   const placedPaths = new Set();
+  const startedAt = Date.now();
   let result;
-  for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt += 1) {
+  do {
     result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN, excludePids: foreignPids() });
     for (const placed of result.fences?.placed ?? []) placedPaths.add(placed);
     if (result.status === 'placed') break;
@@ -188,7 +200,7 @@ test('a clean workspace is fenced and scanned clean again by the whole cutover s
     const scanned = result.status === 'blocked' ? result.before : result.after;
     assert.ok(['blocked', 'placed-then-blocked'].includes(result.status) && onlyForeign(scanned), JSON.stringify(result));
     if (result.status === 'blocked') assert.equal(result.fences, null);
-  }
+  } while (settling(startedAt));
   assert.equal(result.status, 'placed', JSON.stringify(result));
   assert.equal(result.before.status, 'clean');
   assert.equal(result.fences.ok, true);
