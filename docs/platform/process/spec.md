@@ -10,9 +10,10 @@ Canonical: Yes
 Owner: Process component (facts + control, L0)
 Source: packages/process/rust (crate fgos-process); Node leaf src/runner/dispatch/process-identity.mjs
 Contracts: packages/process/contracts/
-Last reviewed: 2026-10-16
+Last reviewed: 2026-10-18
 Related:
 - docs/platform/holder-lock/spec.md
+- docs/platform/run-supervisor/spec.md
 - docs/platform/component-boundary.md
 - docs/platform/session-identity/spec.md
 - docs/specs/runner.md
@@ -37,7 +38,7 @@ Facts are almost never on the lock decision path any more (the kernel decides); 
 | Boot id, start time, pid namespace of a process, read without spawning | Writer identity (Session Identity) |
 | `lock_holders(dev, ino)` and the quiescence `scan` | Deciding what to do with a holder or a scanned process |
 | `spawn_with_fds`, `signal_by_identity` | The gate primitives (subreaper, `PR_SET_PDEATHSIG`, a new PID namespace, the tty foreground group): deferred to the run supervisor, no consumer in this track |
-| `domain_is_empty`, `domain_kill_all` for a declared domain | The full containment port (`create`, `spawn_in`, `guarantee`): run supervisor |
+| `domain_is_empty`, `domain_kill_all` for a declared domain | The attempt, envelope and lock that use the containment port (run supervisor); the port itself is section 10 |
 | The OS-neutral `ProcessPlatform` trait and one driver per OS | mtime of anything; a boot time derived from a clock |
 
 The reconcile planner keeps importing only the `facts` module (the existing import-graph rule of `src/runner/dispatch/process-identity.mjs`). The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
@@ -83,7 +84,7 @@ Public types carry no raw fd or `pid_t`: `ProcId(u32)`, `FdSlot(u32)`, with `#[c
 
 `ProcessPlatform` (facts + control) has one driver per OS. Linux is complete. macOS and Windows are real drivers for the parts that have clear semantics only: macOS reads the boot id through `sysctl`, reports `lock_holders` as `Unlistable` and `scan` as `Unsupported`; Windows uses the creation time in place of a boot id, `Unlistable`, `Unsupported`. `cargo check` for `x86_64-pc-windows-msvc` and `aarch64-apple-darwin` is part of the crate's acceptance.
 
-The containment port of the design (`create(attemptId) → domain`, `spawn_in`, `is_empty`, `kill_all`, `guarantee() → kernel | best-effort`) with the Linux `bwrap-pidns` driver (gate as pid 1 of the namespace), the Windows `job-object` driver and the macOS `pgroup-tree` driver is the run supervisor's work; this track ships only the two domain primitives above. Measured levels, for the record: Linux kernel (PID namespace when a user namespace is available, else best-effort process group), Windows kernel (Job Object, asynchronous kill, hence the predecessor rule), macOS best-effort (a `setsid` + double-fork escapee survives a group kill, measured on macOS 26.6).
+The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`) with the Linux `bwrap-pidns` and `linux-pgroup` drivers, the Windows `windows-job` driver and the macOS `macos-tree` driver is specified in section 10; the holder-lock track shipped only the two domain primitives above. Measured levels, for the record: Linux kernel (PID namespace when a user namespace is available, else best-effort process group), Windows kernel (Job Object, asynchronous kill, hence the predecessor rule), macOS best-effort (a `setsid` + double-fork escapee survives a group kill, measured on macOS 26.6).
 
 ## 6. Quiescence scan
 
@@ -114,3 +115,33 @@ The containment port of the design (`create(attemptId) → domain`, `spawn_in`, 
 | Node leaf and its callers | [runner.md](../../specs/runner.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
+
+## 10. Containment port
+
+Added by the run supervisor ([run-supervisor spec](../run-supervisor/spec.md)); source `packages/process/rust/src/containment/`, [contract](../../../packages/process/contracts/containment.port.v1.json). The port is an OS-neutral process domain per attempt that can be proven empty. L0: it knows no attempt beyond the id that names a domain, and no envelope, lock or pane. The supervisor never calls bwrap, a Job Object or a process group directly.
+
+| Operation | Meaning |
+|---|---|
+| `create(attemptId) -> domain` | A domain with no process yet |
+| `spawn_in(domain, spec) -> root tuple` | Start the gate inside the domain with an explicit fd map (`spawn_with_fds`, every other fd from 3 up is closed) and an exact environment; the domain id is complete afterwards. The id is identical to the `domainId` of the holder-lock predecessor record, so it can be declared as is |
+| `is_empty(domain) -> empty \| not-empty \| unknown` | The OS's real state; a caller never treats `unknown` as empty |
+| `kill_all(domain, graceMs) -> ok \| refused` | SIGTERM (or job terminate), then SIGKILL after `graceMs` (0 means at once), then wait for empty; `refused` when the driver cannot act (identity mismatch, unsupported) |
+| `guarantee() -> {driver, level, escapes}` | `kernel`, `best-effort` or `unsupported`, with the named escape routes the doctor prints |
+
+Driver selection: Linux uses `bwrap-pidns` when bwrap with user and PID namespaces works (probed once per process and path), else `linux-pgroup`; Windows `windows-job`; macOS `macos-tree`; anything else `unsupported-platform`. Port errors have stable names: `unsupported-platform`, `driver-unavailable`, `spawn-failed`, `namespace-unavailable`, `invalid-bwrap-prefix`, `io`.
+
+| Driver | Mechanism | `is_empty` | Level | Named escapes |
+|---|---|---|---|---|
+| `bwrap-pidns` (Linux) | `bwrap --unshare-pid --as-pid-1 --proc /proc`; the gate is pid 1 of the namespace. `--die-with-parent` only in terminal mode, refused in direct mode | `judge(gate host tuple) == dead`: the kernel kills and reaps every task of the namespace before its init becomes a zombie. No `ns/pid` inode scan (doctor diagnostics only) | `kernel` | Processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker) |
+| `linux-pgroup` (Linux, no user namespace) | Own session and process group for the gate; `kill_all` is `killpg` by identity of the root plus a descendant scan | No process left in the group and `judge(root) == dead`; descendants seen by an earlier scan are still counted while they live | `best-effort` | `setsid` descendants leave the group; a group scan after the leader died can meet a reused pgid; daemons outside the domain |
+| `windows-job` | A named Job Object (`KILL_ON_JOB_CLOSE`, no breakaway); the gate is a member from its first instruction. The job functions belong to the Windows domain code of this crate (`windows_job.rs`) | The job view and contender view of the predecessor contract; never `ActiveProcesses == 0` alone, never an unopenable job read as empty | `kernel` | Processes created outside the job by a service or COM server on the agent's request |
+| `macos-tree` (`pgroup-tree`) | Own session and group for the agent; `killpg` plus a scan of the descendant tree (`proc_listchildpids`) | No process in the group and none in the scanned tree; judged from the record alone, a second scan runs after 500 ms | `best-effort` | `setsid` plus a double fork reparents a descendant to launchd, out of the group and the tree (measured: it survives `killpg`); a group or tree scan after the root died can meet a reused pgid; launchd or XPC services |
+
+**Guarantee level.** `kernel` means the OS itself keeps the domain: a PID namespace, a Job Object. `best-effort` means the driver finds and kills what it can see; on a best-effort platform a free attempt lock does not prove that no writer remains, so adopt waits and scans again, and the attempt's binding records the level. No platform is refused for being best-effort; the level is said out loud (doctor `process-containment`, `fgos run --json`, `dispatch inspect`).
+
+**Escapes stated explicitly** (beyond the table):
+
+1. *Reused pgid.* On `macos-tree` and on `linux-pgroup` (best-effort), a pgid scan made after the leader died can meet a pgid the kernel has since given to an unrelated group. The drivers signal a group only while the leader still matches its recorded identity and otherwise fall back to the descendant list gathered earlier; a window remains where a scan after the leader's death cannot tell a stranger's group from the domain's.
+2. *Windows kill wait.* `kill_all` on `windows-job` terminates the job at once and ignores `graceMs` (Windows has no polite stop for a tree), then waits a fixed 5 seconds (`EMPTY_WAIT` in `containment/windows.rs`) for the job to be empty; if it is not, the answer is `refused`. Open: this bound is not yet read from `lock.predecessorKillWaitMs`.
+
+Domain primitives of section 4 are what the port uses underneath: `linux-gate` and `windows-job` and `macos-tree` records are judged by `domain_is_empty` / `domain_kill_all` or their watchers; `linux-pgroup` is a `domainKind` of the predecessor record.
