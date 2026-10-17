@@ -51,9 +51,8 @@ jobs:
       - name: Build the host binary
         run: cargo build -p fgos
 
-      # The Node tests count helper processes of the whole machine, so test
-      # files run one at a time. Until
-      # then the glob matches nothing. A failing test still fails the step.
+      # Some of these tests count the helper processes of the whole machine, so
+      # the files run one at a time. A failing test still fails the step.
       - name: Node Windows facade tests
         run: |
           host=target/debug/fgos
