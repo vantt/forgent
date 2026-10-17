@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 1,
+  "base": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "mainPin": "eab4d617b",
+  "mainAlreadyAncestor": true,
+  "gap02": "Carried all B0→main distribution deltas including 5d/5g/7/7b, setup contract, activation gate and decision history. Whole changed rows retained verbatim.",
+  "gap03": {
+    "appliedDeltaRoutes": [
+      {
+        "delta": 0,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          3,
+          3
+        ],
+        "mainLines": [
+          3,
+          3
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 1,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          67,
+          67
+        ],
+        "mainLines": [
+          67,
+          67
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 2,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          70,
+          69
+        ],
+        "mainLines": [
+          70,
+          70
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 3,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          71,
+          72
+        ],
+        "mainLines": [
+          72,
+          73
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 4,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          181,
+          181
+        ],
+        "mainLines": [
+          182,
+          188
+        ],
+        "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 5,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          183,
+          185
+        ],
+        "mainLines": [
+          190,
+          192
+        ],
+        "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 6,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          322,
+          321
+        ],
+        "mainLines": [
+          329,
+          333
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 7,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          323,
+          322
+        ],
+        "mainLines": [
+          335,
+          338
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 8,
+        "source": "docs/specs/distribution.md",
+        "sourceLines": [
+          327,
+          326
+        ],
+        "mainLines": [
+          343,
+          343
+        ],
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 10,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          21,
+          22
+        ],
+        "mainLines": [
+          21,
+          23
+        ],
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 11,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          72,
+          73
+        ],
+        "mainLines": [
+          73,
+          74
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 12,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          811,
+          813
+        ],
+        "mainLines": [
+          812,
+          814
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 13,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          857,
+          857
+        ],
+        "mainLines": [
+          858,
+          858
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 14,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          889,
+          892
+        ],
+        "mainLines": [
+          890,
+          892
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 15,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          894,
+          894
+        ],
+        "mainLines": [
+          894,
+          895
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 16,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          903,
+          903
+        ],
+        "mainLines": [
+          904,
+          904
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 17,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          905,
+          905
+        ],
+        "mainLines": [
+          906,
+          906
+        ],
+        "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 18,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1017,
+          1018
+        ],
+        "mainLines": [
+          1018,
+          1019
+        ],
+        "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 19,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1100,
+          1100
+        ],
+        "mainLines": [
+          1101,
+          1101
+        ],
+        "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 20,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1113,
+          1113
+        ],
+        "mainLines": [
+          1114,
+          1114
+        ],
+        "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 21,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1123,
+          1123
+        ],
+        "mainLines": [
+          1124,
+          1124
+        ],
+        "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 22,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1128,
+          1127
+        ],
+        "mainLines": [
+          1129,
+          1134
+        ],
+        "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 23,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1220,
+          1220
+        ],
+        "mainLines": [
+          1227,
+          1227
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 24,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1236,
+          1236
+        ],
+        "mainLines": [
+          1243,
+          1243
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 25,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1248,
+          1248
+        ],
+        "mainLines": [
+          1255,
+          1255
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 26,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1265,
+          1265
+        ],
+        "mainLines": [
+          1272,
+          1272
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 27,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1267,
+          1267
+        ],
+        "mainLines": [
+          1274,
+          1274
+        ],
+        "target": "docs/platform/runner/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 28,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          1488,
+          1488
+        ],
+        "mainLines": [
+          1495,
+          1495
+        ],
+        "target": "docs/platform/runner/architecture/h-69197b459754.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 29,
+        "source": "docs/specs/runner.md",
+        "sourceLines": [
+          3350,
+          3350
+        ],
+        "mainLines": [
+          3357,
+          3357
+        ],
+        "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 30,
+        "source": "docs/specs/observe.md",
+        "sourceLines": [
+          16,
+          16
+        ],
+        "mainLines": [
+          16,
+          16
+        ],
+        "target": "docs/platform/observe/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 31,
+        "source": "docs/specs/observe.md",
+        "sourceLines": [
+          39,
+          39
+        ],
+        "mainLines": [
+          39,
+          39
+        ],
+        "target": "docs/platform/observe/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 32,
+        "source": "docs/specs/observe.md",
+        "sourceLines": [
+          78,
+          77
+        ],
+        "mainLines": [
+          78,
+          81
+        ],
+        "target": "docs/platform/observe/decisions/observe-component-architecture.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "delta": 33,
+        "source": "docs/specs/work-state.md",
+        "sourceLines": [
+          1200,
+          1200
+        ],
+        "mainLines": [
+          1200,
+          1200
+        ],
+        "target": "docs/platform/work-state/spec.md",
+        "method": "verbatim except existing relative links retained for observe and work-state"
+      },
+      {
+        "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "sourceLines": [
+          173,
+          173
+        ],
+        "mainLines": [
+          173,
+          174
+        ],
+        "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md"
+      },
+      {
+        "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "sourceLines": [
+          176,
+          175
+        ],
+        "mainLines": [
+          177,
+          179
+        ],
+        "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md"
+      },
+      {
+        "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "sourceLines": [
+          468,
+          471
+        ],
+        "mainLines": [
+          472,
+          479
+        ],
+        "target": "docs/platform/packaging-distribution/contracts/activation-binding.md"
+      },
+      {
+        "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "sourceLines": [
+          1030,
+          1030
+        ],
+        "mainLines": [
+          1038,
+          1038
+        ],
+        "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+      }
+    ],
+    "needsNothingOrRetainedSource": [
+      {
+        "source": "AGENTS.md",
+        "disposition": "Already merged verbatim from main; frozen area-map-closing-instructions.md declares no platform carrier. L1–L10 links already point to preserved laws; seven design principles remain canonical core instruction sources and generated projection, not a new hand copy. Program-board pointer is already imported. Native rebind its changed instruction units, no root write."
+      },
+      {
+        "source": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+        "disposition": "Body already equals main boundary change: Agent Context Engine composes/selects, packaging delivers/renders/repairs. Retain candidate carriage metadata; no further edit needed."
+      },
+      {
+        "source": "docs/platform-foundations.md",
+        "disposition": "L3 D-ADR0055 note already carried under L11-20. L9 and L10 full wording already present verbatim; add only missing L10 summary and updated legacy spec projection note beside original laws."
+      },
+      {
+        "source": "docs/specs/reading-map.md",
+        "disposition": "No candidate reading-map successor inside platform. Frozen root-authorities map keeps docs/reading-map.md outside scope, navigation merge at cutover. New holder/process and repo-lock routes are conserved in candidate portals/specs and runner pointers. Native carry imported source units now; no protected route edit."
+      },
+      {
+        "source": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+        "disposition": "Retained end-user guide; not retiring platform source. Main diagnostic changes copied into candidate install/release verification evidence. Guide stays untouched."
+      },
+      {
+        "source": "docs/decisions/index.md; docs/explanation/glm-openrouter-executor.md",
+        "disposition": "Other main-imported identity-scope files: retained generated index/end-user guide, no platform-authority copy or generator edit. Included in native rebind manifest."
+      },
+      {
+        "source": "docs/platform/event-store/spec.md; docs/platform/process/spec.md",
+        "disposition": "Main-authored specs already merged, no author edit. Every introduced/changed native unit included in rebind manifest."
+      }
+    ],
+    "additionalRuntimeCarry": "All four runtime-identity source deltas conserved in repository-runtime-layout, activation-binding and architecture sequence.",
+    "manifestClassificationsEqual": true
+  },
+  "gap04": "Ranks 58/70 from signed spec carried as planned mutex rows; registry declares neither. Event Store boundary row added; holder row/§15 say signed, implementation not started. Historical decision text retained. README status/old L10 citation remain Phase 9 as queued.",
+  "N2": {
+    "seal": "2026-10-17T11:55:30Z",
+    "keySha256": "1568f570…4056",
+    "keyUnchanged": true,
+    "status": "semantic key remains valid; candidate hashes stale for 3 files, independent package reviewer must verify N2 before close; no reseal authored",
+    "editedSealedFiles": [
+      {
+        "path": "docs/platform/platform-foundations.md",
+        "edits": "L10 summary and Added in candidate legacy spec RUL3/L1–L10 projection note",
+        "answerOrRouteChanged": false,
+        "cells": "C4 already cites verbatim L9/L10; B1/B2/B4/B7 already use signed L3 note; all original law text and cited anchors unchanged"
+      },
+      {
+        "path": "docs/platform/holder-lock/spec.md",
+        "edits": "§7 planned ranks 58/70 plus §15 signed-but-not-implemented status",
+        "answerOrRouteChanged": false,
+        "cells": "B3 already states 58 < state 60 < 70 from Event Store §4; A cold-lock obligations and B1 §9 unchanged; no new registered/implemented claim"
+      },
+      {
+        "path": "docs/platform/component-boundary.md",
+        "edits": "§4 Event Store row and holder-lock signed implementation-pending wording",
+        "answerOrRouteChanged": false,
+        "cells": "C1/C2/C3 route/owners/contracts unchanged; B6 already requires signed decision separated from implementation; new row restates sealed spec"
+      }
+    ],
+    "unchangedSealedFiles": [
+      "docs/platform/README.md",
+      "docs/platform/governance.md",
+      "docs/platform/architecture-map.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/event-store/spec.md"
+    ],
+    "stopRule": "Any independent finding of changed answer/route/anchor stops acceptance of that edit and returns key to Step 7; never alter key in this author turn."
+  },
+  "newCandidateEdits": [
+    {
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "281aad15e83629d542a9a07b8b68dd09f0fa4eeb12bcf10e3e61b9722a0aeef8",
+      "finalSha256": "40795a63f2fef1bd72b8f7307ecadbf93040acfe086e418a27fe34351f7aa3b9"
+    },
+    {
+      "path": "docs/platform/contracts/architecture-manifest.json",
+      "beforeSha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "finalSha256": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "beforeSha256": "86471bd4c4f88595133209bd9e70e9a7f9db28dbe527b748a080563475194e04",
+      "finalSha256": "ed9c95e5ad71281e436ddc8aa02e6d5aa2be97f122e76ae62a3c9f1929884cfd"
+    },
+    {
+      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "beforeSha256": "c52ff6f2119986e0f4ff2592ade83a8f376a0b7132eaf0dd7f696de6797ffe3b",
+      "finalSha256": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265"
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "beforeSha256": "a3f8d1ff084fc88ea632e8eaff6da19a384a381eb57d7d77a6e7a420a2018ce5",
+      "finalSha256": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "beforeSha256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d",
+      "finalSha256": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "beforeSha256": "7fa1b2360be1c710b408a6b729523bc7bda5e725f0047d9a9dcbd591cc34d5bc",
+      "finalSha256": "737740f38410da971a8afa92326bdbe99b4b1fa2e1336955158162f8f26e1ccf"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "beforeSha256": "e6fd05841efbbab24de026bfdd8ea5c56e785aecfaa6f43965390cdf3560f4db",
+      "finalSha256": "ad7ef96c4b60b4c3f3b6d76da600e42cee1571832c219ff3902124c91cf2da0b"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeSha256": "a607454729dd5e7171fe4b22f9b28b4cd01b441ee4267ee7f4b491ce73a43e61",
+      "finalSha256": "7c50e599e2ae544a3a57a41a8ba006526e1ae554970341143a9ce2f83f5d004f"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "beforeSha256": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+      "finalSha256": "802a1c1c2c5459bb7567307b5a0c22df87d64a136ac1b28250877235740db9d1"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "beforeSha256": "be7366a641ead4f32be7462a4c8e7e9f2f081d50207a8956257d7c239885ffe9",
+      "finalSha256": "f64194e4f363c1202f0309c9c07dfc309fe401e62f3712353e845334e5cee09d"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "beforeSha256": "e050932d75f4a51211f4f163d2999e08a53abd2b944f1742573025cfcc93a89d",
+      "finalSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "beforeSha256": "c1b3d03c43d7d6021fc54c59a8eb97cfb202a70a049819067fb59d86b016a554",
+      "finalSha256": "9cda6915740d71be4816e63e5c5d2a217740fd0fa91c4d1128b83ccd86569ea7"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "beforeSha256": "b94976ab75a5b09d1a888f94b5f77e93833f742d5547aba8696af9b3a1b8b598",
+      "finalSha256": "06cb6ef110523cce86ee1d23eea6b20fd153ce9be4b6653e5e1fa549d960a00e"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "beforeSha256": "1afb7f78f6ac4a97dd2be6c2d847d5c6ab7c14cde3fd6065ac5f600fc1ff62bd",
+      "finalSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "beforeSha256": "4931644a1ad0919d0a6a30f0d504ed6e21464f6eee101a9f381c583fa66a7a12",
+      "finalSha256": "b8b3d8df8bae3fea6497423d8fb4ed648ef51d49b36046bc5fb18915dc795270"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "beforeSha256": "afefc6dc31cf1e4de2f25fb165e74ebafa14e8962000726f8dfa5c4fb8a15a14",
+      "finalSha256": "e99f04b005e41adab13ff07aa37c124cfc9d916d612f064ecf6d963641d13306"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "beforeSha256": "463ff6d0b88d2dba4cad8276d82378bbff23b47097aff42e9b866c758bd81ec3",
+      "finalSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202"
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "beforeSha256": "bb00e9d755a3f69a8c7cf411337c644bc7193a80b254481b65ab19df96ea8caf",
+      "finalSha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469"
+    }
+  ],
+  "review": "Native rebind and matching review pending, no approval carried"
+}

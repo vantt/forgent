@@ -316,7 +316,7 @@ fgctl resolves TopologyContext:
   repositoryId, workspaceId, workStateId,
   machineReleaseStore, workHistoryRoot, runtimeCoordinationRoot,
   workspace installation root
-fgctl acquires install.lock
+fgctl acquires the install lock (<store>/locks/install.lock)
 fgctl obtains a release payload
 fgctl stages release under machineReleaseStore/releases/<artifactDigest>/
 fgctl verifies ReleaseManifest

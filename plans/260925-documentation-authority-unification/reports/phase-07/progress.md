@@ -14,7 +14,7 @@
 - Steps 3 and 4: accepted after the bounded independent 15/15 re-review; A45 and L11-12..L11-14 are applied.
 - Bounded re-review (Lead note): 15/15 ok, 0 rework, pins match, at `df3626178`;
   report `review-a38-step-03-step-04-bounded-rework-01.md`. Steps 3 and 4 accepted.
-- Current action: Step 5 bounded authoring complete; one independent review request prepared, including the reviewer-held seeded remainder draw. Step 5 remains reviewing.
+- Current action: Steps 1–8 accepted; Step 9 item 1 candidate authoring is frozen for the runner commit. The separate package turn owns native carry/rebind/review and closing proofs; provenance/ratchet parks remain explicit.
 - L11-15: main `0d6da9033` landed through merge `21555f026`. The holder-lock and process specs and component-boundary merge edit join Step 5/6 inventory. All eight main-imported identity-scope changes ride the Step 9 native carry; unsynced identity before that carry is expected.
 - Assignment override: no `fgos` CLI may run this turn. New evidence artifacts use the established `reports/phase-07/` sibling naming pattern; convention resolution cannot be rerun under this explicit restriction. No generated naming policy is changed.
 - Final turn verification: changed JSON parses; matrix/stop and unpark assertions
@@ -199,9 +199,9 @@ resolved path, author, reviewer, digest and status here.
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
-| 7 | accepted | Re-sealed after L11-19/L11-20: `review-a38-step-07-key-reseal-02.md`, sealedAt 2026-10-17T11:55:30Z, keySha256 `1568f570…4056`, commit `5d19b4940` | none | no candidate edit after seal |
+| 7 | accepted | Re-sealed after L11-19/L11-20: `review-a38-step-07-key-reseal-02.md`, sealedAt 2026-10-17T11:55:30Z, keySha256 `1568f570…4056`, commit `5d19b4940` | none | Step 9 N2 records three answer/route-preserving edits; independent confirmation pending |
 | 8 | accepted | Round 2 PASS (`fresh-reader-p7-r2-score.md`): reader-3 and reader-4 each A 6/6, B 6/6, C 6/6, probes 3/3, 0 fabricated anchors, 0 out-of-scope reads, 0 legacy authority; round 1 FAIL kept on record | P7-DOC-GAP-04 reader-found defects routed to Step 9 / Phase 9 | none |
-| 9 | ready | Reader gate passed; main merges after the seal need the N2 reader-staleness check | none | wait for owner go-ahead |
+| 9 | in-progress | Item 1 author content frozen; `step-09-author-conservation.json`, `step-09-rebind-units.json`, `step-09-author-checks.json` | PARK-PROTECTED-01 / S6-RATCHET-03 remain explicit close-proof parks | runner commits; separate item 2 package turn |
 
 Allowed states are `not-started`, `ready`, `in-progress`, `parked`, `reviewing`,
 `accepted`, and `rejected`. Every handoff updates this ledger with exact evidence and
@@ -305,3 +305,225 @@ All are authored by the session above; reviewer and seal remain pending.
 Step 7 review packaging registration: `review-input-step-07-key-01/part-01-gaps.json`
 and `review-input-step-07-key-01/part-02-key.json`, one logical request with
 52 and 54 explicit entries respectively (each below 60 entries / 400 KB).
+
+## Step 9 item 1 — Final candidate author freeze
+
+Author `fgos-run_unit-run-179224adb775ef`, 2026-10-17. This is the author handoff,
+not acceptance of Step 9. Main pin `eab4d617b` is already an ancestor; no merge or git
+write ran. No fgOS CLI, native carry/sync, global inventory, D/E, comparator or full
+suite ran. No gate, baseline, generated output, shipped contract or protected source
+was edited. The runner commits these authored bytes before the package turn.
+
+- **P7-DOC-GAP-02:** all B0→main distribution changes carried: rows 5d/5g/7/7b,
+  setup/fix effects and config default, activation probes/kernel locks/Windows gate,
+  and decision history. Setup details go to its existing split contract.
+- **P7-DOC-GAP-03:** runner deltas conserved across spec, operations, reconcile,
+  workflow, rules and decision-history successors; Observe lock/history and Work
+  RUL10 updated. L9/L10 full law text was already verbatim: only missing L10 index
+  and updated spec-projection facts are added beside it. L3's signed note is retained.
+  Manual architecture classifications now equal main's `files` map (map/carriage
+  fields retained). Install-guide changed rows and executor example are conserved
+  in candidate install/release evidence. A further full identity-path comparison
+  found runtime-identity source deltas; retained layout detail, activation binding
+  and init sequence now carry them too.
+- **Needs nothing / retained sources:** AGENTS has no platform carrier per the frozen
+  closing-instructions map; its main law/design-principle/program-board imports are
+  already present. Instruction-composition's owner split is already merged, with
+  candidate metadata preserved. Reading-map retains its outside-platform singleton
+  route; candidate holder/process/repo-lock paths are covered. Main's generated
+  decision index and audience-facing GLM guide remain retained imports, never copied
+  or regenerated here. See per-source dispositions in the conservation report.
+- **P7-DOC-GAP-04:** holder-lock §7 lists `event-seal` 58 / `event-append` 70 as
+  planned mutexes from signed Event Store §4; neither exists in the current registry.
+  Implementation has not started. Add the Event Store component row; current holder
+  row and §15 now say signed, implementation pending. Historical decision text stays.
+  README Accepted/Candidate wording and old L10→L3 citation remain Phase 9 as queued.
+
+All 19 candidate files edited in this author turn, with before/final hashes and
+source/main hunk routes, are in `step-09-author-conservation.json` and the pre-edit
+`post-review-edits.md` log:
+
+- `docs/platform/component-boundary.md`
+- `docs/platform/contracts/architecture-manifest.json`
+- `docs/platform/holder-lock/spec.md`
+- `docs/platform/observe/decisions/observe-component-architecture.md`
+- `docs/platform/observe/spec.md`
+- `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md`
+- `docs/platform/packaging-distribution/contracts/activation-binding.md`
+- `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+- `docs/platform/packaging-distribution/spec.md`
+- `docs/platform/packaging-distribution/verification/install-and-release-proof.md`
+- `docs/platform/platform-foundations.md`
+- `docs/platform/runner/architecture/h-69197b459754.md`
+- `docs/platform/runner/architecture/h-e53a3a9829a8.md`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md`
+- `docs/platform/runner/operations/h-51f5cd7279fd.md`
+- `docs/platform/runner/spec.md`
+- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`
+- `docs/platform/work-state/spec.md`
+
+### N2 — Reader staleness disposition
+
+The eight-file sealed union was checked, not only the newly merged files. Key SHA-256
+remains `1568f570026679c959cbc9f42af8e2d0542ee8d5ee9022ac78ad7b10c94a4056`,
+seal `2026-10-17T11:55:30Z`; all 41 cited anchors resolve. The key was not edited.
+
+| Edited sealed file | Effect on sealed answers/routes |
+|---|---|
+| `platform-foundations.md` | L10 index + legacy RUL3 projection note only; full L3/L9/L10 and C4/B answers/anchors unchanged. |
+| `holder-lock/spec.md` | §7 spells out ranks already required by B3; §15 now matches the signed, unimplemented design already required by B2/B4. A obligations and B1 §9 route unchanged. |
+| `component-boundary.md` | Event Store row repeats the signed spec; holder wording distinguishes design from implementation. C1/C2/C3 owner/contract answers and routes unchanged. |
+
+README, governance, architecture-map, Process and Event Store are the five unchanged
+sealed files. **No sealed answer, route or cited anchor changes; semantic key remains
+valid.** Its pinned candidate hashes are stale for the three files above; do not
+silently refresh them or claim a fresh seal. Independent changed-row review must
+confirm this N2 assessment. If it finds an answer/route/anchor change, STOP acceptance
+of the affected edit and return to Step 7; no author key mutation or reader rerun now.
+
+### Protected provenance and ratchet — re-park honestly
+
+`PARK-PROTECTED-01`: raw reading-map equality with main remains false. The precise
+main→branch difference is one transition note and two compounding→knowledge rows;
+**all three complete branch passages already exist in B0**. Working bytes equal HEAD,
+there is no first-parent non-merge Phase 7 protected authoring, and no protected
+working edit. Hashes/ranges are in `step-09-author-checks.json`. This resolves the
+cause, not the literal equality requirement. Re-park the formal proof for Lead:
+the package must authenticate those inherited bytes across B0 and all merge parents,
+then obtain an explicit provenance disposition; never label raw equality green or
+rewrite the protected source to hide the delta.
+
+`S6-RATCHET-03`: the unchanged checker now reports **seven** digest mismatches,
+not the old Step 6 three: runtime-identity legacy architecture, distribution, observe,
+reading-map, runner, work-state and platform-foundations specs. Every flagged file
+is byte-equal to HEAD; six equal pinned main, reading-map has the inherited difference
+above. Candidate conservation cannot fix a legacy digest exception. No checker,
+exception or baseline is changed. The package must reproduce this exact set, prove
+main-import/inherited provenance, and demonstrate a genuinely green ratchet before
+close. If still red, D zero-fatal/Step 9 close is blocked: route the separately scoped
+reviewed exception update (`scripts/check-legacy-docs-ratchet.exceptions.json`) or
+upstream repair to Lead. Do not waive it, hide it in expected strict-E opens or alter
+the baseline. The present author assignment expressly permits this re-park.
+
+### Exact rebind queue and package-turn commands
+
+`step-09-rebind-units.json` is the exact bounded list, not a native identity result:
+**48 files; 1,237 final content/occurrence/context units; 869 displaced B0 units;
+31 routing/digest obligations = 2,137 queue records**. This includes both whole-file
+JSON manifest units. `unitColumns` defines the compact tuples; `files` binds every
+index to before/final SHA-256. Each content/context key uses the unchanged production
+extractor, adjacent unit digests and duplicate occurrence. Previous units must get
+native successor/retirement/gap dispositions, never disappear. Pairing old/current
+records during review may reduce the logical review-row count; no queue record may
+be omitted. The manifest additionally names **15 affected A34 rows** and **7 affected
+identical-owner groups**; they are join obligations, not extra fabricated native IDs.
+All final changed units, native additional context effects, candidate-unverified
+lists and partial carries return to pending; carry no approval.
+
+The 31 independent bindings are exactly X-DEFECT-01..14 (14), X-NAV-01..04 (4),
+QF-01..13 (13), individually listed in the manifest. Bind DEFECT to the actual final
+correction or content-bearing rationale/queue record when parked; NAV to the final
+portal/header units, QF to the full family routing record in the phase file/owner
+answers. Resolve source and target digests from actual content and occurrence,
+not note ids, path strings or route labels. None is rebound in this author turn.
+
+Run one process at a time, roughly 11 GiB maximum for a heavy Node job. No overlap
+with any other inventory, carry, D/E, comparator or suite process. First pin the runner's
+committed author tree and verify every manifest final-file hash; reports/ledger-only
+commits may follow, identity-source bytes may not. Never run a second refresh merely
+to pick up report changes. N1 content repair must return to author item 1.
+
+The following are the package turn's commands, **not executed here**. `$S/rebind.mjs`,
+`$S/check-both.mjs` and `$S/closure-inputs.mjs` are scratch-only package adapters to be
+prepared in that turn against the frozen manifest and unchanged native exports;
+they are not existing CLI verbs or shipped mechanisms. Do not run these lines until
+the adapters exist and their read/write scopes have been checked. They may edit only
+authorized ledger/report bindings, never candidate bytes, gates or approval fields.
+
+```bash
+P=plans/260925-documentation-authority-unification
+R="$P/reports/phase-07"
+S=/tmp/fgos-work/phase-07-step-09-package
+F=$(git rev-parse HEAD)
+mkdir -p "$S"
+cp "$P/reports/phase-06/working-identity-registry.json" "$S/identity-registry.json"
+
+# Exactly ONE native carry + full HEAD inventory refresh, over committed bytes.
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240   scripts/generate-doc-inventory.mjs --refresh --commit "$F"   --identity-registry "$S/identity-registry.json"   --json-out "$S/doc-inventory.json" --md-out "$S/doc-inventory.md"
+
+# Rebind every manifest row by native id + content + occurrence/context.
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240 "$S/rebind.mjs"   --queue "$R/step-09-rebind-units.json" --commit "$F"   --inventory "$S/doc-inventory.json" --registry "$S/identity-registry.json"   --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions"   --out "$S/rebound-rows.json"
+
+# Before the following commands: partition the rebound queue, obtain independent
+# matching review (including N2), and apply verdicts only to bound current tuples.
+# Ledger/report-only rework needs no second native carry. Pending is never approval.
+# D both priors explicitly through unchanged checkInventory(previousRegistries).
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240 "$S/check-both.mjs"   --mode D --commit "$F" --inventory "$S/doc-inventory.json"   --registry "$S/identity-registry.json"   --prior "$P/reports/identity-registry.json"   --prior "$P/reports/phase-02-identity-registry.json"   --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions"   --out "$S/D-both.json"
+
+# D each prior (capture each exit separately; stop acceptance on any fatal).
+for prior in identity-registry phase-02-identity-registry; do
+  env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240     scripts/check-doc-inventory-gates.mjs     --inventory "$S/doc-inventory.json" --identity-registry "$S/identity-registry.json"     --previous-registry "$P/reports/$prior.json"     --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions" --json     > "$S/D-$prior.json"
+done
+
+# Generate scope.args and comparator inputs from current authored/native state.
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240 "$S/closure-inputs.mjs"   --commit "$F" --inventory "$S/doc-inventory.json"   --registry "$S/identity-registry.json" --rebound "$S/rebound-rows.json"   --previous-applied "$P/reports/phase-06/step10-final-close-applied-rows.json"   --previous-expected "$P/reports/phase-06/step10-final-close-expected.json"   --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions"   --out-dir "$S"
+
+# E both; adapter loads complete explicit scope.json and the same two priors.
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240 "$S/check-both.mjs"   --mode E --commit "$F" --inventory "$S/doc-inventory.json"   --registry "$S/identity-registry.json" --scope-file "$S/scope.json"   --prior "$P/reports/identity-registry.json"   --prior "$P/reports/phase-02-identity-registry.json"   --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions"   --out "$S/E-both.json"
+
+# E each: scope.args is NUL-delimited repeated --scope/path arguments.
+for prior in identity-registry phase-02-identity-registry; do
+  xargs -0 env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240     scripts/check-doc-inventory-gates.mjs --strict     --inventory "$S/doc-inventory.json" --identity-registry "$S/identity-registry.json"     --previous-registry "$P/reports/$prior.json"     --decisions "$P/pilot/decisions" --decisions "$P/ledger/decisions" --json     < "$S/scope.args" > "$S/E-$prior.json"
+done
+
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=10240   scripts/compare-doc-global-closure.mjs --gate "$S/E-both.json"   --actual "$S/applied-rows.json" --expected "$S/closure-lists.json"   > "$S/comparison.json"
+```
+
+Adapter requirements: `rebind` joins each queued current/displaced occurrence against
+native units/retiredUnits/identityGaps and the actual source→target ledger; records all
+additional native effects; updates every impacted target digest, candidate list,
+identical-owner tuple and A34 binding; produces the 31 real bindings and an exhaustive
+zero-omission receipt. `check-both` calls unchanged `checkInventory`, loading sharded
+inventory through its existing artifact loader, native registry bytes, current
+vocabulary/dropped register/ratchet and both decision directories; D has no source
+filter, E sets `strict:true`. Do not rely on CLI default priors with a scratch registry:
+its committed-HEAD lookup would target the scratch path and fail to bind the intended
+prior. Both prior arrays must be passed explicitly in the adapter.
+
+`closure-inputs` builds **two independent inputs**: actual rows via native
+`applyDecisions`; expected holds/partialCarries/identicalUnits/candidateLists from the
+authored, reviewed declarations and rebind receipts. Never derive expected from the
+strict gate output. Explicit scope is the union of every sourcePath in the Phase 6
+final-close applied claims/gaps plus every changed manifest path and newly rebound
+source, deduplicated and verified non-vacuous. It preserves the entire Phase 6 scope,
+not only changed files. `scope.json` stores paths, `scope.args` stores one NUL-delimited
+`--scope`, path pair per entry; ensure xargs makes exactly one invocation. If ARG_MAX
+would split it, use the API adapter with that exact scope for each prior instead.
+
+The existing comparator must exit 0 with `ok=true`, zero differences and `errors=[]`.
+D both/each must have zero fatal; strict E both/each may be nonzero only for the exact
+independently declared Phase 8/9 open sets (partial carries, explicit identical-owner
+exceptions, candidate-unverified units and any individually authorized holds). Prior
+Phase 6 counts are provenance, not new expectations. Ratchet failures and unexplained
+native IDs are not expected strict-E opens. Capture exit codes and sets separately;
+no `|| true` acceptance. Before the global gates, partition the one logical changed-row request at ≤60 entries
+and ≤400 KB per part, no approval carry; obtain independent matching review, including
+N2 and the parked rows, and apply only exact matching verdicts. After passing the
+global gates, continue Step 9's separate hostile checkpoint/truth
+sample, retirement dry-run, scorecard and real suite. No closure is claimed here.
+
+### Author checks and remaining boundaries
+
+`step-09-author-checks.json`: A/B/C pass; H strict checks 217 candidate/promoted
+files with zero findings; I links equal HEAD and frozen baseline bytes are unchanged,
+while raw frozen equality remains disclosed false for the three imported routes.
+No new early reader switch. `git diff --check` passes; 41/41 key anchors pass. All
+candidate edits are logged; every JSON report parses. Impact-analysis is not queried:
+no symbol is edited and the assignment forbids the fgOS CLI. Preview is not started:
+no MDView tool is available, and a CLI fallback would write outside this assignment.
+
+Author item 1 is complete for runner commit. Remaining close blockers are the formal
+protected reading-map provenance disposition and the genuinely red ratchet; native
+carry/rebind/review/D/E/comparator and later Step 9 proofs remain the package turn's
+work. No exception, approval, law or authority change is inferred from this handoff.

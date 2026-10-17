@@ -156,10 +156,14 @@ Publishing must be atomic from the perspective of invocations. A project
 command must see either the previous ready workspace binding or the new ready
 workspace binding, never a half-prepared runtime.
 
-`fgctl` must hold the release store `install.lock` before staging, verifying,
-repairing, upgrading, rolling back, or quarantining release content. It must
-also hold a workspace activation lock before writing that workspace's
-`activation.json`. Projection writes are not part of the activation publish;
+`fgctl` must hold the release store install lock (kernel lock
+`<store>/locks/install.lock`) before staging, verifying, repairing, upgrading,
+rolling back, or quarantining release content. It must also hold the workspace
+activation lock (kernel lock `.fgos/locks/activation.lock`) before writing that
+workspace's `activation.json`. Both are kernel locks without TTL or stale
+reclaim: a killed holder frees the lock at once. On Windows, `fgctl init`,
+`upgrade` and `repair` refuse with `lock-driver-unavailable` until the Windows
+lock driver exists. Projection writes are not part of the activation publish;
 they belong to local `fgos init` / `fgos doctor --fix` under projection locks
 defined by workspace topology.
 

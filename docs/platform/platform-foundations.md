@@ -54,6 +54,7 @@ During migration:
 | L7 | Run complete, merge complete, and durable are different states. | `docs/platform-foundations.md` |
 | L8 | Always-loaded doctrine follows placement, transport, and anchor-suite rules. | `docs/platform-foundations.md` |
 | L9 | A single work item has separate run, merge, and durability completion levels. | `docs/platform-foundations.md` |
+| L10 | Extend through the existing door; do not add a parallel read or write path. | `docs/platform-foundations.md` |
 | RUL11 | Tùm lum is not “heavy”; when the system is messy, consolidate boundaries and contracts. | `docs/platform-foundations.md`, `docs/specs/platform-foundations.md` |
 
 ## 4. Design Gate
@@ -376,3 +377,9 @@ entropy-trend, evolving human-gated). Chi tiết + candidate map: consult report
 đã dẫn ở đầu. Ba candidate F1 của distill (`porting-outcome-lifecycle`,
 `distillery-entropy-trend`, `seal-digest-zero-effort`) chạy song song được —
 distill là phòng thí nghiệm compound đầu tiên.
+
+## Added in candidate: Main projection conservation
+
+The main spec projection now cites laws L1–L10 for review (including the full L9/L10 text retained above). Its RUL3 supersession annotation is conserved here; the original law text remains unchanged.
+
+- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).

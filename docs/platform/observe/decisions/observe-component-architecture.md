@@ -23,6 +23,12 @@ Superseded by: None
 
 ## 6. Lịch sử quyết định
 
+### 2026-10-16 — Store lock chuyển sang kernel lock
+
+Store lock đổi từ file `O_EXCL` có pid/TTL sang kernel lock `<fgosDir>/locks/observe.lock` của holder-lock: chờ 5 giây, không TTL, snapshot shard ghi dưới lock, holder chết thì lock nhả ngay. Đường cũ `.fgos/observe/.lock` thành thư mục tombstone. Quyết định gốc và bằng chứng: `docs/platform/holder-lock/spec.md` §15.
+
+
+
 ### D-ADR0037 (Observe Component Architecture)
 
 - **Một component Observe**: Gom toàn bộ đo lường (`fgos metrics`) và friction (`fgos friction`) vào một crate Rust duy nhất (`packages/observe/rust`).

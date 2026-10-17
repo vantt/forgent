@@ -87,7 +87,6 @@
     "src/runner/iron-law-gate.mjs": "infra",
     "src/runner/frozen-judge.mjs": "domain",
     "src/runner/merge.mjs": "infra",
-    "src/runner/main-checkout-lock.mjs": "infra",
     "src/runner/main-checkout-activity.mjs": "infra",
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
@@ -275,6 +274,15 @@
     "src/state/step-fsm.mjs": "domain",
     "src/verbs/state/step.mjs": "use-case",
     "src/runner/operation-choice.mjs": "use-case",
-    "src/runner/work-dispatch.mjs": "use-case"
+    "src/runner/work-dispatch.mjs": "use-case",
+    "src/runner/lock-status.mjs": "infra",
+    "src/runner/dispatch/llm-accounts.mjs": "infra",
+    "src/setup/model-pool-checks.mjs": "use-case",
+    "src/runner/dispatch/tier-cell.mjs": "infra",
+    "src/runner/main-fgos-checkpoint.mjs": "infra",
+    "src/runner/repo-locks.mjs": "infra",
+    "src/util/format-lock-duration.mjs": "kernel",
+    "src/runner/lock-fence.mjs": "infra",
+    "src/runner/execution/explain.mjs": "infra"
   }
 }

@@ -123,8 +123,12 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 40 | `worktree-admin` | mutex |
 | 50 | `main-checkout` | mutex |
 | 55 | git's own `index.lock`: outside fgOS, no row; the hook tries rank 50 once | — |
+| 58 | `event-seal` (signed design; not registered or implemented) | mutex (planned; Event Store spec §4) |
 | 60 | `state`, `porting-events` | hot-mutex |
+| 70 | `event-append` (signed design; not registered or implemented) | mutex (planned; Event Store spec §4) |
 | 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `observe`, `activation`, `install` | mutex, lease |
+
+The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055; implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.
 
 Locks cut over by this track: `gateway`, `runner`, `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.
 
@@ -240,7 +244,7 @@ The main checkout is written by claim, merge, land and the `.fgos` checkpoint. I
 
 ## 15. Hot state mutex and porting events (pending)
 
-Not specified here. `events.lock`, `runtime/claims.lock` and `porting/events.lock` stay the in-process locks of the state store, unchanged, until the event store decision says which locks the store keeps and in what form. Nothing in this component imports the event log, a shard, `events.lock` or a state transaction: the `.fgos` checkpoint of the main door is a detachable adapter, and every test of the repo locks passes with an adapter that does nothing. The registry keeps the rows `state` and `porting-events` (rank 60, kind `hot-mutex`) as the reserved place in the lock order; no fence is placed for them and no code takes them through this port.
+Not specified here. `events.lock`, `runtime/claims.lock` and `porting/events.lock` stay the in-process locks of the state store, unchanged pending implementation of the signed Event Store decision (D-ADR0055, implementation not started). The signed design in Event Store spec §4 now declares the future ranks and ownership; it does not claim those locks have cut over. Nothing in this component imports the event log, a shard, `events.lock` or a state transaction: the `.fgos` checkpoint of the main door is a detachable adapter, and every test of the repo locks passes with an adapter that does nothing. The registry keeps the rows `state` and `porting-events` (rank 60, kind `hot-mutex`) as the reserved place in the lock order; no fence is placed for them and no code takes them through this port.
 
 ## 16. `worktree-admin`
 

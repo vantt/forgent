@@ -180,11 +180,17 @@ Added in candidate — complete source units from `docs/specs/distribution.md` a
   same default schema the project-local file gets, or fills in any missing
   key, every time it runs, regardless of which project it's run from;
   a value the caller already customized at the global level is never
-  overwritten.
+  overwritten. The lock directories of row 5g are created when missing:
+  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);
+  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the
+  defaults the fill-missing-only merge adds. Because setup runs every
+  registered fix, it also attempts the `lock-fences` cutover step (row 7b),
+  which places nothing unless the workspace's activated release already
+  runs holder-lock and no other fgOS process of the workspace is running.
 - **Side effects:** the caller's own shell profile file(s), local project
-  config file, and global config file (`~/.fgos/config.json`) may be
-  modified; nothing outside the caller's own environment is touched, and
-  no network access happens.
+  config file, global config file (`~/.fgos/config.json`), and the two lock
+  directories may be created or modified; nothing outside the caller's own
+  environment is touched, and no network access happens.
 - **Afterwards:** the caller sees exactly what changed — which profile
   file(s) gained the source line (or already had it), which project config
   settings were newly added (or that none were needed), and which global

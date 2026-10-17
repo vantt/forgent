@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "author": "fgos-run_unit-run-179224adb775ef",
+  "headBeforeRunner": "9a5d5505636eb4a9c65111a04b990f0b41713083",
+  "A": {
+    "workingViolations": [],
+    "historyViolations": [],
+    "finalWorkingPathsChecked": 24
+  },
+  "B": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "equal": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "equal": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48",
+      "equal": true
+    }
+  ],
+  "C": {
+    "switchboardUnchangedFromB0": true
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "result": {
+      "counts": {
+        "files": 612,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 394
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    }
+  },
+  "I": {
+    "command": "git grep -h -o 'docs/platform/[^ )`|>\"]*' -- AGENTS.md CLAUDE.md README.md docs/README.md docs/reading-map.md docs/specs/reading-map.md | sort -u | diff - <frozen-baseline>",
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "headLinks": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "equalToHEAD": true,
+    "equalToFrozenBaseline": false,
+    "frozenBaselineUnchanged": true,
+    "baselineSha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1",
+    "importedDelta": [
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "posture": "bounded author pass: no new reader switch; frozen equality remains disclosed red, not rebaselined"
+  },
+  "protectedWorkingPaths": [],
+  "ratchet": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs --json",
+    "exit": 1,
+    "result": {
+      "clean": false,
+      "findings": [
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+          "message": "docs/architect/packaging-distribution/runtime-identity-and-activation.md: maintained file (class: maintained-authority) modified under legacy root without reviewed exception in exceptions ledger (baseline a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6, current 6cc50b90e1275f4b349dcf8c6b009c957f71c38ab7f27877183f5edd72b5180e)."
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/distribution.md",
+          "message": "docs/specs/distribution.md: modified maintained file has exception but digest mismatch (expected 2edf4befb296c5ca466f7905bc18da5bbc7ed047f86b25b0682cc6fa833e617a, got 67de192b44b02f6cc8acd481e17efb8c14b1b07cee8b0773237c48e97209dd20)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/observe.md",
+          "message": "docs/specs/observe.md: new maintained file has exception but digest mismatch (expected 7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4, got bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/reading-map.md",
+          "message": "docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250, got ff12350c5548d1ec2832998c15bc38bf7866b055a7294d451b846fc44089d91f)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/runner.md",
+          "message": "docs/specs/runner.md: modified maintained file has exception but digest mismatch (expected 1c6c01ad2197db7ef884314de4ca40fa58fd3f9e0bfcd2953de42e100d7ea8a8, got be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/work-state.md",
+          "message": "docs/specs/work-state.md: modified maintained file has exception but digest mismatch (expected aa7f9f1041531a918c58cdf5f41995a257c5ec8c353d4237a21096d24b60eef0, got 78728821b393a1a475a99ae8837f71851d3b9ce114c958c70138a3c7d6a541d4)"
+        },
+        {
+          "type": "unused-exception",
+          "path": "docs/specs/platform-foundations.md",
+          "message": "docs/specs/platform-foundations.md: exception in ledger is unused (no matching edit or new file exists on disk)."
+        }
+      ],
+      "stats": {
+        "baselineFilesCount": 994,
+        "onDiskFilesCount": 995,
+        "accountedEditsCount": 21,
+        "accountedNewFilesCount": 0,
+        "findingsCount": 7
+      }
+    },
+    "findingImports": [
+      {
+        "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "sha256": "6cc50b90e1275f4b349dcf8c6b009c957f71c38ab7f27877183f5edd72b5180e",
+        "equalHEAD": true,
+        "equalMainParent": true
+      },
+      {
+        "path": "docs/specs/distribution.md",
+        "sha256": "67de192b44b02f6cc8acd481e17efb8c14b1b07cee8b0773237c48e97209dd20",
+        "equalHEAD": true,
+        "equalMainParent": true
+      },
+      {
+        "path": "docs/specs/observe.md",
+        "sha256": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+        "equalHEAD": true,
+        "equalMainParent": true
+      },
+      {
+        "path": "docs/specs/reading-map.md",
+        "sha256": "ff12350c5548d1ec2832998c15bc38bf7866b055a7294d451b846fc44089d91f",
+        "equalHEAD": true,
+        "equalMainParent": false
+      },
+      {
+        "path": "docs/specs/runner.md",
+        "sha256": "be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9",
+        "equalHEAD": true,
+        "equalMainParent": true
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "sha256": "78728821b393a1a475a99ae8837f71851d3b9ce114c958c70138a3c7d6a541d4",
+        "equalHEAD": true,
+        "equalMainParent": true
+      },
+      {
+        "path": "docs/specs/platform-foundations.md",
+        "sha256": "154ad2c92d0b016bec982500b7f4aec980bc0de2bd331346c2cfd13197b28cb1",
+        "equalHEAD": true,
+        "equalMainParent": true
+      }
+    ]
+  },
+  "readingMapProvenance": {
+    "status": "PARK-PROTECTED-01 re-parked; raw main-parent equality remains false, no waiver",
+    "path": "docs/specs/reading-map.md",
+    "mainPin": "eab4d617b",
+    "mainBlob": "eed506e8777bfbdb2d19a3d62b5d9ca775ae87ed",
+    "headBlob": "6c21d329290ef9d31c87471f91ceb7c2ae02eb44",
+    "workingBlob": "6c21d329290ef9d31c87471f91ceb7c2ae02eb44",
+    "rawEqualMain": false,
+    "workingEqualHEAD": true,
+    "mainToBranchDeltas": [
+      {
+        "operation": "insert",
+        "mainLines": [
+          2,
+          1
+        ],
+        "branchLines": [
+          2,
+          9
+        ],
+        "branchTextSha256": "75965b722f24ed6139319f64b1c4ffcf82c93e10a65bf59b7ba3f0075dc24b2f",
+        "alreadyInB0": true,
+        "summary": "inherited transition note"
+      },
+      {
+        "operation": "replace",
+        "mainLines": [
+          26,
+          26
+        ],
+        "branchLines": [
+          34,
+          34
+        ],
+        "branchTextSha256": "2ce7c4c81ddd0699c74bf86877c02631eb5cd06bdb9c823761256c87d644dd54",
+        "alreadyInB0": true,
+        "summary": "inherited compounding-to-knowledge skill rename"
+      },
+      {
+        "operation": "replace",
+        "mainLines": [
+          29,
+          29
+        ],
+        "branchLines": [
+          37,
+          37
+        ],
+        "branchTextSha256": "5ea6863edd0f76343c12c9289e1be64e39f9fb16dfcebb71aa63e0345652a091",
+        "alreadyInB0": true,
+        "summary": "inherited compounding-to-knowledge skill rename"
+      }
+    ],
+    "allDeltasAlreadyInB0": true,
+    "packageObligation": "Authenticate inherited transition note and two knowledge rename rows against B0/merge parents; never report raw imported-blob equality green or rewrite protected reading-map. Lead must accept provenance or obtain a separately scoped correction."
+  },
+  "diffCheck": {
+    "command": "git diff --check",
+    "exit": 0
+  },
+  "notRun": [
+    "native carry/sync",
+    "global inventory",
+    "D/E",
+    "comparator",
+    "full npm test"
+  ],
+  "scope": "Step 9 item 1 only; package/close not accepted",
+  "keyAnchors": {
+    "references": 41,
+    "invalid": [],
+    "keySha256": "1568f570026679c959cbc9f42af8e2d0542ee8d5ee9022ac78ad7b10c94a4056"
+  },
+  "finalAuthorValidation": {
+    "candidateEditsLoggedAndHashesMatch": 19,
+    "rebindFilesHashesMatch": 48,
+    "queueRecords": 2137,
+    "placeholderRows": 31,
+    "affectedIdenticalOwnerGroups": 7,
+    "jsonParse": "pass",
+    "diffCheckExit": 0
+  }
+}
