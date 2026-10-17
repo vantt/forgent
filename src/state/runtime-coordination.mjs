@@ -132,8 +132,14 @@ export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 1
  */
 export function readClaim(fgosDirInput, id) {
   if (!id || typeof id !== 'string') return null;
-  const fgosDir = getMainFgosDir(fgosDirInput);
-  const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
+  const claimsDir = resolveFgosFile(getMainFgosDir(fgosDirInput), FGOS_FILE.CLAIMS_DIR);
+  return readClaimFile(claimsDir, id);
+}
+
+// Reads one claim file from an already-resolved claims directory. Resolving
+// the main checkout spawns git, so a caller reading many claims resolves once
+// and calls this per file instead of going back through `readClaim`.
+function readClaimFile(claimsDir, id) {
   const claimFilePath = path.join(claimsDir, `${id}.json`);
   let raw;
   try {
@@ -172,7 +178,7 @@ export function readClaims(fgosDirInput) {
   const claims = {};
   for (const file of files) {
     const id = file.slice(0, -5);
-    const claim = readClaim(fgosDir, id);
+    const claim = readClaimFile(claimsDir, id);
     if (claim) {
       claims[id] = claim;
     }

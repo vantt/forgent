@@ -15,7 +15,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > **Update 2026-10-05: glm no longer uses the claude CLI.** Behind the
 > OpenRouter gateway, the claude CLI in a herdr pane stopped at
 > "Please run /login · API Error: 401 Missing Authentication header" every
-> time, so `glm` and `glm-herdr` now run the `pi` CLI against OpenRouter
+> time, so `glm` now runs the `pi` CLI against OpenRouter
 > (`z-ai/glm-5.3` from the `z-ai` model policy, raised from 5.2 on 2026-10-05), the same shape as `deepseek`
 > (headless) and `xai` (herdr pane). The key is still only a `${VAR}`
 > reference: `OPENROUTER_API_KEY` is set from `${GLM_OPENROUTER_API_KEY}`.
@@ -35,8 +35,9 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > pane this looks like one call repeated forever. The Unit then runs until the
 > output buffer (10 MiB) or the ceiling kills it and fails as an execution failure
 > with no fallback to the next executor. The capability preference pools name
-> `glm` with `pi-cli-bwrap-openrouter`, not `glm-herdr`, which stays defined for
-> investigation. The model was raised to `z-ai/glm-5.3` on 2026-10-05 in the hope that it
+> `glm` with `pi-cli-bwrap-openrouter`. The pane executor `glm-herdr` was removed on
+> 2026-10-17 when each family got exactly one executor: a pane invocation on `glm`
+> would be chosen inside herdr whenever a pool fell back to glm, so glm runs headless only. The model was raised to `z-ai/glm-5.3` on 2026-10-05 in the hope that it
 > does not degenerate: 16 of 16 headless runs passed (medium and high), but 5.2 also passed
 > 24 of 24 in the same session, so this is not proof the loop is gone; watch for it.
 

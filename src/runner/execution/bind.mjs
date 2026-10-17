@@ -6,7 +6,7 @@ import { deriveProviderFamily, resolveTierModel } from '../dispatch/resolve.mjs'
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
-import { MODEL_POLICY_TIERS, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { resolveAccountPin } from './account-pin.mjs';
 
@@ -115,6 +115,25 @@ export function getProviderFamily(runnerConfig, executorId) {
  * @param {object} ctx
  * @returns {object} success binding or { refused: { reason, detail } }
  */
+/**
+ * The highest tier a seat of `capability` may run at. runner.maxTier caps every seat, except that a
+ * capability declaring its own rigor in the config raises the cap for itself to that rigor's tier.
+ * A unit's rigor and an override stay under the ceiling, so only the config decides which
+ * capabilities may run above the cap. Null when runner.maxTier is not set.
+ *
+ * @returns {{value: string, source: string}|null} `source` is `global` or `capability-rigor(<cap>, <rigor>)`.
+ */
+export function resolveTierCeiling(runnerConfig, capability, capabilityRigor) {
+  const globalMaxTier = runnerConfig?.maxTier ?? runnerConfig?.runner?.maxTier;
+  if (!globalMaxTier || !MODEL_POLICY_TIERS.includes(globalMaxTier)) return null;
+  const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
+  const capabilityTier = capabilityRigor ? rigorToTier[capabilityRigor] : undefined;
+  if (capabilityTier && MODEL_POLICY_TIERS.includes(capabilityTier) && TIER_STRENGTH[capabilityTier] > TIER_STRENGTH[globalMaxTier]) {
+    return { value: capabilityTier, source: `capability-rigor(${capability}, ${capabilityRigor})` };
+  }
+  return { value: globalMaxTier, source: 'global' };
+}
+
 export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] } = {}) {
   const {
     unit,
@@ -408,13 +427,10 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     tierSource = `override:${matchingOverride.origin ?? 'unknown'}`;
   }
 
-  // Global maxTier check if configured
-  const globalMaxTier = runnerConfig.maxTier ?? runnerConfig.runner?.maxTier;
-  if (globalMaxTier && MODEL_POLICY_TIERS.includes(globalMaxTier)) {
-    if (TIER_STRENGTH[finalTier] > TIER_STRENGTH[globalMaxTier]) {
-      finalTier = globalMaxTier;
-      tierSource = `clamped:maxTier(${globalMaxTier})`;
-    }
+  const tierCeiling = resolveTierCeiling(runnerConfig, capKey ?? unit?.capability, capRigor);
+  if (tierCeiling && TIER_STRENGTH[finalTier] > TIER_STRENGTH[tierCeiling.value]) {
+    finalTier = tierCeiling.value;
+    tierSource = `clamped:maxTier(${tierCeiling.value}, ${tierCeiling.source})`;
   }
 
   // Resolve Model
@@ -512,7 +528,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     executor: { value: executorId, source: chosenCandidate.source },
     invocation: { value: invocation, source: invocation ? chosenCandidate.source : 'none' },
     transport: { value: transport, source: transportSource },
-    tier: { value: finalTier, source: tierSource },
+    tier: { value: finalTier, source: tierSource, ...(tierCeiling ? { ceiling: tierCeiling } : {}) },
     model: { value: model, source: modelSource },
     persona: { value: persona, source: personaSource },
     reasoningEffort: { value: reasoningEffort, source: reasoningEffortSource },

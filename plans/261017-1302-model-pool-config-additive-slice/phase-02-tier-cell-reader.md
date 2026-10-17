@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Bộ đọc ô tier và luật chọn model"
-status: pending
+status: done
 effort: 5h
 ---
 
@@ -58,6 +58,29 @@ effort: 5h
 - Test `bind()`: ô `["x@other", "y"]` cho họ `f` chọn `y`; ô chỉ có
   `x@other` thì bị từ chối `model-tier-missing`.
 - `npm test` xanh.
+
+## Kết quả (2026-10-17)
+
+- `src/runner/dispatch/tier-cell.mjs`: `parseTierCell`, `isExtendedTierCell`.
+  `resolve.mjs`: `resolveTierCandidates` (cả danh sách) và `resolveTierModel`
+  (mục đầu tiên có `pool === family`). Validator, sanitizer global và
+  `supportsPolicyTier` đọc qua `parseTierCell`.
+- **Lệch plan, có chủ ý:** `supportsPolicyTier` đúng khi ô có một mục thuộc
+  pool của chính họ (cùng mục `resolveTierModel` trả), không phải "ít nhất một
+  mục bất kỳ"; hàm không có chỗ gọi production, docstring của nó là "trả lời
+  trước điều `resolveTierModel` sẽ làm mà không ném lỗi".
+- **Bước 5 (thiếu ô thì từ chối) chưa làm.** Baseline config repo không có dòng
+  `default`, nhưng toàn suite cho thấy 89 test ở ~20 file dựa vào lối rơi về
+  `executorEntry.model ?? "default"`: fixture tối giản không khai
+  `modelPolicies`, và hai check doctor chạy `bind()` trên config người dùng
+  (`workflow-pool-independence`, `executor-posture-coverage`). Ép từ chối sẽ
+  làm hỏng project khác đang dùng fgOS mà không khai đủ ô. Giữ lối rơi; câu
+  hỏi cho anh nằm trong báo cáo cuối đợt. Ô chỉ có mục pool khác được coi như
+  thiếu ô (rơi về như cũ, không bao giờ chạy model của pool khác).
+- `bind()` trên 608 dòng baseline: 0 dòng khác so với `main` sau phase 01.
+- impact-analysis: inactive (0 provider); người gọi dò bằng `rg`: 7 chỗ gọi
+  `resolveTierModel`, chữ ký và kết quả với ô chuỗi không đổi; không config
+  nào (project, global của máy này) có id chứa `@`.
 
 ## Rủi ro
 

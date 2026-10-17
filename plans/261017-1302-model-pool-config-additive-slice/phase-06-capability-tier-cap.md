@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Rigor do capability khai thì nâng trần tier của capability đó"
-status: pending
+status: done
 effort: 5h
 ---
 
@@ -19,7 +19,7 @@ qua `rigorToTier`), override của người có thể nâng thêm, rồi `runner
 **toàn cục** kẹp mọi tier xuống (`src/runner/execution/bind.mjs:411-418`), không
 phân biệt nguồn. Vì vậy rigor mà chính capability khai trong config bị cắt mất:
 
-| Capability | rigor | Tier theo rigor | Tier thật sau trần `advanced` |
+| Capability | rigor | Tier theo rigor | Tier thật sau trần `advanced` (lúc viết) |
 |---|---|---|---|
 | `architecture:frame`, `architecture:critique` | high | flagship | advanced |
 | `architecture:shape`, `architecture:synthesize`, `architecture:explain` | critical | frontier | advanced |
@@ -29,6 +29,10 @@ vẫn chạy `sonnet`; hội đồng `wf-run-1792209767959-7424ddf9` chạy toà
 trung; muốn ghế mạnh thì phải nâng trần toàn cục, kéo mọi worker khác lên model
 đắt. Một lần nâng tạm `frontier` đã bị cuốn vào commit `95885e6d3` và phải sửa ở
 `214e8530d`.
+
+Từ `287c2cb91` (anh duyệt 13:53) trần toàn cục là `flagship`: hai capability rigor
+`high` đã ra `flagship`, còn ba capability rigor `critical` vẫn bị kẹp ở
+`flagship` thay vì `frontier`. Luật dưới vẫn cần cho ba capability đó.
 
 Hiện chỉ 5 capability trên khai rigor `high` hoặc `critical`; mọi capability
 khác để trống hoặc `standard`.
@@ -86,14 +90,35 @@ Hiện không có trường hợp thật nào cần; khi có thì mới thêm.
 ## Kiểm chứng
 
 - 7 test trên xanh; test 2, 5, 6 đỏ trước khi sửa.
-- Trên config đã commit (`runner.maxTier: advanced`, không sửa gì): dry-bind
+- Trên config đã commit (`runner.maxTier: flagship`, không sửa gì): dry-bind
   workflow `architecture-advisory` cho ghế tổng hợp model `fable`, ghế
-  `architecture:frame` model tier `flagship`, còn `code:implement` vẫn ở
-  `advanced`.
-- Doctor liệt kê đúng 5 capability kiến trúc.
-- `bind-committed-config.test.mjs` xanh; so với baseline phase 00, chỉ 5
-  capability kiến trúc đổi tier.
+  `architecture:frame` model tier `flagship`, còn `code:implement` không vượt
+  `flagship`.
+- Doctor liệt kê đúng 3 capability rigor `critical` (2 capability rigor `high`
+  không vượt trần `flagship`).
+- `bind-committed-config.test.mjs` xanh; so với baseline phase 00, chỉ 3
+  capability rigor `critical` đổi tier.
 - `npm test` không thêm test hỏng nào so với phase 05.
+
+## Kết quả (2026-10-17)
+
+- `resolveTierCeiling` export từ `bind.mjs`; `bind()` và check doctor
+  `capability-rigor-ceiling` (`src/setup/model-pool-checks.mjs`) dùng chung.
+  Provenance: `tier.ceiling = { value, source }`, kẹp ghi
+  `clamped:maxTier(<tier>, global | capability-rigor(<cap>, <rigor>))`.
+- Test trong `bind.test.mjs`: 7 test, 6 đỏ trước khi sửa (test "không có
+  maxTier" xanh sẵn). Test 7 của plan (dry-bind) thay bằng test "rigor thấp
+  hơn trần không hạ trần", vì `simulateUnitBindings` gọi thẳng `bind()` và
+  không ghi tier.
+- Trên config đã commit (`maxTier: flagship`): 48/608 dòng baseline đổi, chỉ
+  `architecture:shape`, `architecture:synthesize`, `architecture:explain`
+  (`flagship` thành `frontier`: claude `fable`, openai `gpt-6-astra`).
+- **Hai bộ tính tier:** `assignment-policy` không áp trần và thường không biết
+  capability (`run.mjs` không truyền); model thật luôn là của `bind()`
+  (`cliOverride.model`), chỉ bản ghi tier lệch khi `bind()` kẹp. Sửa cần
+  `run.mjs`, nên tách thành việc riêng (`plan.md`).
+- `fgos dispatch decide` không trả tier, nên trần chỉ hiện ở `explain`.
+- Spec RUL103 (lần đầu spec mô tả `runner.maxTier`); CHANGELOG mục Changed.
 
 ## Rủi ro
 

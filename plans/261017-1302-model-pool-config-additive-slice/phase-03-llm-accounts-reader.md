@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Bộ đọc runner.llmAccounts, chỉ đọc"
-status: pending
+status: done
 effort: 3h
 ---
 
@@ -47,6 +47,23 @@ effort: 3h
   pool có `@`; tên alias; account rỗng; `llmAccounts` trong project; đối chiếu
   với kho cũ có lệch hai chiều.
 - `npm test` xanh. Không test nào của `provider-capacity` đổi.
+
+## Kết quả (2026-10-17)
+
+- `src/runner/dispatch/llm-accounts.mjs`: `readLlmAccounts(runnerConfig, { projectConfig })`,
+  `compareWithLegacyInventory`, `legacyStateKey`. Dùng lại `expandCredentialHome`
+  (`provider-credential-probe.mjs`), `normalizeProviderFamily` và
+  `providerAccountInventory`; không sửa `provider-capacity.mjs`.
+- Alias: tên không phải họ nào của config (khoá `modelPolicies`, `providerModel`)
+  nhưng chuẩn hoá trùng một họ (`codex`, `openai-codex`, `glm`, `agy`). Báo
+  kèm tên họ nên dùng.
+- Validator runner không chặn khoá lạ ở cấp `runner`, nên bản cũ bỏ qua
+  `llmAccounts` như giả định.
+- Trên config thật của máy (chưa có `llmAccounts`): 6 account cũ đều ở
+  `onlyLegacy`; 0 problem.
+- Đối chiếu theo khoá state cũ: kho cũ khai account OpenRouter dưới `z-ai` và
+  `deepseek`; theo thiết kế mới chúng thuộc pool `openrouter`, nên doctor ở
+  phase 04 sẽ báo chúng lệch cho tới khi anh khai `llmAccounts`.
 
 ## Rủi ro
 
