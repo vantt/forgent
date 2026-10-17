@@ -9,6 +9,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/specs/system-overview.md — area map, shared entities, cross-area flows
 - docs/specs/reading-map.md — where every doc and source path in this repo lives
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
+- plans/261017-1313-fgos-platform-program-board/plan.md — which platform plans are running or held, what each waits for, which shared files collide; read it before starting lock/git/state/config/runner work, and update your own lane's row when you start, finish, block or land
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
 - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
 - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing
