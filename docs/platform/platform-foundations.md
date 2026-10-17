@@ -47,7 +47,7 @@ During migration:
 | --- | --- | --- |
 | L1 | Durable data declares whether it is log or state. | `docs/platform-foundations.md` |
 | L2 | Memory has lower mechanical layers and higher learning layers. | `docs/platform-foundations.md` |
-| L3 | JSONL/event changesets are truth; databases are rebuildable views unless a named threshold supersedes this. | `docs/platform-foundations.md` |
+| L3 | JSONL/event changesets are truth; databases are rebuildable views unless a named threshold supersedes this. Clauses 1 and 4 superseded by D-ADR0055 (2026-10-17); see the L3 note and [Event Store](event-store/spec.md). | `docs/platform-foundations.md` |
 | L4 | Routing depends on the audience of each interface; there is no one global routing model. | `docs/platform-foundations.md` |
 | L5 | Definition of done is the six-question stranger-agent test. | `docs/platform-foundations.md` |
 | L6 | Platform maturity uses the F0-F5 ladder and needs real evidence. | `docs/platform-foundations.md` |
@@ -181,6 +181,8 @@ engine khác mai kia, chỉ cần replay.
 (recursive CTE đủ cho traversal vừa); graph engine chỉ khi traversal là nút
 thắt đo được (LadybugDB là ứng viên sống duy nhất; CozoDB dormant từ 12/2023).
 D-ID `ae461c8b`.
+
+**Đã bị thay một phần (2026-10-17, D-ADR0055, owner ký).** Điều 1 và điều 4 của luật này không còn hiệu lực: truth là changeset đã niêm phong thành git object trên ref riêng của mỗi máy `refs/fgos/events/<máy>`, xác nhận khi `fsync` vào log mở ngoài cây làm việc; mọi view là cache dựng lại được. Điều 2 và 3 giữ nguyên. Hợp đồng: [docs/platform/event-store/spec.md](event-store/spec.md). Câu chữ gốc phía trên giữ nguyên làm lịch sử.
 
 **Ngưỡng xem lại (có tên, từ evidence beads 2026-07-14).**
 `beads:dolt-as-versioned-truth`: beads đã RẼ KHỎI JSONL-truth sang

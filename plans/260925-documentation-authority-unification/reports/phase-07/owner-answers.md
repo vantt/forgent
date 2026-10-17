@@ -426,6 +426,24 @@ the independent findings without authorizing promotion, cutover or retirement.
   starts. Identity changes ride the Step 9 carry as in L11-15/L11-18.
 - **Affected rows/steps:** Steps 7, 8, 9.
 
+### L11-20 — Reconcile the candidate corpus with the signed Event Store decision
+
+- **Date:** 2026-10-17
+- **Status:** decided (Lead under A42)
+- **What is happening:** the re-seal review (`review-a38-step-07-key-reseal-01.md`) found
+  that main signed the Event Store design (D-ADR0055, superseding L3 clauses 1 and 4),
+  while the key (B2, B4, B5, B6, B7), candidate `docs/platform/README.md` and candidate
+  `platform-foundations.md` L3 still read it as an unsigned draft.
+- **Decision:** carry main's verbatim D-ADR0055 supersession note into candidate
+  `platform-foundations.md` L3 beside the unchanged original text (relative link
+  adjusted) and annotate the L3 index row; rewrite the README event-store row as a signed
+  design with implementation not started; rewrite the five key answers to the signed
+  state. The candidate `component-boundary.md` holder-lock row (main-authored, "until the
+  event store decision") stays as main wrote it: locks remain with the state store until
+  implementation; its wording reconciliation joins P7-DOC-GAP-03 at Step 9. A fresh key
+  reviewer re-validates and seals.
+- **Affected rows/steps:** Steps 7, 8; P7-DOC-GAP-03.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
