@@ -274,6 +274,10 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
+  // The queue lib imports the holder-lock facade (src/holder-lock), which
+  // reads the lock registry under packages/: link both trees in whole, so
+  // the mirror loads the real modules and their own imports.
+  for (const tree of ['src', 'packages']) fs.symlinkSync(path.join(REPO_ROOT, tree), path.join(root, tree), 'dir');
   return root;
 }
 
