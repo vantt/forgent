@@ -6,13 +6,15 @@
 - Standing delegation: A42; ordinary owner-routed choices are Lead decisions.
 - Independent-review rule: A38 extended through Phase 7 by L11-1.
 - Planning: revised after independent red-team; P7-1..P7-19 mapped and addressed.
-- Execution: Step 1 authoring complete; independent A38 review pending under
-  `codex-session:fgos-run_unit-run-17922054c556f0@2026-10-17`.
-- Completed step: none.
-- Current step: Step 1 reviewing — evidence, inventory, routing, owner batch and
-  checks are authored; the producer did not run the independent derivation.
-- Next step: give `review-request-a38-groups-and-inventory-01.md` to a distinct A38
-  reviewer; apply only its bounded verdict before Step 2-6 authoring begins.
+- Execution: both independent Step 1 A38 reviews are complete at commit `135230fb3`;
+  the bounded rework and Lead decisions L11-8..L11-11 are authored. Step 2 authoring
+  is complete and no candidate content changed.
+- Completed step: none; Steps 1 and 2 both await the single bounded independent
+  acceptance request below.
+- Current step: Steps 1-2 reviewing — 39 entries are ready for a distinct A38 reviewer
+  under `review-request-a38-step-01-rework-and-step-02-01.md`.
+- Next step: apply only the independent 39-entry verdict; if all entries are ok, mark
+  Steps 1-2 accepted and begin the unaffected Step 3 rows while CTR010 stays parked.
 
 Phase 6 is closed. Its A1-A44 answers remain authoritative at
 `../phase-06/owner-answers.md`; this file does not reopen them.
@@ -104,6 +106,23 @@ Plan-repair verification: `git diff --check` passed; structural validation found
 only the three Phase 7 plan/control files changed. Execution proofs remain Step 1/9
 work and are not claimed by this planning turn.
 
+## Step 1 rework and Step 2 result
+
+- Step 1 rework: X-DUP-01 carries the CTR010 park marker; X-SEM-29/31 route only
+  through X-DUP-04/02 in Step 6; the manifest pair is path-keyed with current blob
+  `2ff043edb`; QF notation distinguishes Step from Phase.
+- Lead decisions L11-8..L11-11 settle the manifest key, promoted-target reading,
+  Step 7 navigation host and Step 9 real-digest obligation. QF-01 carries the 12-row
+  A34 Phase 9 re-home obligation.
+- Step 2: 28/28 semantic rows mechanically joined; 27/27 pair bindings reviewed in
+  Phase 6 and current/B0 digests match. The three X-SEM-13 members were fully read.
+  Twenty-six groups are resolved here; X-SEM-29/31 route to Step 6 because they are
+  the same byte groups as X-DUP-04/02. Local candidate corrections: zero.
+- Checks A/B/C/G/H/I, protected boundary and `git diff --check`: green. No heavy job
+  was needed. Evidence: `step-02-checks.json`.
+- Independent request: `review-request-a38-step-01-rework-and-step-02-01.md`, one
+  39-entry part, 6,324 bytes, SHA-256 `67927aa6…b7a3`.
+
 ## Artifact register
 
 Only the two control paths are fixed by the assignment. Step 1 resolves all other
@@ -117,18 +136,22 @@ resolved path, author, reviewer, digest and status here.
 | Plan red-team | `reports/phase-07/red-team-p7-plan.md` | independent reviewer | Lead/Doer applied | pinned at Step 1 | closed into plan |
 | Step 1 inputs | `reports/phase-07/step-01-inputs.json` | Doer | A38 reviewer | aggregate `fde149da…` | complete |
 | Allowed paths | `reports/phase-07/allowed-paths.json` | Doer | A38 reviewer | pending settlement bytes | complete |
-| Cross-area readable | `reports/phase-07/cross-area-inventory.md` | Doer | A38 reviewer | pending settlement bytes | complete |
-| Cross-area machine | `reports/phase-07/cross-area-inventory.json` | Doer | A38 reviewer | pinned by review-input index | complete |
+| Cross-area readable | `reports/phase-07/cross-area-inventory.md` | Doer | distinct A38 reviewer | SHA-256 `a2600f2c…e0a5` | rework authored |
+| Cross-area machine | `reports/phase-07/cross-area-inventory.json` | Doer | distinct A38 reviewer | SHA-256 `66056888…e2fe` | rework authored |
 | Owner batch 01 | `reports/phase-07/owner-batch-01.md` | Doer records Lead dispatch | owner | pending settlement bytes | sent; answer pending |
 | A38 request | `reports/phase-07/review-request-a38-groups-and-inventory-01.md` | Doer | distinct A38 reviewer | part indexes pin inputs | ready |
 | Step 1 checks | `reports/phase-07/step-01-checks.json` | Doer | A38 reviewer | pending settlement bytes | green |
+| Step 2 semantic resolutions | `reports/phase-07/step-02-semantic-group-resolutions.json` | Doer | distinct A38 reviewer | SHA-256 `7affde35…8b14` | reviewing |
+| Step 2 readable report | `reports/phase-07/step-02-semantic-group-resolutions.md` | Doer | distinct A38 reviewer | SHA-256 `ab666c74…cd74` | reviewing |
+| Step 2 checks | `reports/phase-07/step-02-checks.json` | Doer | distinct A38 reviewer | SHA-256 `36cb3bac…0b50` | green |
+| Step 1 rework + Step 2 review request | `reports/phase-07/review-request-a38-step-01-rework-and-step-02-01.md` | Doer | distinct A38 reviewer | SHA-256 `67927aa6…b7a3` | ready |
 
 ## Step ledger
 
 | Step | State | Evidence | Parked rows | Next action |
 |---:|---|---|---|---|
-| 1 | reviewing | inputs + fresh projection + 98-row inventory + green checks + bounded A38 request | CTR010 answer pending; only dependent rows parked | independent fresh derivation and inventory verdict |
-| 2 | not-started | none | none | wait for Step 1 |
+| 1 | reviewing | A38 reviews at `135230fb3`; bounded rework + L11-8..L11-11 authored | CTR010 answer pending; dependent rows parked | independent verdict on 11 Part A entries |
+| 2 | reviewing | 28 records + full-read triple + green `step-02-checks.json` | X-SEM-29/31 route to Step 6 duplicate handling | independent verdict on 28 Part B entries |
 | 3 | not-started | none | CTR010 rows await owner | proceed on all other contract/boundary rows after Step 1 |
 | 4 | not-started | none | none | wait for Step 1 |
 | 5 | not-started | none | none | wait for Step 1 |

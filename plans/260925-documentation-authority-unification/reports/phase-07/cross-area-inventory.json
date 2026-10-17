@@ -43,8 +43,8 @@
       "targetDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
       "implementationEvidence": "Step 6 full-read plus declared generator/manual rule",
       "readerGapId": null,
-      "disposition": "pending",
-      "blockedDecision": null,
+      "disposition": "park-dependent-rows",
+      "blockedDecision": "owner CTR010 choice sent by Lead; same park as X-CTR010-01",
       "targetStep": 6
     },
     {
@@ -71,7 +71,7 @@
     {
       "rowId": "X-DUP-03",
       "kind": "duplicate-group",
-      "groupId": "e6d9582ddf4cbb72acaaebf8940dc4018e19ed67",
+      "groupId": "paths:docs/architecture-manifest.json::docs/platform/contracts/architecture-manifest.json",
       "owner": "docs/platform/contracts/architecture-manifest.json",
       "consumers": [
         "docs/architecture-manifest.json"
@@ -83,7 +83,7 @@
       "targetPath": "docs/platform/contracts/architecture-manifest.json",
       "targetId": "src_694573f60aefd8b32f528bb6ece84c6e",
       "targetDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "implementationEvidence": "Step 6 full-read plus declared generator/manual rule",
+      "implementationEvidence": "Step 6 full-read plus declared generator/manual rule; current shared Git blob 2ff043edb at B0; stale Phase 6 queue blob e6d9582dd is not an identity key",
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
@@ -630,11 +630,11 @@
       "targetPath": "docs/platform/ui-spec/architecture/spec.config.yaml",
       "targetId": "src_bf4a7c601b6de03e5c32f0672ed15e3f",
       "targetDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
-      "implementationEvidence": "Reviewed Phase 6 source-to-candidate binding",
+      "implementationEvidence": "Reviewed Phase 6 source-to-candidate binding; duplicate-byte handling is X-DUP-04",
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": 6
     },
     {
       "rowId": "X-SEM-30",
@@ -672,11 +672,11 @@
       "targetPath": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
       "targetId": "src_aab174cec5d324122e56dd4b57ef4378",
       "targetDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
-      "implementationEvidence": "Reviewed Phase 6 source-to-candidate binding",
+      "implementationEvidence": "Reviewed Phase 6 source-to-candidate binding; duplicate-byte handling is X-DUP-02",
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": 6
     },
     {
       "rowId": "X-SEM-32",
@@ -1776,11 +1776,11 @@
       "targetPath": "phase-route",
       "targetId": "family-route-1",
       "targetDigest": "356aa3334a6d6c42a306e48df2fa5e5d9a6f57d53d56a517cd781b19378879c3",
-      "implementationEvidence": "Phase 7 mandatory routing table",
+      "implementationEvidence": "Phase 7 mandatory routing table; Phase 9 must re-home residuals X-A34-01 and X-A34-17..X-A34-28 because their successor is the retiring legacy source",
       "readerGapId": null,
-      "disposition": "5 sample; 9 affected; 9 promotion truth",
+      "disposition": "Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home",
       "blockedDecision": null,
-      "targetStep": "5 sample; 9 affected; 9 promotion truth"
+      "targetStep": "Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home"
     },
     {
       "rowId": "QF-02",
@@ -1797,9 +1797,9 @@
       "targetDigest": "51ed493c41202aa4d659ed3c340638c7f6e66bfceba473ddc57afaf2a094534b",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "5 bounded; 9 full",
+      "disposition": "Step 5 bounded; Phase 9 full",
       "blockedDecision": null,
-      "targetStep": "5 bounded; 9 full"
+      "targetStep": "Step 5 bounded; Phase 9 full"
     },
     {
       "rowId": "QF-03",
@@ -1816,9 +1816,9 @@
       "targetDigest": "c72a35747375d015d89de43d49bae518f5253399388f6d04c3fd155a99dde9e9",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "4-6 candidate defects; 9 rationale-only",
+      "disposition": "Steps 4-6 candidate defects; Phase 9 rationale-only",
       "blockedDecision": null,
-      "targetStep": "4-6 candidate defects; 9 rationale-only"
+      "targetStep": "Steps 4-6 candidate defects; Phase 9 rationale-only"
     },
     {
       "rowId": "QF-04",
@@ -1835,9 +1835,9 @@
       "targetDigest": "368988299e94b56b1671e79dd753130fb168b77097667e9a9ac9f057bd4c5657",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "2 semantic; 6 duplicate; 8 alias mechanics",
+      "disposition": "Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics",
       "blockedDecision": null,
-      "targetStep": "2 semantic; 6 duplicate; 8 alias mechanics"
+      "targetStep": "Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics"
     },
     {
       "rowId": "QF-05",
@@ -1854,9 +1854,9 @@
       "targetDigest": "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "9",
+      "disposition": "Phase 9",
       "blockedDecision": null,
-      "targetStep": "9"
+      "targetStep": "Phase 9"
     },
     {
       "rowId": "QF-06",
@@ -1873,9 +1873,9 @@
       "targetDigest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "8",
+      "disposition": "Phase 8",
       "blockedDecision": null,
-      "targetStep": "8"
+      "targetStep": "Phase 8"
     },
     {
       "rowId": "QF-07",
@@ -1892,9 +1892,9 @@
       "targetDigest": "16c4b6b5193bba56c91d416c98ee42ca1261bb7bf86959b3d74d98b3308154db",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "8-9",
+      "disposition": "Phase 8/9",
       "blockedDecision": null,
-      "targetStep": "8-9"
+      "targetStep": "Phase 8/9"
     },
     {
       "rowId": "QF-08",
@@ -1911,9 +1911,9 @@
       "targetDigest": "787ad5f39b7cb99c840dca7cca7f5d856a73682b5d8fabd63cf75833c2c339fd",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "8 preparation; 9 adoption",
+      "disposition": "Phase 8 preparation; Phase 9 adoption",
       "blockedDecision": null,
-      "targetStep": "8 preparation; 9 adoption"
+      "targetStep": "Phase 8 preparation; Phase 9 adoption"
     },
     {
       "rowId": "QF-09",
@@ -1930,9 +1930,9 @@
       "targetDigest": "eedfaeca089553da22448fff13d37f3d15b3c94b0fee46c4226335f3bfb86bbd",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "preserve; 9 affected rebind",
+      "disposition": "preserve; Step 9 affected rebind",
       "blockedDecision": null,
-      "targetStep": "preserve; 9 affected rebind"
+      "targetStep": "preserve; Step 9 affected rebind"
     },
     {
       "rowId": "QF-10",
@@ -1968,9 +1968,9 @@
       "targetDigest": "5b4828f7dcf2e03ee11d1afa3aa6691427e046eb35a55459f7b8457df3fc5507",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "owner at 9",
+      "disposition": "owner at Phase 9",
       "blockedDecision": "owner promotion/cutover authority",
-      "targetStep": "owner at 9"
+      "targetStep": "owner at Phase 9"
     },
     {
       "rowId": "QF-12",
@@ -1987,9 +1987,9 @@
       "targetDigest": "fadd3dc024849b13978ebc2f29cd5219ba154048ebccb690b5c71bd2296aa309",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
-      "disposition": "4-6 named; 9 remaining truth",
+      "disposition": "Steps 4-6 named; Phase 9 remaining truth",
       "blockedDecision": null,
-      "targetStep": "4-6 named; 9 remaining truth"
+      "targetStep": "Steps 4-6 named; Phase 9 remaining truth"
     },
     {
       "rowId": "QF-13",

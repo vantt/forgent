@@ -390,6 +390,9 @@ Phase 7 unit to Phase 9 for later accounting.
    carries. Carry no approval. Package all changed rows into one logical ordinary
    request, partitioned at ≤60 entries/≤400 KB per part, and obtain independent
    matching review.
+   Independently of content edits, replace every placeholder/non-content digest in
+   the 14 DEFECT, four NAV and 13 QF inventory rows with a real digest of the bound
+   unit or routing record; prove all 31 bindings in the closing package.
 4. Refresh a scratch HEAD inventory and scratch registry. Run global D against both
    prior registries together and each prior separately; run strict E; regenerate
    expectations from authored/native state; require the unchanged comparator to exit
@@ -460,6 +463,7 @@ which receive both decision directories explicitly.
 | Non-strict D, both priors together and each separately | exit 0, zero fatal |
 | Strict E | expected nonzero/red only for the exact declared Phase 8/9 categories; no unexplained row |
 | Comparator | exit 0, `ok=true`, zero differences, `errors=[]` |
+| Inventory digest bindings | all 31 DEFECT/NAV/QF placeholder or non-content digests bind real units; zero note-id/path-only/route-placeholder hashes remain |
 | Retirement dry run | expected blocked/red for named Phase 8/9 gates; delta recorded, never treated as a Phase 7 stop |
 | Candidate status/constitution placement/ratchet | green without promotion or baseline change |
 | `env -u CLAUDE_CODE_SESSION_ID npm test` | exit 0; real behavior only |

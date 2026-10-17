@@ -11,9 +11,10 @@ inherits A28, A34, A36, A38, A42, A43 and A44.
 - Main landing, push, Phase 9 cutover/legacy retirement, deletion, locked-law changes
   and stable/public contract renumbering remain owner-only.
 
-The decisions below were supplied by the Lead in assignment
-`unit-run-1792200236674-43960430/producer/1` as A42 applications. They repair the
-independent red-team findings without authorizing promotion, cutover or retirement.
+L11-1..L11-7 were supplied by the Lead in assignment
+`unit-run-1792200236674-43960430/producer/1` as A42 applications. L11-8..L11-11 are
+the Lead's bounded decisions on the committed Step 1 A38 review. Together they repair
+the independent findings without authorizing promotion, cutover or retirement.
 
 ## Phase 7 Lead decisions
 
@@ -178,6 +179,86 @@ independent red-team findings without authorizing promotion, cutover or retireme
   `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, Phase 6
   owner queue; red-team P7-10.
 - **Affected rows/steps:** CTR010 and Gateway REST registry rows; Steps 1, 3 and 9.
+
+### L11-8 — Identify the architecture-manifest pair by paths, not a stale blob
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** the Phase 6 queue keys the architecture-manifest duplicate
+  pair with stale blob `e6d9582dd`, while both paths share current blob `2ff043edb`.
+- **Cause:** the two files changed together after the queue snapshot, so their member
+  set stayed stable while the content-addressed key changed.
+- **Options and costs:** edit the dated Phase 6 queue (destroys its snapshot meaning),
+  keep using the stale key (breaks the current join), or key the Phase 7 row by its two
+  stable paths and retain the current blob as evidence.
+- **Recommendation:** use the two paths as identity and record `2ff043edb`; leave the
+  Phase 6 queue unchanged.
+- **Scope of answer:** X-DUP-03 and its Step 6 join only; no baseline or queue edit.
+- **Lead decision:** apply the recommendation.
+- **Reason:** membership is the stable fact across synchronized content changes; a
+  stale content key cannot identify the current group.
+- **Evidence:** `review-a38-fresh-groups-01.md`; X-DUP-03.
+- **Affected rows/steps:** X-DUP-03; Steps 1 and 6.
+
+### L11-9 — Treat an already-promoted target as the settled target authority
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** X-SEM-12 pairs a still-live legacy source with a target that
+  was already promoted rather than one still labelled candidate.
+- **Cause:** L11-4 named candidate-versus-own-legacy pairs but did not spell out the
+  stronger already-promoted case.
+- **Options and costs:** invent a separate handling path (duplicate semantics), reopen
+  the promotion (outside Phase 7), or apply the existing settled-target reading.
+- **Recommendation:** apply “target settled; legacy source retires at Phase 9.”
+- **Scope of answer:** X-SEM-12's report-level reading only; no promoted-file edit,
+  retirement or authority transition.
+- **Lead decision:** apply the recommendation.
+- **Reason:** a promoted file is already the target authority, so it satisfies the
+  single-target requirement more strongly than a candidate target does.
+- **Evidence:** `review-a38-cross-area-inventory-01.md`; L11-4; X-SEM-12.
+- **Affected rows/steps:** X-SEM-12; Step 2 and Phase 9 retirement.
+
+### L11-10 — Use the candidate platform portal as the navigation host
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** four system-architecture candidate files have no candidate
+  navigation host, and no area-local portal exists at B0.
+- **Cause:** the earlier migration deferred their routes to the root switchboard,
+  which Phase 7 may not edit.
+- **Options and costs:** create another portal (new surface), wait for Phase 8 (reader
+  gate remains broken), or add one system-architecture area entry to the existing
+  candidate `docs/platform/README.md` and link all four files there.
+- **Recommendation:** use `docs/platform/README.md` in Step 7.
+- **Scope of answer:** the planned Step 7 candidate navigation edit only; no root
+  switchboard or authority-status change now.
+- **Lead decision:** apply the recommendation.
+- **Reason:** the existing candidate portal is the reader entrypoint fixed by L11-5
+  and can expose all four routes without creating a competing portal.
+- **Evidence:** X-NAV-01..04; `review-a38-cross-area-inventory-01.md`; L11-5.
+- **Affected rows/steps:** X-NAV-01..04; Step 7.
+
+### L11-11 — Bind placeholder inventory digests to real units at close
+
+- **Date:** 2026-10-17
+- **Status:** decided
+- **What is happening:** 31 Step 1 rows presently hash a note id, target path or route
+  placeholder rather than the content/routing unit they are meant to prove.
+- **Cause:** Step 1 intentionally allowed late binding for 14 DEFECT, four NAV and 13
+  QF rows, but their hashes cannot serve as closing evidence.
+- **Options and costs:** accept the placeholders (false proof), bind them during each
+  content step (duplicated work), or require real unit digests in Step 9's single
+  closing package.
+- **Recommendation:** require all 31 real bindings in Step 9 and normalize routing
+  notation now to distinguish Phase 8/9 from Phase 7's Step 9.
+- **Scope of answer:** inventory proof and route notation; no checker, baseline or
+  vocabulary change.
+- **Lead decision:** apply the recommendation.
+- **Reason:** late binding remains efficient only if close proves the actual units;
+  explicit Phase/Step notation removes an otherwise material routing ambiguity.
+- **Evidence:** `review-a38-cross-area-inventory-01.md` Notes 2-4.
+- **Affected rows/steps:** X-DEFECT-01..14, X-NAV-01..04, QF-01..13; Steps 1 and 9.
 
 ## Open owner question — CTR010 (sent)
 

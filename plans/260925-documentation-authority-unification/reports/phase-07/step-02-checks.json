@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "HEAD": "135230fb3cffe7dd0d8b55d14610761b459c8848",
+  "semanticPopulation": {
+    "rows": 28,
+    "candidateVersusOwnLegacyPairs": 27,
+    "intraPlatformHistoryTriples": 1,
+    "sourceDigestsMatchB0AndCurrent": 28,
+    "targetDigestsMatchB0AndCurrent": 28,
+    "pairsWithReviewedDecisionBinding": 27,
+    "routesMatch": 28,
+    "resolvedHere": 26,
+    "routedToStep6": ["X-SEM-29 -> X-DUP-04", "X-SEM-31 -> X-DUP-02"],
+    "localCandidateCorrections": 0,
+    "failures": [],
+    "ok": true
+  },
+  "historyTriple": {
+    "fullRead": true,
+    "members": [
+      {"path":"docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md","sha256":"4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b"},
+      {"path":"docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md","sha256":"a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb"},
+      {"path":"docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md","sha256":"491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6"}
+    ],
+    "singleCurrentTargetOwner": "docs/specs/runner.md",
+    "ok": true
+  },
+  "A": {
+    "violations": [],
+    "ok": true
+  },
+  "B": {
+    "rows": [
+      {"path":"scripts/generate-doc-inventory.mjs","expected":"a52981ff2862cc2c553dbb3181e4e822a26b146b","actual":"a52981ff2862cc2c553dbb3181e4e822a26b146b","equal":true},
+      {"path":"scripts/doc-inventory-artifact.mjs","expected":"1e6b7bdad954fad1f7c67a4ba6c850c02304ac64","actual":"1e6b7bdad954fad1f7c67a4ba6c850c02304ac64","equal":true},
+      {"path":"scripts/generate-shipped-path-inventory.mjs","expected":"0f1cd7e1cee308772c0b56c37f3190333039cfb3","actual":"0f1cd7e1cee308772c0b56c37f3190333039cfb3","equal":true},
+      {"path":"scripts/check-legacy-docs-ratchet.mjs","expected":"8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d","actual":"8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d","equal":true},
+      {"path":"scripts/lib/is-main-module.mjs","expected":"680570946fa1381474900c9192795514b5b88f48","actual":"680570946fa1381474900c9192795514b5b88f48","equal":true}
+    ],
+    "ok": true
+  },
+  "C": {
+    "B0Sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+    "currentSha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+    "ok": true
+  },
+  "G": {
+    "source": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-both.json",
+    "committedIdentityOrDecisionDrift": [],
+    "workingIdentityOrDecisionDrift": [],
+    "claimIdNotConserved": 0,
+    "decisionSelfReview": 0,
+    "fatalCount": 0,
+    "ok": true
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "files": 609,
+    "checked": 217,
+    "findings": 0,
+    "ok": true
+  },
+  "I": {
+    "source": "plans/260925-documentation-authority-unification/reports/phase-07/step-01-checks.json",
+    "reason": "No docs, root instruction or switchboard bytes changed after Step 1; the frozen baseline and disclosed session-identity delta are unchanged.",
+    "ok": true
+  },
+  "protectedBoundary": {
+    "workingChanges": [],
+    "ok": true
+  },
+  "diffCheck": {
+    "command": "git diff --check",
+    "exit": 0,
+    "ok": true
+  },
+  "stopConditions": {
+    "missingBinding": false,
+    "digestDrift": false,
+    "unresolvedMeaning": false,
+    "impliedEarlyRetirementOrPromotion": false,
+    "ownerOnlyIdentityChoice": false
+  },
+  "ok": true
+}
