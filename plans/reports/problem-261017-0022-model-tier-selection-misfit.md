@@ -307,9 +307,9 @@ the executor (it put a supply fact on the harness layer).
 
 Prerequisites found in the current config:
 
-- `claude` and `claude-herdr` are split only because an executor named `claude`
-  is merged with `runner.executor` and loses its invocations. That merge must be
-  fixed before the two are merged; about ten capabilities name `claude-herdr`.
+- `claude` and `claude-herdr` are split only because `claude` has no herdr
+  invocation (the "merged with `runner.executor`" reason in its description is
+  stale, see 5.3); 26 capabilities name `claude-herdr`.
 - `glm` and `glm-herdr` differ only in transport and merge into one executor.
 - The gemini invocations pass no `--model {model}`; the omp profile fixes the
   model, so `modelPolicies.gemini` has no effect today.
@@ -425,6 +425,118 @@ Assumptions the spike must check: the deepseek vendor API runs through `pi`
 with its key in the store's `settings.json`; `${HOME}/.pi/accounts/deepseek-main`
 does not exist yet; the three unconfined openai invocations
 (`codex-cli-bypass-fgovn`, `pi-cli-<account>`) have no remaining caller.
+
+### 5.3 Impact review and order of work (2026-10-17)
+
+Two read-only `rfc` reviews checked 5.2 against the code, both configs, the
+specs and the in-flight plans. The first (producer on claude,
+`unit-run-1792205702240-a1927d84`) wrote the assessment; its checkers were
+refused because the `advise` capability serves only claude. The second
+(`unit-run-1792206977582-39f8e89a`: producer xai, reviewer and red-team
+deepseek) verified it claim by claim. Both reached the same verdict: **start
+only an additive slice; the account/lease half and the confinement half wait.**
+
+Corrections the verification made to earlier statements:
+
+- `executors.claude` declares no `providerModel`; only `claude-herdr` declares
+  `claude`. `glm` and `glm-herdr` both declare `z-ai`.
+- The "merged with `runner.executor`, loses its invocations" reason in
+  `claude-herdr`'s description is stale: `resolveExecutorAndOverrides`
+  (`src/runner/dispatch/resolve.mjs:270-276`) returns the entry verbatim. The only
+  real reason for the split is that `claude` has no herdr invocation.
+- 26 capabilities name `claude-herdr`, and 27 `prefer` entries pin an invocation
+  (21 glm `pi-cli-bwrap-openrouter`, 3 gemini, 2 codex, 1 claude).
+- `261014-1400-two-doors-one-rununit` is complete (commit `cb0acb254`) despite
+  `status: pending`. No `261016-*` plan has code on main and none has a worktree
+  on this machine; the collisions below are with the files those plans declare
+  they will change.
+
+Findings the shape does not settle yet: the global config has no claude
+accounts; `bind()` falls back to model `default` on a missing tier cell
+(`bind.mjs:421-433`) while `assignment-policy` throws and ignores `maxTier`
+entirely; in-process agent models (`.claude/agents/*.md`) stay outside
+`modelPolicies`; tier ceilings, escalation and override authority (section 5)
+are not part of 5.2.
+
+**Wave 0. Decide, no code.** Record the answers in `docs/specs/runner.md`. Every
+core change in wave B depends on them.
+
+1. Where account health reaches source choice: inside `bind()`, or in a lease
+   walk over the tier entries after `bind()` (then the model id must be
+   recomputed, because each pool spells it differently).
+2. Whether changing pool inside one tier re-chooses the invocation (the first
+   pool's accounts may hold only a `pi` store while `bind()` chose codex).
+3. Whether a pool declares its billing kind, and whether fallback from a
+   subscription pool to a pay-per-token pool needs an explicit opt-in.
+4. Where the 27 invocation pins in `prefer` go once `prefer` names a family.
+5. How an account that is an environment-variable API key is expressed (glm
+   reads `GLM_OPENROUTER_API_KEY` today).
+6. Whether a credential fault excludes a family or only a pool
+   (`credentialFaultFamilies`, `src/runner/execution/account-rotation.mjs:55-68`,
+   excludes the family, so a dead OpenRouter key also skips a healthy
+   `deepseek-api` entry).
+7. Whether pool names pass through `normalizeProviderFamily`
+   (`src/runner/dispatch/provider-adapter.mjs:82-101`), which maps `openai` to
+   `openai-codex` and `glm` to `z-ai`.
+
+**Wave A. Start now, additive, no file owned by an in-flight plan.**
+
+- **A1. Config cleanup so "one family, one executor" holds.** Merge `glm-herdr`
+  into `glm`. Add a herdr invocation to `claude`, point the 26 capabilities at
+  `claude`, delete `claude-herdr` and its stale description. Add
+  `--model {model}` to the gemini invocations. File: `.fgos/config.json` only.
+  Proof: `fgos dispatch decide` for every affected capability gives the same
+  mechanism and invocation before and after. The owner's uncommitted gemini
+  edit to that file must land first.
+- **A2. Tier-cell reader and one model rule.** A pure module reads a cell as a
+  string or a list of `model` / `model@pool`, split at the last `@`; old callers
+  still get a string. `supportsPolicyTier` accepts a list. The validator allows
+  lists in the project config only, never in the global config (an older release
+  throws on a list there, for every project on the machine). A missing tier cell
+  is refused with a reason code instead of falling back to `default`. Files:
+  `src/runner/dispatch/resolve.mjs`, `src/runner/dispatch/config.mjs`, the model
+  step of `src/runner/execution/bind.mjs`.
+- **A3. `llmAccounts` reader beside the old inventory.** A new file reads
+  `runner.llmAccounts` and returns the exact shape `providerAccountInventory`
+  returns today, merged with `runner.providers`; lease and quarantine keys do not
+  change. Older releases ignore the key (no reference in `src/`). One call line
+  in `src/runner/dispatch/provider-capacity.mjs:234`, a file holder-lock P09 will
+  rewrite: a small, announced merge conflict.
+- **A4. Read-only checks.** `fgos dispatch explain` prints family, tier cell,
+  pool, account and store, each marked declared, inferred or refused. New doctor
+  checks: duplicate `providerModel`, a pool missing from `llmAccounts`, a pool
+  with no account matching the executor's stores, a pool name containing `@`.
+  Files: `src/setup/registrations.mjs`, `docs/specs/runner.md`, `CHANGELOG.md`.
+  The final phase of every `261016-*` plan edits these three files, so these
+  changes go in small separate commits.
+
+**Wave B. Wait for the in-flight plans that own the same code.**
+
+| Work | Waits for | Why |
+|---|---|---|
+| B1. Pool-keyed lease, state and quarantine; rotation filtered by `credentialStore.use`; account pin as `pool/account` | holder-lock P09 | P09 rewrites the lock functions of `provider-capacity.mjs` (`withFileLock`, `acquireAccountLock`, the generation-lock block); doing B1 first forces P09 to rebase its lock cutover |
+| B2. `credentialStore {use, homeEnv, files}` in `confinement-request.v1` and the bwrap driver, replacing `env` and `resourceBindings` | run-supervisor P07-P09, terminal-mode P05-P06 | They change `authority.mjs`, `drivers/bwrap.mjs`, `transport.mjs`, `assignment-runner.mjs` and `provider-credential-renewal.mjs`, the credential path itself |
+| B3. The source-fallback step (provenance `source-rotation`) between account rotation and family change | controller-death P02 | P02 changes the attempt and resume bookkeeping in `run.mjs` where the new step records its provenance |
+
+B1 and B3 also need wave-0 answers 1, 2 and 6; B1 and B2 need 3, 5 and 7. If the
+owner shelves a `261016-*` plan for long, its wave-B item may start earlier, and
+that plan records that it rebases onto this change.
+
+**Wave C. Wait until a release that reads `llmAccounts` is active for every
+project on the machine.**
+
+- C1. `prefer` names a family, with the 27 pins placed per answer 4.
+- C2. Move the accounts in `~/.fgos/config.json` to `llmAccounts`, delete
+  `runner.providers`, and allow lists and `@` in the global `modelPolicies`.
+
+Why: every project on the machine reads the global config; one still on an
+older release would refuse it or run the wrong model. RUL80 records the same
+lesson: change the inventory only after the release that reads it is active.
+
+**Out of scope here.** Per-capability tier ceilings, escalation rules, override
+authority, `assignment-policy` ignoring `maxTier`, and in-process agent models
+are the part of section 5 that addresses the cost incident itself. They become a
+separate item, so they do not block the waves above.
 
 ## 6. Constraints
 
