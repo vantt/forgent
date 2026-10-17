@@ -307,25 +307,53 @@ test('concurrent createSession from real separate OS processes never loses a reg
   }
 });
 
-test('sessions.lock excludes a concurrent holder and reclaims a stale (dead-pid) lock', () => {
+test('sessions lock excludes a second holder in this process, and a released lock is free again', () => {
   const repoRoot = initTempRepo();
   try {
     const fgosDir = path.join(repoRoot, '.fgos');
     const held = acquireSessionsLock(fgosDir);
-    assert.ok(fs.existsSync(path.join(fgosDir, 'sessions.lock')), 'lock file exists while held');
-    // a second acquire cannot win while the first is held (live pid = us)
+    assert.equal(held.path, path.join(fgosDir, 'locks', 'sessions.lock'));
     assert.throws(
-      () => acquireSessionsLock(fgosDir, { timeoutMs: 150, retryMs: 20 }),
-      (err) => err instanceof SessionError && /timed out/.test(err.message),
+      () => acquireSessionsLock(fgosDir, { timeoutMs: 150 }),
+      (err) => err instanceof SessionError && /timed out/.test(err.message) && err.holderPid === process.pid,
     );
     held.release();
-    assert.ok(!fs.existsSync(path.join(fgosDir, 'sessions.lock')), 'lock file gone after release');
-
-    // a stale lock (dead pid) is reclaimed, not waited on forever
-    fs.writeFileSync(path.join(fgosDir, 'sessions.lock'), String(deadPid()));
-    const after = acquireSessionsLock(fgosDir, { timeoutMs: 2000 });
-    assert.equal(after.lockPath, path.join(fgosDir, 'sessions.lock'));
+    const after = acquireSessionsLock(fgosDir, { timeoutMs: 150 });
     after.release();
+  } finally {
+    cleanup(repoRoot);
+  }
+});
+
+test('sessions lock held by another process that is killed with SIGKILL is free at once', async () => {
+  if (process.platform === 'win32') return;
+  const repoRoot = initTempRepo();
+  try {
+    const fgosDir = path.join(repoRoot, '.fgos');
+    const readyPath = path.join(fgosDir, 'holder-ready');
+    const holder = spawn(process.execPath, ['--input-type=module', '-e', `
+      import fs from 'node:fs';
+      import { acquireSessionsLock } from ${JSON.stringify(SESSION_MOD_PATH)};
+      acquireSessionsLock(${JSON.stringify(fgosDir)});
+      fs.writeFileSync(${JSON.stringify(readyPath)}, 'held');
+      setInterval(() => {}, 1000);
+    `], { stdio: 'ignore' });
+    const exited = new Promise((resolve) => holder.once('exit', resolve));
+    const deadline = Date.now() + 5000;
+    while (!fs.existsSync(readyPath)) {
+      assert.ok(Date.now() < deadline, 'holder never acquired the lock');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    assert.throws(
+      () => acquireSessionsLock(fgosDir, { timeoutMs: 100 }),
+      (err) => err instanceof SessionError && err.holderPid === holder.pid,
+    );
+    holder.kill('SIGKILL');
+    await exited;
+    const startedAt = Date.now();
+    const lock = acquireSessionsLock(fgosDir, { timeoutMs: 1000 });
+    assert.ok(Date.now() - startedAt < 1000, 'a dead holder must not make the next acquire wait');
+    lock.release();
   } finally {
     cleanup(repoRoot);
   }

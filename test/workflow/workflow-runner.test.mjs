@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 
 import {
   validateWorkflow,
@@ -30,6 +30,7 @@ import {
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
+import { acquireSync, createLockScope, probe } from '../../src/holder-lock/index.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
 const worktreeDirs = [];
@@ -521,33 +522,131 @@ test('CLI: fgos workflow resume returns at once and a detached process advances 
   assert.equal(completions.length, 1, 'the detached child advances in the foreground and does not spawn another advance');
 });
 
+const HOLDER_LOCK_MOD = path.resolve('src/holder-lock/index.mjs');
+
+function advanceParams(tmp, id) {
+  return { fgosDir: path.join(tmp, '.fgos'), workflowRunDir: path.join(tmp, '.fgos', 'workflow-runs', id) };
+}
+
+/** Hold the run's advance lock in this test process, which stands in for the live advancing process. */
+function holdAdvanceHere(tmp, id) {
+  const res = acquireSync(createLockScope('test-advance-holder'), 'advance', advanceParams(tmp, id));
+  assert.equal(res.result, 'acquired');
+  return res.handle;
+}
+
+/** Hold the run's advance lock in a separate process; resolves once it holds it. */
+async function holdAdvanceInChild(tmp, id) {
+  const readyPath = path.join(tmp, `advance-holder-${process.hrtime.bigint()}`);
+  const child = spawn(process.execPath, ['--input-type=module', '-e', `
+    import fs from 'node:fs';
+    import { acquireSync, createLockScope } from ${JSON.stringify(HOLDER_LOCK_MOD)};
+    const res = acquireSync(createLockScope('holder'), 'advance', ${JSON.stringify(advanceParams(tmp, id))});
+    if (res.result !== 'acquired') process.exit(3);
+    fs.writeFileSync(${JSON.stringify(readyPath)}, 'held');
+    setInterval(() => {}, 1000);
+  `], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.once('exit', resolve));
+  const deadline = Date.now() + 10000;
+  while (!fs.existsSync(readyPath)) {
+    assert.ok(Date.now() < deadline, 'the holder never took the advance lock');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return { child, exited };
+}
+
 test('a run already being advanced by a live process refuses a second advance and records nothing', async () => {
   const tmp = setupTestRepo();
   const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
   const id = parked.workflowRunId;
-  const lockPath = path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.lock');
-  assert.equal(fs.existsSync(lockPath), false, 'the lock is released when an advance ends');
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'free', 'the lock is released when an advance ends');
 
-  // This test process stands in for the live advancing process.
-  fs.writeFileSync(lockPath, String(process.pid));
+  const held = holdAdvanceHere(tmp, id);
   const eventCount = () => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).length;
   const before = eventCount();
   const opts = { repoRoot: tmp, cwd: tmp };
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
-  assert.throws(() => resumeWorkflowDetached(id, opts), /already being advanced/);
+  assert.throws(() => resumeWorkflowDetached(id, opts), new RegExp(`already being advanced by process ${process.pid}`));
   assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
   await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
   await assert.rejects(answerWorkflow(id, answer), /already being advanced/);
   assert.equal(eventCount(), before, 'a refused advance must not record the gate answer');
-  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid), 'a refused advance leaves the holder lock alone');
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'a refused advance leaves the holder lock alone');
+  held.release();
 
-  // A lock left by a process that is gone is taken over.
-  const dead = execFileSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' });
-  fs.writeFileSync(lockPath, dead);
   const state = await answerWorkflow(id, answer);
   assert.equal(state.status, 'completed');
-  assert.equal(fs.existsSync(lockPath), false);
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'free');
+});
+
+test('an advance holder killed right after it took the lock does not block the next advance', async () => {
+  if (process.platform === 'win32') return;
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const answer = { stepId: 'step-gate', answer: 'yes', approved: true, repoRoot: tmp, cwd: tmp };
+
+  const { child, exited } = await holdAdvanceInChild(tmp, id);
+  await assert.rejects(answerWorkflow(id, answer), new RegExp(`already being advanced by process ${child.pid}`));
+  child.kill('SIGKILL');
+  await exited;
+
+  const startedAt = Date.now();
+  const state = await answerWorkflow(id, answer);
+  assert.equal(state.status, 'completed', 'the next advance goes in at once, with no stale lock to clear');
+  assert.ok(Date.now() - startedAt < 10000);
+});
+
+test('a run directory deleted while a process holds its advance lock gives the next advance a fresh lock', async () => {
+  if (process.platform === 'win32') return;
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const runDir = path.join(tmp, '.fgos', 'workflow-runs', id);
+  const answer = { stepId: 'step-gate', answer: 'yes', approved: true, repoRoot: tmp, cwd: tmp };
+
+  const { child, exited } = await holdAdvanceInChild(tmp, id);
+  try {
+    // The run is removed and recorded again under the same id while the old holder lives on.
+    const events = fs.readFileSync(path.join(runDir, 'events.jsonl'));
+    fs.rmSync(runDir, { recursive: true, force: true });
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'events.jsonl'), events);
+
+    assert.equal(statusWorkflow(id, { repoRoot: tmp, cwd: tmp }).advance.running, false, 'the old holder holds a file that is gone');
+    const state = await answerWorkflow(id, answer);
+    assert.equal(state.status, 'completed', 'the old holder\'s lock on the deleted inode does not hold the new run');
+  } finally {
+    child.kill('SIGKILL');
+    await exited;
+  }
+});
+
+test('reading status while another process advances never makes the advance see the lock held', async () => {
+  if (process.platform === 'win32') return;
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const donePath = path.join(tmp, 'status-loop-done');
+  const reader = spawn(process.execPath, ['--input-type=module', '-e', `
+    import fs from 'node:fs';
+    import { statusWorkflow } from ${JSON.stringify(path.resolve('src/workflow/index.mjs'))};
+    const stopAt = Date.now() + 1500;
+    let reads = 0;
+    while (Date.now() < stopAt) { statusWorkflow(${JSON.stringify(id)}, { repoRoot: ${JSON.stringify(tmp)}, cwd: ${JSON.stringify(tmp)} }); reads += 1; }
+    fs.writeFileSync(${JSON.stringify(donePath)}, String(reads));
+  `], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => reader.once('exit', resolve));
+  let tries = 0;
+  while (!fs.existsSync(donePath)) {
+    const res = acquireSync(createLockScope('test-advance'), 'advance', advanceParams(tmp, id));
+    assert.equal(res.result, 'acquired', 'a status read must never hold the advance lock');
+    res.handle.release();
+    tries += 1;
+  }
+  await exited;
+  assert.ok(tries > 10 && Number(fs.readFileSync(donePath, 'utf8')) > 10, 'both loops overlapped');
 });
 
 function writeRunLog(tmp, id, text) {
@@ -576,12 +675,12 @@ test('status reports a live advance holder and the tail of the advance log', asy
   assert.equal(idle.lastLines, undefined, 'an empty or absent log has nothing to tail');
   assert.equal(idle.hint, undefined, 'a parked run is waiting for an answer, not for a restart');
 
-  // This test process stands in for the live advancing process.
-  fs.writeFileSync(path.join(runDir, 'advance.lock'), String(process.pid));
+  const held = holdAdvanceHere(tmp, id);
   const lines = Array.from({ length: 30 }, (_, i) => `line-${i + 1} ${'x'.repeat(i === 29 ? 500 : 0)}`);
   writeRunLog(tmp, id, lines.join('\n') + '\n');
 
   const live = statusWorkflow(id, opts).advance;
+  held.release();
   assert.equal(live.running, true);
   assert.equal(live.pid, process.pid);
   assert.equal(live.lastLines.length, 20, 'the tail is the last 20 lines');
@@ -595,30 +694,34 @@ test('status says a running run has no live advance and names resume once the la
   const workflow = validateWorkflow({ id: 'test/no-gate', steps: [{ id: 'only', dependsOn: [] }] });
   const { workflowRunId: id } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
   const opts = { repoRoot: tmp, cwd: tmp };
-  const lockPath = path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.lock');
 
   const fresh = statusWorkflow(id, opts);
   assert.equal(fresh.status, 'running');
   assert.equal(fresh.advance.running, false);
   assert.equal(fresh.advance.hint, undefined, 'a just-recorded run may still be starting its advance');
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'locks')), false, 'status of a run never advanced creates no lock file');
 
   ageRunEvents(tmp, id, 10 * 60 * 1000);
   writeRunLog(tmp, id, 'Error: spawn failed\n');
-  const dead = execFileSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' });
-  fs.writeFileSync(lockPath, dead);
+  if (process.platform !== 'win32') {
+    const { child, exited } = await holdAdvanceInChild(tmp, id);
+    child.kill('SIGKILL');
+    await exited;
+  }
 
   const stale = statusWorkflow(id, opts).advance;
-  assert.equal(stale.running, false, 'a lock left by a dead process is not a live advance');
+  assert.equal(stale.running, false, 'a lock whose holder died is not a live advance');
   assert.equal(stale.pid, null);
   assert.match(stale.hint, /not running/);
   assert.ok(stale.hint.includes(`fgos workflow resume ${id}`));
   assert.deepEqual(stale.lastLines, ['Error: spawn failed'], 'whatever the dead child printed stays readable');
 
   // A live holder means the run is being advanced, however old the last event.
-  fs.writeFileSync(lockPath, String(process.pid));
-  const held = statusWorkflow(id, opts).advance;
-  assert.equal(held.running, true);
-  assert.equal(held.hint, undefined);
+  const held = holdAdvanceHere(tmp, id);
+  const live = statusWorkflow(id, opts).advance;
+  held.release();
+  assert.equal(live.running, true);
+  assert.equal(live.hint, undefined);
 });
 
 test('a resumed workflow continues the unit run its dead controller started and dispatches no settled seat again', async () => {

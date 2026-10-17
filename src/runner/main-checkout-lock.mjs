@@ -47,7 +47,6 @@
 //
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveHolderLiveness as resolveHolderLivenessByIdentity } from './dispatch/process-identity.mjs';
 import { RUN_TIMEOUT_MAX_MS } from './dispatch/run-timeout.mjs';
 
 export const LOCK_FILE = 'main-checkout.lock';
@@ -72,14 +71,6 @@ export const LOCK_FILE = 'main-checkout.lock';
  */
 export function mergeSlotLockFile(targetRef) {
   return `merge-slot--${encodeURIComponent(targetRef)}.lock`;
-}
-
-/**
- * Maps a working directory path (cwd) to a collision-free, filesystem-safe
- * lock filename for per-item dispatch concurrency protection (tsk-64hk). Pure.
- */
-export function dispatchLockFile(cwd) {
-  return `dispatch--${encodeURIComponent(cwd)}.lock`;
 }
 
 /** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
@@ -163,35 +154,11 @@ export const UNSUPPORTED_PROTOCOL_MESSAGE = 'the lock was written by a newer fgO
 export const LOCK_PROTOCOL_VERSION = 1;
 
 export const ACQUIRED = 'acquired';
-// tsk-64hk S2 fix (dispatch-engine-liveness-hardening Phase 3): was
-// 'held-by-live-other-pid', which overclaimed a verified-live pid for EVERY
-// holder shape this status covers -- including a string identity, which has
-// no pid to be "live" at all, and (before this fix) even a dispatch-lock
-// composite identity whose embedded pid was confirmed dead but still blocked
-// on ttlMs alone. Neutral name: HELD only ever means "not yet reclaimable by
-// this acquire attempt", never a claim about verified liveness.
+// Neutral name: HELD only ever means "not yet reclaimable by this acquire
+// attempt", never a claim about verified liveness (a string identity has no
+// pid to be "live" at all).
 export const HELD = 'held';
 export const AMBIGUOUS = 'ambiguous';
-
-// COMPOSITE_PID_IDENTITY_RE / parseCompositePidIdentity (S2 fix): the per-cwd
-// dispatch lock's own identity shape (`dispatchLockFile`, cli.mjs's
-// `executeExecutorCli`) is `${pid}:${acquiredAtMs}:${rand}` -- a STRING
-// identity carrying a real pid, unlike every other string-identity caller of
-// this module (the pre-commit hook's opaque session id, claim-port.mjs's
-// session id), which have no process to probe at all. Byte-identical regex
-// to reconciliation-planner.mjs's own `CWD_LOCK_IDENTITY_RE` (that module is
-// banned from importing this file -- it calls `process.kill`, which the
-// reconcile door's own import-graph test forbids -- so the shape is
-// necessarily duplicated there, not imported from here; both are pinned to
-// the same real production format by test/runner/dispatch-reconciliation.
-// test.mjs and test/runner/main-checkout-lock.test.mjs).
-const COMPOSITE_PID_IDENTITY_RE = /^(\d+):(\d+):[a-z0-9]+$/;
-export function parseCompositePidIdentity(identity) {
-  if (typeof identity !== 'string') return null;
-  const match = COMPOSITE_PID_IDENTITY_RE.exec(identity);
-  if (!match) return null;
-  return { pid: Number(match[1]), acquiredAtMs: Number(match[2]) };
-}
 
 /** Signal-0 liveness probe (mirrors loop.mjs/session.mjs/events.mjs's
  * isPidAlive). EPERM means the pid exists under another user — still alive,
@@ -260,20 +227,17 @@ function lockRecord(identity, ts, ttlMs) {
  * run-timeout ceiling (a holder killed without releasing whose pid was reused reads as live, and no
  * record may block longer than one run may take). A record without ttlMs was left by a release
  * before every writer recorded one; it gets the window its writer used:
- *   - a non-composite string identity was only ever written by the pre-commit hook: HOOK_TTL_MS;
- *   - a numeric pid was written by claim, land, merge or a merge slot: DEFAULT_TTL_MS;
- *   - a dispatch composite identity ran under a run timeout: the run-timeout ceiling.
+ *   - a string identity was only ever written by the pre-commit hook: HOOK_TTL_MS;
+ *   - a numeric pid was written by claim, land, merge or a merge slot: DEFAULT_TTL_MS.
  */
 function recordTtlMs(record) {
   if (record.ttlMs !== undefined) return Math.min(record.ttlMs, RUN_TIMEOUT_MAX_MS);
-  if (typeof record.pid === 'number') return DEFAULT_TTL_MS;
-  return parseCompositePidIdentity(record.pid) !== null ? RUN_TIMEOUT_MAX_MS : HOOK_TTL_MS;
+  return typeof record.pid === 'number' ? DEFAULT_TTL_MS : HOOK_TTL_MS;
 }
 
 /**
  * Whether a different identity's parsed `record` still holds the lock at `now`. A numeric holder is
- * held while its pid is alive and the record is within its own ttl; a dispatch composite identity
- * whose embedded pid is confirmed dead is free at once (S2 fix); any other string identity has no
+ * held while its pid is alive and the record is within its own ttl; a string identity has no
  * process to probe and is judged by ttl alone. Returns `{held, ttlMs}`.
  */
 function judgeRecord(record, now) {
@@ -281,13 +245,6 @@ function judgeRecord(record, now) {
   const withinTtl = now - record.ts <= ttlMs;
   if (typeof record.pid === 'number') {
     return { held: isPidAlive(record.pid) && withinTtl, ttlMs };
-  }
-  // No processStartTime is recorded alongside a composite identity, so a live pid cannot yet be told
-  // apart from a different process that reused it (resolveHolderLiveness's legacy-record fallback:
-  // alive + no processStartTime -> 'held'); the ttl above bounds that case.
-  const composite = parseCompositePidIdentity(record.pid);
-  if (composite !== null && resolveHolderLivenessByIdentity({ pid: composite.pid }, isPidAlive(composite.pid)) === 'dead') {
-    return { held: false, ttlMs };
   }
   return { held: withinTtl, ttlMs };
 }

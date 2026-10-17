@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
+import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -31,7 +31,7 @@ function parseFile(filePath) {
   if (filePath.endsWith('.json')) {
     return JSON.parse(content);
   }
-  return YAML.parse(content);
+  return parseYaml(content, { filename: filePath });
 }
 
 /**

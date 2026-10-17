@@ -1621,7 +1621,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }
   // The default run timeout obeys the same ceiling as one run's own: the confinement reaper keeps a
-  // live run's private home and a contender honours a dispatch lock's ttl only up to it.
+  // live run's private home only up to it.
   if (cfg.timeoutMs > RUN_TIMEOUT_MAX_MS) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) "timeoutMs" must be at most ${RUN_TIMEOUT_MAX_MS / 3600000}h, got ${cfg.timeoutMs}ms.`);
   }

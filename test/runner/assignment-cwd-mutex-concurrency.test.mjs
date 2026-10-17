@@ -1,5 +1,5 @@
 // dispatch-engine-liveness-hardening Phase 8 (S4): the cli-spawn detached-
-// supervisor path had no acquireMainCheckoutLock coverage at all, so two
+// supervisor path had no per-cwd dispatch lock coverage at all, so two
 // DIFFERENT MUTATING Assignments (real, independent admission ledgers)
 // could mutate the SAME cwd concurrently. This proves the fix against the
 // REAL cli-spawn adapter path (useSupervisorRecovery, the default adapter
@@ -14,12 +14,8 @@
 //
 // Two concurrent executeAssignment() calls in the SAME process (rather than
 // two spawned OS processes) is deliberate and still proves real admission-
-// time contention: acquireMainCheckoutLock's own per-call composite string
-// identity (`${pid}:${ts}:${rand}`) never self-recognizes a second, unrelated
-// call from the same process as a refresh of the first (see
-// assignment-runner.mjs's own comment on this), and a composite identity's
-// held-ness is judged by the EMBEDDED pid's real liveness -- so the lock
-// genuinely contends here exactly as it would across two real OS processes.
+// time contention: each call opens its own description of the kernel lock
+// file, and two descriptions exclude each other even inside one process.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -157,7 +153,7 @@ test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd i
       (err) => {
         assert.equal(err.errorClass, 'dispatch-in-flight', `expected dispatch-in-flight, got ${err.errorClass}: ${err.message}`);
         assert.equal(err.cwd, tempDir);
-        assert.ok(typeof err.holderPid === 'string' && err.holderPid.startsWith(`${process.pid}:`), `holder identity must name the current holder; got ${err.holderPid}`);
+        assert.equal(err.holderPid, process.pid, 'the refusal must name the process holding the lock');
         assert.ok(err.message.includes(tempDir), 'refusal message must name the contended cwd');
         return true;
       },

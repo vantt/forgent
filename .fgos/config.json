@@ -14,7 +14,9 @@
         "--model",
         "{model}",
         "--permission-mode",
-        "acceptEdits"
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*),Bash(rtk cargo:*),Bash(rtk node:*),Bash(rtk proxy cargo:*),Bash(rtk proxy node:*),Skill"
       ]
     },
     "capabilities": {
@@ -745,9 +747,7 @@
               "-p",
               "{prompt}",
               "--model",
-              "{model}",
-              "--allowedTools",
-              "Read,Edit,Write,Glob,Grep,Skill,Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*)"
+              "{model}"
             ],
             "confinement": {
               "backend": "bwrap"
@@ -1582,6 +1582,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
+    "maxTier": "advanced",
     "confinement": {
       "strict": false
     },
@@ -1624,7 +1625,7 @@
         ]
       }
     ],
-    "idleTimeoutMs": 1500000
+    "idleTimeoutMs": 5400000
   },
   "gateBypass": {
     "level": "standard"

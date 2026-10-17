@@ -27,15 +27,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
+import { compileDomain } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
-import { agentShapeProblem, findAgentDuplicates, scanAgentTiers } from '../runner/agent-definitions.mjs';
+import { agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import {
@@ -52,7 +54,12 @@ import {
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
-import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
+import {
+  checkWorkflowPoolsSatisfyIndependence,
+  readWorkflowDefinitionFiles,
+  withUnreadableDefinitions,
+  workflowRoots,
+} from './workflow-pool-independence.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
@@ -89,7 +96,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
@@ -122,6 +129,8 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -880,44 +889,6 @@ function allTaskSpecs(cwd) {
   return specs;
 }
 
-// Extracts a `skills:` list's own item strings from raw yaml SOURCE TEXT,
-// without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
-// must keep loading in a plain unpacked copy with no `node_modules/` yet
-// (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
-// fgos that is not in a git checkout" case proves this is a real,
-// exercised scenario) -- a static top-level `import ... from 'yaml'`
-// would break module load there even though 'yaml' is a real dependency
-// used elsewhere (scripts/project-agents.mjs, run only after `npm
-// install`, well after this constraint applies). Supports both block-list
-// (`skills:\n  - a\n  - b`) and inline flow (`skills: [a, b]`) styles,
-// enough for a diagnostic -- the real authority on whether a source yaml
-// is well-formed is project-agents.mjs's own full parse at projection
-// time, never this heuristic.
-function extractSkillsFromYamlText(text) {
-  const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
-  if (inlineMatch) {
-    return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
-  }
-  const lines = text.split('\n');
-  const skills = [];
-  let inBlock = false;
-  for (const line of lines) {
-    if (/^skills:\s*$/.test(line)) {
-      inBlock = true;
-      continue;
-    }
-    if (!inBlock) continue;
-    const item = line.match(/^\s+-\s*(\S+)\s*$/);
-    if (item) {
-      skills.push(item[1]);
-      continue;
-    }
-    if (line.trim() === '') continue;
-    break;
-  }
-  return skills;
-}
-
 function parseTaskSpecHeaderFields(headerLine) {
   if (!headerLine) return {};
   const parts = headerLine.split('|').map((p) => p.trim());
@@ -992,23 +963,36 @@ function allAgentYamlFiles(cwd) {
   return files;
 }
 
+// Reads every agent file once and maps agent name to the skills it declares. A file that cannot be
+// read or is not valid YAML is left out of the map and named in `problems`, never skipped silently.
+function readAgentSkills(agentFiles) {
+  const agentSkillsMap = new Map();
+  const problems = [];
+  for (const file of agentFiles) {
+    const rel = `${file.source}/${file.fileName}`;
+    let text;
+    try {
+      text = fs.readFileSync(file.filePath, 'utf8');
+    } catch (error) {
+      problems.push(`${rel}: cannot be read (${error.message})`);
+      continue;
+    }
+    const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });
+    if (error) {
+      problems.push(`${rel}: ${error}`);
+      continue;
+    }
+    agentSkillsMap.set(declared ?? file.fileName.replace(/\.yaml$|\.yml$/, ''), new Set(skills));
+  }
+  return { agentSkillsMap, problems };
+}
+
 // tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
 // agent-type declares skills. Check validates every requires-skill is provided by at least
 // one agent-type, and every pinned agent exists.
 function checkAgentClaimsResolve(cwd) {
   const agentFiles = allAgentYamlFiles(cwd);
-  const agentSkillsMap = new Map();
-  for (const file of agentFiles) {
-    try {
-      const text = fs.readFileSync(file.filePath, 'utf8');
-      const nameMatch = text.match(/^name:\s*(\S+)/m);
-      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
-      const skills = extractSkillsFromYamlText(text);
-      agentSkillsMap.set(name, new Set(skills));
-    } catch {
-      continue;
-    }
-  }
+  const { agentSkillsMap, problems: agentFileProblems } = readAgentSkills(agentFiles);
 
   const allProvidedSkills = new Set();
   for (const skillsSet of agentSkillsMap.values()) {
@@ -1016,7 +1000,7 @@ function checkAgentClaimsResolve(cwd) {
   }
 
   const taskSpecs = allTaskSpecs(cwd);
-  const problems = [];
+  const problems = [...agentFileProblems];
 
   for (const spec of taskSpecs) {
     let text;
@@ -1064,18 +1048,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   const problems = [];
 
   const agentFiles = allAgentYamlFiles(root);
-  const agentSkillsMap = new Map();
-  for (const file of agentFiles) {
-    try {
-      const text = fs.readFileSync(file.filePath, 'utf8');
-      const nameMatch = text.match(/^name:\s*(\S+)/m);
-      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
-      const skills = extractSkillsFromYamlText(text);
-      agentSkillsMap.set(name, new Set(skills));
-    } catch {
-      continue;
-    }
-  }
+  const { agentSkillsMap, problems: agentFileProblems } = readAgentSkills(agentFiles);
+  problems.push(...agentFileProblems);
   const allProvidedSkills = new Set();
   for (const skillsSet of agentSkillsMap.values()) {
     for (const s of skillsSet) allProvidedSkills.add(s);
@@ -1282,11 +1256,11 @@ function checkAgentTypeNamesUnique(cwd) {
     try {
       text = fs.readFileSync(entry.file, 'utf8');
     } catch (error) {
-      problems.push(`${entry.rel} cannot be read (${error.message})`);
+      problems.push(`${entry.rel}: cannot be read (${error.message})`);
       continue;
     }
     const problem = agentShapeProblem(entry.name, text);
-    if (problem) problems.push(`${entry.rel} ${problem}`);
+    if (problem) problems.push(`${entry.rel}: ${problem}`);
     // Keys the renderer drops are not an error (the file still seats); they are said here because
     // nothing else says it, and a persona that silently loses its voice or boundary is a failure.
     for (const warning of agentRenderWarnings(text)) notes.push(`${entry.rel}: ${warning}`);
@@ -1492,16 +1466,17 @@ registerCheck({
   check: (cwd) => checkAgentClaimsResolve(cwd),
 });
 
-// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) so it
-// loads with no YAML parser. A missing or unreadable file breaks every command that resolves a
-// domain; a stale one (YAML edited, not rebuilt) silently serves old steps. The freshness half
-// needs the `yaml` package, so it only runs where that package resolves (a checkout after install).
+// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) at
+// import time. A missing or unreadable file breaks every command that resolves a domain; a stale
+// one (YAML edited, not rebuilt) silently serves old steps; a YAML file that cannot be parsed
+// cannot be compiled at all. This check names each of those per domain, compiling from the YAML
+// with the same function the build uses.
 function checkDomainRegistryCompiled(cwd) {
   const domainsDir = path.join(cwd, 'domains');
   if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
   const problems = [];
   let checked = 0;
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
     checked += 1;
     const compiled = path.join(domainsDir, entry.name, 'compiled.json');
@@ -1509,21 +1484,31 @@ function checkDomainRegistryCompiled(cwd) {
       problems.push(`domains/${entry.name}/compiled.json is missing`);
       continue;
     }
+    let onDisk;
     try {
-      JSON.parse(fs.readFileSync(compiled, 'utf8'));
+      onDisk = JSON.parse(fs.readFileSync(compiled, 'utf8'));
     } catch (err) {
       problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
+      continue;
     }
+    let fromYaml;
+    try {
+      fromYaml = JSON.parse(JSON.stringify(compileDomain(path.join(domainsDir, entry.name))));
+    } catch (err) {
+      problems.push(err.message);
+      continue;
+    }
+    if (!isDeepStrictEqual(onDisk, fromYaml)) problems.push(`domains/${entry.name}/compiled.json is stale — run npm run build:domains`);
   }
   if (problems.length > 0) {
-    return { passed: false, message: `${problems.join('; ')} — run npm run build:domains` };
+    return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled and readable` };
+  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled, readable and in step with their YAML` };
 }
 
 registerCheck({
   id: 'domain-registry-compiled',
-  description: "every domain's compiled.json (the YAML-free form the Work lifecycle reads) exists and parses",
+  description: "every domain's compiled.json (the form the Work lifecycle reads) exists, parses and matches its registry and workflow YAML",
   check: (cwd) => checkDomainRegistryCompiled(cwd),
 });
 
@@ -2232,40 +2217,45 @@ registerCheck({
   check: () => checkProviderCapacityState(),
 });
 
-// C2c: withFileLock's own runtime reclaim handles a dead-holder lock the
-// moment the NEXT lease/release/quarantine call contends for it, but doctor
-// gets a passive, standalone signal so an operator sees a stuck lock (a
-// SIGKILL between openSync and unlinkSync leaves every future provider-
-// capacity call blocked for waitMs until the next contender happens to
-// reclaim it) without needing to wait for that next real call. Read-only;
-// never reclaims the lock itself -- pure inspection.
-export function checkProviderCapacityLockStale() {
-  let lock;
-  try {
-    lock = inspectProviderCapacityLock(defaultProviderCapacityRuntimeDir());
-  } catch (err) {
-    return { passed: false, message: `provider-capacity lock unreadable: ${err.message}` };
-  }
-  if (!lock.present) {
-    return { passed: true, message: 'no provider-capacity lock file present' };
-  }
-  if (lock.holderAlive === false) {
-    return {
-      passed: false,
-      message: `provider-capacity lock at ${lock.lockPath} is held by dead pid ${lock.holderPid} -- will self-heal on the next lease/release/quarantine call, or remove the file manually`,
-    };
-  }
-  if (lock.holderAlive === null) {
-    return { passed: true, message: `provider-capacity lock present but unreadable/unattributed at ${lock.lockPath} -- treated as live, not stale` };
-  }
-  return { passed: true, message: `provider-capacity lock held by live pid ${lock.holderPid} -- expected under real contention` };
-}
-
+// Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
+// of both lock directories, the borrow vectors, who holds each lock, the
+// cutover fences, the predecessor kill wait and the one state root. Bodies
+// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
+// directories; the `lock-fences` fix is the cutover step and acts only in a
+// workspace whose activated release already runs these locks.
 registerCheck({
-  id: 'provider-capacity-lock-stale',
-  description: 'provider-capacity lock file (if any) is not held by a dead process',
-  check: () => checkProviderCapacityLockStale(),
+  id: 'lock-kernel-semantics',
+  description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
+  check: (cwd) => checkLockKernelSemantics(cwd),
 });
+registerCheck({
+  id: 'lock-borrow-vectors',
+  description: 'a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)',
+  check: (cwd) => checkLockBorrowVectors(cwd),
+});
+registerCheck({
+  id: 'lock-holders',
+  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',
+  check: (cwd) => checkLockHolders(cwd),
+});
+registerCheck({
+  id: 'lock-fences',
+  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',
+  check: (cwd) => checkLockFences(cwd),
+});
+registerCheck({
+  id: 'lock-predecessor-kill-wait',
+  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',
+  check: (cwd) => checkLockPredecessorKillWait(cwd),
+});
+registerCheck({
+  id: 'state-root',
+  description: 'Node and the Rust host resolve the same state root and lock root',
+  check: (cwd) => checkStateRoot(cwd),
+});
+registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
+registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
+registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md D2): the two role-by-intelligence capability slots --
@@ -2482,34 +2472,36 @@ registerCheck({
 // bind() resolves it (exact name, then the bare verb). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
 // A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
-// Read straight from the definition files with a line match instead of loading them
-// through the Workflow loader: `fgos setup` runs from copies of fgos that have no
-// installed dependencies, and the loader needs the YAML parser.
-function workflowCapabilityUses(root) {
+// Definition files come from the one Workflow reader (readWorkflowDefinitionFiles) and every string
+// under a key named `capability`, at any depth, is a use. A file that cannot be read or parsed is
+// reported by name, never skipped.
+function workflowCapabilityUses(files) {
   const uses = new Map();
-  const dirs = [];
-  const core = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(core)) dirs.push([core, '']);
-  const domainsDir = path.join(root, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
-      const dir = path.join(domainsDir, d.name, 'workflows');
-      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`]);
-    }
-  }
-  for (const [dir, prefix] of dirs) {
-    for (const file of fs.readdirSync(dir).sort()) {
-      if (!/\.(ya?ml|json)$/i.test(file)) continue;
-      const id = `${prefix}${file.replace(/\.[^.]+$/, '')}`;
-      for (const line of fs.readFileSync(path.join(dir, file), 'utf8').split('\n')) {
-        const match = /^\s*"?capability"?\s*:\s*["']?([^\s"',#]+)/.exec(line);
-        if (!match) continue;
-        if (!uses.has(match[1])) uses.set(match[1], new Set());
-        uses.get(match[1]).add(id);
-      }
+  for (const { fileId, raw } of files) {
+    for (const capability of capabilityValues(raw)) {
+      if (!uses.has(capability)) uses.set(capability, new Set());
+      uses.get(capability).add(fileId);
     }
   }
   return uses;
+}
+
+// Every string stored under a key named `capability`, at any depth. Iterative with a visited set:
+// a YAML alias can make a document reference itself, and a recursive walk would never end.
+function capabilityValues(root) {
+  const found = [];
+  const visited = new Set();
+  const queue = [root];
+  for (let next = 0; next < queue.length; next += 1) {
+    const node = queue[next];
+    if (node === null || typeof node !== 'object' || visited.has(node)) continue;
+    visited.add(node);
+    for (const [key, value] of Array.isArray(node) ? node.entries() : Object.entries(node)) {
+      if (key === 'capability' && typeof value === 'string' && value.trim() !== '') found.push(value.trim());
+      else queue.push(value);
+    }
+  }
+  return found;
 }
 
 // Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's
@@ -2518,18 +2510,18 @@ function workflowCapabilityUses(root) {
 const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
 
 function checkWorkflowCapabilitiesConfigured(cwd) {
-  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
-  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const uses = workflowCapabilityUses(packageRoot);
+  const { files, unreadable } = readWorkflowDefinitionFiles(workflowRoots(cwd, packageRoot));
+  const uses = workflowCapabilityUses(files);
   for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
     uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
   }
-  if (path.resolve(cwd) !== packageRoot) {
-    for (const [capability, ids] of workflowCapabilityUses(cwd)) {
-      uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
-    }
-  }
+  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, uses), unreadable);
+}
+
+function evaluateWorkflowCapabilities(cwd, uses) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const missing = [...uses].filter(
     ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
   );
