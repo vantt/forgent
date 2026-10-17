@@ -60,6 +60,12 @@ rg -n "win32|unsupported on Windows|no holder-lock driver|not applicable on Wind
 - A crash during a borrowed git commit costs about 120–170 ms at the next acquire.
 - Reword the older lines that promise "until the Windows driver".
 
+**Hot records of `state` and `porting-events` on Windows** (added 2026-10-17 18:50 by the 4.3 lane; plan 4.3 re-cut block):
+- Plan 4.3 wave S ships `src/state/hot-lock.mjs`, whose dead-holder reclaim uses `judge(tuple)` from `/proc`. On Windows the record has no `startTime`/`pidNs`, `judge` returns `unknown`, and the hot lock fails closed: a holder that crashed blocks `state` until `fgos lock fence state`.
+- Give the Node `judge` a Windows branch that decides dead or alive for a hot record from this plan's process identity (`fgos-process` on Windows: creation time from the process handle), so a crashed holder is reclaimed under `<resource>.reclaim` exactly as on Linux. Unknown or unopenable stays `unknown` (fail closed, must-have 2 of the probe).
+- Test on the Windows CI job: holder killed inside `withStateTx`, a second process reclaims within the 5 s wait; a live holder is never reclaimed.
+- If wave S has not landed when this phase starts, skip this item and record it in the report; it then moves to a follow-up.
+
 ## Owned files
 
 | Action | File |

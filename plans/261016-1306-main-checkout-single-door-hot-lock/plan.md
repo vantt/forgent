@@ -1,7 +1,7 @@
 ---
 title: "4.3 Main checkout một cửa + mutex nóng state"
 description: "Main mutex sang kernel lock với một cửa withMainCheckout và checkpoint nhận handle, mượn qua fd thay FGOS_MAIN_LOCK_HOLDER_PID, worktree-admin, gộp events.lock + claims.lock thành state có stateTx, exec ra khỏi vùng găng nóng, kiểm trần và thu hẹp claim trong một commit; cutover dừng-toàn-bộ"
-status: pending
+status: in-progress
 priority: P1
 effort: 50h
 branch: worktree-agent-ae86665b911b82fc1
@@ -29,6 +29,20 @@ created: 2026-10-16
 >   3. Bằng chứng git ở P09/P10 **không dựa vào** `events.jsonl`, shard `.fgos/events/`, hot-lock hay `stateTx`.
 >   4. Không đưa vào P00 bảng kê `stateTx` hay call site của state, không đổi `merge=union`, `.gitattributes` hay luật strip `.fgos` trong phần này: các thứ đó chờ kết luận event store.
 > - Bối cảnh: [roadmap](../reports/roadmap-261016-2212-fgos-cook-and-git-component.md), [danh mục bài học git](../reports/research-261017-1032-git-lessons-catalogue.md), [probe event store](../reports/investigation-261017-1027-fgos-event-store-git-coupling.md).
+
+> **CẮT LẠI 2026-10-17 18:50 (lane 4.3, anh duyệt "chọn b").** Thay đoạn "Phần state tạm giữ" ở trên.
+> - **Phần khoá repo đã land** 10-17 18:28 trên máy owner: main `56f87bf5b`, [báo cáo landing](../reports/landing-261017-1827-main-door-repo-lock-stop-everything-landing.md). Máy thứ hai land riêng.
+> - **Hội đồng event store đã xong:** anh ký D-ADR0055 ([spec](../../docs/platform/event-store/spec.md) §13, §17, §20; [brief cho lane này](../reports/brief-261017-1823-main-door-state-recut-after-event-store.md)). `withStateTx` trên hot-mutex `state` chính là cổng Work mà event store dựng lên trên, nên P01, P02 giữ nguyên như đã viết và không phụ thuộc chỗ event được lưu. Rào F10 điểm 4 vẫn giữ: không đổi định dạng event, `merge=union`, `.gitattributes`, luật strip `.fgos` (thuộc cutover event store, spec §18).
+> - **Wave S (phần state), chạy từ main**, nhánh tích hợp `main-door-state/integration` (worktree `.claude/worktrees/ms-integration`), phase `main-door-state/sNN-<slug>` (worktree `.claude/worktrees/ms-sNN`), lead Sonnet, một lead một lúc:
+>   1. **S1** = phần state của P00 (contract `hot-lock.v1.json` + test contract) + [P01](phase-01-hot-lock-core.md).
+>   2. **S2** = [P02](phase-02-state-cutover-claims-merge.md). Giữ "một lần tra main checkout cho mỗi lần đọc" của `a4b1278ae` (`readClaims`; test đếm spawn trong `test/state/runtime-coordination.test.mjs`).
+>   3. **S3** = [P04](phase-04-claim-capacity-and-narrow-claim.md) **đủ cả hai nửa, một commit** (kiểm trần trong `state` + main chỉ giữ quanh checkpoint). Không tách như spec event store §20 gợi ý: kiểm trần trong `state` mà main còn tuần tự hoá mọi claim thì dư; phần thu hẹp là chỗ bớt thời gian chờ `main-checkout.lock` mà spec §17 gán cho P04. Cutover event store sau này chỉ xoá lời gọi checkpoint. P04 không thêm đường lock nên, nếu trễ, được cắt ra và land bằng merge + activate thường, không cần dừng toàn bộ.
+>   4. **S4** = phần state của [P09](phase-09-doctor-setup-fences-docs-changelog.md): check `lock-record-unreadable`, hàng rào `events.lock`, `runtime/claims.lock`, `porting/events.lock`, docs, CHANGELOG.
+>   5. **S5** = phần A của [P10](phase-10-integration-dogfood-landing.md). **Phần B (một ngày dogfood) thay bằng** (anh chọn phương án b, 18:46): full `npm test` (gác exec cũng ném trong test) + smoke trên clone đủ mọi verb ghi state (`take`, `pick`, `return`, `approve`, `move`, `add`, `edit`, workflow runner, porting) + 1–2 unit `fgos run` thật trên clone. Mọi `exec-under-hot-lock`, `hot-lock-reentry`, `lock-order-violation` được sửa trong phase sở hữu file.
+>   6. Landing dừng-toàn-bộ (phần C của P10, cắt cho phần state), anh chọn giờ; máy thứ hai land riêng.
+> - **Windows:** hot record trên Windows thiếu `/proc`, `judge` ra `unknown`, nên S1 **fail closed** (không dọn; thoát bằng `fgos lock fence state`), đúng quyết định "Windows báo unsupported, không lùi về đường cũ". Phán holder chết trên Windows chuyển sang [4.4b](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) P05 ("các nhánh Windows còn lại").
+> - **Tiêu chí 2, 3, 5 và phần `withClaimsLock`/`withEventsLock` của tiêu chí 4** thuộc wave S. Plan 4.3 đóng khi wave S land.
+> - **Mở khoá sau wave S:** 6.2 P09 (cần P01 + P02: bản ghi nóng có `pidNs`) và phase chuyển Work của event store.
 
 ## Phạm vi
 

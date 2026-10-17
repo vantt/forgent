@@ -33,9 +33,9 @@ Trạng thái: `landed` · `running` · `ready` (chạy được, chưa ai nhậ
 | 4.2 | Holder-lock: cổng lock, kernel lock cho các lock lạnh | [plan](../261016-1104-holder-lock-kernel-lock-foundation/plan.md) | **landed** 10-17 12:30, main `0d6da9033`, release `af277e02…` ở forgentX, mdview, mcp-skill-hub | xong; [báo cáo landing](../reports/landing-261017-1219-holder-lock-stop-everything-landing.md) | — | 4.3, 4.4a, 6.2, 6.5 |
 | 4.4a | Rust callers lên holder-lock (`fgctl`, `install.lock`, observe) | [plan](../261016-1306-fgctl-rust-callers-on-holder-lock/plan.md) | **landed** 10-17 16:25 (máy owner), 16:43 (máy thứ hai) | main `09f824ea0`, release `79ead131…`, 3 workspace activate, fence đủ; [báo cáo landing](../reports/landing-261017-1625-rust-callers-holder-lock-stop-everything-landing.md). Máy thứ hai (`~/projects/forgent`): release `2895ff70…`, fence 214/214, [báo cáo](../reports/landing-261017-1643-rust-callers-holder-lock-this-machine.md) | — | 4.3 P08 + landing 4.3 |
 | 4.3-R | Main checkout một cửa: **phần khoá repo** | [plan](../261016-1306-main-checkout-single-door-hot-lock/plan.md), rào chắn F10 | **landed** 10-17 18:28 (máy owner) | main `56f87bf5b`, release `e74cb03c…`, 3 workspace activate, fence đủ (2420/216/17); [báo cáo landing](../reports/landing-261017-1827-main-door-repo-lock-stop-everything-landing.md); máy thứ hai chưa land | máy thứ hai landing | component Git (dùng lại nguyên các khoá) |
-| 4.3-S | Main checkout: **phần state** (hot-lock, `stateTx`, gộp `claims.lock`, trần claim + thu hẹp) | cùng plan; P01, P02, P04 + phần state của P00/P09 | **ready** (lane 4.3 đã cắt lại 18:35) | plan 4.3 đóng với phần khoá repo; phần state chạy thành **wave riêng từ main**, dùng lại phase file P01 → P02 → nửa capacity của P04 (thu hẹp `main-checkout` để sau cutover event store), nhánh `main-door-state/integration`, lead Sonnet, một lần landing; tiêu chí 2, 3, 5 và phần `withClaimsLock`/`withEventsLock` của tiêu chí 4 chuyển sang wave này; rào F10 vẫn giữ; [brief](../reports/brief-261017-1823-main-door-state-recut-after-event-store.md) | owner cho bắt đầu | 6.2 P09; phase chuyển Work của event store |
+| 4.3-S | Main checkout: **phần state** (hot-lock, `stateTx`, gộp `claims.lock`, trần claim + thu hẹp) | [plan 4.3](../261016-1306-main-checkout-single-door-hot-lock/plan.md), khối "CẮT LẠI 18:50" | **running** (wave S, từ 10-17 19:00) | nhánh `main-door-state/integration` từ main; S1 (contract hot-lock + P01) → S2 (P02) → S3 (P04 đủ hai nửa, một commit; cắt ra được nếu trễ) → S4 (phần state của P09) → S5 (P10A; dogfood một ngày thay bằng full suite + smoke mọi verb ghi state + 1–2 `fgos run` thật, owner chọn b 18:46); lead Sonnet; máy owner, big lead `forgentx-95`. Windows: hot-lock fail closed, phán holder chuyển sang 4.4b P05 | landing dừng toàn bộ: owner chọn giờ (cả 2 máy) | 6.2 P09 (cần S1+S2); phase chuyển Work của event store |
 | ES | Event store (luật L3 chạm ngưỡng xem lại) | [spec v2](../../docs/platform/event-store/spec.md), [đo V-SPAWN-01](../reports/experiment-261017-1431-event-store-v-spawn-01.md), [hội đồng 1](../reports/council-261017-1210-event-store-final-packet.md), [thí nghiệm 1](../reports/experiment-261017-1220-event-store-exp1-relocate-open-shards.md), [thí nghiệm 2](../reports/experiment-261017-1220-event-store-exp2-seal-first-merge-crash.md), hội đồng 2 `wf-run-1792216377992-d45c6038` | **running** | 10-17 14:35, phiên `ac420727` (máy thứ hai): owner đã chốt B + lõi Rust, view là cache, claims runtime, phạm vi project/branch/local, **Q1=(a) event niêm phong nằm trên ref git riêng mỗi máy `refs/fgos/events/<máy>`, không là file trong cây**, Q2 chia sẻ giữa 3 máy. Spec v2 đã viết xong (giữ cổng read-check-append của Work, thứ tự theo `seq` không theo đồng hồ, giao thức đọc khi đang niêm phong); số đo nền: p95 `take` ở 20 phiên là 37 giây, một `take` sinh 983 process. Đường Node→Rust chưa chọn (N-API hay facade, vướng rào exec của 4.3 P01). Xuất bản không đi qua `main-checkout.lock` | hội đồng mở lại `wf-run-1792222330384-ad2d44f3` xong ([packet](../reports/council-261017-1513-event-store-reopen-final-packet.md)): đủ ý, cần sửa M1-M4. Owner 15:13 chốt: N-API không ngoại lệ exec, chấp nhận xung đột ghi lại giữa máy, không giới hạn số event chưa niêm phong. Spec đã sửa M1-M4 và gộp kết quả [model check](../reports/experiment-261017-1527-event-store-model-check-reader-seal.md) (tìm 6 phản ví dụ, đã sửa văn bản) và [thí nghiệm ref git](../reports/experiment-261017-1527-event-store-git-ref-mechanics.md) (6/6 đạt). Đang chạy model check lại trên quy tắc đã sửa `wf-run-1792226327422-dac63901` → owner ký decision thay L3 | 4.3-S → 6.2 P09 → 6.3 → 6.4 |
-| 4.4b | Driver Windows (`LockFileEx` + Job Object), bàn giao macOS | [plan](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) (7 phase, khoảng 36 giờ; D3 đã duyệt 13:53: domain `windows-job` chuyển từ 6.2 P02 sang đây) | **ready** sau khi 4.4a và 4.3-R land | plan trên main `703f0b130`; cổng probe đã đạt ([probe](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md), 0/500) | 4.4a và 4.3-R land; trước khi land 4.4b, owner chạy stress 500 lần trên máy Windows | `fgos run` trên Windows (6.2 D7) |
+| 4.4b | Driver Windows (`LockFileEx` + Job Object), bàn giao macOS | [plan](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) (7 phase, khoảng 36 giờ; D3 đã duyệt 13:53: domain `windows-job` chuyển từ 6.2 P02 sang đây) | **running** (từ 10-17 19:00) | nhánh `win-driver/integration`; P00 → P01 ∥ P02 → P03 → P04 → P05 (+ phán holder hot-lock `state` trên Windows, thêm 18:50) → P06; lead Sonnet; máy owner. Không cần chờ 4.3-S: plan chờ 4.3 vì `src/holder-lock/*`, phần đó thuộc 4.3-R đã land | 4.4a và 4.3-R land; trước khi land 4.4b, owner chạy stress 500 lần trên máy Windows | `fgos run` trên Windows (6.2 D7) |
 | 6.5 | terminal-control: lõi Rust, driver herdr | [plan](../261016-1306-terminal-control-rust-core-herdr-driver/plan.md) | **ready** | xếp hàng sau 4.4a / 4.3-R trên máy owner | — (song song được với 4.3, 4.4a) | 6.3 |
 | 6.2 | Run supervisor: lõi Rust, cách khởi động direct | [plan](../261016-1351-run-supervisor-rust-core-direct-mode/plan.md) | **ready** P00–P08; **held** P09 | nhánh nháp `run-supervisor/p02-containment-win-mac` (10-16) | P09 chờ 4.3-S P01+P02 | 6.3, 6.4 |
 | 6.3 | Terminal mode + nửa launcher của identity | [plan](../261016-1351-terminal-mode-and-launcher-identity/plan.md) | **held** | — | 6.2 **và** 6.5 land | 6.4 |
@@ -57,20 +57,20 @@ flowchart LR
   L42 --> L65["6.5 terminal-control (ready)"]
   L42 --> L62a["6.2 P00–P08 (ready)"]
   L44a -->|activate fgctl mới| L43R
-  ES["Event store: spec v2 + đo (running)"] --> L43S["4.3-S state (held)"]
+  ES["Event store: D-ADR0055 ký"] --> L43S["4.3-S state wave S (running)"]
   L43S --> L62b["6.2 P09 (held)"]
   L62a --> L62b
   L62b --> L63["6.3 terminal mode (held)"]
   L65 --> L63
   L63 --> L64["6.4 controller chết (held)"]
-  PROBE["probe Windows ✅"] --> L44b["4.4b driver Windows (planning)"]
+  PROBE["probe Windows ✅"] --> L44b["4.4b driver Windows (running)"]
   L44b -.Windows.-> L62b
   L43R --> GIT["Component Git (not-planned)"]
   GIT --> COOK["fgos-cook P4–P6"]
   MPA["Config model/pool đợt A (ready)"]
 ```
 
-**Đường găng:** hội đồng event store → 4.3-S → 6.2 P09 → 6.3 → 6.4. Mọi thứ khác chạy song song quanh nó.
+**Đường găng:** 4.3-S (wave S) → 6.2 P09 → 6.3 → 6.4. Lane khoá đóng khi 4.4b land (việc dài nhất, cần owner chạy stress 500 lần trên máy Windows). Mọi thứ khác chạy song song quanh nó.
 
 ## Quyết định đang treo
 
@@ -108,6 +108,7 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 - **Chuỗi lead trên máy owner:** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
 
 ## Nhật ký
+- 2026-10-17 18:50 (`forgentx-95`): 4.3-R land 18:28 (máy owner). Cắt lại 4.3-S thành wave S từ main (P04 làm đủ hai nửa; dogfood đổi theo phương án b). 4.4b chạy song song ngay. Gửi phiên event store: spec §13 ghi `state` ở `<fgosDir>/locks/state.lock`, còn plan 4.3 và registry dùng `state.hot` + kernel `state.reclaim.lock`; nên sửa spec cho khớp.
 - 2026-10-17 15:30 (phiên `56677996`): thêm luồng YAML (landed 10-16) và INS (phần làm tay landed `f9ea9c219`; nhóm A chờ D6).
 
 - 2026-10-17 13:55: đặt `maxTier` là flagship; plan 4.4b đã lên main. 4.4a xong P00–P02; 4.3-R xong P00, P03, P05, P04r và P06.
