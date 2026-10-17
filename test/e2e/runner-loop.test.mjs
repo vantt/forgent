@@ -1068,16 +1068,11 @@ test('e2e crash-idempotency: runner killed mid-round (after doing, before the wo
   const record = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
   assert.equal(record.execution.status, 'running', 'nothing settled the killed round');
 
-  // Second --once: the killed runner left its runner.lock behind, so this
-  // run cleans the stale lock and yields busy (exit 6).
-  const second = runner(repoRoot, ['--once']);
-  assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
-  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
-
-  // Third --once: acquires a clean lock; startup reap resolves the stale
+  // Second --once: the kernel released the killed runner's lock with its
+  // process, so this run acquires at once; startup reap resolves the stale
   // `doing` item. Its branch carries no commit, so it is reclaimed blocked.
-  const third = runner(repoRoot, ['--once']);
-  assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
+  const second = runner(repoRoot, ['--once']);
+  assert.equal(second.status, 0, `--once after a killed runner did not recover cleanly: ${second.stderr}`);
   assert.equal(stateView(repoRoot).work['item-crash'].status, 'blocked');
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 0, 'the reap never re-ran the item');
 
@@ -1086,7 +1081,7 @@ test('e2e crash-idempotency: runner killed mid-round (after doing, before the wo
   // else leaked.
   assert.equal(fs.readFileSync(path.join(held, 'output.txt'), 'utf8'), 'produced by worker\n');
   assert.equal(worktreeCount(repoRoot), 2, 'only the killed round\'s own checkout is left');
-  assert.match(third.stdout + third.stderr, new RegExp(`keeping fgw/item-crash \\(0 commits, but still checked out at `));
+  assert.match(second.stdout + second.stderr, new RegExp(`keeping fgw/item-crash \\(0 commits, but still checked out at `));
   // The kept checkout lives in the runner's default worktree dir, outside the fixture.
   execFileSync('git', ['worktree', 'remove', '--force', held], { cwd: repoRoot });
 });
