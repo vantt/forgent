@@ -88,6 +88,7 @@ The spec also takes the following decisions inside that frame. They are agent de
 - `fgos rebuild` stays the one rebuild door (section 15);
 - the fetch refspec is configured and the push refspec is not, and mirrors live under `refs/fgos/remotes/<remote>/`, the namespace V-REF-01 tested (section 14);
 - `eventStore.sync.intervalSec` defaults to 300 (section 14);
+- `eventStore.rebuild.maxAttempts` defaults to 5 (section 13);
 - the 50 ms in-gate latency number is a proposed default and has not been measured (section 17).
 
 The first council rejected the draft as an implementation contract for six reasons, and each is fixed here: C1 (section 13), C2 (section 12), C3 (section 11), the overclaim of experiment 2 (section 24), the rollback against `src/state/replay.mjs:876-880` (section 18), and the O1-O7 labels (this section). The reopen council's four amendments are applied as follows:
@@ -266,7 +267,7 @@ One open log per stream, not per writer: the per-writer files of today (`src/sta
    3. Compare-and-swap the ref with `update-ref <ref> <new> <old>`, where `<old>` is the tip read in step 2.1 (the all-zero id when the ref is new). The call goes through the publication port: either `gix` in process, or `git` plumbing with `-c core.fsync=objects,reference -c gc.auto=0 -c maintenance.auto=false`, with no index, no work tree and no porcelain.
 
       A failed compare-and-swap exits non-zero and changes nothing. In V-REF-01, eight concurrent swaps had one winner, and the seven losers each succeeded after rereading the tip. A caller rereads the tip and runs step 2.1 again from it before any retry; it never retries with the stale `<old>`. Inside the store, `event-seal` serializes seal and sync, so the reread tip either is the commit of the store's own receipt (crash recovery, table below) or was moved by an actor outside the store. In the second case, stop with `event-store-ref-moved`, keep the segment, and doctor fails.
-   4. Receipt: read the ref back, then read the blob `<new>:events.jsonl`. The ref must equal `<new>`, and the blob's SHA-256 must equal the segment's. The receipt `{ref, commit, sha256, firstSeq, lastSeq}` goes to `sealed.json` together with the walk's `cover` and `certified`, with `<new>` added to `certified`. The file is written with tmp, `fsync`, rename and `fsync` dir, so that it is durable before step 2.5.
+   4. Receipt: read the ref back, then read the blob `<new>:events.jsonl`. The ref must equal `<new>`, and the blob's SHA-256 must equal the segment's. The receipt `{ref, commit, sha256, firstSeq, lastSeq}` goes to `sealed.json` together with the walk's `cover` and `certified`, with `lastSeq` kept apart from the emitted coverage. `<new>` is added to `certified` only when every event in `<new>` and its ancestors has been emitted, the coverage has been raised to match, and nothing is deferred (sections 11 and 12); otherwise the receipt is still written, so the deletion of step 2.5 may proceed, but `<new>` is not certified. The file is written with tmp, `fsync`, rename and `fsync` dir, so that it is durable before step 2.5.
    5. Only after the receipt: delete the closed segment and `fsync` the directory.
 3. Re-list `closed/`; repeat while segments remain (bounded per call), so a lifecycle seal that lost the `try` race is picked up by the running sealer.
 
@@ -392,7 +393,7 @@ This spec keeps that serialization and moves only the append target. The gate is
 3. Release the gate, ack to the caller.
 4. After the gate: if any appended type is `sealOnWrite`, `seal(project)` with `try`.
 
-No commit-DAG walk, no git call and no process spawn runs inside the gate. A foreign event fetched after step 1 is not folded by this mutation. Its `seen` then names exactly the foreign coverage of the view, so section 12 treats that event as concurrent and loses nothing. A rebuild computed outside the gate is installed under the gate only when the own-stream positions it was computed from are still current; otherwise it is computed again.
+No commit-DAG walk, no git call and no process spawn runs inside the gate. A foreign event fetched after step 1 is not folded by this mutation. Its `seen` then names exactly the foreign coverage of the view, so section 12 treats that event as concurrent and loses nothing. A rebuild computed outside the gate is installed under the gate only when the own-stream positions it was computed from are still current; otherwise it is computed again, at most `eventStore.rebuild.maxAttempts` times (agent default 5). After the last mismatch the consumer stops with `event-store-rebuild-busy`: the current cache stays valid, no stale snapshot is installed, and the result is never reported as a successful rebuild. Retrying alone cannot promise progress under sustained writes (the corrected model check found that livelock, N1); a handoff that guarantees installation is a later item that needs its own proof.
 
 The per-stream `event-append` lock protects only the bytes and the sequence of one open log; it never replaces the gate. The draft's lines "Per-writer lock; writers never contend" (draft section 11) and "P01 and P02/P04 are re-cut around claims only" (draft section 15) are withdrawn. Porting keeps its own gate (`porting-events`, rank 60, `src/state/porting-store.mjs:89`) the same way.
 
@@ -565,6 +566,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 |---|---|
 | `eventStore.seal.intervalSec` | 300 |
 | `eventStore.sync.intervalSec` | 300 (0 = explicit sync only) |
+| `eventStore.rebuild.maxAttempts` | 5 (rebuild-install attempts before `event-store-rebuild-busy`) |
 | `eventStore.remote` | `origin` |
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
@@ -670,7 +672,7 @@ Both tasks ran on 2026-10-17 in run `wf-run-1792224866445-9a03a834`. Their findi
    - a deferred event, whose predecessor sits on a ref not yet fetched, is not folded, no cursor advances past it, and it is emitted once its predecessor arrives (C5);
    - a late concurrent event that sorts before folded events triggers a suffix replay or rebuild, and the result equals a full rebuild (C6);
    - full rebuild and incremental fold give the same view;
-   - a rebuild racing gated appends is installed only when current;
+   - a rebuild racing gated appends is installed only when current, and stops with `event-store-rebuild-busy` after the bounded attempts (N1);
    - a cross-machine concurrent CAS yields the same recorded conflict on all three machines.
 5. **Three machines:** three clones push, fetch, go through an offline period, diverge and merge on a shared machine id, and distribute the legacy ref, first against a local bare repository. The last step runs against the owner's real remote and confirms that it accepts and serves `refs/fgos/*`. Pushing there needs the owner's authorization at that time.
 6. **Legacy parity:** the import reproduces the pre-cutover Work view byte for byte; fixtures with equal `ts`, missing `src` or `h`, mixed v3 and v4.
@@ -789,3 +791,9 @@ These positions came from the reopen council and are still not settled by eviden
 - **SQLite expertise.** Both red-team rounds want multi-process SQLite WAL expertise in the core review. This spec keeps it out of scope because Work's view is `state.json` (section 15), and it becomes required when a consumer folds into SQLite inside the Work gate (section 25).
 - **Design impact of the commit DAG.** Red-team revisit round 1 sees a shift to a distributed DAG that hides major protocol complexity. This spec treats it as a bounded definition (section 11) on a chain that promote commits had already made a DAG. The model check of 23.1 item 1 settles the question. Note added after the proofs: the model check has run. It found the full walk with a visited set finite and complete, and it found the coverage stop unsafe (C4), which section 11 now replaces with pruning at certified commits. Whether the DAG hides further complexity stays open until section 23.2 item 2 runs on the corrected rules.
 
+## Changes after the corrected model check (2026-10-17)
+
+The model check was run again on the corrected rules ([report](../../../plans/reports/experiment-261017-1545-event-store-model-recheck-corrected.md)). All six earlier counterexamples are gone within its bounds. It found one progress gap and one ambiguity, both fixed here:
+
+1. **N1, rebuild-install livelock (section 13, 23.2).** Under sustained writes a rebuild computed outside the gate can be rejected forever. Retries are now bounded by `eventStore.rebuild.maxAttempts` (agent default 5) and end in `event-store-rebuild-busy` with the current cache kept valid.
+2. **Certification of a new seal (section 10 step 2.4).** The receipt keeps `lastSeq` apart from emitted coverage, and `<new>` is certified only when it and its ancestors are fully emitted with nothing deferred, matching sections 11 and 12.
