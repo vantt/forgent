@@ -98,3 +98,25 @@ test('global-model-policies-portable fails on a list or model@pool cell in the g
   assert.equal(extended.passed, false);
   assert.match(extended.message, /claude\.advanced, deepseek\.standard/);
 });
+
+test('capability-rigor-ceiling names a capability whose rigor lifts it above runner.maxTier, with its model', () => {
+  const runner = {
+    maxTier: 'advanced',
+    executors: { claude: agent('claude') },
+    modelPolicies: { claude: { standard: 'sonnet', advanced: 'sonnet', flagship: 'opus', frontier: 'fable' } },
+    capabilities: {
+      synthesize: { prefer: ['claude'], rigor: 'critical' },
+      implement: { prefer: ['claude'], rigor: 'standard' },
+    },
+  };
+  const lifted = runCheck('capability-rigor-ceiling', runner);
+  assert.equal(lifted.passed, true);
+  assert.match(lifted.message, /synthesize \(rigor critical\) runs at frontier: claude fable/);
+  assert.doesNotMatch(lifted.message, /implement/);
+
+  const none = runCheck('capability-rigor-ceiling', { ...runner, maxTier: 'frontier' });
+  assert.match(none.message, /no capability rigor lifts a seat above runner\.maxTier frontier/);
+
+  const unset = runCheck('capability-rigor-ceiling', { ...runner, maxTier: undefined });
+  assert.match(unset.message, /runner\.maxTier not set/);
+});

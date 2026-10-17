@@ -42,7 +42,7 @@ test('explain reports the entry of the family pool as used and an entry of anoth
   assert.equal(result.executor.id, 'deepseek');
   assert.equal(result.executor.source, 'capability:research');
   assert.equal(result.invocation, 'pi-cli-bwrap');
-  assert.deepEqual(result.tier, { value: 'standard', source: 'rigor:standard', maxTier: null });
+  assert.deepEqual(result.tier, { value: 'standard', source: 'rigor:standard', ceiling: null });
   assert.equal(result.model.value, 'deepseek/deepseek-v4-flash');
   assert.deepEqual(result.cell.entries, [
     { model: 'deepseek-v4-flash', pool: 'deepseek-api', status: 'pending-pool-routing' },

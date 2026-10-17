@@ -66,6 +66,7 @@ import {
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
   checkGlobalModelPoliciesPortable,
+  checkCapabilityRigorCeiling,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
@@ -1483,6 +1484,12 @@ registerCheck({
   id: 'global-model-policies-portable',
   description: 'runner.modelPolicies in ~/.fgos/config.json uses plain model names only, since every fgOS release on the machine reads it',
   check: () => checkGlobalModelPoliciesPortable(),
+});
+
+registerCheck({
+  id: 'capability-rigor-ceiling',
+  description: 'lists the capabilities whose own rigor lifts their seats above runner.maxTier, with the tier and model they then run at; informational',
+  check: (cwd) => checkCapabilityRigorCeiling(cwd),
 });
 
 registerCheck({

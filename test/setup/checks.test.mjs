@@ -181,6 +181,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'llm-accounts-shape',
       'llm-accounts-vs-legacy',
       'global-model-policies-portable',
+      'capability-rigor-ceiling',
       'coordination-protocol-dead-vocabulary',
     ].sort(),
   );

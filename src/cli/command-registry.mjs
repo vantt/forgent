@@ -1306,7 +1306,7 @@ export const COMMAND_REGISTRY = [
         ],
       },
       explain: {
-        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier and its source (rigor, override, maxTier), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
+        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier, its source (rigor, override) and its ceiling (runner.maxTier, or the capability\'s own rigor when that is higher), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
         parameters: {
           type: 'object',
           properties: {

@@ -79,7 +79,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
     executor: { id: binding.executor, source: p.executor?.source ?? null },
     invocation: binding.invocation,
     transport: binding.transport,
-    tier: { value: binding.tier, source: p.tier?.source ?? null, maxTier: runnerConfig.maxTier ?? null },
+    tier: { value: binding.tier, source: p.tier?.source ?? null, ceiling: p.tier?.ceiling ?? null },
     model: { value: binding.model, source: p.model?.source ?? null },
     cell: family ? labelCell(runnerConfig, binding.tier, family, binding.model) : { entries: [], problem: 'the bound executor is not registered in this config' },
     accounts: family ? accountsOf(runnerConfig, family, projectConfig) : null,
