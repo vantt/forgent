@@ -117,7 +117,9 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         Err(err) => return Verdict::because("open", format!("lock probe failed: {err}")),
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
-    if binding.is_none() && !dir.join("receipt.json").exists() && still_starting(read_json(&dir.join("envelope.json")).as_ref(), START_GRACE) {
+    let envelope_json = read_json(&dir.join("envelope.json"));
+    let refusal = binding.is_none().then(|| start_refusal(dir, envelope_json.as_ref())).flatten();
+    if binding.is_none() && refusal.is_none() && !dir.join("receipt.json").exists() && still_starting(envelope_json.as_ref(), START_GRACE) {
         return Verdict::because("running", "starting");
     }
     // Lock free is not enough: the domain must be provably empty.
@@ -130,7 +132,10 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     };
     if args.probe_only {
         return match domain_state {
-            DomainState::Empty => Verdict::state("needs-adopt"),
+            DomainState::Empty => match &refusal {
+                Some(code) => Verdict::because("needs-adopt", format!("start-refused:{code}")),
+                None => Verdict::state("needs-adopt"),
+            },
             _ => Verdict::because("running", "domain-not-empty"),
         };
     }
@@ -186,7 +191,10 @@ fn drive(dir: &Path, bound_hint: bool) -> Verdict {
             let closed = json!({"v": 1, "attemptId": attempt_id, "closedBy": "adopt", "steps": ids, "at": iso_utc_now()});
             let published = serde_json::to_vec(&closed).map_err(std::io::Error::other).and_then(|bytes| publish_once(dir, "closed.json", &bytes));
             match published {
-                Ok(_) => Verdict { outcome: Some(outcome), ..Verdict::state("adopted") },
+                Ok(_) => {
+                    let reason = (outcome == "abandoned-not-started").then(|| start_refusal(dir, Some(&envelope))).flatten().map(|code| format!("start-refused:{code}"));
+                    Verdict { outcome: Some(outcome), reason, ..Verdict::state("adopted") }
+                }
                 Err(why) => Verdict { outcome: Some(outcome), ..Verdict::because("open", format!("closed.json not published: {why}")) },
             }
         }
@@ -206,6 +214,11 @@ fn ensure_receipt(envelope: &Value, dir: &Path, bound: bool) -> std::io::Result<
         }
     }
     publish_receipt_as(envelope, dir, "adopt", !bound)
+}
+
+/// The code the supervisor named in `start-refused.json` for this attempt.
+fn start_refusal(dir: &Path, envelope: Option<&Value>) -> Option<String> {
+    crate::supervise::read_start_refusal(dir, envelope?["attemptId"].as_str()?)
 }
 
 /// `adopting.json`, rewritten by each adopter: temp file, then rename.

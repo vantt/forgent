@@ -117,6 +117,11 @@ pub(crate) fn publish_receipt_as(envelope: &Value, run_dir: &Path, synthesized_b
     if let Some(exit) = gate_exit {
         receipt["gateExit"] = exit;
     }
+    if not_started {
+        if let Some(code) = read_start_refusal(run_dir, attempt_id) {
+            receipt["reason"] = json!(format!("start-refused:{code}"));
+        }
+    }
     publish_once(run_dir, "receipt.json", &serde_json::to_vec(&receipt).map_err(std::io::Error::other)?)?;
     // A receipt that already existed is the one that counts.
     let published: Value = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(receipt);
@@ -231,10 +236,29 @@ pub fn run(args: &[String]) -> i32 {
     match supervise(&args) {
         Ok(code) => code,
         Err(refusal) => {
+            record_start_refusal(&args.envelope, &refusal);
             report("supervise", refusal.code, &refusal.why);
             refusal.exit
         }
     }
+}
+
+/// A supervisor that ends before it bound the attempt leaves its named reason
+/// in `start-refused.json`, so adopt and doctor show a code, not a line of
+/// `supervisor.log`. Best effort: the refusal itself is what the exit code reports.
+fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
+    let Some(envelope) = std::fs::read_to_string(envelope_path).ok().and_then(|text| serde_json::from_str::<Value>(&text).ok()) else { return };
+    let (Some(run_dir), Some(attempt_id)) = (envelope["runDir"].as_str(), envelope["attemptId"].as_str()) else { return };
+    let note = json!({"v": 1, "attemptId": attempt_id, "code": refusal.code, "why": refusal.why, "at": iso_utc_now()});
+    if let Ok(bytes) = serde_json::to_vec(&note) {
+        let _ = publish_once(Path::new(run_dir), "start-refused.json", &bytes);
+    }
+}
+
+/// The code a supervisor named when it refused to start this attempt, if it did.
+pub(crate) fn read_start_refusal(run_dir: &Path, attempt_id: &str) -> Option<String> {
+    let note: Value = serde_json::from_str(&std::fs::read_to_string(run_dir.join("start-refused.json")).ok()?).ok()?;
+    (note["attemptId"] == attempt_id).then(|| note["code"].as_str().unwrap_or("unknown").to_string())
 }
 
 fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {

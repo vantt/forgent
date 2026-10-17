@@ -96,7 +96,11 @@ impl ContainmentDriver for MacosTree {
         Guarantee {
             driver: "macos-tree",
             level: GuaranteeLevel::BestEffort,
-            escapes: vec!["setsid plus a double fork re-parents a descendant to launchd, out of the group and the tree", "processes started by a launchd or XPC service on the agent's request"],
+            escapes: vec![
+                "setsid plus a double fork re-parents a descendant to launchd, out of the group and the tree",
+                "a group or tree scan made after the root died can meet a reused pgid",
+                "processes started by a launchd or XPC service on the agent's request",
+            ],
         }
     }
 }

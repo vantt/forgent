@@ -8,6 +8,7 @@
     "gateExit": "the gate-exit.v1 object, or absent when no gate-exit.json exists",
     "captureDigests": { "stdout": "\"sha256:<hex>\" of the capture file bytes or null when absent", "stderr": "same" },
     "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir",
+    "reason": "optional string; `start-refused:<code>` on abandoned-not-started when the supervisor named why it never bound (start-refused.json), e.g. lock-held on Windows",
     "synthesizedBy": { "enum": ["supervisor", "adopt"] },
     "publishedAt": "string, ISO-8601 UTC"
   },

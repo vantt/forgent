@@ -81,7 +81,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, readAttemptOwnershipMarker, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -137,6 +137,8 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
+import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace } from './run-supervisor-checks.mjs';
+import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
@@ -2305,6 +2307,37 @@ registerCheck({
 });
 registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
+
+// Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
+// host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.
+// `dispatch.gateKillGraceMs` is read with a default and never written by setup.
+registerCheck({
+  id: 'process-containment',
+  description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',
+  check: (cwd) => checkProcessContainment(cwd),
+});
+registerCheck({
+  id: 'run-supervisor-route',
+  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1',
+  check: (cwd) => checkRunSupervisorRoute(cwd),
+});
+registerCheck({
+  id: 'runtime-socket-dir',
+  description: 'the runtime socket directory exists, is owned by this user and is 0700',
+  check: () => checkRuntimeSocketDir(),
+});
+registerCheck({
+  id: 'run-attempts-stuck',
+  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it)',
+  check: (cwd) => checkRunAttemptsStuck(cwd),
+});
+registerCheck({
+  id: 'gate-kill-grace',
+  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',
+  check: (cwd) => checkGateKillGrace(cwd),
+});
+registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
+registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
 registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
@@ -5458,6 +5491,8 @@ function countDeadOwnedConfinementDirs(roots) {
       for (const cand of candidates) {
         const markerPath = path.join(cand, OWNERSHIP_MARKER_FILE);
         if (!fs.existsSync(markerPath)) continue;
+        // An attempt home (version 2 marker) belongs to adopt: only its finalize-home step removes it.
+        if (readAttemptOwnershipMarker(cand)) continue;
         try {
           const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
           // A home kept for a left-open pane is awaiting that pane, not orphaned.
@@ -5480,7 +5515,7 @@ function countDeadOwnedConfinementDirs(roots) {
   return count;
 }
 
-export function fixConfinementOrphanedResourcesReaped() {
+export function fixConfinementOrphanedResourcesReaped(cwd) {
   const roots = defaultConfinementTempRoots();
   let totalReaped = 0;
   const messages = [];
@@ -5488,11 +5523,13 @@ export function fixConfinementOrphanedResourcesReaped() {
   for (const root of tightened) {
     try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
   }
-  for (const tempRoot of roots) {
-    const { reaped } = reapOrphanedConfinementResources({ tempRoot });
-    totalReaped += reaped.length;
-    if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
-  }
+  // One sweep per root through the adopt door; attempt directories are looked at once, with the first root.
+  roots.forEach((tempRoot, index) => {
+    const assignmentsRoot = index === 0 && cwd ? path.join(path.resolve(cwd), '.fgos', 'assignments') : undefined;
+    const { reap } = sweepAttempts({ assignmentsRoot, tempRoot });
+    totalReaped += reap.reaped.length;
+    if (reap.reaped.length > 0) messages.push(`${reap.reaped.length} under ${tempRoot}`);
+  });
   const tightenedNote = tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '';
   return {
     changed: totalReaped > 0 || tightened.length > 0,
@@ -5513,7 +5550,7 @@ registerCheck({
 
 registerFix({
   id: 'confinement-orphaned-resources-reaped',
-  fix: () => fixConfinementOrphanedResourcesReaped(),
+  fix: (cwd) => fixConfinementOrphanedResourcesReaped(cwd),
 });
 
 // A login copy that outlives its dispatch holds a refresh token that may be the only valid one, so fgOS

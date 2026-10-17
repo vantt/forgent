@@ -3043,7 +3043,9 @@ Mọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `ex
   - Khóa (lock) thời gian dài không còn cần thiết cho việc thao tác file, chỉ cần cho việc update-ref (nhưng update-ref đã có cơ chế CAS an toàn).
   - Lỗi test hoặc timeout tự động dọn dẹp worktree mà không rò rỉ state vào nhánh chính.
 
-### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor
+### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor [PHẦN `detached-run-supervisor` ĐÃ BỊ THAY bởi D-ADR-run-supervisor (id chưa cấp), cuối mục này]
+
+> Phần `bound-invocation-supervisor` vẫn hiệu lực. Vai `detached-run-supervisor` (`cli-spawn-supervisor.mjs`, Node, cầm pipe và kênh IPC) không còn: thay bằng run supervisor Rust ở bản ghi cuối mục này.
 
 #### Bối cảnh
 
@@ -3361,4 +3363,18 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Không đóng:** A1 (dọn v1 vẫn đọc-lại-rồi-unlink), lấy cắp holder số còn sống khi quá ttl (nay là ttl của holder), commit tay không bị loại trừ (A5), `main-checkout-reset` chưa bọc mutex, promote-engine đọc tip ngoài lock, hook `post-checkout`/worktree add chậm vẫn trong vùng claim (A14). Đèn còn sót của hook bản cũ đọc theo 20 s, nhưng release cũ đang chạy vẫn có thể ghi record chuỗi mới cho tới khi được thay.
 - **Bằng chứng:** `test/e2e/main-checkout-activity-beacon.test.mjs` (9 ca, đỏ trên HEAD trước thay đổi, xanh sau), `test/runner/main-checkout-lock.test.mjs`, `test/runner/main-checkout-activity.test.mjs`, ba file e2e hook hiện có, `cargo test -p fgos-distribution lock::`. Báo cáo: `plans/reports/implementation-261015-2150-w1-main-checkout-lock-unblock.md`.
 - **Ranh giới:** No component-boundary change (đèn là một file mới trong `.fgos/runtime/` của runner; mutex giữ chủ cũ).
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### D-ADR-run-supervisor (id chưa cấp) — Run supervisor Rust thay `detached-run-supervisor`: cách `direct` không pipe, không IPC, receipt qua file (thay phần `detached-run-supervisor` của 0043)
+
+- **Trạng thái:** Settled cho cách `direct` (2026-10-18). Cách `terminal` là plan 6.3. Số ADR chưa cấp: repo chưa có quy ước cấp số kiểm được (số `00xx` của mục này và `D-ADR00xx` ở các spec khác đã từng trùng nhau, ví dụ 0055), nên bản ghi này dùng tên tạm, cấp id khi lead chốt.
+- **Bối cảnh:** `detached-run-supervisor.mjs` (Node, 1234 dòng) cầm pipe của agent và kênh `ipc` tới controller. Controller chết thì kênh đóng (`ERR_IPC_CHANNEL_CLOSED`), supervisor và agent chết theo; kết quả cli mất dù agent đã làm xong. Reaper `reapOrphanedConfinementResources` quyết quyền dọn home bằng pid/pane, hai thẩm quyền trên cùng một attempt.
+- **Quyết định:**
+  1. Mỗi attempt một supervisor Rust (`fgos internal supervise`) và một gate (`fgos internal gate`) là gốc process của agent trong miền chứa chứng minh được rỗng (cổng chứa của `fgos-process`; Linux: gate là pid 1 của PID namespace). Supervisor không cầm pipe của agent: gate làm chủ IO (capture, stdin).
+  2. Dispatch cli: controller giữ `attempt.lock` (và lease cwd nếu ghi) trước mọi side effect, ghi envelope v3 bất biến có digest, rồi **khởi động `fgos internal supervise` tách rời (setsid), không IPC, không pipe**, chờ `supervisor-binding.json`, đóng fd lock, và từ đó **chỉ đọc receipt và receipt bước từ file**. Controller không tự settle khi supervisor còn sống.
+  3. Chính sách: supervisor chết thì agent chạy tiếp tới khi thoát hoặc tới trần cứng của gate; cửa adopt (`fgos internal adopt`, ma trận phục hồi) settle từ `gate-exit.json` và outbox. Một cửa duy nhất cho resume, recover, quét đầu `fgos run` và doctor fix; bốn call site reaper đi qua `sweepAttempts`; home attempt dùng marker bản 2 (không pid, không pane), chỉ `finalize-home` dưới lock attempt mới xoá.
+  4. Argv vẫn từ `resolveExecutorCommand` (cấu hình executor), ghi vào envelope; agent-protocol `direct` chỉ quyết stdin, nguồn hoạt động và kết quả có tên.
+  5. `bound-invocation-supervisor` (RPC ngắn) giữ riêng; chỉ dùng chung primitive L0.
+- **Hệ quả:** Xoá supervisor Node, kênh IPC và settle ở controller trong phase cutover `direct`; đường cũ không còn song song. Windows chạy end-to-end bằng driver `windows-job` và driver lock `LockFileEx`. Chi tiết, bảng lỗi và route: [run-supervisor spec](../platform/run-supervisor/spec.md), [agent-protocol spec](../platform/agent-protocol/spec.md), [process spec](../platform/process/spec.md#10-containment-port).
+- **Ranh giới:** Component-boundary có đổi: thêm Run Supervisor (L4), Launch gate (L4), Agent protocol (L3), Containment port (L0) trong [component-boundary.md](../platform/component-boundary.md).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

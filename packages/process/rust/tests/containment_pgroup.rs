@@ -96,6 +96,7 @@ fn containment_pgroup_ends_a_tree_of_twenty_including_a_setsid_child() {
     let guarantee = driver.guarantee();
     assert_eq!(guarantee.level, GuaranteeLevel::BestEffort);
     assert!(guarantee.escapes.iter().any(|e| e.contains("setsid")));
+    assert!(guarantee.escapes.iter().any(|e| e.contains("reused pgid")));
     // SAFETY: ends the escaped test process this test started.
     unsafe { libc::kill(escape_pid as libc::pid_t, libc::SIGKILL) };
 }
