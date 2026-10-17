@@ -45,7 +45,7 @@
       "readerGapId": null,
       "disposition": "park-dependent-rows",
       "blockedDecision": "owner CTR010 choice sent by Lead; same park as X-CTR010-01",
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DUP-02",
@@ -66,7 +66,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DUP-03",
@@ -87,7 +87,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DUP-04",
@@ -108,7 +108,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-SEM-05",
@@ -129,7 +129,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-06",
@@ -150,7 +150,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-07",
@@ -171,7 +171,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-08",
@@ -192,7 +192,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-09",
@@ -213,7 +213,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-10",
@@ -234,7 +234,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-11",
@@ -255,7 +255,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-12",
@@ -276,7 +276,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-13",
@@ -298,7 +298,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-14",
@@ -319,7 +319,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-15",
@@ -340,7 +340,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-16",
@@ -361,7 +361,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-17",
@@ -382,7 +382,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-18",
@@ -403,7 +403,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-19",
@@ -424,7 +424,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-20",
@@ -445,7 +445,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-21",
@@ -466,7 +466,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-22",
@@ -487,7 +487,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-23",
@@ -508,7 +508,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-24",
@@ -529,7 +529,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-25",
@@ -550,7 +550,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-26",
@@ -571,7 +571,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-27",
@@ -592,7 +592,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-28",
@@ -613,7 +613,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-29",
@@ -634,7 +634,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-SEM-30",
@@ -655,7 +655,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-SEM-31",
@@ -676,7 +676,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-SEM-32",
@@ -697,7 +697,7 @@
       "readerGapId": null,
       "disposition": "pending",
       "blockedDecision": null,
-      "targetStep": 2
+      "targetStep": "Step 2"
     },
     {
       "rowId": "X-A34-01",
@@ -716,7 +716,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-02",
@@ -735,7 +735,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-03",
@@ -754,7 +754,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-04",
@@ -773,7 +773,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-05",
@@ -792,7 +792,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-06",
@@ -811,7 +811,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-07",
@@ -830,7 +830,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-08",
@@ -849,7 +849,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-09",
@@ -868,7 +868,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-10",
@@ -887,7 +887,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-11",
@@ -906,7 +906,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-12",
@@ -925,7 +925,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-13",
@@ -944,7 +944,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-14",
@@ -963,7 +963,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-15",
@@ -982,7 +982,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-16",
@@ -1001,7 +1001,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-17",
@@ -1020,7 +1020,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-18",
@@ -1039,7 +1039,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-19",
@@ -1058,7 +1058,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-20",
@@ -1077,7 +1077,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-21",
@@ -1096,7 +1096,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-22",
@@ -1115,7 +1115,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-23",
@@ -1134,7 +1134,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-24",
@@ -1153,7 +1153,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-25",
@@ -1172,7 +1172,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-26",
@@ -1191,7 +1191,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-27",
@@ -1210,7 +1210,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-A34-28",
@@ -1229,7 +1229,7 @@
       "readerGapId": null,
       "disposition": "preserve-and-rebind-if-affected",
       "blockedDecision": null,
-      "targetStep": "5-sample;9-all-affected"
+      "targetStep": "Step 5 sample; Step 9 all affected"
     },
     {
       "rowId": "X-NAV-01",
@@ -1250,7 +1250,7 @@
       "readerGapId": "RG-NAV-1",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": 7
+      "targetStep": "Step 7"
     },
     {
       "rowId": "X-NAV-02",
@@ -1271,7 +1271,7 @@
       "readerGapId": "RG-NAV-2",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": 7
+      "targetStep": "Step 7"
     },
     {
       "rowId": "X-NAV-03",
@@ -1292,7 +1292,7 @@
       "readerGapId": "RG-NAV-3",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": 7
+      "targetStep": "Step 7"
     },
     {
       "rowId": "X-NAV-04",
@@ -1313,7 +1313,7 @@
       "readerGapId": "RG-NAV-4",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": 7
+      "targetStep": "Step 7"
     },
     {
       "rowId": "X-STALE-01",
@@ -1335,7 +1335,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-STALE-02",
@@ -1357,7 +1357,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-STALE-03",
@@ -1379,7 +1379,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-STALE-04",
@@ -1401,7 +1401,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-STALE-05",
@@ -1423,7 +1423,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-STALE-06",
@@ -1445,7 +1445,7 @@
       "readerGapId": null,
       "disposition": "authority-separation-then-alignment",
       "blockedDecision": null,
-      "targetStep": 5
+      "targetStep": "Step 5"
     },
     {
       "rowId": "X-DEFECT-01",
@@ -1571,7 +1571,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 4
+      "targetStep": "Step 4"
     },
     {
       "rowId": "X-DEFECT-07",
@@ -1592,7 +1592,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 4
+      "targetStep": "Step 4"
     },
     {
       "rowId": "X-DEFECT-08",
@@ -1613,7 +1613,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 4
+      "targetStep": "Step 4"
     },
     {
       "rowId": "X-DEFECT-09",
@@ -1634,7 +1634,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DEFECT-10",
@@ -1655,7 +1655,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DEFECT-11",
@@ -1676,7 +1676,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DEFECT-12",
@@ -1697,7 +1697,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DEFECT-13",
@@ -1718,7 +1718,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-DEFECT-14",
@@ -1739,7 +1739,7 @@
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": 6
+      "targetStep": "Step 6"
     },
     {
       "rowId": "X-CTR010-01",
@@ -1761,7 +1761,7 @@
       "readerGapId": null,
       "disposition": "park-dependent-rows",
       "blockedDecision": "owner CTR010 choice sent by Lead",
-      "targetStep": "3;9-close"
+      "targetStep": "Step 3; Step 9 close"
     },
     {
       "rowId": "QF-01",

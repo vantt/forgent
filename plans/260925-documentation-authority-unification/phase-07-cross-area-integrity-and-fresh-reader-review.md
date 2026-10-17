@@ -341,7 +341,9 @@ repairs, finish before Step 7 seals the key. Step 9 is the only accounting/close
 
 - All Steps 2-6 candidate edits must be finished. Repair navigation gaps inside
   candidate files only: `docs/platform/README.md`, candidate area portals and file
-  header links. Do not edit either switchboard file; switchboard work remains Phase 8.
+  header links. Per L11-10, the host is one system-architecture entry in
+  `docs/platform/README.md` linking all four affected files. Do not edit either
+  switchboard file; switchboard work remains Phase 8.
 - Draft three cross-area scenarios. Each asks all six DoD questions and one authoring
   probe: where a made-up claim belongs, required metadata and links/registrations.
 - State in both brief and key: **answer as the candidate corpus will read after

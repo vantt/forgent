@@ -1,0 +1,15 @@
+{
+  "schema":"phase-07-independent-review-index.v1",
+  "request":"../review-request-a38-step-03-step-04-01.md",
+  "parts":[
+    {"part":1,"path":"part-01-architecture-contracts.json","entries":22,"bytes":2114,"sha256":"c6b558006590700899ad4963b1ac99bbb3454f4c0a3e3b2401f48728c79e320f","reviewReport":"../review-a38-step-03-04-architecture-01.md"},
+    {"part":2,"path":"part-02-vocabulary.json","entries":13,"bytes":1400,"sha256":"201871b9411c8883f52db1d0672f0b3d7460f3fb1d9e659f2c2f7dfa9f9d5f3c","reviewReport":"../review-a38-step-03-04-vocabulary-01.md"}
+  ],
+  "evidence":[
+    {"path":"../step-03-contract-boundary-matrix.json","sha256":"7c5550e5288e2dba0dba2e7833d8571380cf2165fdf666965acb2466a55c9149"},
+    {"path":"../step-04-vocabulary-rows.json","sha256":"a59f14e2e6f3510eab506bcc144794bcfd0cab054d615732c43239b3f0acc865"},
+    {"path":"../step-03-checks.json","sha256":"16591b2dd1bb419ef8dd8de433a137441e463422940c448c725ccd58d3cf4307"},
+    {"path":"../step-04-checks.json","sha256":"e201dd407199da60b839716ca6fd8c3b5d430871c9cb2a224d0fb5c2e3d82910"}
+  ],
+  "limits":{"maxEntriesPerPart":60,"maxBytesPerPart":409600,"allPartsWithinLimits":true}
+}

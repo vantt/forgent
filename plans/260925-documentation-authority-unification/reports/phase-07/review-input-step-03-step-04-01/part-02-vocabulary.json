@@ -1,0 +1,26 @@
+{
+  "schema":"phase-07-independent-review-part.v1",
+  "part":2,
+  "reviewerProfile":"vocabulary",
+  "entryCount":13,
+  "primaryEvidence":"../step-04-vocabulary-rows.json",
+  "readableEvidence":"../step-04-vocabulary-rows.md",
+  "checks":"../step-04-checks.json",
+  "postReviewEdits":"../post-review-edits.md",
+  "entries":[
+    {"id":"V-01","focus":"component meaning and prohibited authority/class conflation"},
+    {"id":"V-02","focus":"package physical grouping without authority"},
+    {"id":"V-03","focus":"bounded context meaning"},
+    {"id":"V-04","focus":"authority boundary meaning"},
+    {"id":"V-05","focus":"A43: responsibility ring never implies class/entity"},
+    {"id":"V-06","focus":"candidate authority"},
+    {"id":"V-07","focus":"current authority"},
+    {"id":"V-08","focus":"historical authority"},
+    {"id":"V-09","focus":"producer/consumer"},
+    {"id":"V-10","focus":"proposal versus settled decision"},
+    {"id":"TRUTH-15","focus":"reviewed runner self-citation correction only"},
+    {"id":"TRUTH-26","focus":"visible archive-path label correction; destination unchanged"},
+    {"id":"TRUTH-27","focus":"reviewed CLI line-citation correction only"}
+  ],
+  "requiredVerdict":"For every entry return ok or rework with evidence. Confirm 10/10 term rows, A43 guard, exactly three candidate edits, five rationale-only rows deferred, zero vocabulary/checker/history edits."
+}

@@ -9,12 +9,15 @@
 - Execution: both independent Step 1 A38 reviews are complete at commit `135230fb3`;
   the bounded rework and Lead decisions L11-8..L11-11 are authored. Step 2 authoring
   is complete and no candidate content changed.
-- Completed step: none; Steps 1 and 2 both await the single bounded independent
-  acceptance request below.
-- Current step: Steps 1-2 reviewing — 39 entries are ready for a distinct A38 reviewer
-  under `review-request-a38-step-01-rework-and-step-02-01.md`.
-- Next step: apply only the independent 39-entry verdict; if all entries are ok, mark
-  Steps 1-2 accepted and begin the unaffected Step 3 rows while CTR010 stays parked.
+- Completed steps: Steps 1 and 2; the independent bounded review returned 39/39 ok
+  at commit `1d78440f9`, with zero rework and two non-blocking housekeeping notes.
+- Current steps: Step 3 is parked by its own stop rule after completing the
+  22-row matrix; Step 4 authoring is complete and reviewing. CTR010-dependent
+  rows remain parked, as do four missing-id seams and one incompatible
+  retired/current producer boundary.
+- Next action: obtain the two-part independent verdict requested by
+  `review-request-a38-step-03-step-04-01.md`; apply only bounded rework. Step 3
+  cannot become accepted until its stop findings are routed or resolved.
 
 Phase 6 is closed. Its A1-A44 answers remain authoritative at
 `../phase-06/owner-answers.md`; this file does not reopen them.
@@ -122,6 +125,35 @@ work and are not claimed by this planning turn.
   was needed. Evidence: `step-02-checks.json`.
 - Independent request: `review-request-a38-step-01-rework-and-step-02-01.md`, one
   39-entry part, 6,324 bytes, SHA-256 `67927aa6…b7a3`.
+- Independent result: 39/39 ok, zero rework, commit `1d78440f9`. The two
+  non-blocking concerns were applied: all remaining bare `targetStep` values in
+  the authoritative cross-area inventory are normalized to `Step N`/`Phase N`,
+  and Step 7 now names the L11-10
+  `docs/platform/README.md` system-architecture host.
+
+## Steps 3 and 4 result
+
+- Step 3: 22 matrix rows = 16 contract/boundary rows plus six stale
+  coordination rows inventoried only. Ten rows are compatible. S3-01 records
+  one current-versus-retired producer/consumer incompatibility; S3-01/02/04/09
+  record four missing stable/versioned contract ids. Six rows are parked:
+  those four plus the two CTR010 rows. No second Work-state writer was found.
+- CTR010 dossier: the architecture registry gives CTR010 to
+  `confinement-authority.v1`; Gateway OpenAPI gives it to `fgos-gateway.v1`, and
+  the registry has no separate Gateway REST row. L11-7 remains unanswered, so
+  no registry edit or renumbering occurred.
+- Step 4: 10 term rows, including the A43 guard that responsibility rings never
+  imply classes/entities. Three reviewed candidate fixes landed (TRUTH-15/26/27)
+  and are logged in `post-review-edits.md`; five C1 rationale-only observations
+  remain Phase 9 work.
+- Checks A/B/C/H/I, protected boundary and `git diff --check` are green. G's
+  Phase 6 base remains zero-fatal; the three changed candidate units are
+  explicitly pending the single L11-2 native carry/rebind and fresh G at Step 9,
+  so no fresh native-close claim is made here.
+- Independent request: two parts, 22 architecture/contract entries and 13
+  vocabulary/edit entries; each is below 60 entries and 400 KB. Unique reviewer
+  report paths and portable light-only commands are in
+  `review-request-a38-step-03-step-04-01.md`.
 
 ## Artifact register
 
@@ -145,15 +177,24 @@ resolved path, author, reviewer, digest and status here.
 | Step 2 readable report | `reports/phase-07/step-02-semantic-group-resolutions.md` | Doer | distinct A38 reviewer | SHA-256 `ab666c74…cd74` | reviewing |
 | Step 2 checks | `reports/phase-07/step-02-checks.json` | Doer | distinct A38 reviewer | SHA-256 `36cb3bac…0b50` | green |
 | Step 1 rework + Step 2 review request | `reports/phase-07/review-request-a38-step-01-rework-and-step-02-01.md` | Doer | distinct A38 reviewer | SHA-256 `67927aa6…b7a3` | ready |
+| Post-review candidate edit log | `reports/phase-07/post-review-edits.md` | Doer | vocabulary reviewer | pending settlement bytes | reviewing |
+| Step 3 machine matrix | `reports/phase-07/step-03-contract-boundary-matrix.json` | Doer | architecture/contract reviewer | SHA-256 `7c5550e5…9149` | parked/reviewing |
+| Step 3 readable matrix | `reports/phase-07/step-03-contract-boundary-matrix.md` | Doer | architecture/contract reviewer | pending settlement bytes | parked/reviewing |
+| Step 3 checks | `reports/phase-07/step-03-checks.json` | Doer | architecture/contract reviewer | SHA-256 `16591b2d…307` | stop findings recorded |
+| Step 4 machine vocabulary | `reports/phase-07/step-04-vocabulary-rows.json` | Doer | vocabulary reviewer | SHA-256 `a59f14e2…865` | reviewing |
+| Step 4 readable vocabulary | `reports/phase-07/step-04-vocabulary-rows.md` | Doer | vocabulary reviewer | pending settlement bytes | reviewing |
+| Step 4 checks | `reports/phase-07/step-04-checks.json` | Doer | vocabulary reviewer | SHA-256 `e201dd40…910` | green for bounded authoring |
+| Steps 3-4 review input index | `reports/phase-07/review-input-step-03-step-04-01/index.json` | Doer | two distinct A38 reviewers preferred | pins two parts and four evidence files | ready |
+| Steps 3-4 review request | `reports/phase-07/review-request-a38-step-03-step-04-01.md` | Doer | architecture/contract + vocabulary reviewers | 22 + 13 entries | ready |
 
 ## Step ledger
 
 | Step | State | Evidence | Parked rows | Next action |
 |---:|---|---|---|---|
-| 1 | reviewing | A38 reviews at `135230fb3`; bounded rework + L11-8..L11-11 authored | CTR010 answer pending; dependent rows parked | independent verdict on 11 Part A entries |
-| 2 | reviewing | 28 records + full-read triple + green `step-02-checks.json` | X-SEM-29/31 route to Step 6 duplicate handling | independent verdict on 28 Part B entries |
-| 3 | not-started | none | CTR010 rows await owner | proceed on all other contract/boundary rows after Step 1 |
-| 4 | not-started | none | none | wait for Step 1 |
+| 1 | accepted | 11/11 independent rework verdicts ok at `1d78440f9` | CTR010 answer pending; dependent rows parked | none |
+| 2 | accepted | 28/28 independent semantic verdicts ok at `1d78440f9` | X-SEM-29/31 route to Step 6 duplicate handling | none |
+| 3 | parked | 22-row matrix + `step-03-checks.json` | S3-01/02/04/09; CTR010 S3-14/15 | independent verdict, then route stop findings without inventing ids |
+| 4 | reviewing | 10 term rows + 3 logged candidate corrections + green bounded checks | native rebind waits for Step 9 by L11-2 | independent verdict on 13 entries |
 | 5 | not-started | none | none | wait for Step 1 |
 | 6 | not-started | none | none | wait for Step 1 |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
