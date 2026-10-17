@@ -93,7 +93,7 @@
       "exists": true
     },
     {
-      "ref": "docs/platform/holder-lock/spec.md#16-related-files",
+      "ref": "docs/platform/holder-lock/spec.md#21-related-files",
       "exists": true
     },
     {
@@ -113,7 +113,7 @@
       "exists": true
     },
     {
-      "ref": "docs/platform/holder-lock/spec.md#15-lịch-sử-quyết-định",
+      "ref": "docs/platform/holder-lock/spec.md#20-lịch-sử-quyết-định",
       "exists": true
     },
     {
@@ -173,7 +173,7 @@
       "exists": true
     },
     {
-      "ref": "docs/platform/event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation",
+      "ref": "docs/platform/event-store/spec.md#23-proof-gates",
       "exists": true
     },
     {
@@ -391,7 +391,7 @@
     },
     {
       "from": "docs/platform/README.md",
-      "destination": "event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation",
+      "destination": "event-store/spec.md#23-proof-gates",
       "path": "docs/platform/event-store/spec.md",
       "exists": true
     },

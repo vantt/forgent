@@ -199,8 +199,8 @@ resolved path, author, reviewer, digest and status here.
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
-| 7 | accepted | Key review 106/106 accept; sealed 2026-10-17T08:31:30Z, keySha256 `b7abe144…6287`, runner commit `e9c1996a3` (`review-a38-step-07-key-01.md`) | none | no candidate edit after seal |
-| 8 | ready | Seal recorded; reader starts must be later than 2026-10-17T08:31:30Z with unchanged key/candidate hashes | none | wait for owner go-ahead |
+| 7 | reviewing | Seal of 08:31:30Z voided by main merge `dd9486292` (L11-19); three anchors repaired; new key SHA-256 `a638b02e77c2…`; fresh key re-review and re-seal pending | none | key re-review + re-seal |
+| 8 | not-started | waits for the new seal | none | wait for Step 7 re-seal |
 | 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
 
 Allowed states are `not-started`, `ready`, `in-progress`, `parked`, `reviewing`,

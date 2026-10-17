@@ -52,7 +52,7 @@ Target area docs live at `docs/platform/<area>/`.
 | [system-overview](system-overview/spec.md) | Candidate overview; use [component boundaries](component-boundary.md#4-current-high-level-components) for current ownership routes |
 | [holder-lock](holder-lock/spec.md) | Kernel lock port, registry, predecessor-domain rules and guarantee levels |
 | [process](process/spec.md) | Process facts and control; shared judge vectors and platform limits |
-| [event-store](event-store/spec.md) | Draft durability design; [decision awaiting signature](event-store/spec.md#26-decision-record) and [proof required](event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation); navigation does not accept or implement it |
+| [event-store](event-store/spec.md) | Draft durability design; [decision awaiting signature](event-store/spec.md#26-decision-record) and [proof required](event-store/spec.md#23-proof-gates); navigation does not accept or implement it |
 | [agent-confinement](agent-confinement/README.md) | Candidate area portal; retained sources are identified there |
 | [claude-plugin](claude-plugin/README.md) | Candidate area portal; retained sources are identified there |
 | [decision-citation-drift](decision-citation-drift/README.md) | Candidate area portal; retained sources are identified there |

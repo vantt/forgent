@@ -408,6 +408,24 @@ the independent findings without authorizing promotion, cutover or retirement.
   default for later merges.
 - **Affected rows/steps:** Steps 7, 8, 9; P7-DOC-GAP-03.
 
+### L11-19 — Third main merge invalidates the seal; repair anchors and re-seal
+
+- **Date:** 2026-10-17
+- **Status:** decided (owner asked to keep up with main, then continue; Lead under A42)
+- **What is happening:** main `eab4d617b` changed three of the eight sealed key files
+  (`component-boundary.md`, `event-store/spec.md` +486/-, `holder-lock/spec.md`) after the
+  2026-10-17T08:31:30Z seal. Merged cleanly at `dd9486292`. Three key anchors broke
+  because sections were renumbered: holder-lock `#16-related-files` → `#21-related-files`,
+  `#15-lịch-sử-quyết-định` → `#20-lịch-sử-quyết-định`, event-store
+  `#23-proof-required-before-acceptance-of-the-implementation` → `#23-proof-gates`.
+- **Decision:** the earlier seal is void (phase rule: a candidate change after sealing
+  returns to Step 7). The Lead repaired the three anchors in the key, proof, key review
+  part and the candidate `docs/platform/README.md` link (logged); all 41 key refs and all
+  README anchor links pass the unchanged anchor checker. A fresh key reviewer must
+  re-validate every answer against the changed specs and re-seal before any reader
+  starts. Identity changes ride the Step 9 carry as in L11-15/L11-18.
+- **Affected rows/steps:** Steps 7, 8, 9.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
