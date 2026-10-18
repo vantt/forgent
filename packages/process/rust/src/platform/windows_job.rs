@@ -144,7 +144,7 @@ pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u3
     let mut found: BTreeMap<u32, u64> = BTreeMap::new();
     for p in procs {
         let Some(created) = p.created else { continue };
-        let parent_alive = by_pid.get(&p.ppid).is_some_and(|parent| parent.created.map_or(true, |pc| pc <= created));
+        let parent_alive = by_pid.get(&p.ppid).is_some_and(|parent| parent.created.is_none_or(|pc| pc <= created));
         let excluded = p.pid == 0 || in_tree.contains(&p.pid) || (p.pid, created) == holder || keeper == Some((p.pid, created));
         if created >= declared_at && !parent_alive && !excluded {
             found.insert(p.pid, created);
