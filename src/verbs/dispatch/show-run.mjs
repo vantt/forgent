@@ -19,7 +19,7 @@ import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { findRunDir, listAssignmentRuns, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { deriveUnitState, unitDirsOfAssignment } from '../../runner/execution/unit-state.mjs';
+import { deriveUnitState, unitDirOfAssignment } from '../../runner/execution/unit-state.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
@@ -198,10 +198,8 @@ export function readAttemptView(runDir, { fgosDir, probe = probeAttempt } = {}) 
   const view = replacement
     ? { attemptState: 'superseded', supersededBy: replacement, attemptOutcome: attemptState }
     : { attemptState, ...(attemptReason ? { attemptReason } : {}) };
-  const unitDir = typeof run?.assignmentId === 'string' && fgosDir
-    ? unitDirsOfAssignment(path.join(fgosDir, 'assignments'), run.assignmentId)[0]
-    : undefined;
-  if (unitDir === undefined) return view;
+  const unitDir = fgosDir ? unitDirOfAssignment(fgosDir, run?.assignmentId) : null;
+  if (!unitDir) return view;
   let unit;
   try { unit = deriveUnitState(unitDir, { probe }); } catch { return view; }
   return { ...view, unitRunId: unit.unitRunId, unitState: unit.unitState, ...(unit.resumeCommand ? { resumeCommand: unit.resumeCommand } : {}) };

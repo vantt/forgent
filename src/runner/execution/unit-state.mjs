@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { listGenerations } from '../dispatch/run-lock.mjs';
+import { assignmentDir } from '../dispatch/assignment-layout.mjs';
 import { unitControllerHeld } from './unit-control.mjs';
 
 const readJson = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
@@ -26,18 +27,17 @@ export function lastAttempts(unitRecord) {
   return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
 }
 
-/** Unit run directories under `assignmentsDir` that recorded an attempt of `assignmentId`. */
-export function unitDirsOfAssignment(assignmentsDir, assignmentId) {
-  let names;
-  try { names = fs.readdirSync(assignmentsDir, { withFileTypes: true }); } catch { return []; }
-  const found = [];
-  for (const entry of names) {
-    if (!entry.isDirectory()) continue;
-    const unitDir = path.join(assignmentsDir, entry.name);
-    const record = readJson(path.join(unitDir, 'unit.json'));
-    if (record && lastAttempts(record).some((attempt) => attempt.assignmentId === assignmentId)) found.push(unitDir);
-  }
-  return found;
+/**
+ * The unit directory that owns an assignment, or null. A unit run's assignment id starts with its unit run id
+ * (`<unitRunId>/<seat>/<round>`), so the unit is resolved from the id through the layout, never by listing the
+ * assignments tree; its `unit.json` must name the assignment.
+ */
+export function unitDirOfAssignment(fgosDir, assignmentId) {
+  const unitRunId = typeof assignmentId === 'string' ? assignmentId.split('/')[0] : null;
+  const unitDir = unitRunId ? assignmentDir(fgosDir, unitRunId) : null;
+  if (!unitDir) return null;
+  const record = readJson(path.join(unitDir, 'unit.json'));
+  return record && lastAttempts(record).some((attempt) => attempt.assignmentId === assignmentId) ? unitDir : null;
 }
 
 // A stored summary whose outcome is not yet known (a run still in flight) is not a verdict.

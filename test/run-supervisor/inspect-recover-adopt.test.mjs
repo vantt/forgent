@@ -24,7 +24,7 @@ const write = (file, value) => {
 };
 
 /** A project root holding one attempt of `assignmentId`; `supervised: false` leaves it as a run from before the supervisor. */
-function project({ assignmentId = 'asg-1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {
+function project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {
   const root = makeFixtureDir('inspect-recover-');
   const assignments = path.join(root, '.fgos', 'assignments');
   const dir = path.join(assignments, assignmentId, 'runs', attempt);
@@ -48,7 +48,7 @@ function project({ assignmentId = 'asg-1', runId = 'run-1', supervised = true, a
 }
 
 /** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */
-function unitOf(p, assignmentId = 'asg-1', unitRunId = 'unit-run-1') {
+function unitOf(p, assignmentId = 'unit-run-1/producer/1', unitRunId = 'unit-run-1') {
   const unitDir = path.join(p.assignments, unitRunId);
   write(path.join(unitDir, 'unit.json'), { execution: { status: 'running' }, bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } });
   return unitDir;
@@ -132,8 +132,8 @@ test('a closed attempt a later resume replaced reads superseded', { skip }, () =
   const p = project();
   write(path.join(p.dir, 'closed.json'), { v: 1, closedBy: 'supervisor' });
   write(path.join(p.dir, 'receipt.json'), { outcome: 'cancelled' });
-  const second = path.join(p.assignments, 'asg-1', 'runs', '02');
-  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'asg-1', status: 'running', supersedesRunId: 'run-1' });
+  const second = path.join(p.assignments, 'unit-run-1/producer/1', 'runs', '02');
+  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'unit-run-1/producer/1', status: 'running', supersedesRunId: 'run-1' });
   const view = showRunUseCase(p.ctx, { runId: 'run-1' });
   assert.equal(view.attemptState, 'superseded');
   assert.equal(view.supersededBy, 'run-2');
