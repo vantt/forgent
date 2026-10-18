@@ -1,6 +1,6 @@
 # Git Component Specification
 
-Status: Proposed G0, owner answered Q1-Q7 and R30 on 2026-10-17; proofs folded 2026-10-18, re-checked 2026-10-18; second re-check passed 2026-10-18; ready for owner signature. Vectors that need an implementation, a real device or owner-written budgets stay implementation-time conditions (§19).
+Status: Accepted G0, canonical. Signed by the owner 2026-10-18 as D-ADR0057. Proofs runnable at G0 passed in finite models and probes (§19); vectors that need an implementation, a real device or owner-written budgets stay implementation-time conditions (§19).
 
 ```txt
 Assembled: 2026-10-17 (Asia/Saigon) from the settled output of an architecture council; assembly only, no new design
@@ -33,9 +33,9 @@ Re-check fold: 2026-10-18 (Asia/Saigon), five re-check runs folded into §§2-6,
 Document type: BA-grade area specification
 Audience: reviewer, maintainer, implementation agent
 Purpose: One authority for fgOS repository operations and recovery in every domain
-Design status: Proposed G0. Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19); ready for owner signature, not signed.
+Design status: Accepted G0, D-ADR0057 (2026-10-18). Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19).
 Implementation status: Node writers exist; Rust replacement is not claimed implemented.
-Canonical target: docs/platform/git/spec.md
+Canonical: Yes (docs/platform/git/spec.md)
 Owner: Git component
 Source (proposed): packages/git/rust, crate fgos-git
 Node facade (proposed): src/git/; every Node-reachable Git operation goes through one combined
@@ -557,7 +557,7 @@ Rows G-135–G-165, G-167–G-169, G-171–G-180, G-182, G-185–G-201 are **not
 
 ## 17. Acceptance, remaining uncertainty, prohibited claims
 
-G0 has the owner's answers to Q1-Q7 and R30 (§18) and remains unsigned until the owner signs it. The first proof runs were folded on 2026-10-18 and re-checked the same day (§19); every finding a re-check reported as violated has a text fix, so G0 is ready for owner signature. What the re-checks established holds only in a finite model or a raw-Git/fixture probe (§19). The second fold's two new rules (§10 rule 4 TargetAttempt; Refs under worktree-admin 40, §3/§5) are text with a small re-check listed in §19. The vectors that need an implementation, a real device or owner-written budgets are implementation-time conditions: implementation done requires them to pass. Implementation done requires: boundary-map row; zero product mutation exceptions; one matcher port/implementation; each retained lesson tested at its guard/consumer; all verification vectors with real tests; npm test/Rust suites green. Publication cannot connect before WAL/recovery/doctor exist. Workflow old writer cannot coexist with replacement Land.
+G0 has the owner's answers to Q1-Q7 and R30 (§18) and was signed by the owner on 2026-10-18 as D-ADR0057. The first proof runs were folded on 2026-10-18 and re-checked the same day (§19); every finding a re-check reported as violated has a text fix, which is why the owner signed it. What the re-checks established holds only in a finite model or a raw-Git/fixture probe (§19). The second fold's two new rules (§10 rule 4 TargetAttempt; Refs under worktree-admin 40, §3/§5) passed their re-check on 2026-10-18 (§19). The vectors that need an implementation, a real device or owner-written budgets are implementation-time conditions: implementation done requires them to pass. Implementation done requires: boundary-map row; zero product mutation exceptions; one matcher port/implementation; each retained lesson tested at its guard/consumer; all verification vectors with real tests; npm test/Rust suites green. Publication cannot connect before WAL/recovery/doctor exist. Workflow old writer cannot coexist with replacement Land.
 
 No repository evidence shows external consumers using shallow or alternates clones (`scripts/ci-external-consumer.sh` uses neither); the risk that refusing repository-owned layouts until E5 blocks a legitimate clone is unquantified, not observed.
 
