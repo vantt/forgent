@@ -211,80 +211,121 @@ impl LockDriver for FlockDriver {
     }
 
     fn prepare_borrow(&self, cmd: &mut Command) {
-        // macOS cannot list holders, so what a borrowing child leaves behind
-        // is found through its own process group instead.
-        if cfg!(target_os = "macos") {
-            use std::os::unix::process::CommandExt;
-            cmd.process_group(0);
-        }
+        use std::os::unix::process::CommandExt;
+        // Command applies setpgid in the child before exec, alongside the
+        // explicit fd mapping. The unreaped leader pins this group id.
+        cmd.process_group(0);
     }
 
     fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
         if cfg!(target_os = "linux") {
-            end_listed_holders(file, kill_wait)
+            end_listed_holders(file, child_pid, kill_wait)
         } else {
             end_process_group(child_pid, kill_wait)
         }
     }
 }
 
-/// Linux: every other process listed as holding the description is a
-/// leftover; kill each by identity and wait until the list holds only this
-/// process.
-fn end_listed_holders(file: &File, kill_wait: Duration) -> Result<u32, Leftovers> {
+/// Linux: only the borrow group and descendants may be killed. Foreign
+/// description holders are waited (transient fork/exec copies) or refused.
+fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
+    drain_description(file, Some(child_pid), kill_wait)
+}
+
+/// Non-spawning admission: no borrowing domain means nobody may be killed.
+#[cfg(target_os = "linux")]
+pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration) -> Result<(), Leftovers> {
+    drain_description(file, None, kill_wait).map(|_| ())
+}
+
+fn drain_description(file: &File, child_pid: Option<u32>, kill_wait: Duration) -> Result<u32, Leftovers> {
     use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
-    use fgos_process::facts::{file_key, lock_holders, Holders};
+    use fgos_process::facts::{file_key, identity_of, lock_holders, Holders};
     let Ok((dev, ino)) = file_key(file) else {
-        return Err(Leftovers { killed: 0, pids: Vec::new() });
+        return Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false });
     };
-    use fgos_process::facts::{judge_here, Verdict};
     let me = std::process::id();
     let deadline = Instant::now() + kill_wait;
     let mut signaled: HashSet<(u32, String)> = HashSet::new();
     let mut killed = 0u32;
     loop {
-        // A full holder scan reads every process's fdinfo; it runs once per
-        // round, and the killed processes are then watched by identity until
-        // they are gone, before the next scan confirms nothing is left (a
-        // leftover may have forked before it died).
-        let others: Vec<_> = match lock_holders(dev, ino) {
-            Holders::List(list) => list.into_iter().filter(|t| t.pid.0 != me).collect(),
-            // Linux always lists; an answer it cannot give is never "none left".
-            Holders::Unlistable => return Err(Leftovers { killed, pids: Vec::new() }),
+        let holders = match lock_holders(dev, ino) {
+            Holders::List(list) if list.iter().any(|t| t.pid.0 == me) => list.into_iter().filter(|t| t.pid.0 != me).collect::<Vec<_>>(),
+            // Absence of our known locked description is not proof of an
+            // empty holder set (Publication admission also requires self).
+            Holders::List(_) | Holders::Unlistable => return Err(Leftovers { killed, pids: Vec::new(), foreign: false }),
         };
-        if others.is_empty() {
-            return Ok(killed);
+        let had_holders = !holders.is_empty();
+        let mut foreign = Vec::new();
+        let mut refused = false;
+        let mut domain = child_pid.map(|pid| group_members(pid as libc::pid_t)).unwrap_or_default();
+        // Include still-reachable descendants that changed process group,
+        // even if they closed the borrowed description.
+        if let (Some(child_pid), Ok(entries)) = (child_pid, std::fs::read_dir("/proc")) {
+            domain.extend(entries.flatten().filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
+                .filter(|pid| in_borrow_domain(*pid, child_pid)));
         }
-        for tuple in &others {
-            if signaled.insert((tuple.pid.0, tuple.start_time.clone())) && signal_by_identity(tuple, Signal::Kill) == SignalOutcome::Sent {
-                killed += 1;
+        for tuple in holders {
+            if child_pid.is_some_and(|root| in_borrow_domain(tuple.pid.0, root)) {
+                domain.push(tuple.pid.0);
+            } else {
+                // An unrelated child can inherit CLOEXEC descriptions until
+                // exec. Re-scan fdinfo, not liveness: it may exec and stay live.
+                // A process can disappear between fdinfo and stat. Do not
+                // turn that normal exit into a permanent foreign refusal;
+                // the next description scan confirms it is gone.
+                refused |= parent_and_group(tuple.pid.0).is_some_and(|(ppid, _)| ppid != me);
+                foreign.push(tuple.pid.0);
             }
         }
-        loop {
-            let alive: Vec<u32> = others.iter().filter(|t| judge_here(&t.to_record()) != Verdict::Dead).map(|t| t.pid.0).collect();
-            if alive.is_empty() {
-                break;
-            }
-            if Instant::now() >= deadline {
-                return Err(Leftovers { killed, pids: alive });
-            }
-            std::thread::sleep(Duration::from_millis(1));
-        }
-        if Instant::now() >= deadline {
-            // The killed ones are gone; one last scan decides.
-            return match lock_holders(dev, ino) {
-                Holders::List(list) => {
-                    let left: Vec<u32> = list.into_iter().filter(|t| t.pid.0 != me).map(|t| t.pid.0).collect();
-                    if left.is_empty() {
-                        Ok(killed)
-                    } else {
-                        Err(Leftovers { killed, pids: left })
+        domain.sort_unstable();
+        domain.dedup();
+        let mut live = Vec::new();
+        for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
+            if let Some(tuple) = identity_of(fgos_process::ProcId(pid)) {
+                // Re-check membership before signalling a pinned identity.
+                if child_pid.is_some_and(|root| in_borrow_domain(pid, root)) {
+                    live.push(pid);
+                    if signaled.insert((pid, tuple.start_time.clone())) && signal_by_identity(&tuple, Signal::Kill) == SignalOutcome::Sent {
+                        killed += 1;
                     }
                 }
-                Holders::Unlistable => Err(Leftovers { killed, pids: Vec::new() }),
-            };
+            }
         }
+        if live.is_empty() && (refused || (!foreign.is_empty() && Instant::now() >= deadline)) {
+            return Err(Leftovers { killed, pids: foreign, foreign: true });
+        }
+        if live.is_empty() && foreign.is_empty() && !had_holders {
+            return Ok(killed);
+        }
+        if Instant::now() >= deadline {
+            return Err(Leftovers { killed, pids: live, foreign: false });
+        }
+        std::thread::sleep(Duration::from_millis(1));
     }
+}
+
+/// Read-only local Linux domain facts; no process-control policy lives here.
+fn parent_and_group(pid: u32) -> Option<(u32, u32)> {
+    let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
+    let mut fields = stat[stat.rfind(')')? + 1..].split_whitespace();
+    fields.next()?;
+    Some((fields.next()?.parse().ok()?, fields.next()?.parse().ok()?))
+}
+
+fn in_borrow_domain(mut pid: u32, root: u32) -> bool {
+    let mut seen = HashSet::new();
+    while pid > 1 && seen.insert(pid) {
+        if pid == root {
+            return true;
+        }
+        let Some((parent, group)) = parent_and_group(pid) else { return false };
+        if group == root {
+            return true;
+        }
+        pid = parent;
+    }
+    false
 }
 
 /// macOS: the borrowing child ran in its own process group; kill the group
@@ -302,7 +343,7 @@ fn end_process_group(child_pid: u32, kill_wait: Duration) -> Result<u32, Leftove
             return Ok(killed);
         }
         if Instant::now() >= deadline {
-            return Err(Leftovers { killed, pids: left });
+            return Err(Leftovers { killed, pids: left, foreign: false });
         }
         std::thread::sleep(Duration::from_millis(1));
     }

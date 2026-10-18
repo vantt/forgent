@@ -1,6 +1,6 @@
 //! Borrowing with real git: the four vectors and the sibling check are
 //! green; a control without the gc switch shows the vector catches a real
-//! leak; the release rule kills a hook's setsid escaper before
+//! leak; the release rule refuses an unprovable setsid escaper before
 //! `run_borrowed` returns.
 #![cfg(target_os = "linux")]
 
@@ -9,12 +9,12 @@ mod common;
 use std::fs;
 use std::path::Path;
 use std::process::{Command, Stdio};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use common::*;
 use fgos_holder_lock::borrow_vectors::{self, add_loose_objects, git_env, init_repo};
 use fgos_holder_lock::port::borrowed_argv;
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, Mode, Probe, Wait};
 use fgos_process::facts::{lock_holders, observe, Holders, Observed};
 use fgos_process::{FdSlot, ProcId};
 
@@ -130,11 +130,11 @@ fn fd_of_handle(path: &Path) -> i32 {
     panic!("handle fd not found");
 }
 
-/// Release rule: a hook starts a setsid escaper that the gc switch cannot
-/// prevent; `run_borrowed` kills it before it returns, and the lock is free
-/// as soon as the owner releases.
+/// A reparented setsid escaper has no provable group/ancestry link at
+/// cleanup. The clarified domain rule refuses it rather than killing a
+/// potentially foreign holder; exclusion must survive the refusal.
 #[test]
-fn run_borrowed_kills_a_setsid_escaper_before_returning() {
+fn run_borrowed_refuses_an_unprovable_setsid_holder_without_killing() {
     let _serial = serial();
     let dir = temp_dir("escaper");
     let repo = dir.join("repo");
@@ -158,15 +158,26 @@ fn run_borrowed_kills_a_setsid_escaper_before_returning() {
         clear_env: false,
         stdio: BorrowStdio::Null,
     };
-    let started = Instant::now();
-    let outcome = run_borrowed(&handle, &spec, &helper()).expect("run_borrowed");
-    assert_eq!(outcome.exit, Some(0));
-    assert!(outcome.leftovers_killed >= 1, "{outcome:?}");
+    let result = run_borrowed(&handle, &spec, &helper());
     let escaper: u32 = fs::read_to_string(&pidfile).unwrap().trim().parse().unwrap();
-    assert!(matches!(observe(ProcId(escaper)), Observed::Absent | Observed::Zombie), "escaper {escaper} outlived run_borrowed");
-    assert!(others_holding(&res.path).is_empty(), "only the holder may hold the description after run_borrowed");
-    println!("release rule: escaper killed, run_borrowed took {:?}", started.elapsed());
+    // Always end the test-created process, including on an assertion failure.
+    struct Cleanup(u32);
+    impl Drop for Cleanup {
+        fn drop(&mut self) { kill_pids(&[self.0]); }
+    }
+    let cleanup = Cleanup(escaper);
+    let error = result.expect_err("unprovable ancestry must fail closed");
+    assert!(matches!(error, BorrowError::ForeignHolder { ref pids } if pids.contains(&escaper)), "{error}");
+    assert!(matches!(observe(ProcId(escaper)), Observed::Live { .. }), "foreign holder was killed");
+    assert_eq!(probe(&res).unwrap(), Probe::Held);
     release(handle);
+    assert_eq!(probe(&res).unwrap(), Probe::Held, "refusal must preserve the foreign description");
+    drop(cleanup);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !matches!(observe(ProcId(escaper)), Observed::Absent | Observed::Zombie) {
+        assert!(Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(1));
+    }
     assert_eq!(probe(&res).unwrap(), Probe::Free);
     let _ = fs::remove_dir_all(&dir);
 }
