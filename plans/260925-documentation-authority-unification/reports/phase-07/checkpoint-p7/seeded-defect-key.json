@@ -1,0 +1,214 @@
+{
+ "seed": 730291846,
+ "method": "random.Random(seed); sample per pool; S3-02,S3-04,S3-07,S3-11 chosen deliberately; shuffled with same rng",
+ "drawnIds": [
+  {
+   "record": 1,
+   "cat": "rebind",
+   "id": "current-1128"
+  },
+  {
+   "record": 2,
+   "cat": "contract",
+   "id": "S3-07"
+  },
+  {
+   "record": 3,
+   "cat": "rebind",
+   "id": "current-0281"
+  },
+  {
+   "record": 4,
+   "cat": "alignment",
+   "id": "X-MAIN-02"
+  },
+  {
+   "record": 5,
+   "cat": "alignment",
+   "id": "X-STALE-03"
+  },
+  {
+   "record": 6,
+   "cat": "rebind",
+   "id": "current-0322"
+  },
+  {
+   "record": 7,
+   "cat": "contract",
+   "id": "S3-04"
+  },
+  {
+   "record": 8,
+   "cat": "routing",
+   "id": "QF-12"
+  },
+  {
+   "record": 9,
+   "cat": "rebind",
+   "id": "current-0973"
+  },
+  {
+   "record": 10,
+   "cat": "rebind",
+   "id": "current-0303"
+  },
+  {
+   "record": 11,
+   "cat": "alignment",
+   "id": "X-STALE-02"
+  },
+  {
+   "record": 12,
+   "cat": "rebind",
+   "id": "current-0379"
+  },
+  {
+   "record": 13,
+   "cat": "contract",
+   "id": "S3-11"
+  },
+  {
+   "record": 14,
+   "cat": "rebind",
+   "id": "current-0914"
+  },
+  {
+   "record": 15,
+   "cat": "accounting",
+   "id": "accounting-ratchet-0004"
+  },
+  {
+   "record": 16,
+   "cat": "rebind",
+   "id": "current-1136"
+  },
+  {
+   "record": 17,
+   "cat": "a34",
+   "id": "X-A34-25"
+  },
+  {
+   "record": 18,
+   "cat": "rebind",
+   "id": "current-0520"
+  },
+  {
+   "record": 19,
+   "cat": "rebind",
+   "id": "current-0359"
+  },
+  {
+   "record": 20,
+   "cat": "rebind",
+   "id": "current-0949"
+  },
+  {
+   "record": 21,
+   "cat": "rebind",
+   "id": "current-0249"
+  },
+  {
+   "record": 22,
+   "cat": "a34",
+   "id": "X-A34-19"
+  },
+  {
+   "record": 23,
+   "cat": "routing",
+   "id": "QF-07"
+  },
+  {
+   "record": 24,
+   "cat": "routing",
+   "id": "X-DEFECT-03"
+  },
+  {
+   "record": 25,
+   "cat": "alignment",
+   "id": "X-STALE-06"
+  },
+  {
+   "record": 26,
+   "cat": "contract",
+   "id": "S3-02"
+  },
+  {
+   "record": 27,
+   "cat": "rebind",
+   "id": "current-0843"
+  },
+  {
+   "record": 28,
+   "cat": "a34",
+   "id": "X-A34-27"
+  },
+  {
+   "record": 29,
+   "cat": "rebind",
+   "id": "current-0499"
+  },
+  {
+   "record": 30,
+   "cat": "accounting",
+   "id": "accounting-ratchet-0003"
+  }
+ ],
+ "categoryCounts": {
+  "rebind": 14,
+  "alignment": 4,
+  "contract": 4,
+  "routing": 3,
+  "accounting": 2,
+  "a34": 3
+ },
+ "mutations": [
+  {
+   "record": 2,
+   "id": "S3-07",
+   "kind": "c",
+   "field": "implementationEvidence[0]",
+   "original": "src/runner/dispatch/agent-result-claim-contract.mjs:5",
+   "mutated": "src/runner/dispatch/agent-result-claim-contract.mjs:45"
+  },
+  {
+   "record": 3,
+   "id": "current-0281",
+   "kind": "a",
+   "field": "sourceUnitDigest",
+   "original": "7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf",
+   "mutated": "7ecbfde0b13952ce60d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf"
+  },
+  {
+   "record": 10,
+   "id": "current-0303",
+   "kind": "b",
+   "field": "sourceAnchor",
+   "original": "slice-live-tính-năng-xuyên-tầng-trỏ-về-component",
+   "mutated": "x-slice-live-tính-năng-xuyên-tầng-trỏ-về-component"
+  },
+  {
+   "record": 13,
+   "id": "S3-11",
+   "kind": "f",
+   "field": "contractId",
+   "original": "CTR002",
+   "mutated": "CTR004"
+  },
+  {
+   "record": 17,
+   "id": "X-A34-25",
+   "kind": "e",
+   "field": "verbatimPayload",
+   "original": "  2. Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.",
+   "mutated": "  2. Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận vào đầu đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage."
+  },
+  {
+   "record": 26,
+   "id": "S3-02",
+   "kind": "d",
+   "field": "payloadTransport",
+   "original": "operation identity, TaskSpec, Skill, Role, policy hints; current payload has no version field",
+   "mutated": "operation identity, TaskSpec, Skill, Role, policy hints; payload carries a `version` field validated when the step definition is loaded"
+  }
+ ]
+}
