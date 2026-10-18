@@ -201,7 +201,7 @@ fn send_frame_with_fds(stream: &UnixStream, frame: &Value, fds: &[RawFd]) -> std
         }
     }
     // SAFETY: sendmsg over the prepared message.
-    let sent = unsafe { libc::sendmsg(stream.as_raw_fd(), &msg, 0) };
+    let sent = unsafe { libc::sendmsg(stream.as_raw_fd(), &msg, libc::MSG_NOSIGNAL) };
     if sent < 0 {
         return Err(std::io::Error::last_os_error());
     }
@@ -245,11 +245,11 @@ fn launch_spec(plan: &Plan, run_dir: &Path) -> Result<LaunchSpec, String> {
 /// (the kernel translates the peer pid for a reader in an ancestor namespace); it must belong to the
 /// process terminal-control saw in the pane. Without that answer, the namespace's init among the
 /// pane root's children is the gate.
-fn gate_tuple(stream: &UnixStream, root: &ProcessIdentity) -> Result<ProcTuple, String> {
+fn gate_tuple(stream: &UnixStream, root: &ProcessIdentity, sandboxed: bool) -> Result<ProcTuple, String> {
     #[cfg(target_os = "linux")]
     {
         let from_peer = peer_cred(stream).map(|c| c.pid as u32).filter(|pid| *pid != 0 && within(*pid, root.pid));
-        if let Some(tuple) = from_peer.or_else(|| namespace_init_under(root.pid)).and_then(|pid| facts::identity_of(ProcId(pid))) {
+        if let Some(tuple) = from_peer.or_else(|| namespace_init_under(root.pid, sandboxed)).and_then(|pid| facts::identity_of(ProcId(pid))) {
             return Ok(tuple);
         }
         Err(format!("the gate is not among the descendants of pane root {}", root.pid))
@@ -283,9 +283,9 @@ fn within(pid: u32, ancestor: u32) -> bool {
     false
 }
 
-/// The child of `root` that is pid 1 in a namespace of its own, or `root` when it has none.
+/// The child of `root` that is pid 1 in a namespace of its own, or `root` when it has none and no sandbox was asked for.
 #[cfg(target_os = "linux")]
-fn namespace_init_under(root: u32) -> Option<u32> {
+fn namespace_init_under(root: u32, sandboxed: bool) -> Option<u32> {
     let nspid = |pid: u32| -> Option<Vec<u32>> {
         let status = fs::read_to_string(format!("/proc/{pid}/status")).ok()?;
         let line = status.lines().find_map(|l| l.strip_prefix("NSpid:"))?;
@@ -294,9 +294,21 @@ fn namespace_init_under(root: u32) -> Option<u32> {
     if nspid(root)?.len() == 1 {
         let children = fs::read_to_string(format!("/proc/{root}/task/{root}/children")).ok().unwrap_or_default();
         let init = children.split_whitespace().filter_map(|c| c.parse::<u32>().ok()).find(|c| nspid(*c).is_some_and(|ns| ns.len() > 1 && ns.last() == Some(&1)));
-        return init.or(Some(root));
+        // Behind a sandbox the pane root is only bwrap's monitor: with no namespace init found, nothing here is the gate.
+        return init.or(if sandboxed { None } else { Some(root) });
     }
     Some(root)
+}
+
+/// The process a `{host, bootId, pidNs, pid, startTime}` record names.
+fn tuple_of(record: &Value) -> Option<ProcTuple> {
+    Some(ProcTuple {
+        host: record["host"].as_str()?.to_string(),
+        boot_id: record["bootId"].as_str().map(String::from),
+        pid_ns: record["pidNs"].as_str()?.to_string(),
+        pid: ProcId(record["pid"].as_u64()? as u32),
+        start_time: record["startTime"].as_str()?.to_string(),
+    })
 }
 
 fn domain_of(kind: &str, gate: ProcTuple) -> Result<Domain, String> {
@@ -323,6 +335,8 @@ struct Sup<'a> {
     stopped: Option<Instant>,
     ended_domain: bool,
     agent_bound: bool,
+    /// The agent as the gate reported it, for domains that do not contain it (a process group).
+    agent: Option<ProcTuple>,
     channel_open: bool,
     gate_gone: bool,
     end: TerminalEnd,
@@ -354,6 +368,7 @@ impl Sup<'_> {
             match read_frame(&mut self.go) {
                 Ok(frame) if frame["type"] == "AGENT" && !self.agent_bound => {
                     self.agent_bound = true;
+                    self.agent = tuple_of(&frame["tuple"]);
                     let body = json!({"v": 1, "attemptId": self.watch.attempt_id, "envelopeDigest": self.watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
                     if let Ok(bytes) = serde_json::to_vec(&body) {
                         let _ = publish_once(self.run_dir, "agent-binding.json", &bytes);
@@ -523,7 +538,8 @@ fn not_started(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks
 pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch: &Watch) -> Result<i32, Refusal> {
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
-    let backend = Backend::from_env();
+    crate::terminal_slot::record_endpoint(run_dir);
+    let backend = Backend::from_env(run_dir);
     let core = backend.core();
     let spec = launch_spec(&plan, run_dir).map_err(Refusal::internal)?;
 
@@ -541,7 +557,7 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     };
     socket.close();
 
-    let gate = gate_tuple(&stream, &root).map_err(Refusal::internal)?;
+    let gate = gate_tuple(&stream, &root, plan.bwrap_prefix.is_some()).map_err(Refusal::internal)?;
     let domain = domain_of(&plan.domain_kind, gate.clone()).map_err(Refusal::internal)?;
     if let Err(why) = super::bind_record(envelope, run_dir, &locks, &domain, &gate, plan.domain_kind == "linux-gate") {
         let _ = domain_kill_all(&domain);
@@ -569,6 +585,7 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
         stopped: None,
         ended_domain: false,
         agent_bound: false,
+        agent: None,
         channel_open: true,
         gate_gone: false,
         end: TerminalEnd::default(),
@@ -582,6 +599,10 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     }
     if domain_is_empty(&sup.domain) != DomainState::Empty {
         let _ = domain_kill_all(&sup.domain);
+    }
+    // A process group does not hold the agent (it leads a group of its own): end it by identity.
+    if let (Domain::LinuxPgroup(_), Some(agent)) = (&sup.domain, &sup.agent) {
+        let _ = fgos_process::control::signal_by_identity(agent, fgos_process::control::Signal::Kill);
     }
     let end = sup.end.clone();
     drop(sup);
@@ -654,7 +675,7 @@ fn end_early(io: &mut TermIo, outcome: &TerminalOutcome) {
 
 /// The result is in: type the exit command, give the agent a short time to leave, then stop it.
 fn ask_to_leave(plan: &Plan, adapter: &Terminal, io: &mut TermIo) {
-    let sent = match &plan.exit {
+    let _ = match &plan.exit {
         Some(text) => io.send(&SendInput { text: Some(text.clone()), keys: None, submit: true }),
         None => match adapter.exit_command() {
             ExitCommand::Text(text) => io.send(&SendInput { text: Some(text.to_string()), keys: None, submit: true }),
@@ -666,7 +687,6 @@ fn ask_to_leave(plan: &Plan, adapter: &Terminal, io: &mut TermIo) {
         io.pause(TICK.as_millis() as u64);
     }
     if !io.sup.finished() {
-        let _ = sent;
         io.sup.begin_stop("cancel", Some("terminal:completed-no-exit"));
     }
 }

@@ -8,6 +8,7 @@
 //! (`FGOS_HERDR_BIN`, `HERDR_SESSION`, `HERDR_SOCKET_PATH`), so the controller
 //! that starts the supervisor decides which herdr it talks to.
 
+use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use fgos_terminal_control::core::{Core, CoreConfig};
@@ -30,11 +31,14 @@ pub struct Backend {
 }
 
 impl Backend {
-    /// The backend of this process's environment.
-    pub fn from_env() -> Backend {
-        let mut herdr = HerdrConfig::new(std::env::var("FGOS_HERDR_BIN").unwrap_or_default());
-        herdr.session = std::env::var("HERDR_SESSION").ok().filter(|v| !v.is_empty());
-        herdr.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|v| !v.is_empty());
+    /// The backend of this process's environment; what the environment does not name comes from the
+    /// endpoint the supervisor recorded in the attempt directory (adopt runs under another environment).
+    pub fn from_env(run_dir: &Path) -> Backend {
+        let recorded: Value = std::fs::read_to_string(run_dir.join(ENDPOINT_FILE)).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(Value::Null);
+        let pick = |var: &str, field: &str| std::env::var(var).ok().filter(|v| !v.is_empty()).or_else(|| recorded[field].as_str().filter(|v| !v.is_empty()).map(String::from));
+        let mut herdr = HerdrConfig::new(pick("FGOS_HERDR_BIN", "bin").unwrap_or_default());
+        herdr.session = pick("HERDR_SESSION", "session");
+        herdr.socket_path = pick("HERDR_SOCKET_PATH", "socket");
         let config = CoreConfig {
             state_root: default_state_root(),
             limits: DEFAULT_LIMITS,
@@ -50,6 +54,18 @@ impl Backend {
 
     pub fn core(&self) -> Core<'_> {
         Core::new(&self.driver, self.policy.as_ref(), self.config.clone())
+    }
+}
+
+/// Where the supervisor records the herdr endpoint it launched into.
+pub const ENDPOINT_FILE: &str = "terminal-endpoint.json";
+
+/// Record the herdr endpoint of this process's environment next to the attempt, once.
+pub fn record_endpoint(run_dir: &Path) {
+    let get = |var: &str| std::env::var(var).ok().filter(|v| !v.is_empty());
+    let body = serde_json::json!({"v": 1, "bin": get("FGOS_HERDR_BIN"), "session": get("HERDR_SESSION"), "socket": get("HERDR_SOCKET_PATH")});
+    if let Ok(bytes) = serde_json::to_vec(&body) {
+        let _ = crate::publish::publish_once(run_dir, ENDPOINT_FILE, &bytes);
     }
 }
 

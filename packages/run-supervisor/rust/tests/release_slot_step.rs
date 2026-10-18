@@ -107,3 +107,13 @@ fn terminal_control_that_cannot_prove_it_may_close_leaves_the_step_open_for_adop
     assert!(case.dir.join("steps/settle-attempt.json").exists(), "the earlier step kept its receipt");
     assert!(case.herdr.calls_starting("pane close").is_empty());
 }
+
+#[test]
+fn a_step_that_asks_for_a_retry_leaves_the_slot_undecided() {
+    let case = case("rs-retry", "echo '{\"result\":\"retry\",\"reason\":\"later\"}'; exit 75");
+    case.receipt("exited", true);
+    let outcome = case.run();
+    assert!(matches!(&outcome, StepsOutcome::Retry { step_id, .. } if step_id == "settle-attempt"), "{outcome:?}");
+    assert!(case.release_detail().is_none(), "the slot waits for the retried step");
+    assert!(case.herdr.calls_starting("pane close").is_empty());
+}

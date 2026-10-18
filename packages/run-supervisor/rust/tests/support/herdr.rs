@@ -83,8 +83,7 @@ impl FakeHerdr {
         let policy = policy_by_name(None).unwrap();
         let config = CoreConfig { state_root: self.state_root.clone(), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 8 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 5_000 };
         let core = Core::new(&driver, policy.as_ref(), config);
-        let result = f(&core);
-        result
+        f(&core)
     }
 
     /// The controller's half: a slot for `key` before the supervisor starts.

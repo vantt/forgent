@@ -72,8 +72,10 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
         }
     }
 
+    // A step that asked for a retry may pass next time; deciding the slot now would fix it as "kept".
+    let retrying = matches!(failure, Some(StepsOutcome::Retry { .. }));
     let earlier_done = failure.is_none();
-    for step in items.iter().filter(|step| is_builtin(step)) {
+    for step in items.iter().filter(|step| is_builtin(step) && !retrying) {
         let step_id = step_id_of(step);
         if has_receipt(&step_id) {
             continue;
@@ -104,7 +106,7 @@ fn release_slot(envelope: &Value, run_dir: &Path, earlier_steps_done: bool) -> R
     let key = envelope["slot"]["key"].as_str().ok_or_else(|| StepFailure::Failed("release-slot needs envelope.slot.key".into()))?;
     let receipt: Option<Value> = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|text| serde_json::from_str(&text).ok());
     let disposition = disposition_for(receipt.as_ref(), earlier_steps_done);
-    match release(&Backend::from_env(), key, disposition) {
+    match release(&Backend::from_env(run_dir), key, disposition) {
         Ok(detail) => Ok(Some(detail)),
         Err(ReleaseFailure::Retry(reason)) => Err(StepFailure::Retry(reason)),
         Err(ReleaseFailure::Unsupported(reason)) => Err(StepFailure::Failed(format!("terminal-mode-unsupported: {reason}"))),
