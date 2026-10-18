@@ -163,6 +163,12 @@ fn main() {
             let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_terminal_control::route::main(&rest));
         }
+        // `identity <op>`: the writer-id rules the Node payload must not copy
+        // (see `fgos_session_identity::route`).
+        if args.get(2).is_some_and(|a| a == "identity") {
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            std::process::exit(fgos_session_identity::route::main(&rest));
+        }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step.
         let rest: Vec<String> = args[2..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
         if let Some(route) = rest.first() {
