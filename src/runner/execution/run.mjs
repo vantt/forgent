@@ -34,6 +34,7 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { installCancelOnSignal, readCancelWaitMs } from '../../run-supervisor/cancel-registry.mjs';
 import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
+import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -166,11 +167,6 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
   };
 }
 
-/** The last attempt of each role/round: the one a resume continues from. */
-function lastAttempts(unitRecord) {
-  return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
-}
-
 /**
  * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
@@ -194,18 +190,6 @@ function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
     ].join(', ');
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": commit ${commit.sha} is already on the branch but does not hold exactly the files of its write scope (${diff}; + is outside the scope, - is missing); inspect it and take it off the branch by hand (git reset HEAD~1 keeps its files in the worktree), then resume`);
   }
-}
-
-/**
- * The newest attempt directory the admission ledger committed for `assignmentId`, with its run id; null
- * while nothing was admitted or the directory was never materialized.
- */
-function currentAttemptOf(assignmentsDir, assignmentId) {
-  const generationsDir = path.join(assignmentsDir, assignmentId, 'admission', 'generations');
-  const current = listGenerations(generationsDir).at(-1)?.record;
-  if (!current) return null;
-  const dir = path.join(assignmentsDir, assignmentId, 'runs', current.attemptStr ?? String(current.attempt).padStart(2, '0'));
-  return fs.existsSync(dir) ? { dir, runId: current.runId } : null;
 }
 
 /**

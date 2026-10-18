@@ -15,7 +15,7 @@
     }
   },
   "attemptState": {
-    "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy"],
+    "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy", "superseded"],
     "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: the doctor fix writes it, the probe never reports it",
     "rules": {
       "running": "attempt.lock is held and no adopting.json: a supervisor owns it",
@@ -24,6 +24,7 @@
       "legacy-run": "run written before the supervisor (no attempt.lock); adopt cannot judge it",
       "abandoned-not-started": "no binding, receipt outcome abandoned-not-started (receipt.v1.json); a resume launches a new attempt with supersedesRunId",
       "abandoned-before-brief": "terminal mode; receipt outcome abandoned-before-brief, nothing ran after GO. Counts as closed once closed.json exists; a resume treats it like abandoned-not-started and launches a new attempt with supersedesRunId",
+      "superseded": "inspect and show-run only: a closed (or abandoned) attempt that a later `--resume` replaced with a new attempt whose run.json names it in supersedesRunId. Reported with supersededBy (the new run id) and attemptOutcome (what the attempt itself was)",
       "abandoned-legacy": "a legacy-run attempt settled by the doctor fix once every recorded pid judged dead and no home marker points at it"
     }
   },
