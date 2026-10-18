@@ -9,7 +9,7 @@ Session `ac420727` (second machine), 2026-10-18 22:40 to 2026-10-19 04:15 Asia/S
 | Shared durable-file / canonical-JSON moves (deferred after 6.3) | on main `035c3a0aa` | [guide](guide-261018-2246-owner-machine-after-shared-primitive-moves.md) |
 | Event Store phase 05 (sharing and sync) + review fixes | on main `31055716a` | [review](review-261018-2221-es-p05-sharing-sync.md), [guide](guide-261018-2305-owner-machine-after-event-store-sync.md) |
 | Publication port optimization + review fixes + holder-lock release settle | on main `4ebca1739` | [final E3](experiment-261019-0247-git-e3-after-release-settle.md), [guide](guide-261019-0410-owner-machine-after-publication-port-optimization.md) |
-| Git phase 04 (custody lease across the runner commit) | branch `git/p04-custody` `0bf950a79`, reviewed, review fixed, host-verified | [review](../../.claude/worktrees/git-p04/plans/reports/review-261019-0051-git-p04-custody-lease.md) (on the branch) |
+| Git phase 04 (custody lease across the runner commit) | branch `git/p04-custody` `0bf950a79`, reviewed, review fixed, host-verified | review `plans/reports/review-261019-0051-git-p04-custody-lease.md` on that branch |
 
 Git 01 is **not landed**: E3 is not green, so the 22:38 self-land condition is not met. Event Store phase 06 and Git phase 02 have not started: the E3 budgets file says any failed line stops the plan for the owner.
 
