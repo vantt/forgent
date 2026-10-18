@@ -1,7 +1,7 @@
 ---
 title: "4.3 Main checkout một cửa + mutex nóng state"
 description: "Main mutex sang kernel lock với một cửa withMainCheckout và checkpoint nhận handle, mượn qua fd thay FGOS_MAIN_LOCK_HOLDER_PID, worktree-admin, gộp events.lock + claims.lock thành state có stateTx, exec ra khỏi vùng găng nóng, kiểm trần và thu hẹp claim trong một commit; cutover dừng-toàn-bộ"
-status: in-progress
+status: completed
 priority: P1
 effort: 50h
 branch: worktree-agent-ae86665b911b82fc1
