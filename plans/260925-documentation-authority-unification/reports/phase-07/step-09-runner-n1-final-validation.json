@@ -1,0 +1,38 @@
+{
+  "contentCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+  "writeScope": "plans/260925-documentation-authority-unification",
+  "gitDiffCheckExit": 0,
+  "workingIdentitySourceDiff": [],
+  "productionCodeTestsCheckersBaselinesDiff": [],
+  "phase07PlanUnchanged": true,
+  "preview": {
+    "command": "mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-07/review-request-a38-step-09-runner-n1-01.md",
+    "exit": 1,
+    "error": "database error: attempt to write a readonly database",
+    "settingsOrPermissionsChanged": false,
+    "packageBlocker": false
+  },
+  "reviewRequestBytes": 11373,
+  "reviewEntries": 65,
+  "parts": [
+    36,
+    18,
+    11
+  ],
+  "maxPartBytes": 144181,
+  "mechanicalAuthentication": {
+    "exit": 0,
+    "checked": 65,
+    "evidence": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-review-authentication.json"
+  },
+  "portableComparator": {
+    "exit": 1,
+    "same24RecordedErrors": true,
+    "evidence": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-portable-comparator.json"
+  },
+  "packageBlockers": [],
+  "independentReview": "pending",
+  "phase7ClosureClaimed": false,
+  "changedPaths": 44,
+  "outsideWriteScope": []
+}

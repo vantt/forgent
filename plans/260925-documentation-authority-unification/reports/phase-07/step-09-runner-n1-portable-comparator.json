@@ -1,0 +1,8 @@
+{
+  "command": "node scripts/compare-doc-global-closure.mjs --gate plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-E-both.json --actual <fresh scratch>/actual.json --expected plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-expected.json",
+  "exit": 1,
+  "errors": 24,
+  "exactRecordedResultEqual": true,
+  "freshDirectory": "/tmp/fgos-work/p7-runner-review-8zs2tql6",
+  "completeAppliedRowsSHA256": "0533175961b1945658dc9529aba2740367fac7a80c5b0628233c4bbe9eeffa57"
+}

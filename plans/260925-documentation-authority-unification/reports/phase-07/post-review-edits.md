@@ -97,3 +97,13 @@ The Lead repaired only holder-lock line 8 in committed `e6b7efeec` after the pri
 | Candidate | Prior committed SHA-256 | Corrected committed SHA-256 |
 |---|---|---|
 | `docs/platform/holder-lock/spec.md` | `ed9c95e5ad71281e436ddc8aa02e6d5aa2be97f122e76ae62a3c9f1929884cfd` | `e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa` |
+
+
+### N1 committed runner citation correction — carriage record
+
+The Lead corrected the two runner candidate files in `7f7ae1ed0` and `b919e2b9b`. This package edits no candidate byte. The unchanged native matcher runs once over committed `b919e2b9b`; only those two documents and their eight native transitions are persisted. Five current unit digests and three neighboring context bindings change; three positional predecessors remain identity gaps with new successor IDs and pending supersession decisions. See `step-09-runner-n1-carry.json` and `step-09-runner-n1-rebindings.json`. Independent bounded re-review remains pending; no approval carries.
+
+| Candidate | Prior committed SHA-256 (`e6b7efeec`) | Corrected committed SHA-256 (`b919e2b9b`) |
+|---|---|---|
+| `docs/platform/runner/architecture/h-7af1f0242611.md` | `111f0866f5caacdb4610eaf5f1e82a349a39b0b47804f2fe9e51e39f0a903d4d` | `c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654` |
+| `docs/platform/runner/operations/h-51f5cd7279fd.md` | `b8b3d8df8bae3fea6497423d8fb4ed648ef51d49b36046bc5fb18915dc795270` | `e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b` |

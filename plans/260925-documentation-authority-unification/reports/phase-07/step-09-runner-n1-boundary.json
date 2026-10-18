@@ -1,0 +1,30 @@
+{
+  "contentCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+  "priorContentCommit": "e6b7efeece3d28f3bc9b47ecd3b748f54a8d90ed",
+  "identitySourceChanges": [
+    "docs/platform/runner/architecture/h-7af1f0242611.md",
+    "docs/platform/runner/operations/h-51f5cd7279fd.md"
+  ],
+  "unchangedNativeRecords": {
+    "units": 91729,
+    "identityGaps": 5995,
+    "retiredUnits": 2309
+  },
+  "allowedNativeTransitions": 8,
+  "knownIDsLost": 0,
+  "otherDocumentRowsEqual": true,
+  "otherCurrentQueueRowsEqual": true,
+  "displacedSourceTuplesEqual": true,
+  "affectedA34RowsEqual": true,
+  "affectedIdenticalOwnerGroupsEqual": true,
+  "candidateListRowsChanged": 0,
+  "candidateListReason": "The five changed units are already named by source decisions; no candidate-unverified tuple names their prior IDs/digests. Candidate lists remain byte-equal.",
+  "workingIdentitySourceDiff": [],
+  "phase07PlanUnchanged": true,
+  "runnerAnchorsAndUnitKindsEqual": true,
+  "readerKeySHA256": "1568f570026679c959cbc9f42af8e2d0542ee8d5ee9022ac78ad7b10c94a4056",
+  "readerKeyUnchanged": true,
+  "readerEvidence": "Only citation line references changed, runner headings/routes unchanged; no sealed answer key read or edited.",
+  "remainingLiveTargetReferencesToOldChangedDigests": [],
+  "targetReferenceScan": "All nested targetUnitDigest/targetDigest fields in pilot/decisions and ledger/decisions; exact string match against the five prior sourceUnitDigest values"
+}

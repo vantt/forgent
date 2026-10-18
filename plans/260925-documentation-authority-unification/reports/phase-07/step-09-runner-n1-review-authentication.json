@@ -1,0 +1,13 @@
+{
+  "stage": "final-complete-package",
+  "checked": 65,
+  "parts": 3,
+  "exit": 0,
+  "mechanicalOnly": true,
+  "independentSemanticReview": "pending",
+  "indexSHA256": "a1a8f558cfe51ea4e1048721d219386917a755151d56cda450a131b5389ef5f6",
+  "allMandatory": true,
+  "maximumPartEntries": 36,
+  "maximumPartBytes": 144181,
+  "completeComparatorInputsAuthenticated": true
+}

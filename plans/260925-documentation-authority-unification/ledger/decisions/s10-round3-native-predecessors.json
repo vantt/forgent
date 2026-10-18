@@ -59,10 +59,10 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-26",
-      "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. N1 rebind at b919e2b9b: committed runner citation repair; current target digest and occurrence are bound in step-09-runner-n1-rebindings.json. Earlier target-equality/review statements above are historical; independent bounded re-review pending, no approval carry.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "e3c02468a7c14b176731dc4ab9e40a7a3b8f5e8c23eacf816f8165dfefd7b4af",
+      "targetUnitDigest": "ec0d27fd1c7ebde3501029563b908d4765ba32a7c6db9712bec33ae6a1c3c3ad",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",

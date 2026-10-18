@@ -1,0 +1,101 @@
+{
+  "contentCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+  "nativeCarryInvocations": 1,
+  "candidateBytesEdited": false,
+  "jobsSerialized": true,
+  "firstInventoryAttempt": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=7500 /tmp/fgos-work/p7-runner-n1/run-global.mjs",
+    "exit": 137,
+    "inventoryCompleted": false,
+    "checksProduced": false,
+    "log": "Native inventory start 2026-10-18T08:36:50.935Z",
+    "noEvidenceClaimed": true
+  },
+  "retry": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=5000 --max-semi-space-size=4 --optimize-for-size /tmp/fgos-work/p7-runner-n1/run-global.mjs",
+    "purpose": "Read-only reconstruction; no second carry; lower heap forces earlier garbage collection",
+    "state": "killed-before-native-inventory-completed",
+    "exit": 137,
+    "checksProduced": false,
+    "log": "Native inventory start 2026-10-18T08:41:45.982Z",
+    "hostMemoryAfterWorkerExited": {
+      "totalGiB": 15,
+      "usedGiB": 13,
+      "availableGiB": 1.5,
+      "swapFreeGiB": 0
+    }
+  },
+  "productionToolDigests": {
+    "scripts/generate-doc-inventory.mjs": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+    "scripts/check-doc-inventory-gates.mjs": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+    "scripts/compare-doc-global-closure.mjs": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+    "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e"
+  },
+  "thirdAttempt": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=3500 --max-semi-space-size=4 --optimize-for-size /tmp/fgos-work/p7-runner-n1/run-global.mjs",
+    "exit": 134,
+    "checksProduced": false,
+    "nativeInventoryCompleted": false,
+    "error": "FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory",
+    "lastFullGC": "3379.0 -> 3325.7 MB; allocation still fails"
+  },
+  "fourthAttempt": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=4096 --max-semi-space-size=1 --optimize-for-size /tmp/fgos-work/p7-runner-n1/run-global.mjs",
+    "state": "completed",
+    "hostAvailableBeforeStartGiB": 8.8,
+    "nativeInventoryCompleted": true,
+    "files": 4489,
+    "claims": 91734,
+    "startedAt": "2026-10-18T08:57:24.120Z",
+    "inventoryCompletedAt": "2026-10-18T09:40:27.168Z",
+    "exit": 0,
+    "checksCompletedAt": "2026-10-18T09:58:49.947Z",
+    "nativeCarryInvocations": 0,
+    "DExits": [
+      0,
+      0,
+      0
+    ],
+    "DFatals": [
+      0,
+      0,
+      0
+    ],
+    "strictEExits": [
+      1,
+      1,
+      1
+    ],
+    "strictEFatals": [
+      8,
+      8,
+      8
+    ],
+    "comparatorExit": 1,
+    "comparatorErrors": 24
+  },
+  "readOnlyDiagnostics": {
+    "cpuSampleMilliseconds": 1500,
+    "sampledGCFrames": 1075,
+    "sampledReducerFrames": 303,
+    "hotSource": "scripts/generate-doc-inventory.mjs:1824",
+    "progressSamples": [
+      {
+        "completedEdges": 4111081,
+        "totalEdges": 4897231,
+        "approximateAt": "2026-10-18T09:32:29Z"
+      },
+      {
+        "completedEdges": 4238326,
+        "totalEdges": 4897231,
+        "approximateAt": "2026-10-18T09:34:36Z"
+      },
+      {
+        "completedEdges": 4857991,
+        "totalEdges": 4897231,
+        "approximateAt": "2026-10-18T09:39:18Z"
+      }
+    ],
+    "method": "Brief Node inspector CPU sample and paused-frame count reads; no source, inputs, native object or runtime flag changed; every paused session resumed and disconnected."
+  }
+}

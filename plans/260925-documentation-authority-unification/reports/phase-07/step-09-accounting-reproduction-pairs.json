@@ -5,7 +5,7 @@
     "plans/260925-documentation-authority-unification/reports/phase-07/",
     "scripts/check-decision-citation-drift.baseline.json"
   ],
-  "reason": "Phase 7 reports and documented main-citation baseline accounting are authorized current lanes; six/seven plan-file historical pairs stay explicit, never generally allowlisted",
+  "reason": "Phase 7 reports and documented main-citation baseline accounting are authorized current lanes; historical plan-file commit/path pairs stay explicit, never generally allowlisted",
   "changes": [
     {
       "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
@@ -50,6 +50,11 @@
           "commit": "7d10459005abe1934998e0052e2d952c8afb1900",
           "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
           "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "A46 / Phase 7 authorized plan accounting"
         }
       ]
     },
@@ -96,8 +101,24 @@
           "commit": "7d10459005abe1934998e0052e2d952c8afb1900",
           "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
           "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "A46 / Phase 7 authorized plan accounting"
         }
       ]
     }
-  ]
+  ],
+  "latestAuthority": "A46 / N1 package at b919e2b9b",
+  "addedExactPairCount": 18,
+  "laterTrackedPlanCommitScan": {
+    "fromExclusive": "2296413a2",
+    "through": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+    "method": "first-parent non-merge commits, compare each touched path to the existing exact-pair paths in each manifest",
+    "newCommits": [
+      "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f"
+    ],
+    "phase07PlanEditedByPackage": false
+  }
 }

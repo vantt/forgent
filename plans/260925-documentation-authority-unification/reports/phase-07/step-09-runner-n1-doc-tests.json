@@ -1,0 +1,12 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+  "exit": 0,
+  "tests": 67,
+  "pass": 67,
+  "fail": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "log": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-doc-tests.log",
+  "logSHA256": "9b536bb4e4c213b469556f6a0edf404573b3f30c0fa1f85172b46e921a37495a",
+  "fullSuiteRun": false
+}
