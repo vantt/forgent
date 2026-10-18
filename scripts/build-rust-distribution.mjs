@@ -20,6 +20,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
+/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */
+export function gitCapabilitiesForHost(platform = process.platform, arch = process.arch) {
+  const target = releaseTargetForHost(platform, arch);
+  return target?.manifestTarget.os === 'linux' ? ['git-wal-v1'] : [];
+}
+
 /**
  * Deterministic, key-sorted canonical JSON serializer (RFC 8785 / JCS compatible).
  * Formats objects with lexicographically sorted keys at all depths and no extra whitespace.
@@ -425,7 +431,7 @@ export function buildRustDistribution({
       fgos: 'bin/fgos',
       fgosRunner: 'bin/fgos-runner',
     },
-    capabilities: ["git-wal-v1"],
+    capabilities: gitCapabilitiesForHost(),
     components: {
       nativeAddon,
       legacyNode: {

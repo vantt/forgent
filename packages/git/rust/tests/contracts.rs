@@ -70,3 +70,12 @@ fn result_codes_match_machine_contract() {
     ];
     assert_eq!(serde_json::to_value(codes).unwrap(), contract["codes"]);
 }
+
+#[cfg(windows)]
+#[test]
+fn lock_taking_git_refuses_windows_by_name() {
+    assert_eq!(
+        fgos_git::require_lock_scope_platform().unwrap_err().cause,
+        "git-lockscope-unavailable-windows"
+    );
+}

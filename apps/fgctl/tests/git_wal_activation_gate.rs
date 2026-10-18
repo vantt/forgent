@@ -1,0 +1,193 @@
+//! Real controller admission, including publication and same-digest paths.
+#![cfg(target_os = "linux")]
+use fgos_git::wal::{self, Begin, Intent, OperationKind, Phase, Tip};
+use sha2::{Digest, Sha256};
+use std::{
+    fs,
+    io::{BufRead, BufReader},
+    path::Path,
+    process::{Command, Stdio},
+};
+fn hash(bytes: &[u8]) -> String {
+    format!("sha256:{:x}", Sha256::digest(bytes))
+}
+fn candidate(root: &Path, wal: bool) {
+    use std::os::unix::fs::PermissionsExt;
+    let host = b"#!/bin/sh\nexit 0\n";
+    let legacy = b"console.log('fixture');\n";
+    fs::create_dir_all(root.join("bin")).unwrap();
+    fs::create_dir_all(root.join("libexec/legacy-node/bin")).unwrap();
+    fs::write(root.join("bin/fgos"), host).unwrap();
+    fs::set_permissions(root.join("bin/fgos"), fs::Permissions::from_mode(0o755)).unwrap();
+    fs::write(root.join("libexec/legacy-node/bin/fgos.mjs"), legacy).unwrap();
+    let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":"bin/fgos"},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":"linux","arch":"x64"},"files":[{"path":"bin/fgos","kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"},{"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"}]});
+    let path = root.join("manifest.json");
+    fs::write(&path, serde_json::to_vec(&m).unwrap()).unwrap();
+    m["artifactDigest"] = fgos_distribution::verify::recompute_artifact_digest(&path)
+        .unwrap()
+        .into();
+    fs::write(path, serde_json::to_vec(&m).unwrap()).unwrap();
+}
+fn controller(ws: &Path, state: &Path, verb: &str, from: &Path) -> std::process::Output {
+    Command::new(env!("CARGO_BIN_EXE_fgctl"))
+        .args([verb, "--from"])
+        .arg(from)
+        .current_dir(ws)
+        .env("FGOS_STATE_ROOT", state)
+        .output()
+        .unwrap()
+}
+fn success(out: std::process::Output) {
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+}
+struct Authority;
+impl wal::PublicationAuthority for Authority {
+    fn validate_publication_borrow(&self, _: &Intent) -> wal::WalResult<()> {
+        Ok(())
+    }
+}
+#[test]
+fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgctl-git-c5-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    let ws = root.join("ws");
+    fs::create_dir(&ws).unwrap();
+    assert!(Command::new("git")
+        .args(["init", "-q"])
+        .arg(&ws)
+        .status()
+        .unwrap()
+        .success());
+    let state = root.join("state");
+    fs::create_dir(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let old = root.join("old");
+    let new = root.join("new");
+    candidate(&old, false);
+    candidate(&new, true);
+    success(controller(&ws, &state, "init", &old));
+    let scan = Command::new(env!("CARGO_BIN_EXE_fgctl"))
+        .args(["internal", "quiesce-scan", "--protocol", "1", "--root"])
+        .arg(&ws)
+        .env("FGOS_STATE_ROOT", &state)
+        .output()
+        .unwrap();
+    let scan: serde_json::Value = serde_json::from_slice(&scan.stdout).unwrap();
+    if scan["result"] == "unavailable" {
+        let out = controller(&ws, &state, "upgrade", &new);
+        assert!(!out.status.success());
+        assert!(String::from_utf8_lossy(&out.stderr).contains("git-predecessor-writer-live"));
+        assert!(!fgos_holder_lock::tombstone::is_tombstone(
+            &ws.join(".fgos/locks/activation.lock"),
+            "activation",
+            "fgos git"
+        ));
+        let common = ws.join(".git");
+        let journal = wal::Wal::with_filesystem(&common, wal::OsFileSystem).unwrap();
+        let intent = Intent {
+            kind: OperationKind::PublicationCas,
+            request_digest: "1".repeat(64),
+            repo_identity: journal.repository_identity().into(),
+            resource_set: vec!["refs/fgos/events/test".into()],
+            authority_binding: "test".into(),
+            writer_identity: "test".into(),
+            object_format: fgos_git::ObjectFormat::Sha1,
+            expected: Tip::Absent,
+            next: Tip::Oid("1".repeat(40)),
+        };
+        let chain = match journal.begin("pending", intent, &Authority).unwrap() {
+            Begin::Created(c) => c,
+            _ => panic!(),
+        };
+        let pending_refusal = controller(&ws, &state, "init", &old);
+        assert!(!pending_refusal.status.success());
+        assert!(String::from_utf8_lossy(&pending_refusal.stderr).contains("git-wal-pending"));
+        journal
+            .append(&chain, Phase::Outcome(wal::Outcome::AbandonedBeforeAttempt))
+            .unwrap();
+        eprintln!(
+            "C5 refused unavailable real process scan: {}",
+            scan["detail"]
+        );
+        fs::remove_dir_all(root).unwrap();
+        return;
+    }
+    let script = ws.join("fgos.mjs");
+    fs::write(
+        &script,
+        "console.log('ready'); setInterval(()=>{},10000);\n",
+    )
+    .unwrap();
+    let mut writer = Command::new("node")
+        .arg(&script)
+        .current_dir(&ws)
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut ready = String::new();
+    BufReader::new(writer.stdout.take().unwrap())
+        .read_line(&mut ready)
+        .unwrap();
+    assert_eq!(ready.trim(), "ready");
+    let rejected = controller(&ws, &state, "upgrade", &new);
+    writer.kill().unwrap();
+    writer.wait().unwrap();
+    assert!(!rejected.status.success());
+    let message = String::from_utf8_lossy(&rejected.stderr);
+    assert!(
+        message.contains("git-predecessor-writer-live") && message.contains("fgos.mjs"),
+        "{message}"
+    );
+    success(controller(&ws, &state, "upgrade", &new));
+    let fence = ws.join(".fgos/locks/activation.lock");
+    assert!(fgos_holder_lock::tombstone::is_tombstone(
+        &fence,
+        "activation",
+        "fgos git"
+    ));
+    for verb in ["init", "upgrade"] {
+        fs::remove_dir_all(&fence).unwrap(); // Simulate activation by a pre-C5 controller.
+        success(controller(&ws, &state, verb, &new));
+        assert!(fgos_holder_lock::tombstone::is_tombstone(
+            &fence,
+            "activation",
+            "fgos git"
+        ));
+    }
+    let common = ws.join(".git");
+    let journal = wal::Wal::with_filesystem(&common, wal::OsFileSystem).unwrap();
+    let intent = Intent {
+        kind: OperationKind::PublicationCas,
+        request_digest: "1".repeat(64),
+        repo_identity: journal.repository_identity().into(),
+        resource_set: vec!["refs/fgos/events/test".into()],
+        authority_binding: "test".into(),
+        writer_identity: "test".into(),
+        object_format: fgos_git::ObjectFormat::Sha1,
+        expected: Tip::Absent,
+        next: Tip::Oid("1".repeat(40)),
+    };
+    let chain = match journal.begin("pending", intent, &Authority).unwrap() {
+        Begin::Created(c) => c,
+        _ => panic!(),
+    };
+    let rejected = controller(&ws, &state, "upgrade", &old);
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("git-wal-pending"));
+    journal
+        .append(&chain, Phase::Outcome(wal::Outcome::AbandonedBeforeAttempt))
+        .unwrap();
+    success(controller(&ws, &state, "upgrade", &old));
+    assert!(fgos_holder_lock::tombstone::is_tombstone(
+        &fence,
+        "activation",
+        "fgos git"
+    ));
+    fs::remove_dir_all(root).unwrap();
+}

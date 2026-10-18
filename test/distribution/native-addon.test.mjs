@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 import {ensureHostBin, ensureGitAddon as buildAddon} from '../../scripts/run-tests.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
-import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest} from '../../scripts/build-rust-distribution.mjs';
+import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
 const built = ensureGitAddon();
 
 test('release staging carries a real combined addon resolved from its release manifest', () => {
@@ -36,7 +36,7 @@ test('release staging carries a real combined addon resolved from its release ma
     assert.equal(addon.napiVersion, 8);
     assert.equal(addon.target, `${process.platform}-${process.arch}`);
     assert.equal(Object.keys(addon.crateChecksums).length, 3);
-    assert.deepEqual(manifest.capabilities, ['git-wal-v1']);
+    assert.deepEqual(manifest.capabilities, gitCapabilitiesForHost());
     assert.equal(manifest.files.find(f => f.path === addon.path).digest, `sha256:${addon.digest}`);
     const {artifactDigest, ...payload} = manifest;
     assert.equal(artifactDigest, computeArtifactDigest(payload));
@@ -121,4 +121,10 @@ fs.copyFileSync(process.env.DEV_ADDON_BYTES,path.join(output,${JSON.stringify(na
     assert.equal(result.files.find(f => f.path === result.component.path).digest, `sha256:${result.component.digest}`);
     assert.deepEqual(fs.readdirSync(path.join(repo, '.fgos/runtime/dev-host')), []);
   } finally { fs.rmSync(temp, {recursive: true, force: true}); }
+});
+
+test('only registered Linux releases advertise C5 and fence-backed Git WAL capability', () => {
+  assert.deepEqual(gitCapabilitiesForHost('linux', 'x64'), ['git-wal-v1']);
+  assert.deepEqual(gitCapabilitiesForHost('win32', 'x64'), []);
+  assert.deepEqual(gitCapabilitiesForHost('darwin', 'arm64'), []);
 });

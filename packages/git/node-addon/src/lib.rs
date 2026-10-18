@@ -16,8 +16,15 @@ fn error(e: impl std::fmt::Display) -> Error {
 #[napi]
 pub fn versions() -> Result<Value> {
     check()?;
+    let mut contracts = fgos_git::contract_versions();
+    // Read the Event Store's own envelope contract, not this addon's package version.
+    let envelope: Value = serde_json::from_str(include_str!(
+        "../../../event-store/contracts/envelope.v4.schema.json"
+    ))
+    .map_err(error)?;
+    contracts["eventStore"] = envelope["properties"]["v"]["const"].clone();
     Ok(
-        json!({"addon": env!("CARGO_PKG_VERSION"), "git": env!("CARGO_PKG_VERSION"), "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8}),
+        json!({"addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts}),
     )
 }
 

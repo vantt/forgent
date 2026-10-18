@@ -107,9 +107,26 @@ impl ReleaseManifest {
         {
             return Err("nativeAddon digest must be lowercase SHA-256 hex");
         }
-        let checksums = native_addon_crate_checksums();
-        if checksums.len() != 3 || addon.crate_checksums != checksums {
-            return Err("nativeAddon crate checksums differ from Cargo.lock");
+        let checksums = &addon.crate_checksums;
+        if checksums.len() != 3
+            || ["napi", "napi-derive", "napi-build"].iter().any(|name| {
+                checksums
+                    .iter()
+                    .filter(|(key, value)| {
+                        let Some(version) = key.strip_prefix(&format!("{name}@")) else {
+                            return false;
+                        };
+                        semver::Version::parse(version).is_ok()
+                            && value.len() == 64
+                            && value.bytes().all(|b| b.is_ascii_hexdigit())
+                    })
+                    .count()
+                    != 1
+            })
+        {
+            return Err(
+                "nativeAddon crate checksums must attest three named versioned SHA-256 inputs",
+            );
         }
         if !self.files.iter().any(|file| {
             file.path == addon.path
@@ -295,7 +312,7 @@ pub struct NativeAddonComponent {
     pub crate_checksums: std::collections::BTreeMap<String, String>,
 }
 
-/// The locked crates.io inputs of the ABI toolchain, embedded in the verifier.
+/// Build-time provenance for fixtures and staging; never a cross-release trust constraint.
 pub fn native_addon_crate_checksums() -> std::collections::BTreeMap<String, String> {
     include_str!("../../../../Cargo.lock")
         .split("[[package]]")

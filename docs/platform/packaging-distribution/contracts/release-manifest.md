@@ -144,14 +144,22 @@ file nor any path component may be a symlink. The target is `linux-x64` or
 `win32-x64` (Node platform spelling), matching the release's Linux/Windows x64
 target. The ABI line is Node-API 8 for the combined Git + Event Store addon.
 `crateChecksums` records exactly the three pinned napi toolchain packages and their
-crates.io checksums from `Cargo.lock`; the verifier compares against its compiled
-lockfile. Checksums attest declared build inputs; the binary digest authenticates
+crates.io checksums from the producing build’s `Cargo.lock`. Staging/CI checks
+equality there; later verifiers check exactly three named `name@semver` keys and
+64-hex values, independent of their own build lockfile. Checksums attest declared build inputs; the binary digest authenticates
 payload bytes. CI builds with `--locked`, audits crates with `cargo deny check`,
 and compares the addon digest with a second independent build on the same target.
-Release staging includes `capabilities: ["git-wal-v1"]` with the addon.
+Release staging advertises `git-wal-v1` only on the registered Linux target while
+C5 scan and atomic fence admission are Linux-only. A windows-x64 release omits
+the claim and remains activatable. Adding it on Windows requires implemented
+C5/fence admission and Windows tests; lock-taking Git ports meanwhile refuse
+`git-lockscope-unavailable-windows` (Q6).
 
 Every staging and activation preflight verifies a present addon, including ABI,
 target, checksum provenance and bytes. Absence remains accepted in this phase.
 **M10 switch point:** the release carrying Git phase 05 makes the addon mandatory
 for linux-x64 activation. That future switch must explicitly reject missing
 `components.nativeAddon`; this additive step does not impose it on older releases.
+
+The combined addon reports Git port/receipt/WAL and Event Store envelope contract
+versions separately from package versions; the ABI doctor row checks each.

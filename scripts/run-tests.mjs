@@ -18,6 +18,7 @@
 // invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
+import { nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
@@ -51,7 +52,7 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   const cargoEnv = { ...env, CARGO_TARGET_DIR: dir };
   execFileSync('cargo', ['build', ...(locked ? ['--locked'] : []), '-p', 'fgos-node-addon'], { cwd, env: cargoEnv, stdio: 'inherit' });
-  const library = process.platform === 'win32' ? 'fgos_node_addon.dll' : process.platform === 'darwin' ? 'libfgos_node_addon.dylib' : 'libfgos_node_addon.so';
+  const library = nativeAddonLibraryName();
   const addonDir = path.join(cwd, '.fgos/runtime/git-addon');
   fs.mkdirSync(addonDir, { recursive: true });
   const addon = path.join(addonDir, 'fgos.node');
@@ -61,7 +62,7 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.writeFileSync(temporaryAddon, bytes);
     fs.renameSync(temporaryAddon, addon);
   }
-  const record = { path: path.relative(cwd, addon), digest: createHash('sha256').update(fs.readFileSync(addon)).digest('hex'), target: `${process.platform}-${process.arch}`, napiVersion: 8 };
+  const record = nativeAddonComponent(addon, path.relative(cwd, addon), cwd);
   const manifestDir = path.join(cwd, '.fgos/runtime/git-addon');
   fs.mkdirSync(manifestDir, { recursive: true });
   const manifest = path.join(manifestDir, 'native-addon.json');

@@ -100,3 +100,29 @@ fn historical_release_without_addon_still_verifies() {
     manifest.validate_v1_invariants().unwrap();
     verify_native_addon(std::path::Path::new("unused-old-release"), &manifest).unwrap();
 }
+
+#[test]
+fn native_addon_accepts_cross_release_toolchain_attestation_but_rejects_bad_shape() {
+    let (root, mut manifest) = fixture();
+    let checksums = &mut manifest
+        .components
+        .native_addon
+        .as_mut()
+        .unwrap()
+        .crate_checksums;
+    *checksums = ["napi@99.0.0", "napi-build@99.1.0", "napi-derive@98.0.0"]
+        .into_iter()
+        .map(|name| (name.into(), "a".repeat(64)))
+        .collect();
+    manifest.validate_v1_invariants().unwrap();
+    verify_native_addon(&root, &manifest).unwrap();
+    manifest
+        .components
+        .native_addon
+        .as_mut()
+        .unwrap()
+        .crate_checksums
+        .insert("napi@99.0.0".into(), "bad".into());
+    assert!(manifest.validate_v1_invariants().is_err());
+    std::fs::remove_dir_all(root).unwrap();
+}

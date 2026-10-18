@@ -91,6 +91,9 @@ impl RepoHandle {
     pub fn layout(&self) -> &RepoLayout {
         &self.layout
     }
+    pub fn git_dir(&self) -> &std::path::Path {
+        &self.git_dir
+    }
     pub fn common_dir(&self) -> &std::path::Path {
         &self.common_dir
     }
@@ -390,4 +393,28 @@ pub struct RepoLayout {
 pub enum RefStorage {
     Files,
     Reftable,
+}
+
+/// Versions of the public Git contracts, independent of package release versions.
+pub fn contract_versions() -> serde_json::Value {
+    serde_json::json!({"gitPort": 1, "receipt": 1, "walRecord": 1})
+}
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Lock-taking Git ports stay dormant until the Windows handoff exists (Q6).
+pub fn require_lock_scope_platform() -> Result<()> {
+    if cfg!(target_os = "windows") {
+        return Err(OperationError {
+            code: ResultCode::Refused,
+            cause: "git-lockscope-unavailable-windows".into(),
+            retryable: false,
+            operation_id: None,
+            receipt: None,
+            exit_code: None,
+            signal: None,
+            stderr: vec![],
+        });
+    }
+    Ok(())
 }

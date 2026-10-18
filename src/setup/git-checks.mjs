@@ -6,16 +6,16 @@ import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 export const FETCH_MAPPING = ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*', '+refs/fgos/legacy:refs/fgos/remotes/origin/legacy'];
-function context(cwd) {
+function context(cwd, loaderOptions) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  return { root, stateRoot: resolveStateRoot({ fgosDir: path.join(root, '.fgos') }).stateRoot, native: loadNativeAddon() };
+  return { root, stateRoot: resolveStateRoot({ fgosDir: path.join(root, '.fgos') }).stateRoot, native: loadNativeAddon(loaderOptions) };
 }
-export function checkGit(cwd, kind) {
+export function checkGit(cwd, kind, loaderOptions) {
   try {
-    const { root, stateRoot, native } = context(cwd);
+    const { root, stateRoot, native } = context(cwd, loaderOptions);
     const versions = native.versions();
     const facts = native.inspectGit(stateRoot, cwd, root);
-    if (kind === 'git-component-compatible') return { passed: versions.napi === 8 && facts.floor.supported && facts.floor.probes.every(p => p.passed), message: JSON.stringify({ versions, floor: facts.floor }) };
+    if (kind === 'git-component-compatible') return { passed: compatibleGitContracts(versions, facts.floor), message: JSON.stringify({ versions, floor: facts.floor }) };
     if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
     switch (kind) {
       case 'git-trust-topology': return { passed: true, message: `${facts.commonDir}: ${facts.layout}` };
@@ -25,7 +25,7 @@ export function checkGit(cwd, kind) {
       case 'git-durability-capability': return { passed: true, message: `info: ${facts.durability}` };
       default: throw new Error(`unknown Git check: ${kind}`);
     }
-  } catch (err) { return { passed: false, message: err.message }; }
+  } catch (err) { return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
 }
 function initializeWal(cwd) {
   const { root, stateRoot, native } = context(cwd);
@@ -48,3 +48,7 @@ function attemptFix(cwd, fix) {
 }
 export function fixGitWal(cwd) { return attemptFix(cwd, initializeWal); }
 export function fixGitFetchMapping(cwd) { return attemptFix(cwd, installFetchMapping); }
+
+export function compatibleGitContracts(versions, floor) {
+  return versions.napi === 8 && Object.entries({ gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 }).every(([key, version]) => versions.contracts?.[key] === version) && floor.supported && floor.probes.every(p => p.passed);
+}

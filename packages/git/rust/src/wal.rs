@@ -22,6 +22,7 @@ pub enum WalError {
     Busy,
     RecoveryRequired,
     Unsupported,
+    FenceMissing,
 }
 impl From<io::Error> for WalError {
     fn from(e: io::Error) -> Self {
@@ -30,6 +31,9 @@ impl From<io::Error> for WalError {
 }
 impl std::fmt::Display for WalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if matches!(self, Self::FenceMissing) {
+            return write!(f, "git-fence-missing");
+        }
         write!(f, "{self:?}")
     }
 }
@@ -510,8 +514,20 @@ pub enum Begin {
     Existing(Chain),
     Compacted(CompactReceipt),
 }
+/// All WAL-writing doors require the controller's durable cutover fence.
+pub fn require_activation_fence(repo: &RepoHandle) -> WalResult<()> {
+    if !fgos_holder_lock::tombstone::is_tombstone(
+        &repo.trusted_main_root().join(".fgos/locks/activation.lock"),
+        "activation",
+        "fgos git",
+    ) {
+        return Err(WalError::FenceMissing);
+    }
+    Ok(())
+}
 impl Wal<OsFileSystem> {
     pub fn open(repo: &RepoHandle) -> WalResult<Self> {
+        require_activation_fence(repo)?;
         Self::with_filesystem(repo.common_dir(), OsFileSystem)
     }
 }
@@ -1794,6 +1810,13 @@ mod tests {
                 crate::ResolveRepo::Repository(r) => r,
                 _ => panic!(),
             };
+            let fence = repo.trusted_main_root().join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
             let w = Wal::open(&repo).unwrap();
             let oid = String::from_utf8(git(
                 &t.0,

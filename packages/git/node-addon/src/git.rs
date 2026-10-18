@@ -39,6 +39,7 @@ impl GitPublication {
         helper_exe: Option<String>,
     ) -> Result<Self> {
         check()?;
+        require_lock_scope_platform().map_err(operation)?;
         let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
         let repo = match driver
             .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
@@ -193,15 +194,13 @@ pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) 
     let mappings = driver
         .configured_fetch_refspecs(&repo, "origin")
         .map_err(operation)?;
-    let native_locks = [
-        "index.lock",
-        "config.lock",
-        "packed-refs.lock",
-        "shallow.lock",
-    ]
-    .iter()
-    .filter(|name| repo.common_dir().join(name).exists())
-    .collect::<Vec<_>>();
+    let mut native_locks = ["config.lock", "packed-refs.lock", "shallow.lock"]
+        .iter()
+        .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())
+        .collect::<Vec<_>>();
+    if std::fs::symlink_metadata(repo.git_dir().join("index.lock")).is_ok() {
+        native_locks.push(&"index.lock");
+    }
     Ok(
         json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
@@ -237,6 +236,7 @@ pub fn ensure_git_fetch_mapping(
     operation_id: String,
 ) -> Result<Value> {
     check()?;
+    require_lock_scope_platform().map_err(operation)?;
     let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
     match driver
         .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))

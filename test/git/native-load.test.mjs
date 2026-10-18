@@ -18,7 +18,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8 });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('a second physical addon copy refuses at load, while a child owns its own marker', () => {
@@ -62,12 +62,14 @@ test('real append and read run in a hot section without a child process; Git ref
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('Publication marshals object writes, reads, ordered walks and receipted CAS through the real port', () => {
+test('Publication marshals object writes, reads, ordered walks and receipted CAS through the real port', { skip: process.platform === 'win32' }, () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-publication-'));
   const repoPath = path.join(temp, 'repo');
   fs.mkdirSync(repoPath);
   execFileSync('git', ['init', '--bare', repoPath], { stdio: 'ignore' });
   fs.mkdirSync(path.join(repoPath, 'fgos/events/locks'), { recursive: true, mode: 0o700 });
+  fs.mkdirSync(path.join(repoPath, '.fgos/locks/activation.lock'), { recursive: true });
+  fs.writeFileSync(path.join(repoPath, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
   let port;
   try {
     port = createGitPublication({ stateRoot: temp, repoPath, trustedMain: repoPath, reference: 'refs/fgos/events/fixture', writer: 'fixture' }, options);
@@ -109,17 +111,29 @@ test('staged release and npm-relative manifests resolve their own addon without 
       const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: os.tmpdir(), encoding: 'utf8' }));
       assert.equal(result.version, 8);
       assert.equal(result.helper, host);
+      if (channel === 'npm') {
+        const descriptorPath = path.join(payload, 'native-addon.json');
+        const probe = `import {loadNativeAddon} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; try { loadNativeAddon({hostBin:null}); } catch(e) { console.log(e.code); }`;
+        for (const value of ['{}', '{broken']) {
+          fs.writeFileSync(descriptorPath, value);
+          assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-unavailable');
+        }
+        fs.rmSync(descriptorPath);
+        assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-not-shipped');
+      }
     }
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', () => {
+test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', { skip: process.platform === 'win32' }, () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-inspect-'));
   const repo = path.join(temp, 'repo');
   execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
   const git = (...args) => execFileSync('git', ['--git-dir', repo, ...args], { encoding: 'utf8' }).trim();
   git('config', 'remote.origin.url', '/fixture/remote');
   git('config', '--add', 'remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*');
+  fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
+  fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
   let port;
   try {
     const facts = addon.inspectGit(temp, repo, repo);
@@ -143,4 +157,22 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
     assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);
     assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');
   } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-linked-lock-'));
+  const main = path.join(temp, 'main'), linked = path.join(temp, 'linked');
+  try {
+    execFileSync('git', ['init', '-q', main]);
+    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);
+    execFileSync('git', ['-C', main, 'worktree', 'add', '-q', '--detach', linked]);
+    const gitDir = execFileSync('git', ['-C', linked, 'rev-parse', '--absolute-git-dir'], { encoding: 'utf8' }).trim();
+    fs.symlinkSync(path.join(temp, 'missing'), path.join(gitDir, 'index.lock'));
+    assert.ok(addon.inspectGit(temp, linked, main).nativeLocks.includes('index.lock'));
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('Windows lock-taking addon doors refuse by name before resolving paths', { skip: process.platform !== 'win32' }, () => {
+  assert.throws(() => new addon.GitPublication('missing-state', 'missing-repo', 'missing-main', 'refs/fgos/events/test', 'test'), /git-lockscope-unavailable-windows/);
+  assert.throws(() => addon.ensureGitFetchMapping('missing-state', 'missing-repo', 'missing-main', 'origin', ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*'], 'test'), /git-lockscope-unavailable-windows/);
 });

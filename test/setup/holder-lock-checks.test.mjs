@@ -353,7 +353,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
   const before = checkLockFences(root, { providerRuntimeDir });
   assert.equal(before.passed, true);
-  assert.match(before.message, /^warning: 14 of 14 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
+  assert.match(before.message, /^warning: 13 of 13 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
 
   const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
   assert.equal(noActivation.changed, false);

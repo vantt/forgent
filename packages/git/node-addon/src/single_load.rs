@@ -91,8 +91,7 @@ fn register() -> Result<Marker, String> {
             unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt},
         },
     };
-    let root = std::env::var_os("FGOS_STATE_ROOT")
-        .ok_or("git-addon-unavailable: state root required for marker")?;
+    let root = fgos_holder_lock::state_root().0;
     let root = std::fs::canonicalize(root).map_err(|e| e.to_string())?;
     let run = root.join("run");
     match DirBuilder::new().mode(0o700).create(&run) {

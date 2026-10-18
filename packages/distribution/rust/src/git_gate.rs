@@ -1,10 +1,7 @@
 //! Git C5 admission owned by the activation controller, never a candidate.
 use crate::init::{ActivationLockGuard, InitError};
 use crate::manifest::ReleaseManifest;
-use fgos_git::{
-    wal::{OsFileSystem, Wal},
-    GitDriver, ResolveRepo,
-};
+use fgos_git::wal::{OsFileSystem, Wal};
 use std::path::Path;
 
 fn refusal(code: &str, detail: impl std::fmt::Display) -> InitError {
@@ -50,17 +47,21 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
         .arg(workspace)
         .args(["--exclude-pid", &std::process::id().to_string()])
         .output()?;
-    let scan: serde_json::Value = serde_json::from_slice(&output.stdout)
-        .map_err(|e| refusal("git-predecessor-writer-live", e))?;
+    validate_predecessor_scan(&output.stdout, output.status.code())
+}
+
+fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(), InitError> {
+    let scan: serde_json::Value =
+        serde_json::from_slice(bytes).map_err(|e| refusal("git-predecessor-writer-live", e))?;
     if scan["v"] != 1
         || scan["protocol"] != 1
         || scan["result"] == "unavailable"
         || scan["unreadable"].as_u64() != Some(0)
-        || !matches!(output.status.code(), Some(0 | 10))
+        || !matches!(exit_code, Some(0 | 10))
     {
         return Err(refusal(
             "git-predecessor-writer-live",
-            "process scan unavailable or incomplete",
+            format!("process scan unavailable or incomplete: {}", scan["detail"]),
         ));
     }
     let processes = scan["processes"]
@@ -101,7 +102,10 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
         if !compatible {
             return Err(refusal(
                 "git-predecessor-writer-live",
-                format!("pid {} lacks proven git-wal-v1", process["pid"]),
+                format!(
+                    "pid {} argv {cmdline:?} lacks proven git-wal-v1",
+                    process["pid"]
+                ),
             ));
         }
     }
@@ -110,23 +114,34 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
 
 pub(crate) fn admit(
     workspace: &Path,
-    state_root: &Path,
+    _state_root: &Path,
     manifest: &ReleaseManifest,
     lock: &ActivationLockGuard,
 ) -> Result<(), InitError> {
-    let driver = GitDriver::new(state_root).map_err(|e| refusal("git-wal-unreadable", e.cause))?;
-    let mut wal_exists = false;
-    if let ResolveRepo::Repository(repo) = driver
-        .resolve_repo(workspace, workspace)
-        .map_err(|e| refusal("git-wal-unreadable", e.cause))?
-    {
-        wal_exists = repo
-            .common_dir()
-            .join("fgos/git")
-            .symlink_metadata()
-            .is_ok();
-        check_wal(repo.common_dir(), has_wal(manifest))?;
+    if has_wal(manifest) && !cfg!(target_os = "linux") {
+        return Err(refusal(
+            "git-wal-unsupported-platform",
+            "C5/fence support is Linux-only",
+        ));
     }
+    // C5 needs the journal, not Publication's Git floor, command policy or
+    // hooks probe. Activation owns a main checkout; indirect gitdirs require
+    // explicit resolution support rather than silently skipping their WAL.
+    let common = workspace.join(".git");
+    let wal_exists = match std::fs::symlink_metadata(&common) {
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
+        Err(e) => return Err(refusal("git-wal-unreadable", e)),
+        Ok(meta) => {
+            if !meta.is_dir() || meta.file_type().is_symlink() {
+                return Err(refusal(
+                    "git-wal-unreadable",
+                    "activation requires a direct main-checkout git directory",
+                ));
+            }
+            check_wal(&common, has_wal(manifest))?;
+            common.join("fgos/git").symlink_metadata().is_ok()
+        }
+    };
     let fence = workspace.join(".fgos/locks/activation.lock");
     if has_wal(manifest) || wal_exists {
         predecessor_scan(workspace)?;
@@ -147,6 +162,50 @@ mod tests {
     use fgos_git::wal::{
         Begin, Intent, OperationKind, Phase, PublicationAuthority, Tip, WalResult,
     };
+    #[test]
+    fn predecessor_scan_refuses_unavailable_incomplete_and_names_live_writer() {
+        for (body, exit) in [
+            (
+                serde_json::json!({"v":1,"protocol":1,"result":"unavailable","unreadable":0,"processes":[]}),
+                Some(0),
+            ),
+            (
+                serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":1,"processes":[]}),
+                Some(0),
+            ),
+            (
+                serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[]}),
+                Some(2),
+            ),
+        ] {
+            assert!(validate_predecessor_scan(&serde_json::to_vec(&body).unwrap(), exit).is_err());
+        }
+        let scan = serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[{"pid":424242,"cmdline":"node bin/fgos.mjs"}]});
+        let error = validate_predecessor_scan(&serde_json::to_vec(&scan).unwrap(), Some(10))
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("424242") && error.contains("node bin/fgos.mjs"));
+        let clean =
+            serde_json::json!({"v":1,"protocol":1,"result":"ok","unreadable":0,"processes":[]});
+        validate_predecessor_scan(&serde_json::to_vec(&clean).unwrap(), Some(0)).unwrap();
+    }
+    #[test]
+    fn non_git_non_wal_admission_needs_no_git_or_state_root() {
+        let root =
+            std::env::temp_dir().join(format!("fgos-nongit-admission-{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let manifest: ReleaseManifest = serde_json::from_str(include_str!(
+            "../tests/goldens/release-manifest-minimal.json"
+        ))
+        .unwrap();
+        let lock = ActivationLockGuard::acquire(&root).unwrap();
+        admit(&root, &root.join("missing-state-root"), &manifest, &lock).unwrap();
+        std::fs::create_dir(root.join(".git")).unwrap();
+        admit(&root, &root.join("missing-state-root"), &manifest, &lock).unwrap();
+        assert!(!root.join("missing-state-root").exists());
+        drop(lock);
+        std::fs::remove_dir_all(root).unwrap();
+    }
     struct Seed;
     impl PublicationAuthority for Seed {
         fn validate_publication_borrow(&self, _: &Intent) -> WalResult<()> {
@@ -206,6 +265,31 @@ mod tests {
             .unwrap_err()
             .to_string()
             .starts_with("git-wal-unreadable"));
+        std::fs::remove_dir_all(root).unwrap();
+    }
+}
+
+#[cfg(all(test, target_os = "windows"))]
+mod windows_tests {
+    use super::*;
+    #[test]
+    fn windows_activation_without_wal_claim_needs_no_linux_scan_or_fence() {
+        let root = std::env::temp_dir().join(format!("fgos-windows-no-wal-{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let mut manifest: ReleaseManifest = serde_json::from_str(include_str!(
+            "../tests/goldens/release-manifest-minimal.json"
+        ))
+        .unwrap();
+        manifest.target.os = "windows".into();
+        std::fs::create_dir_all(root.join(".git")).unwrap();
+        let lock = ActivationLockGuard::acquire(&root).unwrap();
+        admit(&root, &root.join("state"), &manifest, &lock).unwrap();
+        manifest.capabilities.push("git-wal-v1".into());
+        assert!(admit(&root, &root.join("state"), &manifest, &lock)
+            .unwrap_err()
+            .to_string()
+            .starts_with("git-wal-unsupported-platform"));
+        drop(lock);
         std::fs::remove_dir_all(root).unwrap();
     }
 }

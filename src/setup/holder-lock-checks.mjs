@@ -12,6 +12,7 @@
 // starts with `warning:` warns, `info:` is informational, anything else passes.
 
 import fs from 'node:fs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 
@@ -577,6 +578,15 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
     status = fenceStatus({ fgosDir: fgosDirOf(repoRoot), workspaceRoot: path.resolve(repoRoot), providerRuntimeDir });
   } catch (err) {
     return { passed: false, message: `cannot read the fence status: ${err.message}` };
+  }
+  // Channels without a controller activation or WAL have never crossed C5.
+  const activatedPath = path.join(fgosDirOf(repoRoot), 'installation/activation.json');
+  const main = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
+  const common = fs.existsSync(path.join(main, '.git')) ? path.join(main, '.git') : main;
+  if (!fs.existsSync(activatedPath) && !fs.existsSync(path.join(repoRoot, 'fgos/git')) && !fs.existsSync(path.join(common, 'fgos/git'))) {
+    status.targets = status.targets.filter(target => !(target.managedBy === 'fgctl' && target.state === 'absent'));
+    status.missing = status.targets.filter(target => !target.fenced).map(target => target.path);
+    status.complete = status.missing.length === 0;
   }
   if (status.complete) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
   if (status.targets.filter(target => !target.fenced).every(target => target.managedBy === 'fgctl')) {

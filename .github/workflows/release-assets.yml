@@ -83,17 +83,17 @@ jobs:
         if: runner.os == 'Linux'
         run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl
 
-      - name: Record shipped addon digest
-        run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile,nativeAddonLibraryName} from './scripts/build-rust-distribution.mjs'; fs.writeFileSync('addon-digest.txt',hashFile('target/release/'+nativeAddonLibraryName())+'\n');"
+      - name: Package release assets
+        run: node scripts/package-release-assets.mjs --version "${{ steps.version.outputs.version }}" --out dist
+
+      - name: Record staged addon digest and verify manifest binding
+        run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile} from './scripts/build-rust-distribution.mjs'; const m=JSON.parse(fs.readFileSync('dist/tree/manifest.json')); const a=m.components.nativeAddon; const digest=hashFile('dist/tree/'+a.path); if(digest!=='sha256:'+a.digest || !m.files.some(f=>f.path===a.path && f.digest===digest)) throw Error('staged addon manifest mismatch'); fs.writeFileSync('addon-digest.txt',digest+'\n');"
 
       - uses: actions/upload-artifact@v4
         with:
           name: shipped-addon-${{ matrix.target }}
           path: addon-digest.txt
           if-no-files-found: error
-
-      - name: Package release assets
-        run: node scripts/package-release-assets.mjs --version "${{ steps.version.outputs.version }}" --out dist
 
       - name: External consumer proof (Linux)
         if: runner.os == 'Linux'

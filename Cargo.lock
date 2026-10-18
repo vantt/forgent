@@ -116,8 +116,10 @@ name = "fgctl"
 version = "0.2.0"
 dependencies = [
  "fgos-distribution",
+ "fgos-git",
  "fgos-holder-lock",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]
@@ -179,6 +181,7 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",
+ "semver",
  "serde",
  "serde_json",
  "sha2",
