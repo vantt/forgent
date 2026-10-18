@@ -9,7 +9,7 @@ use std::process::{Command, Output, Stdio};
 use std::time::{Duration, Instant};
 
 use fgos_holder_lock::predecessor::{declare, record_path};
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Resource, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Release, Resource, Wait};
 use fgos_process::facts::{identity_of, lock_holders, observe, Holders, Observed};
 use fgos_process::{Domain, FdSlot, ProcId};
 use serde_json::Value;
@@ -114,11 +114,11 @@ fn wait_ms_times_out_and_leaves_nothing_on_the_description() {
     assert_eq!(v["result"], "timeout");
     assert!(v["waitedMs"].as_u64().unwrap() >= 300);
     assert!(took >= Duration::from_millis(300) && took < Duration::from_secs(2), "{took:?}");
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     // The timed-out description holds nothing: a fresh acquire succeeds
     // while it is still open.
     match acquire(&res, Mode::Ex, Wait::Try, 2000) {
-        Acquire::Acquired(h) => release(h),
+        Acquire::Acquired(h) => assert!(matches!(release(h), Release::Released { .. })),
         other => panic!("timed-out description kept the lock: {other:?}"),
     }
     drop(file);
@@ -142,7 +142,7 @@ fn shared_try_answers_free_or_held_and_guarantee_names_the_driver() {
     let held = route_fd(&["lock-fd", "--protocol", "1", "--shared-try"], &file);
     assert_eq!((held.status.code(), json_line(&held)["result"].clone()), (Some(10), Value::from("held")));
     drop(file);
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     let g = route(&["lock-fd", "--protocol", "1", "--guarantee", &res.path.to_string_lossy()]);
     assert_eq!(g.status.code(), Some(0));
     let v = json_line(&g);
@@ -192,7 +192,7 @@ fn borrowed_check_accepts_the_borrowed_description_and_refuses_a_sibling() {
     cmd.env("FGOS_LOCK_FD", "main:3");
     let out = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(3), &stranger)]).unwrap().wait_with_output().unwrap();
     assert_eq!(json_line(&out)["reason"], "inode-mismatch");
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -303,7 +303,7 @@ fn probe_opens_its_own_description_and_answers_free_or_held() {
     };
     let held = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
     assert_eq!((held.status.code(), json_line(&held)["result"].clone()), (Some(10), Value::from("held")));
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     let free = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
     assert_eq!((free.status.code(), json_line(&free)["result"].clone()), (Some(0), Value::from("free")));
     let _ = fs::remove_dir_all(&dir);

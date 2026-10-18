@@ -14,7 +14,7 @@ use std::time::Duration;
 
 use fgos_holder_lock::borrow_vectors::{self, git_env, init_repo};
 use fgos_holder_lock::predecessor::record_path;
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, HelperExe, Mode, Probe, Resource, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, HelperExe, Mode, Probe, Release, Resource, Wait};
 use serde_json::Value;
 use windows_support::*;
 use windows_sys::Win32::Foundation::{SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
@@ -67,7 +67,7 @@ fn a_borrowed_commit_ends_what_its_hook_left_behind_and_leaves_nothing() {
     assert_eq!(ended(sleeper[0]), Some(true), "the hook's background process is signaled when run_borrowed returns");
     assert!(!record_path(&resource.path).exists(), "the predecessor record is removed");
     assert_keeper_gone();
-    release(handle);
+    assert!(matches!(release(handle), Release::Released { .. }));
     assert_eq!(probe(&resource).unwrap(), Probe::Free);
     let _ = fs::remove_dir_all(&dir);
 }
@@ -115,7 +115,7 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
         fs::write(&go, "go").unwrap();
         assert_eq!(borrow.join().unwrap().expect("run_borrowed").exit, Some(0));
     });
-    release(handle);
+    assert!(matches!(release(handle), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -146,7 +146,7 @@ fn a_holder_that_dies_mid_borrow_leaves_a_job_the_next_acquire_empties_before_ad
                 violations.push((round, *pid));
             }
         }
-        release(handle);
+        assert!(matches!(release(handle), Release::Released { .. }));
     }
     assert!(violations.is_empty(), "members still running when acquire returned: {violations:?}");
     let _ = fs::remove_dir_all(&dir);
@@ -186,7 +186,7 @@ fn a_keeper_that_cannot_open_its_job_does_not_acknowledge_and_leaves_nothing() {
     assert!(matches!(outcome, Err(BorrowError::Spawn(_))), "{outcome:?}");
     assert!(!record_path(&resource.path).exists(), "no record is left");
     assert!(children_named("fgos.exe").is_empty() && children_named("cmd.exe").is_empty(), "no process is left");
-    release(handle);
+    assert!(matches!(release(handle), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -207,7 +207,7 @@ fn a_holder_that_outlives_its_lock_is_not_killed_by_a_record_written_back() {
         stdio: BorrowStdio::Null,
     };
     assert_eq!(run_borrowed(&handle, &copy, &helper()).expect("run_borrowed").exit, Some(0));
-    release(handle);
+    assert!(matches!(release(handle), Release::Released { .. }));
     // What a failed removal would have left behind.
     fs::write(record_path(&resource.path), fs::read_to_string(&saved).unwrap()).unwrap();
 
@@ -288,6 +288,6 @@ fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
     assert_eq!(outcome.exit, Some(0));
     assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the holder's inheritable handle must not reach the borrowed child");
     assert_keeper_gone();
-    release(handle);
+    assert!(matches!(release(handle), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }

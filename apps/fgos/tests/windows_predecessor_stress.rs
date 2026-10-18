@@ -28,7 +28,7 @@ use std::time::{Duration, Instant};
 
 use fgos_holder_lock::borrow_vectors::{git_env, init_repo};
 use fgos_holder_lock::predecessor::record_path;
-use fgos_holder_lock::{acquire_with_trace, release, Acquire, Mode, Resource, Wait};
+use fgos_holder_lock::{acquire_with_trace, release, Acquire, Mode, Release, Resource, Wait};
 use serde_json::{json, Value};
 use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
 use windows_sys::Win32::System::Threading::{CreateEventW, OpenEventW, OpenProcess, SetEvent, TerminateProcess, WaitForSingleObject, PROCESS_TERMINATE};
@@ -179,7 +179,7 @@ impl Rig {
             return (waited, trace, Err(why)) };
             // As soon as acquire returns: every pid that was in the borrow.
             let still_running: Vec<u32> = judged.iter().copied().filter(|pid| ended(*pid) != Some(true)).collect();
-            release(handle);
+            assert!(matches!(release(handle), Release::Released { .. }));
             (waited, trace, Ok(still_running))
         });
         match scenario {
