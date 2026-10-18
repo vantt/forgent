@@ -8,7 +8,7 @@ use std::process::{Child, Command};
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
-use crate::facts::{self, Holders, Observed, PidNs, ProcTuple, ProcView, Scan, ScanFilter, UnreadableCause, Verdict};
+use crate::facts::{self, CreationMark, Holders, Observed, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter, UnreadableCause, Verdict};
 use crate::{FdSlot, ProcId};
 
 /// The inode number of the initial PID namespace, fixed by the kernel
@@ -74,6 +74,76 @@ impl ProcessPlatform for Linux {
             }
         }
         Holders::List(holders)
+    }
+
+    fn lock_holders_among(&self, dev: u64, ino: u64, pids: &[ProcId]) -> Holders {
+        let mut holders = Vec::new();
+        for pid in pids {
+            if holds_lock_on(*pid, dev, ino).unwrap_or(false) {
+                if let Some(tuple) = self.identity_of(*pid) {
+                    holders.push(tuple);
+                }
+            }
+        }
+        Holders::List(holders)
+    }
+
+    fn relations(&self) -> Option<Vec<Relation>> {
+        let proc_dir = File::open("/proc").ok()?;
+        let pids = proc_pids();
+        if pids.is_empty() {
+            return None;
+        }
+        let mut buf = [0u8; 4096];
+        Some(pids.into_iter().filter_map(|pid| read_relation(&proc_dir, pid, &mut buf)).collect())
+    }
+
+    fn last_pid(&self) -> Option<u32> {
+        fs::read_to_string("/proc/sys/kernel/ns_last_pid").ok()?.trim().parse().ok()
+    }
+
+    fn created_since(&self, mark: &CreationMark) -> Option<Vec<Relation>> {
+        let floor = mark.last_pid?;
+        let pid_max: u64 = fs::read_to_string("/proc/sys/kernel/pid_max").ok()?.trim().parse().ok()?;
+        let window = std::time::Duration::from_secs_f64(pid_max as f64 / facts::ALLOCATION_RATE_BOUND as f64);
+        if mark.at.elapsed() >= window {
+            return None;
+        }
+        // /proc must list this pid namespace, the one ns_last_pid reads.
+        if fs::read_link("/proc/self").ok()?.to_str()?.parse::<u32>().ok()? != std::process::id() {
+            return None;
+        }
+        let proc_dir = File::open("/proc").ok()?;
+        let mut buf = [0u8; 4096];
+        let last = self.last_pid()?;
+        let span = if last >= floor { u64::from(last - floor) } else { pid_max.saturating_sub(u64::from(floor)) + u64::from(last) };
+        if span <= 4096 {
+            // Few allocations since the mark: probe each pid allocated after
+            // it, up to the cursor, instead of listing every process. Thread
+            // ids share the pid space; only thread-group leaders are kept.
+            let mut out = Vec::new();
+            let mut pid = floor;
+            while pid != last {
+                pid = if u64::from(pid) + 1 >= pid_max { 1 } else { pid + 1 };
+                if let Some((relation, leader)) = read_relation_and_leader(&proc_dir, ProcId(pid), &mut buf) {
+                    if leader {
+                        out.push(relation);
+                    }
+                }
+            }
+            return Some(out);
+        }
+        // List first, then read the cursor again: a pid listed here was
+        // allocated no later than that read.
+        let pids = proc_pids();
+        let last = self.last_pid()?;
+        let after = |pid: u32| if last >= floor { pid > floor && pid <= last } else { pid > floor || pid <= last };
+        Some(
+            pids.into_iter()
+                .filter(|pid| after(pid.0))
+                .filter_map(|pid| read_relation(&proc_dir, pid, &mut buf))
+                .collect(),
+        )
     }
 
     fn scan(&self, filter: &ScanFilter) -> Scan {
@@ -149,6 +219,41 @@ impl ProcessPlatform for Linux {
         }
         outcome
     }
+}
+
+/// One `/proc/<pid>/stat` read relative to an open `/proc`: one open, one
+/// read, one close (this runs for many processes after every borrow).
+fn read_relation(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) -> Option<Relation> {
+    read_relation_and_leader(proc_dir, pid, buf).map(|(relation, _)| relation)
+}
+
+/// [`read_relation`], and whether `pid` names a thread-group leader: a
+/// thread created with `CLONE_THREAD` has exit signal -1 (stat field 38),
+/// which no process has.
+fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) -> Option<(Relation, bool)> {
+    use std::io::Read;
+    use std::os::fd::{AsRawFd, FromRawFd};
+    let name = std::ffi::CString::new(format!("{}/stat", pid.0)).ok()?;
+    // SAFETY: openat on a directory descriptor the caller owns and a
+    // NUL-terminated relative name; the result is owned by a File.
+    let fd = unsafe { libc::openat(proc_dir.as_raw_fd(), name.as_ptr(), libc::O_RDONLY | libc::O_CLOEXEC) };
+    if fd < 0 {
+        return None;
+    }
+    // SAFETY: fd was just opened and is owned by nobody else.
+    let mut file = unsafe { File::from_raw_fd(fd) };
+    let n = file.read(buf).ok()?;
+    let line = if n < buf.len() {
+        String::from_utf8_lossy(&buf[..n]).into_owned()
+    } else {
+        // A stat line never fills the buffer; read it whole if it did.
+        let mut rest = buf.to_vec();
+        file.read_to_end(&mut rest).ok()?;
+        String::from_utf8_lossy(&rest).into_owned()
+    };
+    let relation = facts::parse_relation(pid, &line)?;
+    let exit_signal = line[line.rfind(')')? + 1..].split_whitespace().nth(35)?;
+    Some((relation, exit_signal != "-1"))
 }
 
 /// Signal 0: does any process (even one `/proc` hides from us) own `pid`?
@@ -275,6 +380,22 @@ mod tests {
         assert_eq!(Linux.observe(ProcId(pid_max + 1)), Observed::Absent);
         assert_eq!(Linux.observe(ProcId(u32::MAX)), Observed::Absent, "a pid that does not fit pid_t names nothing");
         assert_eq!(Linux.observe(ProcId(0)), Observed::Absent, "pid 0 is a process group to kill(2), never a process");
+    }
+
+    #[test]
+    fn threads_are_not_listed_as_processes_created_since_a_mark() {
+        let mark = facts::creation_mark().unwrap();
+        let worker = std::thread::spawn(|| std::thread::sleep(std::time::Duration::from_millis(200)));
+        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let created = Linux.created_since(&mark).expect("young mark");
+        let pids: Vec<u32> = created.iter().map(|r| r.pid.0).collect();
+        child.kill().unwrap();
+        child.wait().unwrap();
+        worker.join().unwrap();
+        assert!(pids.contains(&child.id()), "the child is listed: {pids:?}");
+        assert!(!pids.contains(&std::process::id()), "this process predates the mark");
+        let own_tasks: Vec<u32> = fs::read_dir("/proc/self/task").unwrap().flatten().filter_map(|e| e.file_name().to_str()?.parse().ok()).collect();
+        assert!(own_tasks.iter().all(|tid| !pids.contains(tid)), "no thread id of this process is listed");
     }
 
     #[test]
