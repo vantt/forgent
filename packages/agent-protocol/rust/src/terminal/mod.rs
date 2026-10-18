@@ -345,15 +345,6 @@ impl Terminal {
         })
     }
 
-    /// Type the brief (inline text or a file-pointer line), leave this CLI's
-    /// gap, press Enter. Either failure is returned; it does not say whether
-    /// the CLI took the brief.
-    pub fn deliver(&self, io: &mut dyn AgentIo, message: &str) -> Result<(), IoError> {
-        self.type_brief(io, message)?;
-        io.pause(self.profile.enter_gap_ms);
-        self.press_enter(io)
-    }
-
     /// Deliver the brief and confirm it, re-typing only when sure it was not
     /// taken: the typing call itself failed AND the pane is still showing what
     /// it showed before, idle, with no draft in the composer. At most
