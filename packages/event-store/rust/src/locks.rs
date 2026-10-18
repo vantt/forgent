@@ -33,6 +33,83 @@ pub fn acquire_append(
             "event-append requires all held ranks below 70",
         ));
     }
+    let guarantee = validate_directory(layout, fs)?;
+    match fgos_holder_lock::acquire(
+        &Resource::new(APPEND_NAME, lock_path(layout, false)),
+        Mode::Ex,
+        Wait::Ms(APPEND_WAIT_MS),
+        DEFAULT_KILL_WAIT_MS,
+    ) {
+        Acquire::Acquired(handle) => Ok(AppendGuard {
+            _handle: handle,
+            guarantee,
+        }),
+        Acquire::Held { .. } | Acquire::Timeout { .. } => Err(Error::new(
+            ErrorCode::EventStoreLockTimeout,
+            "event-append wait exhausted or predecessor not empty",
+        )),
+        Acquire::Unavailable { reason, detail } => Err(Error::new(
+            ErrorCode::EventStoreIo,
+            format!("{}: {detail}", reason.as_str()),
+        )),
+    }
+}
+
+/// Owns the event-seal description for rotation and Publication borrowing.
+pub struct SealGuard {
+    pub(crate) handle: Handle,
+    path: PathBuf,
+}
+impl SealGuard {
+    pub(crate) fn validate(&self, layout: &Layout) -> Result<(), Error> {
+        if self.path != layout.seal_lock() {
+            return Err(Error::new(
+                ErrorCode::LockOrderViolation,
+                "seal guard belongs to another store",
+            ));
+        }
+        fgos_holder_lock::validate(&self.handle)
+            .map_err(|e| Error::new(ErrorCode::EventStoreIo, e.to_string()))
+    }
+}
+pub fn acquire_seal(
+    layout: &Layout,
+    held_ranks: &[u32],
+    hot_lock_depth: u32,
+    opportunistic: bool,
+) -> Result<Option<SealGuard>, Error> {
+    validate_seal_context(held_ranks, hot_lock_depth)?;
+    validate_directory(layout, &crate::fsio::OsFileSystem)?;
+    match fgos_holder_lock::acquire(
+        &Resource::new(SEAL_NAME, layout.seal_lock()),
+        Mode::Ex,
+        if opportunistic {
+            Wait::Try
+        } else {
+            Wait::Ms(APPEND_WAIT_MS)
+        },
+        DEFAULT_KILL_WAIT_MS,
+    ) {
+        Acquire::Acquired(handle) => Ok(Some(SealGuard {
+            handle,
+            path: layout.seal_lock(),
+        })),
+        Acquire::Held { .. } | Acquire::Timeout { .. } if opportunistic => Ok(None),
+        Acquire::Held { .. } | Acquire::Timeout { .. } => Err(Error::new(
+            ErrorCode::EventStoreLockTimeout,
+            "event-seal wait exhausted",
+        )),
+        Acquire::Unavailable { reason, detail } => Err(Error::new(
+            ErrorCode::EventStoreIo,
+            format!("{}: {detail}", reason.as_str()),
+        )),
+    }
+}
+
+fn validate_directory(
+    layout: &Layout,
+    fs: &dyn FileSystem,
+) -> Result<fgos_holder_lock::Guarantee, Error> {
     let dir = layout.root.join("locks");
     let valid = fs::symlink_metadata(&dir).is_ok_and(|meta| {
         if !meta.is_dir() || meta.file_type().is_symlink() {
@@ -67,23 +144,21 @@ pub fn acquire_append(
             "holder-lock unavailable",
         ));
     }
-    match fgos_holder_lock::acquire(
-        &Resource::new(APPEND_NAME, lock_path(layout, false)),
-        Mode::Ex,
-        Wait::Ms(APPEND_WAIT_MS),
-        DEFAULT_KILL_WAIT_MS,
-    ) {
-        Acquire::Acquired(handle) => Ok(AppendGuard {
-            _handle: handle,
-            guarantee,
-        }),
-        Acquire::Held { .. } | Acquire::Timeout { .. } => Err(Error::new(
-            ErrorCode::EventStoreLockTimeout,
-            "event-append wait exhausted or predecessor not empty",
-        )),
-        Acquire::Unavailable { reason, detail } => Err(Error::new(
-            ErrorCode::EventStoreIo,
-            format!("{}: {detail}", reason.as_str()),
-        )),
+    Ok(guarantee)
+}
+
+pub(crate) fn validate_seal_context(held_ranks: &[u32], hot_lock_depth: u32) -> Result<(), Error> {
+    if hot_lock_depth > 0 || held_ranks.contains(&60) {
+        return Err(Error::new(
+            ErrorCode::EventStoreSealUnderState,
+            "seal must run outside state",
+        ));
     }
+    if held_ranks.iter().any(|r| *r >= SEAL_RANK) {
+        return Err(Error::new(
+            ErrorCode::LockOrderViolation,
+            "event-seal requires held ranks below 58",
+        ));
+    }
+    Ok(())
 }

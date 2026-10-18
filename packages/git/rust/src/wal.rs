@@ -1249,6 +1249,15 @@ impl<F: FileSystem> Wal<F> {
     /// Admission never traverses historical ledger entries. A directory without
     /// record zero is not an Intent and cannot block an unrelated operation.
     pub fn active(&self, bound: usize) -> WalResult<Vec<Chain>> {
+        Ok(self
+            .retained(bound)?
+            .into_iter()
+            .filter(|c| c.outcome().is_none())
+            .collect())
+    }
+    /// Retained operation directories, including terminal records awaiting
+    /// compaction. Historical compacted ids are never traversed.
+    pub fn retained(&self, bound: usize) -> WalResult<Vec<Chain>> {
         let mut chains = Vec::new();
         for (n, entry) in fs::read_dir(self.root.path())?.enumerate() {
             if n >= bound {
@@ -1263,9 +1272,7 @@ impl<F: FileSystem> Wal<F> {
                 continue;
             }
             let chain = self.inspect(&id)?;
-            if chain.outcome().is_none() {
-                chains.push(chain);
-            }
+            chains.push(chain);
         }
         Ok(chains)
     }

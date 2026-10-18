@@ -26,6 +26,11 @@ impl Repo {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&root).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        }
         let mut git = Command::new("git");
         for (k, _) in std::env::vars_os() {
             if k.to_string_lossy().starts_with("GIT_") {
@@ -40,6 +45,15 @@ impl Repo {
             .success());
         let layout = Layout::from_common_dir(Some(&root.join(".git"))).unwrap();
         fs::create_dir_all(layout.root.join("locks")).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(
+                layout.common_dir.join("fgos"),
+                fs::Permissions::from_mode(0o700),
+            )
+            .unwrap();
+        }
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;

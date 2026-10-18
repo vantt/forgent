@@ -71,7 +71,7 @@ fn dev_ino(_: &Path) -> Result<String, Error> {
     ))
 }
 #[cfg(target_os = "linux")]
-fn random_id() -> Result<String, Error> {
+pub(crate) fn random_id() -> Result<String, Error> {
     let mut bytes = [0u8; 16];
     File::open("/dev/urandom")
         .and_then(|mut f| f.read_exact(&mut bytes))
@@ -79,7 +79,7 @@ fn random_id() -> Result<String, Error> {
     Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
 }
 #[cfg(not(target_os = "linux"))]
-fn random_id() -> Result<String, Error> {
+pub(crate) fn random_id() -> Result<String, Error> {
     Err(Error::new(
         ErrorCode::EventStoreUnsupportedPlatform,
         "native random identity driver unavailable",

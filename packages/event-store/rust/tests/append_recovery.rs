@@ -170,14 +170,9 @@ fn rotation_has_no_sequence_reset_and_syncs_both_directories() {
     let r = Repo::new();
     let a = r.append(3);
     let trace = Trace(Default::default());
-    let rotated = fgos_event_store::rotate::rotate_with_fs(
-        &r.layout,
-        "test-aa2345",
-        &r.stream,
-        &[58],
-        &trace,
-    )
-    .unwrap();
+    let rotated =
+        fgos_event_store::rotate::rotate_with_fs(&r.layout, "test-aa2345", &r.stream, &[], &trace)
+            .unwrap();
     assert_eq!(rotated.last_seq, 3);
     assert!(rotated.segment.unwrap().exists());
     let points = trace.0.borrow();

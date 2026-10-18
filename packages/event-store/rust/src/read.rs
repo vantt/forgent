@@ -609,16 +609,25 @@ pub fn reconcile_durable_history(
         crate::fsio::sync_dir(&layout.root)?;
         // lastSeq is physical publication, deliberately separate from coverage:
         // causal deferral must never permit reuse of a published sequence.
-        let bytes = crate::envelope::line(
-            &serde_json::json!({"lastSeq":high,"ref":own_ref.as_str(),"commit":tip.as_str(),"cover":recovered,"certified":certified}),
-        )?;
-        fgos_durable_file::replace_durably(&paths.root, "sealed.json", &bytes)
-            .map_err(|e| Error::new(ErrorCode::EventStoreIo, e.to_string()))?;
+        crate::receipt::Receipt {
+            last_seq: high,
+            reference: own_ref.as_str().into(),
+            commit: tip.as_str().into(),
+            cover: recovered,
+            certified,
+            ..Default::default()
+        }
+        .write(&paths.root)?;
     }
     crate::fsio::write_hwm(&paths.root, high, &fs)?;
     Ok(high)
 }
-fn descends(port: &dyn Inspect, repo: &RepoHandle, tip: &Oid, old: &str) -> Result<bool, Error> {
+pub(crate) fn descends(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tip: &Oid,
+    old: &str,
+) -> Result<bool, Error> {
     let old = Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
     if *tip == old {
         return Ok(true);

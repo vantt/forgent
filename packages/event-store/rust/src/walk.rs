@@ -95,6 +95,10 @@ fn walk_inner(
             )
         })
         .collect();
+    let mut machines: BTreeMap<String, Option<String>> = tips
+        .iter()
+        .map(|tip| (tip.as_str().into(), identity.map(|i| i.0.to_owned())))
+        .collect();
     let stops = certified
         .iter()
         .map(|s| Oid::parse(s, repo.object_format()).map_err(|e| invalid(e.to_string())))
@@ -139,13 +143,28 @@ fn walk_inner(
                 .get(commit.oid.as_str())
                 .copied()
                 .unwrap_or(Scope::Project);
-            if let Some((machine, _)) = identity {
-                verify_tip(&seal, machine, scope)?;
+            let actual_machine = match &seal {
+                Seal::Seal { machine_id, .. } | Seal::Merge { machine_id, .. } => {
+                    Some(machine_id.clone())
+                }
+                Seal::Legacy { .. } => None,
+            };
+            if identity.is_some() {
+                let expected_machine = machines
+                    .get(commit.oid.as_str())
+                    .and_then(|m| m.as_deref())
+                    .or(actual_machine.as_deref())
+                    .ok_or_else(|| invalid("legacy in event ancestry"))?;
+                verify_tip(&seal, expected_machine, scope)?;
             }
+            if identity.is_some() {
+                machines.insert(commit.oid.as_str().into(), actual_machine.clone());
+            }
+            let merge_commit = matches!(&seal, Seal::Merge { .. });
             if certified.contains(commit.oid.as_str()) {
                 continue;
             }
-            let mut promoted = false;
+            let mut promoted_parent = None;
             match seal {
                 Seal::Seal {
                     origin,
@@ -184,19 +203,28 @@ fn walk_inner(
                             "seal/event identity, scope or range mismatch",
                         ));
                     }
-                    if commit.parents.len() > 1 {
-                        promoted = framed.events.iter().any(|e| {
+                    if let Some((index, parent)) = commit.parents.iter().enumerate().next_back() {
+                        if framed.events.iter().any(|e| {
                             e.event_type == "store.promote"
-                                && e.payload["tip"].as_str() == Some(commit.parents[1].as_str())
-                        });
-                        if identity.is_some()
-                            && (!promoted || scope != Scope::Project || commit.parents.len() != 2)
-                        {
-                            return Err(Error::new(
-                                ErrorCode::EventStoreRefTampered,
-                                "invalid promote ancestry",
-                            ));
+                                && e.payload["tip"].as_str() == Some(parent.as_str())
+                        }) {
+                            promoted_parent = Some(index);
                         }
+                    }
+                    if identity.is_some()
+                        && ((commit.parents.len() > 1 && promoted_parent.is_none())
+                            || (promoted_parent.is_some()
+                                && (scope != Scope::Project || commit.parents.len() > 2))
+                            || (framed
+                                .events
+                                .iter()
+                                .any(|e| e.event_type == "store.promote")
+                                && promoted_parent.is_none()))
+                    {
+                        return Err(Error::new(
+                            ErrorCode::EventStoreRefTampered,
+                            "invalid promote ancestry",
+                        ));
                     }
                     let high = cover
                         .get(&format!("{origin}:{stream}"))
@@ -219,7 +247,35 @@ fn walk_inner(
                 Seal::Legacy { .. } => return Err(invalid("legacy ref passed to event walk")),
             }
             for (index, parent) in commit.parents.iter().enumerate() {
-                let expected = if promoted && index == 1 {
+                // The mirror side of a merge is another machine's ref. Its
+                // header establishes that chain's machine; first-parent and
+                // promote ancestry retain their actual source machine.
+                let expected_machine = if merge_commit && index == 1 {
+                    None
+                } else {
+                    actual_machine.clone()
+                };
+                match machines.entry(parent.as_str().into()) {
+                    std::collections::btree_map::Entry::Vacant(e) => {
+                        e.insert(expected_machine);
+                    }
+                    std::collections::btree_map::Entry::Occupied(mut e) => {
+                        if identity.is_some()
+                            && e.get().is_some()
+                            && expected_machine.is_some()
+                            && e.get() != &expected_machine
+                        {
+                            return Err(Error::new(
+                                ErrorCode::EventStoreRefTampered,
+                                "ancestor reached through incompatible machine identities",
+                            ));
+                        }
+                        if e.get().is_none() {
+                            e.insert(expected_machine);
+                        }
+                    }
+                }
+                let expected = if promoted_parent == Some(index) {
                     Scope::Branch
                 } else {
                     scope

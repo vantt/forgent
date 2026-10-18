@@ -527,3 +527,120 @@ fn authenticated_promote_parent_releases_later_branch_tail_after_certification()
     assert_eq!(&next.sequence[3..], &[promote, branches[1].clone()]);
     assert!(next.deferred.is_empty());
 }
+
+#[test]
+fn merged_parent_keeps_its_source_machine_identity_and_is_discovered_below_covered_seal() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let a = event('a', 1, 1);
+    let b = event('b', 1, 2);
+    let own = seal(&p, &f.repo, vec![], std::slice::from_ref(&a), "test-aa");
+    let foreign = seal(&p, &f.repo, vec![], std::slice::from_ref(&b), "other-aa");
+    let merged = merge(&p, &f.repo, &own, &foreign, "test-aa");
+    let mut next = event('a', 2, 3);
+    next.seen.insert(format!("{}:project", b.origin), 1);
+    rehash(&mut next);
+    let top = seal(&p, &f.repo, vec![merged], &[next], "test-aa");
+    let cover = std::collections::BTreeMap::from([(format!("{}:project", a.origin), 2)]);
+    let walked = walk::walk_verified(
+        &p,
+        &f.repo,
+        &top,
+        &cover,
+        &BTreeSet::new(),
+        "test-aa",
+        Scope::Project,
+    )
+    .unwrap();
+    assert_eq!(walked.events, vec![b]);
+}
+
+#[test]
+fn covered_seal_discovers_unknown_origin_with_open_or_rebuilt_receipt_coverage() {
+    for rebuild_receipt in [false, true] {
+        let f = Fixture::new();
+        let stream = StreamId::parse("project").unwrap();
+        let paths = f.layout.stream(&stream);
+        fs::create_dir_all(paths.closed()).unwrap();
+        let a1 = event('a', 1, 1);
+        let a2 = event('a', 2, 3);
+        let c1 = event('c', 1, 0);
+        let mut b1 = event('b', 1, 2);
+        b1.seen.insert(format!("{}:project", c1.origin), 1);
+        rehash(&mut b1);
+        fs::write(paths.active(), batch(&[a1.clone(), a2.clone()])).unwrap();
+        let open = read_project(&f, &Cursor::default(), &[]);
+        assert_eq!(open.cursor.cover[&format!("{}:project", a1.origin)], 2);
+        assert!(!open
+            .cursor
+            .cover
+            .contains_key(&format!("{}:project", b1.origin)));
+        let mut cursor = open.cursor;
+        let folded = open.sequence;
+        let mut h = f.handle();
+        {
+            let p = f.port(&mut h, "refs/fgos/events/test-aa");
+            let own = seal(&p, &f.repo, vec![], std::slice::from_ref(&a1), "test-aa");
+            let foreign = seal(&p, &f.repo, vec![], std::slice::from_ref(&b1), "test-bb");
+            let merged = merge(&p, &f.repo, &own, &foreign, "test-aa");
+            let top = seal(
+                &p,
+                &f.repo,
+                vec![merged],
+                std::slice::from_ref(&a2),
+                "test-aa",
+            );
+            publish(
+                &p,
+                &f.repo,
+                "refs/fgos/events/test-aa",
+                None,
+                top,
+                "covered-top",
+            );
+            if rebuild_receipt {
+                fs::remove_file(paths.active()).unwrap();
+                assert_eq!(
+                    reconcile_durable_history(
+                        &p,
+                        &f.repo,
+                        &f.layout,
+                        &a1.origin,
+                        &stream,
+                        &RefName::parse("refs/fgos/events/test-aa").unwrap(),
+                    )
+                    .unwrap(),
+                    2
+                );
+                let receipt = fgos_event_store::receipt::Receipt::read(&paths.sealed()).unwrap();
+                assert_eq!(receipt.cover, cursor.cover);
+                assert!(receipt.certified.is_empty());
+                cursor.cover = receipt.cover;
+                cursor.certified = receipt.certified;
+            }
+        }
+        // B has never been emitted: its origin is absent from coverage, and
+        // it lives below the already covered A2 seal. C now makes it readable.
+        {
+            let p = f.port(&mut h, "refs/fgos/events/test-cc");
+            let tip = seal(&p, &f.repo, vec![], std::slice::from_ref(&c1), "test-cc");
+            publish(
+                &p,
+                &f.repo,
+                "refs/fgos/events/test-cc",
+                None,
+                tip,
+                "release-cause",
+            );
+        }
+        let result = read_project(&f, &cursor, &folded);
+        assert!(result.deferred.is_empty());
+        assert!(result.missing.is_empty());
+        assert_eq!(result.sequence.len(), 4);
+        let hashes: BTreeSet<_> = result.sequence.iter().map(|e| e.h.clone()).collect();
+        assert_eq!(hashes, BTreeSet::from([a1.h, a2.h, b1.h, c1.h]));
+        assert_eq!(result.cursor.cover[&format!("{}:project", b1.origin)], 1);
+        assert_eq!(result.cursor.cover[&format!("{}:project", c1.origin)], 1);
+    }
+}
