@@ -386,7 +386,7 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
     let mut status: Option<ExitStatus> = None;
     let mut agent_pid: Option<libc::pid_t> = None;
     let mut agent_tuple: Option<facts::ProcTuple> = None;
-    let mut channel = config.terminal.then(|| Channel { frames: arrived.rest, brief_delivered: false, gone: false, result_seen: None });
+    let mut channel = config.terminal.then_some(Channel { frames: arrived.rest, brief_delivered: false, gone: false, result_seen: None });
     if let Some(channel) = channel.as_mut() {
         channel.absorb();
     }

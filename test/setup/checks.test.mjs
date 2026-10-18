@@ -142,6 +142,12 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'coordination-example-requests-valid',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
+      'git-component-compatible',
+      'git-trust-topology',
+      'git-operation-journal',
+      'git-native-locks',
+      'git-publication-refspecs',
+      'git-durability-capability',
       'terminal-config',
       'terminal-allocations',
       'trust-store-readable',

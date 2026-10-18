@@ -43,6 +43,14 @@ impl Fixture {
             ResolveRepo::Repository(r) => r,
             _ => panic!(),
         };
+        // Git WAL writers refuse a workspace without the controller's activation fence.
+        let fence = repo.trusted_main_root().join(".fgos/locks/activation.lock");
+        fs::create_dir_all(&fence).unwrap();
+        fs::write(
+            fence.join("TOMBSTONE"),
+            "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+        )
+        .unwrap();
         let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
         fs::create_dir_all(layout.root.join("locks")).unwrap();
         fs::set_permissions(

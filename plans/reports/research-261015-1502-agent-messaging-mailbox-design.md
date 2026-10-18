@@ -475,10 +475,37 @@ Tín hiệu khẩn cấp là một mức ưu tiên riêng (mục 5.4: `interrupt
 - **Mỗi lần xả tốn context.** Dòng trạng thái ở quy tắc 2 nên cực ngắn; nội dung dài để agent tự kéo bằng tool khi cần.
 - **Ngắt quá nhiều làm hỏng công việc dở.** Giữ `interrupt` cho tin cấp bách thật sự.
 
-### 8.7 Tóm tắt cho fgOS
+### 8.7 Chỉ dẫn "hãy kiểm tra hộp thư" trong file instruction: tác dụng và giới hạn
+
+Cách phổ biến nhất để nhận tin là viết vào `AGENTS.md` một dòng bảo agent tự kiểm tra hộp thư. Ví dụ điển hình là khối chỉ dẫn của **MCP Agent Mail** (mục 4.4), một dự án riêng có tích hợp với Beads. Bản thân Beads không có hộp thư kiểu đó: theo `docs/distillery/sources/beads.md`, Beads chỉ có gate và "message bead" nằm trong đồ thị việc, cùng `bd prime` để nạp memory lại đầu phiên.
+
+**Nguồn đã đọc.** README của MCP Agent Mail (đọc 100.000 trong 126.476 ký tự của trang, phần cuối chưa xem). Khối chỉ dẫn bảo agent kiểm tra inbox bằng `fetch_inbox` và xác nhận bằng `acknowledge_message`, và khuyên dùng macro như `macro_start_session` cho model nhỏ. Về cơ chế ép buộc, README chỉ mô tả hook pre-commit chặn xung đột đặt chỗ file (không liên quan tới thư), không mô tả thông báo đẩy khi có tin mới, và có sự kiện "ACK overdue" để gắn nhãn trong Beads mà không nói cách phát hiện. Tuỳ chọn `unread_only` của `fetch_inbox` cho thấy thiết kế chờ agent tự thăm dò. Chưa có bằng chứng nào trong nguồn về việc agent thực tế tuân theo chỉ dẫn này tốt đến đâu.
+
+**Bản chất.** Chỉ dẫn biến việc nhận tin thành cơ hội O5 (agent tự kéo bằng tool, mục 8.3). Điều xảy ra sau đó là suy luận về cách agent hoạt động, chưa được đo:
+
+| Có tác dụng | Không đảm bảo |
+|---|---|
+| Đầu phiên: chỉ dẫn vừa nằm trong context nên agent thường làm theo, nhất là khi có macro gom sẵn bước kiểm tra | Giữa phiên dài: chỉ dẫn xa dần trong context, nhất là sau compact, nên agent thôi kiểm tra |
+| Tại ranh giới tự nhiên (xong việc, trước khi báo xong): agent có thể kiểm tra | Khi kẹt một step dài hoặc đang tập trung: không có lúc nào để kiểm tra |
+| Chi phí thấp, không cần đổi harness | Mỗi lần kiểm tra tốn một lần gọi tool, nên agent kiểm tra quá nhiều hoặc quá ít |
+| Chạy giống nhau trên mọi CLI | Không ai biết "agent nào chưa kiểm tra" nếu không có ack có hạn |
+
+Kết luận: chỉ dẫn cho **xác suất** nhận tin, không cho **cơ hội được bảo đảm**. Tin quan trọng vẫn có thể nằm trong hộp thư mà không ai đọc (kiểu mất đầu tiên ở mục 8.5).
+
+**Cách dùng đúng: chỉ dẫn là lớp thứ hai.** Chỉ dẫn dạy agent *cách đọc và cách ack*. Việc *nhắc đúng lúc* và *ép xả* nên do harness lo (quy tắc 1, 2, 4 ở mục 8.4).
+
+| Chế độ chạy của fgOS | Vai trò hợp lý của chỉ dẫn | Lớp phải có thêm |
+|---|---|---|
+| Headless (lần chạy ngắn một lượt, không có `send`) | Gần đủ nếu tin được **nhét sẵn vào brief lúc spawn** (M0); chỉ dẫn chỉ cần nói cách ack | Brief mang tin chưa ack; ack có hạn |
+| Herdr (REPL chạy lâu) | Dạy cách đọc, ack và trả lời | Lời nhắc do hook của harness phát ra (sau tool, trước khi dừng), hoặc `send.text` đánh thức khi `activity` báo rảnh; chỉ dẫn một mình sẽ mòn dần theo thời gian chạy |
+
+Điểm chưa kiểm chứng: hook của từng CLI (claude, codex, omp, pi) có chạy trong `-p` và có nạp nội dung vào context hay chặn việc dừng được không (xem phép đo cần làm ở mục 8.8). Cho tới khi đo xong, không nên coi chỉ dẫn trong `AGENTS.md` là cơ chế giao tin của fgOS, chỉ coi là chỉ dẫn cách xử lý tin đã tới.
+
+### 8.8 Tóm tắt cho fgOS
 
 - Hiện chưa có hộp thư; V-011 loại hộp thư tổng quát (mục 10). Khi có nhu cầu được chứng minh, bài toán "thường xuyên nhận được" nên giải bằng *cơ hội do harness tạo ra* (O1 điểm xả mỗi ranh giới round, O3/O4 cổng dừng, O2/O8 đánh thức), không bằng việc yêu cầu agent nhớ tự đọc inbox.
 - Các thành phần nền đã có: hook cho các CLI (doctor `*-hook-wired`), `send.text` và `activity.state` trong terminal-control, supervisor giữ attempt, và event store làm hàng đợi bền (mục 9.4).
+- Chỉ dẫn trong `AGENTS.md` chỉ là lớp thứ hai (mục 8.7); lớp nhắc đúng lúc do harness lo.
 - Việc còn thiếu để kiểm chứng: đo độ trễ O1 thực tế trên từng CLI, và xác nhận hook "sắp dừng" của từng CLI có chặn dừng và nạp tin được không (Claude Code, Codex, omp, pi, agy khác nhau; chưa kiểm chứng trong phiên này).
 
 ---
@@ -607,3 +634,5 @@ Tài liệu fgOS liên quan:
 - `docs/architect/agent-coordination/vision.md` (V-011)
 - `docs/architect/agent-coordination/contracts/coordination-session.md` (Deliberation Contribution Ledger)
 - `docs/platform/event-store/spec.md` mục 14 (chia sẻ giữa các máy qua `refs/fgos/events/<machine>`, D-ADR0055), nguồn của mục 9
+- README của MCP Agent Mail, khối chỉ dẫn `AGENTS.md` và cơ chế nhắc: https://github.com/Dicklesworthstone/mcp_agent_mail (đọc một phần, xem mục 8.7)
+- `docs/distillery/sources/beads.md` (Beads: gate, message bead, `bd prime`), nguồn của mục 8.7

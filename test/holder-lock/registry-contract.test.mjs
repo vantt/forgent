@@ -202,7 +202,7 @@ test('the Rust-owned activation, install and observe locks are leaf mutexes fenc
   const rustOwned = registry.locks.filter((lock) => lock.owner === '4.4');
   assert.deepEqual(rustOwned.map((lock) => lock.name).sort(), ['activation', 'install', 'observe']);
   const expected = {
-    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation.lock', v1Shape: 'file-link', v1Path: '.fgos/installation/activation.lock' },
+    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation-v2.lock', v1Shape: 'file-link', v1Path: ['.fgos/installation/activation.lock', '.fgos/locks/activation.lock'] },
     install: { scope: 'machine', v3Path: '<lockRoot>/install.lock', v1Shape: 'file-wx', v1Path: '<stateRoot>/install.lock' },
     observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock', v1Shape: 'file-wx', v1Path: '.fgos/observe/.lock' },
   };
@@ -211,7 +211,7 @@ test('the Rust-owned activation, install and observe locks are leaf mutexes fenc
     assert.equal(lock.rank, 80, `${lock.name}: rank`);
     assert.equal(lock.fence, 'tombstone', `${lock.name}: fence`);
     const want = expected[lock.name];
-    for (const key of Object.keys(want)) assert.equal(lock[key], want[key], `${lock.name}: ${key}`);
+    for (const key of Object.keys(want)) assert.deepEqual(lock[key], want[key], `${lock.name}: ${key}`);
   }
 });
 
@@ -296,4 +296,27 @@ test('event-store mutex contracts pin names, ranks, paths and owner schema', () 
     const missing = { ...row }; delete missing.owner;
     assert.notDeepEqual(validate(missing, schema.$defs.lock, schema), []);
   }
+});
+
+test('Git repo-config is a rank 80 leaf and Node leaves the held controller path to fgctl', async () => {
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const { placeFences, fenceStatus } = await import('../../src/holder-lock/fences.mjs');
+  const row = registry.locks.find(row => row.name === 'repo-config');
+  assert.deepEqual({ kind: row.kind, rank: row.rank, owner: row.owner }, { kind: 'mutex', rank: 80, owner: 'git' });
+  const dir = fs.mkdtempSync(join(os.tmpdir(), 'fgos-controller-fence-'));
+  try {
+    const old = join(dir, '.fgos/locks/activation.lock');
+    fs.mkdirSync(dirname(old), { recursive: true });
+    fs.writeFileSync(old, 'held inode');
+    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, stateRoot: join(dir, 'state'), owners: ['4.4'] };
+    assert.equal(placeFences(options).ok, true);
+    assert.equal(fs.readFileSync(old, 'utf8'), 'held inode');
+    const status = fenceStatus(options);
+    const target = status.targets.find(target => target.path === old);
+    assert.equal(target.managedBy, 'fgctl');
+    assert.equal(target.fenced, false);
+    assert.deepEqual(status.controllerMissing, [old]);
+    assert.ok(!status.missing.includes(old) && !status.v1Present.includes(old), 'the held controller file never blocks or counts against Node placement');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

@@ -185,10 +185,13 @@ test('fenceStatus lists every missing path before placement and none after', () 
   const ws = makeWorkspace('status');
   const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(before.complete, false);
-  assert.equal(before.missing.length, before.targets.length);
+  // Every path is missing: the ones this module places in `missing`, fgctl's controller path in `controllerMissing`.
+  assert.equal(before.missing.length + before.controllerMissing.length, before.targets.length);
+  assert.deepEqual(before.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')]);
   assert.deepEqual(before.v1Present, []);
   placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(afterwards.complete, true);
   assert.deepEqual(afterwards.missing, []);
+  assert.deepEqual(afterwards.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')], 'placeFences leaves the controller fence to fgctl');
 });

@@ -246,6 +246,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     }
     fn wal(&self, repo: &RepoHandle) -> Result<Wal<&F>> {
         self.authority.validate(repo)?;
+        wal::require_activation_fence(repo).map_err(werr)?;
         Wal::with_filesystem(repo.common_dir(), &self.filesystem).map_err(werr)
     }
     fn admit_pending(&self, repo: &RepoHandle, wal: &Wal<&F>, id: &str) -> Result<()> {

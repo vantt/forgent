@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "docs/platform/git/spec.md \u00a73\u20134",
-  "implementationStatus": "publication-linux-backend; remaining ports are contracts",
+  "implementationStatus": "publication-linux-backend; repository-config-fetch-mapping-rust; Node config binding and other ports pending",
   "ports": {
     "Inspect": [
       "resolveRepo",

@@ -168,13 +168,14 @@ pub enum InitError {
 }
 
 /// Holds the workspace activation lock: a kernel lock on
-/// `<workspace>/.fgos/locks/activation.lock` taken through `fgos-holder-lock`.
+/// `<workspace>/.fgos/locks/activation-v2.lock` taken through `fgos-holder-lock`.
 ///
 /// One attempt, never a wait. The lock lives on an open file description, so
 /// a killed holder frees it at once and there is nothing to reclaim; `Drop`
 /// closes the description and never unlocks explicitly.
 pub struct ActivationLockGuard {
     _handle: fgos_holder_lock::Handle,
+    legacy: Option<fgos_holder_lock::Handle>,
 }
 
 impl ActivationLockGuard {
@@ -190,28 +191,83 @@ impl ActivationLockGuard {
             fgos_holder_lock::Wait::Try,
             fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
         ) {
-            fgos_holder_lock::Acquire::Acquired(handle) => Ok(Self { _handle: handle }),
-            fgos_holder_lock::Acquire::Held { reason, .. } => Err(InitError::ActivationLockHeld(reason.as_str())),
-            // A single try never times out; treat it as held if a driver ever reports it.
-            fgos_holder_lock::Acquire::Timeout { .. } => {
-                Err(InitError::ActivationLockHeld(fgos_holder_lock::HeldReason::KernelLockHeld.as_str()))
+            fgos_holder_lock::Acquire::Acquired(handle) => {
+                let old = workspace_root.join(".fgos/locks/activation.lock");
+                let legacy =
+                    if fgos_holder_lock::tombstone::is_tombstone(&old, "activation", "fgos git") {
+                        None
+                    } else {
+                        match fgos_holder_lock::acquire(
+                            &fgos_holder_lock::Resource::new("activation", &old),
+                            fgos_holder_lock::Mode::Ex,
+                            fgos_holder_lock::Wait::Try,
+                            fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
+                        ) {
+                            fgos_holder_lock::Acquire::Acquired(legacy) => Some(legacy),
+                            fgos_holder_lock::Acquire::Held { reason, .. } => {
+                                return Err(InitError::ActivationLockHeld(reason.as_str()))
+                            }
+                            other => {
+                                return Err(InitError::Custom(format!(
+                                    "git-fence-missing: {other:?}"
+                                )))
+                            }
+                        }
+                    };
+                Ok(Self {
+                    _handle: handle,
+                    legacy,
+                })
             }
-            fgos_holder_lock::Acquire::Unavailable { reason, detail } => Err(InitError::LockDriverUnavailable {
-                lock: "activation",
-                note: format!("{}: {detail}", reason.as_str()),
-            }),
+            fgos_holder_lock::Acquire::Held { reason, .. } => {
+                Err(InitError::ActivationLockHeld(reason.as_str()))
+            }
+            // A single try never times out; treat it as held if a driver ever reports it.
+            fgos_holder_lock::Acquire::Timeout { .. } => Err(InitError::ActivationLockHeld(
+                fgos_holder_lock::HeldReason::KernelLockHeld.as_str(),
+            )),
+            fgos_holder_lock::Acquire::Unavailable { reason, detail } => {
+                Err(InitError::LockDriverUnavailable {
+                    lock: "activation",
+                    note: format!("{}: {detail}", reason.as_str()),
+                })
+            }
         }
     }
 }
 
-/// `<workspace>/.fgos/locks/activation.lock`, the one path of the activation lock.
+impl ActivationLockGuard {
+    pub(crate) fn fence_legacy(&self, workspace: &Path) -> Result<(), InitError> {
+        if let Some(legacy) = &self.legacy {
+            fgos_holder_lock::tombstone::replace_held_file(
+                legacy,
+                "activation",
+                "fgos git",
+                &format_iso8601_utc(SystemTime::now()),
+            )?;
+        }
+        if !fgos_holder_lock::tombstone::is_tombstone(
+            &workspace.join(".fgos/locks/activation.lock"),
+            "activation",
+            "fgos git",
+        ) {
+            return Err(InitError::Custom("git-fence-missing".into()));
+        }
+        Ok(())
+    }
+}
+
+/// `<workspace>/.fgos/locks/activation-v2.lock`, the one path of the activation lock.
 pub fn activation_lock_path(workspace_root: &Path) -> std::path::PathBuf {
-    workspace_root.join(".fgos").join("locks").join("activation.lock")
+    workspace_root
+        .join(".fgos")
+        .join("locks")
+        .join("activation-v2.lock")
 }
 
 /// Cleans up any stale `activation.json.tmp.*` files left from a previous killed run (Reviewer L8).
 ///
-/// Must only be called after acquiring `activation.lock`.
+/// Must only be called after acquiring `activation-v2.lock`.
 pub fn cleanup_stale_activation_tmp_files(installation_dir: &Path) {
     if let Ok(entries) = std::fs::read_dir(installation_dir) {
         for entry in entries.flatten() {
@@ -727,6 +783,17 @@ fn init_workspace_tagged(
                 {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&workspace_root)?;
+                    let active_manifest = read_manifest_from_dir(&release_dir_path(
+                        &store_root,
+                        &current.artifact_digest,
+                    ))
+                    .map_err(|e| InitError::Custom(e.to_string()))?;
+                    crate::git_gate::admit(
+                        &workspace_root,
+                        &store_root,
+                        &active_manifest,
+                        &_activation_lock,
+                    )?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
 
                     let shim_fgos = installation_dir.join("bin").join("fgos");
@@ -769,6 +836,17 @@ fn init_workspace_tagged(
                 {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&workspace_root)?;
+                    let active_manifest = read_manifest_from_dir(&release_dir_path(
+                        &store_root,
+                        &current.artifact_digest,
+                    ))
+                    .map_err(|e| InitError::Custom(e.to_string()))?;
+                    crate::git_gate::admit(
+                        &workspace_root,
+                        &store_root,
+                        &active_manifest,
+                        &_activation_lock,
+                    )?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
 
                     let shim_fgos = installation_dir.join("bin").join("fgos");
@@ -808,6 +886,17 @@ fn init_workspace_tagged(
                 {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&workspace_root)?;
+                    let active_manifest = read_manifest_from_dir(&release_dir_path(
+                        &store_root,
+                        &current.artifact_digest,
+                    ))
+                    .map_err(|e| InitError::Custom(e.to_string()))?;
+                    crate::git_gate::admit(
+                        &workspace_root,
+                        &store_root,
+                        &active_manifest,
+                        &_activation_lock,
+                    )?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
 
                     let shim_fgos = installation_dir.join("bin").join("fgos");
@@ -894,6 +983,7 @@ fn init_workspace_tagged(
             && current.status != "quarantined"
             && is_release_staged(&store_root, &current.artifact_digest)
         {
+            crate::git_gate::admit(&workspace_root, &store_root, &manifest, &_activation_lock)?;
             let shim_fgos = installation_dir.join("bin").join("fgos");
             run_tail(
                 &workspace_root,
@@ -959,11 +1049,19 @@ pub enum HolderLockGate {
 /// and `lock_root`, then the borrow vectors with `git`. All of it runs in this
 /// process through the crate fgctl links; nothing under the candidate release
 /// runs. A red result refuses the activation; there is no switch to skip it.
-pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path, helper: &fgos_holder_lock::HelperExe) -> Result<HolderLockGate, InitError> {
+pub fn holder_lock_gate(
+    workspace_root: &Path,
+    lock_root: &Path,
+    git: &Path,
+    helper: &fgos_holder_lock::HelperExe,
+) -> Result<HolderLockGate, InitError> {
     use fgos_holder_lock::borrow_vectors::{self, RunError};
     let started = std::time::Instant::now();
     if !fgos_holder_lock::driver::current().supported() {
-        return Err(InitError::LockKernelSemanticsFailed(format!("no holder-lock driver on {}", std::env::consts::OS)));
+        return Err(InitError::LockKernelSemanticsFailed(format!(
+            "no holder-lock driver on {}",
+            std::env::consts::OS
+        )));
     }
     let workspace_locks = workspace_root.join(".fgos").join("locks");
     for dir in [workspace_locks.as_path(), lock_root] {
@@ -977,8 +1075,9 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path, hel
                 guarantee.notes.join("; ")
             )));
         }
-        fgos_holder_lock::semantics::two_process_probe(dir, helper)
-            .map_err(|detail| InitError::LockKernelSemanticsFailed(format!("{}: {detail}", dir.display())))?;
+        fgos_holder_lock::semantics::two_process_probe(dir, helper).map_err(|detail| {
+            InitError::LockKernelSemanticsFailed(format!("{}: {detail}", dir.display()))
+        })?;
     }
     let report = borrow_vectors::run(git, helper, &[], false).map_err(|err| {
         InitError::LockBorrowVectorsFailed(match err {
@@ -986,23 +1085,46 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path, hel
         })
     })?;
     if !report.pass() {
-        let mut red: Vec<String> =
-            report.vectors.iter().filter(|v| !v.pass).map(|v| format!("{}: {}", v.name, v.detail)).collect();
+        let mut red: Vec<String> = report
+            .vectors
+            .iter()
+            .filter(|v| !v.pass)
+            .map(|v| format!("{}: {}", v.name, v.detail))
+            .collect();
         if !report.sibling.0 {
             red.push(format!("sibling: {}", report.sibling.1));
         }
-        return Err(InitError::LockBorrowVectorsFailed(format!("{} ({})", red.join("; "), report.git_version)));
+        return Err(InitError::LockBorrowVectorsFailed(format!(
+            "{} ({})",
+            red.join("; "),
+            report.git_version
+        )));
     }
-    Ok(HolderLockGate::Passed { elapsed_ms: started.elapsed().as_secs_f64() * 1000.0 })
+    Ok(HolderLockGate::Passed {
+        elapsed_ms: started.elapsed().as_secs_f64() * 1000.0,
+    })
 }
 
 /// Holder-lock gate, preflight, capsule creation, atomic activation publishing, and post-activation tail.
 pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     // Before the capsule is written, so a refusal leaves no capsule behind
     // (only the two lock directories the gate probed).
-    let helper = fgos_holder_lock::HelperExe::current()
-        .map_err(|err| InitError::LockKernelSemanticsFailed(format!("the running executable is unknown: {err}")))?;
-    holder_lock_gate(args.workspace_root, &args.store_root.join("locks"), Path::new("git"), &helper)?;
+    let helper = fgos_holder_lock::HelperExe::current().map_err(|err| {
+        InitError::LockKernelSemanticsFailed(format!("the running executable is unknown: {err}"))
+    })?;
+    holder_lock_gate(
+        args.workspace_root,
+        &args.store_root.join("locks"),
+        Path::new("git"),
+        &helper,
+    )?;
+
+    crate::git_gate::admit(
+        args.workspace_root,
+        args.store_root,
+        args.manifest,
+        args._lock,
+    )?;
 
     let workspace_id = compute_workspace_id(args.workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);
@@ -1233,11 +1355,7 @@ pub fn upgrade_workspace_resolving(
             eprintln!("no local release given; downloading {which}");
             let downloaded = fetch_release(endpoint, version.as_deref())?;
             eprintln!("downloaded and verified {}", downloaded.origin);
-            upgrade_workspace_tagged(
-                start_dir,
-                &downloaded.tarball,
-                downloaded.tag.as_deref(),
-            )
+            upgrade_workspace_tagged(start_dir, &downloaded.tarball, downloaded.tag.as_deref())
         }
         SourceChoice::Pinned => unreachable!("choose_source(_, false) never returns Pinned"),
     }
@@ -1289,6 +1407,17 @@ fn upgrade_workspace_tagged(
     {
         check_main_checkout_lock(&workspace_root)?;
         let _activation_lock = ActivationLockGuard::acquire(&workspace_root)?;
+        let active_manifest = read_manifest_from_dir(&release_dir_path(
+            &store_root,
+            &current_activation.artifact_digest,
+        ))
+        .map_err(|e| InitError::Custom(e.to_string()))?;
+        crate::git_gate::admit(
+            &workspace_root,
+            &store_root,
+            &active_manifest,
+            &_activation_lock,
+        )?;
         cleanup_stale_activation_tmp_files(&installation_dir);
         if let Some(tag) = release_tag {
             let pin = TrackedDistributionPin {
@@ -1392,6 +1521,7 @@ fn upgrade_workspace_tagged(
                 std::fs::create_dir_all(workspace_root.join(".fgos"))?;
                 std::fs::write(&distribution_path, pin_bytes)?;
             }
+            crate::git_gate::admit(&workspace_root, &store_root, &manifest, &lock)?;
             let shim_fgos = installation_dir.join("bin").join("fgos");
             run_tail(
                 &workspace_root,
@@ -1986,7 +2116,13 @@ mod tests {
         let _serial = GATE_TESTS.lock().unwrap_or_else(|e| e.into_inner());
         let root = fresh_temp_root("holder_lock_gate_pass");
         let helper = fgos_holder_lock::HelperExe::current().unwrap();
-        let HolderLockGate::Passed { elapsed_ms } = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), Path::new("git"), &helper).unwrap();
+        let HolderLockGate::Passed { elapsed_ms } = holder_lock_gate(
+            &root.join("ws"),
+            &root.join("state").join("locks"),
+            Path::new("git"),
+            &helper,
+        )
+        .unwrap();
         assert!(elapsed_ms < GATE_BOUND_MS, "gate took {elapsed_ms} ms");
         assert!(root.join("ws/.fgos/locks").is_dir());
         assert!(root.join("state/locks").is_dir());
@@ -1995,16 +2131,55 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn holder_lock_gate_refuses_when_a_borrowed_git_leaves_a_background_gc() {
+    fn holder_lock_gate_drains_a_borrowed_git_background_gc() {
         let _serial = GATE_TESTS.lock().unwrap_or_else(|e| e.into_inner());
-        let root = fresh_temp_root("holder_lock_gate_red");
+        let root = fresh_temp_root("holder_lock_gate_gc_drained");
         let bin = root.join("bin");
         std::fs::create_dir_all(&bin).unwrap();
         let git = git_that_ignores_gc_switch(&bin);
-        let err = holder_lock_gate(&root.join("ws"), &root.join("state").join("locks"), &git, &fgos_holder_lock::HelperExe::current().unwrap()).unwrap_err();
-        let text = err.to_string();
-        assert!(text.starts_with("lock-borrow-vectors-failed: "), "{text}");
-        assert!(text.contains("gc-auto-loose-objects"), "{text}");
+        let helper = fgos_holder_lock::HelperExe::current().unwrap();
+        let HolderLockGate::Passed { .. } = holder_lock_gate(
+            &root.join("ws"),
+            &root.join("state").join("locks"),
+            &git,
+            &helper,
+        )
+        .unwrap();
+        // Keep a second real GC vector's lock inode for an independent holder
+        // check after the borrowed command and holder have both drained.
+        let report = fgos_holder_lock::borrow_vectors::run(
+            &git,
+            &helper,
+            &["gc-auto-loose-objects".into()],
+            true,
+        )
+        .unwrap();
+        assert!(report.pass(), "{report:?}");
+        let kept = report.kept.unwrap();
+        let resource =
+            fgos_holder_lock::Resource::new("borrow-vectors", kept.join("gc-auto-loose-objects.lock"));
+        assert_eq!(
+            fgos_holder_lock::probe(&resource).unwrap(),
+            fgos_holder_lock::Probe::Free
+        );
+        if cfg!(target_os = "linux") {
+            assert_eq!(
+                fgos_holder_lock::holders(&resource).unwrap(),
+                fgos_holder_lock::HoldersList::List(vec![])
+            );
+            // The auto-GC's cwd is the kept vector repository, including
+            // after daemonisation. No live descendant may remain there.
+            for entry in std::fs::read_dir("/proc").unwrap().flatten() {
+                if let Ok(cwd) = std::fs::read_link(entry.path().join("cwd")) {
+                    assert!(
+                        !cwd.starts_with(&kept),
+                        "GC/vector process remains: {}",
+                        entry.path().display()
+                    );
+                }
+            }
+        }
+        let _ = std::fs::remove_dir_all(kept);
         let _ = std::fs::remove_dir_all(&root);
     }
 }

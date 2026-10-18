@@ -1,0 +1,17 @@
+# Git phase 01, Lane B steps 9–11
+
+Completed the previous attempt: registry owner `git`, repo-config rank 80, activation-v2 registry/fences, Linux atomic Rust tombstone, and controller-owned C5 activation/rollback admission. Pending WAL records refuse releases without `git-wal-v1`; corrupt/incomplete scans and unproven predecessor writers refuse. Node leaves the controller's old lock fence to fgctl inside its activation critical section. Unsupported tombstone platforms refuse rather than opening an unlink/mkdir race.
+
+The Rust RepositoryConfig writer installs only missing Event Store mirror refspecs under repo-config 80 and native config.lock, preserves user configuration, checks exact-old bytes, and journals ConfigChange/TargetAttempt/outcome with effective remote URL provenance. The previously refusing addon method is connected. A config-only addon entry lets setup use the same writer without acquiring a seal. Reused the hardened Git driver, holder-lock, WAL scan and publication APIs; history found a declared unimplemented port rather than an older config writer to restore.
+
+Registered six read-only doctor checks: one combined ABI/floor/probe row `git-component-compatible`, trust/topology, WAL health (pending count, oldest unresolved, retained/ledger bytes), native lock detection, fetch mappings and durability limits. Inspection neither initializes the repository WAL nor takes event-seal. Registered WAL-directory and additive origin-mapping fixes; missing addon or other refusals are reported without aborting unrelated fixes. No config default or test-only production branch was added. Durability diagnostics state the process-crash/fsync contract, without certifying storage power-loss behavior.
+
+Updated holder-lock §7/§12, Git implementation status, activation/setup contracts and Unreleased notes. Registry inventory assertions now read the canonical packaging-distribution setup contract instead of the explicitly historical distribution Data Dictionary. Registrations and architecture-manifest edits remain small. Impact-analysis: inactive (zero providers). The coordinator owns program-board/rollout updates outside this unit's write scope.
+
+Verification: required locked Rust suite (183 passed, one existing ignored harness) and all-target Clippy are green; logs are in `/tmp/fgos-work/git-p01b/rust.log` and `clippy.log`. Required Node glob run: 974 tests, 967 passed, six failed, one skipped (`node-repeat.log`). All six failing names reproduce on archived HEAD (`baseline.log`): missing compiled release fixture, four holder/process-namespace checks and missing generated skill projections. No new failing names. Real-addon integration proves read-only uninitialized inspection, WAL initialization, both mapping bindings, idempotence, preserved user refspecs, URL provenance and native-lock preservation. Registry and architecture checks pass. An intermediate Rust rerun hit the existing distribution store lock-release timing assertion; the final full rerun passed, including that assertion. `git diff --check` passes. Markdown preview was attempted; mdview's database is read-only. No staging or commits were run.
+
+Status: DONE_WITH_CONCERNS
+Summary: Steps 9–11 are implemented, including the previously blocked addon and registered doctor/setup integration.
+Concerns/Blockers: Six baseline Node failures remain; Linux atomic fencing is implemented and other platforms refuse; real-host predecessor/rollout proof remains outside this PID namespace.
+Context refs:
+- (none)
