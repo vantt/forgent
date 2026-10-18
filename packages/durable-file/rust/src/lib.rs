@@ -61,7 +61,55 @@ pub fn install_with(
     bytes: &[u8],
     filesystem: &dyn FileSystem,
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, &mut |step| filesystem.checkpoint(step))
+    install_ordered(dir, name, bytes, filesystem, &|| Ok(()), &mut || Ok(()), &[])
+}
+
+/// [`install_with`] with additions for a caller that orders other durable
+/// effects around one record. `alongside` runs on another thread while the
+/// record's bytes are synced (other fsyncs that must precede the record can
+/// then share the filesystem's journal commit with it); `before_install`
+/// runs once both finished and before the name is installed. The record
+/// cannot exist until both returned `Ok`; an error leaves only the
+/// temporary. `also_sync` are further directories synced together with
+/// `dir` after the name is installed (for example the parent of a directory
+/// created for this record); the install returns only after all are synced.
+pub fn install_ordered(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+    filesystem: &dyn FileSystem,
+    alongside: &(dyn Fn() -> io::Result<()> + Sync),
+    before_install: &mut dyn FnMut() -> io::Result<()>,
+    also_sync: &[&Path],
+) -> Result<Installed, InstallError> {
+    write_durably(dir, name, bytes, false, &mut |step| match step {
+        "file-fsync" => {
+            filesystem.checkpoint(step)?;
+            before_install()
+        }
+        _ => filesystem.checkpoint(step),
+    }, also_sync, alongside)
+}
+
+/// Sync several directories, each with its own fsync, issued concurrently
+/// so a journaling filesystem can serve them with one commit. Returns after
+/// every fsync finished; the first error wins.
+pub fn sync_directories(dirs: &[&Path]) -> io::Result<()> {
+    match dirs {
+        [] => Ok(()),
+        [one] => sync_directory(one),
+        [first, rest @ ..] => std::thread::scope(|scope| {
+            let others: Vec<_> = rest.iter().map(|dir| scope.spawn(move || sync_directory(dir))).collect();
+            let mut result = sync_directory(first);
+            for other in others {
+                let synced = other.join().unwrap_or_else(|_| Err(io::Error::other("directory sync panicked")));
+                if result.is_ok() {
+                    result = synced;
+                }
+            }
+            result
+        }),
+    }
 }
 
 /// Replace a name atomically without opening its old target, then sync its parent.
@@ -90,7 +138,7 @@ pub fn replace_durably_observed(
         "name-installed" => observe(ReplacePoint::Renamed),
         "parent-fsync" => observe(ReplacePoint::DirectorySynced),
         _ => Ok(()),
-    })
+    }, &[], &|| Ok(()))
 }
 
 /// One write path for both modes. `replace` renames over the name; otherwise the
@@ -102,6 +150,8 @@ fn write_durably(
     bytes: &[u8],
     replace: bool,
     checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
+    also_sync: &[&Path],
+    alongside: &(dyn Fn() -> io::Result<()> + Sync),
 ) -> Result<Installed, InstallError> {
     let mut components = Path::new(name).components();
     if name.is_empty()
@@ -150,7 +200,29 @@ fn write_durably(
     // publishing a truncated record. Keep the temporary on every failure.
     file.write_all(bytes).map_err(|e| error(e, None))?;
     checkpoint("bytes-written").map_err(|e| error(e, None))?;
-    file.sync_all().map_err(|e| error(e, None))?;
+    #[cfg(target_os = "linux")]
+    {
+        use std::os::fd::AsRawFd;
+        // Start the data writeback first, so the block allocation joins the
+        // running journal transaction before `alongside` can commit it; the
+        // fsync below stays the durability boundary either way.
+        // SAFETY: sync_file_range on a descriptor this call owns.
+        unsafe {
+            libc::sync_file_range(
+                file.as_raw_fd(),
+                0,
+                0,
+                libc::SYNC_FILE_RANGE_WAIT_BEFORE | libc::SYNC_FILE_RANGE_WRITE | libc::SYNC_FILE_RANGE_WAIT_AFTER,
+            );
+        }
+    }
+    std::thread::scope(|scope| {
+        let other = scope.spawn(alongside);
+        let synced = file.sync_all();
+        let other = other.join().unwrap_or_else(|_| Err(io::Error::other("concurrent durable step panicked")));
+        synced.and(other)
+    })
+    .map_err(|e| error(e, None))?;
     checkpoint("file-fsync").map_err(|e| error(e, None))?;
     drop(file);
     let target = dir.join(name);
@@ -181,7 +253,9 @@ fn write_durably(
         }
         checkpoint("temp-removed").map_err(after_install)?;
     }
-    sync_directory(dir).map_err(|source| InstallError {
+    let mut dirs = vec![dir];
+    dirs.extend_from_slice(also_sync);
+    sync_directories(&dirs).map_err(|source| InstallError {
         source,
         installed: Some(installed),
         temporary: None,
