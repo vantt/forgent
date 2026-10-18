@@ -35,3 +35,6 @@ pub mod route;
 
 /// The `fgos internal attempt-step` route: hands a step to the Node payload.
 pub mod attempt_step;
+
+/// The supervisor's door to terminal-control, and the `release-slot` step built on it.
+pub mod terminal_slot;

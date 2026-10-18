@@ -10,6 +10,13 @@
 //! The gate never compares pids (they mean nothing across PID namespaces) and
 //! never dies with its parent in `direct` mode: after `GO` the supervisor can
 //! disappear and the attempt still ends by itself.
+//!
+//! In `terminal` mode the gate runs in a pane, connects to the supervisor's
+//! AF_UNIX socket (`--go-socket`), receives the attempt lock (and the cwd
+//! lease) with `GO` over `SCM_RIGHTS`, makes the agent's process group the
+//! tty's foreground group, and ends the domain itself when the supervisor is
+//! gone: at once before `BRIEF_DELIVERED`, after a finished result plus
+//! `orphanSettleMs` once the brief was delivered.
 
 //!
 //! One gate, one contract, a platform part per OS: `gate/unix.rs` (pid 1 of a
@@ -156,6 +163,15 @@ pub(crate) struct Config {
     pub(crate) grace: Duration,
     /// The current boot, read once.
     pub(crate) boot_id: Option<String>,
+    /// `terminal`: the agent runs in a pane and the supervisor may disappear while it runs.
+    pub(crate) terminal: bool,
+    /// The envelope says the dispatch cwd is held by a lease, so a second lock description comes with GO.
+    pub(crate) mutating: bool,
+    pub(crate) outbox_dir: std::path::PathBuf,
+    /// Extra wait after a result showed up while the supervisor is gone.
+    pub(crate) orphan_settle: Duration,
+    /// `(writerId, parentWriterId)` the agent sees as `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`.
+    pub(crate) identity: Option<(String, Option<String>)>,
 }
 
 /// Why the agent is being stopped.
@@ -191,7 +207,27 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
         _ => None,
     };
+    let terminal = match value["mode"].as_str() {
+        Some("terminal") => true,
+        Some("direct") => false,
+        _ => return Err("envelope field mode missing".into()),
+    };
+    let orphan_settle = match (terminal, value["terminal"]["orphanSettleMs"].as_u64()) {
+        (true, Some(ms)) => Duration::from_millis(ms),
+        (true, None) => return Err("a terminal envelope needs terminal.orphanSettleMs".into()),
+        (false, _) => Duration::ZERO,
+    };
+    let identity = match value["identity"]["writerId"].as_str() {
+        Some(writer) => Some((writer.to_string(), value["identity"]["parentWriterId"].as_str().map(String::from))),
+        None if terminal => return Err("a terminal envelope needs identity.writerId".into()),
+        None => None,
+    };
     Ok(Config {
+        terminal,
+        mutating: value["mutation"] == "mutating",
+        outbox_dir: text_of(&launch["outboxDir"], "launch.outboxDir")?.into(),
+        orphan_settle,
+        identity,
         attempt_id: text_of(&value["attemptId"], "attemptId")?,
         digest: claimed.to_string(),
         run_dir: text_of(&value["runDir"], "runDir")?.into(),

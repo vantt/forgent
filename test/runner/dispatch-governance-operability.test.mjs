@@ -1,14 +1,13 @@
 // test/runner/dispatch-governance-operability.test.mjs
 // Verification test suite for dispatch governance, public CLI, observation truth, and doctor coherence.
 
-import { test, before, after } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
 import {
   RunnerConfigError,
@@ -28,7 +27,6 @@ import {
 } from '../../src/runner/dispatch/runtime-inspection.mjs';
 import {
 } from '../../src/setup/registrations.mjs';
-import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
@@ -404,191 +402,5 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
   } finally {
     console.warn = origWarn;
     fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-// ─── 8. Herdr Polling Skips Liveness Check During Working State (Behavioral) ───
-
-// The terminal-control route finds the herdr server by the process listening on its socket.
-let harness;
-before(async () => { harness = await startTerminalHarness(); });
-after(() => { harness?.stop(); });
-
-function createMockHerdr(tmpDir, scenario = {}) {
-  const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
-  const wrapperPath = path.join(tmpDir, 'mock-herdr.sh');
-  const statePath = path.join(tmpDir, 'mock-state.json');
-  const logPath = path.join(tmpDir, 'mock-log.jsonl');
-  const scenarioPath = path.join(tmpDir, 'mock-scenario.json');
-
-  fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0, exited: false }));
-  fs.writeFileSync(logPath, '');
-  fs.writeFileSync(scenarioPath, JSON.stringify({
-    worker: 'ack-then-result',
-    workerOnPrompt: 1,
-    statuses: ['idle'],
-    screen: '',
-    ...scenario,
-  }));
-
-  fs.writeFileSync(scriptPath, `
-import fs from "node:fs";
-import path from "node:path";
-import { spawn } from "node:child_process";
-const args = process.argv.slice(2);
-fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + "\\n");
-const [group, action] = args;
-if (args[0] === "--version") { console.log("herdr 0.9.1-mock"); process.exit(0); }
-if (group === "tab" && action === "create") { console.log(JSON.stringify({ id: "cli:mock", result: { tab: { tab_id: "mock-tab-1" }, root_pane: { pane_id: "mock-pane-1" } } })); process.exit(0); }
-if (group === "pane" && action === "read") { console.log(""); process.exit(0); }
-if (group === "pane" && action === "split") { console.log(JSON.stringify({ id: "cli:mock", result: { pane: { pane_id: "mock-pane-1" } } })); process.exit(0); }
-if (group === "pane" && action === "close") { console.log(JSON.stringify({ id: "cli:mock", result: { closed: true } })); process.exit(0); }
-if (group === "pane" && action === "run") { console.log(JSON.stringify({ id: "cli:mock", result: { type: "ok" } })); process.exit(0); }
-if (group === "pane" && action === "process-info") {
-  const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
-  if (state.exited) {
-    console.log(JSON.stringify({ id: "cli:mock", result: { process_info: { pane_id: "mock-pane-1", shell_pid: 100, foreground_process_group_id: 100, foreground_processes: [{ pid: 100, name: "bash" }] } } }));
-    process.exit(0);
-  }
-  // The agent is a real process: the port identifies it by its pid.
-  const agent = state.agentPid ? (() => { try { process.kill(state.agentPid, 0); return fs.readFileSync("/proc/" + state.agentPid + "/cmdline", "utf8").split("\\0").filter(Boolean); } catch { return null; } })() : null;
-  const foreground = agent ? [{ pid: state.agentPid, name: agent[0], argv: agent }, { pid: 100, name: "bash", argv: ["bash"] }] : [{ pid: 100, name: "bash", argv: ["bash"] }];
-  console.log(JSON.stringify({ id: "cli:mock", result: { process_info: { pane_id: "mock-pane-1", shell_pid: 100, foreground_process_group_id: agent ? state.agentPid : 100, foreground_processes: foreground } } }));
-  process.exit(0);
-}
-if (group === "agent" && action === "start") {
-  const child = spawn("bash", ["-c", "exec -a agy sleep 600"], { detached: true, stdio: "ignore" });
-  child.unref();
-  const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
-  state.agentPid = child.pid;
-  fs.writeFileSync(${JSON.stringify(statePath)}, JSON.stringify(state));
-  console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "idle" } } }));
-  process.exit(0);
-}
-if (group === "agent" && action === "get") {
-  const scenario = JSON.parse(fs.readFileSync(${JSON.stringify(scenarioPath)}, "utf8"));
-  if (scenario.getError) { console.log(JSON.stringify({ error: { code: scenario.getError }, id: "cli:mock" })); process.exit(1); }
-  const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
-  const status = scenario.statuses[Math.min(state.gets, scenario.statuses.length - 1)];
-  state.gets = (state.gets || 0) + 1;
-  fs.writeFileSync(${JSON.stringify(statePath)}, JSON.stringify(state));
-  console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: status, pane_id: "mock-pane-1" } } }));
-  process.exit(0);
-}
-if (group === "agent" && action === "prompt") {
-  const text = args[3];
-  if (text.startsWith("/")) {
-    const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
-    state.exited = true;
-    fs.writeFileSync(${JSON.stringify(statePath)}, JSON.stringify(state));
-    if (state.agentPid) { try { process.kill(state.agentPid, "SIGKILL"); } catch {} }
-    console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "idle" } } }));
-    process.exit(0);
-  }
-  const scenario = JSON.parse(fs.readFileSync(${JSON.stringify(scenarioPath)}, "utf8"));
-  if (scenario.worker !== "silent") {
-    let briefText = text;
-    const pointer = text.match(/^Read (.+) and do what it says\\.$/);
-    if (pointer) {
-      try { briefText = fs.readFileSync(pointer[1], 'utf8'); } catch {}
-    }
-    const ackSuffix = '/outbox/ack-1.json';
-    const ackIdx = briefText.indexOf(ackSuffix);
-    if (ackIdx !== -1) {
-      const start = briefText.lastIndexOf(' ', ackIdx) + 1;
-      const ackPath = briefText.slice(start, ackIdx + ackSuffix.length).trim();
-      const outbox = path.dirname(ackPath);
-      try {
-        fs.mkdirSync(outbox, { recursive: true });
-        fs.writeFileSync(path.join(outbox, 'ack-1.json'), JSON.stringify({ round: 1 }));
-        fs.writeFileSync(path.join(outbox, 'report-1.md'), 'done');
-        fs.writeFileSync(path.join(outbox, 'result-1.json'), JSON.stringify({ status: 'settled', summary: 'done' }));
-      } catch {}
-    }
-  }
-  console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "working" } } }));
-  process.exit(0);
-}
-if (group === "agent" && action === "read") { console.log(JSON.stringify({ id: "cli:mock", result: { read: { text: "" } } })); process.exit(0); }
-console.log(JSON.stringify({ id: "cli:mock", result: {} }));
-`);
-
-  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`, { mode: 0o755 });
-
-  return {
-    herdrBin: wrapperPath,
-    calls: () => fs.readFileSync(logPath, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)),
-  };
-}
-
-function dispatchThroughMock(tmpDir, mock, { prompt, timeoutMs = 5000, idleTimeoutMs = 500, transportDeadlines } = {}) {
-  const runDir = path.join(tmpDir, 'run');
-  fs.mkdirSync(runDir, { recursive: true });
-  return EXECUTOR_ADAPTERS['herdr-spawn'](
-    {
-      command: 'agy',
-      args: ['-i', prompt],
-      argsTemplate: ['-i', '{prompt}'],
-      prompt,
-      env: {},
-      interactiveMode: { exitCommand: '/exit' },
-    },
-    {
-      cwd: tmpDir,
-      timeoutMs,
-      idleTimeoutMs,
-      workId: 'w1',
-      tier: 'standard',
-      model: 'sonnet',
-      herdrBin: mock.herdrBin,
-      runDir,
-      transportDeadlines: { resendAfterMs: 200, maxResends: 0, ...transportDeadlines },
-    },
-  );
-}
-
-test('Herdr polling skips pane process-info liveness check while agent reports working', async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-liveness-check-'));
-  const mock = createMockHerdr(tmpDir, { statuses: ['working', 'working'], worker: 'ack-then-result' });
-  try {
-    await dispatchThroughMock(tmpDir, mock, { prompt: 'do work' });
-    const calls = mock.calls();
-    const promptIdx = calls.findIndex((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'));
-    const exitIdx = calls.findIndex((c) => c[0] === 'agent' && c[1] === 'prompt' && c[3] === '/exit');
-    assert.ok(promptIdx !== -1 && exitIdx > promptIdx, 'round must prompt and exit');
-
-    // During the polling loop between prompt and exit, since agent_status is 'working',
-    // readLiveness() must be skipped, resulting in 0 'pane process-info' calls.
-    const pollingProcessInfoCalls = calls.filter(
-      (c, i) => i > promptIdx && i < exitIdx && c[0] === 'pane' && c[1] === 'process-info',
-    );
-    assert.equal(pollingProcessInfoCalls.length, 0, 'pane process-info must be skipped while agent is working');
-  } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
-});
-
-// ─── 9. Failed Status Read in Herdr Contributes to Blind Time (Behavioral) ─────
-
-test('failed status read in Herdr polling accumulates to blind time rather than charging worker idle', async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-blind-check-'));
-  // When getError is set, agent get fails. The round must NOT fail as idle timeout (idleTimeoutMs: 300),
-  // because blind time is subtracted from idle time. Instead it must survive until timeoutMs ceiling.
-  const mock = createMockHerdr(tmpDir, { worker: 'silent', getError: 'connection_refused' });
-  try {
-    await assert.rejects(
-      () => dispatchThroughMock(tmpDir, mock, {
-        prompt: 'do work',
-        idleTimeoutMs: 300,
-        timeoutMs: 800,
-      }),
-      (err) => {
-        assert.equal(err.outcome, 'timed-out-ceiling',
-          `a blind round where status cannot be read must hit ceiling timeout, not idle timeout; got: ${err.outcome}`);
-        return true;
-      },
-    );
-  } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });

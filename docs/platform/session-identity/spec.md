@@ -62,7 +62,15 @@ The rule lives in `packages/session-identity/rust/src/resolve.rs`; the OS is rea
 
 Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing`, `host-version-mismatch` (the active release has no `identity` verb), `timeout`, `host-error`, `bad-output`, `identity-in-lock`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
 
+## 5a. Attempt writer id (launcher half)
+
+An agent run (attempt) writes under its own id: `mint_attempt_writer_id(attemptId)` = `att-<attemptId>`, a pure function so a resume gets the same id and the same env digest (`packages/session-identity/contracts/attempt-writer-id.v1.json`, vectors beside it). Node reaches it only through `fgos internal identity mint-attempt --attempt <id> --protocol 1` (facade `mintAttemptWriterId`; exit 65 / `invalid-attempt-id` for an unusable id); same lock rule as the resolver. The launcher applies `scrub_and_set(env, writerId, parentWriterId)`: it removes `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and any inherited `FGOS_PARENT_WRITER_ID`, overwrites `FGOS_SESSION_ID` (never empty, so an inherited empty value cannot reach the agent) and sets `FGOS_PARENT_WRITER_ID` to the controller's writer id. `workerBaseEnv` no longer passes any of the three session ids. Codex only carries a minted id through `-c shell_environment_policy.set={FGOS_SESSION_ID=...}`; the other CLIs inherit the env.
+
+Who mints and who scrubs. The controller asks the route once per attempt and writes the result into the envelope (`identity {writerId, parentWriterId}`, both launch modes, so a resume re-derives the same envelope digest). The **gate** applies it: it starts the agent with `env_clear` plus the envelope's environment plus `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`, because a pane inherits the environment of the herdr server, which `--env` cannot clear. In a pane the gate keeps only the pane's own `TERM*` and `HERDR_*` variables, and the controller strips its own copies of those from the envelope and side file. Lineage is one step: `FGOS_PARENT_WRITER_ID` is the controller's writer id, so an observer can tie an agent's writes to the run that started it.
+
 ## 6. Known limits
+
+- **Codex runs its shell commands under a shared daemon** (`codex app-server`). Measured on codex 0.163.0 in a pane: without the explicit setting a command run by codex sees no `FGOS_SESSION_ID` and a stale `HERDR_PANE_ID` of a closed pane, only its own `CODEX_THREAD_ID`, so its writes resolve to the thread id (different per pane). With `-c shell_environment_policy.set={FGOS_SESSION_ID="<id>"}` the command sees the attempt id. The terminal adapter passes the option, so the limit applies only to a codex started by hand or by an older release. claude, agy, pi and omp pass the variable through unchanged.
 
 - A terminal or IDE started from a shell without a new session: its terminals share the launching shell's id.
 - Subagents of one Claude session share `CLAUDE_CODE_SESSION_ID`.

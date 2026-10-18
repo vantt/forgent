@@ -1,0 +1,10 @@
+➜  codex-capture-sandbox git:(master) ✗ codex
+>─You are in /tmp/claude-1000/-home-vantt-projects-forgentX/1b6fb381-92ae-4764-b75e-f1a39844aa49/scratchpad/codex-capture-sandbox
+
+  Do you trust the contents of this directory? Working with untrusted contents comes with higher risk of prompt injection. Trusting the directory allows project-local
+  config, hooks, and exec policies to load.
+
+› 1. Yes, continue
+  2. No, quit
+
+  Press enter to continue

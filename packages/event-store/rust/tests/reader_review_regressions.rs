@@ -1,0 +1,529 @@
+#![cfg(target_os = "linux")]
+mod reader_support;
+use fgos_event_store::{
+    cursor::Cursor,
+    envelope::Scope,
+    layout::StreamId,
+    read::{read, reconcile_durable_history, ReadRequest},
+    walk,
+};
+use fgos_git::*;
+use reader_support::*;
+use std::{collections::BTreeSet, fs};
+fn read_project(
+    f: &Fixture,
+    cursor: &Cursor,
+    folded: &[fgos_event_store::envelope::Envelope],
+) -> fgos_event_store::read::ReadResult {
+    read(
+        &f.driver,
+        &f.repo,
+        ReadRequest {
+            layout: &f.layout,
+            origin: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            streams: &[StreamId::parse("project").unwrap()],
+            cursor,
+            folded,
+            project: true,
+        },
+    )
+    .unwrap()
+}
+#[test]
+fn identical_overlap_recovers_receipt_without_requiring_segment_deletion() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let e = event('a', 1, 1);
+    let oid = seal(&p, &f.repo, vec![], std::slice::from_ref(&e), "test-aa");
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-aa",
+        None,
+        oid,
+        "identical",
+    );
+    let stream = StreamId::parse("project").unwrap();
+    let paths = f.layout.stream(&stream);
+    fs::create_dir_all(paths.closed()).unwrap();
+    fs::write(
+        paths.closed().join("1-1.jsonl"),
+        batch(std::slice::from_ref(&e)),
+    )
+    .unwrap();
+    assert_eq!(
+        reconcile_durable_history(
+            &f.driver,
+            &f.repo,
+            &f.layout,
+            &e.origin,
+            &stream,
+            &RefName::parse("refs/fgos/events/test-aa").unwrap()
+        )
+        .unwrap(),
+        1
+    );
+    assert!(paths.sealed().exists());
+    assert!(paths.closed().join("1-1.jsonl").exists());
+}
+#[test]
+fn unrelated_stream_and_orphan_branch_do_not_disable_frontier_certification() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let (old, new) = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        let first = seal(&p, &f.repo, vec![], &[event('a', 1, 1)], "test-aa");
+        let mut other = event('b', 1, 1);
+        other.stream = "project:porting".into();
+        rehash(&mut other);
+        let second = seal(&p, &f.repo, vec![first.clone()], &[other], "test-aa");
+        publish(
+            &p,
+            &f.repo,
+            "refs/fgos/events/test-aa",
+            None,
+            second.clone(),
+            "two-streams",
+        );
+        (first, second)
+    };
+    {
+        let p = f.port(&mut h, "refs/fgos/branch-events/test-aa/feature");
+        let mut orphan = event('c', 1, 1);
+        orphan.scope = Scope::Branch;
+        orphan.stream = "branch:feature".into();
+        rehash(&mut orphan);
+        let oid = seal(&p, &f.repo, vec![], &[orphan], "test-aa");
+        publish(
+            &p,
+            &f.repo,
+            "refs/fgos/branch-events/test-aa/feature",
+            None,
+            oid,
+            "orphan",
+        );
+    }
+    let first = read_project(&f, &Cursor::default(), &[]);
+    assert_eq!(first.sequence.len(), 1);
+    assert_eq!(
+        first.cursor.certified,
+        BTreeSet::from([new.as_str().to_owned()])
+    );
+    assert!(!first.cursor.certified.contains(old.as_str()));
+    let newest = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        let oid = seal(
+            &p,
+            &f.repo,
+            vec![new.clone()],
+            &[event('a', 2, 2)],
+            "test-aa",
+        );
+        publish(
+            &p,
+            &f.repo,
+            "refs/fgos/events/test-aa",
+            Some(new),
+            oid.clone(),
+            "next",
+        );
+        oid
+    };
+    let delta = walk::walk(
+        &f.driver,
+        &f.repo,
+        &[newest],
+        &first.cursor.cover,
+        &first.cursor.certified,
+    )
+    .unwrap();
+    assert_eq!(delta.visited.len(), 2); // New commit and the certified boundary only.
+    assert_eq!(
+        read_project(&f, &first.cursor, &first.sequence)
+            .sequence
+            .len(),
+        2
+    );
+}
+#[test]
+fn spliced_ancestor_machine_and_scope_are_refused() {
+    for wrong_scope in [false, true] {
+        let f = Fixture::new();
+        let mut h = f.handle();
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        let mut ancestor = event('a', 1, 1);
+        if wrong_scope {
+            ancestor.scope = Scope::Local;
+            ancestor.stream = "local".into();
+            rehash(&mut ancestor);
+        }
+        let old = seal(
+            &p,
+            &f.repo,
+            vec![],
+            &[ancestor],
+            if wrong_scope { "test-aa" } else { "test-bb" },
+        );
+        let tip = seal(&p, &f.repo, vec![old], &[event('b', 1, 2)], "test-aa");
+        publish(
+            &p,
+            &f.repo,
+            "refs/fgos/events/test-aa",
+            None,
+            tip,
+            "spliced",
+        );
+        let error = read(
+            &f.driver,
+            &f.repo,
+            ReadRequest {
+                layout: &f.layout,
+                origin: &"d".repeat(32),
+                streams: &[StreamId::parse("project").unwrap()],
+                cursor: &Cursor::default(),
+                folded: &[],
+                project: true,
+            },
+        )
+        .unwrap_err();
+        assert_eq!(error.code.as_str(), "event-store-ref-tampered");
+    }
+}
+#[test]
+fn lost_receipt_uses_verified_own_ref_for_own_origin_mirror() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/remotes/origin/events/test-aa");
+    let oid = seal(&p, &f.repo, vec![], &[event('a', 1, 1)], "test-aa");
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/remotes/origin/events/test-aa",
+        None,
+        oid,
+        "mirror",
+    );
+    assert_eq!(read_project(&f, &Cursor::default(), &[]).sequence.len(), 1);
+}
+#[test]
+fn reader_uses_inspect_while_publication_lock_is_held() {
+    let f = Fixture::new();
+    let _held = f.handle();
+    assert!(read_project(&f, &Cursor::default(), &[])
+        .sequence
+        .is_empty());
+}
+#[test]
+fn git_failure_is_io_and_keeps_cause_instead_of_claiming_gap() {
+    let f = Fixture::new();
+    let error = walk::walk(
+        &f.driver,
+        &f.repo,
+        &[Oid::parse(&"a".repeat(40), f.repo.object_format()).unwrap()],
+        &Default::default(),
+        &Default::default(),
+    )
+    .unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-io");
+    assert!(error.detail.contains("Git:"));
+    assert!(error.detail.len() > 5);
+}
+#[test]
+fn tracked_fence_without_fetched_legacy_is_refspec_missing() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    tracked_head(&f,&p,b"events",&serde_json::to_vec(&serde_json::json!({"legacyRefOid":"a".repeat(40),"sealDigest":"b".repeat(64),"fromCommit":"c".repeat(40)})).unwrap());
+    let error = read(
+        &f.driver,
+        &f.repo,
+        ReadRequest {
+            layout: &f.layout,
+            origin: &"d".repeat(32),
+            streams: &[StreamId::parse("project").unwrap()],
+            cursor: &Cursor::default(),
+            folded: &[],
+            project: true,
+        },
+    )
+    .unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-refspec-missing");
+}
+#[test]
+fn head_legacy_ignores_project_files_and_nested_shards() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let bad = p.write_blob(&f.repo, b"foreign project data\n").unwrap();
+    let child = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b"foreign.jsonl".to_vec(),
+                mode: 0o100644,
+                oid: bad.clone(),
+            }],
+        )
+        .unwrap();
+    let nested = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b"nested".to_vec(),
+                mode: 0o040000,
+                oid: child.clone(),
+            }],
+        )
+        .unwrap();
+    let fgos = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b"events".to_vec(),
+                mode: 0o040000,
+                oid: nested,
+            }],
+        )
+        .unwrap();
+    let root = p
+        .write_tree(
+            &f.repo,
+            &[
+                TreeEntry {
+                    name: b"events.jsonl".to_vec(),
+                    mode: 0o100644,
+                    oid: bad,
+                },
+                TreeEntry {
+                    name: b"events".to_vec(),
+                    mode: 0o040000,
+                    oid: child,
+                },
+                TreeEntry {
+                    name: b".fgos".to_vec(),
+                    mode: 0o040000,
+                    oid: fgos,
+                },
+            ],
+        )
+        .unwrap();
+    let oid = commit_tree(&p, &f.repo, root);
+    assert!(std::process::Command::new("git")
+        .arg("-C")
+        .arg(f.root.join("repo"))
+        .args(["checkout", "-q", "--detach", oid.as_str()])
+        .status()
+        .unwrap()
+        .success());
+    assert!(read_project(&f, &Cursor::default(), &[]).legacy.is_empty());
+}
+#[test]
+fn ignored_stream_can_advance_after_certification_without_a_false_gap() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let mut other = event('b', 1, 1);
+    other.stream = "project:porting".into();
+    rehash(&mut other);
+    let old = seal(&p, &f.repo, vec![], &[other.clone()], "test-aa");
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-aa",
+        None,
+        old.clone(),
+        "other-first",
+    );
+    let first = read_project(&f, &Cursor::default(), &[]);
+    other.seq = 2;
+    rehash(&mut other);
+    let next = seal(&p, &f.repo, vec![old.clone()], &[other], "test-aa");
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-aa",
+        Some(old),
+        next,
+        "other-second",
+    );
+    assert!(read_project(&f, &first.cursor, &first.sequence)
+        .sequence
+        .is_empty());
+}
+#[test]
+fn changed_legacy_head_forces_rebuild_even_when_v4_order_is_unchanged() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    tracked_head(
+        &f,
+        &p,
+        b"events.jsonl",
+        b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1}\n",
+    );
+    let first = read_project(&f, &Cursor::default(), &[]);
+    tracked_head(
+        &f,
+        &p,
+        b"events.jsonl",
+        b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":2}\n",
+    );
+    let next = read_project(&f, &first.cursor, &first.sequence);
+    assert_eq!(
+        next.fold,
+        fgos_event_store::cursor::Fold::RebuildRequired {
+            first_difference: 0
+        }
+    );
+}
+#[test]
+fn certified_commit_cannot_be_reused_under_a_different_machine_ref() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let oid = {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        let oid = seal(&p, &f.repo, vec![], &[event('a', 1, 1)], "test-aa");
+        publish(
+            &p,
+            &f.repo,
+            "refs/fgos/events/test-aa",
+            None,
+            oid.clone(),
+            "valid",
+        );
+        oid
+    };
+    let first = read_project(&f, &Cursor::default(), &[]);
+    let p = f.port(&mut h, "refs/fgos/events/test-bb");
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-bb",
+        None,
+        oid,
+        "wrong-ref",
+    );
+    let error = read(
+        &f.driver,
+        &f.repo,
+        ReadRequest {
+            layout: &f.layout,
+            origin: &"a".repeat(32),
+            streams: &[StreamId::parse("project").unwrap()],
+            cursor: &first.cursor,
+            folded: &first.sequence,
+            project: true,
+        },
+    )
+    .unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-ref-tampered");
+}
+#[test]
+fn subtree_listing_does_not_capture_an_oversized_unrelated_project_tree() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let blob = p.write_blob(&f.repo, b"data").unwrap();
+    let files: Vec<_> = (0..1000)
+        .map(|n| TreeEntry {
+            name: format!("{n:04}-{}", "x".repeat(100)).into_bytes(),
+            mode: 0o100644,
+            oid: blob.clone(),
+        })
+        .collect();
+    let shared = p.write_tree(&f.repo, &files).unwrap();
+    let small = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b"events.jsonl".to_vec(),
+                mode: 0o100644,
+                oid: blob,
+            }],
+        )
+        .unwrap();
+    let mut roots: Vec<_> = (0..1000)
+        .map(|n| TreeEntry {
+            name: format!("project-{n:04}").into_bytes(),
+            mode: 0o040000,
+            oid: shared.clone(),
+        })
+        .collect();
+    roots.push(TreeEntry {
+        name: b".fgos".to_vec(),
+        mode: 0o040000,
+        oid: small,
+    });
+    let root = p.write_tree(&f.repo, &roots).unwrap();
+    let commit = commit_tree(&p, &f.repo, root);
+    // A recursive whole-tree listing would exceed the driver's 64 MiB ceiling.
+    let page = f
+        .driver
+        .list_tree(&f.repo, &commit, b".fgos/", None, 1024)
+        .unwrap();
+    assert!(page.complete);
+    assert_eq!(page.entries.len(), 1);
+    assert_eq!(page.entries[0].path, b".fgos/events.jsonl");
+}
+#[test]
+fn authenticated_promote_parent_releases_later_branch_tail_after_certification() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let mut branches = vec![event('a', 1, 1), event('a', 2, 2)];
+    for e in &mut branches {
+        e.scope = Scope::Branch;
+        e.stream = "branch:feature".into();
+        rehash(e);
+    }
+    let branch = seal(&p, &f.repo, vec![], &branches, "test-aa");
+    let start = event('a', 1, 0);
+    let base = seal(&p, &f.repo, vec![], std::slice::from_ref(&start), "test-aa");
+    let mut promote = event('a', 2, 3);
+    promote.event_type = "store.promote".into();
+    promote.payload =
+        serde_json::json!({"stream":"branch:feature","throughSeq":1,"tip":branch.as_str()});
+    rehash(&mut promote);
+    let first_tip = seal(
+        &p,
+        &f.repo,
+        vec![base, branch.clone()],
+        std::slice::from_ref(&promote),
+        "test-aa",
+    );
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-aa",
+        None,
+        first_tip.clone(),
+        "promote-one",
+    );
+    let first = read_project(&f, &Cursor::default(), &[]);
+    assert_eq!(first.sequence, vec![start, promote, branches[0].clone()]);
+    let mut promote = event('a', 3, 4);
+    promote.event_type = "store.promote".into();
+    promote.payload =
+        serde_json::json!({"stream":"branch:feature","throughSeq":2,"tip":branch.as_str()});
+    rehash(&mut promote);
+    let tip = seal(
+        &p,
+        &f.repo,
+        vec![first_tip.clone(), branch],
+        std::slice::from_ref(&promote),
+        "test-aa",
+    );
+    publish(
+        &p,
+        &f.repo,
+        "refs/fgos/events/test-aa",
+        Some(first_tip),
+        tip,
+        "promote-two",
+    );
+    let next = read_project(&f, &first.cursor, &first.sequence);
+    assert_eq!(next.sequence.len(), 5);
+    assert_eq!(&next.sequence[3..], &[promote, branches[1].clone()]);
+    assert!(next.deferred.is_empty());
+}

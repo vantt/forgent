@@ -71,3 +71,31 @@ test('the prefix really puts the command at pid 1 of a fresh namespace', (t) => 
   // `$$` is the shell, which is pid 1; the cat it spawned reports it as its parent.
   assert.deepEqual(run.stdout.trim().split('\n'), ['1', '1']);
 });
+
+test('a run directory and gate binary under /tmp are readable inside the sandbox, and the bound attempt file stays writable', (t) => {
+  const probe = cp.spawnSync('/usr/bin/bwrap', ['--unshare-pid', '--as-pid-1', '--ro-bind', '/', '/', '--proc', '/proc', 'true']);
+  if (probe.status !== 0) return t.skip('bwrap with a pid namespace is not usable on this machine');
+  const base = fs.realpathSync('/tmp');
+  const runDir = fs.mkdtempSync(path.join(base, 'fgos-bwrap-run-'));
+  t.after(() => fs.rmSync(runDir, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), '{"v":3}\n');
+  const gateExit = path.join(runDir, 'gate-exit.json');
+  fs.writeFileSync(gateExit, '');
+  const gateBin = path.join(runDir, 'gate-bin');
+  fs.writeFileSync(gateBin, '#!/bin/sh\ncat "$1" && echo done > "$2"\n', { mode: 0o755 });
+  const workspace = fs.mkdtempSync(path.join(base, 'fgos-bwrap-ws-'));
+  t.after(() => fs.rmSync(workspace, { recursive: true, force: true }));
+  const plan = {
+    coverage: {},
+    resources: [{ resource: 'workspace', hostTarget: workspace, executionTarget: { location: 'host', path: workspace }, access: 'read-write', delivery: 'mount' }],
+  };
+  const request = {
+    dispatchId: 'disp-tmp', invocation: { command: 'agent-cli', args: [], env: {} }, context: { runDir },
+    launchMode: 'direct', attemptId: 'att-tmp', gateCommand: [gateBin], attemptBinds: [gateExit],
+  };
+  const { bwrapPrefix } = prepareBwrapSync(plan, request, BACKEND);
+  const run = cp.spawnSync('/usr/bin/bwrap', [...bwrapPrefix, gateBin, path.join(runDir, 'envelope.json'), gateExit], { encoding: 'utf8' });
+  assert.equal(run.status, 0, run.stderr);
+  assert.equal(run.stdout, '{"v":3}\n');
+  assert.equal(fs.readFileSync(gateExit, 'utf8'), 'done\n');
+});

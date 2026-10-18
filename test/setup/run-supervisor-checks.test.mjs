@@ -152,6 +152,65 @@ test('runtime-socket-dir: a directory too long for a socket name fails and is no
   assert.ok(!res.message.includes('--fix"'), res.message);
 });
 
+/** A node process that listens on `file`; killing it with SIGKILL leaves the path behind, as a killed supervisor does. */
+async function listenerOn(file) {
+  const child = spawn(process.execPath, ['-e', `require('net').createServer().listen(process.argv[1], () => process.stdout.write('up\\n'))`, file], { stdio: ['ignore', 'pipe', 'ignore'] });
+  children.add(child);
+  await new Promise((resolve, reject) => {
+    child.stdout.once('data', resolve);
+    child.once('exit', () => { reject(new Error('listener exited before it bound')); });
+  });
+  return child;
+}
+
+const exited = (child) => new Promise((resolve) => { if (child.exitCode !== null || child.signalCode !== null) resolve(); else child.once('exit', resolve); });
+
+test('runtime-socket-dir: a socket whose supervisor was killed is reported and removed; a live one is left alone', { skip: (UID === undefined || process.platform !== 'linux') && 'needs the Linux socket table' }, async () => {
+  const xdg = path.join(scratch, 'xdg-orphan');
+  fs.mkdirSync(xdg, { mode: 0o700 });
+  const env = { XDG_RUNTIME_DIR: xdg };
+  const dir = path.join(xdg, 'fgos');
+  assert.equal(fixRuntimeSocketDir({ env }).changed, true);
+
+  const liveFile = path.join(dir, '0123456789abcdef.sock');
+  const deadFile = path.join(dir, 'fedcba9876543210.sock');
+  const live = await listenerOn(liveFile);
+  const dead = await listenerOn(deadFile);
+  dead.kill('SIGKILL');
+  await exited(dead);
+  fs.writeFileSync(path.join(dir, 'notes.txt'), 'not a socket');
+  fs.writeFileSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock'), 'a plain file with a socket name');
+
+  const res = checkRuntimeSocketDir({ env });
+  assert.equal(res.passed, false, res.message);
+  assert.match(res.message, /1 attempt socket\(s\) in .* have no supervisor: fedcba9876543210\.sock/);
+  assert.doesNotMatch(res.message, /0123456789abcdef/);
+  assert.match(res.message, /fgos doctor --fix/);
+
+  const fixed = fixRuntimeSocketDir({ env });
+  assert.equal(fixed.changed, true, fixed.message);
+  assert.match(fixed.message, /removed 1 attempt socket\(s\) with no supervisor/);
+  assert.ok(!fs.existsSync(deadFile), 'the orphan is gone');
+  assert.ok(fs.existsSync(liveFile), 'the live socket stays');
+  assert.ok(fs.existsSync(path.join(dir, 'notes.txt')) && fs.existsSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock')), 'only sockets are removed');
+  assert.equal(checkRuntimeSocketDir({ env }).passed, true);
+  live.kill('SIGKILL');
+  await exited(live);
+});
+
+test('runtime-socket-dir: without a socket table nothing is judged or removed', { skip: UID === undefined && 'no uid on this platform' }, () => {
+  const xdg = path.join(scratch, 'xdg-no-table');
+  fs.mkdirSync(xdg, { mode: 0o700 });
+  const env = { XDG_RUNTIME_DIR: xdg };
+  fixRuntimeSocketDir({ env });
+  const file = path.join(xdg, 'fgos', '0123456789abcdef.sock');
+  fs.writeFileSync(file, '');
+  const procFile = path.join(scratch, 'no-such-table');
+  assert.match(checkRuntimeSocketDir({ env, procFile }).message, /attempt sockets are not judged on this platform/);
+  assert.equal(fixRuntimeSocketDir({ env, procFile }).changed, false);
+  assert.ok(fs.existsSync(file));
+});
+
 // ─── gate-kill-grace ────────────────────────────────────────────────────
 
 test('gate-kill-grace: absent is the default, project overrides global, below 1000 or not an integer fails', () => {
@@ -214,6 +273,16 @@ test('run-attempts-stuck: an unclosed attempt with a free lock fails with the re
 
   fs.writeFileSync(path.join(dir, 'start-refused.json'), JSON.stringify({ v: 1, attemptId: 'att-free', code: 'lock-held', why: 'attempt: kernel-lock-held', at: '2026-10-18T00:00:00.000Z' }));
   assert.match(checkRunAttemptsStuck(root).message, /runs\/01 \(start-refused:lock-held\)/);
+});
+
+test('run-attempts-stuck: an unclosed terminal attempt is judged like any other', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const root = workspace('stuck-terminal');
+  const dir = attemptDir(root, 'pane');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-pane', mode: 'terminal', terminal: { socketPath: '/nonexistent/x.sock' } }));
+  const res = checkRunAttemptsStuck(root);
+  assert.equal(res.passed, false, res.message);
+  assert.match(res.message, /1 attempt\(s\) have no holder and no closed\.json: .*runs\/01/);
 });
 
 test('run-attempts-stuck: the fix sends the attempt through adopt and names what stays open', () => {

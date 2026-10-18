@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
-import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir, markResourceRetained, bindOwnershipMarker, markOwnershipLaunched } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
 import { expandCredentialHome } from '../../provider-credential-probe.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
@@ -495,6 +495,16 @@ export function prepareBwrapSync(plan, request, backend) {
       bwrapArgs.push('--die-with-parent', '--bind', socketDir, socketDir);
     }
     const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
+    // The private /tmp above hides whatever lives under the host's /tmp. The gate reads its envelope
+    // from the run directory and is itself a host binary, so each is bound back where it sits.
+    if (attemptId) {
+      const gateBin = Array.isArray(request.gateCommand) ? request.gateCommand[0] : null;
+      for (const hostPath of [request.context?.runDir, gateBin]) {
+        if (typeof hostPath === 'string' && isInsideRoot(path.resolve(hostPath), '/tmp')) {
+          bwrapArgs.push('--ro-bind', path.resolve(hostPath), path.resolve(hostPath));
+        }
+      }
+    }
 
     const resources = plan.resources || [];
     const blind = requestIsBlind(request);
@@ -513,9 +523,11 @@ export function prepareBwrapSync(plan, request, backend) {
         // home receives a login copy. Nothing above the named root is touched.
         ensurePrivateDir(res.hostTarget, { root: res.tempRoot ?? res.hostTarget });
         if (attemptId) {
+          // An attempt home is removed only by adopt's finalize-home step.
           writeAttemptMarker(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, resource: res.resource });
         } else {
-          writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource, timeoutMs: request.context?.timeoutMs });
+          // A dispatch outside the assignment door removes its own home when it settles.
+          writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         }
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
@@ -601,30 +613,12 @@ export function prepareBwrapSync(plan, request, backend) {
       }
     };
 
-    // The worker's pane was left open after a failed run: keep the homes, tag
-    // them with the pane, and hand back where they are so the failure record
-    // can say. They are reaped once the pane is gone.
-    const retain = ({ paneId, terminalKey, herdrSession } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId, terminalKey, herdrSession }));
-
-    // Bind every allocated home to the process its worker runs under (and the pane plus herdr endpoint
-    // for a herdr round), so the orphan reaper keeps it while that binder lives. Throws on the first
-    // home that cannot be bound: the caller fails the round closed. The adapter never sees the paths.
-    const bind = ({ paneId, terminalKey, herdrEndpoint, herdrSession, binderPid, binderStartTime } = {}) => {
-      for (const p of allocatedPaths) bindOwnershipMarker(p, { paneId, terminalKey, herdrEndpoint, herdrSession, binderPid, binderStartTime });
-    };
-    const markLaunched = () => {
-      for (const p of allocatedPaths) markOwnershipLaunched(p);
-    };
-
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
       ...(attemptId ? { bwrapPrefix: [...bwrapArgs], agentArgv, ...(Array.isArray(request.gateCommand) ? { launchDigest: computeLaunchDigest({ bwrapPrefix: bwrapArgs, gateCommand: request.gateCommand, agentArgv }) } : {}) } : {}),
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
-      retain,
-      bind,
-      markLaunched,
     };
   } catch (err) {
     // On prepare error: clean up any allocated resources before throwing

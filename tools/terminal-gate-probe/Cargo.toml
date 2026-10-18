@@ -1,0 +1,16 @@
+[package]
+name = "fgos-terminal-gate-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Measures how a gate inside a pane, inside a PID namespace, takes the foreground tty and receives a lock fd over a unix socket"
+
+# Standalone package: not a member of the main workspace.
+[workspace]
+
+[dependencies]
+libc = "0.2"
+
+[profile.release]
+opt-level = "s"
+strip = true

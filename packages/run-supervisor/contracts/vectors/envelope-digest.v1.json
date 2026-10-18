@@ -28,7 +28,8 @@
           ],
           "env": {
             "HOME": "/tmp/fgos-confinement/d1/home",
-            "FGOS_SESSION_ID": "att_asgn-demo_01_7f3a"
+            "FGOS_SESSION_ID": "att-att_asgn-demo_01_7f3a",
+            "FGOS_PARENT_WRITER_ID": "ctl-7c1d"
           },
           "stdinPolicy": "brief-file",
           "briefPath": "/repo/.fgos/assignments/asgn-demo/runs/01/brief.md",
@@ -87,10 +88,142 @@
             "stepTimeoutMs": 120000
           }
         ],
-        "sideFile": "/repo/.fgos/assignments/asgn-demo/runs/01/protected/attempt-secrets.json"
+        "sideFile": "/repo/.fgos/assignments/asgn-demo/runs/01/protected/attempt-secrets.json",
+        "identity": {
+          "writerId": "att-att_asgn-demo_01_7f3a",
+          "parentWriterId": "ctl-7c1d"
+        }
       },
-      "canonical": "{\"agentProtocol\":{\"cli\":\"claude\",\"mode\":\"direct\"},\"attemptId\":\"att_asgn-demo_01_7f3a\",\"containment\":{\"bwrapPrefix\":[\"bwrap\",\"--unshare-user\",\"--unshare-pid\",\"--as-pid-1\",\"--proc\",\"/proc\",\"--\"],\"preferred\":\"linux-gate\"},\"cwd\":\"/repo/.claude/worktrees/x\",\"deadlines\":{\"gateKillGraceMs\":10000,\"hardCeiling\":{\"bootId\":\"b0\",\"boottimeNs\":9007199254740991},\"idleMs\":600000,\"softAt\":{\"bootId\":\"b0\",\"boottimeNs\":1800000000000}},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"launch\":{\"args\":[\"-p\",\"--output-format\",\"stream-json\"],\"briefPath\":\"/repo/.fgos/assignments/asgn-demo/runs/01/brief.md\",\"capture\":{\"stderr\":\"/repo/.fgos/assignments/asgn-demo/runs/01/stderr.log\",\"stdout\":\"/repo/.fgos/assignments/asgn-demo/runs/01/stdout.log\"},\"command\":\"/usr/bin/claude\",\"env\":{\"FGOS_SESSION_ID\":\"att_asgn-demo_01_7f3a\",\"HOME\":\"/tmp/fgos-confinement/d1/home\"},\"outboxDir\":\"/repo/.fgos/assignments/asgn-demo/outbox\",\"stdinPolicy\":\"brief-file\"},\"mode\":\"direct\",\"mutation\":\"mutating\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"protocolId\":1,\"runDir\":\"/repo/.fgos/assignments/asgn-demo/runs/01\",\"sideFile\":\"/repo/.fgos/assignments/asgn-demo/runs/01/protected/attempt-secrets.json\",\"steps\":[{\"argv\":[\"internal\",\"attempt-step\",\"settle-attempt\",\"--protocol\",\"1\",\"--run-dir\",\"/repo/.fgos/assignments/asgn-demo/runs/01\"],\"cwd\":\"/repo\",\"env\":{\"FGOS_STATE_ROOT\":\"/repo/.fgos\"},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"stepId\":\"settle-attempt\",\"stepTimeoutMs\":120000}],\"unitRunId\":\"unit_demo_1\",\"v\":3}",
-      "digest": "sha256:d3197e41d0767ab5d02480493d5967b6ad671ea8a03e6e0b332f9bdf9774b0a5"
+      "canonical": "{\"agentProtocol\":{\"cli\":\"claude\",\"mode\":\"direct\"},\"attemptId\":\"att_asgn-demo_01_7f3a\",\"containment\":{\"bwrapPrefix\":[\"bwrap\",\"--unshare-user\",\"--unshare-pid\",\"--as-pid-1\",\"--proc\",\"/proc\",\"--\"],\"preferred\":\"linux-gate\"},\"cwd\":\"/repo/.claude/worktrees/x\",\"deadlines\":{\"gateKillGraceMs\":10000,\"hardCeiling\":{\"bootId\":\"b0\",\"boottimeNs\":9007199254740991},\"idleMs\":600000,\"softAt\":{\"bootId\":\"b0\",\"boottimeNs\":1800000000000}},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"identity\":{\"parentWriterId\":\"ctl-7c1d\",\"writerId\":\"att-att_asgn-demo_01_7f3a\"},\"launch\":{\"args\":[\"-p\",\"--output-format\",\"stream-json\"],\"briefPath\":\"/repo/.fgos/assignments/asgn-demo/runs/01/brief.md\",\"capture\":{\"stderr\":\"/repo/.fgos/assignments/asgn-demo/runs/01/stderr.log\",\"stdout\":\"/repo/.fgos/assignments/asgn-demo/runs/01/stdout.log\"},\"command\":\"/usr/bin/claude\",\"env\":{\"FGOS_PARENT_WRITER_ID\":\"ctl-7c1d\",\"FGOS_SESSION_ID\":\"att-att_asgn-demo_01_7f3a\",\"HOME\":\"/tmp/fgos-confinement/d1/home\"},\"outboxDir\":\"/repo/.fgos/assignments/asgn-demo/outbox\",\"stdinPolicy\":\"brief-file\"},\"mode\":\"direct\",\"mutation\":\"mutating\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"protocolId\":1,\"runDir\":\"/repo/.fgos/assignments/asgn-demo/runs/01\",\"sideFile\":\"/repo/.fgos/assignments/asgn-demo/runs/01/protected/attempt-secrets.json\",\"steps\":[{\"argv\":[\"internal\",\"attempt-step\",\"settle-attempt\",\"--protocol\",\"1\",\"--run-dir\",\"/repo/.fgos/assignments/asgn-demo/runs/01\"],\"cwd\":\"/repo\",\"env\":{\"FGOS_STATE_ROOT\":\"/repo/.fgos\"},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"stepId\":\"settle-attempt\",\"stepTimeoutMs\":120000}],\"unitRunId\":\"unit_demo_1\",\"v\":3}",
+      "digest": "sha256:4b19e67439c60f5d0f59bce4e02a3858c94963d4d21d262664332087cb7c55cf"
+    },
+    {
+      "name": "envelope-terminal-read-only",
+      "input": {
+        "v": 3,
+        "digest": "sha256:placeholder-excluded",
+        "attemptId": "asgn-demo_02_91bc",
+        "unitRunId": "unit_demo_1",
+        "runDir": "/repo/.fgos/assignments/asgn-demo/runs/02",
+        "mode": "terminal",
+        "protocolId": 1,
+        "hostBin": "/home/u/.fgos/releases/r1/bin/fgos",
+        "payloadRoot": "/home/u/.fgos/releases/r1/legacy-node",
+        "cwd": "/repo/.claude/worktrees/x",
+        "mutation": "read-only",
+        "launch": {
+          "command": "/usr/bin/claude",
+          "args": [],
+          "env": {
+            "HOME": "/tmp/fgos-confinement/d2/home",
+            "FGOS_SESSION_ID": "att-asgn-demo_02_91bc",
+            "FGOS_PARENT_WRITER_ID": "ctl-7c1d"
+          },
+          "stdinPolicy": "null",
+          "briefPath": null,
+          "outboxDir": "/repo/.fgos/assignments/asgn-demo/outbox",
+          "capture": {
+            "stdout": "/repo/.fgos/assignments/asgn-demo/runs/02/stdout.log",
+            "stderr": "/repo/.fgos/assignments/asgn-demo/runs/02/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-gate",
+          "bwrapPrefix": [
+            "bwrap",
+            "--unshare-user",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--die-with-parent",
+            "--bind",
+            "/run/user/1000/fgos",
+            "/run/user/1000/fgos",
+            "--proc",
+            "/proc",
+            "--"
+          ]
+        },
+        "deadlines": {
+          "softAt": {
+            "bootId": "b0",
+            "boottimeNs": 1800000000000
+          },
+          "idleMs": 600000,
+          "hardCeiling": {
+            "bootId": "b0",
+            "boottimeNs": 9007199254740991
+          },
+          "gateKillGraceMs": 10000
+        },
+        "agentProtocol": {
+          "cli": "claude",
+          "mode": "terminal"
+        },
+        "steps": [
+          {
+            "stepId": "settle-attempt",
+            "hostBin": "/home/u/.fgos/releases/r1/bin/fgos",
+            "payloadRoot": "/home/u/.fgos/releases/r1/legacy-node",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "settle-attempt",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/repo/.fgos/assignments/asgn-demo/runs/02"
+            ],
+            "cwd": "/repo",
+            "env": {
+              "FGOS_STATE_ROOT": "/repo/.fgos"
+            },
+            "stepTimeoutMs": 120000
+          },
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/home/u/.fgos/releases/r1/bin/fgos",
+            "payloadRoot": "/home/u/.fgos/releases/r1/legacy-node",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/repo/.fgos/assignments/asgn-demo/runs/02"
+            ],
+            "cwd": "/repo",
+            "env": {
+              "FGOS_STATE_ROOT": "/repo/.fgos"
+            },
+            "stepTimeoutMs": 120000
+          },
+          {
+            "stepId": "release-slot",
+            "builtin": true,
+            "disposition": {
+              "onSuccess": "close",
+              "onFailure": "retain"
+            }
+          }
+        ],
+        "sideFile": "/repo/.fgos/assignments/asgn-demo/runs/02/protected/attempt-secrets.json",
+        "identity": {
+          "writerId": "att-asgn-demo_02_91bc",
+          "parentWriterId": "ctl-7c1d"
+        },
+        "slot": {
+          "key": "asgn-demo_02_91bc",
+          "groupKey": "ws-demo"
+        },
+        "terminal": {
+          "socketPath": "/run/user/1000/fgos/3f9a1c7e5b2d.sock",
+          "exitCommand": "/exit",
+          "orphanSettleMs": 3000
+        }
+      },
+      "canonical": "{\"agentProtocol\":{\"cli\":\"claude\",\"mode\":\"terminal\"},\"attemptId\":\"asgn-demo_02_91bc\",\"containment\":{\"bwrapPrefix\":[\"bwrap\",\"--unshare-user\",\"--unshare-pid\",\"--as-pid-1\",\"--die-with-parent\",\"--bind\",\"/run/user/1000/fgos\",\"/run/user/1000/fgos\",\"--proc\",\"/proc\",\"--\"],\"preferred\":\"linux-gate\"},\"cwd\":\"/repo/.claude/worktrees/x\",\"deadlines\":{\"gateKillGraceMs\":10000,\"hardCeiling\":{\"bootId\":\"b0\",\"boottimeNs\":9007199254740991},\"idleMs\":600000,\"softAt\":{\"bootId\":\"b0\",\"boottimeNs\":1800000000000}},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"identity\":{\"parentWriterId\":\"ctl-7c1d\",\"writerId\":\"att-asgn-demo_02_91bc\"},\"launch\":{\"args\":[],\"briefPath\":null,\"capture\":{\"stderr\":\"/repo/.fgos/assignments/asgn-demo/runs/02/stderr.log\",\"stdout\":\"/repo/.fgos/assignments/asgn-demo/runs/02/stdout.log\"},\"command\":\"/usr/bin/claude\",\"env\":{\"FGOS_PARENT_WRITER_ID\":\"ctl-7c1d\",\"FGOS_SESSION_ID\":\"att-asgn-demo_02_91bc\",\"HOME\":\"/tmp/fgos-confinement/d2/home\"},\"outboxDir\":\"/repo/.fgos/assignments/asgn-demo/outbox\",\"stdinPolicy\":\"null\"},\"mode\":\"terminal\",\"mutation\":\"read-only\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"protocolId\":1,\"runDir\":\"/repo/.fgos/assignments/asgn-demo/runs/02\",\"sideFile\":\"/repo/.fgos/assignments/asgn-demo/runs/02/protected/attempt-secrets.json\",\"slot\":{\"groupKey\":\"ws-demo\",\"key\":\"asgn-demo_02_91bc\"},\"steps\":[{\"argv\":[\"internal\",\"attempt-step\",\"settle-attempt\",\"--protocol\",\"1\",\"--run-dir\",\"/repo/.fgos/assignments/asgn-demo/runs/02\"],\"cwd\":\"/repo\",\"env\":{\"FGOS_STATE_ROOT\":\"/repo/.fgos\"},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"stepId\":\"settle-attempt\",\"stepTimeoutMs\":120000},{\"argv\":[\"internal\",\"attempt-step\",\"finalize-home\",\"--protocol\",\"1\",\"--run-dir\",\"/repo/.fgos/assignments/asgn-demo/runs/02\"],\"cwd\":\"/repo\",\"env\":{\"FGOS_STATE_ROOT\":\"/repo/.fgos\"},\"hostBin\":\"/home/u/.fgos/releases/r1/bin/fgos\",\"payloadRoot\":\"/home/u/.fgos/releases/r1/legacy-node\",\"stepId\":\"finalize-home\",\"stepTimeoutMs\":120000},{\"builtin\":true,\"disposition\":{\"onFailure\":\"retain\",\"onSuccess\":\"close\"},\"stepId\":\"release-slot\"}],\"terminal\":{\"exitCommand\":\"/exit\",\"orphanSettleMs\":3000,\"socketPath\":\"/run/user/1000/fgos/3f9a1c7e5b2d.sock\"},\"unitRunId\":\"unit_demo_1\",\"v\":3}",
+      "digest": "sha256:26926f5f3ee82c5b56bfeb746e3e3e08807a4a902da28bd08410a5047fbe1756"
     },
     {
       "name": "key-order-case-and-underscore",
