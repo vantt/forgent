@@ -72,7 +72,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
 - **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum trong phạm vi việc đang làm thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ; tùm lum thấy ngoài phạm vi thì ghi thành item riêng, và gom mà phải xây công cụ mới là một câu hỏi quyết định; đích là ranh giới rõ và contract tường minh (ADR0054 (thêm vế phạm vi cho RUL11 theo phát biểu của người dùng 2026-10-08, supersede ADR0036)).
-- **RUL104 (tốt hơn, không to hơn).** Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang có tốt hơn — ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn, API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn — trong phạm vi code đang có, không làm nó to ra; không thêm tính năng, lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt (L10); một tính năng chỉ được thêm khi thật sự đáng: mọi ý tưởng thêm được gom vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật, bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn (ADR0061 (khoá RUL104 theo phát biểu của owner 2026-10-18)).
+- **RUL104 (tốt hơn, không to hơn).** Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang có tốt hơn — ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng được, API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn — trong phạm vi code đang có, không làm nó to ra; không thêm tính năng, lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt (L10); một tính năng chỉ được thêm khi thật sự đáng: mọi ý tưởng thêm được gom vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật, bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn (ADR0062 (RUL104 thêm clean code và hexagonal theo owner 2026-10-18, supersede ADR0061)).
 
 ## Edge Cases Settled
 
@@ -488,6 +488,8 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 
 ### 0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
 
+> Superseded bởi 0062 (2026-10-18): RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal. Phát biểu gốc dưới đây giữ nguyên.
+
 #### Bối cảnh
 
 Phát biểu của owner (2026-10-18, giữ nguyên văn làm nguồn — luật ở Business Rules là bản chưng):
@@ -511,3 +513,21 @@ Khoá thành RUL104 (`docs/specs/platform-foundations.md`'s Business Rules): m�
 #### Tham chiếu
 
 - Bảng chương trình `plans/261017-1313-fgos-platform-program-board/plan.md`, luồng HARDEN.
+
+### 0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)
+
+#### Bối cảnh
+
+Owner bổ sung cùng tối (2026-10-18, nguyên văn): "chổ ` ổn định, nhanh, nhẹ, code đơn giản hơn` thêm áp dụng clean code principles, hexagon nếu có thể."
+
+#### Quyết định
+
+Giữ nguyên ý và phát biểu của 0061; vế "code đơn giản hơn" mang thêm: theo các nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng được. Hexagonal ở đây là nguyên tắc thiết kế số 3 (`core/instructions/design-principles.md`: logic chung độc lập với công cụ, CLI/herdr/tmux/agent CLI là driver mỏng sau một port), áp vào phần đang có, không phải lý do thêm lớp mới.
+
+#### Hệ quả
+
+- Dòng RUL104 (tốt hơn, không to hơn) ở Business Rules trích 0062; `test/docs/rul104-law.txt` khớp chữ mới; mục `AGENTS.md` mang cùng vế; câu neo không đổi.
+
+#### Tham chiếu
+
+- 0061 — quyết định bị supersede.

@@ -116,6 +116,7 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 - **Chuỗi lead trên máy owner:** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
 
 ## Nhật ký
+- 2026-10-18 21:45 (`forgentx-95`): owner bổ sung RUL104 (tốt hơn, không to hơn): "code đơn giản hơn" theo clean code và hexagonal (ports và adapters) khi áp dụng được → **D-ADR0062** supersede D-ADR0061. **Đính chính số quyết định lần nữa:** D-ADR0060 giữ cho 6.4, D-ADR0061/0062 là RUL104; lane GIT/ES lấy số từ **D-ADR0063**.
 - 2026-10-18 21:40 (`forgentx-95`): owner khoá luật **RUL104 (tốt hơn, không to hơn)** = **D-ADR0061** (`docs/specs/platform-foundations.md` Business Rules + mục `AGENTS.md` + `test/docs/rul104-anchor-phrase.test.mjs`); mọi đợt audit, soát lại, làm cứng áp dụng. **Đính chính số quyết định:** D-ADR0060 giữ cho 6.4 (ghi lúc landing), D-ADR0061 là RUL104; lane GIT/ES lấy số từ **D-ADR0062** (thay cho ghi chú 15:40).
 - 2026-10-18 21:27 (`forgentx-95`): owner thêm luồng HARDEN (hội đồng soát + plan làm cứng các lớp tầng thấp, chỉ tốt hơn không to hơn), chờ mọi lớp tầng thấp kể cả GIT và ES land. Owner duyệt: sau khi 6.4 land làm MP-B2 và đóng 5.1.
 - 2026-10-18 21:15 (`forgentx-95`): thêm luồng TRUST (kiểm tin cậy thư mục trước khi mở pane, hỏi sớm); owner: chỉ ghi, chưa làm, ưu tiên đóng việc dở (6.4).
