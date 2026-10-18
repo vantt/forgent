@@ -1,1400 +1,534 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:fgos:git:wal-record:v1",
-  "title": "Immutable WAL envelope skeleton (\u00a710), not a transition validator",
-  "description": "Kind-specific data and phase graphs must be closed before WAL use. Digest canonicalization and resource/authority checks remain backend obligations; schema validation alone never authorizes an effect.",
-  "oneOf": [
-    {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "version": {
-          "const": 1
-        },
-        "operationId": {
-          "type": "string",
-          "minLength": 1
-        },
-        "sequence": {
-          "const": 0
-        },
-        "previousDigest": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "operationId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 15
+    },
+    "previousDigest": {
+      "oneOf": [
+        {
           "type": "null"
         },
-        "digest": {
+        {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
-        },
-        "phase": {
-          "const": "intent"
-        },
-        "requestDigest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
-        },
-        "repoIdentity": {
-          "type": "string",
-          "minLength": 1
-        },
-        "kind": {
-          "enum": [
-            "RefUpdate",
-            "RefDelete",
-            "Land",
-            "ScopedCommit",
-            "Sync",
-            "WorktreeCreate",
-            "WorktreeMove",
-            "WorktreeRemove",
-            "Restore",
-            "ConfigChange",
-            "RemoteTransfer",
-            "PublicationCas"
-          ]
-        },
-        "resourceSet": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "authorityBinding": {
-          "type": "object",
-          "minProperties": 1
-        },
-        "writerIdentity": {
-          "type": "object",
-          "minProperties": 1
-        },
-        "payload": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "RefUpdate"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "RefDelete"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "Land"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "ScopedCommit"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "Sync"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "WorktreeCreate"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "WorktreeMove"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "WorktreeRemove"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "Restore"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "ConfigChange"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "RemoteTransfer"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "type": {
-                  "const": "PublicationCas"
-                },
-                "preconditions": {
-                  "type": "object"
-                },
-                "irreversibleBoundary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "snapshotNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "pinNeeds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "recoveryObservations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "terminalOutcomes": {
-                  "type": "array",
-                  "items": {
-                    "enum": [
-                      "unchanged",
-                      "created",
-                      "committed",
-                      "landed",
-                      "conflicted-open",
-                      "conflict-aborted",
-                      "busy",
-                      "stale",
-                      "refused",
-                      "cancelled",
-                      "failed",
-                      "published-checkout-pending",
-                      "committed-but-contract-violation",
-                      "remote-outcome-unknown",
-                      "recovery-required",
-                      "superseded"
-                    ]
-                  }
-                },
-                "data": {
-                  "type": "object"
-                }
-              },
-              "required": [
-                "type",
-                "preconditions",
-                "irreversibleBoundary",
-                "snapshotNeeds",
-                "pinNeeds",
-                "recoveryObservations",
-                "terminalOutcomes",
-                "data"
-              ]
-            }
-          ]
-        }
-      },
-      "required": [
-        "version",
-        "operationId",
-        "sequence",
-        "previousDigest",
-        "digest",
-        "phase",
-        "requestDigest",
-        "repoIdentity",
-        "kind",
-        "resourceSet",
-        "authorityBinding",
-        "writerIdentity",
-        "payload"
-      ],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "RefUpdate"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "RefUpdate"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "RefDelete"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "RefDelete"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "Land"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "Land"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "ScopedCommit"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "ScopedCommit"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "Sync"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "Sync"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "WorktreeCreate"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "WorktreeCreate"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "WorktreeMove"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "WorktreeMove"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "WorktreeRemove"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "WorktreeRemove"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "Restore"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "Restore"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "ConfigChange"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "ConfigChange"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "RemoteTransfer"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "RemoteTransfer"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "PublicationCas"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "payload": {
-                "properties": {
-                  "type": {
-                    "const": "PublicationCas"
-                  }
-                }
-              }
-            }
-          }
         }
       ]
     },
-    {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "version": {
-          "const": 1
-        },
-        "operationId": {
-          "type": "string",
-          "minLength": 1
-        },
-        "sequence": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "previousDigest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
-        },
-        "digest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
-        },
-        "phase": {
-          "type": "string",
-          "minLength": 1
-        },
-        "observedFacts": {
-          "type": "object"
-        },
-        "effectReceipt": {
-          "$ref": "urn:fgos:git:receipt:v1"
-        },
-        "error": {
-          "type": "object"
-        },
-        "targetAttempt": {
+    "phase": {
+      "oneOf": [
+        {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "priorTargetAttempt": {
-              "type": "null"
+            "phase": {
+              "const": "intent"
             },
-            "expected": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "kind": {
-                      "const": "absent"
-                    }
-                  },
-                  "required": [
-                    "kind"
-                  ]
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "PublicationCas"
                 },
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "kind": {
-                      "const": "oid"
-                    },
-                    "oid": {
-                      "type": "string",
-                      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "oid"
-                  ]
-                }
-              ]
-            },
-            "next": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "kind": {
-                      "const": "absent"
-                    }
-                  },
-                  "required": [
-                    "kind"
-                  ]
+                "requestDigest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
                 },
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "kind": {
-                      "const": "oid"
-                    },
-                    "oid": {
-                      "type": "string",
-                      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "oid"
-                  ]
-                }
-              ]
-            }
-          },
-          "required": [
-            "priorTargetAttempt",
-            "expected",
-            "next"
-          ]
-        },
-        "supersession": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "laterOperationId": {
-              "type": "string",
-              "minLength": 1
-            },
-            "laterReceiptDigest": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            }
-          },
-          "required": [
-            "laterOperationId",
-            "laterReceiptDigest"
-          ]
-        }
-      },
-      "required": [
-        "version",
-        "operationId",
-        "sequence",
-        "previousDigest",
-        "phase",
-        "observedFacts",
-        "digest"
-      ],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "phase": {
-                "const": "target-attempt"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "targetAttempt"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "phase": {
-                "const": "superseded"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "supersession",
-              "effectReceipt"
-            ],
-            "properties": {
-              "effectReceipt": {
-                "properties": {
-                  "attribution": {
-                    "enum": [
-                      "effectObservedOnly",
-                      "uncertain"
-                    ]
+                "repoIdentity": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resourceSet": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^refs/fgos/"
                   }
+                },
+                "authorityBinding": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "writerIdentity": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "objectFormat": {
+                  "enum": [
+                    "sha1",
+                    "sha256"
+                  ]
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
                 }
-              }
+              },
+              "required": [
+                "kind",
+                "requestDigest",
+                "repoIdentity",
+                "resourceSet",
+                "authorityBinding",
+                "writerIdentity",
+                "objectFormat",
+                "expected",
+                "next"
+              ]
             }
-          }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "prepared"
+            }
+          },
+          "required": [
+            "phase"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "target-attempt"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "prior_target_attempt": {
+                  "type": "null"
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "prior_target_attempt",
+                "expected",
+                "next"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "outcome"
+            },
+            "data": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "success"
+                    },
+                    "observed": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "absent"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "oid"
+                            },
+                            "oid": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "oid"
+                          ]
+                        }
+                      ]
+                    },
+                    "attribution": {
+                      "enum": [
+                        "thisInvocationWonCas",
+                        "effectObservedOnly"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "observed",
+                    "attribution"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "loss"
+                    },
+                    "observed": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "absent"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "oid"
+                            },
+                            "oid": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "oid"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "observed"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "superseded"
+                    },
+                    "later_operation_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "later_receipt_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "attribution": {
+                      "enum": [
+                        "effectObservedOnly",
+                        "uncertain"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "later_operation_id",
+                    "later_receipt_digest",
+                    "attribution"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "pin-release-attempt"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "prior_target_attempt": {
+                  "type": "null"
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "prior_target_attempt",
+                "expected",
+                "next"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "pin-released"
+            }
+          },
+          "required": [
+            "phase"
+          ]
         }
       ]
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     }
-  ]
+  },
+  "required": [
+    "version",
+    "operationId",
+    "sequence",
+    "previousDigest",
+    "phase",
+    "digest"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fgos:git:wal-record:v1",
+  "title": "Publication WAL immutable envelope v1",
+  "description": "Concrete PublicationCas graph. Other operation families remain unimplemented and are refused. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Intent at sequence zero has null predecessor; every subsequent record hashes its predecessor. Semantic transitions, object-format validation, resource and live authority checks are Rust obligations. This file is evidence, never effect authority."
 }

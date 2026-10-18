@@ -4,7 +4,8 @@
 //! hardened driver, WAL and recovery must land before an implementation can
 //! issue effects. There is intentionally no public raw-argv escape hatch.
 mod driver;
-pub use driver::GitDriver;
+pub mod wal;
+pub use driver::{GitDriver, WalReader};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

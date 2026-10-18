@@ -41,7 +41,26 @@ impl std::error::Error for InstallError {
 /// Write all bytes, sync the file, install without replacement, remove the
 /// temporary link and sync the parent. Errors preserve the observed effect.
 /// Existing targets (including symlinks) are never opened or overwritten.
+pub trait FileSystem {
+    fn checkpoint(&self, step: &'static str) -> io::Result<()>;
+}
+pub struct OsFileSystem;
+impl FileSystem for OsFileSystem {
+    fn checkpoint(&self, _: &'static str) -> io::Result<()> {
+        Ok(())
+    }
+}
 pub fn install_once(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed, InstallError> {
+    install_with(dir, name, bytes, &OsFileSystem)
+}
+/// Inject failures after each real filesystem boundary; never bypass a write
+/// or fsync. Errors retain the same installation evidence as OS failures.
+pub fn install_with(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+    filesystem: &dyn FileSystem,
+) -> Result<Installed, InstallError> {
     let mut components = Path::new(name).components();
     if name.is_empty()
         || !matches!(components.next(), Some(Component::Normal(_)))
@@ -86,14 +105,26 @@ pub fn install_once(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed, I
     };
     // write_all retries short writes and reports WriteZero/EFBIG rather than
     // publishing a truncated record. Keep the temporary on every failure.
+    filesystem
+        .checkpoint("temp-created")
+        .map_err(|e| error(e, None))?;
     file.write_all(bytes).map_err(|e| error(e, None))?;
+    filesystem
+        .checkpoint("bytes-written")
+        .map_err(|e| error(e, None))?;
     file.sync_all().map_err(|e| error(e, None))?;
+    filesystem
+        .checkpoint("file-fsync")
+        .map_err(|e| error(e, None))?;
     drop(file);
     let installed = match install_name(&temporary, &dir.join(name)) {
         Ok(()) => Installed::Created,
         Err(e) if e.kind() == io::ErrorKind::AlreadyExists => Installed::AlreadyExists,
         Err(e) => return Err(error(e, None)),
     };
+    filesystem
+        .checkpoint("name-installed")
+        .map_err(|e| error(e, Some(installed)))?;
     // Windows moves the temp; Unix links then unlinks. A surviving Unix temp
     // is an orphan, not a second record or permission to overwrite a target.
     #[cfg(not(windows))]
@@ -102,11 +133,21 @@ pub fn install_once(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed, I
     if installed == Installed::AlreadyExists {
         fs::remove_file(&temporary).map_err(|e| error(e, Some(installed)))?;
     }
+    filesystem
+        .checkpoint("temp-removed")
+        .map_err(|e| error(e, Some(installed)))?;
     sync_directory(dir).map_err(|source| InstallError {
         source,
         installed: Some(installed),
         temporary: None,
     })?;
+    filesystem
+        .checkpoint("parent-fsync")
+        .map_err(|source| InstallError {
+            source,
+            installed: Some(installed),
+            temporary: None,
+        })?;
     Ok(installed)
 }
 

@@ -805,6 +805,93 @@ fn nul_records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
     Ok(bytes[..bytes.len() - 1].split(|b| *b == 0).collect())
 }
 
+/// Read-only WAL observations use the same hardened driver as repository
+/// inspection. No raw Git spawn or filesystem ref parser in the journal.
+pub struct WalReader<'a> {
+    pub driver: &'a GitDriver,
+    pub repo: &'a RepoHandle,
+}
+impl crate::wal::RecoveryReader for WalReader<'_> {
+    fn read_ref(&self, reference: &str) -> crate::wal::WalResult<crate::wal::ObservedRef> {
+        use crate::wal::{ObservedRef, Tip, WalError};
+        RefName::parse(reference).map_err(|_| WalError::RecoveryRequired)?;
+        // Also catches a dangling symbolic ref, which for-each-ref omits.
+        if self
+            .driver
+            .checked(
+                self.repo,
+                &["symbolic-ref", "--quiet", "--", reference],
+                Policy::Inspect,
+            )
+            .is_ok()
+        {
+            return Ok(ObservedRef::Symbolic);
+        }
+        match self.driver.checked(
+            self.repo,
+            &["show-ref", "--exists", "--", reference],
+            Policy::Inspect,
+        ) {
+            Ok(_) => (),
+            Err(e) if e.exit_code == Some(2) => return Ok(ObservedRef::Direct(Tip::Absent)),
+            Err(_) => return Err(WalError::RecoveryRequired),
+        }
+        // for-each-ref succeeds for an absent ref, unlike rev-parse. Recheck
+        // exact name: its pattern argument also matches descendants.
+        let bytes = self
+            .driver
+            .checked(
+                self.repo,
+                &[
+                    "for-each-ref",
+                    "--format=%(refname)%00%(objectname)%00%(symref)",
+                    "--",
+                    reference,
+                ],
+                Policy::Inspect,
+            )
+            .map_err(|_| WalError::RecoveryRequired)?;
+        for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
+            let parts: Vec<_> = line.split(|b| *b == 0).collect();
+            if parts.len() != 3 {
+                return Err(WalError::RecoveryRequired);
+            }
+            if parts[0] != reference.as_bytes() {
+                continue;
+            }
+            if !parts[2].is_empty() {
+                return Ok(ObservedRef::Symbolic);
+            }
+            let oid = std::str::from_utf8(parts[1]).map_err(|_| WalError::RecoveryRequired)?;
+            Oid::parse(oid, self.repo.object_format()).map_err(|_| WalError::RecoveryRequired)?;
+            return Ok(ObservedRef::Direct(Tip::Oid(oid.into())));
+        }
+        Err(WalError::RecoveryRequired)
+    }
+    fn candidate_intact(&self, intent: &crate::wal::Intent) -> crate::wal::WalResult<bool> {
+        if let crate::wal::Tip::Oid(oid) = intent.candidate() {
+            Oid::parse(oid, self.repo.object_format())
+                .map_err(|_| crate::wal::WalError::RecoveryRequired)?;
+            if self.repo.layout().shallow {
+                return Ok(false);
+            }
+            return Ok(self
+                .driver
+                .checked(self.repo, &["cat-file", "-e", "--", oid], Policy::Inspect)
+                .is_ok()
+                && self
+                    .driver
+                    .checked(
+                        self.repo,
+                        &["rev-list", "--objects", oid, "--"],
+                        Policy::Inspect,
+                    )
+                    .is_ok());
+        }
+        Ok(true)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
