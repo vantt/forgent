@@ -3383,7 +3383,7 @@ Superseding this decision needs a new record; do not edit it in place.
 
 ### Round herdr do supervisor canh qua terminal-control, không còn canh trong controller (D-ADR0059 (round herdr do supervisor canh), mở rộng D-ADR0056 (run supervisor Rust cách direct))
 
-- **Trạng thái:** Settled (2026-10-18). Id D-ADR0059 (round herdr do supervisor canh) được giữ chỗ trên bảng chương trình (D-ADR0057 và D-ADR0058 là của Git); ghi vào state bằng `fgos decision` lúc landing, ở main.
+- **Trạng thái:** Settled (2026-10-18). Id D-ADR0059 (round herdr do supervisor canh) được giữ chỗ trên bảng chương trình (D-ADR0057 (Git là một thành phần nền) và D-ADR0058 (phục hồi publication của Git) là của Git); ghi vào state bằng `fgos decision` lúc landing, ở main.
 - **Bối cảnh:** vòng canh của round herdr nằm trong controller (`herdr-round.mjs`: `pollForOutcome`, deadline, `settleRound`, đóng pane). Controller chết thì mất cả ba: deadline không thi hành, kết quả không settle, pane không đóng (T8 hB/hC/hD). Phần vá reaper tạm (`bindOwnershipMarker`, pane/pid trong marker) chỉ chữa triệu chứng và từng suýt xoá home của worker còn sống.
 - **Quyết định:**
   1. Seat `herdr-spawn` chạy như seat `cli-spawn`: một cửa `executeAssignment`, envelope v3 `mode: terminal`, supervisor Rust và gate. Controller chuẩn bị (brief, home, `allocate` với key = attempt id), giao, rồi chỉ đọc file. `herdr-spawn` không còn thi hành trực tiếp (`herdr-spawn-supervised-only`).
