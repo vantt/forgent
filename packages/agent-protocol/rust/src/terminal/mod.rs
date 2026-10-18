@@ -393,6 +393,7 @@ impl Terminal {
         let mut enters = 0;
         let mut last_enter: Option<u64> = None;
         let mut no_draft = 0;
+        let mut working_looks = 0;
         while io.now_ms() < deadline {
             if outbox.newest_complete().is_some() {
                 return TerminalOutcome::Delivered;
@@ -407,14 +408,23 @@ impl Terminal {
             if seen.visible_blocker || state == "blocked" {
                 return self.blocked_outcome(io);
             }
+            // The TUI flashes `working` while it takes in a long paste, before the Enter has submitted
+            // anything; a brief that was taken keeps the agent working for longer than one look.
             if seen.visible_working || state == "working" {
-                return TerminalOutcome::Delivered;
+                working_looks += 1;
+                if working_looks >= SUBMIT_WORKING_LOOKS {
+                    return TerminalOutcome::Delivered;
+                }
+                io.pause(POLL_MS);
+                continue;
             }
+            working_looks = 0;
             let idle = state == "idle";
             let mut screen = String::new();
-            if idle && seen.prompt_text.is_empty() {
+            if idle {
+                // The detector's prompt text can be the window title, not the composer: look at the screen.
                 screen = io.screen().unwrap_or_default();
-                if has_working_tail(&bottom_lines(&screen, 6)) {
+                if seen.prompt_text.is_empty() && has_working_tail(&bottom_lines(&screen, 6)) {
                     return TerminalOutcome::Delivered;
                 }
             }

@@ -20,6 +20,8 @@ pub const SUBMIT_ENTER_EVERY_MS: u64 = 2500;
 pub const SUBMIT_MAX_ENTERS: u32 = 6;
 /// Consecutive looks with no unsent draft after which the submit check is over.
 pub const SUBMIT_NO_DRAFT_POLLS: u32 = 4;
+/// Consecutive looks at a working agent that count as the brief being taken.
+pub const SUBMIT_WORKING_LOOKS: u32 = 2;
 /// How long after typing the adapter keeps checking that the brief was taken.
 pub const SUBMIT_CONFIRM_MS: u64 = 60_000;
 
@@ -190,9 +192,24 @@ pub fn draft_still_in_composer(message: &str, prompt_text: &str, visible_screen:
         if has_paste_chip(&bottom) {
             return true;
         }
-        if boxed.is_empty() && holds(&bottom) {
+        if (boxed.is_empty() && holds(&bottom)) || holds_a_window(&squashed, &bottom) {
             return true;
         }
     }
     false
+}
+
+/// Brief lines shown in the composer without the brief's first or last characters: a composer that
+/// grew to hold a long paste shows a window of it. At least two lines long enough to be the brief's
+/// own and found verbatim in the brief count, so a status line or a short echo never does.
+fn holds_a_window(message: &[char], bottom: &str) -> bool {
+    const MIN_LINE: usize = 30;
+    const MIN_LINES: usize = 2;
+    let message: String = message.iter().collect();
+    bottom
+        .lines()
+        .map(squash)
+        .filter(|line| line.chars().count() >= MIN_LINE && message.contains(line.as_str()))
+        .count()
+        >= MIN_LINES
 }
