@@ -143,11 +143,12 @@ export function snapshotSqliteFile(source, destination, { loadSqlite = defaultLo
 
 /**
  * Copy an explicit allow-list of files from a credential home into `destinationRoot`, at the same
- * relative paths. A missing, escaping or non-regular entry throws `makeError(message)`. A listed
- * `agent.db` is copied as a SQLite snapshot (consistent, WAL included) when the module is available, and
- * as a plain file otherwise.
+ * relative paths, and return the list of those copied. A missing, escaping or non-regular entry throws
+ * `makeError(message)`; with `skipMissing`, a listed path that does not exist at all is left out instead
+ * (a dangling link, a link out of the home or a non-file still throws). A listed `agent.db` is copied as a
+ * SQLite snapshot (consistent, WAL included) when the module is available, and as a plain file otherwise.
  */
-export function copyCredentialFiles(destinationRoot, sourceHome, files, { makeError = (message) => new Error(message), ensureDir, loadSqlite } = {}) {
+export function copyCredentialFiles(destinationRoot, sourceHome, files, { makeError = (message) => new Error(message), ensureDir, loadSqlite, skipMissing = false } = {}) {
   let realHome;
   try {
     realHome = fs.realpathSync(sourceHome);
@@ -155,9 +156,17 @@ export function copyCredentialFiles(destinationRoot, sourceHome, files, { makeEr
     throw makeError(`selected credential home is not readable: ${err.message}`);
   }
   const mkdir = ensureDir ?? ((dir) => fs.mkdirSync(dir, { recursive: true, mode: 0o700 }));
+  const copied = [];
   for (const rel of files) {
     if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
       throw makeError(`credential file ${JSON.stringify(rel)} must be a relative path without "..".`);
+    }
+    if (skipMissing) {
+      try {
+        fs.lstatSync(path.join(realHome, rel));
+      } catch (err) {
+        if (err.code === 'ENOENT') continue;
+      }
     }
     let realSource;
     try {
@@ -186,7 +195,9 @@ export function copyCredentialFiles(destinationRoot, sourceHome, files, { makeEr
     } catch (copyErr) {
       throw makeError(`selected credential file "${rel}" could not be copied: ${copyErr.message}`);
     }
+    copied.push(rel);
   }
+  return copied;
 }
 
 // ---------------------------------------------------------------------------------------------------

@@ -30,24 +30,29 @@ function credentialError(message) {
 }
 
 /**
- * Copies an explicit allow-list of files from an account's real home into the
- * private home, at the same relative paths. Nothing outside the list is
- * copied and the real home is never mounted. Fails closed: a missing, escaping
- * or non-regular entry aborts before the worker is spawned. A SQLite store
- * (`agent.db`) is copied as a consistent snapshot, not as a raw file.
+ * Copies the listed files that exist in an account's real home into the private home, at the same
+ * relative paths, and returns the ones copied. Nothing outside the list is copied and the real home is
+ * never mounted. Fails closed: an escaping, dangling or non-regular entry aborts before the worker is
+ * spawned. A SQLite store (`agent.db`) is copied as a consistent snapshot, not as a raw file.
  */
 function copyHomeFiles(privateHomeTarget, sourceHome, files) {
-  copyCredentialFiles(privateHomeTarget, sourceHome, files, {
+  return copyCredentialFiles(privateHomeTarget, sourceHome, files, {
     makeError: credentialError,
     ensureDir: (dir) => ensurePrivateDir(dir, { root: privateHomeTarget }),
+    skipMissing: true,
   });
 }
 
 /**
- * Copies the selected account's credential files into the private home: the listed files of a home-files
- * source, or a Codex home's `auth.json`. Returns false when the request selects no credential.
+ * Copies the login files of the store the invocation declares into the private home: the invocation's own
+ * `files`, else the listed files of the account's home-files source, else a Codex home's `auth.json`.
+ * The files present are copied; none present refuses the launch, since the worker would start logged out.
+ * An invocation that declares no store gets nothing, whatever account was leased. Returns false when the
+ * request selects no credential.
  */
 function provisionSelectedCredential(privateHomeTarget, request) {
+  const store = request?.invocation?.credentialStore;
+  if (!store) return false;
   const capacity = request?.providerCapacity;
   const source = capacity?.credentialSource;
   if (!source) {
@@ -59,18 +64,22 @@ function provisionSelectedCredential(privateHomeTarget, request) {
     return false;
   }
   const home = expandCredentialHome(source.home);
+  let files;
   if (source.kind === 'home-files') {
     if (!home || !Array.isArray(source.files) || source.files.length === 0) {
       throw credentialError('selected home-files credential needs an absolute "home" and a non-empty "files" list');
     }
-    copyHomeFiles(privateHomeTarget, home, source.files);
-    return true;
-  }
-  if (source.kind !== 'codex-home') {
+    files = source.files;
+  } else if (source.kind === 'codex-home') {
+    if (!home) throw credentialError('selected Codex credential needs an absolute "home"');
+    files = ['auth.json'];
+  } else {
     throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
   }
-  if (!home) throw credentialError('selected Codex credential needs an absolute "home"');
-  copyHomeFiles(privateHomeTarget, home, ['auth.json']);
+  files = store.files ?? files;
+  if (copyHomeFiles(privateHomeTarget, home, files).length === 0) {
+    throw credentialError(`credential-store-empty: account "${capacity.accountId}" has none of [${files.join(', ')}] of store "${store.use}" under ${home}`);
+  }
   return true;
 }
 
@@ -360,6 +369,15 @@ export function assessBwrap(request, backend) {
     }
   }
 
+  // A store is handed over through the private home: a policy that grants none leaves the worker
+  // nowhere to find it, and its home variable would keep naming the real store.
+  if (request.invocation?.credentialStore && policy && !policyGrants.some((grant) => grant.resource === 'private-home')) {
+    mismatches.push({
+      code: 'confinement-grant-invalid',
+      detail: `the invocation reads login store "${request.invocation.credentialStore.use}" through a private home, and policy "${policyId}" grants no "private-home".`,
+    });
+  }
+
   // Resolve resources via canonical ResourceResolver (R2)
   let resolvedResources = [];
   try {
@@ -570,21 +588,14 @@ export function prepareBwrapSync(plan, request, backend) {
       for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
     }
 
-    // Apply generic resource bindings (spec §6.5: no provider branching!)
+    // The invocation names the variable its CLI reads its login home from; it points at the private home
+    // (spec §6.5: no provider branching, only the name the invocation declared). It wins over a value the
+    // invocation's own env carries, which names the real store.
     const resolvedEnv = { ...(request.invocation?.env || {}) };
-    let finalArgs = [...(request.invocation?.args || [])];
-
-    for (const binding of request.invocation?.resourceBindings || []) {
-      const match = plan.resources?.find((r) => r.resource === binding.resource);
-      if (!match) continue;
-
-      const targetPath = match.executionTarget.path;
-      if (binding.target?.kind === 'env') {
-        resolvedEnv[binding.target.name] = targetPath;
-      } else if (binding.target?.kind === 'argument' && binding.target.token) {
-        finalArgs = finalArgs.map((arg) => arg.split(binding.target.token).join(targetPath));
-      }
-    }
+    const finalArgs = [...(request.invocation?.args || [])];
+    const homeEnv = request.invocation?.credentialStore?.homeEnv;
+    const privateHome = plan.resources?.find((r) => r.resource === 'private-home');
+    if (homeEnv && privateHome) resolvedEnv[homeEnv] = privateHome.executionTarget.path;
 
     // Command wrap to ensure no inherited writable fds survive (R7, MED-1 fix)
     // Runs bash helper that closes all fds >= 3 before execing the child command.

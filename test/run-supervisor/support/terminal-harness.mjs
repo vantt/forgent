@@ -168,7 +168,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
             providerModel: id,
             invocations: [
               { id: `${id}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: executor.command, args: ['{prompt}'] },
-              { id: `${id}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }] },
+              { id: `${id}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, credentialStore: { use: 'agent', homeEnv: 'HOME' } },
             ],
           }])),
           modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),

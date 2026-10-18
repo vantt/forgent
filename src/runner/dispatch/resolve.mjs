@@ -11,6 +11,7 @@
 
 import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { parseTierCell } from './tier-cell.mjs';
+import { credentialStoreOf } from './provider-capacity.mjs';
 
 /**
  * Canonical capability identity for a dispatch, independent of any Work item.
@@ -441,11 +442,11 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     defaultCliInvocation = cfg.executor.invocations.find((inv) => inv.via === 'cli');
   }
   const byExecutor = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env ?? executorEntry?.env, liveOutput: cliInvocation.liveOutput ?? executorEntry?.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry?.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry?.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry?.permissionMode, confinement: cliInvocation.confinement ?? executorEntry?.confinement, resourceBindings: cliInvocation.resourceBindings ?? executorEntry?.resourceBindings }
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env ?? executorEntry?.env, liveOutput: cliInvocation.liveOutput ?? executorEntry?.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry?.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry?.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry?.permissionMode, confinement: cliInvocation.confinement ?? executorEntry?.confinement, credentialStore: credentialStoreOf({ command: cliInvocation.command, credentialStore: cliInvocation.credentialStore, resourceBindings: cliInvocation.resourceBindings ?? executorEntry?.resourceBindings }) }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
       : defaultCliInvocation
-        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput ?? cfg?.executor?.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode ?? cfg?.executor?.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery ?? cfg?.executor?.promptDelivery, permissionMode: defaultCliInvocation.permissionMode ?? cfg?.executor?.permissionMode, confinement: defaultCliInvocation.confinement ?? cfg?.executor?.confinement, resourceBindings: defaultCliInvocation.resourceBindings ?? cfg?.executor?.resourceBindings }
+        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput ?? cfg?.executor?.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode ?? cfg?.executor?.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery ?? cfg?.executor?.promptDelivery, permissionMode: defaultCliInvocation.permissionMode ?? cfg?.executor?.permissionMode, confinement: defaultCliInvocation.confinement ?? cfg?.executor?.confinement, credentialStore: credentialStoreOf({ command: defaultCliInvocation.command, credentialStore: defaultCliInvocation.credentialStore, resourceBindings: defaultCliInvocation.resourceBindings ?? cfg?.executor?.resourceBindings }) }
         : resolvedViaAgentType
           ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
           : undefined;

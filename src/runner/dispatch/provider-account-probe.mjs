@@ -17,7 +17,7 @@ import path from 'node:path';
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 import { expandCredentialHome } from './provider-credential-probe.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { accountCredentialSources, commandCli, credentialSourceForCli, providerAccountInventory } from './provider-capacity.mjs';
+import { accountCredentialSources, commandCli, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
@@ -46,9 +46,9 @@ const CREDENTIAL_ENV = ['CODEX_HOME', 'PI_CODING_AGENT_DIR', 'HOME'];
 
 /**
  * The invocations of `provider`'s executors that run as `accountId`, each with how the account reaches it:
- * - `lease`: a confined invocation with a private home whose CLI the account has a login store for (its
- *   per-CLI store, or the one store whose layout that CLI logs in); the capacity layer copies that store
- *   into the home, exactly as a real dispatch does;
+ * - `lease`: a confined invocation that reads a login store the account has (its per-CLI store of that key,
+ *   or the one store whose layout that CLI logs in); the capacity layer copies that store into the home,
+ *   exactly as a real dispatch does;
  * - `env`: the invocation's own credential env names one of the account's store homes;
  * - `name`: the invocation id ends with `-<accountId>` (config convention `<bin>-<mode>-<account>`),
  *   for a CLI that keeps its own login of the same account in its own directory.
@@ -68,9 +68,9 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
     for (const inv of Array.isArray(executor?.invocations) ? executor.invocations : []) {
       if (inv?.via !== 'cli' || !inv.id) continue;
       const confined = Boolean((inv.confinement ?? executor.confinement)?.backend);
-      const privateHome = (inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home');
+      const store = credentialStoreOf(inv);
       let via = null;
-      if (confined && privateHome && account && leases(cliOf(inv))) via = 'lease';
+      if (confined && store && account && leases(store.use)) via = 'lease';
       else if (CREDENTIAL_ENV.some((key) => homes.has(expandCredentialHome(inv.env?.[key])))) via = 'env';
       else if (inv.id.endsWith(`-${accountId}`)) via = 'name';
       if (via) found.push({ executorId: id, invocationId: inv.id, cli: cliOf(inv), adapter: inv.adapter ?? 'cli-spawn', confined, via });

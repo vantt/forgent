@@ -6,7 +6,7 @@
 import { bind } from './bind.mjs';
 import { deriveProviderFamily, resolveTierCandidates } from '../dispatch/resolve.mjs';
 import { readLlmAccounts, legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { providerAccountInventory } from '../dispatch/provider-capacity.mjs';
+import { credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 
 /**
  * Label every entry of the tier cell: the one that runs is `used`; a later entry served by the
@@ -56,6 +56,16 @@ function accountsOf(runnerConfig, pool, projectConfig) {
 }
 
 /**
+ * The login store the bound invocation reads, and whether the config declares it or it is inferred from
+ * an older config's private-home binding; null when the invocation is not named or reads none.
+ */
+function storeOfBinding(executorEntry, invocationId) {
+  const entry = invocationId ? executorEntry?.invocations?.find((inv) => inv?.id === invocationId) : null;
+  const store = entry ? credentialStoreOf({ ...entry, command: entry.command ?? executorEntry.command }) : null;
+  return store ? { ...store, source: entry.credentialStore ? 'declared' : 'inferred' } : null;
+}
+
+/**
  * @param {object} runnerConfig the merged runner section.
  * @param {object} ask
  * @param {string} ask.capability
@@ -78,6 +88,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
     family,
     executor: { id: binding.executor, source: p.executor?.source ?? null },
     invocation: binding.invocation,
+    credentialStore: storeOfBinding(executorEntry, binding.invocation),
     transport: binding.transport,
     tier: { value: binding.tier, source: p.tier?.source ?? null, ceiling: p.tier?.ceiling ?? null },
     model: { value: binding.model, source: p.model?.source ?? null },

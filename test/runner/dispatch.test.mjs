@@ -903,7 +903,7 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['omp-gemini-tetcu72', 'omp-cli-bwrap-gemini-tetcu72']) {
+  for (const id of ['omp-herdr', 'omp-cli-bwrap']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
   // The Antigravity CLI is no longer installed; nothing may still spawn it.
@@ -914,7 +914,7 @@ test('the committed .fgos/config.json runner section declares the consolidated g
     assert.ok(at >= 0 && inv.args[at + 1] === '{model}', `${inv.id} must pass --model {model}`);
     assert.deepEqual(inv.confinement, { backend: 'bwrap' }, `${inv.id} runs confined`);
   }
-  const headless = executor.invocations.find((inv) => inv.id === 'omp-cli-bwrap-gemini-tetcu72');
+  const headless = executor.invocations.find((inv) => inv.id === 'omp-cli-bwrap');
   assert.equal(headless.via, 'cli');
   assert.equal(headless.adapter, 'cli-spawn');
   assert.ok(headless.args.includes('{prompt}'));
@@ -1990,7 +1990,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     prompt,
     model: effectivePolicy.model,
     executorId: 'openai',
-    invocationId: 'codex-cli-bypass-fgovn',
+    invocationId: 'codex-cli-bwrap',
   });
 
   assert.equal(resolved.command, 'codex');
@@ -2002,7 +2002,9 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   assert.equal(resolved.args[resolved.args.length - 1], prompt, '{prompt} must remain a separate argv element, not shell-concatenated');
   assert.deepEqual(resolved.args, [
     'exec',
-    '--dangerously-bypass-approvals-and-sandbox',
+    '--skip-git-repo-check',
+    '-s',
+    'danger-full-access',
     '--model',
     flagshipModel,
     prompt,

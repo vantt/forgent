@@ -628,7 +628,7 @@ export async function executeExecutorCli(
   const resolvedAgentType = agentType ?? null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings, reasoningEffort: effortApplied, modelCheck } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, credentialStore, reasoningEffort: effortApplied, modelCheck } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     requestedModel: requestedModel ?? modelOverride,
@@ -699,7 +699,7 @@ export async function executeExecutorCli(
           url,
           headers,
           body,
-          resourceBindings,
+          credentialStore,
         },
         context: {
           cwd,

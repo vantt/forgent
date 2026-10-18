@@ -1,7 +1,7 @@
 # Plan 5.1: chuyển resolver writer identity sang crate Rust `fgos-session-identity`
 
 - Ngày: 2026-10-15. Lead: agent 5.1, worktree `.claude/worktrees/agent-ac970642d8c2e90a0`, nhánh `worktree-agent-ac970642d8c2e90a0`. Tiếp bản nháp của lead trước (bị dừng nhầm).
-- Trạng thái: **phase 00–04 xong trên nhánh, phase 05 đo xong (warm đạt, cold cần đo lại trên máy rảnh), phase 06 chờ Lead.** Báo cáo: [reports/implementation-261015-2240-identity-resolver-rust-crate.md](reports/implementation-261015-2240-identity-resolver-rust-crate.md).
+- Trạng thái: **completed (đóng 2026-10-19).** Phase 00–06 xong: cả 12 commit của nhánh `worktree-agent-ac970642d8c2e90a0` đã có trên main dưới dạng patch tương đương (`git cherry main <nhánh>` toàn `-`); facade Node `src/util/session-identity.mjs` gọi `fgos identity`; release đang active (6.3, `a6bcdc29…`) đã mang crate. Cổng S6: warm đạt ≤5 ms p95; cold đạt theo ngưỡng ≤10 ms anh nới ngày 2026-10-15 (xem mục "Quyết định cổng cold" trong báo cáo). Báo cáo: [reports/implementation-261015-2240-identity-resolver-rust-crate.md](reports/implementation-261015-2240-identity-resolver-rust-crate.md).
 - Đầu việc: 5.1 trong [hội đồng §6.2](../reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md). Không có work item (anh cấm cho track này).
 
 ## Mục tiêu

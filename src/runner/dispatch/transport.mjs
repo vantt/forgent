@@ -47,6 +47,7 @@ import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
+import { credentialStoreOf } from './provider-capacity.mjs';
 import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
@@ -268,7 +269,8 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     url: executor.url,
     headers: executor.headers,
     body: executor.body,
-    resourceBindings: executor.resourceBindings,
+    // The login store this launch reads, declared or inferred from an older config; null when it reads none.
+    credentialStore: credentialStoreOf(executor),
     // What the effort flag rendered to, when one was requested.
     ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
     // The pre-spawn half of the model check; collectModelWarnings adds what

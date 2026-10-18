@@ -13,13 +13,13 @@ const runner = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.j
 const find = (executor, id) => runner.executors[executor].invocations.find((inv) => inv.id === id);
 
 const providers = [
-  { executor: 'openai', id: 'codex-herdr-fgovn', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml' },
-  { executor: 'gemini', id: 'omp-gemini-tetcu72', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined },
-  { executor: 'xai', id: 'omp-herdr-vantt', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined },
+  { executor: 'openai', id: 'codex-herdr', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml', store: 'codex' },
+  { executor: 'gemini', id: 'omp-herdr', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
+  { executor: 'xai', id: 'omp-herdr', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
 ];
 
 for (const p of providers) {
-  test(`${p.id} runs ${p.command} in a pane under the bwrap posture with a private account home`, () => {
+  test(`${p.executor}/${p.id} runs ${p.command} in a pane under the bwrap posture with a private account home`, () => {
     const inv = find(p.executor, p.id);
     assert.ok(inv, `${p.id} must exist`);
     assert.equal(inv.adapter, 'herdr-spawn');
@@ -28,8 +28,8 @@ for (const p of providers) {
     assert.equal(inv.interactiveMode.kind, p.kind);
     assert.equal(inv.interactiveMode.trustStore?.kind, p.trust);
     assert.deepEqual(
-      inv.resourceBindings,
-      [{ resource: 'private-home', target: { kind: 'env', name: p.homeVar } }],
+      { use: inv.credentialStore.use, homeEnv: inv.credentialStore.homeEnv },
+      { use: p.store, homeEnv: p.homeVar },
       'the agent state lives in the private home the confinement allocates, not in the real account directory',
     );
   });
@@ -55,7 +55,7 @@ test('no herdr invocation relies on a bypass flag in place of the sandbox', () =
     }
   }
   // codex keeps its own sandbox off only because bwrap encloses it, and never asks for approval nobody can give.
-  const codex = find('openai', 'codex-herdr-fgovn');
+  const codex = find('openai', 'codex-herdr');
   assert.deepEqual(codex.args.slice(0, 4), ['-s', 'danger-full-access', '-a', 'never']);
 });
 
@@ -66,8 +66,8 @@ test('the codex pane keeps its session in its own process, never on the shared b
   // workspace-write sandbox: it tries to mkdir masks such as <cwd>/.aws inside the read-only
   // workspace and every command fails before it runs. --no-daemon keeps -s danger-full-access
   // in force for the whole session; bwrap stays the confinement.
-  const codex = find('openai', 'codex-herdr-fgovn');
-  assert.ok(codex.args.includes('--no-daemon'), `codex-herdr-fgovn args ${JSON.stringify(codex.args)} must carry --no-daemon`);
+  const codex = find('openai', 'codex-herdr');
+  assert.ok(codex.args.includes('--no-daemon'), `codex-herdr args ${JSON.stringify(codex.args)} must carry --no-daemon`);
 });
 
 test('the account inventory that provisions these homes is machine-global, never declared in the project config', () => {
