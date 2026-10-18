@@ -12,6 +12,7 @@
 // starts with `warning:` warns, `info:` is informational, anything else passes.
 
 import fs from 'node:fs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 
@@ -374,7 +375,8 @@ const LOCK_FILES = {
   runner: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'runner.lock')),
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),
   reconcile: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'reconcile.lock')),
-  activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation.lock')),
+  'repo-config': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'repo-config.lock')),
+  activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation-v2.lock')),
   observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
@@ -577,7 +579,18 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
   } catch (err) {
     return { passed: false, message: `cannot read the fence status: ${err.message}` };
   }
-  if (status.complete) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
+  // Channels without a controller activation or WAL have never crossed C5.
+  const activatedPath = path.join(fgosDirOf(repoRoot), 'installation/activation.json');
+  const main = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
+  const common = fs.existsSync(path.join(main, '.git')) ? path.join(main, '.git') : main;
+  if (!fs.existsSync(activatedPath) && !fs.existsSync(path.join(repoRoot, 'fgos/git')) && !fs.existsSync(path.join(common, 'fgos/git'))) {
+    status.targets = status.targets.filter(target => !(target.managedBy === 'fgctl' && target.state === 'absent'));
+    status.controllerMissing = status.targets.filter(target => target.managedBy === 'fgctl' && !target.fenced).map(target => target.path);
+  }
+  if (status.complete && status.controllerMissing.length === 0) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
+  if (status.complete) {
+    return { passed: false, message: 'git-fence-missing: the new fgctl places the activation fence during a WAL-capable activation' };
+  }
   const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
   const activated = activatedHolderLockRelease(repoRoot);
   const fixable = fixableTargets(status, activated);
@@ -586,7 +599,7 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
     : `the fix waits for this release to be activated here (${activated.reason ?? 'the activated release does not yet take every one of these locks'})`;
   return {
     passed: true,
-    message: warn(`${status.missing.length} of ${status.targets.length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
+    message: warn(`${status.missing.length} of ${status.targets.filter(target => target.managedBy !== 'fgctl').length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
   };
 }
 
@@ -599,7 +612,8 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
  */
 function fixableTargets(status, activated) {
   const owners = activated.owners ?? [];
-  return status.targets.filter((target) => !target.fenced && owners.includes(target.owner));
+  const missing = new Set(status.missing);
+  return status.targets.filter((target) => missing.has(target.path) && owners.includes(target.owner));
 }
 
 /**
@@ -653,6 +667,9 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
     status = fenceStatus({ fgosDir, workspaceRoot, providerRuntimeDir });
   } catch (err) {
     return { changed: false, message: `cannot read the fence status: ${err.message}` };
+  }
+  if (status.complete && status.controllerMissing.length > 0) {
+    return { changed: false, message: 'fences not placed: only the new fgctl may place the activation fence during a WAL-capable activation' };
   }
   if (status.complete) return { changed: false, message: `all ${status.targets.length} legacy lock path(s) already fenced` };
   const activated = activatedHolderLockRelease(repoRoot);

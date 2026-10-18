@@ -37,7 +37,6 @@ import {
   writeOwnershipMarker,
   readOwnershipMarker,
   cleanupConfinementResource,
-  reapOrphanedConfinementResources,
   OWNERSHIP_MARKER_FILE,
   OWNERSHIP_CONTRACT,
   OWNERSHIP_CREATOR,
@@ -769,58 +768,6 @@ test('R5: cleanup stops a process still running from inside the directory it rem
     assert.equal(alive(child.pid), false, 'nothing keeps running from a directory that was deleted');
   } finally {
     try { if (child) process.kill(child.pid, 'SIGKILL'); } catch { /* already gone */ }
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('R5: reapOrphanedConfinementResources removes empty per-dispatch shells once they are old enough, and nothing else without a marker', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
-  try {
-    const oldEmpty = path.join(tmp, 'disp_1_old');
-    const freshEmpty = path.join(tmp, 'disp_2_fresh');
-    const foreign = path.join(tmp, 'disp_3_foreign');
-    fs.mkdirSync(oldEmpty);
-    fs.mkdirSync(freshEmpty);
-    fs.mkdirSync(path.join(foreign, 'home'), { recursive: true });
-    fs.writeFileSync(path.join(foreign, 'home', 'keep.txt'), 'not ours');
-    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
-    fs.utimesSync(oldEmpty, longAgo, longAgo);
-
-    const pass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.ok(!fs.existsSync(oldEmpty), 'an empty shell left behind is removed');
-    assert.ok(fs.existsSync(freshEmpty), 'a new empty directory may still be filled by a dispatch that is starting');
-    assert.ok(fs.existsSync(path.join(foreign, 'home', 'keep.txt')), 'a directory without our marker is never touched');
-    assert.deepEqual(pass.reaped.map((r) => [r.dispatchId, r.reason]), [['disp_1_old', 'empty']]);
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('R5: reapOrphanedConfinementResources is idempotent and ignores living processes', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
-  try {
-    const deadDir = path.join(tmp, 'dead-dispatch', 'home');
-    const aliveDir = path.join(tmp, 'alive-dispatch', 'home');
-    fs.mkdirSync(deadDir, { recursive: true });
-    fs.mkdirSync(aliveDir, { recursive: true });
-
-    // Write marker with dead pid (e.g. 99999999)
-    writeOwnershipMarker(deadDir, { dispatchId: 'dead-1', pid: 99999999 });
-    // Write marker with current living process pid
-    writeOwnershipMarker(aliveDir, { dispatchId: 'alive-1', pid: process.pid });
-
-    // First reaper pass: dead process allocation is reaped, alive is kept
-    const firstPass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.equal(firstPass.reaped.length, 1);
-    assert.equal(firstPass.reaped[0].dispatchId, 'dead-1');
-    assert.ok(!fs.existsSync(deadDir));
-    assert.ok(fs.existsSync(aliveDir));
-
-    // Second reaper pass: IDEMPOTENT (no error, double-acting, or crash)
-    const secondPass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.equal(secondPass.reaped.length, 0);
-    assert.ok(fs.existsSync(aliveDir));
-  } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });

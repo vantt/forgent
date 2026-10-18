@@ -1,0 +1,13 @@
+# Audit the locked dependency graph, including the combined addon toolchain.
+[advisories]
+ignore = [{ id = "RUSTSEC-2024-0449", reason = "Pre-existing serde_yaml in host-runtime and observe; replacement tracked on the program board, 2026-10-18" }]
+
+[bans]
+multiple-versions = "warn"
+# Existing workspace path dependencies omit publish=false; --locked pins the external graph.
+wildcards = "warn"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

@@ -95,7 +95,7 @@ fn activity_of(delta: &str) -> Activity {
     }
 }
 
-fn tail(text: &str) -> Vec<&str> {
+pub(crate) fn tail(text: &str) -> Vec<&str> {
     let lines: Vec<&str> = text
         .lines()
         .map(str::trim)
@@ -115,7 +115,7 @@ fn blocked_reason(capture_tail: &str) -> Option<BlockedReason> {
     None
 }
 
-fn is_auth_failure(line: &str) -> bool {
+pub(crate) fn is_auth_failure(line: &str) -> bool {
     let line = line.to_lowercase();
     const SUBSTRINGS: [&str; 9] = [
         "oauth refresh failed",
@@ -148,7 +148,7 @@ fn is_auth_failure(line: &str) -> bool {
         .is_some_and(|name| !name.trim().is_empty())
 }
 
-fn is_quota_limit(line: &str) -> bool {
+pub(crate) fn is_quota_limit(line: &str) -> bool {
     let line = line.to_lowercase().replace('’', "'");
     let rest = strip_error_prefix(&line);
     rest.starts_with("you've hit your usage limit")

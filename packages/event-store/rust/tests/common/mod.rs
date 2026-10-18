@@ -43,7 +43,15 @@ impl Repo {
             .status()
             .unwrap()
             .success());
-        let layout = Layout::from_common_dir(Some(&root.join(".git"))).unwrap();
+        // Git WAL writers refuse a workspace without the controller's activation fence.
+        let fence = root.join(".fgos/locks/activation.lock");
+        fs::create_dir_all(&fence).unwrap();
+        fs::write(
+            fence.join("TOMBSTONE"),
+            "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+        )
+        .unwrap();
+        let layout =Layout::from_common_dir(Some(&root.join(".git"))).unwrap();
         fs::create_dir_all(layout.root.join("locks")).unwrap();
         #[cfg(unix)]
         {

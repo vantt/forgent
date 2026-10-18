@@ -1,3 +1,4 @@
+import { checkGit, fixGitWal, fixGitFetchMapping } from './git-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -81,7 +82,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { readAttemptOwnershipMarker, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -138,7 +139,6 @@ import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace } from './run-supervisor-checks.mjs';
-import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
@@ -5386,13 +5386,9 @@ registerFix({
   fix: () => fixConfinementBackendRegistryReadable(),
 });
 
-// ─── Confinement orphan reaper (Phase 04 M8) ───────────────────────────────
-// `reapOrphanedConfinementResources` (confinement/cleanup.mjs) existed but
-// was never called from any production path -- only a test called it
-// directly, so a temporary confinement resource whose owning process died
-// (or timed out, see finalizeConfinementResources's own `retained` outcome)
-// stayed on disk forever. Wiring it in here (checked/fixed via `doctor
-// --fix`) and at runner start (loop.mjs) is what actually reclaims it.
+// ─── Confinement temp roots ────────────────────────────────────────────────
+// A private home belongs to one attempt and only adopt's finalize-home step removes it (the
+// `run-attempts-stuck` check names an attempt nobody holds). This check guards the roots they live under.
 
 export { defaultConfinementTempRoots, credentialScanRoots };
 
@@ -5412,56 +5408,46 @@ function looseConfinementRoots(roots) {
 }
 
 export function checkConfinementOrphanedResourcesReaped() {
-  // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
-  // own (it deletes), so this counts dead-owned markers itself instead of
-  // calling it -- a `check` must never mutate.
+  // Read-only. A home of a dispatch outside the assignment door removes itself when that dispatch
+  // settles; one whose process died is left for `doctor --fix`, since no sweep judges it. An attempt home
+  // (version 2 marker) is adopt's and is named by `run-attempts-stuck`.
   const roots = defaultConfinementTempRoots();
-  const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
+  const deadOwned = deadOwnedConfinementDirs(roots).length;
   const loose = looseConfinementRoots(roots);
-  const emptyShells = countEmptyDispatchShells(roots);
-  if (markedDeadOwnerDirs === 0 && emptyShells === 0 && loose.length === 0) {
-    return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
-  }
+  const emptyShells = emptyDispatchShells(roots).length;
+  if (deadOwned === 0 && emptyShells === 0 && loose.length === 0) return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   const problems = [];
-  if (emptyShells > 0) {
-    problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
-  }
-  if (markedDeadOwnerDirs > 0) {
-    problems.push(`${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
-  }
-  if (loose.length > 0) {
-    problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
-  }
+  if (emptyShells > 0) problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
+  if (deadOwned > 0) problems.push(`${deadOwned} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
+  if (loose.length > 0) problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
   return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
 }
 
-/** Empty per-dispatch directories old enough that the reaper removes them (see reapOrphanedConfinementResources). */
-function countEmptyDispatchShells(roots) {
-  let count = 0;
+/** How old an empty per-dispatch directory must be before it counts as left behind. */
+const EMPTY_SHELL_GRACE_MS = 600000;
+
+/** Empty per-dispatch directories old enough that no dispatch can still be about to fill them. */
+function emptyDispatchShells(roots) {
+  const found = [];
   for (const tempRoot of roots) {
     try {
       for (const entry of fs.readdirSync(tempRoot, { withFileTypes: true })) {
         if (!entry.isDirectory()) continue;
         const dir = path.join(tempRoot, entry.name);
-        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) count += 1;
+        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) found.push(dir);
       }
     } catch {
       // an unreadable or missing root has nothing to count
     }
   }
-  return count;
+  return found;
 }
 
-function countDeadOwnedConfinementDirs(roots) {
-  let count = 0;
+function deadOwnedConfinementDirs(roots) {
+  const found = [];
   for (const tempRoot of roots) {
-    if (!fs.existsSync(tempRoot)) continue;
     let entries = [];
-    try {
-      entries = fs.readdirSync(tempRoot, { withFileTypes: true });
-    } catch {
-      continue;
-    }
+    try { entries = fs.readdirSync(tempRoot, { withFileTypes: true }); } catch { continue; }
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const dispatchDir = path.join(tempRoot, entry.name);
@@ -5472,68 +5458,57 @@ function countDeadOwnedConfinementDirs(roots) {
         }
       } catch {}
       for (const cand of candidates) {
-        const markerPath = path.join(cand, OWNERSHIP_MARKER_FILE);
-        if (!fs.existsSync(markerPath)) continue;
-        // An attempt home (version 2 marker) belongs to adopt: only its finalize-home step removes it.
-        if (readAttemptOwnershipMarker(cand)) continue;
-        try {
-          const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
-          // A home kept for a left-open pane is awaiting that pane, not orphaned.
-          if (marker.paneId) continue;
-          // A home held for its unstaged login is never reaped; credential-copies-retained reports it.
-          if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-          // A bound home (a cli-spawn run supervisor's) belongs to its binder, not to the controller that prepared it.
-          const ownerPid = marker.boundAt ? (marker.binderPid ?? marker.pid) : marker.pid;
-          const alive = Number.isInteger(ownerPid) && ownerPid > 0 && (() => {
-            try { process.kill(ownerPid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
-          })();
-          if (!alive) count += 1;
-        } catch {
-          // Unreadable marker: not this check's concern (ownership itself
-          // is what reapOrphanedConfinementResources trusts or refuses).
-        }
+        // Only a marker of this module's own first version names a process owner.
+        const marker = readOwnershipMarker(cand);
+        if (!marker) continue;
+        // A home held for its unstaged login is never removed; credential-copies-retained reports it.
+        if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
+        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
+          try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
+        })();
+        if (!alive) found.push({ dir: cand, dispatchId: marker.dispatchId });
       }
     }
   }
-  return count;
+  return found;
 }
 
-export function fixConfinementOrphanedResourcesReaped(cwd) {
+export function fixConfinementOrphanedResourcesReaped() {
   const roots = defaultConfinementTempRoots();
-  let totalReaped = 0;
-  const messages = [];
   const tightened = looseConfinementRoots(roots);
   for (const root of tightened) {
     try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
   }
-  // One sweep per root through the adopt door; attempt directories are looked at once, with the first root.
-  roots.forEach((tempRoot, index) => {
-    const assignmentsRoot = index === 0 && cwd ? path.join(path.resolve(cwd), '.fgos', 'assignments') : undefined;
-    const { reap } = sweepAttempts({ assignmentsRoot, tempRoot });
-    totalReaped += reap.reaped.length;
-    if (reap.reaped.length > 0) messages.push(`${reap.reaped.length} under ${tempRoot}`);
-  });
-  const tightenedNote = tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '';
+  // A home whose recorded dispatcher process is dead holds a login copy nobody will remove: the owner's
+  // explicit --fix is the one place that judges it, by that pid alone. A home that cannot go (a login
+  // that could not be staged) stays and is counted by credential-copies-retained.
+  let removedHomes = 0;
+  for (const { dir, dispatchId } of deadOwnedConfinementDirs(roots)) {
+    try { if (cleanupConfinementResource(dir, dispatchId).cleaned) removedHomes += 1; } catch { /* kept */ }
+  }
+  let removedShells = 0;
+  for (const shell of emptyDispatchShells(roots)) {
+    try { fs.rmdirSync(shell); removedShells += 1; } catch { /* filled meanwhile */ }
+  }
   return {
-    changed: totalReaped > 0 || tightened.length > 0,
+    changed: removedHomes > 0 || removedShells > 0 || tightened.length > 0,
     message: [
-      totalReaped > 0
-        ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
-        : 'no orphaned confinement resources to reap',
-      tightenedNote,
+      removedHomes > 0 ? `removed ${removedHomes} home(s) left by a dead dispatch` : '',
+      removedShells > 0 ? `removed ${removedShells} empty per-dispatch dir(s)` : 'no empty per-dispatch dirs to remove',
+      tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '',
     ].filter(Boolean).join('; '),
   };
 }
 
 registerCheck({
   id: 'confinement-orphaned-resources-reaped',
-  description: 'no confinement temp resources are left behind by a dead owning process',
+  description: 'confinement temp roots are owner-only and no dispatch home is left behind by a dead process',
   check: () => checkConfinementOrphanedResourcesReaped(),
 });
 
 registerFix({
   id: 'confinement-orphaned-resources-reaped',
-  fix: (cwd) => fixConfinementOrphanedResourcesReaped(cwd),
+  fix: () => fixConfinementOrphanedResourcesReaped(),
 });
 
 // A login copy that outlives its dispatch holds a refresh token that may be the only valid one, so fgOS
@@ -6622,3 +6597,17 @@ registerCheck({
   description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
+
+// Git and Event Store share one addon ABI admission row.
+for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+  registerCheck({ id, description: {
+    'git-component-compatible': 'Combined addon contracts and Git feature floor',
+    'git-trust-topology': 'Trusted repository layout and common directory',
+    'git-operation-journal': 'Readable Git WAL with no unresolved operations',
+    'git-native-locks': 'Native Git lock residue (read-only detection)',
+    'git-publication-refspecs': 'Additive Event Store mirror fetch mappings',
+    'git-durability-capability': 'Measured Git durability guarantees',
+  }[id], check: (cwd) => checkGit(cwd, id) });
+}
+registerFix({ id: 'git-wal-dir', fix: fixGitWal });
+registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

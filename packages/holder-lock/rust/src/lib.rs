@@ -22,6 +22,7 @@ pub mod predecessor;
 pub mod route;
 pub mod semantics;
 pub mod state_root;
+pub mod tombstone;
 
 pub use port::{
     validate, validate_quiescent, acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, run_borrowed_io, BorrowIo, BorrowIoOutcome, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Guarantee, Handle, HeldReason, HelperExe,

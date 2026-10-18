@@ -322,7 +322,7 @@ export function checkApply({ snapshot, evidence, action, expectedSnapshot, expec
  * MUST be issued by a controller/supervisor into controller/, never read from the
  * worker-writable outbox/.
  * File-naming convention: `replacement-authority--<driverId>.json` in controller/
- * names a fresh driver's authorization; `ack-*`/`report-*`/`result.json` in outbox/
+ * names a fresh driver's authorization; `ack-*`/`report-*`/`result-*.json`/`result.json` in outbox/
  * are the worker's own result artifacts (same prefixes findWorkerResult/the outbox
  * convention already use elsewhere); anything else is `unknown` -- which is
  * exactly what routes a recommendation to `park` rather than a guess. */
@@ -351,7 +351,7 @@ export function collectEvidence(snapshot, opts = {}) {
 
   for (const entry of snapshot.outbox ?? []) {
     const name = entry.name;
-    if (/^(ack|report)-/.test(name) || name === 'result.json') {
+    if (/^(ack|report|result)-/.test(name) || name === 'result.json') {
       evidence.push({ id: name, type: 'worker-result' });
       continue;
     }

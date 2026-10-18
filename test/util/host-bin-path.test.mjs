@@ -87,6 +87,20 @@ test('resolveActiveHostBin order: FGOS_HOST_BIN, then the activation next to fgo
   });
 });
 
+test('a FGOS_HOST_BIN that is not an executable file is the answer, never a reason to fall back', () => {
+  const byDir = workspace('fgos-hbp-nofallback-');
+  const saved = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = path.join(tmp('fgos-hbp-missing-'), 'no-such-host');
+  try {
+    const { bin, tried } = resolveActiveHostBin({ fgosDir: path.join(byDir.root, '.fgos'), cwd: byDir.root });
+    assert.equal(bin, null);
+    assert.equal(tried.length, 1);
+  } finally {
+    if (saved === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = saved;
+  }
+});
+
 test('resolveActiveHostBin reports where it looked when nothing resolves', () => {
   withoutHostEnv(() => {
     const empty = tmp('fgos-hbp-empty-');

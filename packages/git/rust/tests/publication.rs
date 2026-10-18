@@ -60,7 +60,16 @@ fn init(path: &Path, format: &str, backend: &str) {
 }
 fn resolve(driver: &GitDriver, path: &Path) -> RepoHandle {
     match driver.resolve_repo(path, path).unwrap() {
-        ResolveRepo::Repository(r) => r,
+        ResolveRepo::Repository(r) => {
+            let fence = r.trusted_main_root().join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+            )
+            .unwrap();
+            r
+        }
         _ => panic!(),
     }
 }
@@ -1659,4 +1668,226 @@ fn sigkill_before_target_allows_a_new_nonidentical_operation_and_terminal_supers
             .count(),
         0
     );
+}
+
+#[test]
+fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    git(
+        &root,
+        &[
+            "remote",
+            "add",
+            "origin",
+            "https://example.invalid/project.git",
+        ],
+    );
+    git(&root, &["config", "unrelated.keep", "value"]);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = vec![
+        "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into(),
+        "+refs/fgos/legacy:refs/fgos/remotes/origin/legacy".into(),
+    ];
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
+        .unwrap();
+    let config = fs::read(root.join("config")).unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
+        .unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-second")
+        .unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-second")
+        .unwrap();
+    assert_eq!(fs::read(root.join("config")).unwrap(), config);
+    assert_eq!(git(&root, &["config", "unrelated.keep"]), b"value\n");
+    assert_eq!(
+        driver
+            .configured_fetch_refspecs(&repo, "origin")
+            .unwrap()
+            .len(),
+        3
+    );
+    assert!(driver.push_refspecs(&repo, "origin").unwrap().is_empty());
+    let provenance = driver
+        .fetch_mapping_provenance(&repo, "origin")
+        .unwrap()
+        .unwrap();
+    assert_eq!(provenance.operation_id, "mapping-first");
+    assert_eq!(provenance.remote_url, "https://example.invalid/project.git");
+    assert_eq!(provenance.refspecs, maps);
+    assert_eq!(
+        wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
+        0
+    );
+    assert!(driver
+        .ensure_fetch_mapping(
+            &repo,
+            "origin",
+            &["+refs/heads/*:refs/heads/*".into()],
+            "bad-mapping"
+        )
+        .is_err());
+    assert!(driver
+        .ensure_fetch_mapping(&repo, "origin", &[maps[0].clone()], "mapping-first")
+        .is_err());
+}
+
+#[test]
+fn config_busy_staging_failure_and_raw_edit_resolve_without_removing_foreign_locks() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    git(
+        &root,
+        &["remote", "add", "origin", "https://example.invalid/r.git"],
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = vec!["+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into()];
+    let native = root.join("config.lock");
+    fs::write(&native, "foreign").unwrap();
+    let busy = driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "busy")
+        .unwrap_err();
+    assert_eq!(busy.code, ResultCode::Busy);
+    assert!(busy.retryable);
+    assert_eq!(fs::read(&native).unwrap(), b"foreign");
+    assert!(wal::Wal::open(&repo).unwrap().inspect("busy").is_err());
+    fs::remove_file(&native).unwrap();
+    struct Fault<'a> {
+        root: &'a Path,
+        mode: &'a str,
+    }
+    impl FileSystem for Fault<'_> {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "config-staged" {
+                match self.mode {
+                    "staging" => return Err(std::io::Error::other("staging I/O failure")),
+                    "stale" => {
+                        fs::write(self.root.join("config"), b"[unrelated]\nkeep = edited\n")?
+                    }
+                    "replaced" => {
+                        fs::rename(
+                            self.root.join("config.lock"),
+                            self.root.join("our-old-lock"),
+                        )?;
+                        fs::write(self.root.join("config.lock"), "foreign replacement")?;
+                        return Err(std::io::Error::other("substitution"));
+                    }
+                    _ => (),
+                }
+            }
+            if step == "config-replaced" && self.mode == "readback" {
+                return Err(std::io::Error::other("post-rename I/O failure"));
+            }
+            Ok(())
+        }
+    }
+    let original = fs::read(root.join("config")).unwrap();
+    for mode in ["staging", "stale", "replaced", "readback"] {
+        fs::write(root.join("config"), &original).unwrap();
+        assert!(driver
+            .ensure_fetch_mapping_with_filesystem(
+                &repo,
+                "origin",
+                &maps,
+                mode,
+                &Fault { root: &root, mode }
+            )
+            .is_err());
+        assert_eq!(
+            wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
+            0
+        );
+        if mode == "replaced" {
+            assert_eq!(fs::read(&native).unwrap(), b"foreign replacement");
+            fs::remove_file(&native).unwrap();
+        } else {
+            assert!(!native.exists(), "{mode}");
+        }
+        if mode == "stale" {
+            assert_eq!(
+                fs::read(root.join("config")).unwrap(),
+                b"[unrelated]\nkeep = edited\n"
+            );
+        }
+    }
+}
+
+#[test]
+fn wal_open_refuses_unfenced_workspace_without_creating_records() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    fs::remove_dir_all(repo.trusted_main_root().join(".fgos/locks/activation.lock")).unwrap();
+    assert_eq!(
+        wal::Wal::open(&repo).err().unwrap().to_string(),
+        "git-fence-missing"
+    );
+    assert!(!repo.common_dir().join("fgos/git").exists());
+}
+
+#[test]
+fn config_recovery_observes_attempted_changes_and_never_replays_old_ids() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    git(
+        &root,
+        &["remote", "add", "origin", "https://example.invalid/r.git"],
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = vec!["+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into()];
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "seed")
+        .unwrap();
+    let journal = wal::Wal::open(&repo).unwrap();
+    let intent = journal.inspect("seed").unwrap().intent().clone();
+    struct Seed;
+    impl wal::PublicationAuthority for Seed {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
+    }
+    for (id, installed) in [("observed", true), ("uncertain", false)] {
+        if !installed {
+            git(&root, &["config", "--unset-all", "remote.origin.fetch"]);
+        }
+        let chain = match journal.begin(id, intent.clone(), &Seed).unwrap() {
+            wal::Begin::Created(c) => c,
+            _ => panic!(),
+        };
+        let chain = journal.append(&chain, Phase::Prepared).unwrap();
+        journal
+            .append(
+                &chain,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: wal::Tip::Absent,
+                    next: wal::Tip::Absent,
+                },
+            )
+            .unwrap();
+        driver
+            .ensure_fetch_mapping(&repo, "origin", &maps, &format!("later-{id}"))
+            .unwrap();
+        assert!(
+            matches!(journal.inspect(id).unwrap().outcome(), Some(wal::Outcome::Transfer { acknowledged, unknown, .. }) if *acknowledged == installed && *unknown != installed)
+        );
+        assert_eq!(journal.scan(100).unwrap().unresolved, 0);
+        if !installed {
+            assert!(driver
+                .ensure_fetch_mapping(&repo, "origin", &maps, id)
+                .is_err());
+        }
+    }
 }

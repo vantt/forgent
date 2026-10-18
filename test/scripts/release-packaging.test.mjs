@@ -62,8 +62,13 @@ test('release assets workflow builds Linux on ubuntu-22.04 and Windows on window
   assert.doesNotMatch(assets, /ubuntu-latest/);
   assert.match(assets, /scripts\/check-glibc-ceiling\.sh target\/release\/fgos target\/release\/fgctl/);
   assert.match(assets, /ci-external-consumer\.ps1/);
-  const targetsInWorkflow = [...assets.matchAll(/target: ([a-z0-9_-]+)/g)].map((m) => m[1]).sort();
-  assert.deepEqual(targetsInWorkflow, RELEASE_TARGETS.map((t) => t.triple).sort());
+  // Every matrix (the release build and the independent addon rebuild) covers exactly the release targets.
+  const matrices = assets.split(/\n\s+include:\n/).slice(1).map((block) => block.split(/\n\s+runs-on:/)[0]);
+  assert.ok(matrices.length >= 1, 'the workflow has a target matrix');
+  for (const matrix of matrices) {
+    const targetsInMatrix = [...matrix.matchAll(/target: ([a-z0-9_-]+)/g)].map((m) => m[1]).sort();
+    assert.deepEqual(targetsInMatrix, RELEASE_TARGETS.map((t) => t.triple).sort());
+  }
 });
 
 test('the check workflow runs the shared assets workflow on main pushes and pull requests and publishes nothing', () => {

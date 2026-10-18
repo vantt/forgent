@@ -25,7 +25,7 @@ fn a_supervisor_killed_midway_leaves_the_agent_running_and_the_lock_held_until_t
     let mut supervisor = supervisor;
     let _ = supervisor.wait();
 
-    assert!(run.path("gate-exit.json").exists() == false, "the agent is still running");
+    assert!(!run.path("gate-exit.json").exists(), "the agent is still running");
     assert!(!lock_is_free(&run.path("attempt.lock")), "the gate keeps the attempt lock after its supervisor died");
 
     wait_until(Duration::from_secs(30), "the gate to end the attempt", || run.path("gate-exit.json").exists());

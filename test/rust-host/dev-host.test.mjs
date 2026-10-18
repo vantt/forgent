@@ -5,12 +5,15 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest, resolveProductionDependencies } from '../../scripts/build-rust-distribution.mjs';
+import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest, resolveProductionDependencies, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const binaryName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
-const nativeBinary = path.join(repoRoot, 'target', 'release', binaryName);
+const cargoOutput = path.resolve(repoRoot, process.env.CARGO_TARGET_DIR ?? 'target');
+const releaseBinary = path.join(cargoOutput, 'release', binaryName);
+const nativeBinary = fs.existsSync(releaseBinary) ? releaseBinary : path.join(cargoOutput, 'debug', binaryName);
 const cleanEnv = () => {
   const env = { ...process.env };
   delete env.CLAUDE_CODE_SESSION_ID;
@@ -22,7 +25,8 @@ const cleanEnv = () => {
 };
 
 function fixture() {
-  assert.ok(fs.existsSync(nativeBinary), `Build the release fgos host before this suite: ${nativeBinary}`);
+  assert.ok(fs.existsSync(nativeBinary), `Build the fgos host before this suite: ${nativeBinary}`);
+  const addon = ensureGitAddon().addon;
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dev-host-'));
   const checkout = path.join(root, 'checkout');
   const workspace = path.join(root, 'workspace');
@@ -35,6 +39,7 @@ function fixture() {
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(repoRoot, relative), destination);
   }
+  fs.copyFileSync(path.join(repoRoot, 'Cargo.lock'), path.join(checkout, 'Cargo.lock'));
   // The declared production dependencies, if any, copied rather than symlinked into the payload.
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
   for (const [name, dir] of resolveProductionDependencies(repoRoot, packageJson)) {
@@ -56,15 +61,16 @@ function fixture() {
   const builderDir = path.join(root, 'builder');
   fs.mkdirSync(builderDir);
   // Only Cargo is substituted: it installs an existing
-  // compiled native host. Every command below executes that real host, its
+  // compiled native host and addon. Every command below executes that real host, its
   // unchanged manifest verifier, and the actual checkout Node consumer.
-  const builder = `#!${process.execPath}\nimport fs from 'node:fs';\nimport path from 'node:path';\nif (process.env.DEV_TEST_BUILD_FAIL) process.exit(Number(process.env.DEV_TEST_BUILD_FAIL));\nconst target = path.resolve(process.cwd(), process.env.CARGO_TARGET_DIR ?? 'target');\nfs.mkdirSync(path.join(target, 'debug'), { recursive: true });\nfs.copyFileSync(process.env.DEV_TEST_NATIVE_BINARY, path.join(target, 'debug', ${JSON.stringify(binaryName)}));\nfs.chmodSync(path.join(target, 'debug', ${JSON.stringify(binaryName)}), 0o755);\n`;
+  const builder = `#!${process.execPath}\nimport fs from 'node:fs';\nimport path from 'node:path';\nif (process.env.DEV_TEST_BUILD_FAIL) process.exit(Number(process.env.DEV_TEST_BUILD_FAIL));\nconst target = path.resolve(process.cwd(), process.env.CARGO_TARGET_DIR ?? 'target');\nfs.mkdirSync(path.join(target, 'debug'), { recursive: true });\nfs.copyFileSync(process.env.DEV_TEST_NATIVE_BINARY, path.join(target, 'debug', ${JSON.stringify(binaryName)}));\nfs.chmodSync(path.join(target, 'debug', ${JSON.stringify(binaryName)}), 0o755);\nfs.copyFileSync(process.env.DEV_TEST_NATIVE_ADDON, path.join(target, 'debug', ${JSON.stringify(nativeAddonLibraryName())}));\n`;
   fs.writeFileSync(path.join(builderDir, 'cargo'), builder, { mode: 0o755 });
   fs.writeFileSync(path.join(builderDir, 'package.json'), '{"type":"module"}\n');
   const env = {
     ...cleanEnv(),
     PATH: `${builderDir}${path.delimiter}${process.env.PATH}`,
     DEV_TEST_NATIVE_BINARY: nativeBinary,
+    DEV_TEST_NATIVE_ADDON: addon,
     FGOS_STATE_HOME: path.join(root, 'state'),
     HOME: path.join(root, 'home'),
   };
@@ -202,6 +208,9 @@ if (process.argv[1] === path.join(process.env.DEV_TEST_CHECKOUT, 'bin', 'fgos.mj
     for (const runDir of runDirs) {
       const directory = path.join(runtime, runDir);
       const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+      const stagedAddon = path.resolve(f.checkout, manifest.components.nativeAddon.path);
+      assert.equal(hashFile(stagedAddon), hashFile(f.env.DEV_TEST_NATIVE_ADDON));
+      assert.equal(manifest.components.nativeAddon.napiVersion, 8);
       const entry = manifest.entries.fgos;
       assert.equal(path.resolve(f.checkout, entry), path.join(directory, binaryName));
       assert.equal(hashFile(path.join(directory, binaryName)), hashFile(nativeBinary));

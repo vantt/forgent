@@ -57,7 +57,8 @@ export function useReleaseFixture() {
 
 // A PATH whose first `git` drops the `-c gc.auto=0` and `-c maintenance.auto=false` switches a
 // borrowed git runs with, then runs the real git: a git that can start a background gc while it
-// borrows a lock. An environment fixture for the activation gate's red case, not a code branch.
+// borrows a lock. An environment fixture for the activation gate's escaped-holder case, not a code
+// branch: the gc that escapes the borrow still holds the description and the drain must end it.
 export function pathWithGcLeakingGit(dir) {
   const real = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
   const bin = path.join(dir, 'gc-leaking-git');
@@ -139,4 +140,31 @@ export function writePinFor(proj, releaseVersion) {
       projectRuntime: { policy: 'exact-digest', artifactDigest: fixture.digest, releaseVersion, channel: null, allowPrerelease: false },
     }),
   );
+}
+
+/**
+ * Live processes whose working directory or any open file lies under one of `prefixes`, read from
+ * `/proc` (Linux). On a platform without `/proc` this returns null: the caller cannot prove the
+ * absence there and says so instead of passing on an empty list.
+ */
+export function processesUnder(prefixes) {
+  if (!fs.existsSync('/proc/self/fd')) return null;
+  const found = [];
+  for (const entry of fs.readdirSync('/proc')) {
+    if (!/^\d+$/.test(entry) || Number(entry) === process.pid) continue;
+    const links = [];
+    try { links.push(fs.readlinkSync(`/proc/${entry}/cwd`)); } catch { /* gone or not ours */ }
+    try {
+      for (const fd of fs.readdirSync(`/proc/${entry}/fd`)) {
+        try { links.push(fs.readlinkSync(`/proc/${entry}/fd/${fd}`)); } catch { /* closed meanwhile */ }
+      }
+    } catch { /* gone or not ours */ }
+    const hit = links.find((link) => prefixes.some((prefix) => link.startsWith(prefix)));
+    if (hit) {
+      let cmdline = '';
+      try { cmdline = fs.readFileSync(`/proc/${entry}/cmdline`, 'utf8').replace(/\0/g, ' ').trim(); } catch { /* gone */ }
+      found.push({ pid: Number(entry), path: hit, cmdline });
+    }
+  }
+  return found;
 }

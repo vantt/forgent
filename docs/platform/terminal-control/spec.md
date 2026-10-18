@@ -12,6 +12,7 @@ Source: packages/terminal-control/rust
 Contracts: packages/terminal-control/contracts/
 Last reviewed: 2026-10-18
 Related:
+- docs/platform/run-supervisor/spec.md
 - docs/platform/component-boundary.md
 - docs/platform/session-identity/spec.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
@@ -47,7 +48,7 @@ The operation inputs and results are in [terminal-control.port.v1.json](../../..
 
 Two rules carry meaning beyond the field lists:
 
-- `launch` returns the identity of the process it started (pid, start time, boot id, process group), checked against the argv the caller asked for. The supervisor only releases its agent after that identity is durable.
+- `launch` types `cd <cwd> && <command>` into the pane and returns the identity of the process it started (pid, start time, boot id, process group), checked against the argv the caller asked for. The pane's shell stays as the parent (no `exec`): a pane whose root process is the command closes with it, and a pane kept for a person to read (`retain`) would be gone before they looked. A pane whose shell was replaced by a launcher is still recognised, because the shell pid is not excluded when the argv matches. The supervisor only releases its agent after that identity is durable.
 - A pane taken with `attach` (a pane the caller already owns, for example the one `/fgOS:terminal` runs in) is never closed by the core. `release` on it only removes the label or the binding. `attach` may name a `groupKey`: the pane joins that group, so the group's next pane opens beside it (`FGOS_HERDR_ANCHOR_PANE` of a dispatching caller).
 - A fresh herdr session has no workspace to hold a tab. The herdr driver then creates the session's first workspace for the group's first `allocate`; its root pane is the slot and its tab takes the group's label.
 - A slot that was `released` as `retain` refuses a later `close` by key (it closes when `until` passes). A caller that keeps a pane for a person and still wants anyone to be able to close it by key (the account probe, the reaper) leaves the slot allocated instead of retaining it; only an explicit retention window uses `retain`.
@@ -159,7 +160,7 @@ Two coordinators with the same `groupKey` (only when set by hand) can create two
 
 ## 12. Migration status
 
-The dispatch path has moved: `src/runner/dispatch/herdr-round.mjs`, `herdr-reconcile.mjs`, `worker-session-boot.mjs`, the account probe and the confinement reaper reach herdr only through `fgos internal terminal-control`. `createHerdrClient`, `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-*` labels are deleted; `FGOS_HERDR_ANCHOR_PANE` is an `attach` into the round's group. A round's slot key is its agent name (the normalized `fgos-<runId>-<launchCommandId>` for an assignment run); its group key is the batch key, else the unit run id. The reaper reads `terminalKey` from the home marker; a marker without one names no slot and its pane is never closed on a guess.
+The dispatch path has moved twice. First every herdr caller reached herdr only through `fgos internal terminal-control` (`createHerdrClient`, `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-*` labels are deleted; `FGOS_HERDR_ANCHOR_PANE` is an `attach` into the round's group). Then the run supervisor took over the round: **the slot key of a run is its attempt id** (`att-...`, the same string the attempt directory and the writer id carry), and its group key is the batch key, else the unit run id. The controller calls `allocate(key = attemptId, groupKey)` once, through the client's per-group queue, before it hands the attempt over; the supervisor then calls `launch`, `send`, `read`, `inspect` and `release` in process by that key, and adopt calls `release` for an attempt whose supervisor is gone. Nothing outside the attempt closes a pane: the confinement reaper and its `terminalKey` home-marker field are deleted, a home belongs to an attempt (run-supervisor spec, section 8). A `release(close)` from the supervisor can race an `allocate` that splits from that pane: the core skips a pane that vanished between its liveness check and its geometry read and opens a new tab under the same label when the group has none left, so the race costs a tab, never a wrong close.
 
 `/fgOS:terminal` and `/fgOS:terminal-close` act through `attach`, `label` and `release` of the caller's own pane.
 

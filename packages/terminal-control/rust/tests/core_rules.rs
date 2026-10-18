@@ -43,6 +43,33 @@ fn a_closed_anchor_continues_the_group_in_a_new_tab_with_the_same_label() {
 }
 
 #[test]
+fn a_pane_released_while_the_group_is_measured_does_not_stop_the_allocation() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("vanish-while-measured"));
+    let a = core.allocate(&request("a", "g")).unwrap().slot;
+    let b = core.allocate(&request("b", "g")).unwrap().slot;
+    // Another process closes `a` after the group was found live and before its geometry is read.
+    *driver.vanish_on_layout.borrow_mut() = Some(a.pane_id.clone());
+    let c = core.allocate(&request("c", "g")).expect("a vanished pane is no error");
+    assert!(driver.panes.borrow().contains_key(&c.slot.pane_id));
+    let anchor = driver.calls("pane.split").last().cloned().unwrap_or_default();
+    assert!(!anchor.contains(&a.pane_id), "no split starts from the vanished pane: {anchor}");
+    assert!(driver.panes.borrow().contains_key(&b.pane_id));
+}
+
+#[test]
+fn every_pane_of_the_group_vanishing_while_it_is_measured_continues_in_a_new_tab() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("all-vanish-while-measured"));
+    let a = core.allocate(&request("a", "g")).unwrap().slot;
+    *driver.vanish_on_layout.borrow_mut() = Some(a.pane_id.clone());
+    let b = core.allocate(&request("b", "g")).expect("a vanished pane is no error").slot;
+    assert_ne!(b.tab_id, a.tab_id);
+    let labels: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
+    assert_eq!(labels, vec!["label-g", "label-g"]);
+}
+
+#[test]
 fn release_close_closes_only_its_own_pane_and_never_a_tab() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("release"));

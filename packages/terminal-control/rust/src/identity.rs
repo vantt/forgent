@@ -19,15 +19,16 @@ pub fn match_launched<'a>(info: &'a ProcessInfo, command: &str, args: &[String])
     })
 }
 
-/// The foreground process a launcher is expected to become: not the pane's
-/// shell, argv0 is the expected argv0, command or its basename, and the rest
-/// equals `args` (empty strings dropped on both sides).
+/// The foreground process a launcher is expected to become: argv0 is the
+/// expected argv0, command or its basename, and the rest equals `args` (empty
+/// strings dropped on both sides). A launcher that `exec`s keeps the pane
+/// shell's own pid, so the pid is not excluded; the shell the pane started
+/// with never has the launcher's argv.
 pub fn match_expected<'a>(info: &'a ProcessInfo, expect: &ExpectedProcess) -> Option<&'a ForegroundProcess> {
     let expected: Vec<&str> = expect.args.iter().map(String::as_str).filter(|a| !a.is_empty()).collect();
     let base = Path::new(&expect.command).file_name().and_then(|n| n.to_str()).unwrap_or(&expect.command);
     info.foreground.iter().find(|p| {
-        p.pid != info.shell_pid
-            && p.argv.first().is_some_and(|a0| *a0 == expect.argv0 || *a0 == expect.command || a0 == base)
+        p.argv.first().is_some_and(|a0| *a0 == expect.argv0 || *a0 == expect.command || a0 == base)
             && p.argv[1..].iter().map(String::as_str).eq(expected.iter().copied())
     })
 }
@@ -78,8 +79,17 @@ mod tests {
     }
 
     #[test]
-    fn the_shell_itself_never_matches_an_expected_process() {
-        let seen = info(10, &[(10, &["claude"])]);
-        assert!(match_expected(&seen, &expect("claude", "claude", &[])).is_none());
+    fn a_shell_that_exec_replaced_itself_is_the_expected_process() {
+        // A pane whose shell was replaced (`exec`) by a launcher script that `exec`s again: the shell's own
+        // pid now runs the launcher's target and its child is the gate.
+        let seen = info(10, &[(10, &["/usr/bin/bwrap", "--die-with-parent", "--", "/opt/fgos", "internal", "gate"]), (11, &["/opt/fgos", "internal", "gate"])]);
+        let want = expect("/usr/bin/bwrap", "/usr/bin/bwrap", &["--die-with-parent", "--", "/opt/fgos", "internal", "gate"]);
+        assert_eq!(match_expected(&seen, &want).map(|p| p.pid), Some(10));
+    }
+
+    #[test]
+    fn a_pane_still_on_its_own_shell_matches_nothing() {
+        let seen = info(10, &[(10, &["zsh"])]);
+        assert!(match_expected(&seen, &expect("/usr/bin/bwrap", "/usr/bin/bwrap", &["--"])).is_none());
     }
 }

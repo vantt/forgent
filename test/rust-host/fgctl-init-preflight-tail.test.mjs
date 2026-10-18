@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -300,29 +300,29 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
 });
 
 
-test('holder-lock gate: a git that leaves a background gc while it borrows a lock refuses init before anything of the activation is written', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-red-'));
+test('holder-lock gate: a git that leaves a background gc while it borrows a lock passes init, and the escaped gc is ended with nothing left holding a lock', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-gc-'));
   const tempHome = path.join(root, 'home');
   const tempState = path.join(root, 'state');
   const tempProj = path.join(root, 'proj');
+  // The borrow vectors build their throwaway repository under TMPDIR: pin it so the escaped gc can be looked for.
+  const tempTmp = path.join(root, 'tmp');
   try {
-    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir);
+    for (const dir of [tempHome, tempState, tempProj, tempTmp]) fs.mkdirSync(dir);
     execFileSync('git', ['init'], { cwd: tempProj });
 
     const res = runFgctl(['init', '--from', fixture.releaseDir], {
       cwd: tempProj,
       stateHome: tempState,
-      env: { HOME: tempHome, PATH: pathWithGcLeakingGit(root) },
+      env: { HOME: tempHome, TMPDIR: tempTmp, PATH: pathWithGcLeakingGit(root) },
     });
 
-    assert.notEqual(res.status, 0, 'init must be refused when a borrow vector is red');
-    assert.match(res.stderr, /lock-borrow-vectors-failed: /);
-    assert.match(res.stderr, /gc-auto-loose-objects/);
-    const installation = path.join(tempProj, '.fgos', 'installation');
-    assert.ok(!fs.existsSync(path.join(installation, 'activation.json')), 'activation.json must not exist');
-    assert.ok(!fs.existsSync(path.join(installation, 'bin', 'fgos')), 'bin/fgos shim must not exist');
-    assert.ok(!fs.existsSync(path.join(installation, 'root.json')), 'root.json must not exist');
-    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'distribution.json must not exist');
+    // The refined description rule: an escaped holder of a borrowed description is killed, drained and verified.
+    assert.equal(res.status, 0, `init must pass the gate: ${res.stderr}`);
+    assert.doesNotMatch(res.stderr, /lock-(kernel-semantics|borrow-vectors)-failed/);
+    assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')), 'activation.json written');
+    const left = processesUnder([path.join(tempTmp, 'fgos-borrow-vectors-'), path.join(tempProj, '.fgos', 'locks'), path.join(tempState, 'locks')]);
+    if (left !== null) assert.deepEqual(left, [], 'the escaped gc is gone and no process holds a lock file');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

@@ -128,3 +128,38 @@ Release staging and preflight reject:
 | Stage, preflight, and host verify manifest and release files (`verify_release_files` + `verify_legacy_node`) | `packages/distribution/rust/src/store.rs`, `packages/distribution/rust/src/verify.rs`, `apps/fgos/src/legacy_exec.rs`, `test/rust-host/fgctl-stage.test.mjs` |
 | Payload safety and digest enforcement regression tests (commits 19000200, 3b3a95fc: symlink-component refusal, path traversal, legacyNode digest verification) | `packages/distribution/rust/src/verify.rs`, `apps/fgos/tests/cli_tests.rs`, `test/rust-host/fgctl-stage.test.mjs` |
 | Schema golden tests (full, minimal, forward-compat, invariant) | `packages/distribution/rust/tests/schema_golden.rs`, `packages/distribution/rust/tests/goldens/release-manifest-*.json` |
+
+## 8. Combined native addon (additive V1)
+
+`components.nativeAddon` is optional and omitted when absent (never synthesized as
+`null`); historical payload identities remain unchanged. When present it contains:
+
+```json
+{"path":"libexec/native/fgos.node","digest":"<64 lowercase hex>","target":"linux-x64","napiVersion":8,"crateChecksums":{"napi@2.16.17":"<Cargo.lock checksum>","napi-derive@2.16.13":"<Cargo.lock checksum>","napi-build@2.2.4":"<Cargo.lock checksum>"}}
+```
+
+The path is a canonical, release-relative `.node` file and must occur in `files[]`
+with the same digest (the file entry uses the usual `sha256:` prefix). Neither the
+file nor any path component may be a symlink. The target is `linux-x64` or
+`win32-x64` (Node platform spelling), matching the release's Linux/Windows x64
+target. The ABI line is Node-API 8 for the combined Git + Event Store addon.
+`crateChecksums` records exactly the three pinned napi toolchain packages and their
+crates.io checksums from the producing build’s `Cargo.lock`. Staging/CI checks
+equality there; later verifiers check exactly three named `name@semver` keys and
+64-hex values, independent of their own build lockfile. Checksums attest declared build inputs; the binary digest authenticates
+payload bytes. CI builds with `--locked`, audits crates with `cargo deny check`,
+and compares the addon digest with a second independent build on the same target.
+Release staging advertises `git-wal-v1` only on the registered Linux target while
+C5 scan and atomic fence admission are Linux-only. A windows-x64 release omits
+the claim and remains activatable. Adding it on Windows requires implemented
+C5/fence admission and Windows tests; lock-taking Git ports meanwhile refuse
+`git-lockscope-unavailable-windows` (Q6).
+
+Every staging and activation preflight verifies a present addon, including ABI,
+target, checksum provenance and bytes. Absence remains accepted in this phase.
+**M10 switch point:** the release carrying Git phase 05 makes the addon mandatory
+for linux-x64 activation. That future switch must explicitly reject missing
+`components.nativeAddon`; this additive step does not impose it on older releases.
+
+The combined addon reports Git port/receipt/WAL and Event Store envelope contract
+versions separately from package versions; the ABI doctor row checks each.

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
-import { buildRustDistribution, hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
+import { REPO_ROOT, buildRustDistribution, hashFile, listLegacyNodeSourceFiles, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
 
 const CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 const ID = 'active-release-matches-checkout';
@@ -327,6 +327,9 @@ test('real builder selection and staged production dependency payload agree with
   put(f.source, 'node_modules/dep/index.mjs', 'export default "dependency";');
   put(f.source, 'target/release/fgos', '#!/bin/sh\nexit 0\n');
   fs.chmodSync(path.join(f.source, 'target/release/fgos'), 0o755);
+  // The builder records the native addon: its compiled library and the locked napi crates it was built from.
+  put(f.source, `target/release/${nativeAddonLibraryName()}`, 'native addon fixture\n');
+  fs.copyFileSync(path.join(REPO_ROOT, 'Cargo.lock'), path.join(f.source, 'Cargo.lock'));
   const built = path.join(f.temp, 'built');
   const result = buildRustDistribution({ outDir: built, repoRoot: f.source });
   const manifest = JSON.parse(fs.readFileSync(result.manifestPath, 'utf8'));

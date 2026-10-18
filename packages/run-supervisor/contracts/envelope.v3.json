@@ -40,6 +40,7 @@
   "optionalFields": {
     "launch.maxOutputBytes": "integer >= 1: the supervisor stops the agent (stop cause output-limit, receipt outcome output-limit) once the two capture files hold more than this together (config maxBuffer, default 10485760); absent means no limit",
     "cwdLeaseFile": "string, Windows only: the dispatch-cwd lease file the supervisor takes itself (a LockFileEx lock is never inherited). A mutating Windows envelope without it is refused with exit 65; absent on Unix, where the lease arrives at fd 4",
+    "terminal.retainFailedPaneMs": "terminal mode only: integer >= 1 or null. How long a pane kept for a person (any end but a clean exit) stays before terminal-control may close it; null keeps it until a person closes it; absent means 24 hours. Source: config terminal.retainFailedPaneMs",
     "createdAt": "object {bootId, boottimeNs}: the controller's boot id and monotonic boot time (CLOCK_BOOTTIME ns; Windows GetTickCount64 ms * 1e6) when it wrote the envelope. Windows adopt gives an unbound attempt with a free lock a 60 s start grace measured from it, on the same boot only; absent or another boot means no grace. File times are never used"
   },
   "fields": {
@@ -48,7 +49,7 @@
     "attemptId": "string, globally unique attempt id minted by the controller (also the slot key in terminal mode)",
     "unitRunId": "string, the unit run this attempt belongs to",
     "runDir": "absolute path of attemptDir",
-    "mode": { "enum": ["direct", "terminal"] },
+    "mode": { "enum": ["direct", "terminal"], "meaning": "terminal requires slot, terminal, a CLI with a terminal adapter and the release-slot builtin step; direct forbids all of them" },
     "protocolId": { "const": 1, "meaning": "internal-route protocol the supervisor, gate and steps must speak (internal-route.run-supervisor.v1.json)" },
     "hostBin": "absolute path of the fgos host binary of the release that wrote the envelope; resolved once by the controller, never through PATH or a shim",
     "payloadRoot": "absolute path of the legacy-node payload root of the same release (components.legacyNode.root of the activated manifest); resolved like apps/fgos/src/legacy_exec.rs",
@@ -59,7 +60,7 @@
       "args": "string[]",
       "env": "object string -> string; the non-secret environment of the agent. Secret values are absent here and present in sideFile.env; the gate merges sideFile.env over this map",
       "stdinPolicy": { "enum": ["brief-file", "null"], "meaning": "brief-file: the gate opens briefPath read-only as stdin; null: stdin is /dev/null (NUL on Windows)" },
-      "briefPath": "absolute path of the brief file, or null when the brief travels in argv",
+      "briefPath": "absolute path of the brief file, or null when the brief travels in argv; terminal mode requires a file: the supervisor types its content at the agent",
       "outboxDir": "absolute path where the agent writes result-<N>.json",
       "capture": {
         "stdout": "absolute path; the gate opens it O_WRONLY|O_CREAT|O_APPEND and dup2s it to fd 1",
@@ -68,7 +69,7 @@
     },
     "containment": {
       "preferred": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
-      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`"
+      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`. Terminal mode: the launcher script that terminal-control starts in the pane execs bwrap with --die-with-parent and a --bind of the socket directory, then `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-socket <terminal.socketPath>`"
     },
     "deadlines": {
       "softAt": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds; null when no soft deadline" },
@@ -82,11 +83,21 @@
       "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"], "other": "any other command name selects the generic adapter (exit and outbox only)" },
       "mode": { "enum": ["direct", "terminal"], "meaning": "always equal to the top-level mode" }
     },
-    "slot": "object {key} or absent; terminal mode only (terminal-control key, equal to attemptId)",
+    "slot": "object {key, groupKey}; present exactly when mode is terminal. key: terminal-control key, equal to attemptId. groupKey: the Node client's serialization group for allocate (a string the controller chooses); the supervisor never allocates, it only addresses the slot by key",
+    "terminal": "object {socketPath, exitCommand, orphanSettleMs}; present exactly when mode is terminal. socketPath: absolute AF_UNIX path of the GO socket under the runtime socket dir (mode 0700, owner is the user, name is a hash of attemptId, at most 107 bytes). exitCommand: string typed into the pane after the agent protocol reports completed, or null to use the CLI adapter's own exit command. orphanSettleMs: integer >= 0, the extra wait the gate gives the outbox after it saw a result while the supervisor is gone (orphan branch)",
+    "identity": "object {writerId, parentWriterId}; both modes. writerId: the attempt's writer id, equal to mint_attempt_writer_id(attemptId) (packages/session-identity/contracts/attempt-writer-id.v1.json); the gate exports it as FGOS_SESSION_ID. parentWriterId: writer id of the controller that wrote the envelope, exported as FGOS_PARENT_WRITER_ID, or null when the controller has none",
     "steps": {
-      "type": "array, run in order after the receipt; see step-receipt.v1.json",
+      "type": "array, run in order after the receipt; see step-receipt.v1.json. A terminal envelope ends with the release-slot builtin item; a direct envelope never carries it",
+      "builtinItem": {
+        "stepId": { "const": "release-slot" },
+        "builtin": { "const": true, "meaning": "run by the step runner itself in-process through the terminal-control crate: no hostBin, argv, cwd, env or stepTimeoutMs" },
+        "disposition": {
+          "onSuccess": { "const": "close", "meaning": "terminal-control.release(key, close) when the earlier steps all have receipts" },
+          "onFailure": { "const": "retain", "meaning": "terminal-control.release(key, retain) when an earlier step has no receipt, so the pane stays for a person" }
+        }
+      },
       "item": {
-        "stepId": { "enum": ["settle-attempt", "finalize-home", "release-slot"] },
+        "stepId": { "enum": ["settle-attempt", "finalize-home", "cleanup-trust"], "meaning": "process items; release-slot is a builtinItem. cleanup-trust (terminal mode) removes the folder-trust entry the controller wrote into the agent's trust store (controller/trust-context.json); it is a no-op when the controller wrote none" },
         "hostBin": "absolute path, normally equal to the top-level hostBin",
         "payloadRoot": "absolute path, normally equal to the top-level payloadRoot",
         "argv": "string[] after hostBin, normally [\"internal\", \"attempt-step\", <stepId>, \"--protocol\", \"1\", \"--run-dir\", <runDir>]",
@@ -111,6 +122,8 @@
   "invariants": [
     "the envelope is written after the attempt lock (and the cwd lease when mutating) is held and before any agent process exists",
     "nothing in the envelope is a secret",
+    "mode terminal: slot, terminal and the release-slot builtin step are all present and slot.key equals attemptId; mode direct: none of them is present",
+    "identity.writerId equals mint_attempt_writer_id(attemptId) in both modes; a reader that finds another value refuses with envelope-invalid",
     "a reader that finds v != 3 or a digest that does not match treats the run as legacy-run (adopt) or refuses with envelope-invalid (supervise, gate, attempt-step)"
   ]
 }

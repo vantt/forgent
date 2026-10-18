@@ -28,7 +28,7 @@ import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
-import { resolveConfinementTempRoot, createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
 import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
@@ -322,7 +322,7 @@ export async function runUnit(options = {}) {
   try { roots = resolveGitRoots(cwd); } catch (err) { rootsFailure = err; }
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
   try {
-    sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined, tempRoot: resolveConfinementTempRoot() });
+    sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
   } catch { /* best effort */ }
   if (rootsFailure) throw rootsFailure;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;

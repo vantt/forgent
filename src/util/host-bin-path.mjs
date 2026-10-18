@@ -59,7 +59,8 @@ export function hostBinFromActivation(installationDir) {
 /**
  * resolveActiveHostBin({ fgosDir, cwd, ignoreEnv }) -> { bin, tried }
  *
- * Order: FGOS_HOST_BIN (unless ignoreEnv) -> the activation next to
+ * Order: FGOS_HOST_BIN (unless ignoreEnv; when set it is the only answer,
+ * `bin` null if it is not an executable file) -> the activation next to
  * `fgosDir` (its parent's `.fgos/installation`; the store's fgosDir is
  * already the main `.fgos`, even from a /tmp `fgos pick` worktree) -> the
  * nearest activation walking up from `cwd`, as ~/.local/bin/fgos does.
@@ -71,7 +72,8 @@ export function resolveActiveHostBin({ fgosDir, cwd = process.cwd(), ignoreEnv =
   if (!ignoreEnv && fromEnv) {
     const candidate = path.resolve(fromEnv);
     tried.push(`FGOS_HOST_BIN=${candidate}`);
-    if (isExecutableFile(candidate)) return { bin: candidate, tried };
+    // A named host that cannot be run is an error, never a reason to look elsewhere.
+    return { bin: isExecutableFile(candidate) ? candidate : null, tried };
   }
   if (typeof fgosDir === 'string' && fgosDir) {
     const installationDir = path.join(path.dirname(path.resolve(fgosDir)), INSTALLATION);

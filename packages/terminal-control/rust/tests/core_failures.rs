@@ -89,7 +89,7 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
     assert!(!identity.start_time.is_empty());
     let run = driver.calls("pane.run");
     assert_eq!(run.len(), 1);
-    assert!(run[0].contains("cd '/tmp' && exec 'sleep' '30'"), "{}", run[0]);
+    assert!(run[0].contains("cd '/tmp' && 'sleep' '30'") && !run[0].contains("exec"), "{}", run[0]);
     assert!(core.reconcile_scan(0).unwrap().is_empty());
     let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Live);

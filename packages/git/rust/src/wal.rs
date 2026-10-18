@@ -22,6 +22,7 @@ pub enum WalError {
     Busy,
     RecoveryRequired,
     Unsupported,
+    FenceMissing,
 }
 impl From<io::Error> for WalError {
     fn from(e: io::Error) -> Self {
@@ -30,6 +31,9 @@ impl From<io::Error> for WalError {
 }
 impl std::fmt::Display for WalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if matches!(self, Self::FenceMissing) {
+            return write!(f, "git-fence-missing");
+        }
         write!(f, "{self:?}")
     }
 }
@@ -64,8 +68,18 @@ impl FileSystem for OsFileSystem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct ConfigChange {
+    pub remote: String,
+    pub url: String,
+    pub refspecs: Vec<String>,
+    pub old_values: Vec<String>,
+    pub old_config_digest: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
+    ConfigChange(Box<ConfigChange>),
     RemoteFetch { url: String, refspecs: Vec<String> },
     RemotePush { url: String, refspecs: Vec<String> },
 }
@@ -230,6 +244,26 @@ impl Intent {
         {
             return Err(corrupt("intent binding"));
         }
+        if let OperationKind::ConfigChange(change) = &self.kind {
+            let ConfigChange {
+                remote,
+                url,
+                refspecs,
+                old_config_digest,
+                ..
+            } = change.as_ref();
+            if remote.is_empty()
+                || url.is_empty()
+                || refspecs.is_empty()
+                || !digest_valid(old_config_digest)
+                || self.resource_set != ["config:local"]
+                || self.expected != Tip::Absent
+                || self.next != Tip::Absent
+            {
+                return Err(corrupt("config change binding"));
+            }
+            return Ok(());
+        }
         for resource in &self.resource_set {
             RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
             if !resource.starts_with("refs/fgos/")
@@ -254,6 +288,7 @@ impl Intent {
         validate_tip(&self.next, self.object_format)
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct Chain {
     records: Vec<Record>,
@@ -479,8 +514,20 @@ pub enum Begin {
     Existing(Chain),
     Compacted(CompactReceipt),
 }
+/// All WAL-writing doors require the controller's durable cutover fence.
+pub fn require_activation_fence(repo: &RepoHandle) -> WalResult<()> {
+    if !fgos_holder_lock::tombstone::is_tombstone(
+        &repo.trusted_main_root().join(".fgos/locks/activation.lock"),
+        "activation",
+        "fgos git",
+    ) {
+        return Err(WalError::FenceMissing);
+    }
+    Ok(())
+}
 impl Wal<OsFileSystem> {
     pub fn open(repo: &RepoHandle) -> WalResult<Self> {
+        require_activation_fence(repo)?;
         Self::with_filesystem(repo.common_dir(), OsFileSystem)
     }
 }
@@ -1795,6 +1842,13 @@ mod tests {
                 crate::ResolveRepo::Repository(r) => r,
                 _ => panic!(),
             };
+            let fence = repo.trusted_main_root().join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
             let w = Wal::open(&repo).unwrap();
             let oid = String::from_utf8(git(
                 &t.0,

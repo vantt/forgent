@@ -58,7 +58,7 @@ jobs:
         run: npm install
 
       - name: Build Rust release binaries for npm tests
-        run: cargo build --release --workspace
+        run: cargo build --locked --release --workspace
 
       # Full suite (docs/distribution-vision.md tsk-49r D1): already
       # includes test/install-packaging.test.mjs (the pack -> install -g ->
@@ -165,7 +165,7 @@ jobs:
       - run: npm install
 
       - name: Build Rust host binary for tests
-        run: cargo build -p fgos
+        run: cargo build --locked -p fgos
 
       - name: Run related tests
         id: run-tests
@@ -255,7 +255,7 @@ jobs:
           retention-days: 90
 
   herdr-plugin:
-    name: cargo test (herdr-dashboard)
+    name: cargo test --locked (herdr-dashboard)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -265,7 +265,7 @@ jobs:
         run: rustup show && cargo --version
 
       - name: cargo test
-        run: cargo test --manifest-path herdr-dashboard/Cargo.toml
+        run: cargo test --locked --manifest-path herdr-dashboard/Cargo.toml
 
   # One OS, no toolchain action, same reasoning as the herdr-plugin job just
   # above: x86_64-unknown-linux-gnu is the only target this track's Decisions
@@ -285,10 +285,16 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: cargo clippy
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
       - name: cargo test
-        run: cargo test --workspace
+        run: cargo test --locked --workspace
+
+      - name: Install dependency auditor
+        run: cargo install cargo-deny --locked --version 0.20.2
+
+      - name: Audit locked dependencies
+        run: cargo deny --config .github/cargo-deny.toml check advisories bans sources
 
   # Packages through the same script release.yml uses, so this proof and a release can
   # never differ. Built on ubuntu-22.04 like the release asset (see release-assets.yml).
@@ -311,7 +317,7 @@ jobs:
         run: npm ci
 
       - name: Build workspace (release)
-        run: cargo build --release --workspace
+        run: cargo build --locked --release --workspace
 
       - name: Check glibc ceiling of the shipped binaries
         run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl
@@ -321,3 +327,7 @@ jobs:
 
       - name: Run external consumer proof
         run: scripts/ci-external-consumer.sh --assets dist
+
+  addon-reproducibility:
+    name: addon reproducibility
+    uses: ./.github/workflows/release-assets.yml

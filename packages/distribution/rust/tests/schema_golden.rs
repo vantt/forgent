@@ -480,3 +480,29 @@ fn test_release_status_and_workspace_status_serde() {
         serde_json::from_str(&json_str).expect("must deserialize ws status");
     assert_eq!(ws_status, re_parsed);
 }
+
+#[test]
+fn historical_manifest_digests_are_unchanged_without_native_addon() {
+    use fgos_distribution::verify::to_canonical_json;
+    use sha2::{Digest, Sha256};
+    let manifest: ReleaseManifest = serde_json::from_str(GOLDEN_RELEASE_MANIFEST_FULL).unwrap();
+    assert!(manifest.components.native_addon.is_none());
+    let mut value = serde_json::to_value(&manifest).unwrap();
+    assert!(value["components"].get("nativeAddon").is_none());
+    assert!(value.get("capabilities").is_none());
+    value.as_object_mut().unwrap().remove("artifactDigest");
+    assert_eq!(
+        format!("{:x}", Sha256::digest(to_canonical_json(&value).as_bytes())),
+        "62b1185fb97cacf699135f8bceb460266bb6bc3c94948928ed8dad163f55d747"
+    );
+    let manifest: ReleaseManifest = serde_json::from_str(GOLDEN_RELEASE_MANIFEST_MINIMAL).unwrap();
+    assert!(manifest.components.native_addon.is_none());
+    let mut value = serde_json::to_value(&manifest).unwrap();
+    assert!(value["components"].get("nativeAddon").is_none());
+    assert!(value.get("capabilities").is_none());
+    value.as_object_mut().unwrap().remove("artifactDigest");
+    assert_eq!(
+        format!("{:x}", Sha256::digest(to_canonical_json(&value).as_bytes())),
+        "99532c4cce5fe9eb480b23cc60a0608c5bd884d2af90ef21183313971152390c"
+    );
+}

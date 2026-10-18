@@ -23,6 +23,8 @@ pub struct MemDriver {
     pub tabs: RefCell<Vec<(String, String)>>,
     pub log: RefCell<Vec<String>>,
     pub incarnation_pid: Cell<u32>,
+    /// A pane that vanishes at the moment something first asks for its geometry (another process closed it).
+    pub vanish_on_layout: RefCell<Option<String>>,
     next: Cell<u32>,
 }
 
@@ -43,6 +45,7 @@ impl MemDriver {
             tabs: RefCell::new(Vec::new()),
             log: RefCell::new(Vec::new()),
             incarnation_pid: Cell::new(4242),
+            vanish_on_layout: RefCell::new(None),
             next: Cell::new(1),
         }
     }
@@ -199,6 +202,10 @@ impl TerminalDriver for MemDriver {
         Ok(())
     }
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
+        if self.vanish_on_layout.borrow().as_deref() == Some(pane) {
+            self.vanish_on_layout.borrow_mut().take();
+            self.kill_pane(pane);
+        }
         let panes = self.panes.borrow();
         let tab = panes.get(pane).ok_or_else(|| unknown("pane_not_found"))?.tab.clone();
         let members = panes

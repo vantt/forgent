@@ -1,7 +1,7 @@
 ---
 title: "6.3 Cách khởi động terminal qua terminal-control + nửa launcher của identity (5.2)"
 description: "Gate trong pane nhận lock attempt qua SCM_RIGHTS, supervisor canh round herdr theo attempt id qua terminal-control, agent-protocol interactive cho 5 CLI, supervisor mint writer id + scrub env + lineage cho cả hai cách, supervisor làm chủ home; xoá vòng poll/deadline/đóng pane của controller trong herdr-round.mjs và phần herdr của reaper tạm"
-status: pending
+status: completed
 priority: P1
 effort: 64h
 branch: plan/run-supervisor-6-2-6-3-6-4
@@ -17,6 +17,35 @@ created: 2026-10-16
 - **Quyết định của anh áp vào đây:** một người dùng, không tương thích ngược, cutover dừng-toàn-bộ xoá đường cũ cùng phase; Rust-first; đa nền tảng qua cổng (Windows: cách `terminal` `unsupported` tới khi herdr có bản Windows, `direct` không ảnh hưởng); chỉ `--resume` tường minh; không work item; song song hoá.
 - Impact-analysis: GitNexus có mặt, index cũ; executor chạy `analyze` rồi `impact` trên `runHerdrRound`, `driveRound`, `pollForOutcome`, `settleRound`, `herdrSpawnAdapter`, `reapOrphanedConfinementResources`, `workerBaseEnv` trước khi sửa (dự kiến HIGH với `herdr-round.mjs`).
 - Component boundary: **có đổi nhỏ** (launch gate có nửa trong pane; session-identity có hàm mint dùng bởi supervisor). P08 cập nhật [`component-boundary.md`](../../docs/platform/component-boundary.md).
+
+## CẮT LẠI 2026-10-18
+
+Block này thắng mọi dòng cũ trong plan và phase file. Đối chiếu với main sau khi 6.2 (supervisor direct, D-ADR0056) và 6.5 (terminal-control) đã land.
+
+**Tiền đề đã đủ:** 6.2 (crate `run-supervisor`, `agent-protocol`, cổng chứa, route `internal supervise|gate|adopt|attempt-step`, `src/run-supervisor/sweep.mjs`, marker v2); 6.5 (`packages/terminal-control`, route `internal terminal-control`, client Node `src/terminal-control/client.mjs`); `withDefaultExecutor`; hot-lock 4.3. Gate và supervisor đã chạy trên Windows/macOS cho `direct`; `terminal` trên Windows vẫn `unsupported`.
+
+**Đã có sẵn trên main (phase chỉ bổ sung, không định nghĩa lại):**
+- `envelope.v3.json` đã có `mode: terminal`, `slot {key}`, bước `release-slot`; `gate-go.v1.json` đã mô tả đường `terminal` (`BRIEF_DELIVERED`, EOF trước/sau); `receipt.v1.json` đã có `carrier-lost`. `gate.rs` đã parse `--go-socket` (kèm `go_pipe.rs`); `bwrap.mjs` đã có `--die-with-parent` + bind socket cho `terminal`.
+- `agent-protocol` mới có `port.rs` (`AgentIo`: send/read/activity), `outcome.rs`, fixtures `direct/`; chưa có `terminal/`, chưa có `inspect` trong `AgentIo`.
+- Chưa có: `mint_attempt_writer_id`, route `internal identity`, `tools/terminal-gate-probe`, `src/run-supervisor/steps/cleanup-trust.mjs`.
+- `killPaneForegroundAndClose` đã không còn trong `src/`; mọi ký hiệu xoá khác ở tiêu chí 6 còn nguyên (`pollForOutcome`, `settleRound`, `concludeFailure`, `livenessProbe`, `startAgent`, `PASTE_CHIP_RE`, `bindOwnershipMarker`, `defaultPaneOpen`, `bindingForPrepared`, `reapOrphanedConfinementResources`). `reapOrphanedConfinementResources` còn caller ở `sweep.mjs` và `registrations.mjs`: P07 chuyển hết sang adopt.
+- `FGOS_SESSION_ID` còn đặt ở `transport.mjs:396` và `authority.mjs:1422` (số dòng đã đổi so với phase file).
+
+**Delta theo phase:**
+- **P00:** chỉ thêm phần còn thiếu: `terminal:{socketPath, exitCommand, orphanSettleMs}`, `slot.groupKey`, `identity{writerId, parentWriterId}` vào envelope; `attempt-writer-id.v1.json` + vector; `terminal-outcomes.v1.json`; `inspect` vào contract AgentIo. Bỏ phần receipt/GO đã có. Cập nhật contract test hiện có `test/run-supervisor/contracts.test.mjs` thay vì chỉ tạo file mới.
+- **P01:** không đổi. Dùng `terminal-control` (6.5) mở pane thay vì gọi herdr thô; tab riêng.
+- **P02:** gate đã có `--go-socket`/`go_pipe.rs`: việc thật là nhánh peer uid, `SCM_RIGHTS`, tty foreground, mồ côi. Giữ nguyên chủ file `gate.rs`, `go_channel.rs`, `go_pipe.rs`.
+- **P03:** gọi `fgos-terminal-control` in-process; chủ `supervise.rs`, `steps.rs`; `release-slot` là bước builtin trong envelope đã khai. Adopt (`adopt.rs`) dùng cùng bước.
+- **P04:** thêm `terminal/` vào crate `agent-protocol`; mở rộng `AgentIo` có `inspect`. Đọc logic nguồn ở HEAD của `herdr-round.mjs`, số dòng trong phase file chỉ để tham khảo.
+- **P05:** route `internal identity mint-attempt` đăng ký theo bảng route hiện tại của host (`apps/fgos/src/main.rs` đi qua `internal`), không còn tranh `main.rs` với 6.2. `workerBaseEnv` ở `adapters.mjs`; hai chỗ đặt `FGOS_SESSION_ID` nêu ở trên.
+- **P06:** `herdr-round.mjs` vẫn là chủ duy nhất; mọi lời gọi herdr đã đi qua `src/terminal-control/client.mjs`, nên xoá vòng canh chỉ còn gỡ logic, không đổi IO. Đường `direct` của 6.2 là mẫu cho prepare+giao.
+- **P07:** thêm: gỡ caller `reapOrphanedConfinementResources` ở `sweep.mjs` và `registrations.mjs`.
+- **P08:** `registrations.mjs` đã đổi sang `sweepAttempts` ở 6.2; chỉ kiểm lại sau P07.
+- **P09 phần A:** review độc lập chạy trên Sonnet (owner 10-17: không Opus/Fable cho review code).
+
+**Thứ tự chạy (thay thứ tự merge cũ):** P00 → P01 → P02 → P04 → P05 → P03 → P06 → P07 → P08 → P09 phần A. Chuỗi lead chạy tuần tự một phase một lúc; P03 sau P04 và P02 vì nghiệm thu cần cả hai; P08 sau P07. Thứ tự không phải đổi so với hàng đợi của brief. Windows/macOS CI: workflow `process-containment.yml` chạy khi push nhánh `terminal-mode/**`.
+
+**Hai sửa đã làm cùng phase này (P00r):** gate đọc được envelope khi run dir/gate nằm dưới `/tmp` (bwrap bind lại, test bwrap thật); `FGOS_HOST_BIN` trỏ file không chạy được là lỗi, không rơi sang activation.
 
 ## Prior art (đã kiểm `git log -G`)
 
