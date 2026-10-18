@@ -72,6 +72,12 @@ pub fn promote(
         &mut guard,
         &OsFileSystem,
     )?;
+    if Receipt::read(&req.layout.stream(&project).sealed())?
+        .commit
+        .is_empty()
+    {
+        return Err(invalid("promote requires an existing project publication"));
+    }
     let a = append(
         req.layout,
         registry,
@@ -119,6 +125,21 @@ pub fn abandon(
     }
     let mut guard = acquire_seal(layout, held_ranks, hot_lock_depth, false)?.expect("waited seal");
     let identity = StoreIdentity::open(layout, machine)?;
+    // Promote and abandon share event-seal. Refuse to drop the only root
+    // while a previously interrupted promote still needs it for publication.
+    {
+        let _append = acquire_append(layout, &[58], &OsFileSystem)?;
+        let project = StreamId::parse("project")?;
+        let receipt = Receipt::read(&layout.stream(&project).sealed())?;
+        let pending = crate::open_read::read_own(layout, &identity.store_id, &project)?;
+        if pending.events.iter().any(|e| {
+            e.seq > receipt.last_seq
+                && e.event_type == "store.promote"
+                && e.payload.get("stream").and_then(|v| v.as_str()) == Some(stream.as_str())
+        }) {
+            return Err(invalid("branch has an unsealed store.promote"));
+        }
+    }
     let reference = own_ref(machine, stream)?;
     let port = PublicationPort::new(
         driver,
@@ -135,14 +156,20 @@ pub fn abandon(
     match port.read_ref(repo, &reference).map_err(git_error)? {
         RefValue::Direct(oid) => {
             let id = operation_id()?;
-            port.compare_and_swap(
+            let cas = port.compare_and_swap(
                 repo,
                 &reference,
                 &ExpectedTip::Oid(oid),
                 &ExpectedTip::Absent,
                 &id,
-            )
-            .map_err(git_error)?;
+            );
+            if cas
+                .as_ref()
+                .is_err_and(|e| e.code == fgos_git::ResultCode::Stale)
+            {
+                port.release_pin_and_compact(repo, &id).map_err(git_error)?;
+            }
+            cas.map_err(git_error)?;
             port.release_pin_and_compact(repo, &id).map_err(git_error)?;
         }
         RefValue::Absent => (),

@@ -1217,6 +1217,10 @@ pub struct Backlog {
     pub complete: bool,
     pub unresolved: usize,
     pub ledger_bytes: u64,
+    /// Retained id bindings are linear, even though the active working set drains.
+    pub ledger_entries: usize,
+    /// Doctor consumers should surface this as capacity debt, never delete ids.
+    pub ledger_capacity_warning: bool,
     pub retained_bytes: u64,
     pub oldest_unresolved: Option<(String, std::time::SystemTime)>,
 }
@@ -1284,6 +1288,8 @@ impl<F: FileSystem> Wal<F> {
             complete: true,
             unresolved: 0,
             ledger_bytes: 0,
+            ledger_entries: 0,
+            ledger_capacity_warning: false,
             retained_bytes: 0,
             oldest_unresolved: None,
         };
@@ -1300,6 +1306,9 @@ impl<F: FileSystem> Wal<F> {
                 let metadata = entry.metadata()?;
                 if ledger {
                     result.ledger_bytes += metadata.len();
+                    result.ledger_entries += 1;
+                    result.ledger_capacity_warning =
+                        result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
                     result.retained_bytes += metadata.len();
                 }
@@ -1690,6 +1699,19 @@ mod tests {
         }
     }
     #[test]
+    fn doctor_scan_flags_retained_ledger_capacity_without_deleting_evidence() {
+        let t = Temp::new();
+        let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let path = w.ledger.path().join("capacity-evidence");
+        let file = std::fs::File::create(&path).unwrap();
+        file.set_len(64 * 1024 * 1024).unwrap();
+        let scan = w.scan(100).unwrap();
+        assert_eq!(scan.ledger_entries, 1);
+        assert!(scan.ledger_capacity_warning);
+        assert!(scan.entries[0].error.is_some());
+        assert!(path.exists());
+    }
+    #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
         let t = Temp::new();
         let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
@@ -1719,7 +1741,10 @@ mod tests {
             w.begin("one", i, &Authority),
             Err(WalError::OperationIdConflict)
         ));
-        assert!(w.scan(100).unwrap().ledger_bytes <= 512);
+        let scan = w.scan(100).unwrap();
+        assert!(scan.ledger_bytes <= 512);
+        assert_eq!(scan.ledger_entries, 1);
+        assert!(!scan.ledger_capacity_warning);
     }
     fn git(path: &Path, args: &[&str], input: Option<&[u8]>) -> Vec<u8> {
         use std::io::Write;

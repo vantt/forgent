@@ -182,3 +182,77 @@ fn branch_and_local_refs_promote_two_parents_and_abandon_exact_old() {
         3
     );
 }
+
+#[test]
+fn abandon_preserves_branch_until_pending_promote_is_sealed() {
+    let r = Repo::new();
+    let reg = registry();
+    let branch = StreamId::parse("branch:pending").unwrap();
+    let d = GitDriver::new(&r.root).unwrap();
+    let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    append(
+        &r.layout,
+        &reg,
+        AppendRequest {
+            stream: &branch,
+            events: &[EventInput {
+                event_type: "branch.note".into(),
+                schema_version: 1,
+                payload: serde_json::json!({}),
+                ts: "2026-10-18T05:00:00.000Z".into(),
+            }],
+            cursor: &Positions::new(),
+            writer: "test",
+            machine: "test-aa2345",
+            held_ranks: &[],
+        },
+    )
+    .unwrap();
+    // An empty project cannot provide parent zero for a promote.
+    assert!(promote(
+        &d,
+        &repo,
+        &reg,
+        PromoteRequest {
+            layout: &r.layout,
+            machine: "test-aa2345",
+            branch: &branch,
+            through_seq: 1,
+            writer: "test",
+            ts: "2026-10-18T05:00:01.000Z",
+            cursor: &Positions::new(),
+            held_ranks: &[],
+            hot_lock_depth: 0
+        }
+    )
+    .is_err());
+    r.append(1);
+    let branch_tip = Receipt::read(&r.layout.stream(&branch).sealed())
+        .unwrap()
+        .commit;
+    append(&r.layout, &reg, AppendRequest { stream: &r.stream, events: &[EventInput { event_type: "store.promote".into(), schema_version: 1, payload: serde_json::json!({"stream":branch.as_str(),"throughSeq":1,"tip":branch_tip}), ts: "2026-10-18T05:00:01.000Z".into() }], cursor: &Positions::new(), writer: "test", machine: "test-aa2345", held_ranks: &[] }).unwrap();
+    for closed in [false, true] {
+        if closed {
+            fgos_event_store::rotate::rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
+        }
+        assert!(abandon(&d, &repo, &r.layout, "test-aa2345", &branch, &[], 0).is_err());
+        assert!(r.layout.stream(&branch).root.exists());
+    }
+    seal(
+        &d,
+        &repo,
+        SealRequest {
+            layout: &r.layout,
+            machine: "test-aa2345",
+            stream: &r.stream,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+            opportunistic: false,
+        },
+    )
+    .unwrap();
+    abandon(&d, &repo, &r.layout, "test-aa2345", &branch, &[], 0).unwrap();
+}

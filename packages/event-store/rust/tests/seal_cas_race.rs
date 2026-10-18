@@ -48,6 +48,15 @@ fn two_independent_stores_with_one_machine_ref_have_one_cas_winner() {
         },
     )
     .unwrap();
+    // Prepare shared WAL metadata before racing operation-specific creation.
+    // A mkdir checkpoint on a shared directory fires only for its creator;
+    // using it as a two-party rendezvous can strand the other participant.
+    let driver = GitDriver::new(&r.root).unwrap();
+    let repo = match driver.resolve_repo(&r.root, &r.root).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!(),
+    };
+    fgos_git::wal::Wal::open(&repo).unwrap();
     let barrier = Barrier::new(2);
     let results = std::thread::scope(|scope| {
         let workers: Vec<_> = [&r.layout, &other]

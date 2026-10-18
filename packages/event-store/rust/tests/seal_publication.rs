@@ -312,6 +312,25 @@ fn project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse()
         ResolveRepo::Repository(r) => r,
         _ => panic!(),
     };
+    // A registered but as-yet-unused sibling must also be sealable while
+    // the shared ref already exists (receipt reconciliation needs its root).
+    assert_eq!(
+        seal(
+            &d,
+            &repo,
+            SealRequest {
+                layout: &r.layout,
+                machine: "test-aa2345",
+                stream: &extra,
+                held_ranks: &[],
+                hot_lock_depth: 0,
+                opportunistic: false
+            }
+        )
+        .unwrap()
+        .last_seq,
+        0
+    );
     let ack = append(
         &r.layout,
         &r.registry,
@@ -845,4 +864,122 @@ fn pre_epoch_event_seals_with_epoch_date_and_identical_retry() {
     assert_eq!(receipt.commit, first.as_str());
     assert_eq!(run(&r).segments, 0);
     assert_eq!(r.append(1).ack.first_seq, 2);
+}
+
+#[test]
+fn missing_receipt_with_active_or_closed_tail_recovers() {
+    for rotate in [false, true] {
+        let r = Repo::new();
+        r.append(2);
+        run(&r);
+        r.append(1);
+        if rotate {
+            fgos_event_store::rotate::rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
+        }
+        std::fs::remove_file(r.layout.stream(&r.stream).sealed()).unwrap();
+        assert_eq!(run(&r).last_seq, 3);
+        assert_eq!(r.append(1).ack.first_seq, 4);
+    }
+}
+
+#[test]
+fn recovered_integrity_record_is_retired_durably() {
+    let r = Repo::new();
+    r.append(1);
+    run(&r);
+    let prior = Receipt::read(&r.layout.stream(&r.stream).sealed()).unwrap();
+    r.append(1);
+    let reference = own_ref("test-aa2345", &r.stream).unwrap();
+    let d = GitDriver::new(&r.root).unwrap();
+    let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let git = |args: &[&str]| {
+        assert!(std::process::Command::new("git")
+            .arg("-C")
+            .arg(&r.root)
+            .args(args)
+            .status()
+            .unwrap()
+            .success())
+    };
+    git(&["update-ref", "-d", reference.as_str()]);
+    assert!(seal(
+        &d,
+        &repo,
+        SealRequest {
+            layout: &r.layout,
+            machine: "test-aa2345",
+            stream: &r.stream,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+            opportunistic: false
+        }
+    )
+    .is_err());
+    let record = r.layout.stream(&r.stream).root.join("integrity.json");
+    assert!(record.exists());
+    git(&["update-ref", reference.as_str(), &prior.commit]);
+    assert!(seal_with_fs(
+        &d,
+        &repo,
+        SealRequest {
+            layout: &r.layout,
+            machine: "test-aa2345",
+            stream: &r.stream,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+            opportunistic: false
+        },
+        &Stop(Point::AfterSealDelete)
+    )
+    .is_err());
+    assert!(record.exists());
+    // Recovery must clear the diagnostic even after deletion already happened.
+    assert_eq!(run(&r).last_seq, 2);
+    assert!(!record.exists());
+}
+
+#[test]
+fn age_rejects_unparseable_first_line_instead_of_reporting_zero() {
+    let r = Repo::new();
+    r.append(1);
+    std::fs::write(r.layout.stream(&r.stream).active(), b"corrupt\n").unwrap();
+    assert!(fgos_event_store::seal::oldest_unsealed_age_sec(
+        &r.layout,
+        std::slice::from_ref(&r.stream)
+    )
+    .is_err());
+}
+
+#[test]
+fn seal_all_attempts_later_streams_and_aggregates_failures() {
+    let r = Repo::new();
+    r.append(1);
+    let broken = fgos_event_store::layout::StreamId::parse("project:broken").unwrap();
+    let root = r.layout.stream(&broken).root;
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::create_dir(r.layout.stream(&broken).active()).unwrap();
+    let d = GitDriver::new(&r.root).unwrap();
+    let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    assert!(fgos_event_store::seal::seal_all(
+        &d,
+        &repo,
+        &r.layout,
+        "test-aa2345",
+        &[broken, r.stream.clone()],
+        &[],
+        0
+    )
+    .is_err());
+    assert_eq!(
+        Receipt::read(&r.layout.stream(&r.stream).sealed())
+            .unwrap()
+            .last_seq,
+        1
+    );
 }

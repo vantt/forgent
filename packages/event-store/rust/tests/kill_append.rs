@@ -289,3 +289,65 @@ fn sigkill_at_seven_seal_boundaries_recovers_without_loss_or_duplicate() {
         );
     }
 }
+
+#[test]
+fn shared_ref_sigkill_then_sibling_and_seal_all_recover() {
+    use fgos_event_store::{
+        append::{append, AppendRequest},
+        layout::StreamId,
+        receipt::Receipt,
+        seal::seal_all,
+    };
+    for all_first in [false, true] {
+        let r = Repo::new();
+        r.append(2);
+        kill_at(&r, "seal", "AfterSealTargetCas", None);
+        let sibling = StreamId::parse("project:porting").unwrap();
+        append(
+            &r.layout,
+            &r.registry,
+            AppendRequest {
+                stream: &sibling,
+                events: &common::inputs(1),
+                cursor: &Positions::new(),
+                writer: "test",
+                machine: "test-aa2345",
+                held_ranks: &[],
+            },
+        )
+        .unwrap();
+        let d = fgos_git::GitDriver::new(&r.root).unwrap();
+        let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+            fgos_git::ResolveRepo::Repository(r) => r,
+            _ => panic!(),
+        };
+        let streams = if all_first {
+            vec![sibling.clone(), r.stream.clone()]
+        } else {
+            vec![sibling.clone()]
+        };
+        seal_all(&d, &repo, &r.layout, "test-aa2345", &streams, &[], 0).unwrap();
+        seal_all(
+            &d,
+            &repo,
+            &r.layout,
+            "test-aa2345",
+            &[sibling.clone(), r.stream.clone()],
+            &[],
+            0,
+        )
+        .unwrap();
+        assert_eq!(
+            Receipt::read(&r.layout.stream(&r.stream).sealed())
+                .unwrap()
+                .last_seq,
+            2
+        );
+        assert_eq!(
+            Receipt::read(&r.layout.stream(&sibling).sealed())
+                .unwrap()
+                .last_seq,
+            1
+        );
+    }
+}

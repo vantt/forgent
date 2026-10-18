@@ -13,7 +13,7 @@ use crate::{
     walk::{self, git_error},
 };
 use fgos_git::{
-    ExpectedTip, GitDriver, HolderAuthority, Oid, Publication, PublicationPort, RefValue,
+    ExpectedTip, GitDriver, HolderAuthority, Inspect, Oid, Publication, PublicationPort, RefValue,
     RepoHandle,
 };
 struct PublicationFs<'a>(&'a (dyn FileSystem + Sync));
@@ -73,8 +73,23 @@ pub fn seal_with_fs(
         ) {
             let root = req.layout.stream(req.stream).root;
             if root.is_dir() {
+                let receipt = Receipt::read(&req.layout.stream(req.stream).sealed())?;
+                let ranges = segments(&req.layout.stream(req.stream))?
+                    .into_iter()
+                    .map(|(f, l, _)| (f, l))
+                    .collect::<Vec<_>>();
+                let reference = own_ref(req.machine, req.stream)?;
+                let tip = driver
+                    .list_refs(
+                        repo,
+                        &[fgos_git::RefPrefix::parse(reference.as_str())
+                            .map_err(|e| invalid(e.to_string()))?],
+                        None,
+                        1024,
+                    )
+                    .map_err(git_error)?;
                 let diagnostic = crate::envelope::line(
-                    &serde_json::json!({"code":e.code.to_string(),"detail":e.detail,"ref":own_ref(req.machine,req.stream)?.as_str()}),
+                    &serde_json::json!({"code":e.code.to_string(),"detail":e.detail,"ref":reference.as_str(),"tip":format!("{tip:?}"),"ranges":ranges,"lastSeq":receipt.last_seq}),
                 )?;
                 fgos_durable_file::replace_durably(&root, "integrity.json", &diagnostic).map_err(
                     |failure| {
@@ -105,11 +120,11 @@ pub(crate) fn seal_guarded(
     }
     let identity = StoreIdentity::open(req.layout, req.machine)?;
     let reference = own_ref(req.machine, req.stream)?;
+    // Reconciliation may rebuild an entirely missing stream directory, not
+    // only a receipt inside an existing one. Use the append/rotation layout door.
+    crate::append::prepare_stream(req.layout, req.stream, fs)?;
     // Recover lost local hints before rotation can reuse a published sequence.
-    if !req.layout.stream(req.stream).sealed().exists()
-        && segments(&req.layout.stream(req.stream))?.is_empty()
-        && !req.layout.stream(req.stream).active().exists()
-    {
+    if !req.layout.stream(req.stream).sealed().exists() {
         let port = PublicationPort::new(
             driver,
             HolderAuthority::new(
@@ -182,7 +197,14 @@ pub(crate) fn seal_guarded(
             } else {
                 walk::Walked::default()
             };
-            let known_tip = known_receipt_tip(&port, repo, req.layout, &reference, tip.as_ref())?;
+            let known_tip = known_receipt_tip(
+                &port,
+                repo,
+                req.layout,
+                &reference,
+                tip.as_ref(),
+                &identity.store_id,
+            )?;
             let key = format!("{}:{}", identity.store_id, req.stream.as_str());
             let high = prior
                 .cover
@@ -250,6 +272,8 @@ pub(crate) fn seal_guarded(
                     }
                     Err(e) if e.code == fgos_git::ResultCode::Stale => {
                         port.release_pin_and_compact(repo, &id).map_err(git_error)?;
+                        // event-seal serializes legitimate writers; a different
+                        // tip here is outside interference, never a blind retry.
                         let observed = port.read_ref(repo, &reference).map_err(git_error)?;
                         if let RefValue::Direct(tip) = observed {
                             let retry = walk::walk_verified(
@@ -334,6 +358,56 @@ pub(crate) fn seal_guarded(
             result.last_seq = last;
         }
     }
+    // Internal callers (including promote) must retire recovered diagnostics,
+    // including when receipt/deletion recovery already left no closed segment.
+    let record = paths.root.join("integrity.json");
+    if record.exists() && segments(&paths)?.is_empty() {
+        let diagnostic: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&record).map_err(io)?)
+                .map_err(|e| invalid(e.to_string()))?;
+        let ranges: Vec<(u64, u64)> = serde_json::from_value(
+            diagnostic
+                .get("ranges")
+                .cloned()
+                .unwrap_or_else(|| serde_json::json!([])),
+        )
+        .map_err(|e| invalid(e.to_string()))?;
+        let receipt = Receipt::read(&paths.sealed())?;
+        if let RefValue::Direct(tip) = port.read_ref(repo, &reference).map_err(git_error)? {
+            if known_receipt_tip(
+                &port,
+                repo,
+                req.layout,
+                &reference,
+                Some(&tip),
+                &identity.store_id,
+            )? {
+                // Never let a certificate hide the corruption that the record
+                // described: revalidate from the roots before clearing it.
+                let checked = walk::walk_verified(
+                    &port,
+                    repo,
+                    &tip,
+                    &Default::default(),
+                    &Default::default(),
+                    req.machine,
+                    req.stream.scope(),
+                )?;
+                walk::check_contiguous(&checked.events, &Default::default())?;
+                let high = checked
+                    .published
+                    .get(&format!("{}:{}", identity.store_id, req.stream.as_str()))
+                    .copied()
+                    .unwrap_or(0);
+                if receipt.last_seq <= high
+                    && ranges.iter().all(|(_, last)| *last <= receipt.last_seq)
+                {
+                    std::fs::remove_file(record).map_err(io)?;
+                    sync_dir(&paths.root)?;
+                }
+            }
+        }
+    }
     Ok(result)
 }
 fn moved(detail: &str) -> Error {
@@ -397,7 +471,9 @@ pub fn oldest_unsealed_age_sec(layout: &Layout, streams: &[StreamId]) -> Result<
         for p in files {
             let bytes = std::fs::read(p).map_err(io)?;
             if let Some(line) = bytes.split(|b| *b == b'\n').find(|l| !l.is_empty()) {
-                if let Ok(e) = serde_json::from_slice::<crate::envelope::Envelope>(line) {
+                {
+                    let e = serde_json::from_slice::<crate::envelope::Envelope>(line)
+                        .map_err(|e| invalid(e.to_string()))?;
                     let first = crate::publish::timestamp_seconds(&e.ts)?;
                     let now = std::time::SystemTime::now()
                         .duration_since(std::time::UNIX_EPOCH)
@@ -420,23 +496,37 @@ pub fn seal_all(
     hot_lock_depth: u32,
 ) -> Result<Vec<Sealed>, Error> {
     crate::locks::validate_seal_context(held_ranks, hot_lock_depth)?;
-    streams
-        .iter()
-        .map(|stream| {
-            seal(
-                driver,
-                repo,
-                SealRequest {
-                    layout,
-                    machine,
-                    stream,
-                    held_ranks,
-                    hot_lock_depth,
-                    opportunistic: false,
-                },
-            )
-        })
-        .collect()
+    let mut results = Vec::new();
+    let mut errors = Vec::new();
+    for stream in streams {
+        match seal(
+            driver,
+            repo,
+            SealRequest {
+                layout,
+                machine,
+                stream,
+                held_ranks,
+                hot_lock_depth,
+                opportunistic: false,
+            },
+        ) {
+            Ok(result) => results.push(result),
+            Err(error) => errors.push(error),
+        }
+    }
+    if errors.is_empty() {
+        Ok(results)
+    } else {
+        Err(Error::new(
+            errors[0].code,
+            errors
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join("; "),
+        ))
+    }
 }
 pub fn seal_if_due(
     driver: &GitDriver,
@@ -466,9 +556,11 @@ fn known_receipt_tip(
     layout: &Layout,
     reference: &fgos_git::RefName,
     tip: Option<&Oid>,
+    origin: &str,
 ) -> Result<bool, Error> {
     let Some(tip) = tip else { return Ok(false) };
     let mut known = false;
+    let mut stops = Vec::new();
     for entry in std::fs::read_dir(&layout.root).map_err(io)? {
         let entry = entry.map_err(io)?;
         let name = entry.file_name();
@@ -478,6 +570,10 @@ fn known_receipt_tip(
         }
         let receipt = Receipt::read(&entry.path().join("sealed.json"))?;
         if receipt.reference == reference.as_str() && !receipt.commit.is_empty() {
+            stops.push(
+                Oid::parse(&receipt.commit, repo.object_format())
+                    .map_err(|e| invalid(e.to_string()))?,
+            );
             if receipt.commit == tip.as_str() {
                 known = true;
             } else if !crate::read::descends(port, repo, tip, &receipt.commit)? {
@@ -485,5 +581,72 @@ fn known_receipt_tip(
             }
         }
     }
-    Ok(known)
+    if known {
+        return Ok(true);
+    }
+    // Authenticate every unreceipted commit against a retained local segment.
+    // Origin alone is insufficient evidence: an outside writer could copy it.
+    let mut current = tip.clone();
+    let mut visited = std::collections::BTreeSet::new();
+    loop {
+        if stops.contains(&current) {
+            return Ok(true);
+        }
+        if !visited.insert(current.as_str().to_owned()) {
+            return Err(invalid("cycle in publication ancestry"));
+        }
+        let page = port
+            .walk_commits(
+                repo,
+                std::slice::from_ref(&current),
+                &[],
+                None,
+                fgos_git::WalkBounds {
+                    max_commits: 1,
+                    max_bytes: 4 * 1024 * 1024,
+                },
+            )
+            .map_err(git_error)?;
+        let commit = page
+            .commits
+            .into_iter()
+            .find(|c| c.oid == current)
+            .ok_or_else(|| invalid("publication commit missing"))?;
+        let parent = commit.parents.first().cloned();
+        {
+            let crate::envelope::Seal::Seal {
+                origin: o,
+                stream,
+                first_seq,
+                last_seq,
+                ..
+            } = walk::header(port, repo, &commit.oid)?
+            else {
+                return Ok(false);
+            };
+            if o != origin {
+                return Ok(false);
+            }
+            let stream = StreamId::parse(&stream)?;
+            let segment = segments(&layout.stream(&stream))?
+                .into_iter()
+                .find(|(f, l, _)| *f == first_seq && *l == last_seq);
+            let Some((_, _, path)) = segment else {
+                return Ok(false);
+            };
+            let bytes = std::fs::read(path).map_err(io)?;
+            closed(&bytes, origin, &stream, first_seq, last_seq)?;
+            if walk::blob(port, repo, &commit.oid, b"events.jsonl")?.as_deref()
+                != Some(bytes.as_slice())
+            {
+                return Ok(false);
+            }
+        }
+        // Only the first-parent publication spine belongs to this ref.
+        // Promote parents are independently verified by walk_verified.
+        match parent {
+            Some(parent) => current = parent,
+            None => return Ok(true),
+        }
+    }
 }
