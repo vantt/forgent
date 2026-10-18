@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Git WAL admission in `fgctl` uses `activation-v2.lock` and fences old controllers at first WAL-capable activation. Pending operations block rollback to a release without `git-wal-v1`; corrupt or incomplete WAL scans refuse activation. Atomic fence placement currently requires Linux.
 - The Rust Git component can install additive Event Store fetch mappings under `repo-config` 80, preserving user settings and recording the effective remote URL in WAL provenance. The combined Node binding and doctor/setup integration are registered.
+- Event Store sync authenticates its own reconciliation merges (the exact verified prior tip and candidate are authorized before the ref CAS), verifies each mirror independently so a rewound or forged foreign mirror becomes a typed warning instead of blocking own publication, and reports every tracked-fence mismatch as `event-store-legacy-mismatch`. Re-running fetch-mapping setup when mappings already exist records an effect-free `configApproved` WAL outcome.
 
 ### Added
 - Terminal-control lays panes out from the real size of the tab (`measured-split`): it splits the pane whose smaller half stays largest, and opens a new tab of the same group when no split keeps a pane of at least `terminal.layout.minCols` x `minRows` or the tab holds `maxPanesPerTab`.

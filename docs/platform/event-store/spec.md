@@ -430,6 +430,13 @@ Setup installs them before any reader expects mirrors. Until they exist, `status
 4. `git push <remote> refs/fgos/events/<own>:refs/fgos/events/<own>` (and `refs/fgos/legacy` once). Sync pushes only the own ref, never a mirror or another machine's ref. A push the remote rejects as non-fast-forward (V-REF-01: exit 1) converges on the next sync by fetching, writing the two-parent merge of step 3, and pushing normally. It never converges by force.
 5. Record the result (time, tips, error) for `status`; tell registered consumers that mirror tips changed.
 
+Settled with the phase 05 review (2026-10-18):
+
+- **Reconciliation is authenticated, never inferred from the graph.** Before the compare-and-swap of step 3, sync durably records the exact verified prior own tip and the computed candidate (merge or fast-forward target) as authorized; only that pair is accepted as the store's own later. A merge commit on the own ref that no such authorization names is refused (`event-store-ref-tampered`), even when its shape is valid. The authorization survives failures before and after the CAS, so a crash after the CAS recovers and publishes.
+- **Each mirror is verified on its own.** A foreign mirror that is rewound, forged or otherwise fails verification keeps its last authenticated tip and position and is recorded as a typed warning in the sync status; own publication continues. A failure of the mirror of the own machine id refuses the sync.
+- **Certified sync positions.** Sync persists each mirror's authenticated position next to its tip and uses it as a certified stop, so a steady sync walks only new commits; a status file written before positions existed is verified in full once.
+- **One tracked-fence authority per clone.** The tracked legacy fence is read at the HEAD of the trusted main checkout of the clone, so every linked worktree of one clone shares it, whatever commit the worktree is on. Every fence mismatch, in read and in sync, reports `event-store-legacy-mismatch`.
+
 Triggers: the explicit verb; and the opportunistic check of section 16 when the last successful push is older than `eventStore.sync.intervalSec` (default 300; 0 means explicit only). Network calls never run inside the Work gate.
 
 Offline: append, seal and read work fully; fetch and push fail, the failure is recorded, `status` shows "unpublished since", the next trigger retries; Work is never blocked by the network. A clone with no remote keeps everything local.
@@ -804,3 +811,10 @@ Amended 2026-10-18 with the Git G0 signature: publication port moves to Git, com
 1. **Publication port (header, sections 3, 4, 20).** The port for `refs/fgos/*` is the Git component's Publication port (`docs/platform/git/spec.md` section 4), not a driver inside the crate. Event Store stays the only production writer of event refs and calls that port; it keeps every decision of sections 10 and 14.
 2. **Combined addon (header, sections 17, 21).** The Node route is the one combined N-API addon that links `fgos-event-store` and `fgos-git` (Git G0 owner decision Q1, 2026-10-17). There is still no exception to the exec guard and no per-call host facade; `event-store-native-addon` checks the combined addon.
 3. **Unchanged.** No protocol step, lock row, lock rank or decision of D-ADR0055 changes. The dissent "Git component as a precondition" is answered in placement only: publication runs through the Git port, and the Event Store cutover follows the order of Git spec section 12.
+
+## Changes with the phase 05 review (2026-10-18)
+
+Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank or decision of D-ADR0055 changes.
+
+1. **Section 14.** Authenticated reconciliation (exact prior and candidate authorized before the CAS), per-mirror verification (foreign failure is a typed warning, own-id failure refuses), certified sync positions, and the clone-wide tracked-fence authority resolved through the trusted main checkout.
+2. **Git.** The no-op fetch-mapping setup records the effect-free `configApproved` outcome (Git spec section 10 rule 4c).
