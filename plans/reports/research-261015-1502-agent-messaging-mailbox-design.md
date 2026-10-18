@@ -13,11 +13,12 @@
 5. [Những chiều thiết kế bắt buộc phải quyết](#5-những-chiều-thiết-kế-bắt-buộc-phải-quyết)
 6. [Giới hạn kỹ thuật và vướng mắc thường gặp](#6-giới-hạn-kỹ-thuật-và-vướng-mắc-thường-gặp)
 7. [Thiết kế tham chiếu](#7-thiết-kế-tham-chiếu)
-8. [Giao tiếp giữa các agent khác máy](#8-giao-tiếp-giữa-các-agent-khác-máy)
-9. [Liên hệ với fgOS](#9-liên-hệ-với-fgos)
-10. [Bước tiếp theo](#10-bước-tiếp-theo)
-11. [Câu hỏi còn mở](#11-câu-hỏi-còn-mở)
-12. [Nguồn](#12-nguồn)
+8. [Cách agent biết gửi tin và làm sao nhận được tin kịp thời](#8-cách-agent-biết-gửi-tin-và-làm-sao-nhận-được-tin-kịp-thời)
+9. [Giao tiếp giữa các agent khác máy](#9-giao-tiếp-giữa-các-agent-khác-máy)
+10. [Liên hệ với fgOS](#10-liên-hệ-với-fgos)
+11. [Bước tiếp theo](#11-bước-tiếp-theo)
+12. [Câu hỏi còn mở](#12-câu-hỏi-còn-mở)
+13. [Nguồn](#13-nguồn)
 
 ---
 
@@ -28,6 +29,8 @@
 3. **Phải tách hai khái niệm "agent" và "session".** Session là một tiến trình, có ranh giới quyền và người dùng riêng. Agent là một luồng model bên trong session. Claude Code dùng hai kênh khác hẳn nhau: mailbox dạng file cho agent trong team (bền, gửi được cho agent đang không chạy), và socket theo từng session cho tin xuyên session (chỉ sống cùng tiến trình, mang ranh giới tin cậy).
 4. **"Checkpoint" có hai nghĩa dễ nhầm.** Nghĩa thứ nhất là *điểm an toàn để chèn tin* trong vòng lặp. Nghĩa thứ hai, như LangGraph dùng, là *ảnh chụp trạng thái được lưu bền* để tạm dừng và chạy tiếp. Một hệ mailbox tốt cần cả hai, nhưng phải đặt tên tách bạch.
 5. **Phần khó nhất của mailbox cho agent không nằm ở phần vận chuyển, mà ở bốn chỗ**: chèn tin ở đâu trong vòng lặp, tin cậy tin của ai, chặn vòng lặp tin nhắn và bão tin, và chi phí context của mỗi tin nhắn.
+
+6. **Agent không "lắng nghe", nó chỉ "nghe" ở các điểm harness xả hàng đợi.** Muốn agent thường xuyên có cơ hội xử lý tin thì phải tạo điểm xả (mỗi ranh giới step, cổng dừng, đánh thức khi rảnh), ghim tin tới khi ack, đặt hạn và leo thang, và đo độ trễ. Chi tiết ở mục 8.
 
 ---
 
@@ -350,11 +353,141 @@ Mười quy tắc cụ thể:
 
 ---
 
-## 8. Giao tiếp giữa các agent khác máy
+## 8. Cách agent biết gửi tin và làm sao nhận được tin kịp thời
+
+Mục này trả lời hai câu hỏi mà các mục trước chỉ chạm tới: (A) một agent *biết bằng cách nào* rằng mình có thể gửi tin, gửi cho ai và gửi ra sao; (B) làm sao để agent *thường xuyên có cơ hội* nhận và xử lý tin, thay vì tin nằm trong hộp thư mà không ai đọc. Phần Claude Code và Codex dựa trên mục 3 và 4. Phần về hook, về `send.text` của terminal-control và các đề xuất là suy luận thiết kế; những điểm chưa kiểm chứng được nêu rõ.
+
+### 8.1 Nguyên lý nền: agent không "lắng nghe", agent chỉ "nghe" khi vòng lặp chạy qua một cơ hội
+
+Một tiến trình thường trực (server, actor) có thể chờ trên socket và phản ứng ngay. Một agent LLM thì khác: giữa hai lần gọi model, không có gì "đang nghe". Agent chỉ biết một tin tồn tại nếu *harness* (phần mềm bao quanh model) đưa tin đó vào context ở một điểm cụ thể. Vì vậy:
+
+- "Agent nhận được tin" nghĩa là *harness đã nhét tin vào lần gọi model kế tiếp*, không phải là agent tự phát hiện.
+- "Agent có cơ hội xử lý" nghĩa là có một điểm trong vòng lặp mà harness xả hàng đợi *và* model còn quyền hành động sau đó.
+- Tin nằm trong hộp thư nhưng không có điểm xả nào chạy tới thì coi như chưa gửi. Đây là lỗi hay gặp nhất của thiết kế mailbox kiểu "ghi file rồi hy vọng".
+
+Hai nửa của bài toán vì thế tách bạch: *khả năng gửi* là chuyện công cụ và tri thức (agent có biết không), còn *khả năng nhận* là chuyện vòng lặp của harness (có điểm xả không, điểm đó xuất hiện thường xuyên cỡ nào).
+
+### 8.2 (A) Agent biết cách gửi tin bằng cách nào
+
+Agent chỉ biết những gì nằm trong context của nó. Có bốn nguồn tri thức, và thiết kế tốt dùng cả bốn:
+
+| Nguồn | Agent học được gì | Ví dụ |
+|---|---|---|
+| **Công cụ trong danh sách tool** | *Rằng* gửi tin là một hành động có thật, và tham số của nó (`to`, `message`, `summary`) | `SendMessage` của Claude Code; `wait` của Codex multi-agent |
+| **Chỉ dẫn hệ thống / file chỉ dẫn** | *Khi nào* nên gửi, gửi gom hay tách, quy tắc tin cậy, cách đọc tin đến | tài liệu agent teams; `AGENTS.md` và skill của repo |
+| **Danh bạ (roster) được harness đưa vào context hoặc tra bằng tool** | *Gửi cho ai*: tên, vai trò, đang bận hay rảnh, còn sống không | `ListAgents`; `name@team`; danh sách teammate được cấp lúc khởi tạo |
+| **Ngữ cảnh lúc được sinh ra (spawn brief)** | Danh tính của chính mình, ai là lead, địa chỉ để trả lời, ai đã giao việc | prompt khởi tạo teammate; `from` trong tin đến |
+
+Những điểm hay làm sai:
+
+1. **Có tool nhưng không có danh bạ.** Agent biết gọi `send(to=…)` nhưng không biết tên hợp lệ nên đoán tên. Cần hoặc danh bạ cấp sẵn lúc khởi tạo, hoặc tool liệt kê, hoặc lỗi trả về phải kèm danh sách tên hợp lệ.
+2. **Không biết địa chỉ trả lời.** Tin đến thiếu `from` đủ dùng thì bên nhận không trả lời được. Mỗi tin phải mang địa chỉ ổn định của người gửi (mục 5.1), kể cả khi người gửi là subagent mà câu trả lời lại quay về session cha (mục 6, điểm 12).
+3. **Không biết mình nên hay không nên gửi.** Thiếu chỉ dẫn thì agent hoặc im lặng khi cần báo, hoặc nhắn dồn dập. Chỉ dẫn phải nói rõ ba thứ: gửi gom thành một tin, tin nào đòi trả lời, và không hỏi lại liên tục.
+4. **Gọi tool gửi nhưng tưởng là đã giao.** Kết quả của tool nên nói rõ trạng thái (*đã ghi*, không phải *đã đọc*; mục 5.2), để agent không dựa vào một sự im lặng.
+5. **Địa chỉ ở phạm vi nào.** Tên chỉ duy nhất trong team hay trong project hay toàn cục thì danh bạ phải nói đúng phạm vi đó; liên máy cần thêm máy (mục 9.3).
+
+**Áp dụng cho fgOS (đề xuất, chưa có trong repo):** một cửa gửi duy nhất (ví dụ một verb `fgos` có địa chỉ đích, theo nguyên tắc "one door" của `core/instructions/design-principles.md`) thay vì mỗi skill tự chế cách nhắn. Danh bạ lấy từ nguồn sự thật đã có (phiên, claim, worker slot), không dựng bảng riêng. Chỉ dẫn nằm ở một chỗ trong instruction đã được chiếu ra `AGENTS.md`, để mọi CLI (Claude Code, Codex, omp, pi, agy) đọc cùng một nội dung. Bản tóm tắt danh bạ và số tin chưa đọc được đưa vào context ở lúc khởi tạo và ở mỗi checkpoint (xem 8.4).
+
+### 8.3 (B) Các cơ hội để agent nhận và xử lý tin
+
+Mỗi "cơ hội" là một điểm mà harness có thể đưa tin vào context. Liệt kê đủ để thấy chỗ nào còn trống.
+
+| # | Cơ hội | Khi nào xảy ra | Agent phản ứng được ngay? | Nguồn / ghi chú |
+|---|---|---|---|---|
+| O1 | **Checkpoint sau mỗi lô tool** | Tool xong, trước lần gọi model kế tiếp | Có, trong cùng turn | mục 3.1; Claude Code gắn `queued_command` thành attachment; Codex xả `pending_input` mỗi vòng lấy mẫu |
+| O2 | **Đánh thức khi rảnh** | Session đang idle, tin tới | Có, bằng turn mới | `InboxPoller "Session idle, delivering"` |
+| O3 | **Xả khi kết thúc turn** | Model trả câu cuối nhưng hàng đợi còn tin | Có, bằng turn kế tiếp | Codex: vòng ngoài mở turn mới khi còn input; pha `NextTurn` |
+| O4 | **Hook của harness** | Trước khi gửi prompt, sau khi gọi tool, khi sắp dừng | Có nếu hook trả nội dung vào context hoặc chặn việc dừng | Claude Code có hook theo sự kiện (kiến thức về tính năng hook, chưa kiểm chứng lại trong phiên này); fgOS đã cài hook cho Claude Code, Codex, agy, omp, pi (kết quả `fgos doctor` ngày 2026-10-18) |
+| O5 | **Agent tự kéo bằng tool** | Agent chủ động gọi `read inbox` hoặc `wait` | Có, nhưng phụ thuộc agent nhớ làm | MCP Agent Mail; `wait` của Codex |
+| O6 | **Thông báo tác vụ nền** | Tool chạy nền hoàn thành hoặc `Monitor` báo | Có, như tin đến ở O1 hoặc O2 | `run_in_background`, `Monitor` |
+| O7 | **Đánh thức agent đã dừng** | Gửi cho teammate đã dừng thì nạp lại hội thoại | Có, mailbox sống lâu hơn tiến trình | mục 4.1, hệ quả thứ hai |
+| O8 | **Gõ vào terminal của CLI** | Tiến trình CLI đang ở prompt, nhận ký tự | Có, nhưng tin trông như người dùng gõ | fgOS: terminal-control khai `send.text`, `send.keys`, `read.screen`, `activity.state` (doctor, driver herdr, 12 capability). Đây là cơ hội có thật cho CLI không có kênh riêng, và đồng thời là rủi ro (8.6) |
+
+Độ trễ nhận tin tối đa theo trạng thái của agent:
+
+| Agent đang... | Cơ hội gần nhất | Độ trễ tối đa |
+|---|---|---|
+| chạy chuỗi tool ngắn | O1 | độ dài một lô tool, thường vài giây |
+| chạy một tool dài (build, test) | O1 sau khi tool xong; O6 nếu tool chạy nền | độ dài tool dài nhất, trừ khi tool được chạy nền |
+| đang stream câu trả lời dài | O3 hoặc O1 sau lần gọi kế | độ dài lần sinh hiện tại |
+| đã phát câu trả lời cuối | O3 (pha `NextTurn`) | tới hết turn, rồi turn mới mở ngay |
+| rảnh, tiến trình còn sống | O2 | chu kỳ thăm dò của poller (hoặc ngay lập tức nếu là đẩy) |
+| tiến trình đã thoát | O7 nếu hệ có cơ chế nạp lại; nếu không thì **không có cơ hội** | vô hạn |
+| bị compact giữa chừng | O1 sau compact, nếu tin được ghim | một chu kỳ checkpoint, nhưng có rủi ro mất tin (8.5) |
+| chờ người duyệt (`input-required`) | không có, theo thiết kế | tới khi người trả lời hoặc hết hạn |
+
+Hai trạng thái "độ trễ vô hạn" cần chú ý nhất: *tiến trình đã thoát mà không có cơ chế đánh thức*, và *agent chờ người mà không có hạn*. Chúng là nơi tin âm thầm biến mất.
+
+```mermaid
+sequenceDiagram
+    participant S as Người gửi
+    participant Q as Hàng đợi bền (theo địa chỉ)
+    participant H as Harness của người nhận
+    participant M as Model của người nhận
+    S->>Q: ghi tin (msg_id, from, to, cần-trả-lời?, hạn)
+    Note over Q: tin chưa tới model, chỉ nằm chờ
+    loop mỗi vòng agent
+        M->>H: cần chạy tool
+        H->>H: chạy tool xong
+        H->>Q: xả (O1) + đọc số tin chưa đọc
+        Q-->>H: tin mới + "còn N chưa đọc"
+        H->>M: tool_result + tin có nhãn nguồn + dòng "inbox: N"
+        M->>H: xử lý, có thể trả lời hoặc ack
+    end
+    H->>Q: ack sau khi tin vào transcript
+    Note over H,Q: trước khi cho kết thúc turn, hỏi lại Q (cổng dừng, O3/O4)
+```
+
+### 8.4 Quy tắc để agent *thường xuyên* nhận được tin
+
+Mục tiêu là biến "may mắn có checkpoint" thành "luôn có cơ hội, có đo được". Mười quy tắc, mỗi quy tắc gắn với lỗi mà nó chặn:
+
+1. **Mọi ranh giới step là điểm xả.** Không có đường đi nào từ tool xong tới model mà không đi qua xả. (Chặn: tin chỉ được đọc khi cuối task.)
+2. **Luôn nói rõ có tin hay không, kể cả khi không có tin mới.** Mỗi checkpoint kèm một dòng trạng thái ngắn, ví dụ `inbox: 2 chưa đọc, cũ nhất 4 phút`. Dòng này tốn rất ít token và chống lại việc tin cũ bị quên sau khi đã giao một lần. (Chặn: tin đã giao nhưng agent không xử lý rồi bị chôn.)
+3. **Ghim tin chưa ack qua compact và resume.** Tin chỉ được rút khỏi danh sách "chưa xử lý" khi agent ack, không phải khi đã giao. Sau compact, tin chưa ack được đưa lại vào context. (Chặn: tin biến mất vì compact.)
+4. **Cổng dừng.** Trước khi cho một turn kết thúc, harness kiểm tra hàng đợi; còn tin thì mở turn tiếp thay vì trả quyền. Với harness có hook "sắp dừng", hook này có thể chặn việc dừng và nạp tin. (Chặn: câu trả lời cuối làm tin bị bỏ lại.)
+5. **Đánh thức khi rảnh bằng đẩy, không chờ agent tự hỏi.** Dùng một poller hoặc watcher có chu kỳ ngắn và hạn trên rõ ràng; ghi độ trễ giao tin để đo. (Chặn: agent rảnh nhưng không ai gọi.)
+6. **Tool dài chạy nền, kèm handle.** Giữ độ trễ checkpoint thấp. Cho phép huỷ để mức `interrupt` dùng được khi tin cấp bách. (Chặn: một lệnh 10 phút chặn mọi tin.)
+7. **Agent đã dừng phải có đường đánh thức.** Hoặc nạp lại hội thoại từ bản lưu, hoặc chuyển tin thành việc mới cho một agent khác nhận. (Chặn: tin gửi cho agent đã chết.)
+8. **Tin đòi trả lời mang hạn và có vòng leo thang.** Mỗi tin loại "cần phản hồi" có `reply_by`. Quá hạn thì nhắc một lần, rồi đổi người nhận hoặc hỏi chủ dự án, rồi ghi vào hàng tin chết (dead letter) để người nhìn thấy. (Chặn: im lặng bị hiểu là đồng ý, mục 6 điểm 6.)
+9. **Hiện diện thật, không giả định.** `ListAgents` trả trạng thái từ nguồn thực (tiến trình, claim, lease có hạn), không từ một bản sao trong bộ nhớ có thể lệch. Trạng thái "rảnh" cũng phải biết là rảnh *có nhận tin được không*. (Chặn: gửi cho agent mà hệ tưởng còn sống.)
+10. **Đo ba con số.** Độ trễ từ ghi tới giao; tỉ lệ tin giao rồi nhưng chưa ack sau T phút; số tin chạm hạn leo thang. Nếu một con số xấu đi là mailbox đang hỏng âm thầm.
+
+Tín hiệu khẩn cấp là một mức ưu tiên riêng (mục 5.4: `interrupt`), nhưng dùng ít và có kiểm soát, vì mỗi lần ngắt tốn một `tool_result` giả và có thể làm hỏng việc dở dang.
+
+### 8.5 Những cách tin âm thầm mất cơ hội xử lý
+
+| Kiểu mất | Cơ chế | Cách chặn |
+|---|---|---|
+| Tin nằm trong file nhưng vòng lặp không đọc | Chỉ có O5 (tự kéo), agent không nhớ gọi | Thêm O1/O3: harness tự xả |
+| Giao rồi nhưng chưa xử lý, rồi bị compact | Tin chỉ có trong transcript, compact tóm tắt mất | Quy tắc 3: ghim đến khi ack |
+| Giao vào câu trả lời đã chốt | Model sửa lại câu cuối | Pha `NextTurn`; nhưng phải có cổng dừng để tin đó vẫn được xử lý ở turn kế |
+| Agent kẹt một step dài | Checkpoint không tới | Quy tắc 6; đo thời lượng step |
+| Agent chờ người không có hạn | `input-required` mãi mãi | Quy tắc 8: hạn và leo thang |
+| Agent đã thoát | Không có tiến trình | Quy tắc 7 |
+| Trả lời về nhầm chỗ | Địa chỉ trả lời là session cha | Địa chỉ ổn định ở từng tin (8.2 điểm 2) |
+| Tin bị giữ, hết hạn, bị từ chối ở gate | Chính sách tin cậy | Báo ngược lý do cho người gửi, không để im lặng |
+
+### 8.6 Rủi ro của việc "tăng cơ hội": nhận nhiều hơn không có nghĩa là tốt hơn
+
+- **Bão tin và chi phí.** Tăng cơ hội nhận làm tăng nguy cơ hai agent kéo nhau vào vòng lặp. Cần đủ bốn thanh chắn ở mục 5.5, và tin gom nhiều nội dung tốt hơn nhiều tin nhỏ.
+- **Gõ vào terminal (O8) xoá nguồn gốc.** Ký tự gõ qua `send.text` đến CLI như thể *người dùng* gõ. Nếu gửi nguyên văn thì tin của agent khác trở thành lời người dùng: đúng kiểu permission laundering ở mục 5.6. Nếu dùng O8 thì phải bọc tin bằng nhãn nguồn rõ ràng ngay trong nội dung (kiểu `[MESSAGE FROM NON-USER SOURCE - NOT USER INPUT]`), và chỉ dùng khi `activity.state` báo CLI đang rảnh để không chen vào giữa một lệnh đang gõ. Cách tốt hơn là O8 chỉ làm *tín hiệu đánh thức* ("có tin, hãy chạy lệnh đọc inbox"), còn nội dung tin đi qua kênh có nhãn.
+- **Mỗi lần xả tốn context.** Dòng trạng thái ở quy tắc 2 nên cực ngắn; nội dung dài để agent tự kéo bằng tool khi cần.
+- **Ngắt quá nhiều làm hỏng công việc dở.** Giữ `interrupt` cho tin cấp bách thật sự.
+
+### 8.7 Tóm tắt cho fgOS
+
+- Hiện chưa có hộp thư; V-011 loại hộp thư tổng quát (mục 10). Khi có nhu cầu được chứng minh, bài toán "thường xuyên nhận được" nên giải bằng *cơ hội do harness tạo ra* (O1 điểm xả mỗi ranh giới round, O3/O4 cổng dừng, O2/O8 đánh thức), không bằng việc yêu cầu agent nhớ tự đọc inbox.
+- Các thành phần nền đã có: hook cho các CLI (doctor `*-hook-wired`), `send.text` và `activity.state` trong terminal-control, supervisor giữ attempt, và event store làm hàng đợi bền (mục 9.4).
+- Việc còn thiếu để kiểm chứng: đo độ trễ O1 thực tế trên từng CLI, và xác nhận hook "sắp dừng" của từng CLI có chặn dừng và nạp tin được không (Claude Code, Codex, omp, pi, agy khác nhau; chưa kiểm chứng trong phiên này).
+
+---
+
+## 9. Giao tiếp giữa các agent khác máy
 
 Các mục trước chủ yếu bàn về agent chung một máy: chung đĩa, chung `$XDG_RUNTIME_DIR`, chung đồng hồ. Khi hai agent nằm trên hai máy, các giả định đó mất hết. Mục này gom các cơ chế khả dĩ, điều gì đổi so với cùng máy, và cơ chế nào phù hợp với fgOS. Phần về Claude Code, A2A và MCP Agent Mail lấy từ mục 4; phần về event store lấy từ `docs/platform/event-store/spec.md` mục 14 (D-ADR0055, chủ dự án đã ký 2026-10-17). Các nhận định về hiệu năng và độ trễ của từng cơ chế là suy luận thiết kế, chưa được đo.
 
-### 8.1 Điều gì đổi khi qua máy khác
+### 9.1 Điều gì đổi khi qua máy khác
 
 | Thuộc tính | Cùng máy | Khác máy |
 |---|---|---|
@@ -368,22 +501,22 @@ Các mục trước chủ yếu bàn về agent chung một máy: chung đĩa, c
 
 Hệ quả: mọi tin liên máy phải mang `msg_id` bất biến và bên nhận phải khử trùng. Mọi quyết định phải chịu được việc tin đến muộn, đến hai lần, hoặc đến sai thứ tự giữa hai người gửi.
 
-### 8.2 Năm họ cơ chế
+### 9.2 Năm họ cơ chế
 
 1. **Qua máy chủ trung gian của nhà cung cấp.** Claude Code Remote Control và cloud (mục 4.1c): tin đi qua máy chủ Anthropic, session bên kia offline vẫn nhận được khi kết nối lại. Ưu điểm: không phải tự vận hành hạ tầng. Nhược điểm: phụ thuộc nhà cung cấp, không có báo ngược khi gửi từ session không kết nối, và chỉ dùng được giữa các session của chính CLI đó.
 2. **Giao thức agent-to-agent qua HTTP (A2A, mục 4.3).** Mỗi hệ agent công bố `AgentCard`, nhận `Message` và `Task`, báo cập nhật qua `GetTask`, SSE hoặc webhook. Ưu điểm: chuẩn mở, đã có vòng đời task và trạng thái `INPUT_REQUIRED`. Nhược điểm: cần một endpoint mở và xác thực ở mỗi bên, một máy ngủ thì không nhận được webhook, và đặc tả nói rõ không bảo đảm giao tin tin cậy.
 3. **Hộp thư là kho dùng chung qua Git** (kiểu MCP Agent Mail, mục 4.4, và kiểu `refs/fgos/events/<machine>` của fgOS). Tin được ghi thành object Git bất biến, mỗi máy chỉ ghi vào nhánh/ref của riêng mình, các máy `fetch` ref của nhau rồi hợp theo hash. Ưu điểm: không có máy chủ trung gian riêng ngoài remote Git đã có sẵn; ngắt mạng vẫn ghi cục bộ được; lịch sử kiểm tra được; không ai ghi đè ref của người khác nên không có xung đột ghi. Nhược điểm: là cơ chế kéo (pull) theo chu kỳ, độ trễ bằng chu kỳ fetch, không phù hợp để "ngắt giữa chừng" một tool đang chạy; remote có thể ẩn ref tuỳ biến trong giao diện web.
-4. **Hàng đợi hoặc broker trung gian** (Kafka, NATS, Redis streams, hoặc hàng đợi dựa trên đối tượng lưu trữ đám mây). Ưu điểm: đẩy (push) gần thời gian thực, có sẵn ack và retention. Nhược điểm: thêm một thành phần vận hành và một điểm lỗi duy nhất; vi phạm nguyên tắc hiện tại của fgOS là không có điều phối viên trực tuyến (xem 8.4).
+4. **Hàng đợi hoặc broker trung gian** (Kafka, NATS, Redis streams, hoặc hàng đợi dựa trên đối tượng lưu trữ đám mây). Ưu điểm: đẩy (push) gần thời gian thực, có sẵn ack và retention. Nhược điểm: thêm một thành phần vận hành và một điểm lỗi duy nhất; vi phạm nguyên tắc hiện tại của fgOS là không có điều phối viên trực tuyến (xem 9.4).
 5. **Kết nối trực tiếp qua đường hầm** (SSH socket forward, Tailscale, WireGuard) tới socket của session bên kia, kiểu `cc-socks` mở rộng. Ưu điểm: độ trễ thấp, không cần broker. Nhược điểm: cả hai máy phải cùng online, phải tự giải quyết khám phá địa chỉ và xác thực, và một mạng đứt làm mất tin nếu không có hàng đợi bền ở đầu gửi.
 
-### 8.3 Bốn chiều thiết kế riêng cho liên máy
+### 9.3 Bốn chiều thiết kế riêng cho liên máy
 
 - **Mô hình ghi: một người ghi cho mỗi hàng đợi.** Cách ít xung đột nhất là mỗi máy ghi hộp thư gửi đi của chính nó và chỉ đọc hộp thư của máy khác (sở hữu theo nguồn). Người nhận suy ra "inbox của mình" bằng cách lọc các hộp gửi đi theo địa chỉ đích. Cách này giữ được tính bất biến và tránh cần khoá chung, đồng thời tránh phải quyết "ai thắng" khi hai máy cùng ghi.
 - **Danh tính và xác thực.** Địa chỉ phải gồm cả máy: `agent@machine` hoặc `machineId/sessionId/agentId`. Tin cần chữ ký hoặc ít nhất là kênh đã xác thực, vì ranh giới tin cậy cùng máy (cùng uid) không còn. Mọi tin liên máy mặc định rơi vào lớp tin cậy "bên thứ ba" của mục 5.6: không bao giờ mang quyền của người dùng và đi qua gate trước khi vào context.
-- **Độ trễ chấp nhận được quyết định cơ chế.** Phần lớn nhu cầu của fgOS (báo "đã land", bàn giao việc, hỏi chủ dự án một câu quyết định) chịu được độ trễ hàng chục giây đến vài phút, và hợp với cơ chế kéo theo chu kỳ. Chỉ nhu cầu "steer một Unit đang chạy ở máy khác" mới cần đẩy; nhu cầu đó nên giải bằng checkpoint ở ranh giới round (mục 9) cộng một lần đánh thức, không cần kênh thời gian thực.
+- **Độ trễ chấp nhận được quyết định cơ chế.** Phần lớn nhu cầu của fgOS (báo "đã land", bàn giao việc, hỏi chủ dự án một câu quyết định) chịu được độ trễ hàng chục giây đến vài phút, và hợp với cơ chế kéo theo chu kỳ. Chỉ nhu cầu "steer một Unit đang chạy ở máy khác" mới cần đẩy; nhu cầu đó nên giải bằng checkpoint ở ranh giới round (mục 10) cộng một lần đánh thức, không cần kênh thời gian thực.
 - **Phân vùng và hợp nhất.** Hai máy offline rồi cùng chỉnh một thực thể sẽ phân kỳ. Có ba lối: cấm (cần điều phối viên trực tuyến), chọn người thắng, hoặc ghi nhận cả hai kết quả như xung đột có ghi lại. fgOS đã chọn lối thứ ba cho event store: *"cross-machine provisional success with recorded conflicts accepted (no online coordinator)"*, và dùng merge commit hai cha khi hai ref phân kỳ.
 
-### 8.4 Điều fgOS đã có sẵn cho giao tin khác máy
+### 9.4 Điều fgOS đã có sẵn cho giao tin khác máy
 
 Spec event store mục 14 đã mô tả một kênh khác máy hoạt động, dù không phải hộp thư:
 
@@ -394,7 +527,7 @@ Spec event store mục 14 đã mô tả một kênh khác máy hoạt động, d
 
 Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần thành phần mới nếu chấp nhận bốn điều. Một, tin là một loại sự kiện thuộc một stream mới (ví dụ `messages`) trong cùng event store. Hai, địa chỉ đích nằm trong sự kiện và bên nhận lọc theo địa chỉ khi dựng view. Ba, `msg_id` là hash sự kiện nên khử trùng là miễn phí. Bốn, độ trễ bằng chu kỳ `eventStore.sync.intervalSec` (mặc định 300 giây) trừ khi có thêm tín hiệu đánh thức.
 
-### 8.5 So sánh nhanh
+### 9.5 So sánh nhanh
 
 | Tiêu chí | Máy chủ nhà cung cấp | A2A qua HTTP | Git refs (event store) | Broker | Đường hầm trực tiếp |
 |---|---|---|---|---|---|
@@ -406,9 +539,9 @@ Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần t
 | Kiểm tra lại được | không | tuỳ | có, lịch sử Git | tuỳ | không |
 | Hợp với "không điều phối viên trực tuyến" | không (phụ thuộc bên ngoài) | một phần | có | không | một phần |
 
-### 8.6 Khuyến nghị
+### 9.6 Khuyến nghị
 
-1. **Mặc định cho fgOS: hộp thư là một stream sự kiện trên đúng kênh Git refs đã có**, đủ cho bàn giao, thông báo landing và câu hỏi quyết định giữa ba máy của chủ dự án. Không thêm broker hay máy chủ. Điều kiện: chỉ làm khi qua cổng "chứng minh nhu cầu" ở mục 9 (V-011 vẫn có hiệu lực cho tới khi được supersede).
+1. **Mặc định cho fgOS: hộp thư là một stream sự kiện trên đúng kênh Git refs đã có**, đủ cho bàn giao, thông báo landing và câu hỏi quyết định giữa ba máy của chủ dự án. Không thêm broker hay máy chủ. Điều kiện: chỉ làm khi qua cổng "chứng minh nhu cầu" ở mục 10 (V-011 vẫn có hiệu lực cho tới khi được supersede).
 2. **Nếu cần đánh thức nhanh**, thêm tín hiệu nhẹ rẻ tiền (một lần `git ls-remote` theo chu kỳ ngắn, hoặc một thông báo đẩy), chỉ để kích hoạt `events sync`. Nội dung tin vẫn đi qua Git. Như vậy tách "đánh thức" khỏi "giao tin tin cậy".
 3. **Steer liên máy** không dùng kênh thời gian thực; dùng checkpoint ở ranh giới round và một sự kiện `steer` có địa chỉ `unitRunId`, được xả khi Unit tới ranh giới kế tiếp.
 4. **Ghi rõ giới hạn trong spec nếu làm:** giao tin ít nhất một lần cộng khử trùng theo hash; không bảo đảm thứ tự giữa hai máy; không dùng tin liên máy để quyết định quyền hạn; mọi tin vào gate với lớp "bên thứ ba".
@@ -416,7 +549,7 @@ Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần t
 
 ---
 
-## 9. Liên hệ với fgOS
+## 10. Liên hệ với fgOS
 
 - **Tiền lệ đã có:** `docs/architect/agent-coordination/vision.md` (V-011) ghi rõ: *"The first foundation does not require a scheduler, durable Job queue, daemon, general mailbox, mandatory Mission lifecycle, unrestricted peer chat…"* và *"New persisted entities require a distinct authority, recovery need, or invariant that existing entities cannot represent correctly."* Thêm vào đó, `contracts/coordination-session.md` mô tả Deliberation Contribution Ledger là các link bất biến có kiểu, *"never a general message/thread/mailbox subsystem"*.
 - **Ý nghĩa:** muốn đưa mailbox vào fgOS thì phải chứng minh được một nhu cầu khôi phục, một quyền hạn hoặc một bất biến mà Assignment, RunResult và Contribution Ledger hiện tại không biểu diễn được. Nếu chỉ để "cho agent nói chuyện" thì chưa đủ lý do.
@@ -428,7 +561,7 @@ Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần t
 
 ---
 
-## 10. Bước tiếp theo
+## 11. Bước tiếp theo
 
 1. Đọc `src/runner/` để xác định chính xác ranh giới round hiện có, và xem đã có chỗ nào cho phép đưa input vào giữa các round chưa. Kết quả nên là một bản ghi facts ngắn.
 2. Nếu ranh giới đó có, viết một câu hỏi quyết định theo mẫu `core/skills/_shared/decision-question.md` về việc mở lại V-011 chỉ cho phạm vi "hàng đợi steer theo Unit". Cách mở lại là supersede, không sửa tại chỗ.
@@ -437,19 +570,19 @@ Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần t
 
 ---
 
-## 11. Câu hỏi còn mở
+## 12. Câu hỏi còn mở
 
 1. Gửi `SendMessage` tới một subagent trong cùng session (không thuộc team) thì tin đi qua hàng đợi trong bộ nhớ hay qua file? Em chưa đọc tới đoạn code đó.
 2. Antigravity có cơ chế steer giữa task không? Chưa có nguồn chính thức.
 3. Steer của Codex trở thành mặc định từ phiên bản nào? Các nguồn thứ cấp mâu thuẫn nhau.
 4. Mailbox dạng file của Claude Code có giới hạn kích thước hay số tin cho mỗi inbox không? Tài liệu không nói.
 5. Với fgOS, một hàng đợi steer có cần lưu bền hay không, nếu Unit vốn đã có thể chạy lại? Câu trả lời phụ thuộc vào việc chạy lại một round có tốn kém hay không.
-6. Liên máy: chu kỳ `eventStore.sync.intervalSec` 300 giây có đủ cho bàn giao và câu hỏi quyết định giữa các máy không, hay cần tín hiệu đánh thức riêng (mục 8.6)?
+6. Liên máy: chu kỳ `eventStore.sync.intervalSec` 300 giây có đủ cho bàn giao và câu hỏi quyết định giữa các máy không, hay cần tín hiệu đánh thức riêng (mục 9.6)?
 7. Liên máy: hai máy cùng muốn nhận một việc thì ai giữ lease khi claims là runtime state theo máy?
 
 ---
 
-## 12. Nguồn
+## 13. Nguồn
 
 Nguồn chính:
 
@@ -473,4 +606,4 @@ Tài liệu fgOS liên quan:
 
 - `docs/architect/agent-coordination/vision.md` (V-011)
 - `docs/architect/agent-coordination/contracts/coordination-session.md` (Deliberation Contribution Ledger)
-- `docs/platform/event-store/spec.md` mục 14 (chia sẻ giữa các máy qua `refs/fgos/events/<machine>`, D-ADR0055), nguồn của mục 8
+- `docs/platform/event-store/spec.md` mục 14 (chia sẻ giữa các máy qua `refs/fgos/events/<machine>`, D-ADR0055), nguồn của mục 9
