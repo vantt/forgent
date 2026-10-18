@@ -16,9 +16,15 @@ import {
   checkRunAttemptsStuck,
   fixRunAttemptsStuck,
   checkGateKillGrace,
+  checkLegacyAttemptsStuck,
+  fixLegacyAttemptsStuck,
+  checkUnitsAwaitingResume,
+  checkCancelWait,
 } from '../../src/setup/run-supervisor-checks.mjs';
-import { readGateKillGraceMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
+import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
+import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
 import { descriptionHolders } from '../../src/holder-lock/driver.mjs';
+import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -63,6 +69,8 @@ test('the run supervisor checks and fixes are registered', () => {
   const fixIds = FIX_REGISTRATIONS.map((fix) => fix.id);
   assert.ok(fixIds.includes('runtime-socket-dir'));
   assert.ok(fixIds.includes('run-attempts-stuck'));
+  for (const id of ['legacy-attempts-stuck', 'units-awaiting-resume', 'cancel-wait']) assert.ok(ids.includes(id), `${id} is a doctor check`);
+  assert.ok(fixIds.includes('legacy-attempts-stuck'));
 });
 
 // ─── run-supervisor-route ───────────────────────────────────────────────
@@ -312,4 +320,136 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
   assert.equal(res.passed, true, res.message);
   assert.match(res.message, /1 open attempt\(s\), none stuck \(1 running\)/);
   holder.kill('SIGKILL');
+});
+
+// ─── legacy-attempts-stuck ──────────────────────────────────────────────
+
+const LEGACY_FIXTURE = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'fixtures', 'run-layout', 'legacy-stuck', 'assignments');
+const door = { observe: recoverObserveUseCase, apply: recoverApplyUseCase };
+
+/** A workspace holding the two legacy runs of the spike fixture; `confinementRoot` is empty (no v1 home left). */
+function legacyWorkspace(name) {
+  const root = workspace(name);
+  fs.cpSync(LEGACY_FIXTURE, path.join(root, '.fgos', 'assignments'), { recursive: true });
+  const confinementRoot = path.join(root, 'confinement');
+  fs.mkdirSync(confinementRoot);
+  return { root, confinementRoot, herdr: path.join(root, '.fgos', 'assignments', 'unit-run-herdr/producer/1/runs/01'), cli: path.join(root, '.fgos', 'assignments', 'unit-run-cli/producer/1/runs/01') };
+}
+
+test('legacy-attempts-stuck: nothing left running passes', () => {
+  const root = workspace('legacy-none');
+  assert.equal(checkLegacyAttemptsStuck(root).passed, true);
+  assert.equal(fixLegacyAttemptsStuck(root, { door }).changed, false);
+});
+
+test('legacy-attempts-stuck: runs whose processes are all dead fail, the fix settles them and the check then passes', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const w = legacyWorkspace('legacy-dead');
+  const before = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
+  assert.equal(before.passed, false, before.message);
+  assert.match(before.message, /2 run\(s\) from before the run supervisor are left running and every process they recorded is dead/);
+  assert.match(before.message, /fgos doctor --fix/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(w.cli, 'run.json'), 'utf8')).status, 'running', 'the check wrote nothing');
+
+  const fixed = fixLegacyAttemptsStuck(w.root, { door, confinementRoot: w.confinementRoot });
+  assert.equal(fixed.changed, true);
+  assert.match(fixed.message, /settled 2 run\(s\) as abandoned-legacy/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(w.cli, 'run.json'), 'utf8')).settlement, 'abandoned-legacy');
+  assert.equal(checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot }).passed, true);
+});
+
+test('legacy-attempts-stuck: a run with a live recorded process is kept and the reason is printed, by the check and by the fix', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const w = legacyWorkspace('legacy-alive');
+  const generation = path.join(w.herdr, 'control', 'generations', '0000000001.json');
+  const record = JSON.parse(fs.readFileSync(generation, 'utf8'));
+  record.holder = { id: 'live', pid: process.pid, processStartTime: getProcessStartTime(process.pid) };
+  fs.writeFileSync(generation, JSON.stringify(record));
+
+  const res = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
+  assert.equal(res.passed, false, 'one run can still be settled');
+  assert.match(res.message, /kept: .*unit-run-herdr.*pid-alive \(controller \d+\)/);
+
+  const fixed = fixLegacyAttemptsStuck(w.root, { door, confinementRoot: w.confinementRoot });
+  assert.match(fixed.message, /settled 1 run\(s\) as abandoned-legacy; kept: .*unit-run-herdr.*pid-alive/);
+  const after = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
+  assert.equal(after.passed, true, 'nothing left to fix: the kept run only warns');
+  assert.match(after.message, /^warning: 1 run\(s\) from before the run supervisor are left running and stay open: .*pid-alive/);
+});
+
+// ─── units-awaiting-resume ──────────────────────────────────────────────
+
+/** A unit run whose only attempt is closed (no controller, no summary): it awaits resume. */
+function unitWithAttempt(root, unitRunId, { closed }) {
+  const assignmentId = `${unitRunId}/producer/1`;
+  const unitDir = path.join(root, '.fgos', 'assignments', unitRunId);
+  fs.mkdirSync(unitDir, { recursive: true });
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({ bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } }));
+  const run = path.join(root, '.fgos', 'assignments', assignmentId, 'runs', '01');
+  fs.mkdirSync(run, { recursive: true });
+  fs.writeFileSync(path.join(run, 'run.json'), JSON.stringify({ runId: `run-${unitRunId}`, assignmentId, status: 'running' }));
+  if (closed) fs.writeFileSync(path.join(run, 'closed.json'), '{}');
+  fs.mkdirSync(path.join(root, '.fgos', 'assignments', assignmentId, 'admission', 'generations'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'assignments', assignmentId, 'admission', 'generations', '0000000001.json'), JSON.stringify({ runId: `run-${unitRunId}`, attempt: 1, attemptStr: '01' }));
+  return unitDir;
+}
+
+test('units-awaiting-resume: no unit passes; a unit with a closed attempt warns with the resume command and never fails', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const root = workspace('units-awaiting');
+  assert.equal(checkUnitsAwaitingResume(root).message, 'no unit run to resume');
+  const unitDir = unitWithAttempt(root, 'unit-closed', { closed: true });
+  const res = checkUnitsAwaitingResume(root);
+  assert.equal(res.passed, true, 'information, not a failure');
+  assert.match(res.message, /^warning: 1 unit run\(s\) await resume: "fgos run --resume unit-closed"/);
+
+  fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify({ outcome: 'pass' }));
+  assert.match(checkUnitsAwaitingResume(root).message, /1 unit run\(s\), none awaiting resume/);
+});
+
+test('units-awaiting-resume: a unit whose attempt is not closed is not awaiting resume', () => {
+  process.env.FGOS_HOST_BIN = HOST_BIN;
+  const root = workspace('units-running');
+  unitWithAttempt(root, 'unit-open', { closed: false });
+  const run = path.join(root, '.fgos', 'assignments', 'unit-open/producer/1/runs/01');
+  fs.writeFileSync(path.join(run, 'attempt.lock'), '');
+  fs.writeFileSync(path.join(run, 'envelope.json'), JSON.stringify({ v: 3 }));
+  assert.match(checkUnitsAwaitingResume(root).message, /none awaiting resume/);
+});
+
+// ─── cancel-wait ────────────────────────────────────────────────────────
+
+test('cancel-wait: absent is the grace plus five seconds, project overrides global, unusable or shorter than the grace fails', () => {
+  const root = workspace('cancel-wait');
+  const globalConfigPath = path.join(scratch, 'cancel-home', '.fgos', 'config.json');
+  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 15000 (default)' });
+
+  writeConfig(globalConfigPath, { dispatch: { gateKillGraceMs: 2000 } });
+  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 7000 (default)' });
+
+  writeConfig(globalConfigPath, { dispatch: { cancelWaitMs: 20000 } });
+  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 20000 (global)' });
+
+  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 12000 } });
+  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 12000 (project)' });
+
+  for (const bad of [999, 0, 1500.5, '9000']) {
+    writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: bad } });
+    const res = checkCancelWait(root, { globalConfigPath });
+    assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
+    assert.match(res.message, /must be an integer of at least 1000 ms/);
+  }
+  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 5000 } });
+  const short = checkCancelWait(root, { globalConfigPath: path.join(scratch, 'cancel-home-empty', 'config.json') });
+  assert.equal(short.passed, false);
+  assert.match(short.message, /shorter than dispatch\.gateKillGraceMs = 10000/);
+});
+
+test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {
+  const root = workspace('cancel-wait-reader');
+  assert.equal(readCancelWaitMs({ projectRoot: root }), DEFAULT_GATE_KILL_GRACE_MS + 5000);
+  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 3000 } });
+  assert.equal(readCancelWaitMs({ projectRoot: root }), 8000);
+  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 10 } });
+  assert.throws(() => readCancelWaitMs({ projectRoot: root }), /cancelWaitMs must be an integer of at least 1000/);
 });

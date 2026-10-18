@@ -78,6 +78,10 @@ const CALLBACK_METHODS = 'forEach|map|flatMap|filter|some|every|find|findLast|re
 // entry is an existing direct reader with a reason it is not a competing tree
 // walker.
 const ALLOWED = new Map([
+  // The legacy sweep judges one already-resolved run directory: it lists the
+  // record files inside that run (control generations, supervisor bindings,
+  // controller commands, confinement finalization), never the assignments tree.
+  ['src/run-supervisor/legacy-sweep.mjs: listJson: readdirSync(dir)', { count: 1, reason: 'one resolved run directory: its own record files' }],
   // Unit semantics (latest round, fallback seat, outcome mapping) belong to
   // the unit owner. It walks one known unit directory's seats and rounds, not
   // the assignments tree, and its nested shape is the layout's own shape.

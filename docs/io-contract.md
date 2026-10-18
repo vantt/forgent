@@ -93,6 +93,8 @@ Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông �
 
 **Kết cục thực thi (`fgos run` và `fgos workflow start|resume|answer --foreground`, RUL99):**
 Khi lệnh chạy kết thúc với một outcome không phải `pass`, tiến trình CLI trả mã lỗi tương ứng theo bảng mã kết cục thực thi (`policy-refusal`: 4, `provider-limit`: 10, `execution-failure`: 11, `partial-writes`: 12, `blocked`: 13, `findings`: 14), trong khi toàn bộ luồng stdout JSON envelope `fgos.v1` vẫn được giữ nguyên vẹn 100%. Các lệnh chỉ-đọc như `fgos workflow status` luôn trả mã thoát 0 bất kể outcome của workflow run. Lệnh `fgos workflow start` chạy detached trả exit code 0 khi tiến trình daemon được kích hoạt thành công.
+**Tín hiệu (`fgos run`, 2026-10-18):** khi người bấm Ctrl-C (SIGINT) hoặc tiến trình nhận SIGTERM, controller của `fgos run` gửi `cancel` cho các attempt nó đã giao, chờ biên nhận tối đa `dispatch.cancelWaitMs`, in dòng `unit <id> chờ resume: fgos run --resume <id>` ra stderr rồi thoát **130** (SIGINT) hoặc **143** (SIGTERM); tín hiệu lần hai thoát ngay với cùng mã. Hai mã này nằm ngoài các bảng trên (không phải kết cục thực thi): chúng là quy ước shell `128 + số tín hiệu`, không phải `EXIT_CODES` hay `OUTCOME_EXIT_CODES`. Unit dừng ở `awaiting-resume`; chỉ `fgos run --resume <unit>` đi tiếp ([run-supervisor spec §9.1](platform/run-supervisor/spec.md#91-controller-death)).
+
 ### Ngoại lệ có lý do
 
 Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
