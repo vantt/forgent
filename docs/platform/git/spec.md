@@ -2,7 +2,7 @@
 
 Status: Accepted G0, canonical. Signed by the owner 2026-10-18 as D-ADR0057. Proofs runnable at G0 passed in finite models and probes (§19); vectors that need an implementation, a real device or owner-written budgets stay implementation-time conditions (§19).
 
-Amended 2026-10-18 (owner, A1): Publication supersession, §10 rule 4a; amends D-ADR0057; re-checked 2026-10-18 (a1-model-recheck `wf-run-1792294509927-9dd08319`, a1-vcas-recheck `wf-run-1792294510067-c73acc31`), two wording fixes folded (holder-lock admission, not a raw kernel acquire; backend native lock artifacts).
+Amended 2026-10-18 (owner, A1): Publication supersession, §10 rule 4a; amends D-ADR0057 as D-ADR0058; re-checked 2026-10-18 (a1-model-recheck `wf-run-1792294509927-9dd08319`, a1-vcas-recheck `wf-run-1792294510067-c73acc31`), two wording fixes folded (holder-lock admission, not a raw kernel acquire; backend native lock artifacts).
 
 ```txt
 Assembled: 2026-10-17 (Asia/Saigon) from the settled output of an architecture council; assembly only, no new design
