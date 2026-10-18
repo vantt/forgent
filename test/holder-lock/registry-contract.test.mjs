@@ -312,8 +312,11 @@ test('Git repo-config is a rank 80 leaf and Node leaves the held controller path
     const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, stateRoot: join(dir, 'state'), owners: ['4.4'] };
     assert.equal(placeFences(options).ok, true);
     assert.equal(fs.readFileSync(old, 'utf8'), 'held inode');
-    const target = fenceStatus(options).targets.find(target => target.path === old);
+    const status = fenceStatus(options);
+    const target = status.targets.find(target => target.path === old);
     assert.equal(target.managedBy, 'fgctl');
     assert.equal(target.fenced, false);
+    assert.deepEqual(status.controllerMissing, [old]);
+    assert.ok(!status.missing.includes(old) && !status.v1Present.includes(old), 'the held controller file never blocks or counts against Node placement');
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

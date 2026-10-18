@@ -21,7 +21,7 @@ permissions:
 jobs:
   dependency-audit:
     name: audit locked dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -158,7 +158,7 @@ jobs:
   compare-addon:
     name: compare addon digests
     needs: [build, independent-addon]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/download-artifact@v4
         with:

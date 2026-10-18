@@ -91,7 +91,9 @@ test('placeFences tombstones the three old paths, install once for the machine, 
   assert.equal(other.ok, true, JSON.stringify(other));
   assert.ok(other.skipped.includes(secondPaths.install), 'install is already fenced for the machine');
   assert.ok(other.placed.includes(secondPaths.activation) && other.placed.includes(secondPaths.observe));
-  assert.ok(fenceStatus(options(second)).targets.filter(t => !t.fenced).every(t => t.managedBy === 'fgctl'));
+  const secondStatus = fenceStatus(options(second));
+  assert.equal(secondStatus.complete, true);
+  assert.deepEqual(secondStatus.controllerMissing, [path.join(second.fgosDir, 'locks', 'activation.lock')], 'the controller fence is reported and left to fgctl');
 });
 
 test('an old observe lock file still there stops the placement and is left alone', () => {

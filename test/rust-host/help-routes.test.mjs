@@ -5,7 +5,7 @@
 // Runs the real `fgos:dev` door (scripts/run-rust-dev-host.mjs: real manifest,
 // real host, real Node payload); only Cargo is substituted, by a stub that
 // installs the already-built host binary (FGOS_HOST_BIN, which `npm test`
-// builds from this checkout).
+// builds from this checkout) and the real native addon the door also builds.
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,6 +14,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { HELP_SELECTORS } from '../../src/cli/command-registry.mjs';
+import { nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));
@@ -30,12 +32,15 @@ function stubCargo() {
     fs.writeFileSync(path.join(dir, 'package.json'), '{"type":"module"}\n');
     fs.writeFileSync(
       path.join(dir, 'cargo'),
-      `#!${process.execPath}\nimport fs from 'node:fs';\nimport path from 'node:path';\nconst out = path.join(process.env.CARGO_TARGET_DIR, 'debug');\nfs.mkdirSync(out, { recursive: true });\nfs.copyFileSync(process.env.HELP_TEST_HOST_BIN, path.join(out, ${JSON.stringify(BINARY_NAME)}));\nfs.chmodSync(path.join(out, ${JSON.stringify(BINARY_NAME)}), 0o755);\n`,
+      `#!${process.execPath}\nimport fs from 'node:fs';\nimport path from 'node:path';\nconst out = path.join(process.env.CARGO_TARGET_DIR, 'debug');\nfs.mkdirSync(out, { recursive: true });\nfs.copyFileSync(process.env.HELP_TEST_HOST_BIN, path.join(out, ${JSON.stringify(BINARY_NAME)}));\nfs.chmodSync(path.join(out, ${JSON.stringify(BINARY_NAME)}), 0o755);\nfs.copyFileSync(process.env.HELP_TEST_NATIVE_ADDON, path.join(out, ${JSON.stringify(nativeAddonLibraryName())}));\n`,
       { mode: 0o755 },
     );
   }
   return dir;
 }
+
+let builtAddon;
+const nativeAddon = () => (builtAddon ??= ensureGitAddon().addon);
 
 function host(args, cwd) {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
@@ -52,6 +57,7 @@ function host(args, cwd) {
       PATH: `${stubCargo()}${path.delimiter}${process.env.PATH}`,
       CARGO_TARGET_DIR: path.join(scratch, 'cargo-out'),
       HELP_TEST_HOST_BIN: HOST_BIN,
+      HELP_TEST_NATIVE_ADDON: nativeAddon(),
     },
   });
 }
