@@ -36,8 +36,7 @@ import { collectModelWarnings } from './provider-adapter.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
-import { resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
-import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
+import { createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
 import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
 import { createRoundTerminalControl } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
@@ -1071,7 +1070,6 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         const fgosDir = fgosDirFromRoot(repoRoot);
         const invocationFlag = flagValue('--invocation');
         const herdrBin = resolveHerdrBin();
-        const closedPanes = new Set();
         const result = await runAccountProbe({
           cfg: ensureRunnerConfigForDir(repoRoot),
           provider,
@@ -1106,21 +1104,9 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
                 closed = tc.release({ key: terminalKey, disposition: 'close' }).result === 'released';
               }
             } catch { /* a pane that cannot be closed stays open */ }
-            if (closed) closedPanes.add(paneId);
             return closed;
           },
         });
-        // A private home kept for a pane this probe just closed is removed now rather than at the next
-        // sweep; every other home is judged exactly as the regular sweep judges it.
-        if (closedPanes.size) {
-          try {
-            sweepAttempts({
-              assignmentsRoot: assignmentsDir,
-              tempRoot: resolveConfinementTempRoot(),
-              reaperOptions: { checkPaneOpen: paneOpenUnlessClosed(closedPanes) },
-            });
-          } catch { /* the regular sweep removes it later */ }
-        }
         if (returnResult) return result;
         process.stdout.write(`${JSON.stringify(result)}\n`);
       } catch (err) {

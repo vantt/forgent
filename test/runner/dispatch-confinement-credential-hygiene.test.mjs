@@ -12,21 +12,13 @@ import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {
-  reapOrphanedConfinementResources,
   resolveConfinementTempRoot,
   ensurePrivateDir,
-  readOwnershipMarker,
-  paneOpenUnlessClosed,
-  extendOwnershipMarker,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { createTerminalControl } from '../../src/terminal-control/client.mjs';
-import { createSessionFake } from '../helpers/fake-herdr-session.mjs';
-import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
-// A private home holds a copy of an account login. These tests pin the three
-// things that keep that copy from lingering or being readable: owner-only
-// directories at every level, removal when the run is over, and a reaper that
-// never takes a home away from a pane that is still open.
+// A private home holds a copy of an account login. These tests pin the things
+// that keep that copy from lingering or being readable: owner-only directories
+// at every level and removal when the run is over.
 
 const modeOf = (p) => fs.statSync(p).mode & 0o777;
 
@@ -105,47 +97,6 @@ test('cleanup removes the home and the now-empty <dispatchId> directory', async 
   } finally { f.cleanup(); }
 });
 
-test('a retained home is tagged with its pane and survives the reaper while the pane is open', async () => {
-  const f = fixture();
-  try {
-    const plan = planFor(f.tempRoot, 'disp_retained');
-    const prepared = await prepareBwrap(
-      plan,
-      requestFor('disp_retained', { kind: 'home-files', home: f.accountHome, files: ['plain-auth.json'] }),
-      { id: 'bwrap', type: 'bwrap', config: {} },
-    );
-    const home = plan.resources[0].hostTarget;
-    assert.deepEqual(prepared.retain({ paneId: 'p-7' }), [home]);
-    assert.equal(readOwnershipMarker(home).paneId, 'p-7');
-
-    const deadOwner = () => false; // the launching process is long gone
-    const alive = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner, checkPaneOpen: () => true });
-    assert.deepEqual(alive.reaped, []);
-    assert.ok(fs.existsSync(path.join(home, 'plain-auth.json')), 'a live pane keeps its login');
-
-    const unknown = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner, checkPaneOpen: () => null });
-    assert.deepEqual(unknown.reaped, [], 'herdr unreachable and not yet expired: leave it');
-
-    const closed = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner, checkPaneOpen: () => false });
-    assert.equal(closed.reaped.length, 1);
-    assert.equal(closed.reaped[0].reason, 'pane-closed');
-    assert.equal(fs.existsSync(path.dirname(home)), false, 'home and <dispatchId> directory are gone once the pane is');
-  } finally { f.cleanup(); }
-});
-
-test('an unanswerable pane check does not keep a login past the maximum age', async () => {
-  const f = fixture();
-  try {
-    const plan = planFor(f.tempRoot, 'disp_expired');
-    const prepared = await prepareBwrap(plan, requestFor('disp_expired', undefined), { id: 'bwrap', type: 'bwrap', config: {} });
-    prepared.retain({ paneId: 'p-9' });
-    const res = reapOrphanedConfinementResources({
-      tempRoot: f.tempRoot, maxAgeMs: -1, checkLiveness: () => false, checkPaneOpen: () => null,
-    });
-    assert.equal(res.reaped.length, 1);
-  } finally { f.cleanup(); }
-});
-
 test('ensurePrivateDir refuses a path outside its root and never touches levels above it', () => {
   const f = fixture();
   try {
@@ -193,7 +144,7 @@ async function runFailingDispatch(adapterError) {
   const previousRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
   process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
 
-  const calls = { cleanup: 0, retain: [] };
+  const calls = { cleanup: 0 };
   const originalDriver = getBackendDriver('bwrap');
   registerBackendDriver({
     type: 'bwrap',
@@ -208,7 +159,6 @@ async function runFailingDispatch(adapterError) {
       invocation: { command: 'echo', args: ['mocked'] },
       claims: { ...plan.coverage },
       cleanup: async () => { calls.cleanup += 1; },
-      retain: ({ paneId }) => { calls.retain.push(paneId); return ['/fake/home']; },
     }),
   });
 
@@ -234,123 +184,10 @@ async function runFailingDispatch(adapterError) {
   }
 }
 
-test('an adapter failure with no pane left open removes the home', async () => {
+test('an adapter failure removes the home', async () => {
   if (!HAS_WORKING_BWRAP) return;
-  const { calls, thrown } = await runFailingDispatch(new DispatchError('worker-timeout', 'timed out', { paneId: 'p-1', paneRetained: false }));
+  const { calls, thrown } = await runFailingDispatch(new DispatchError("worker-timeout", "timed out"));
   assert.ok(thrown, 'the failure still propagates');
   assert.equal(calls.cleanup, 1);
-  assert.deepEqual(calls.retain, []);
 });
 
-test('an adapter failure that left its pane open keeps the home, tags it with the pane and names it in the error', async () => {
-  if (!HAS_WORKING_BWRAP) return;
-  const { calls, thrown } = await runFailingDispatch(new DispatchError('worker-timeout', 'paused', { paneId: 'p-2', paneRetained: true }));
-  assert.equal(calls.cleanup, 0, 'a live pane is still using the home');
-  assert.deepEqual(calls.retain, ['p-2']);
-  assert.deepEqual(thrown.retainedPrivateHomes, ['/fake/home']);
-  assert.match(thrown.message, /Private home kept for the open pane.*\/fake\/home/, 'the failure record names the path');
-});
-
-// The reaper asks terminal-control about the slot a home's marker names, on the herdr server the
-// marker names. A slot needs an allocation record, so these tests allocate through the same route.
-async function withSlots(f, { panes }, body) {
-  const harness = await startTerminalHarness();
-  const savedBin = process.env.FGOS_HERDR_BIN;
-  try {
-    const herdr = createSessionFake(path.join(f.tmp, 'herdr'), { queue: panes });
-    process.env.FGOS_HERDR_BIN = herdr.bin;
-    const tc = createTerminalControl({ herdrBin: herdr.bin, env: { HERDR_SOCKET_PATH: harness.socketPath } });
-    await body({ herdr, tc, harness });
-  } finally {
-    if (savedBin === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = savedBin;
-    harness.stop();
-  }
-}
-
-async function preparedHome(f, dispatchId) {
-  const plan = planFor(f.tempRoot, dispatchId);
-  const prepared = await prepareBwrap(
-    plan,
-    requestFor(dispatchId, { kind: 'home-files', home: f.accountHome, files: ['plain-auth.json'] }),
-    { id: 'bwrap', type: 'bwrap', config: {} },
-  );
-  return { prepared, home: plan.resources[0].hostTarget };
-}
-
-test('a restarted controller and the reaper both address the herdr session a worker was launched in', async () => {
-  const f = fixture();
-  const savedSession = process.env.HERDR_SESSION;
-  try {
-    await withSlots(f, { panes: ['p-9'] }, async ({ herdr, tc, harness }) => {
-      process.env.HERDR_SESSION = 'operator-cockpit'; // the ambient session is not the worker's
-      assert.equal(tc.allocate({ key: 'k-session', groupKey: 'g-session', display: { label: 'g' } }).result, 'slot');
-
-      const { prepared, home } = await preparedHome(f, 'disp_session');
-      prepared.retain({ paneId: 'p-9', terminalKey: 'k-session', herdrSession: 'fgos-worker' });
-      extendOwnershipMarker(home, { herdrEndpoint: harness.socketPath });
-      assert.equal(readOwnershipMarker(home).herdrSession, 'fgos-worker');
-      assert.equal(readOwnershipMarker(home).terminalKey, 'k-session');
-
-      const deadOwner = () => false;
-      const whilePaneOpen = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner });
-      assert.deepEqual(whilePaneOpen.reaped, [], 'the worker session still has the pane, so its home stays');
-      const sessions = herdr.askedSessions();
-      assert.ok(sessions.includes('fgos-worker'), 'the reaper asked the recorded session');
-      assert.ok(!sessions.slice(-2).includes('operator-cockpit'), 'and never the ambient one');
-
-      herdr.close('p-9');
-      const afterClose = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner });
-      assert.equal(afterClose.reaped.length, 1);
-      assert.equal(afterClose.reaped[0].reason, 'pane-closed');
-    });
-  } finally {
-    if (savedSession === undefined) delete process.env.HERDR_SESSION; else process.env.HERDR_SESSION = savedSession;
-    f.cleanup();
-  }
-});
-
-test('a home whose marker names no slot key is never closed or reaped on a guess about its pane', async () => {
-  const f = fixture();
-  try {
-    await withSlots(f, { panes: [] }, async ({ herdr, harness }) => {
-      const { prepared, home } = await preparedHome(f, 'disp_old_marker');
-      prepared.retain({ paneId: 'p-old', herdrSession: 'fgos-worker' });
-      extendOwnershipMarker(home, { herdrEndpoint: harness.socketPath });
-      const res = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, maxAgeMs: 3600000, checkLiveness: () => false });
-      assert.deepEqual(res.reaped, [], 'a marker written before panes were addressed by key cannot be asked about, so it keeps its home');
-      assert.deepEqual(herdr.calls().filter((c) => c.args[0] === 'pane'), [], 'and no pane is touched');
-    });
-  } finally {
-    f.cleanup();
-  }
-});
-
-test('the sweep after a probe removes the homes of panes it closed and keeps an expired home whose pane is still open', async () => {
-  const f = fixture();
-  try {
-    // Both panes stay open in herdr: the probe's own record of what it closed decides for its pane,
-    // and herdr's answer decides for every other one, exactly as in the regular sweep.
-    await withSlots(f, { panes: ['p-open', 'p-closed'] }, async ({ tc, harness }) => {
-      const homes = {};
-      for (const [dispatchId, paneId, key] of [['disp_kept', 'p-open', 'k-open'], ['disp_probe', 'p-closed', 'k-closed']]) {
-        assert.equal(tc.allocate({ key, groupKey: `g-${key}`, display: { label: 'g' } }).result, 'slot');
-        const { prepared, home } = await preparedHome(f, dispatchId);
-        prepared.retain({ paneId, terminalKey: key, herdrSession: 'fgos-worker' });
-        extendOwnershipMarker(home, { herdrEndpoint: harness.socketPath });
-        homes[paneId] = home;
-      }
-
-      const res = reapOrphanedConfinementResources({
-        tempRoot: f.tempRoot,
-        maxAgeMs: -1, // both homes are past the maximum age
-        checkLiveness: () => false,
-        checkPaneOpen: paneOpenUnlessClosed(new Set(['p-closed'])),
-      });
-      assert.deepEqual(res.reaped.map((r) => r.dispatchId), ['disp_probe'], 'only the home of the pane the probe closed goes');
-      assert.equal(fs.existsSync(path.dirname(homes['p-closed'])), false);
-      assert.ok(fs.existsSync(path.join(homes['p-open'], 'plain-auth.json')), 'an open pane keeps its login even past the maximum age');
-    });
-  } finally {
-    f.cleanup();
-  }
-});

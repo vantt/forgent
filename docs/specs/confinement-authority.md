@@ -1086,34 +1086,32 @@ dụng các binding đã được Authority duyệt.
 Nghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép
 dọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.
 Local-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership
-marker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra
-process identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private
-home không tự biến mất khi process exit. Không cần remote lease/journal engine
+marker trước allocation và finally idempotent. Home của một attempt (marker bản 2,
+`attemptId`) chỉ do bước finalize-home của adopt dọn, khi khoá attempt trống và
+miền tiến trình rỗng; không còn reaper phán home theo pid, pane hay tuổi.
+Host-disk private home không tự biến mất khi process exit. Không cần remote lease/journal engine
 cho default local. Phần journal/lease dưới đây áp dụng profile có resource sống
 ngoài process local (remote/container detached), không phải gate chung của S4.
 
 Attestation `prepared` được ghi trước adapter call. Cleanup chạy trong
 `finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở
-§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn
-lại. Cleanup failure không được biến execution chưa rõ thành thành công, và
+§6.5. Cleanup failure không được biến execution chưa rõ thành thành công, và
 không được che mất execution result đã có. Nếu Authority crash sau khi prepare,
-run record giữ phase cuối cùng và reaper xử lý resource chưa dọn.
+run record giữ phase cuối cùng và adopt kết thúc attempt còn dở (`sweepAttempts` ở `src/run-supervisor/sweep.mjs` là cửa duy nhất: đầu mỗi `fgos run`, đầu vòng runner, `fgos doctor --fix`).
 
-Reaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.
-
-**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe "reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá" (RT2-1) vẫn còn.
+**Home thuộc về attempt, không thuộc về tiến trình (2026-10-18, thay luật binding 2026-10-15).** Authority không còn `bind`/`markLaunched`/`retain` và marker không còn trường `paneId`, `terminalKey`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`, `retainedAt`; finalizer chỉ chấp nhận `credentialKept` là thay đổi sau prepare, mọi thay đổi khác là `ownership-marker-mismatch`. Pane do terminal-control giữ theo khoá, không liên quan tới việc home còn hay mất. Một lượt chạy herdr-spawn luôn là attempt của run supervisor: yêu cầu không mang `attemptId` bị từ chối với `attempt-required` và file herdr-launch-command không còn nơi ghi. Dispatch ngoài cửa assignment (không có attempt) vẫn ghi marker bản 1 (`pid`) và tự dọn home khi settle; nếu process của nó chết thì không sweep nào phán home đó: `fgos doctor` (`confinement-orphaned-resources-reaped`) nêu tên và chỉ `--fix` tường minh của chủ máy mới dọn (theo pid).
 
 Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi
 side effect prepare; driver tạo theo identity đó một cách idempotent. Journal
 ghi dispatch id, backend snapshot reference, resource locator, lease/execution
 identity và trạng thái allocation/collection/cleanup, không chứa credential.
 Callback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.
-Reaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution
+Recovery phải lấy lease độc quyền, kiểm tra liveness bằng execution
 identity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect
 và cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được
 remote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect
 hoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được
-giữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry
+giữ cho recovery, không xóa vì agent đã exit. Doctor dùng cùng registry
 setup/doctor; backend không có recovery contract này chưa được nhận required.
 
 Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu

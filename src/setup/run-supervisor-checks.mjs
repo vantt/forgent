@@ -20,7 +20,6 @@ import { loadGlobalConfig } from '../config/global-config.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { sweepAttempts } from '../run-supervisor/sweep.mjs';
-import { resolveConfinementTempRoot } from '../runner/dispatch/confinement/cleanup.mjs';
 import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem } from '../run-supervisor/gate-kill-grace.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
@@ -205,7 +204,7 @@ export function fixRunAttemptsStuck(repoRoot) {
   const assignmentsRoot = assignmentsRootOf(repoRoot);
   if (listOpenAttemptDirs(assignmentsRoot).length === 0) return { changed: false, message: 'no attempt waits to be closed' };
   const { bin, error } = resolveBin(repoRoot);
-  const result = sweepAttempts({ assignmentsRoot, tempRoot: resolveConfinementTempRoot(), adoptOptions: bin ? { hostBin: bin } : {} });
+  const result = sweepAttempts({ assignmentsRoot, adoptOptions: bin ? { hostBin: bin } : {} });
   if (result.adoptError) return { changed: false, message: `adopt could not run: ${result.adoptError}${error ? ` (${error})` : ''}` };
   const adopted = (result.adopt ?? []).filter((verdict) => verdict.state === 'adopted');
   const left = (result.adopt ?? []).filter((verdict) => STUCK_STATES.has(verdict.state));

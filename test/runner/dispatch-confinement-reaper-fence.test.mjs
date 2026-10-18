@@ -1,67 +1,39 @@
-// Acceptance cases for the confinement orphan reaper fence (backlog p-c3a41d07).
+// Acceptance cases for who may remove a private home (backlog p-c3a41d07, rewritten for attempt-owned homes).
 //
-// The defect: the orphan reaper can remove the private home (and, through stopProcesses, end the
-// processes) of a herdr worker that is still running, because the pane a worker runs in never reaches
-// the home's ownership marker, the reaper decides on a marker it read before the controller acted, and
-// nothing stops a controller from launching into a home a reaper already decided to remove.
+// The old defect: a sweep judged a home by a pid, a pane or an age, and could take the home of a worker
+// that was still running. The rule now: a home is removed only by adopt's finalize-home step, and only
+// while the attempt's lock is free and its process domain is empty. No other sweep judges a home.
 //
-// Every case runs the real reaper (`reapOrphanedConfinementResources`) and the real finalizer
-// (`finalizeConfinementResources`) on real temp directories. OS facts are injected through the seams
-// the reaper already has: `checkLiveness` (is the controller pid alive) and `checkPaneOpen` (is the
-// pane open: true / false / null when herdr cannot be asked). Interleavings are driven from those two
-// callbacks, which the reaper calls after its decision read of the marker, and from a one-shot wrap of
-// `fs.rmSync`, which runs after the removal's own marker re-read and right before the home is deleted.
-// The reaper has no clock seam; ages are set by backdating the marker's timestamps with minute-scale
-// margins, so the outcome does not depend on how long a test takes.
+// How the old cases (1)-(9) map onto that rule:
+//   (1)(2)(2b)(2c) controller killed before or after binding, a reaper racing a binder -> there is no
+//       binder and no reaper; test/run-supervisor/sweep.test.mjs holds the lock-held and lock-free cases and
+//       test/run-supervisor/direct-crash-matrix.test.mjs kills real controllers and supervisors
+//   (3)(4)(7)(9)   pane, retained-pane and herdr-endpoint rules, pane-less binding kept for doctor -> removed
+//       with the pane rules: terminal-control owns panes by key, the home belongs to the attempt
+//   (5)            finalizer field contract -> below: the marker at removal must equal the marker at prepare
+//   (6)            two reapers over one home -> test/run-supervisor/sweep.test.mjs, two adopters remove it once
+//   (8)            one binding over every prepared home -> removed with the binding
 //
-// Two kinds of cases:
-//   - plain tests: the contract the lite fence ships (bind before launch, launch record, bind-anchored
-//     keep window, recorded herdr endpoint, re-read before destroy, finalizer field contract, cli-spawn
-//     supervisor binding); the cases named REGRESSION were red before it;
-//   - `test.todo`: the case needs part (ii) (bind refusal, launch and post-launch checks, exclusive
-//     reclaim claim), deferred to the run supervisor + holder-lock component; the name says so.
-//
-// Never kills a real worker or touches a real home: the worker is modelled, every directory is under a
-// fresh mkdtemp, and the processes spawned are mock herdr scripts that only print JSON and short-lived
-// node children standing in for a run supervisor.
+// Real directories under a fresh mkdtemp; nothing here signals a process.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 
 import {
-  reapOrphanedConfinementResources,
   writeOwnershipMarker,
   extendOwnershipMarker,
   readOwnershipMarker,
-  markResourceRetained,
   ensurePrivateDir,
-  RUN_SETTLE_GRACE_MS,
-  LAUNCH_GRACE_MS,
-  bindOwnershipMarker,
-  markOwnershipLaunched,
   writeOwnershipMarkerV2,
   removeConfinementDir,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { finalizeConfinementResources, bindingForPrepared } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { finalizeConfinementResources } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
-import { RUN_TIMEOUT_MAX_MS } from '../../src/runner/dispatch/run-timeout.mjs';
-import { herdrEndpointForEnv, socketPathForSession } from '../../src/runner/dispatch/worker-session.mjs';
-import { createTerminalControl } from '../../src/terminal-control/client.mjs';
-import { createSessionFake } from '../helpers/fake-herdr-session.mjs';
-import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
-import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
-const MIN = 60_000;
-const HOUR = 60 * MIN;
-const MAX_AGE_MS = HOUR; // the reaper's default maxAgeMs
-const CONTROLLER_PID = 424242; // never signalled: liveness is injected
-
-// ---------------------------------------------------------------------------------------------
-// Fixtures
+const exists = (p) => fs.existsSync(p);
 
 function workspace() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-fence-'));
@@ -69,297 +41,14 @@ function workspace() {
   return { tmp, root, cleanup: () => fs.rmSync(tmp, { recursive: true, force: true }) };
 }
 
-/** A private home as Confinement Authority prepares it (bwrap prepare: ensurePrivateDir + marker). */
-function preparedHome(w, { dispatchId = 'disp_s2', timeoutMs, ageMs = 0 } = {}) {
+/** A private home as a dispatch outside the assignment door prepares it (ensurePrivateDir + marker). */
+function preparedHome(w, { dispatchId = 'disp_s2' } = {}) {
   const dir = path.join(w.root, dispatchId, 'home');
   ensurePrivateDir(dir, { root: w.root });
-  writeOwnershipMarker(dir, { dispatchId, pid: CONTROLLER_PID, timeoutMs });
-  if (ageMs) extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - ageMs).toISOString() });
+  writeOwnershipMarker(dir, { dispatchId, pid: 424242 });
   fs.writeFileSync(path.join(dir, 'auth.json'), '{"fake":"login copy"}');
   return dir;
 }
-
-/**
- * The marker state item 1a (i) leaves, written by the real Confinement Authority functions: the binding
- * (paneId, the herdr endpoint the launching client used, the binder's pid and boundAt) and, unless
- * `launched: false`, the launch record written right before `pane run`. Used as a PRECONDITION for
- * reaper-rule cases.
- */
-function writeBindingFixture(dir, { paneId = 'w1:p7', endpoint = '/run/herdr/default.sock', binderPid = CONTROLLER_PID, boundAtMs = Date.now(), launched = true } = {}) {
-  bindOwnershipMarker(dir, { paneId, herdrEndpoint: endpoint, binderPid, binderStartTime: null, boundAt: new Date(boundAtMs).toISOString() });
-  if (launched) markOwnershipLaunched(dir, { launchedAt: new Date(boundAtMs).toISOString() });
-}
-
-/**
- * The controller between prepare and worker launch with the lite fence (herdr-round.mjs pre-run site):
- *   bind    -> Confinement Authority's bind (bindOwnershipMarker), for every confined round;
- *   launch  -> the launch record (markOwnershipLaunched) written right before `pane run`.
- * There is no launch check and no post-launch check: those belong to part (ii), deferred to the run
- * supervisor + holder-lock component, so a launch is always allowed here.
- */
-const controllerWithLiteFence = Object.freeze({
-  bind(dir, { paneId }) { bindOwnershipMarker(dir, { paneId, herdrEndpoint: '/run/herdr/default.sock', binderPid: CONTROLLER_PID, binderStartTime: null }); },
-  launch(dir) { markOwnershipLaunched(dir); return true; },
-});
-
-function reap(w, { alive, pane, maxAgeMs = MAX_AGE_MS, onLiveness, onPane, onClose } = {}) {
-  return reapOrphanedConfinementResources({
-    tempRoot: w.root,
-    maxAgeMs,
-    checkLiveness: (pid) => {
-      onLiveness?.(pid);
-      return typeof alive === 'function' ? alive(pid) : alive;
-    },
-    checkPaneOpen: pane === undefined ? undefined : (paneId, session, endpoint) => {
-      onPane?.(paneId, session, endpoint);
-      return typeof pane === 'function' ? pane(paneId, session, endpoint) : pane;
-    },
-    // Never a real herdr: a pane close is recorded, not sent.
-    closePane: (paneId, session, endpoint) => onClose?.(paneId, session, endpoint),
-  });
-}
-
-/**
- * Run `fn` with a one-shot hook placed after the removal path's own marker re-read
- * (cleanupConfinementResource) and stopProcessesInside, right before `dir` is deleted. This is
- * the window RT2-1 uses: the reaper has decided and re-read an identical marker, the home still exists.
- */
-function withHookBeforeDeletionOf(dir, hook, fn) {
-  const realRmSync = fs.rmSync;
-  fs.rmSync = function patchedRmSync(target, ...rest) {
-    if (path.resolve(String(target)) === path.resolve(dir)) {
-      fs.rmSync = realRmSync;
-      hook();
-    }
-    return realRmSync.call(this, target, ...rest);
-  };
-  try { return fn(); } finally { fs.rmSync = realRmSync; }
-}
-
-const exists = (dir) => fs.existsSync(dir);
-
-// ---------------------------------------------------------------------------------------------
-// (1) Controller killed before binding, after binding before pane run, after pane run.
-
-test('S2(1) controller killed before binding: no pane, no worker -> the home is reaped', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR });
-    const result = reap(w, { alive: false, pane: () => assert.fail('an unbound home has no pane to ask about') });
-    assert.equal(exists(dir), false);
-    assert.equal(result.reaped[0]?.reason, 'process-dead');
-  } finally { w.cleanup(); }
-});
-
-test('S2(1) controller killed after binding, before pane run (no launchedAt): the home is reaped and its empty pane closed, whatever the pane answers', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * MIN });
-    writeBindingFixture(dir, { boundAtMs: Date.now() - MIN, launched: false });
-    const closed = [];
-    const result = reap(w, { alive: false, pane: true, onClose: (paneId, session, endpoint) => closed.push({ paneId, session, endpoint }) });
-    assert.equal(exists(dir), false, 'no worker was ever launched into the home: nothing keeps it');
-    assert.equal(result.reaped[0]?.reason, 'bound-never-launched');
-    assert.deepEqual(closed, [{ paneId: 'w1:p7', session: null, endpoint: '/run/herdr/default.sock' }], 'the empty pane is closed on the endpoint the binding recorded');
-  } finally { w.cleanup(); }
-});
-
-test('S2(1) bound, binder alive, no launchedAt yet: kept inside the bind-anchored window (the binder may still be launching)', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * MIN });
-    writeBindingFixture(dir, { boundAtMs: Date.now() - MIN, launched: false });
-    const closed = [];
-    reap(w, { alive: true, pane: false, onClose: (paneId) => closed.push(paneId) });
-    assert.equal(exists(dir), true);
-    assert.deepEqual(closed, []);
-  } finally { w.cleanup(); }
-});
-
-test('S2(1) REGRESSION controller killed after pane run, worker alive in its pane: the home must survive (p-c3a41d07)', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * MIN });
-    const controller = controllerWithLiteFence;
-    const worker = { launched: false, paneOpen: false };
-    controller.bind(dir, { paneId: 'w1:p7' });
-    if (controller.launch(dir)) { worker.launched = true; worker.paneOpen = true; }
-    // The controller dies now; the worker keeps running in its open pane.
-    reap(w, { alive: false, pane: (paneId) => (paneId === 'w1:p7' ? worker.paneOpen : false) });
-    assert.equal(worker.launched, true);
-    assert.equal(exists(dir), true, 'the reaper removed the home of a worker still running in an open pane');
-  } finally { w.cleanup(); }
-});
-
-test('S2(1) controller killed after pane run, home bound as 1a(i) specifies: the dead binder\'s home is kept while its pane is open', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * MIN });
-    writeBindingFixture(dir, { boundAtMs: Date.now() - MIN });
-    reap(w, { alive: false, pane: true });
-    assert.equal(exists(dir), true);
-  } finally { w.cleanup(); }
-});
-
-// ---------------------------------------------------------------------------------------------
-// (2) Reaper decided on an unbound marker; bind + launch + controller death happen before it acts.
-
-test('S2(2) REGRESSION reaper reads the unbound marker, then bind + launch + controller death before its liveness check: the home must survive (V14)', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * MIN });
-    const worker = { launched: false };
-    // checkLiveness runs after the reaper's decision read and before the removal: the controller
-    // binds (the state 1a(i) leaves), launches, and dies in between.
-    reap(w, {
-      alive: () => {
-        writeBindingFixture(dir, { boundAtMs: Date.now() });
-        worker.launched = true;
-        return false;
-      },
-      pane: true,
-    });
-    assert.equal(worker.launched, true);
-    assert.equal(exists(dir), true, 'the reaper removed a home whose marker, re-read before removal, names a live pane');
-    assert.equal(readOwnershipMarker(dir)?.paneId, 'w1:p7');
-  } finally { w.cleanup(); }
-});
-
-// ---------------------------------------------------------------------------------------------
-// (2b) Live-but-expired controller (RT2-1): unbound home past max(maxAgeMs, timeout + settle grace),
-// controller alive.
-
-const RT2_1 = { timeoutMs: HOUR, ageMs: 2 * HOUR }; // isPastRun: 2h > max(1h, 1h + 10m)
-
-// RT2-1 (bind and launch landing after the reaper's identical re-read, before deletion) needs either the
-// bind refusal past the creation-anchored window or an exclusive reclaim claim: both are part (ii). The
-// case stays named, unrun, until that component exists; withHookBeforeDeletionOf is kept for it.
-void withHookBeforeDeletionOf;
-test.todo('S2(2b) RT2-1: controller binds and launches after the reaper\'s identical re-read and before deletion; never a launched worker whose home is removed — needs run supervisor + holder-lock (deferred part ii)');
-
-test('S2(2b) REGRESSION mirrored order: controller binds and passes its check first, the reaper comes after and must keep the home', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, RT2_1);
-    const controller = controllerWithLiteFence;
-    const worker = { launched: false };
-    controller.bind(dir, { paneId: 'w1:p7' });
-    if (controller.launch(dir)) worker.launched = true;
-    reap(w, { alive: true, pane: null });
-    assert.ok(!(worker.launched && !exists(dir)), 'the reaper removed the home of a worker its live controller had just launched');
-  } finally { w.cleanup(); }
-});
-
-test.todo('S2(2b) a binder whose home is past its creation-anchored run window refuses to bind: pane closed, round fails, no worker — needs run supervisor + holder-lock (deferred part ii)');
-
-// ---------------------------------------------------------------------------------------------
-// (2c) Bound-marker read, binder alive, home past its creation-anchored window, pane answer null.
-// Created 75m ago (past max(1h, 1h + 10m)), bound 9m after creation (inside that window, so a 1a binder
-// was allowed to bind), 66m since binding: inside boundAt + max(maxAgeMs, launch grace + 1h + 10m).
-
-function boundPastCreationWindow(w) {
-  const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 75 * MIN });
-  writeBindingFixture(dir, { boundAtMs: Date.now() - 66 * MIN });
-  return dir;
-}
-
-test('S2(2c) REGRESSION bound marker, binder alive inside its bind-anchored window, pane answer null: the home is kept (RV3-1 / RT-R1-1 case1A, case1B)', () => {
-  const w = workspace();
-  try {
-    const dir = boundPastCreationWindow(w);
-    reap(w, { alive: true, pane: null });
-    assert.equal(exists(dir), true, 'an unanswerable pane check let expiry remove a live binder\'s home inside its window');
-  } finally { w.cleanup(); }
-});
-
-test('S2(2c) REGRESSION same, pane answer false (wrong or other server\'s socket): ignored inside the window, the home is kept', () => {
-  const w = workspace();
-  try {
-    const dir = boundPastCreationWindow(w);
-    reap(w, { alive: true, pane: false });
-    assert.equal(exists(dir), true);
-  } finally { w.cleanup(); }
-});
-
-test.todo('S2(2c) a controller already past the creation-anchored window refuses to bind: pane closed, no worker — needs run supervisor + holder-lock (deferred part ii)');
-
-// ---------------------------------------------------------------------------------------------
-// (2d) Post-launch check.
-
-test.todo('S2(2d) a launch whose post-launch check finds the marker or home gone, or a claim present, closes the pane and fails the round, never accepting a result — needs run supervisor + holder-lock (deferred part ii)');
-
-// ---------------------------------------------------------------------------------------------
-// (3) Active binding, binder alive, run timeout 4h. Bound 1 minute after creation, so every age
-// below up to timeout + settle grace + 1s from creation is inside the bind-anchored window for
-// any launch grace >= 0.
-
-const TIMEOUT_4H = 4 * HOUR;
-assert.ok(TIMEOUT_4H <= RUN_TIMEOUT_MAX_MS, 'a 4h run timeout is allowed (RUN_TIMEOUT_MAX_MS)');
-
-const ages = [
-  ['age 2h', 2 * HOUR],
-  ['just past maxAgeMs', MAX_AGE_MS + 1000],
-  ['just past timeout + settle grace', TIMEOUT_4H + RUN_SETTLE_GRACE_MS + 1000],
-];
-for (const [label, ageMs] of ages) {
-  for (const answer of [null, true, false]) {
-    // Today: true keeps; null keeps only while not expired (every age here is expired); false reaps.
-    test(`S2(3) ${answer === true ? '' : 'REGRESSION '}binder alive, timeout 4h, ${label}, pane answer ${answer}: kept inside the bind-anchored window`, () => {
-      const w = workspace();
-      try {
-        const dir = preparedHome(w, { timeoutMs: TIMEOUT_4H, ageMs });
-        writeBindingFixture(dir, { boundAtMs: Date.now() - ageMs + MIN });
-        reap(w, { alive: true, pane: answer });
-        assert.equal(exists(dir), true, `a live binder's home was removed inside its window (pane answer ${answer})`);
-      } finally { w.cleanup(); }
-    });
-  }
-}
-
-// After the window (bound one hour past timeout + settle grace ago; assumes launch grace < 1h, the
-// packet calls it "short") the pane answer decides (iii): true keeps, null falls to expiry, false reaps.
-// Same for a dead binder. These hold today and must keep holding.
-for (const [who, alive, sinceBindMs] of [
-  ['binder alive, past its bind-anchored window', true, TIMEOUT_4H + RUN_SETTLE_GRACE_MS + HOUR],
-  ['binder dead, age 2h', false, 2 * HOUR],
-]) {
-  for (const [answer, kept] of [[true, true], [null, false], [false, false]]) {
-    test(`S2(3) ${who}, pane answer ${answer}: ${kept ? 'kept' : 'reaped'} per (iii)`, () => {
-      const w = workspace();
-      try {
-        const dir = preparedHome(w, { timeoutMs: TIMEOUT_4H, ageMs: sinceBindMs + MIN });
-        writeBindingFixture(dir, { boundAtMs: Date.now() - sinceBindMs });
-        reap(w, { alive, pane: answer });
-        assert.equal(exists(dir), kept);
-      } finally { w.cleanup(); }
-    });
-  }
-}
-
-// ---------------------------------------------------------------------------------------------
-// (4) Retained marker (retainedAt): today's pane rule, whatever the binder's liveness.
-
-for (const [label, ageMs, answer, alive, kept] of [
-  ['pane open, past expiry', 2 * HOUR, true, false, true],
-  ['pane open, binder alive', 2 * HOUR, true, true, true],
-  ['pane unanswerable, not expired', 10 * MIN, null, false, true],
-  ['pane unanswerable, expired', 2 * HOUR, null, true, false],
-  ['pane closed, not expired, binder alive', 10 * MIN, false, true, false],
-]) {
-  test(`S2(4) retained marker, ${label}: ${kept ? 'kept' : 'reaped'} (unchanged from today)`, () => {
-    const w = workspace();
-    try {
-      const dir = preparedHome(w, { timeoutMs: HOUR, ageMs });
-      assert.equal(markResourceRetained(dir, { paneId: 'w1:p7', herdrSession: 'fgos-s2' }), true);
-      assert.ok(readOwnershipMarker(dir).retainedAt);
-      reap(w, { alive, pane: answer });
-      assert.equal(exists(dir), kept);
-    } finally { w.cleanup(); }
-  });
-}
-
-// ---------------------------------------------------------------------------------------------
-// (5) Finalizer field contract.
 
 async function finalizeWithPrepareDigest(w, dir, digest) {
   const runDir = path.join(w.tmp, 'run');
@@ -372,56 +61,40 @@ async function finalizeWithPrepareDigest(w, dir, digest) {
   });
 }
 
-test('S2(5) a home bound with exactly the authorized fields finalizes and is cleaned', async () => {
+test('a home whose marker is exactly as prepared finalizes and is cleaned', async () => {
   const w = workspace();
   try {
-    const dir = preparedHome(w, { timeoutMs: HOUR });
-    const digest = computeSha256Digest(readOwnershipMarker(dir));
-    writeBindingFixture(dir, { binderPid: CONTROLLER_PID + 1 });
-    // A rebinding by another binder, with a session and a start time, is still only authorized fields.
-    bindOwnershipMarker(dir, { paneId: 'w1:p8', herdrEndpoint: '/run/herdr/s.sock', herdrSession: 'fgos-s2', binderPid: CONTROLLER_PID + 2, binderStartTime: '12345' });
-    const result = await finalizeWithPrepareDigest(w, dir, digest);
+    const dir = preparedHome(w);
+    const result = await finalizeWithPrepareDigest(w, dir, computeSha256Digest(readOwnershipMarker(dir)));
     assert.equal(result.cleanupState, 'cleaned', `finalizer said ${JSON.stringify(result.cleanupResult)}`);
     assert.equal(exists(dir), false);
   } finally { w.cleanup(); }
 });
 
-test('S2(5) a cli-spawn binding (supervisor pid, no pane) finalizes and is cleaned', async () => {
+test('the count of a failed removal is the only change to the marker the finalizer accepts', async () => {
   const w = workspace();
   try {
-    const dir = preparedHome(w, { timeoutMs: HOUR });
+    const dir = preparedHome(w);
     const digest = computeSha256Digest(readOwnershipMarker(dir));
-    bindOwnershipMarker(dir, { binderPid: CONTROLLER_PID + 3, binderStartTime: null });
+    extendOwnershipMarker(dir, { credentialKept: { attempts: 1, since: new Date().toISOString() } });
     const result = await finalizeWithPrepareDigest(w, dir, digest);
     assert.equal(result.cleanupState, 'cleaned', `finalizer said ${JSON.stringify(result.cleanupResult)}`);
   } finally { w.cleanup(); }
 });
 
-test('S2(5) a bound home whose prepare-time pid was rewritten: still ownership-marker-mismatch (binding never rewrites pid)', async () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR });
-    const digest = computeSha256Digest(readOwnershipMarker(dir));
-    writeBindingFixture(dir);
-    extendOwnershipMarker(dir, { pid: CONTROLLER_PID + 9 });
-    const result = await finalizeWithPrepareDigest(w, dir, digest);
-    assert.equal(result.cleanupResult?.reason, 'ownership-marker-mismatch');
-    assert.equal(exists(dir), true);
-  } finally { w.cleanup(); }
-});
-
 for (const [label, change] of [
   ['an unauthorized new field', { evil: 'x' }],
+  ['a pane the home was never bound to', { paneId: 'w1:p7', terminalKey: 'k', boundAt: new Date().toISOString() }],
   ['a changed dispatchId', { dispatchId: 'disp_other' }],
   ['a changed resource kind', { resource: 'scratch' }],
   ['a changed createdAt', { createdAt: new Date(0).toISOString() }],
+  ['a rewritten pid', { pid: 424243 }],
 ]) {
-  test(`S2(5) bound home whose marker also carries ${label}: still ownership-marker-mismatch, home kept`, async () => {
+  test(`a marker that also carries ${label}: ownership-marker-mismatch, home kept`, async () => {
     const w = workspace();
     try {
-      const dir = preparedHome(w, { timeoutMs: HOUR });
+      const dir = preparedHome(w);
       const digest = computeSha256Digest(readOwnershipMarker(dir));
-      writeBindingFixture(dir);
       extendOwnershipMarker(dir, change);
       const result = await finalizeWithPrepareDigest(w, dir, digest);
       assert.equal(result.cleanupResult?.reason, 'ownership-marker-mismatch');
@@ -429,216 +102,6 @@ for (const [label, change] of [
     } finally { w.cleanup(); }
   });
 }
-
-test.todo('S2(5) a bound marker whose binding fields disagree with the launch record (paneId, endpoint) is ownership-marker-mismatch — the comparison against the launch record is not in the owner-approved lite scope of (iv)');
-
-// ---------------------------------------------------------------------------------------------
-// (6) Exclusion under multiplicity. The re-read before destroy (V14) exists; the reclaim claim does not.
-
-test.todo('S2(6) two reaper passes from different processes against one home: at most one commits a claim, the other backs off; the home is removed at most once — needs run supervisor + holder-lock (deferred part ii)');
-
-test('S2(6) a resuming controller rebinds with its own pid after the reaper decided on the first binding: the reaper skips on its re-read', () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-    writeBindingFixture(dir, { boundAtMs: Date.now() - 90 * MIN });
-    // First binder dead, pane answers closed: the reaper decides to reap. Before it destroys, a resuming
-    // controller rebinds the home with its own pid.
-    const result = reap(w, {
-      alive: false,
-      pane: () => {
-        bindOwnershipMarker(dir, { paneId: 'w1:p7', herdrEndpoint: '/run/herdr/default.sock', binderPid: CONTROLLER_PID + 1, binderStartTime: null });
-        return false;
-      },
-    });
-    assert.equal(exists(dir), true);
-    assert.equal(result.skipped.find((s) => s.path === dir)?.reason, 'marker-changed');
-    assert.equal(readOwnershipMarker(dir).binderPid, CONTROLLER_PID + 1);
-  } finally { w.cleanup(); }
-});
-
-test.todo('S2(6) a stale claim left by a reaper that crashed after claiming makes the controller refuse launch (fail closed) — needs run supervisor + holder-lock (deferred part ii)');
-test.todo('S2(6) a later pass takes over a stale claim only once its recorded claimant pid is provably dead, never while it lives, then runs its own read, claim and re-read — needs run supervisor + holder-lock (deferred part ii)');
-
-// ---------------------------------------------------------------------------------------------
-// (7) The pane check asks terminal-control about the slot a marker names, on the endpoint the round
-// actually used. A slot needs an allocation record, so these tests allocate through the same route,
-// against a fake herdr that answers `pane get` from a list of open panes and logs the server asked.
-
-async function withSessionFake(w, fn) {
-  const harness = await startTerminalHarness();
-  const herdr = createSessionFake(path.join(w.tmp, 'herdr'), { queue: ['w1:p7'] });
-  const saved = process.env.FGOS_HERDR_BIN;
-  process.env.FGOS_HERDR_BIN = herdr.bin;
-  try {
-    const tc = createTerminalControl({ herdrBin: herdr.bin, env: { HERDR_SOCKET_PATH: harness.socketPath } });
-    assert.equal(tc.allocate({ key: 'k-s2', groupKey: 'g-s2', display: { label: 'g' } }).result, 'slot');
-    return await fn({ herdr, socket: harness.socketPath });
-  } finally {
-    if (saved === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = saved;
-    harness.stop();
-  }
-}
-
-test('S2(7) control: a retained home whose session is named is asked on that session and follows the pane', async () => {
-  const w = workspace();
-  try {
-    await withSessionFake(w, ({ herdr, socket }) => {
-      const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-      markResourceRetained(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrSession: 'fgos-s2' });
-      extendOwnershipMarker(dir, { herdrEndpoint: socket });
-      reap(w, { alive: false });
-      assert.equal(exists(dir), true, 'open pane keeps the home past expiry');
-      assert.equal(herdr.calls().find((c) => c.args[0] === 'pane' && c.args[1] === 'get')?.session, 'fgos-s2', 'the recorded session is the one asked');
-      herdr.close('w1:p7');
-      reap(w, { alive: false });
-      assert.equal(exists(dir), false, 'closed pane releases it');
-    });
-  } finally { w.cleanup(); }
-});
-
-test('S2(7) REGRESSION default-session round (HERDR_SESSION unset): the binding records the endpoint actually used, so the reaper asks herdr there and keeps the home while the pane is open (V24)', async () => {
-  const w = workspace();
-  try {
-    await withSessionFake(w, ({ herdr, socket }) => {
-      const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-      // A default-session round: the client env names no session, so the endpoint is the socket herdr
-      // itself falls back to. The binding records it before launch; a later retain (authority.mjs, with
-      // round.herdrSession null) keeps it.
-      const fallback = herdrEndpointForEnv({ HOME: '/home/s2-user' });
-      assert.deepEqual(fallback, { herdrEndpoint: socketPathForSession('default', { home: '/home/s2-user' }), herdrSession: null });
-      // The recorded endpoint is the one the test herdr listens on, so it can be asked for real.
-      bindOwnershipMarker(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrEndpoint: socket, herdrSession: null, binderPid: CONTROLLER_PID, binderStartTime: null });
-      markOwnershipLaunched(dir);
-      markResourceRetained(dir, { paneId: 'w1:p7', terminalKey: 'k-s2', herdrSession: null });
-      reap(w, { alive: false, pane: undefined });
-      const asked = herdr.calls().filter((c) => c.args[0] === 'pane' && c.args[1] === 'get');
-      assert.ok(asked.length > 0, 'the reaper never asked herdr: a default-session pane is unaskable');
-      assert.equal(asked[0].socket, socket, 'asked on the recorded socket');
-      assert.equal(asked[0].session, null, 'with no session assumed');
-      assert.equal(exists(dir), true, 'an open default-session pane lost its home to expiry');
-      herdr.close('w1:p7');
-      reap(w, { alive: false, pane: undefined });
-      assert.equal(exists(dir), false, 'closed pane releases it');
-    });
-  } finally { w.cleanup(); }
-});
-
-test('S2(7) herdrEndpointForEnv: the socket path the client env names wins, then its named session, never an assumed session name', () => {
-  assert.deepEqual(herdrEndpointForEnv({ HOME: '/h', HERDR_SOCKET_PATH: '/x/cockpit.sock', HERDR_SESSION: 'ops' }), { herdrEndpoint: '/x/cockpit.sock', herdrSession: 'ops' });
-  assert.deepEqual(herdrEndpointForEnv({ HOME: '/h', HERDR_SOCKET_PATH: '/x/cockpit.sock' }), { herdrEndpoint: '/x/cockpit.sock', herdrSession: null });
-  assert.deepEqual(herdrEndpointForEnv({ HOME: '/h', HERDR_SESSION: 'fgos-worker' }), { herdrEndpoint: '/h/.config/herdr/sessions/fgos-worker/herdr.sock', herdrSession: 'fgos-worker' });
-  assert.deepEqual(herdrEndpointForEnv({ HOME: '/h' }), { herdrEndpoint: '/h/.config/herdr/herdr.sock', herdrSession: null });
-});
-
-test('S2(7) a marker that names no slot key is never asked about and never has its pane closed blind; the expiry rule decides its home', async () => {
-  const w = workspace();
-  try {
-    await withSessionFake(w, ({ herdr, socket }) => {
-      const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR });
-      markResourceRetained(dir, { paneId: 'w1:p7', herdrSession: 'fgos-s2' });
-      extendOwnershipMarker(dir, { herdrEndpoint: socket });
-      const before = herdr.calls().length;
-      reap(w, { alive: false, onClose: () => assert.fail('a pane named only by id is never closed') });
-      assert.equal(herdr.calls().length, before, 'herdr was not asked');
-      assert.equal(exists(dir), false, 'a pane that cannot be asked about does not keep a login copy past its expiry');
-    });
-  } finally { w.cleanup(); }
-});
-
-test.todo('S2(7) live, not mocked: the reaper against the endpoint recorded for a real default-session pane returns true while it is open and false after it closes [needs a live herdr; out of scope for a deterministic suite]');
-
-// ---------------------------------------------------------------------------------------------
-// (8) Plumbing authority -> binding. A terminal attempt binds nothing in the home from the controller:
-// the attempt lock decides, and the herdr rounds that used to bind a pane before the launch are gone.
-
-test('S2(8) Confinement Authority hands one binding over every prepared home and none when nothing can bind', () => {
-  assert.equal(bindingForPrepared([null, { cleanup() {} }]), null, 'an unconfined round has no home and is handed no bind function');
-  const seen = [];
-  const prepared = { bind: (b) => seen.push(['bind', b]), markLaunched: () => seen.push(['launched']) };
-  const binding = bindingForPrepared([prepared, prepared]);
-  binding.bind({ paneId: 'p' });
-  binding.markLaunched();
-  assert.deepEqual(seen, [['bind', { paneId: 'p' }], ['launched']], 'the same prepared confinement is bound once');
-});
-
-test.todo('S2(8) an assignment confined herdr-spawn dispatch also hands a launch-check and a post-launch-check into runHerdrRound — needs run supervisor + holder-lock (deferred part ii)');
-
-// ---------------------------------------------------------------------------------------------
-// (9) cli-spawn confined rounds: the home is bound to the detached run supervisor, which outlives the
-// controller. Real processes stand in for the supervisor; liveness is the reaper's own (pid + start time).
-
-function spawnSupervisorStandIn() {
-  const child = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'ignore' });
-  return child;
-}
-
-function waitExit(child) {
-  return new Promise((resolve) => { if (child.exitCode !== null || child.signalCode !== null) resolve(); else child.once('exit', resolve); });
-}
-
-function cliSpawnBinding(dir) {
-  return bindingForPrepared([{
-    bind: (b) => bindOwnershipMarker(dir, b),
-    markLaunched: () => markOwnershipLaunched(dir),
-  }]);
-}
-
-test('S2(9) a pane-less binding (written by a release before the run supervisor) is kept for doctor, whoever is alive and however old', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
-  const w = workspace();
-  const supervisor = spawnSupervisorStandIn();
-  try {
-    const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR }); // marker pid: a dead controller
-    cliSpawnBinding(dir).bind({ binderPid: supervisor.pid });
-    const marker = readOwnershipMarker(dir);
-    assert.equal(marker.binderPid, supervisor.pid);
-    assert.ok(marker.binderStartTime, 'the supervisor start time is recorded');
-    assert.equal(marker.paneId, undefined);
-
-    const alive = reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(dir), true, 'the home of a worker still run by its supervisor was removed');
-    assert.equal(alive.skipped.find((s) => s.path === dir)?.reason, 'unpaned-binding-kept-for-doctor');
-
-    supervisor.kill('SIGKILL');
-    await waitExit(supervisor);
-    const dead = reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(dir), true, 'no pid rule removes a pane-less binding any more');
-    assert.equal(dead.skipped.find((s) => s.path === dir)?.reason, 'unpaned-binding-kept-for-doctor');
-    assert.deepEqual(dead.reaped, []);
-  } finally { try { supervisor.kill('SIGKILL'); } catch {} w.cleanup(); }
-});
-
-test('S2(9) a pane-less binding past its old window or on a reused pid is kept as well', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
-  const w = workspace();
-  const supervisor = spawnSupervisorStandIn();
-  try {
-    const past = Date.now() - (LAUNCH_GRACE_MS + HOUR + RUN_SETTLE_GRACE_MS + MIN);
-    const expired = preparedHome(w, { dispatchId: 'disp_exp', timeoutMs: HOUR, ageMs: 3 * HOUR });
-    bindOwnershipMarker(expired, { binderPid: supervisor.pid, boundAt: new Date(past).toISOString() });
-    const reused = preparedHome(w, { dispatchId: 'disp_reuse', timeoutMs: HOUR, ageMs: 2 * HOUR });
-    bindOwnershipMarker(reused, { binderPid: supervisor.pid, binderStartTime: '1' });
-    const result = reapOrphanedConfinementResources({ tempRoot: w.root });
-    assert.equal(exists(expired), true);
-    assert.equal(exists(reused), true);
-    assert.deepEqual(result.reaped, []);
-  } finally { supervisor.kill('SIGKILL'); await waitExit(supervisor); w.cleanup(); }
-});
-
-test('an attempt home (marker version 2) is never judged by the reaper: dead pid, closed pane, any age', () => {
-  const w = workspace();
-  try {
-    const dir = path.join(w.root, 'disp_v2', 'home');
-    ensurePrivateDir(dir, { root: w.root });
-    writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
-    extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * HOUR).toISOString() });
-    fs.writeFileSync(path.join(dir, 'auth.json'), '{"fake":"login copy"}');
-    const result = reap(w, { alive: false, pane: false });
-    assert.equal(exists(dir), true);
-    assert.deepEqual(result.reaped, []);
-    assert.equal(result.skipped.find((s) => s.path === dir)?.reason, 'attempt-home-owned-by-adopt');
-    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos-confinement-owner.json'), 'utf8')).attemptId, 'att-1', 'extending keeps the version 2 marker');
-  } finally { w.cleanup(); }
-});
 
 test('writeOwnershipMarkerV2 refuses a missing attempt or run directory and leaves no marker', () => {
   const w = workspace();
@@ -659,5 +122,16 @@ test('removeConfinementDir refuses an attempt home and removes nothing', () => {
     writeOwnershipMarkerV2(dir, { attemptId: 'att-2', runDir: path.join(w.tmp, 'run') });
     assert.throws(() => removeConfinementDir(dir), /attempt-home-owned-by-adopt/);
     assert.equal(exists(dir), true);
+  } finally { w.cleanup(); }
+});
+
+test('extending an attempt home marker keeps it a version 2 marker', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_v2', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
+    extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString() });
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos-confinement-owner.json'), 'utf8')).attemptId, 'att-1');
   } finally { w.cleanup(); }
 });
