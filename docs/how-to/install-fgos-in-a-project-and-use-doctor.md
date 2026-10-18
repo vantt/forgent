@@ -383,9 +383,9 @@ runner picks executors from that capability's pool in
 "runner": { "capabilities": { "nominal-group:generate": {
   "prefer": [
     { "executor": "claude" },
-    { "executor": "xai", "invocation": "pi-herdr-vantt" },
+    { "executor": "xai", "invocation": "omp-herdr" },
     { "executor": "openai" },
-    { "executor": "glm", "invocation": "pi-cli-bwrap-openrouter" }
+    { "executor": "glm", "invocation": "pi-cli-bwrap" }
   ] } } }
 ```
 
