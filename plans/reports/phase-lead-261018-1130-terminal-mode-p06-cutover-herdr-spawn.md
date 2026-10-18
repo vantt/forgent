@@ -37,3 +37,6 @@ Status: see the done file. Branch `terminal-mode/p06-cutover`.
 - Another session ran a full-suite `node --test` concurrently (load ~20): earlier flakes of my timing-sensitive tests came from that plus two test-harness races (staging dir picked as the attempt dir; adopt while the gate still held the lock), both fixed.
 - `authority.mjs` still sets `FGOS_SESSION_ID: writerId` in the dispatcher env (P07); the gate overrides it.
 - Real-herdr proof with the five CLIs and T8 rerun is P09.
+
+## Full suite
+`npm test` on the integration branch after the merge was started once and stopped by the system for low memory (not a test failure, no result). Not restarted. Run on integration after merge instead: architecture guard, all `test/run-supervisor/*`, all `test/runner/herdr-*`, `execution/run-herdr`, import-graph, enumerator guard, i08b, reaper-fence, dispatch-recovery: 271 pass, 0 fail. Cargo: `-p fgos-run-supervisor -p fgos-agent-protocol -p fgos-session-identity -p fgos-terminal-control -p fgos` all green. The big lead owns the full-suite run.
