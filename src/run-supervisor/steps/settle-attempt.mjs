@@ -104,7 +104,10 @@ function rawResultOf(receipt, outboxClaimPresent) {
   const stopped = receipt.outcome !== 'exited';
   const settledAt = gate?.exitedAt ?? receipt.publishedAt ?? new Date().toISOString();
   // A result the agent wrote is judged whatever stopped it afterwards (hard ceiling, orphan, lost gate).
-  if (outboxClaimPresent && stopped) {
+  // A gate whose supervisor was gone ends the agent itself once the result shows: that ends a finished
+  // agent, so the signal it died of says nothing about the work.
+  const endedAfterResult = gate?.stoppedBy === 'orphan' && gate?.cause === 'orphan-result';
+  if (outboxClaimPresent && (stopped || endedAfterResult)) {
     return { exitCode: 0, signal: null, isTimeout: false, settledAt, executionError: null };
   }
   // A terminal attempt the supervisor ended early names why in the receipt reason (the agent waits on a
