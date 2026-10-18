@@ -206,12 +206,12 @@
       "kind": "mutex",
       "scope": "repo",
       "rank": 80,
-      "v3Path": "<fgosDir>/locks/activation.lock",
+      "v3Path": "<fgosDir>/locks/activation-v2.lock",
       "v1Shape": "file-link",
-      "v1Path": ".fgos/installation/activation.lock",
+      "v1Path": [".fgos/installation/activation.lock", ".fgos/locks/activation.lock"],
       "fence": "tombstone",
       "owner": "4.4",
-      "note": "v1 source: packages/distribution/rust/src/init.rs ActivationLockGuard"
+      "note": "fgctl places the old v3 fence under both activation locks at first git-wal-v1 activation; the 4.4 fence remains"
     },
     {
       "name": "install",
@@ -270,6 +270,17 @@
       "v1Path": null,
       "fence": "none",
       "owner": "event-store"
+    },
+    {
+      "name": "repo-config",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<fgosDir>/locks/repo-config.lock",
+      "v1Shape": null,
+      "v1Path": null,
+      "fence": "none",
+      "owner": "git"
     }
   ]
 }

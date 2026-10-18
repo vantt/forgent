@@ -4,6 +4,7 @@
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
 mod publication;
+mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub mod wal;
 pub use driver::{GitDriver, WalReader};
@@ -89,6 +90,9 @@ pub struct RepoHandle {
 impl RepoHandle {
     pub fn layout(&self) -> &RepoLayout {
         &self.layout
+    }
+    pub fn git_dir(&self) -> &std::path::Path {
+        &self.git_dir
     }
     pub fn common_dir(&self) -> &std::path::Path {
         &self.common_dir
@@ -482,4 +486,28 @@ pub struct TreePage {
     pub entries: Vec<ListedTreeEntry>,
     pub complete: bool,
     pub next_cursor: Option<TreeCursor>,
+}
+
+/// Versions of the public Git contracts, independent of package release versions.
+pub fn contract_versions() -> serde_json::Value {
+    serde_json::json!({"gitPort": 1, "receipt": 1, "walRecord": 1})
+}
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Lock-taking Git ports stay dormant until the Windows handoff exists (Q6).
+pub fn require_lock_scope_platform() -> Result<()> {
+    if cfg!(target_os = "windows") {
+        return Err(OperationError {
+            code: ResultCode::Refused,
+            cause: "git-lockscope-unavailable-windows".into(),
+            retryable: false,
+            operation_id: None,
+            receipt: None,
+            exit_code: None,
+            signal: None,
+            stderr: vec![],
+        });
+    }
+    Ok(())
 }

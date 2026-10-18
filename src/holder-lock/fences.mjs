@@ -213,7 +213,7 @@ export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defa
   const targets = [];
   for (const lock of readRegistry().locks) {
     if (!owners.includes(lock.owner) || !isCutOverLock(lock) || !lock.fence || lock.fence === 'none') continue;
-    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p });
+    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p, ...(lock.name === 'activation' && p === path.join(context.fgosDir, 'locks/activation.lock') ? { managedBy: 'fgctl' } : {}) });
   }
   return targets;
 }
@@ -372,7 +372,7 @@ export function fenceStatus(options = {}) {
     return { ...target, state, fenced: state === 'fenced' };
   });
   const missing = targets.filter((target) => !target.fenced).map((target) => target.path);
-  const v1Present = targets.filter((target) => target.state === 'v1-present').map((target) => target.path);
+  const v1Present = targets.filter((target) => target.state === 'v1-present' && target.managedBy !== 'fgctl').map((target) => target.path);
   return { targets, missing, v1Present, complete: missing.length === 0 };
 }
 
@@ -393,6 +393,8 @@ export function placeFences({ now = new Date().toISOString(), ...options } = {})
   const placed = [];
   const skipped = [];
   for (const target of status.targets) {
+    // Only fgctl may replace the old kernel file while holding both descriptions.
+    if (target.managedBy === 'fgctl') continue;
     let outcome;
     try {
       outcome = target.fence === 'blocking-generation' ? publishBlockingGeneration(target, now) : placeTombstone(target, now);

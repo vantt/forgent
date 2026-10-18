@@ -1773,9 +1773,61 @@ impl Inspect for GitDriver {
         _repo: &RepoHandle,
         _remote: &str,
     ) -> Result<Option<FetchMappingProvenance>> {
-        // No RepositoryConfig writer has recorded provenance in this lane.
-        Ok(None)
+        let wal = match crate::wal::Wal::open_existing(_repo.common_dir(), crate::wal::OsFileSystem)
+        {
+            Ok(wal) => wal,
+            Err(crate::wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(None)
+            }
+            Err(e) => return Err(refusal(format!("git-wal-unreadable: {e}"))),
+        };
+        let scan = wal.scan(100_000).map_err(|e| refusal(e.to_string()))?;
+        if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
+            return Err(refusal("git-wal-unreadable"));
+        }
+        let mut facts = Vec::new();
+        for entry in scan.entries {
+            if let Ok(chain) = wal.inspect(&entry.operation_id) {
+                if matches!(
+                    chain.outcome(),
+                    Some(crate::wal::Outcome::Transfer {
+                        acknowledged: true,
+                        unknown: false,
+                        ..
+                    })
+                ) {
+                    if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
+                        let crate::wal::ConfigChange {
+                            remote,
+                            url,
+                            refspecs,
+                            ..
+                        } = change.as_ref();
+                        if remote == _remote {
+                            facts.push((
+                                std::fs::metadata(
+                                    _repo
+                                        .common_dir()
+                                        .join("fgos/git/operations")
+                                        .join(&entry.operation_id),
+                                )
+                                .and_then(|m| m.modified())
+                                .map_err(io)?,
+                                FetchMappingProvenance {
+                                    operation_id: entry.operation_id,
+                                    remote_url: url.clone(),
+                                    refspecs: refspecs.clone(),
+                                },
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        facts.sort_by_key(|(time, _)| *time);
+        Ok(facts.pop().map(|(_, fact)| fact))
     }
+
     fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {
         GitDriver::resolve_repo(self, path, path)
     }

@@ -373,8 +373,10 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   }
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 13 fence\(s\)/);
-  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 13 legacy lock path(s) fenced' });
-  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 13 legacy lock path(s) already fenced' });
+  assert.equal(checkLockFences(root, { providerRuntimeDir }).passed, false);
+  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^git-fence-missing:/);
+  assert.equal(fs.existsSync(path.join(root, '.fgos/locks/activation.lock')), false, 'doctor never places the controller fence');
+  assert.match(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }).message, /only the new fgctl/);
 });
 
 test('a payload registry without the Rust callers\' locks fences only the locks it owns, leaving the paths an older fgctl still uses', () => {
@@ -397,12 +399,12 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   assert.match(fixed.message, /^placed 10 fence\(s\)/);
   const left = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).missing;
   // The install tombstone is machine-wide and an earlier test already placed it under the shared state root.
-  assert.deepEqual(left.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
+  assert.deepEqual(left.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('locks', 'activation.lock'), path.join('observe', '.lock')]);
   assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), {
     changed: false,
     message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first',
   });
-  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^warning: 2 of 13 legacy lock path\(s\) not fenced: .* -- the fix waits for this release to be activated here/);
+  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^warning: 3 of 14 legacy lock path\(s\) not fenced: .* -- the fix waits for this release to be activated here/);
 });
 
 test('the fence fix refuses while an fgOS payload of the workspace runs, and names it', async () => {

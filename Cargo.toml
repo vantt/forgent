@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "packages/git/node-addon",
     "packages/canonical-json/rust",
     "packages/event-store/rust",
     "packages/durable-file/rust",

@@ -149,9 +149,11 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 
 | Lock | Scope | New path | Legacy path (becomes a tombstone directory) | Caller |
 |---|---|---|---|---|
-| `activation` | repo | `<fgosDir>/locks/activation.lock` | `.fgos/installation/activation.lock` | `fgctl` init, upgrade, repair |
+| `activation` | repo | `<fgosDir>/locks/activation-v2.lock` | `.fgos/installation/activation.lock` and `.fgos/locks/activation.lock` | `fgctl` init, upgrade, repair |
 | `install` | machine | `<lockRoot>/install.lock` (`<stateRoot>/locks/install.lock`) | `<stateRoot>/install.lock` | `fgctl` release store |
 | `observe` | repo | `<fgosDir>/locks/observe.lock` | `.fgos/observe/.lock` | Observe store (`fgos metrics`, `fgos friction`) |
+
+Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
 
 The observe lock waits at most 5 s, has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
 
@@ -225,6 +227,8 @@ The routes live in `apps/fgos/src/main.rs` as the earliest branch of `main()` (b
 A variable whose value is blank is unset; a non-blank value is used untrimmed. `lockRoot` is `<stateRoot>/locks`. The Rust host resolves the root once and exports `FGOS_STATE_ROOT` before it execs the Node payload; Node reads that variable and calls the route only when it is absent (the `node bin/fgos.mjs` compatibility channel), once, before any lock. Dispatch pins `FGOS_STATE_ROOT` into the environment of every child, so a sandbox with its own `HOME` does not move the root; a process that sets another root is, by definition, another machine scope. The key of a cwd is `dev:ino` after `realpath`.
 
 ## 12. Cutover: stop everything, fence once
+
+The Git-WAL activation fence is placed by the **new fgctl**, inside its activation critical section, rather than by doctor. It holds `activation-v2.lock` and the old `activation.lock`; the first `git-wal-v1` activation atomically exchanges the held old file for a prepared directory carrying `{lock: "activation", at: <ISO timestamp>, by: "fgos git"}` in `TOMBSTONE`, then syncs the parent. An old controller sees the held inode or `EISDIR`, never an unfenced interval. Linux uses `renameat2(RENAME_EXCHANGE)`; platforms without this primitive refuse placement. Node fence placement leaves this path to fgctl, while fence status still reports it. The original 4.4 installation-path fence remains. Rollback retains the fence.
 
 fgOS has one user and its runtime state can be rebuilt, so the two-protocol, two-phase quiescence of the design is replaced by a stop-everything cutover: every writer in every workspace (forgentX, mdview, mcp-skill-hub) is stopped, each lock of this track moves to the new path, and the legacy path is deleted in the same phase. There is no family marker, no protocol floor in the activation manifest, and no separate phase that deletes legacy code.
 

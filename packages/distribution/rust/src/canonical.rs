@@ -129,6 +129,7 @@ mod tests {
                 fgos_runner: None,
             },
             components: crate::manifest::ComponentsInfo {
+                native_addon: None,
                 legacy_node: crate::manifest::LegacyNodeComponent {
                     root: "libexec".to_string(),
                     entry: "bin/fgos.mjs".to_string(),
@@ -142,6 +143,7 @@ mod tests {
                 git: None,
             },
             state_schemas: None,
+            capabilities: vec![],
             files,
         }
     }
