@@ -86,3 +86,11 @@ Additional main identity import found by full B0→main path comparison: the run
 | `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md` | `a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d` | `542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e` |
 | `docs/platform/packaging-distribution/contracts/activation-binding.md` | `7fa1b2360be1c710b408a6b729523bc7bda5e725f0047d9a9dcbd591cc34d5bc` | `737740f38410da971a8afa92326bdbe99b4b1fa2e1336955158162f8f26e1ccf` |
 | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` | `e6fd05841efbbab24de026bfdd8ea5c56e785aecfaa6f43965390cdf3560f4db` | `ad7ef96c4b60b4c3f3b6d76da600e42cee1571832c219ff3902124c91cf2da0b` |
+
+### N1 committed header correction — carriage record
+
+The Lead repaired only holder-lock line 8 in committed `e6b7efeec` after the prior STOP. This package changes no candidate byte. The header now waits for implementation of signed D-ADR0055; native N1 carry/rebind evidence is in `step-09-package-n1-carry.json` and `step-09-package-n1-rebindings.json`. Two extractor units change, preserving the old positional block as a gap with one new native successor ID. Bounded independent re-review and N2 remain pending.
+
+| Candidate | Prior committed SHA-256 | Corrected committed SHA-256 |
+|---|---|---|
+| `docs/platform/holder-lock/spec.md` | `ed9c95e5ad71281e436ddc8aa02e6d5aa2be97f122e76ae62a3c9f1929884cfd` | `e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa` |
