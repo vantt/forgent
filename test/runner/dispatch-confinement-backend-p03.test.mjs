@@ -430,12 +430,9 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
       dispatchId: 'disp_test_prep',
       invocation: {
         command: 'agent-cli',
-        args: ['--work', '{HOME_TOKEN}'],
-        env: { FOO: 'bar' },
-        resourceBindings: [
-          { resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } },
-          { resource: 'private-home', target: { kind: 'argument', token: '{HOME_TOKEN}' } },
-        ],
+        args: ['--work'],
+        env: { FOO: 'bar', AGENT_HOME: '/real/store' },
+        credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' },
       },
       context: { cwd: wsDir, runDir },
     };
@@ -462,7 +459,7 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
     const wsIdx = args.indexOf(wsDir);
     assert.ok(wsIdx > 0 && args[wsIdx - 1] === '--bind');
 
-    // Generic bindings applied
+    // The declared home variable points at the private home, over the value the invocation's own env carried
     assert.equal(prepared.invocation.env.AGENT_HOME, '/home/sandbox');
     assert.ok(args.includes('/home/sandbox'));
 
@@ -499,7 +496,7 @@ test('provider capacity: prepareBwrap copies selected account auth.json into pri
     const req = {
       dispatchId: 'disp_selected_home',
       executorId: 'codex-bwrap',
-      invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+      invocation: { command: 'agent-cli', args: [], env: {} },
       providerCapacity: {
         provider: 'openai-codex',
         accountId: 'tetnu',
@@ -557,7 +554,6 @@ test('provider capacity: old FGOS_CODEX_CREDENTIAL_HOMES hash rotation is ignore
         env: {
           FGOS_CODEX_CREDENTIAL_HOMES: poolHome,
         },
-        resourceBindings: [],
       },
       providerCapacity: {
         provider: 'openai-codex',
@@ -604,7 +600,7 @@ test('provider capacity: selected missing credential fails closed before spawn',
       () => prepareBwrap(plan, {
         dispatchId: 'disp_missing_home',
         executorId: 'codex-bwrap',
-        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        invocation: { command: 'agent-cli', args: [], env: {} },
         providerCapacity: {
           provider: 'openai-codex',
           accountId: 'missing',
@@ -649,7 +645,7 @@ function homeFilesFixture() {
   const request = (credentialSource) => ({
     dispatchId: 'disp_home_files',
     executorId: 'agent-bwrap',
-    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } }] },
+    invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
     providerCapacity: { provider: 'p', accountId: 'a', credentialSource },
     context: { cwd: tmp, runDir: tmp },
   });
@@ -1235,7 +1231,7 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     const prepared = await prepareBwrap(plan, {
       dispatchId: 'disp_wt_commit',
       executorId: 'x',
-      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') }, resourceBindings: [] },
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') } },
       context: { cwd: wt, runDir: base },
     }, { id: 'bwrap', type: 'bwrap', config: {} });
     const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: wt, env: prepared.invocation.env, encoding: 'utf8' });

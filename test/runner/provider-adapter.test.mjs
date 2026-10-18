@@ -470,7 +470,6 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
               promptDelivery: resolvedCmd.promptDelivery,
               interactiveMode: resolvedCmd.interactiveMode,
               liveOutput: resolvedCmd.liveOutput,
-              resourceBindings: resolvedCmd.resourceBindings,
               permissionMode: resolvedCmd.permissionMode,
             },
           });

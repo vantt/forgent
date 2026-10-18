@@ -45,7 +45,7 @@ function planFor(tempRoot, dispatchId) {
 const requestFor = (dispatchId, source) => ({
   dispatchId,
   executorId: 'codex-bwrap',
-  invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+  invocation: { command: 'agent-cli', args: [], env: {} },
   providerCapacity: { provider: 'openai-codex', accountId: 'a', credentialSource: source },
   context: { cwd: os.tmpdir(), runDir: os.tmpdir() },
 });

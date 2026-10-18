@@ -654,7 +654,7 @@ test('the ownership marker records the write-back account only when asked, and o
       const request = {
         dispatchId,
         executorId: 'omp-bwrap',
-        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        invocation: { command: 'agent-cli', args: [], env: {} },
         providerCapacity: {
           provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home),
           ...(withWriteBack ? { credentialWriteBack: { runtimeDir: w.runtimeDir } } : {}),
@@ -1892,7 +1892,7 @@ async function prepareCodexHome(codexHome, dispatchId) {
   const request = {
     dispatchId,
     executorId: 'codex-bwrap',
-    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+    invocation: { command: 'agent-cli', args: [], env: {} },
     providerCapacity: { provider: 'openai', accountId: 'acct', credentialSource: { kind: 'codex-home', home: codexHome } },
     context: { cwd: os.tmpdir(), runDir: os.tmpdir() },
   };

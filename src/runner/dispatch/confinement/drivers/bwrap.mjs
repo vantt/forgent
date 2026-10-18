@@ -570,21 +570,14 @@ export function prepareBwrapSync(plan, request, backend) {
       for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
     }
 
-    // Apply generic resource bindings (spec §6.5: no provider branching!)
+    // The invocation names the variable its CLI reads its login home from; it points at the private home
+    // (spec §6.5: no provider branching, only the name the invocation declared). It wins over a value the
+    // invocation's own env carries, which names the real store.
     const resolvedEnv = { ...(request.invocation?.env || {}) };
-    let finalArgs = [...(request.invocation?.args || [])];
-
-    for (const binding of request.invocation?.resourceBindings || []) {
-      const match = plan.resources?.find((r) => r.resource === binding.resource);
-      if (!match) continue;
-
-      const targetPath = match.executionTarget.path;
-      if (binding.target?.kind === 'env') {
-        resolvedEnv[binding.target.name] = targetPath;
-      } else if (binding.target?.kind === 'argument' && binding.target.token) {
-        finalArgs = finalArgs.map((arg) => arg.split(binding.target.token).join(targetPath));
-      }
-    }
+    const finalArgs = [...(request.invocation?.args || [])];
+    const homeEnv = request.invocation?.credentialStore?.homeEnv;
+    const privateHome = plan.resources?.find((r) => r.resource === 'private-home');
+    if (homeEnv && privateHome) resolvedEnv[homeEnv] = privateHome.executionTarget.path;
 
     // Command wrap to ensure no inherited writable fds survive (R7, MED-1 fix)
     // Runs bash helper that closes all fds >= 3 before execing the child command.

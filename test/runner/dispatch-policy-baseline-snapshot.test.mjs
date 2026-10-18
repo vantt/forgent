@@ -42,16 +42,6 @@ export function deriveReadOnlyMechanism(args, confinement) {
 }
 
 /**
- * Stable, secret-free summary of executor resource bindings.
- * Preserves the full binding object structure (resource, target.kind, target.name, etc.)
- * so any regression in binding shape is caught.
- */
-export function summarizeResourceBindings(bindings) {
-  if (!Array.isArray(bindings)) return [];
-  return bindings.map((b) => (typeof b === 'object' && b !== null ? structuredClone(b) : b));
-}
-
-/**
  * Executes the real production resolver chain and returns one normalized snapshot row.
  *
  * `invocationId` (executor-id-consolidation Step 2, optional): pins a
@@ -96,7 +86,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
     command: resolvedCmd.command,
     args: normalizedArgs,
     envKeys: Object.keys(resolvedCmd.env ?? {}),
-    resourceBindings: summarizeResourceBindings(resolvedCmd.resourceBindings),
+    credentialStore: resolvedCmd.credentialStore ?? null,
     adapter: resolvedCmd.adapter,
     promptDelivery: resolvedCmd.promptDelivery ?? (resolvedCmd.adapter === 'herdr-spawn' ? 'inline' : undefined),
     confinement: resolvedCmd.confinement?.backend ?? 'none',
@@ -185,7 +175,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'acceptEdits'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -207,7 +197,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'acceptEdits'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -229,7 +219,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'acceptEdits'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -255,7 +245,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -281,7 +271,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -307,7 +297,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -332,7 +322,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'none',
@@ -357,7 +347,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'none',
@@ -382,7 +372,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
     envKeys: [],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'none',
@@ -412,15 +402,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -450,15 +432,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -488,15 +462,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -522,15 +488,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -556,15 +514,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -590,15 +540,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -624,15 +566,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -658,15 +592,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -692,15 +618,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'PI_CODING_AGENT_DIR'
-        }
-      }
-    ],
+    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -723,7 +641,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -746,7 +664,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -769,7 +687,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -792,15 +710,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'CODEX_HOME'
-        }
-      }
-    ],
+    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -823,15 +733,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'CODEX_HOME'
-        }
-      }
-    ],
+    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -854,15 +756,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    resourceBindings: [
-      {
-        resource: 'private-home',
-        target: {
-          kind: 'env',
-          name: 'CODEX_HOME'
-        }
-      }
-    ],
+    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -886,7 +780,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -910,7 +804,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -934,7 +828,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'CODEX_HOME'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -963,7 +857,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -992,7 +886,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1021,7 +915,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1050,7 +944,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1079,7 +973,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1108,7 +1002,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1138,7 +1032,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'OPENROUTER_API_KEY'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1168,7 +1062,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'OPENROUTER_API_KEY'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1198,7 +1092,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'OPENROUTER_API_KEY'
     ],
-    resourceBindings: [],
+    credentialStore: null,
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
@@ -1322,31 +1216,19 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       }
     });
 
-    // (e) codex-bwrap declares CODEX_HOME resource binding while other executors have empty bindings
-    test('fact (e): resourceBindings captures codex-bwrap CODEX_HOME binding', () => {
+    // (e) codex-bwrap reads the codex login store through CODEX_HOME while the unconfined codex invocation reads none
+    test('fact (e): credentialStore captures the codex-bwrap CODEX_HOME store', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
         const bwrapRow = resolveSnapshotRowByLabel(cfg, 'codex-bwrap', tier, throwawayDir);
         assert.deepEqual(
-          bwrapRow.resourceBindings,
-          [
-            {
-              resource: 'private-home',
-              target: {
-                kind: 'env',
-                name: 'CODEX_HOME',
-              },
-            },
-          ],
-          `codex-bwrap [${tier}] must declare resourceBindings with private-home CODEX_HOME env target`
+          bwrapRow.credentialStore,
+          { use: 'codex', homeEnv: 'CODEX_HOME' },
+          `codex-bwrap [${tier}] must read the codex store through CODEX_HOME`
         );
 
         const cliRow = resolveSnapshotRowByLabel(cfg, 'codex-cli', tier, throwawayDir);
-        assert.deepEqual(
-          cliRow.resourceBindings,
-          [],
-          `codex-cli [${tier}] resourceBindings must be empty`
-        );
+        assert.equal(cliRow.credentialStore, null, `codex-cli [${tier}] reads no store through a private home`);
       }
     });
   });
