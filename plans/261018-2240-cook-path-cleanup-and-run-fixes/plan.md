@@ -1,6 +1,6 @@
 ---
 title: "COOK P1 (cut) + P3: clean stale facts, rename the old cook to deliver, fix the run path for cook"
-status: in-progress
+status: completed
 priority: P1
 created: 2026-10-18
 source: plans/reports/roadmap-261016-2212-fgos-cook-and-git-component.md (P1, P3)
@@ -15,8 +15,8 @@ Owner decisions of 2026-10-18 (board row COOK, log 22:20): P1 is cut to factual 
 
 | Phase | Scope | Status |
 |---|---|---|
-| [P1](phase-01-stale-facts-and-deliver-rename.md) | Stale facts, `/fgOS:cook` → `/fgOS:deliver` | pending |
-| [P3](phase-02-run-path-fixes-for-cook.md) | `verify` on Unit, verify runner with timeout, no pinned `npm test`, one-liner `--input`/`--verify`, `docs:write`, skills at flow level for `bind()`, distinct families at high/critical | pending |
+| [P1](phase-01-stale-facts-and-deliver-rename.md) | Stale facts, `/fgOS:cook` → `/fgOS:deliver` | done |
+| [P3](phase-02-run-path-fixes-for-cook.md) | `verify` on Unit, verify runner with timeout, no pinned `npm test`, one-liner `--input`/`--verify`, `docs:write`, skills at flow level for `bind()`, distinct families at high/critical | done |
 
 ## Acceptance
 
