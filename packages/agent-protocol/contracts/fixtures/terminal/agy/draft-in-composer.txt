@@ -3,7 +3,7 @@ agy
 
 
       ▄▀▀▄        Antigravity CLI 1.4.2
-     ▀▀▀▀▀▀       lopmucdong@gmail.com (Google AI Pro)
+     ▀▀▀▀▀▀       user@example.com (Google AI Pro)
     ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)
    ▄▀▀    ▀▀▄     /tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/agy
   ▄▀▀      ▀▀▄

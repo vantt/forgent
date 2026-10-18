@@ -356,11 +356,13 @@ impl Terminal {
                     return self.confirm_submitted(io, message, outbox);
                 }
                 Err(_) => {
+                    // A refused call may still have reached the CLI; give the
+                    // TUI a render interval before judging the pane untouched.
+                    io.pause(POLL_MS);
                     if resends >= MAX_RESENDS || !self.surely_untouched(io, message, &before) {
                         return TerminalOutcome::DeliveryUnknown;
                     }
                     resends += 1;
-                    io.pause(POLL_MS);
                 }
             }
         }
