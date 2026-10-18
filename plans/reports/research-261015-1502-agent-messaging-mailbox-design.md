@@ -13,10 +13,11 @@
 5. [Những chiều thiết kế bắt buộc phải quyết](#5-những-chiều-thiết-kế-bắt-buộc-phải-quyết)
 6. [Giới hạn kỹ thuật và vướng mắc thường gặp](#6-giới-hạn-kỹ-thuật-và-vướng-mắc-thường-gặp)
 7. [Thiết kế tham chiếu](#7-thiết-kế-tham-chiếu)
-8. [Liên hệ với fgOS](#8-liên-hệ-với-fgos)
-9. [Bước tiếp theo](#9-bước-tiếp-theo)
-10. [Câu hỏi còn mở](#10-câu-hỏi-còn-mở)
-11. [Nguồn](#11-nguồn)
+8. [Giao tiếp giữa các agent khác máy](#8-giao-tiếp-giữa-các-agent-khác-máy)
+9. [Liên hệ với fgOS](#9-liên-hệ-với-fgos)
+10. [Bước tiếp theo](#10-bước-tiếp-theo)
+11. [Câu hỏi còn mở](#11-câu-hỏi-còn-mở)
+12. [Nguồn](#12-nguồn)
 
 ---
 
@@ -349,7 +350,73 @@ Mười quy tắc cụ thể:
 
 ---
 
-## 8. Liên hệ với fgOS
+## 8. Giao tiếp giữa các agent khác máy
+
+Các mục trước chủ yếu bàn về agent chung một máy: chung đĩa, chung `$XDG_RUNTIME_DIR`, chung đồng hồ. Khi hai agent nằm trên hai máy, các giả định đó mất hết. Mục này gom các cơ chế khả dĩ, điều gì đổi so với cùng máy, và cơ chế nào phù hợp với fgOS. Phần về Claude Code, A2A và MCP Agent Mail lấy từ mục 4; phần về event store lấy từ `docs/platform/event-store/spec.md` mục 14 (D-ADR0055, chủ dự án đã ký 2026-10-17). Các nhận định về hiệu năng và độ trễ của từng cơ chế là suy luận thiết kế, chưa được đo.
+
+### 8.1 Điều gì đổi khi qua máy khác
+
+| Thuộc tính | Cùng máy | Khác máy |
+|---|---|---|
+| Kênh vận chuyển | file, socket Unix, `flock` | mạng, hoặc một máy chủ/kho trung gian mà cả hai cùng với tới |
+| Khoá chung | `flock` của kernel có hiệu lực | không có khoá chung; chỉ còn compare-and-swap trên một kho dùng chung |
+| Thứ tự | có thể dùng số thứ tự toàn cục hoặc mtime | không có đồng hồ chung; thứ tự chỉ có theo từng người gửi, thứ tự giữa hai máy là thứ tự nhân quả hoặc không xác định |
+| Hiện diện | kiểm tra tiến trình qua pid | chỉ suy ra từ tin đến muộn, lease có hạn hoặc heartbeat |
+| Tin cậy | cùng người dùng hệ điều hành | khác danh tính, khác ranh giới quyền; cần xác thực người gửi |
+| Lỗi | tiến trình chết là thấy ngay | mạng đứt, máy ngủ, máy offline hàng giờ; "không thấy trả lời" không có nghĩa là "chết" |
+| Giao tin | thường chính xác một lần | tối đa một lần hoặc ít nhất một lần; chính xác một lần chỉ đạt được nhờ khử trùng theo `msg_id` ở bên nhận |
+
+Hệ quả: mọi tin liên máy phải mang `msg_id` bất biến và bên nhận phải khử trùng. Mọi quyết định phải chịu được việc tin đến muộn, đến hai lần, hoặc đến sai thứ tự giữa hai người gửi.
+
+### 8.2 Năm họ cơ chế
+
+1. **Qua máy chủ trung gian của nhà cung cấp.** Claude Code Remote Control và cloud (mục 4.1c): tin đi qua máy chủ Anthropic, session bên kia offline vẫn nhận được khi kết nối lại. Ưu điểm: không phải tự vận hành hạ tầng. Nhược điểm: phụ thuộc nhà cung cấp, không có báo ngược khi gửi từ session không kết nối, và chỉ dùng được giữa các session của chính CLI đó.
+2. **Giao thức agent-to-agent qua HTTP (A2A, mục 4.3).** Mỗi hệ agent công bố `AgentCard`, nhận `Message` và `Task`, báo cập nhật qua `GetTask`, SSE hoặc webhook. Ưu điểm: chuẩn mở, đã có vòng đời task và trạng thái `INPUT_REQUIRED`. Nhược điểm: cần một endpoint mở và xác thực ở mỗi bên, một máy ngủ thì không nhận được webhook, và đặc tả nói rõ không bảo đảm giao tin tin cậy.
+3. **Hộp thư là kho dùng chung qua Git** (kiểu MCP Agent Mail, mục 4.4, và kiểu `refs/fgos/events/<machine>` của fgOS). Tin được ghi thành object Git bất biến, mỗi máy chỉ ghi vào nhánh/ref của riêng mình, các máy `fetch` ref của nhau rồi hợp theo hash. Ưu điểm: không có máy chủ trung gian riêng ngoài remote Git đã có sẵn; ngắt mạng vẫn ghi cục bộ được; lịch sử kiểm tra được; không ai ghi đè ref của người khác nên không có xung đột ghi. Nhược điểm: là cơ chế kéo (pull) theo chu kỳ, độ trễ bằng chu kỳ fetch, không phù hợp để "ngắt giữa chừng" một tool đang chạy; remote có thể ẩn ref tuỳ biến trong giao diện web.
+4. **Hàng đợi hoặc broker trung gian** (Kafka, NATS, Redis streams, hoặc hàng đợi dựa trên đối tượng lưu trữ đám mây). Ưu điểm: đẩy (push) gần thời gian thực, có sẵn ack và retention. Nhược điểm: thêm một thành phần vận hành và một điểm lỗi duy nhất; vi phạm nguyên tắc hiện tại của fgOS là không có điều phối viên trực tuyến (xem 8.4).
+5. **Kết nối trực tiếp qua đường hầm** (SSH socket forward, Tailscale, WireGuard) tới socket của session bên kia, kiểu `cc-socks` mở rộng. Ưu điểm: độ trễ thấp, không cần broker. Nhược điểm: cả hai máy phải cùng online, phải tự giải quyết khám phá địa chỉ và xác thực, và một mạng đứt làm mất tin nếu không có hàng đợi bền ở đầu gửi.
+
+### 8.3 Bốn chiều thiết kế riêng cho liên máy
+
+- **Mô hình ghi: một người ghi cho mỗi hàng đợi.** Cách ít xung đột nhất là mỗi máy ghi hộp thư gửi đi của chính nó và chỉ đọc hộp thư của máy khác (sở hữu theo nguồn). Người nhận suy ra "inbox của mình" bằng cách lọc các hộp gửi đi theo địa chỉ đích. Cách này giữ được tính bất biến và tránh cần khoá chung, đồng thời tránh phải quyết "ai thắng" khi hai máy cùng ghi.
+- **Danh tính và xác thực.** Địa chỉ phải gồm cả máy: `agent@machine` hoặc `machineId/sessionId/agentId`. Tin cần chữ ký hoặc ít nhất là kênh đã xác thực, vì ranh giới tin cậy cùng máy (cùng uid) không còn. Mọi tin liên máy mặc định rơi vào lớp tin cậy "bên thứ ba" của mục 5.6: không bao giờ mang quyền của người dùng và đi qua gate trước khi vào context.
+- **Độ trễ chấp nhận được quyết định cơ chế.** Phần lớn nhu cầu của fgOS (báo "đã land", bàn giao việc, hỏi chủ dự án một câu quyết định) chịu được độ trễ hàng chục giây đến vài phút, và hợp với cơ chế kéo theo chu kỳ. Chỉ nhu cầu "steer một Unit đang chạy ở máy khác" mới cần đẩy; nhu cầu đó nên giải bằng checkpoint ở ranh giới round (mục 9) cộng một lần đánh thức, không cần kênh thời gian thực.
+- **Phân vùng và hợp nhất.** Hai máy offline rồi cùng chỉnh một thực thể sẽ phân kỳ. Có ba lối: cấm (cần điều phối viên trực tuyến), chọn người thắng, hoặc ghi nhận cả hai kết quả như xung đột có ghi lại. fgOS đã chọn lối thứ ba cho event store: *"cross-machine provisional success with recorded conflicts accepted (no online coordinator)"*, và dùng merge commit hai cha khi hai ref phân kỳ.
+
+### 8.4 Điều fgOS đã có sẵn cho giao tin khác máy
+
+Spec event store mục 14 đã mô tả một kênh khác máy hoạt động, dù không phải hộp thư:
+
+- Mỗi máy ghi `refs/fgos/events/<machineId>`, đẩy bằng `fgos events sync`, **không bao giờ force-push**. Các máy khác lấy về `refs/fgos/remotes/<remote>/events/<machineId>` qua refspec do setup cài, chỉ đọc.
+- Hợp theo hash, không có thứ tự toàn cục; con trỏ view ghi độ phủ chứ không ghi vị trí.
+- Ref phân kỳ thì tạo commit loại `merge` với hai cha, không bao giờ force. Máy mới tham gia không cần đăng ký. Offline thì append, seal, đọc đều chạy, chỉ fetch và push thất bại và được ghi lại ("unpublished since"). Lệnh mạng không bao giờ chạy trong cổng Work.
+- Claims và lease nằm ngoài event store (runtime state, theo từng máy), nên khoá khác máy chưa có; đó là khoảng trống thật nếu hai máy cùng muốn một việc.
+
+Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần thành phần mới nếu chấp nhận bốn điều. Một, tin là một loại sự kiện thuộc một stream mới (ví dụ `messages`) trong cùng event store. Hai, địa chỉ đích nằm trong sự kiện và bên nhận lọc theo địa chỉ khi dựng view. Ba, `msg_id` là hash sự kiện nên khử trùng là miễn phí. Bốn, độ trễ bằng chu kỳ `eventStore.sync.intervalSec` (mặc định 300 giây) trừ khi có thêm tín hiệu đánh thức.
+
+### 8.5 So sánh nhanh
+
+| Tiêu chí | Máy chủ nhà cung cấp | A2A qua HTTP | Git refs (event store) | Broker | Đường hầm trực tiếp |
+|---|---|---|---|---|---|
+| Hạ tầng mới | không | endpoint mỗi bên | không (dùng remote Git sẵn có) | có | có (mạng riêng) |
+| Chịu offline | có, giữ tin tới khi kết nối lại | một phần, webhook mất khi máy ngủ | có, ghi cục bộ và đồng bộ sau | có, tuỳ retention | không |
+| Độ trễ (suy luận) | giây | giây | bằng chu kỳ sync | giây | dưới giây |
+| Ngắt tool đang chạy | không đảm bảo | không | không | không | có thể |
+| Xung đột ghi | không công khai | do từng bên | không có (một người ghi mỗi ref) | broker sắp thứ tự | không áp dụng |
+| Kiểm tra lại được | không | tuỳ | có, lịch sử Git | tuỳ | không |
+| Hợp với "không điều phối viên trực tuyến" | không (phụ thuộc bên ngoài) | một phần | có | không | một phần |
+
+### 8.6 Khuyến nghị
+
+1. **Mặc định cho fgOS: hộp thư là một stream sự kiện trên đúng kênh Git refs đã có**, đủ cho bàn giao, thông báo landing và câu hỏi quyết định giữa ba máy của chủ dự án. Không thêm broker hay máy chủ. Điều kiện: chỉ làm khi qua cổng "chứng minh nhu cầu" ở mục 9 (V-011 vẫn có hiệu lực cho tới khi được supersede).
+2. **Nếu cần đánh thức nhanh**, thêm tín hiệu nhẹ rẻ tiền (một lần `git ls-remote` theo chu kỳ ngắn, hoặc một thông báo đẩy), chỉ để kích hoạt `events sync`. Nội dung tin vẫn đi qua Git. Như vậy tách "đánh thức" khỏi "giao tin tin cậy".
+3. **Steer liên máy** không dùng kênh thời gian thực; dùng checkpoint ở ranh giới round và một sự kiện `steer` có địa chỉ `unitRunId`, được xả khi Unit tới ranh giới kế tiếp.
+4. **Ghi rõ giới hạn trong spec nếu làm:** giao tin ít nhất một lần cộng khử trùng theo hash; không bảo đảm thứ tự giữa hai máy; không dùng tin liên máy để quyết định quyền hạn; mọi tin vào gate với lớp "bên thứ ba".
+5. **Khoảng trống phải xử lý riêng:** khoá hoặc lease liên máy (hai máy cùng nhận một việc). Event store không giải quyết điều này; claims đang là runtime state theo máy. Đây là một câu hỏi quyết định riêng, không nên gộp vào hộp thư.
+
+---
+
+## 9. Liên hệ với fgOS
 
 - **Tiền lệ đã có:** `docs/architect/agent-coordination/vision.md` (V-011) ghi rõ: *"The first foundation does not require a scheduler, durable Job queue, daemon, general mailbox, mandatory Mission lifecycle, unrestricted peer chat…"* và *"New persisted entities require a distinct authority, recovery need, or invariant that existing entities cannot represent correctly."* Thêm vào đó, `contracts/coordination-session.md` mô tả Deliberation Contribution Ledger là các link bất biến có kiểu, *"never a general message/thread/mailbox subsystem"*.
 - **Ý nghĩa:** muốn đưa mailbox vào fgOS thì phải chứng minh được một nhu cầu khôi phục, một quyền hạn hoặc một bất biến mà Assignment, RunResult và Contribution Ledger hiện tại không biểu diễn được. Nếu chỉ để "cho agent nói chuyện" thì chưa đủ lý do.
@@ -361,7 +428,7 @@ Mười quy tắc cụ thể:
 
 ---
 
-## 9. Bước tiếp theo
+## 10. Bước tiếp theo
 
 1. Đọc `src/runner/` để xác định chính xác ranh giới round hiện có, và xem đã có chỗ nào cho phép đưa input vào giữa các round chưa. Kết quả nên là một bản ghi facts ngắn.
 2. Nếu ranh giới đó có, viết một câu hỏi quyết định theo mẫu `core/skills/_shared/decision-question.md` về việc mở lại V-011 chỉ cho phạm vi "hàng đợi steer theo Unit". Cách mở lại là supersede, không sửa tại chỗ.
@@ -370,17 +437,19 @@ Mười quy tắc cụ thể:
 
 ---
 
-## 10. Câu hỏi còn mở
+## 11. Câu hỏi còn mở
 
 1. Gửi `SendMessage` tới một subagent trong cùng session (không thuộc team) thì tin đi qua hàng đợi trong bộ nhớ hay qua file? Em chưa đọc tới đoạn code đó.
 2. Antigravity có cơ chế steer giữa task không? Chưa có nguồn chính thức.
 3. Steer của Codex trở thành mặc định từ phiên bản nào? Các nguồn thứ cấp mâu thuẫn nhau.
 4. Mailbox dạng file của Claude Code có giới hạn kích thước hay số tin cho mỗi inbox không? Tài liệu không nói.
 5. Với fgOS, một hàng đợi steer có cần lưu bền hay không, nếu Unit vốn đã có thể chạy lại? Câu trả lời phụ thuộc vào việc chạy lại một round có tốn kém hay không.
+6. Liên máy: chu kỳ `eventStore.sync.intervalSec` 300 giây có đủ cho bàn giao và câu hỏi quyết định giữa các máy không, hay cần tín hiệu đánh thức riêng (mục 8.6)?
+7. Liên máy: hai máy cùng muốn nhận một việc thì ai giữ lease khi claims là runtime state theo máy?
 
 ---
 
-## 11. Nguồn
+## 12. Nguồn
 
 Nguồn chính:
 
@@ -404,3 +473,4 @@ Tài liệu fgOS liên quan:
 
 - `docs/architect/agent-coordination/vision.md` (V-011)
 - `docs/architect/agent-coordination/contracts/coordination-session.md` (Deliberation Contribution Ledger)
+- `docs/platform/event-store/spec.md` mục 14 (chia sẻ giữa các máy qua `refs/fgos/events/<machine>`, D-ADR0055), nguồn của mục 8
