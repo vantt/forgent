@@ -34,8 +34,8 @@ evidence, capability, budget, and provenance semantics.
 
 1. **Three current provenance kinds, one execution path.** Declared and inline
    builders stamp `contractPolicyVersion`, `normalizerVersion` and validator
-   provenance (`assignment.mjs:456-459,663-666`). The Unit door separately writes
-   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:334-338`);
+   provenance (`assignment.mjs:443-444,626-628`). The Unit door separately writes
+   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:569-576`);
    do not assert every kind has the declared builder's identical shape.
    - `declared`: Workflow step/operation/TaskSpec validation and normalization.
    - `inline`: foundation contract validation, the applicable registered domain

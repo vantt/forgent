@@ -69,7 +69,7 @@ distinguishes their shapes. Declared/inline builders stamp policy/normalizer
 versions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in
 `src/runner/dispatch/execution-contract.mjs:47` and
 `src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is
-written by `execution/run.mjs:334-338`.
+written by `execution/run.mjs:569-576`.
 Mutation/evidence normalization is current implementation, not an assumption
 that the retired session stamp-producing door still exists.
 

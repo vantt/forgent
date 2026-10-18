@@ -123,3 +123,12 @@ Three existing decision targets (two Assignment-heading references and one histo
 At committed `6f88f5d8e`, the full identity-source diff since `b919e2b9b` is Assignment only. Native carry ran once and persists only its two changed units: heading ID retained, positional predecessor preserved as a gap with one native successor. Six current bindings (two content, four context) and two unchanged B0 source tuple/current-target correspondences are packaged; predecessor supersession and all affected reviews remain pending. No candidate byte was edited in this package.
 
 `step-09-close-n1-carry.json`, `step-09-close-n1-rebindings.json` and `step-09-close-n1-candidate-rebindings.json` pin the transitions. Every old candidate declaration list, including main-carry and alias lists, is preserved; only one unreferenced Assignment declaration tuple changes. D all three combinations: zero fatal; ratchet exit 0; strict E retains the recorded eight categories and all exact sets after two native correspondences; comparator retains the exact 24 errors, portable replay verified. Four exact reproduction-pair additions resolve the two historical reproduction failures; final doc tests are 67/67. ONE request -02 supersedes -01; independent verdict and Lead H1/H2 close statements remain pending.
+
+### Lead closing re-review fix — Unit-run provenance citations (N1)
+
+Independent re-review `review-a38-step-09-close-rework-02-part-02.md` (entry `assignment-citation-N1`) found the same Assignment sentence still cited `execution/run.mjs:334-338`, which at the main pin and HEAD is the resume branch; the `provenance: { kind: 'unit-run' … }` object is at `src/runner/execution/run.mjs:569-576` (byte-identical to `eab4d617b`). The line shift came from the holder-lock main merge. Lead edits:
+
+- `docs/platform/agent-coordination/contracts/assignment-run-runresult.md:72`: `execution/run.mjs:334-338` → `execution/run.mjs:569-576`.
+- `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md:37-38`: `assignment.mjs:456-459,663-666` → `assignment.mjs:443-444,626-628` (same stamps the contract file and registry row cite) and `execution/run.mjs:334-338` → `execution/run.mjs:569-576`.
+
+Meaning unchanged; citation-only. Re-carry of the changed units and bounded re-review follow under N1. Part 01 rework `X-DEFECT-06` (row pins `runner.md:2475,2607,2895` → `2477,2609,2897`) and the part 02 note on `X-DEFECT-08` probes (4425/4513 → 4426/4514) are plan-record pin fixes in the same package.
