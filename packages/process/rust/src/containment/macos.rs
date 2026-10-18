@@ -56,7 +56,7 @@ impl ContainmentDriver for MacosTree {
         }
         let mapped: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
         let mut child = control::spawn_with_fds(cmd, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
-        let Some(root) = crate::platform::current().identity_of(ProcId(child.id())) else {
+        let Some(root) = crate::platform::macos::child_identity(ProcId(child.id())) else {
             let _ = child.kill();
             let _ = child.wait();
             return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));

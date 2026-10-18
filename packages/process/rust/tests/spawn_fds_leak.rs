@@ -25,7 +25,7 @@ fn child_entry() {
         return;
     }
     let received = control::take_inherited(FdSlot(3)).expect("slot 3 was mapped");
-    let grandchild = Command::new("sleep")
+    let mut grandchild = Command::new("sleep")
         .arg("300")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
@@ -34,6 +34,7 @@ fn child_entry() {
     let out = std::env::var(OUT_FILE).expect("out file path");
     fs::write(format!("{out}.tmp"), grandchild.id().to_string()).unwrap();
     fs::rename(format!("{out}.tmp"), &out).unwrap();
+    std::thread::spawn(move || grandchild.wait().expect("reap grandchild"));
     let _keep_open = received;
     loop {
         std::thread::sleep(Duration::from_secs(3600));
@@ -122,7 +123,7 @@ fn an_empty_map_closes_an_inherited_descriptor_that_lacks_close_on_exec() {
     std::thread::sleep(Duration::from_millis(50));
     let child_fds = open_inodes(child.id());
     assert!(!child_fds.iter().any(|(_, i)| *i == ino), "a descriptor outside the map never reaches the child: {child_fds:?}");
-    assert!(child_fds.iter().all(|(fd, _)| fd.parse::<u32>().map_or(false, |n| n < 3)), "only stdio is open in the child: {child_fds:?}");
+    assert!(child_fds.iter().all(|(fd, _)| fd.parse::<u32>().is_ok_and(|n| n < 3)), "only stdio is open in the child: {child_fds:?}");
 
     child.kill().ok();
     child.wait().ok();

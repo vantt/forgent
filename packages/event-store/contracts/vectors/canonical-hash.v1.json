@@ -1,0 +1,78 @@
+[
+  {
+    "input": {
+      "v": 4,
+      "type": "work.created",
+      "scope": "project",
+      "origin": "0123456789abcdef0123456789abcdef",
+      "stream": "project",
+      "seq": 1,
+      "seen": {
+        "abcdef0123456789abcdef0123456789:project:porting": 2
+      },
+      "ts": "2026-10-18T04:46:00.000Z",
+      "src": "writer-1",
+      "schemaVersion": 1,
+      "payload": {}
+    },
+    "canonicalWithoutHash": "{\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
+    "h": "6e6f9e42ed616db8c9ef92af0516a79999d9643c510b03758539717b925dfcb8",
+    "canonical": "{\"h\":\"6e6f9e42ed616db8c9ef92af0516a79999d9643c510b03758539717b925dfcb8\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n"
+  },
+  {
+    "input": {
+      "v": 4,
+      "type": "work.created",
+      "scope": "project",
+      "origin": "0123456789abcdef0123456789abcdef",
+      "stream": "project",
+      "seq": 1,
+      "seen": {
+        "abcdef0123456789abcdef0123456789:project:porting": 2
+      },
+      "ts": "2026-10-18T04:46:00.000Z",
+      "src": "writer-1",
+      "schemaVersion": 1,
+      "payload": {
+        "value": 1e-07,
+        "negativeZero": 0,
+        "huge": 1e+21
+      }
+    },
+    "canonicalWithoutHash": "{\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"huge\":1e+21,\"negativeZero\":0,\"value\":1e-7},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
+    "h": "3dc1b247ddb80f594a9e06933e6d5099cf6f780273d16756bcbc648ac7bcffa4",
+    "canonical": "{\"h\":\"3dc1b247ddb80f594a9e06933e6d5099cf6f780273d16756bcbc648ac7bcffa4\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"huge\":1e+21,\"negativeZero\":0,\"value\":1e-7},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
+    "rawInput": "{\"v\":4,\"type\":\"work.created\",\"scope\":\"project\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"stream\":\"project\",\"seq\":1,\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"ts\":\"2026-10-18T04:46:00.000Z\",\"src\":\"writer-1\",\"schemaVersion\":1,\"payload\":{\"value\":1e-07,\"negativeZero\":-0,\"huge\":1e+21}}"
+  },
+  {
+    "input": {
+      "v": 4,
+      "type": "work.created",
+      "scope": "project",
+      "origin": "0123456789abcdef0123456789abcdef",
+      "stream": "project",
+      "seq": 1,
+      "seen": {
+        "abcdef0123456789abcdef0123456789:project:porting": 2
+      },
+      "ts": "2026-10-18T04:46:00.000Z",
+      "src": "writer-1",
+      "schemaVersion": 1,
+      "payload": {
+        "": "BMP",
+        "😀": "non-BMP",
+        "nested": [
+          true,
+          null,
+          {
+            "z": "é",
+            "a": "\u0000"
+          }
+        ]
+      }
+    },
+    "canonicalWithoutHash": "{\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"nested\":[true,null,{\"a\":\"\\u0000\",\"z\":\"é\"}],\"😀\":\"non-BMP\",\"\":\"BMP\"},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
+    "h": "9eb4918d9143d682a477f0d0a5cd1534ac77dc818fa3f207109af36e35524180",
+    "canonical": "{\"h\":\"9eb4918d9143d682a477f0d0a5cd1534ac77dc818fa3f207109af36e35524180\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"nested\":[true,null,{\"a\":\"\\u0000\",\"z\":\"é\"}],\"😀\":\"non-BMP\",\"\":\"BMP\"},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n"
+  }
+]

@@ -1,0 +1,22 @@
+# Git phase 01, unit 3: Publication WAL
+
+Implemented step 5 and the WAL side of requirement 12a. Publication CAS itself remains step 6.
+
+- §10 rules 1–3: immutable numbered, versioned SHA-256 hash-chain records; canonical JSON hashing; repository inode/device identity, one canonical publication ref, request and authority binding. Same-id conflicts refuse; competing installs return one transition writer. Reused unit 1's durable-file installer, adding injected post-syscall failure checkpoints without an environment bypass. Directory descriptors, O_NOFOLLOW, owner/mode validation and ancestor/parent fsyncs protect the WAL root.
+- §10 rule 4: Prepared precedes TargetAttempt with null prior attempt and exact expected/next. Unknown attempts remain recovery-required after ABA; no WAL method executes a Git effect. Pin deletion has its own attempt/outcome boundary. Delete preparations retain the old candidate.
+- §10 rule 4a: supersession validates a later durable winning outcome, identical repository/resource/authority, compatible expected value, explicit predecessor admission and absence of native backend locks. It records the later receipt digest and uncertain/effect-observed attribution. No replay path exists. PublicationAuthority has no default implementation and must validate the live borrow before Intent; AuthorityAdmission must supply holder-lock predecessor proof.
+- Recovery table/§11: hardened-driver observations cover actual refs, dangling symbolic refs, candidate objects/history, packed refs, raw pin/target residue and native locks. Unprepared, first-attempt-eligible, effect-observed, pin-reconciliation-required, recovery-required and terminal states are distinct; unknown locks are never removed. Checkout rows are outside PublicationCas.
+- Requirement 12a/§12 C5: terminal-only immutable compact ledger, request/resource/authority commitment, terminal observation and digest, at most 512 bytes per entry. Ledger durability precedes record removal; interrupted deletion resumes only from attributable terminal suffixes. Superseded outcomes are terminal. Read-only open/inspection and bounded scans expose completeness, errors, unresolved count, bytes and oldest unresolved; unresolved evidence never expires.
+
+Evidence: `CARGO_TARGET_DIR=.fgos/runtime/phase-target cargo test --locked -p fgos-git -p fgos-durable-file` passed **32 tests** (23 unit, 3 Git contract, 6 durable-file). Includes 14 WAL tests: three-writer races, 12 Intent crash points, 16 transition fault positions, 25 compaction fault positions, corruption/trust refusals, native lock preservation, borrow refusal, read-only scanning, and real OS-temp Git repositories in all SHA-1/SHA-256 × files/reftable combinations. The 10,000-operation WAL test leaves zero operation directories and unresolved entries, with ledger bytes ≤ 10,000 × 512. It tests WAL storage, not 10,000 Publication CAS effects. Final test run: 15.82s for unit tests. Required locked clippy with `--all-targets -- -D warnings`, changed-file rustfmt checks and `git diff --check` passed.
+
+Prior art: reused the existing durable-file and private driver; history search found only the unit-1 WAL skeleton. The schema now describes the implemented PublicationCas graph; other operation families remain unimplemented. impact-analysis: inactive (zero providers).
+
+Remaining: step 6 must implement live holder-lock borrow/admission adapters, object/pin/target CAS ordering and directory durability, materialize the full §2 Receipt from terminal observations, and wire caller-held authority into effects. Supersession currently requires the later full chain; an already-compacted later receipt safely refuses. WAL descriptor anchoring currently supports Linux only; other platforms refuse Unsupported. No stable-media, full V-CAS, npm, release or doctor integration claim. Board/spec/changelog/setup integration remains coordinator work outside this write scope. MDView MCP was unavailable. No add/commit was run.
+
+Status: DONE_WITH_CONCERNS
+Summary: Implemented the Publication WAL and terminal compaction foundation with real filesystem/Git recovery tests and both required Cargo gates green.
+Concerns/Blockers: Linux-only WAL backend; live authority adapters and actual Publication effects remain step 6. Later compacted evidence cannot yet supersede an old pending chain.
+Context refs:
+- docs/platform/git/spec.md §§2, 10–12, 19
+- plans/261018-0914-git-component-fgos-git/phase-01-publication-port.md

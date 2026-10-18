@@ -29,6 +29,8 @@ pub enum TryLock {
 pub struct Leftovers {
     /// How many were signaled.
     pub killed: u32,
+    /// A description holder outside the borrowing domain was not signaled.
+    pub foreign: bool,
     /// Pids (Linux) or the process group id (macOS) still there.
     pub pids: Vec<u32>,
 }

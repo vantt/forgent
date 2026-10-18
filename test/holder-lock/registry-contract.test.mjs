@@ -283,3 +283,17 @@ test('borrow vectors keep their names and state one assertion per platform', () 
   assert.deepEqual(Object.keys(vectorsContract.platformAssertions), ['posix', 'windows']);
   assert.match(vectorsContract.platformAssertions.windows, /SYNCHRONIZE/);
 });
+
+
+test('event-store mutex contracts pin names, ranks, paths and owner schema', () => {
+  for (const [name, rank] of [['event-seal', 58], ['event-append', 70]]) {
+    const row = registry.locks.find((lock) => lock.name === name);
+    assert.deepEqual(row, { name, kind: 'mutex', scope: 'repo', rank,
+      v3Path: `<eventOpenRoot>/locks/${name}.lock`, v1Shape: null, v1Path: null,
+      fence: 'none', owner: 'event-store' });
+    assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
+    assert.notDeepEqual(validate({ ...row, owner: 'unknown' }, schema.$defs.lock, schema), []);
+    const missing = { ...row }; delete missing.owner;
+    assert.notDeepEqual(validate(missing, schema.$defs.lock, schema), []);
+  }
+});

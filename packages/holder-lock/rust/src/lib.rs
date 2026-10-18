@@ -24,7 +24,7 @@ pub mod semantics;
 pub mod state_root;
 
 pub use port::{
-    acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Guarantee, Handle, HeldReason, HelperExe,
+    validate, validate_quiescent, acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, run_borrowed_io, BorrowIo, BorrowIoOutcome, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Guarantee, Handle, HeldReason, HelperExe,
     HoldersList, Level, Mode, NotBorrowerReason, Probe, Resource, UnavailableReason, Wait, DEFAULT_KILL_WAIT_MS,
 };
 #[cfg(windows)]

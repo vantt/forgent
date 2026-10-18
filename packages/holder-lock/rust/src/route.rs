@@ -165,16 +165,16 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state"].into_iter().filter(|m| flags.has(m)).collect();
+    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--drain-child"].into_iter().filter(|m| flags.has(m)).collect();
     if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
         return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>, --predecessor-state <lockFile>");
     }
     let mode = modes[0];
-    if mode != "--try" && mode != "--wait-ms" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
+    if mode != "--try" && mode != "--wait-ms" && mode != "--drain-child" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
         return usage("--kill-wait-ms and --predecessor apply only to --try and --wait-ms");
     }
     let parsed = (|| -> Result<(Option<u64>, u64, Option<PathBuf>), String> {
@@ -240,6 +240,32 @@ fn lock_fd(args: &[String]) -> i32 {
         Ok(file) => file,
         Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
     };
+    #[cfg(target_os = "linux")]
+    if mode == "--drain-child" {
+        let child = match flags.values("--drain-child")[0].parse::<u32>() {
+            Ok(pid) if pid > 1 => pid,
+            _ => return usage("--drain-child requires a child pid"),
+        };
+        // This helper's parent owns the explicitly inherited description.
+        let owner = unsafe { libc::getppid() } as u32;
+        return match driver::flock::drain_description(
+            &file,
+            Some(child),
+            owner,
+            std::time::Duration::from_millis(kill_wait_ms),
+        ) {
+            Ok(killed) => emit(
+                Some("drained"),
+                json!({"leftoversKilled": killed, "remaining": []}),
+                EXIT_OK,
+            ),
+            Err(left) => emit(
+                Some("not-drained"),
+                json!({"leftoversKilled": left.killed, "remaining": left.pids}),
+                EXIT_NEGATIVE,
+            ),
+        };
+    }
     match drv.file_guarantee(&file) {
         Ok(g) if !g.usable() => return emit(Some("unavailable"), json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
         Ok(_) => {}

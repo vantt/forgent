@@ -217,7 +217,7 @@ impl LockDriver for LockFileExDriver {
     fn prepare_borrow(&self, _cmd: &mut Command) {}
 
     fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration) -> Result<u32, Leftovers> {
-        Err(Leftovers { killed: 0, pids: Vec::new() })
+        Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
     }
 
     fn before_close(&self, file: &File) {

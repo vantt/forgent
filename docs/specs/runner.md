@@ -3369,7 +3369,7 @@ Superseding this decision needs a new record; do not edit it in place.
 
 ### Run supervisor Rust thay `detached-run-supervisor`: cách `direct` không pipe, không IPC, receipt qua file (D-ADR0056 (run supervisor Rust cách direct), thay phần `detached-run-supervisor` của 0043)
 
-- **Trạng thái:** Settled cho cách `direct` (2026-10-18). Cách `terminal` đã land cùng ngày, xem D-ADR0057 (round herdr do supervisor canh) ngay dưới. Id D-ADR0056 (run supervisor Rust cách direct) là số kế tiếp sau D-ADR0055 (event store: sự thật của sự kiện nằm trong git object), kiểm trên mọi nhánh cục bộ ngày 2026-10-18 chưa nơi nào dùng.
+- **Trạng thái:** Settled cho cách `direct` (2026-10-18). Cách `terminal` đã land cùng ngày, xem D-ADR0059 (round herdr do supervisor canh) ngay dưới. Id D-ADR0056 (run supervisor Rust cách direct) là số kế tiếp sau D-ADR0055 (event store: sự thật của sự kiện nằm trong git object), kiểm trên mọi nhánh cục bộ ngày 2026-10-18 chưa nơi nào dùng.
 - **Bối cảnh:** `detached-run-supervisor.mjs` (Node, 1234 dòng) cầm pipe của agent và kênh `ipc` tới controller. Controller chết thì kênh đóng (`ERR_IPC_CHANNEL_CLOSED`), supervisor và agent chết theo; kết quả cli mất dù agent đã làm xong. Reaper `reapOrphanedConfinementResources` quyết quyền dọn home bằng pid/pane, hai thẩm quyền trên cùng một attempt.
 - **Quyết định:**
   1. Mỗi attempt một supervisor Rust (`fgos internal supervise`) và một gate (`fgos internal gate`) là gốc process của agent trong miền chứa chứng minh được rỗng (cổng chứa của `fgos-process`; Linux: gate là pid 1 của PID namespace). Supervisor không cầm pipe của agent: gate làm chủ IO (capture, stdin).
@@ -3381,9 +3381,9 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Ranh giới:** Component-boundary có đổi: thêm Run Supervisor (L4), Launch gate (L4), Agent protocol (L3), Containment port (L0) trong [component-boundary.md](../platform/component-boundary.md).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### Round herdr do supervisor canh qua terminal-control, không còn canh trong controller (D-ADR0057 (round herdr do supervisor canh), mở rộng D-ADR0056 (run supervisor Rust cách direct))
+### Round herdr do supervisor canh qua terminal-control, không còn canh trong controller (D-ADR0059 (round herdr do supervisor canh), mở rộng D-ADR0056 (run supervisor Rust cách direct))
 
-- **Trạng thái:** Settled (2026-10-18). Id D-ADR0057 (round herdr do supervisor canh) là số kế tiếp chưa nơi nào dùng trên mọi nhánh cục bộ ngày 2026-10-18 (0058 trở đi do các lane khác lấy khi cần).
+- **Trạng thái:** Settled (2026-10-18). Id D-ADR0059 (round herdr do supervisor canh) được giữ chỗ trên bảng chương trình (D-ADR0057 và D-ADR0058 là của Git); ghi vào state bằng `fgos decision` lúc landing, ở main.
 - **Bối cảnh:** vòng canh của round herdr nằm trong controller (`herdr-round.mjs`: `pollForOutcome`, deadline, `settleRound`, đóng pane). Controller chết thì mất cả ba: deadline không thi hành, kết quả không settle, pane không đóng (T8 hB/hC/hD). Phần vá reaper tạm (`bindOwnershipMarker`, pane/pid trong marker) chỉ chữa triệu chứng và từng suýt xoá home của worker còn sống.
 - **Quyết định:**
   1. Seat `herdr-spawn` chạy như seat `cli-spawn`: một cửa `executeAssignment`, envelope v3 `mode: terminal`, supervisor Rust và gate. Controller chuẩn bị (brief, home, `allocate` với key = attempt id), giao, rồi chỉ đọc file. `herdr-spawn` không còn thi hành trực tiếp (`herdr-spawn-supervised-only`).

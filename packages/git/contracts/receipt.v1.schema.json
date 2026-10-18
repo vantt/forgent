@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fgos:git:receipt:v1",
+  "title": "Git effect receipt (\u00a72); candidate state is not writer attribution",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "operationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "localEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "absent"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "oid"
+                },
+                "oid": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                }
+              },
+              "required": [
+                "kind",
+                "oid"
+              ]
+            }
+          ]
+        },
+        "publishedOid": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "observedTip": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "absent"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "oid"
+                },
+                "oid": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                }
+              },
+              "required": [
+                "kind",
+                "oid"
+              ]
+            }
+          ]
+        },
+        "publicationState": {
+          "enum": [
+            "notPublished",
+            "currentlyAtCandidate",
+            "casObservedSuccessful",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "expected",
+        "observedTip",
+        "publicationState"
+      ]
+    },
+    "checkout": {
+      "enum": [
+        "notApplicable",
+        "pending",
+        "reconciled",
+        "recoveryRequired"
+      ]
+    },
+    "durability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "processCrash",
+            "stableMedia"
+          ]
+        },
+        "capabilityEvidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "level",
+        "capabilityEvidence"
+      ]
+    },
+    "remote": {
+      "enum": [
+        "notRequested",
+        "acknowledged",
+        "unknown",
+        "rejected"
+      ]
+    },
+    "consumerSettlement": {
+      "const": "notOwnedByGit"
+    },
+    "attribution": {
+      "enum": [
+        "thisInvocationWonCas",
+        "effectObservedOnly",
+        "uncertain"
+      ]
+    }
+  },
+  "required": [
+    "operationId",
+    "requestDigest",
+    "localEffect",
+    "checkout",
+    "durability",
+    "remote",
+    "consumerSettlement",
+    "attribution"
+  ]
+}
