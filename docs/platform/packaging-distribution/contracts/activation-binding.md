@@ -112,4 +112,25 @@ release-manifest contract (confined path, file digest, matching target, Node-API
 and pinned Cargo.lock checksums). A missing addon remains compatible today. The
 release carrying Git phase 05 (M10) is the switch point for refusing linux-x64
 payloads without it; no version guess or environment override enables that gate.
-The subsequent Git activation-fence/C5 step owns WAL rollback admission.
+
+## 9. Git WAL activation admission (C5)
+
+`publish_and_tail`, shared by init, upgrade and repair/rollback, runs C5 through
+`fgos-distribution` linked to the controller's own `fgos-git`. It scans the
+trusted common-dir WAL read-only: an incomplete/corrupt scan refuses with
+`git-wal-unreadable`; unresolved records refuse a candidate without
+`git-wal-v1` with `git-wal-pending`. Terminal records do not prevent rollback.
+A WAL without a valid controller fence refuses with `git-fence-missing`.
+
+For a WAL-capable activation, the controller's own `internal quiesce-scan`
+identifies live fgOS payloads. A payload whose release manifest cannot prove
+`git-wal-v1`, or an unavailable/incomplete process scan, refuses with
+`git-predecessor-writer-live`. No candidate code performs this admission.
+
+The new controller retains `activation-v2.lock` and, until fenced, the old
+`activation.lock`. During first WAL-capable activation it atomically replaces
+the held old inode with the holder-lock `TOMBSTONE` directory (`by: fgos git`)
+and syncs it before publication. Placement currently requires Linux atomic
+exchange; unsupported platforms refuse. Old controllers cannot bypass C5;
+rollback goes through the new controller and never removes the fence or WAL.
+The original `.fgos/installation/activation.lock` tombstone remains intact.

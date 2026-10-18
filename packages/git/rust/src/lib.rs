@@ -4,6 +4,7 @@
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
 mod publication;
+mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub mod wal;
 pub use driver::{GitDriver, WalReader};

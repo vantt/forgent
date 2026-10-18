@@ -168,13 +168,14 @@ pub enum InitError {
 }
 
 /// Holds the workspace activation lock: a kernel lock on
-/// `<workspace>/.fgos/locks/activation.lock` taken through `fgos-holder-lock`.
+/// `<workspace>/.fgos/locks/activation-v2.lock` taken through `fgos-holder-lock`.
 ///
 /// One attempt, never a wait. The lock lives on an open file description, so
 /// a killed holder frees it at once and there is nothing to reclaim; `Drop`
 /// closes the description and never unlocks explicitly.
 pub struct ActivationLockGuard {
     _handle: fgos_holder_lock::Handle,
+    legacy: Option<fgos_holder_lock::Handle>,
 }
 
 impl ActivationLockGuard {
@@ -190,28 +191,83 @@ impl ActivationLockGuard {
             fgos_holder_lock::Wait::Try,
             fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
         ) {
-            fgos_holder_lock::Acquire::Acquired(handle) => Ok(Self { _handle: handle }),
-            fgos_holder_lock::Acquire::Held { reason, .. } => Err(InitError::ActivationLockHeld(reason.as_str())),
-            // A single try never times out; treat it as held if a driver ever reports it.
-            fgos_holder_lock::Acquire::Timeout { .. } => {
-                Err(InitError::ActivationLockHeld(fgos_holder_lock::HeldReason::KernelLockHeld.as_str()))
+            fgos_holder_lock::Acquire::Acquired(handle) => {
+                let old = workspace_root.join(".fgos/locks/activation.lock");
+                let legacy =
+                    if fgos_holder_lock::tombstone::is_tombstone(&old, "activation", "fgos git") {
+                        None
+                    } else {
+                        match fgos_holder_lock::acquire(
+                            &fgos_holder_lock::Resource::new("activation", &old),
+                            fgos_holder_lock::Mode::Ex,
+                            fgos_holder_lock::Wait::Try,
+                            fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
+                        ) {
+                            fgos_holder_lock::Acquire::Acquired(legacy) => Some(legacy),
+                            fgos_holder_lock::Acquire::Held { reason, .. } => {
+                                return Err(InitError::ActivationLockHeld(reason.as_str()))
+                            }
+                            other => {
+                                return Err(InitError::Custom(format!(
+                                    "git-fence-missing: {other:?}"
+                                )))
+                            }
+                        }
+                    };
+                Ok(Self {
+                    _handle: handle,
+                    legacy,
+                })
             }
-            fgos_holder_lock::Acquire::Unavailable { reason, detail } => Err(InitError::LockDriverUnavailable {
-                lock: "activation",
-                note: format!("{}: {detail}", reason.as_str()),
-            }),
+            fgos_holder_lock::Acquire::Held { reason, .. } => {
+                Err(InitError::ActivationLockHeld(reason.as_str()))
+            }
+            // A single try never times out; treat it as held if a driver ever reports it.
+            fgos_holder_lock::Acquire::Timeout { .. } => Err(InitError::ActivationLockHeld(
+                fgos_holder_lock::HeldReason::KernelLockHeld.as_str(),
+            )),
+            fgos_holder_lock::Acquire::Unavailable { reason, detail } => {
+                Err(InitError::LockDriverUnavailable {
+                    lock: "activation",
+                    note: format!("{}: {detail}", reason.as_str()),
+                })
+            }
         }
     }
 }
 
-/// `<workspace>/.fgos/locks/activation.lock`, the one path of the activation lock.
+impl ActivationLockGuard {
+    pub(crate) fn fence_legacy(&self, workspace: &Path) -> Result<(), InitError> {
+        if let Some(legacy) = &self.legacy {
+            fgos_holder_lock::tombstone::replace_held_file(
+                legacy,
+                "activation",
+                "fgos git",
+                &format_iso8601_utc(SystemTime::now()),
+            )?;
+        }
+        if !fgos_holder_lock::tombstone::is_tombstone(
+            &workspace.join(".fgos/locks/activation.lock"),
+            "activation",
+            "fgos git",
+        ) {
+            return Err(InitError::Custom("git-fence-missing".into()));
+        }
+        Ok(())
+    }
+}
+
+/// `<workspace>/.fgos/locks/activation-v2.lock`, the one path of the activation lock.
 pub fn activation_lock_path(workspace_root: &Path) -> std::path::PathBuf {
-    workspace_root.join(".fgos").join("locks").join("activation.lock")
+    workspace_root
+        .join(".fgos")
+        .join("locks")
+        .join("activation-v2.lock")
 }
 
 /// Cleans up any stale `activation.json.tmp.*` files left from a previous killed run (Reviewer L8).
 ///
-/// Must only be called after acquiring `activation.lock`.
+/// Must only be called after acquiring `activation-v2.lock`.
 pub fn cleanup_stale_activation_tmp_files(installation_dir: &Path) {
     if let Ok(entries) = std::fs::read_dir(installation_dir) {
         for entry in entries.flatten() {
@@ -1003,6 +1059,8 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     let helper = fgos_holder_lock::HelperExe::current()
         .map_err(|err| InitError::LockKernelSemanticsFailed(format!("the running executable is unknown: {err}")))?;
     holder_lock_gate(args.workspace_root, &args.store_root.join("locks"), Path::new("git"), &helper)?;
+
+    crate::git_gate::admit(args.workspace_root, args.store_root, args.manifest, args._lock)?;
 
     let workspace_id = compute_workspace_id(args.workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);

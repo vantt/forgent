@@ -64,8 +64,18 @@ impl FileSystem for OsFileSystem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct ConfigChange {
+    pub remote: String,
+    pub url: String,
+    pub refspecs: Vec<String>,
+    pub old_values: Vec<String>,
+    pub old_config_digest: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
+    ConfigChange(Box<ConfigChange>),
     RemoteFetch { url: String, refspecs: Vec<String> },
     RemotePush { url: String, refspecs: Vec<String> },
 }
@@ -230,6 +240,26 @@ impl Intent {
         {
             return Err(corrupt("intent binding"));
         }
+        if let OperationKind::ConfigChange(change) = &self.kind {
+            let ConfigChange {
+                remote,
+                url,
+                refspecs,
+                old_config_digest,
+                ..
+            } = change.as_ref();
+            if remote.is_empty()
+                || url.is_empty()
+                || refspecs.is_empty()
+                || !digest_valid(old_config_digest)
+                || self.resource_set != ["config:local"]
+                || self.expected != Tip::Absent
+                || self.next != Tip::Absent
+            {
+                return Err(corrupt("config change binding"));
+            }
+            return Ok(());
+        }
         for resource in &self.resource_set {
             RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
             if !resource.starts_with("refs/fgos/")
@@ -254,6 +284,7 @@ impl Intent {
         validate_tip(&self.next, self.object_format)
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct Chain {
     records: Vec<Record>,

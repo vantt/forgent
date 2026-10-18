@@ -1357,3 +1357,68 @@ fn batched_walk_returns_a_page_before_an_oversized_future_commit() {
     assert_eq!(second.commits[0].oid, parent);
     assert!(second.complete);
 }
+
+#[test]
+fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    git(
+        &root,
+        &[
+            "remote",
+            "add",
+            "origin",
+            "https://example.invalid/project.git",
+        ],
+    );
+    git(&root, &["config", "unrelated.keep", "value"]);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = vec![
+        "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into(),
+        "+refs/fgos/legacy:refs/fgos/remotes/origin/legacy".into(),
+    ];
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
+        .unwrap();
+    let config = fs::read(root.join("config")).unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
+        .unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-second")
+        .unwrap();
+    assert_eq!(fs::read(root.join("config")).unwrap(), config);
+    assert_eq!(git(&root, &["config", "unrelated.keep"]), b"value\n");
+    assert_eq!(
+        driver
+            .configured_fetch_refspecs(&repo, "origin")
+            .unwrap()
+            .len(),
+        3
+    );
+    assert!(driver.push_refspecs(&repo, "origin").unwrap().is_empty());
+    let provenance = driver
+        .fetch_mapping_provenance(&repo, "origin")
+        .unwrap()
+        .unwrap();
+    assert_eq!(provenance.operation_id, "mapping-first");
+    assert_eq!(provenance.remote_url, "https://example.invalid/project.git");
+    assert_eq!(provenance.refspecs, maps);
+    assert_eq!(
+        wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
+        0
+    );
+    assert!(driver
+        .ensure_fetch_mapping(
+            &repo,
+            "origin",
+            &["+refs/heads/*:refs/heads/*".into()],
+            "bad-mapping"
+        )
+        .is_err());
+    assert!(driver
+        .ensure_fetch_mapping(&repo, "origin", &[maps[0].clone()], "mapping-first")
+        .is_err());
+}

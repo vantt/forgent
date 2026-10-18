@@ -374,7 +374,8 @@ const LOCK_FILES = {
   runner: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'runner.lock')),
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),
   reconcile: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'reconcile.lock')),
-  activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation.lock')),
+  'repo-config': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'repo-config.lock')),
+  activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation-v2.lock')),
   observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
@@ -578,6 +579,9 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
     return { passed: false, message: `cannot read the fence status: ${err.message}` };
   }
   if (status.complete) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
+  if (status.targets.filter(target => !target.fenced).every(target => target.managedBy === 'fgctl')) {
+    return { passed: false, message: 'git-fence-missing: the new fgctl places the activation fence during a WAL-capable activation' };
+  }
   const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
   const activated = activatedHolderLockRelease(repoRoot);
   const fixable = fixableTargets(status, activated);
@@ -599,7 +603,7 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
  */
 function fixableTargets(status, activated) {
   const owners = activated.owners ?? [];
-  return status.targets.filter((target) => !target.fenced && owners.includes(target.owner));
+  return status.targets.filter((target) => !target.fenced && target.managedBy !== 'fgctl' && owners.includes(target.owner));
 }
 
 /**
@@ -655,6 +659,9 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
     return { changed: false, message: `cannot read the fence status: ${err.message}` };
   }
   if (status.complete) return { changed: false, message: `all ${status.targets.length} legacy lock path(s) already fenced` };
+  if (status.targets.filter(target => !target.fenced).every(target => target.managedBy === 'fgctl')) {
+    return { changed: false, message: 'fences not placed: only the new fgctl may place the activation fence during a WAL-capable activation' };
+  }
   const activated = activatedHolderLockRelease(repoRoot);
   if (!activated.release) return { changed: false, message: `fences not placed: ${activated.reason}` };
   const owners = [...new Set(fixableTargets(status, activated).map((target) => target.owner))];

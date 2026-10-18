@@ -175,6 +175,7 @@ dependencies = [
 name = "fgos-distribution"
 version = "0.2.0"
 dependencies = [
+ "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",

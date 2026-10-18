@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git doctor now checks the combined addon ABI and Git floor, repository topology, WAL backlog/retained bytes, native lock residue, publication fetch mappings and durability limits. Registered setup fixes initialize the WAL and install additive origin mirror mappings through the Rust config writer.
+
+- Git WAL admission in `fgctl` uses `activation-v2.lock` and fences old controllers at first WAL-capable activation. Pending operations block rollback to a release without `git-wal-v1`; corrupt or incomplete WAL scans refuse activation. Atomic fence placement currently requires Linux.
+- The Rust Git component can install additive Event Store fetch mappings under `repo-config` 80, preserving user settings and recording the effective remote URL in WAL provenance. The Node binding and doctor/setup integration are still pending.
+
 ### Added
 - Terminal-control lays panes out from the real size of the tab (`measured-split`): it splits the pane whose smaller half stays largest, and opens a new tab of the same group when no split keeps a pane of at least `terminal.layout.minCols` x `minRows` or the tab holds `maxPanesPerTab`.
 - Config section `terminal` (setup adds it when missing): `allocationGraceMs` (60000, the ready timeout plus 30 s at least), `retainFailedPaneMs` (`null`: keep a failed pane until a person closes it), `layout.policy` (`measured-split`), `layout.minCols` (80), `layout.minRows` (20), `layout.maxPanesPerTab` (8). Project over global over default. `fgos setup` also creates `<stateRoot>/terminal` (mode 0700). No new environment variable.

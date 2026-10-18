@@ -36,7 +36,7 @@ Document type: BA-grade area specification
 Audience: reviewer, maintainer, implementation agent
 Purpose: One authority for fgOS repository operations and recovery in every domain
 Design status: Accepted G0, D-ADR0057 (2026-10-18). Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19).
-Implementation status: Node writers exist; Rust replacement is not claimed implemented.
+Implementation status: Linux Rust Publication, the durable WAL and its read-only scan, combined Node addon/release manifest support, controller-owned activation fence/C5 admission, and Rust RepositoryConfig.ensure_fetch_mapping (additive local mirror refspecs with WAL URL provenance) are implemented. The Node ensureFetchMapping binding, six Git doctor rows (including the single combined ABI/floor row), read-only WAL health inspection and registered WAL/mirror-mapping setup fixes are implemented. Other mutation ports and the Node writer migration remain pending; the Rust replacement is not complete.
 Canonical: Yes (docs/platform/git/spec.md)
 Owner: Git component
 Source (proposed): packages/git/rust, crate fgos-git
