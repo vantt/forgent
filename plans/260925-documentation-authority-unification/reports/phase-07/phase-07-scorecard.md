@@ -1,7 +1,7 @@
 # Phase 7 scorecard — draft closing account
 
 Author: `codex-session:fgos-run_unit-run-179233d8d50a57@2026-10-18`.
-Status: **blocked; not awaiting-owner-review**. This is the established `reports/phase-07/phase-07-scorecard.md` plan-local name requested by the closing brief. No fgOS convention call is allowed in this worker.
+Status: **closed by the owner on 2026-10-19 (A48)**. This is the established `reports/phase-07/phase-07-scorecard.md` plan-local name requested by the closing brief. No fgOS convention call is allowed in this worker.
 
 ## Close decisions and limits
 
@@ -9,7 +9,7 @@ Status: **blocked; not awaiting-owner-review**. This is the established `reports
 
 **Closing re-review (Lead, L11-28):** -02 108 ok / 2 rework (fixed), -03 50/50 ok; two untouched stale code citations routed to Phase 9 as P7-DOC-GAP-06.
 
-**H2 A46 ratification:** [Lead fills the owner's answer on the corrected attribution here; pending, no ratification inferred.]
+**H2 A46 ratification (owner, A47):** option 1. A46 stands on the corrected facts below; accounting the 35 changed candidate files (6 main-touched, 29 plan-only) is the first Phase 9 obligation. Success criterion 4 is waived for exactly this recorded set.
 
 A46 originally moved main-import accounting to Phase 9. Corrected facts at prior content pin `6f88f5d8e`: all **35** unknown candidate files equal every `docs/platform/**` file changed since B0 `6f0f39ca1`; **6 main-touched, 29 plan-only**, **2,436 claims and 233 gaps**. The main-touched set is component-boundary, Event Store, Holder-lock, instruction-composition, repository-runtime-layout and Process. It is not an exclusively main-import red set. `step-09-close-checks.json` independently computes the file partition, and `step-09-package-blocker.json.correctedAttribution` records it. Do not claim Phase 7's own work fully accounted until H2 is answered and recorded.
 

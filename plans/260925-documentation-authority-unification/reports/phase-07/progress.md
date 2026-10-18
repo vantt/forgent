@@ -2,18 +2,7 @@
 
 ## State
 
-N1 PACKAGE complete at committed `6f88f5d8e`: Assignment-only native carry, approved exact reproduction pairs and fresh global continuity proof. Closing semantic re-review and H2/Lead close statements remain pending; no candidate or phase-07 plan edit. H1/H2 placeholders are untouched.
-
-- Steps 1–8 have independent review; Step 9 remains **blocked**, not awaiting-owner-review. Draft close account: `phase-07-scorecard.md`.
-- Lead directions L11-23..27 are recorded. X-MAIN-01/X-LOCK-04 are doc-fix/deferred (main-checkout cut over, only hot state pending); X-LOCK-05 and P7-DOC-GAP-02 are resolved; P7-DOC-GAP-04 is narrowed; PARK-PROTECTED-01 is unparked, branch-correct divergence accepted.
-- H1: L11-22 and `step-09-close-suite-attribution.json` already record the Lead suite decision. H2: owner answer/Lead record is pending on corrected attribution — 35 unknown files equal every docs/platform file changed since B0 `6f0f39ca1`, 6 main-touched and 29 plan-only, 2,436 claims and 233 gaps. No ratification or own-work-accounted claim.
-- Final file pins/probes: `step-09-close-pin-verification.json`; 22 Step 3 rows and 109 Step 5 rows. The source red-team counted 26 stale statement hashes; 51 Step 5 rows needed changed pins/citations.
-- Candidate edit: only Assignment line 69's stamp citations; production extractor changes two units, 57/59 identical. Three existing decision target bindings rebound, pending review. `step-09-close-assignment-unit-delta.json`, `step-09-close-assignment-target-rebindings.json`.
-- **N1 complete:** only Assignment changed in full identity scope since `b919e2b9b`. Two content units, three native transitions, four neighboring context changes; all other registry rows preserved, no approval carry. D both/each zero fatal; ratchet exit 0; strict E both/each exit 1 with the eight recorded categories. Every open set equals the recorded set after the two exact native correspondences; comparator retains exactly 24 errors. `step-09-close-n1-open-set-comparison.json`. ONE bounded request is ready: `review-request-a38-step-09-close-rework-02.md`, superseding held -01.
-- Check A passes against allowlist ∪ exact L11-24 lanes, zero outside paths; original allowlist untouched. Check I is **red only for the imported main delta** (Holder-lock, Process, Session Identity spec links), frozen baseline unchanged. Final worker HEAD and all package paths: `step-09-close-n1-checks.json`; the older `step-09-close-checks.json` remains historical.
-- Fresh strict H: exit 0, 217 checked, zero findings. Final doc-tooling tests: **67/67**. Each historical manifest adds only the two exact `6f88f5d8e` Phase 8/9 commit/path pairs; no other later tracked-path pair was needed. `step-09-close-n1-doc-tests.json`; original failed attempts remain historical in `step-09-close-doc-tests.json`. No full suite run or checker/fixture bypass.
-- Checkpoint: existing 6/6, zero false flags; current authored corrections still need independent bounded verdict. Scorecard retains **no fresh seal** wording and Accepted-versus-Candidate/Draft inconsistency.
-- Explicit assignment: no fgOS CLI, git writes, scripts/checker/baseline/protected-reader edits or main import. Existing plan-local naming is reused under that restriction.
+**Phase 7 closed by the owner on 2026-10-19 (A48)** after A47 ratified A46 on the corrected attribution. Close account: `phase-07-scorecard.md`. Decisions: L11-1..L11-28, A45-A48 in `owner-answers.md`. Final reviews: closing red-team `red-team-p7-close-01.md`, re-reviews `review-a38-step-09-close-rework-02-part-0{1,2,3}.md` and `-03.md`. Carried to Phase 9: the 35-file accounting set, P7-DOC-GAP-05/06, L11-23/L11-25 notes. Phase 8 is not authorized yet. The sections below are the historical step record.
 
 Phase 6 is closed. Its A1-A44 answers remain authoritative at
 `../phase-06/owner-answers.md`; this file does not reopen them.

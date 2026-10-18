@@ -635,3 +635,15 @@ Closing verification note for L11-26/L11-27: the first 65/67 doc-test run expose
 - **Decision (Lead, A42):** the closing re-review cycle is complete: `review-a38-step-09-close-rework-02-part-0{1,2,3}.md` (108 ok / 2 rework, both fixed at `1b3302680` and `a97d954d0`) and `review-a38-step-09-close-rework-03.md` (50/50 ok). Two further stale code-line citations the -03 reviewer noted are recorded as **P7-DOC-GAP-06** and routed to the Phase 9 promotion truth check, not fixed now.
 - **P7-DOC-GAP-06:** (a) `docs/platform/agent-coordination/contracts/assignment-run-runresult.md:31` cites `assignment-runner.mjs:431,560,574` for `provenance.kind` inline/declared/unit-run; real uses are near 368, 387, 500, 514, 1164. (b) `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md:60` cites `execution-contract.mjs:345-346` for budget; those lines are the `contract.role` check (`371-382` is correct).
 - **Why:** both sit in text Phase 7 did not change; line drift from main code moves is pervasive in the candidate corpus, and L11-6/A28 keep the full operative-claim truth check at Phase 9 promotion. Fixing them now would open another carry and re-review cycle for citations outside Phase 7's changed set.
+
+## A47 — Ratify A46 on the corrected attribution (owner, 2026-10-19)
+
+- **Question (closing red-team H2):** A46 was chosen on the description "main-import accounting". The data: the 35 strict-E unknown files equal every `docs/platform/**` file changed since B0 `6f0f39ca1`; 6 are main-touched and 29 changed only on the plan branch (2,436 claims, 233 gaps). Option 1: ratify A46 on these facts (Phase 9 accounts every changed candidate file at promotion anyway). Option 2: account the 29 plan-only files in Phase 7 (one long Doer turn plus review, likely needing a new disposition reading).
+- **Answer:** option 1. A46 stands on the corrected facts: the per-unit accounting of all 35 changed candidate files (6 main-touched, 29 plan-only) is the first Phase 9 obligation, before promotion. Phase 7's changed content itself was independently reviewed (scoped closing reviews and re-reviews -02/-03).
+- **Consequence:** success criterion 4 ("no changed unit handed to Phase 9") is waived for exactly this recorded set (`step-09-runner-n1-open-sets.json`, continuity proven in `step-09-close-n1-r03-open-set-comparison.json`); nothing outside it.
+
+## A48 — Close Phase 7 (owner, 2026-10-19)
+
+- **Answer:** the owner approved closing Phase 7 on the scorecard `phase-07-scorecard.md`.
+- **Carried to Phase 9:** A47 accounting of the 35-file set; P7-DOC-GAP-05 (dead-vocabulary guard vs component-boundary carriage, pre-landing blocker); P7-DOC-GAP-06 (two stale code citations); the holder-lock status-header refresh and reading-map divergence note (L11-23/L11-25); A45 legacy CTR010 cutover lines. Phase 8 consumer note: `gateway.rs:1187`.
+- **Not decided here:** Phase 8 authorization.
