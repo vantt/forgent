@@ -1,7 +1,7 @@
 ---
 title: "6.3 Cách khởi động terminal qua terminal-control + nửa launcher của identity (5.2)"
 description: "Gate trong pane nhận lock attempt qua SCM_RIGHTS, supervisor canh round herdr theo attempt id qua terminal-control, agent-protocol interactive cho 5 CLI, supervisor mint writer id + scrub env + lineage cho cả hai cách, supervisor làm chủ home; xoá vòng poll/deadline/đóng pane của controller trong herdr-round.mjs và phần herdr của reaper tạm"
-status: pending
+status: completed
 priority: P1
 effort: 64h
 branch: plan/run-supervisor-6-2-6-3-6-4
