@@ -1,0 +1,22 @@
+2026-10-18T18:50:30.497Z Load scratch inventory
+2026-10-18T18:51:16.224Z Apply native authored decisions
+2026-10-18T18:52:41.055Z Gate D both
+
+<--- Last few GCs --->
+
+[2324:0x3c365000]   190649 ms: Mark-Compact (reduce) 4010.1 (4090.0) -> 4010.1 (4089.0) MB, pooled: 0 MB, 776.14 / 0.00 ms  (average mu = 0.328, current mu = 0.000) last resort; GC in old space requested
+[2324:0x3c365000]   191417 ms: Mark-Compact (reduce) 4010.1 (4089.0) -> 4010.1 (4089.0) MB, pooled: 0 MB, 767.70 / 0.00 ms  (average mu = 0.192, current mu = 0.000) last resort; GC in old space requested
+
+FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x74eae8 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]
+ 2: 0xc42680  [node]
+ 3: 0xc4276f  [node]
+ 4: 0xecce92  [node]
+ 5: 0xea1f34  [node]
+ 6: 0xe89305  [node]
+ 7: 0x12385ae  [node]
+ 8: 0x123aaf2  [node]
+ 9: 0x138ea15  [node]
+10: 0x7eb7b7e769b6 

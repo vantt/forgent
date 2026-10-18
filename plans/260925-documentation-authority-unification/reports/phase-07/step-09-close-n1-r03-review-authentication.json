@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "entries": 50,
+  "parts": 1,
+  "totalPartBytes": 252033,
+  "indexSHA256": "b954394f5f2bd35fc5ba6cba89148d359df12353a91781f51885bfe6924f216e",
+  "outputs": [
+    {
+      "check": "bindings-check",
+      "exit": 0,
+      "stdout": "{\"passed\":true,\"identitySources\":[\"docs/platform/agent-coordination/contracts/assignment-run-runresult.md\",\"docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\"],\"nativeTransitions\":6,\"knownIdsPreserved\":100042,\"queueBindings\":6,\"supplementalBindings\":4,\"targetRows\":4,\"newGapDispositions\":2,\"unchangedQueueRows\":1231,\"noApprovalCarry\":true}"
+    },
+    {
+      "check": "checks-reproduce",
+      "exit": 0,
+      "stdout": "{\"passed\":true,\"historyViolations\":0,\"workingViolations\":0,\"pins\":{\"rows\":131,\"files\":403,\"spans\":97,\"probes\":97},\"mismatches\":0}"
+    },
+    {
+      "check": "compare-reproduce",
+      "exit": 0,
+      "stdout": "{\"passed\":true,\"comparisons\":{\"filesUnknownBlocking\":{\"expected\":35,\"actual\":35,\"unexpected\":0,\"missing\":0},\"claimsUnknownBlocking\":{\"expected\":2436,\"actual\":2436,\"unexpected\":0,\"missing\":0},\"claimsWithoutOwnRationale\":{\"expected\":2436,\"actual\":2436,\"unexpected\":0,\"missing\":0},\"registryGapsWithoutDisposition\":{\"expected\":233,\"actual\":233,\"unexpected\":0,\"missing\":0},\"pendingHolds\":{\"expected\":4504,\"actual\":4504,\"unexpected\":0,\"missing\":0},\"partialCarries\":{\"expected\":28,\"actual\":28,\"unexpected\":0,\"missing\":0},\"identicalUnits\":{\"expected\":362,\"actual\":362,\"unexpected\":0,\"missing\":0},\"candidateUnits\":{\"expected\":2716,\"actual\":2716,\"unexpected\":0,\"missing\":0},\"comparatorErrors\":{\"expected\":24,\"actual\":24,\"unexpected\":0,\"missing\":0}}}"
+    },
+    {
+      "check": "portable-comparator-reproduce",
+      "exit": 0,
+      "stdout": "{\"reproduced\":true,\"comparatorExit\":1,\"errors\":24}"
+    }
+  ],
+  "noSemanticVerdict": true
+}

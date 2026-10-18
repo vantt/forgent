@@ -1,0 +1,21 @@
+{
+  "request": "step-09-close-rework-03",
+  "supersedesOnlyAffectedBindingsOf": "review-request-a38-step-09-close-rework-02.md",
+  "contentCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+  "entries": 50,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-03/part-01.json",
+      "entries": 50,
+      "bytes": 252033,
+      "sha256": "3b651c20384349f9187a1dd08b50fe4934b3909506199929d0522ed7cc1e6230",
+      "requiredNewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-09-close-rework-03.md"
+    }
+  ],
+  "totalPartBytes": 252033,
+  "requiredNewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-09-close-rework-03.md",
+  "releaseStatus": "ready for independent bounded review; no verdict carried",
+  "scope": "Two Lead citation edits and their native/rebinding/context/candidate deltas, affected old rows, two pin fixes, reproduction accounting and exact rechecks. H1/H2 remain Lead-owned.",
+  "allEntriesMandatory": true,
+  "priorReviews": "108 ok / 2 rework in -02 remain historical; this pack supplies no semantic verdict or approval."
+}

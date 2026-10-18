@@ -1,0 +1,164 @@
+{
+  "contentCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+  "priorContentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "identitySourceChanges": [
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+    "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+  ],
+  "productionInputs": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "sha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "scripts/compare-doc-global-closure.mjs",
+      "sha256": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "sha256": "ad4be75733d5684afd50e72439255ccc575a51a848b092dcea21f5677dcd9278",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    },
+    {
+      "path": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "sha256": "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646",
+      "byteEqualToHEAD": true,
+      "equalToPriorReceipt": true
+    }
+  ],
+  "reproduction": {
+    "authority": "Brief 1 N1 PACKAGE -03: exact approved manifest-data procedure only if reproduction fails",
+    "priorPairBoundary": "6f88f5d8e",
+    "scanCommand": [
+      "git",
+      "log",
+      "--first-parent",
+      "--no-merges",
+      "--format=%H",
+      "--name-only",
+      "6f88f5d8e..HEAD",
+      "--",
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+    ],
+    "laterTrackedPlanCommitScan": [],
+    "newPairs": [],
+    "reason": "Required reproduction tests pass 67/67 with existing manifests; neither 7ba806025 nor 1b3302680 touches a tracked historical plan file. No runner commit exists yet in this turn. No manifest data or embedded checker logic changed.",
+    "manifests": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "sha256": "502562f0aba27229878d3f5ad3a2165b23a66a15ff576b4dca0bf393507fae08",
+        "byteEqualToHEAD": true
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "sha256": "7bd8e281d2efbbfbbc8b40b349f2c8ddb5e9aa4d9de5a90cae286292bedfa413",
+        "byteEqualToHEAD": true
+      }
+    ],
+    "finalDeliveryRerun": {
+      "exit": 0,
+      "tests": 67,
+      "pass": 67,
+      "fail": 0,
+      "newPairs": []
+    }
+  },
+  "candidateWorkingDiff": "",
+  "phase07PlanDiff": "",
+  "allWorkingPathsInScope": true,
+  "workingPathsAtBoundarySnapshot": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-assignment-predecessor.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-r03-assignment-predecessors.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/phase-07-scorecard.md",
+    "plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md",
+    "plans/260925-documentation-authority-unification/reports/phase-07/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-03/index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-03/part-01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/review-request-a38-step-09-close-rework-03.md",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-03-contract-boundary-matrix.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-ADR-scope-facts.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-D-both.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-D-identity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-D-phase02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-E-both.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-E-identity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-E-phase02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-bindings-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-bindings-check.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-boundary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-candidate-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-carry-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-carry.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-checks-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-comparator-actual.json.gz",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-compare-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-comparison.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-doc-tests-initial.log",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-doc-tests.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-doc-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-execution.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-expected.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-final-validation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global-initial.log",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global.log",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inputs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inventory-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inventory.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inventory.log",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-open-set-comparison.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-open-sets.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-pin-fixes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-portable-comparator-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-portable-comparator.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-ratchet-command.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-ratchet.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-rebind-reproduce.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-review-authentication.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-review-check.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-scope-boundary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-07/step-09-rebind-units.json"
+  ],
+  "H1H2PlaceholdersPreserved": true,
+  "nativeCarryInvocations": 1,
+  "nativeInventoryGenerations": 1,
+  "heavyJobsSerialized": true,
+  "knownLookupAliasBoundary": "Six pre-existing inventory/registry aliases remain historical; no alias repair or identity transplant. Inspect global.nativeTupleDifferences.",
+  "noGitWrites": true,
+  "noCandidateContentDefectFound": true
+}

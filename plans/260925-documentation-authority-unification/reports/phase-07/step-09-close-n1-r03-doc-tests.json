@@ -1,0 +1,22 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+  "exit": 0,
+  "tests": 67,
+  "pass": 67,
+  "fail": 0,
+  "skipped": 0,
+  "attempts": 2,
+  "log": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-doc-tests.log",
+  "logSHA256": "e910a03340cde07b8d2fbae5eeacbe389575de3c3f3ea5cb010af56c95ac6637",
+  "fullSuiteRun": false,
+  "finalRerun": true,
+  "initialRun": {
+    "exit": 0,
+    "tests": 67,
+    "pass": 67,
+    "fail": 0,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-doc-tests-initial.log",
+    "logSHA256": "19768298a7d1ca0d443c43d020556367a6f65d5771f4340133e9bf38254c1cc4"
+  },
+  "rerunReason": "New delivery paths are consumed by the reproduction checks; validate the complete final delivery file set."
+}

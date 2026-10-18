@@ -1,0 +1,97 @@
+{
+  "contentCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+  "nativeCarryInvocations": 1,
+  "nativeCarryExit": 0,
+  "nativeInventoryGenerations": 1,
+  "nativeInventoryExit": 0,
+  "nativeInventoryStartedAt": "2026-10-18T17:58:16.664Z",
+  "nativeInventoryCompletedAt": "2026-10-18T18:50:00.978Z",
+  "nativeCacheSavedAt": "2026-10-18T18:50:28.044Z",
+  "globalStartedAt": "2026-10-18T18:50:30.497Z",
+  "globalState": "completed; six native gates and unchanged comparator replay verified",
+  "heavyJobsSerialized": true,
+  "nodeFlags": [
+    "--expose-gc",
+    "--max-old-space-size=4096",
+    "--max-semi-space-size=1"
+  ],
+  "inventoryManifest": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inventory.json",
+  "globalAttempts": [
+    {
+      "nodeFlags": [
+        "--expose-gc",
+        "--max-old-space-size=4096",
+        "--max-semi-space-size=1"
+      ],
+      "exit": 134,
+      "nativeInventoryGenerations": 0,
+      "nativeCarryInvocations": 0,
+      "completedGateResults": 0,
+      "error": "FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed - JavaScript heap out of memory; last full GC retained 4010.1 MB at the 4096 MiB heap ceiling."
+    },
+    {
+      "nodeFlags": [
+        "--expose-gc",
+        "--max-old-space-size=5120",
+        "--max-semi-space-size=1",
+        "--optimize-for-size"
+      ],
+      "state": "completed",
+      "purpose": "Read the complete verified native cache and rerun unchanged gates; no new carry or generation.",
+      "exit": 0,
+      "completedAt": "2026-10-18T19:13:58.319769+00:00",
+      "D": [
+        {
+          "priors": "both",
+          "exit": 0,
+          "fatal": 0
+        },
+        {
+          "priors": "identity",
+          "exit": 0,
+          "fatal": 0
+        },
+        {
+          "priors": "phase02",
+          "exit": 0,
+          "fatal": 0
+        }
+      ],
+      "E": [
+        {
+          "priors": "both",
+          "exit": 1,
+          "fatal": 8
+        },
+        {
+          "priors": "identity",
+          "exit": 1,
+          "fatal": 8
+        },
+        {
+          "priors": "phase02",
+          "exit": 1,
+          "fatal": 8
+        }
+      ],
+      "comparatorExit": 1,
+      "comparatorErrors": 24
+    }
+  ],
+  "globalExit": 0,
+  "successfulGlobalAttempt": 2,
+  "logs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global-initial.log",
+      "sha256": "ff86752a807e29e1c6c9ccd2983b9d173d902982a784031a1cf45bff8479e1c0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-global.log",
+      "sha256": "88c52f6f155bb00729d85d4986bd357a97a601b126a31288001b4b2e9f3fb875"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-inventory.log",
+      "sha256": "6ddcd63f70ae723b30f483327c0279b0dd2687b58067ef9d4141abc1b27710cf"
+    }
+  ]
+}

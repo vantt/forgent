@@ -132,3 +132,24 @@ Independent re-review `review-a38-step-09-close-rework-02-part-02.md` (entry `as
 - `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md:37-38`: `assignment.mjs:456-459,663-666` → `assignment.mjs:443-444,626-628` (same stamps the contract file and registry row cite) and `execution/run.mjs:334-338` → `execution/run.mjs:569-576`.
 
 Meaning unchanged; citation-only. Re-carry of the changed units and bounded re-review follow under N1. Part 01 rework `X-DEFECT-06` (row pins `runner.md:2475,2607,2895` → `2477,2609,2897`) and the part 02 note on `X-DEFECT-08` probes (4425/4513 → 4426/4514) are plan-record pin fixes in the same package.
+
+### N1 -03 plan-record pin corrections
+
+Re-read the current source lines: X-DEFECT-06 now pins `docs/specs/runner.md:2477,2609,2897` (the 2×2 grid text and ADR 0034 heading), replacing 2475/2607/2895. X-DEFECT-08 now probes `bin/fgos.mjs:4426,4514` (the two unknown-verb diagnostics), replacing 4425/4513. Both authored alignment rows and their pin-verification projections carry recomputed span SHA-256 and exact probe text; proof commands match. Assignment whole-file statement/evidence hashes in affected Step 3 and pin rows follow committed `1b3302680`. Independent review pending; no candidate text changed. Full before/after: `step-09-close-n1-r03-pin-fixes.json`.
+
+N1 -03 reproduction accounting: the required exact three-file test command passes 67/67 on its first run. No new exception pair is needed; both reproduction manifests stay byte-equal to HEAD. The tracked Phase 6/7/8/9 plan-file scan after `6f88f5d8e` is empty, including Lead commit `1b3302680` and package commit `7ba806025`. Receipt: `step-09-close-n1-r03-reproduction.json`. The future runner commit remains outside this snapshot.
+
+### N1 -03 committed Unit-run citation package — complete
+
+Committed `1b3302680` is the only content input; full identity-source diff since `6f88f5d8e` contains exactly the two Lead-corrected documents. One native carry persists four changed current units / six transitions, with no known ID loss. Six existing queue/context bindings, four supplemental ADR bindings, four current decision targets and two pending predecessor supersessions are current; twenty-six affected -02 entries are superseded. No candidate byte, approval, checker, baseline or manifest is changed.
+
+| Candidate | Prior SHA-256 (`6f88f5d8e`) | Current committed SHA-256 (`1b3302680`) |
+|---|---|---|
+| `docs/platform/agent-coordination/contracts/assignment-run-runresult.md` | `51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b` | `0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a` |
+| `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` | `43e11510b2ec0e2b924023e2398e3730dfa19c2a316a8823ba54a2633c1fdd0b` | `36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd` |
+
+D both/identity/phase02: exit 0, zero fatal each; ratchet: exit 0; strict E both/each: exit 1, eight categories each with identical output; comparator: exit 1, exactly the same 24 errors. All eight exact open sets equal the prior set under only four native correspondences. Conservation scope stays exactly 1,084 paths / 35 unknown files; ADR-006 does not join. Repository-wide D and global strict-E candidate checks still include its edited occurrences. The separate whole-repository touched-file count is 36 after the ADR edit. Its thirteen current native units / three historical gaps / eight candidate-open rows are distinguished in the scope receipt. H1/H2 and independent review remain pending.
+
+The single native generation completed once. The first cache-only gate driver exhausted its 4 GiB heap before any D result (exit 134); the serial 5 GiB retry with `--optimize-for-size` completed all six gates from the same verified cache. No carry/generation was repeated and no incomplete result was counted. Required doc tests remain 67/67; zero new reproduction pairs, both manifests unchanged. `step-09-close-n1-r03-execution.json` records actual resource history.
+
+Final delivery reproduction rerun also passes 67/67, zero failures, exit 0, after the complete package paths are present. The current test receipt/log retain both attempts; the initial pass is preserved in `step-09-close-n1-r03-doc-tests-initial.log`. New reproduction pairs remain zero, and both historical manifests remain unchanged.

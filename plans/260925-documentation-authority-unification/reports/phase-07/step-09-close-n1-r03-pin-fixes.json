@@ -1,0 +1,334 @@
+{
+  "contentCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+  "pinFixes": [
+    {
+      "id": "X-DEFECT-06",
+      "before": {
+        "id": "X-DEFECT-06",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "candidate-citation",
+        "authorityKind": "architecture",
+        "statement": "Disposition of bounded observation TRUTH-15",
+        "statementPath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": null,
+        "statementFileSha256": "c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654",
+        "alignment": "aligned",
+        "alignmentMeaning": "Candidate citation/visible label correction already accepted in Step 4; no new edit or rationale rework.",
+        "evidence": [
+          {
+            "ref": "docs/specs/runner.md:2475,2607,2895",
+            "fileSha256": "be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "span": "2475",
+                "command": "sed -n '2475,2475p' docs/specs/runner.md",
+                "probeLine": 2475,
+                "probe": "lập** của vai trò bên gọi: **arity** (1 đơn vị hay N đơn vị) và",
+                "spanSha256": "9f995e3e96412ae99318523ae474182bd3481d075d2522484efa3114467b90f0"
+              },
+              {
+                "span": "2607",
+                "command": "sed -n '2607,2607p' docs/specs/runner.md",
+                "probeLine": 2607,
+                "probe": "Cửa sổ ấy đã đóng. `0029` điền vào đúng chỗ trống `0028` để lại:",
+                "spanSha256": "720d5e1f4ce31eeaff3ac6c70971e182548b4270044ab781488e9765424968ff"
+              },
+              {
+                "span": "2895",
+                "command": "sed -n '2895,2895p' docs/specs/runner.md",
+                "probeLine": 2895,
+                "probe": "- `docs/history/tsk-1m8/` — item trước, phát hiện gap này khi live-test",
+                "spanSha256": "31fa68a73343dd941f1e597fb4580588ff6a05497e1fdc99b834efcd614993fc"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md; sed -n '2475,2475p' docs/specs/runner.md; sed -n '2607,2607p' docs/specs/runner.md; sed -n '2895,2895p' docs/specs/runner.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "candidate-content-owner",
+        "route": "Step 4",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      },
+      "after": {
+        "id": "X-DEFECT-06",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "candidate-citation",
+        "authorityKind": "architecture",
+        "statement": "Disposition of bounded observation TRUTH-15",
+        "statementPath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": null,
+        "statementFileSha256": "c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654",
+        "alignment": "aligned",
+        "alignmentMeaning": "Candidate citation/visible label correction already accepted in Step 4; no new edit or rationale rework.",
+        "evidence": [
+          {
+            "ref": "docs/specs/runner.md:2477,2609,2897",
+            "fileSha256": "be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "span": "2477",
+                "command": "sed -n '2477,2477p' docs/specs/runner.md",
+                "probeLine": 2477,
+                "probe": "lại\"). Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;",
+                "spanSha256": "d25cf6a7478a83eef076ffb7ec68370aa312d2e517e40c18bb205ddb671c3009"
+              },
+              {
+                "span": "2609",
+                "command": "sed -n '2609,2609p' docs/specs/runner.md",
+                "probeLine": 2609,
+                "probe": "> Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;",
+                "spanSha256": "c3ff193d0c603ed668f227a1671f75f125fc66bea6a618a7bbad6d1a152183b2"
+              },
+              {
+                "span": "2897",
+                "command": "sed -n '2897,2897p' docs/specs/runner.md",
+                "probeLine": 2897,
+                "probe": "### 0034 — Đổi tên `capacity`/`capacities` thành `executor`/`executors`, chốt tách `capability`",
+                "spanSha256": "a05b4b9dfdcec08b5fa8a6da2e8d9a59f5de21ab3125c57449aaa5ebc563e29c"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md; sed -n '2477,2477p' docs/specs/runner.md; sed -n '2609,2609p' docs/specs/runner.md; sed -n '2897,2897p' docs/specs/runner.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "candidate-content-owner",
+        "route": "Step 4",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only",
+          "n1R03ContentCommit": "1b3302680"
+        }
+      }
+    },
+    {
+      "id": "X-DEFECT-08",
+      "before": {
+        "id": "X-DEFECT-08",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "candidate-citation",
+        "authorityKind": "architecture",
+        "statement": "Disposition of bounded observation TRUTH-27",
+        "statementPath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": null,
+        "statementFileSha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+        "alignment": "aligned",
+        "alignmentMeaning": "Candidate citation/visible label correction already accepted in Step 4; no new edit or rationale rework.",
+        "evidence": [
+          {
+            "ref": "bin/fgos.mjs:4425,4513",
+            "fileSha256": "d0f3ba59a9d946897b93dde6e10391324aa98ee150411cba4280ab5f3cfab5c3",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "span": "4425",
+                "command": "sed -n '4425,4425p' bin/fgos.mjs",
+                "probeLine": 4425,
+                "probe": "    default:",
+                "spanSha256": "f85e7a3dc66639492ef16009f2e56b1203cc12efc810c3d15e24adc35fa7624b"
+              },
+              {
+                "span": "4513",
+                "command": "sed -n '4513,4513p' bin/fgos.mjs",
+                "probeLine": 4513,
+                "probe": "  if (!entry) {",
+                "spanSha256": "90a1afb825c88901e2e09df95a831b4da364831c41ad9cc96306b366a924a500"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/operations/h-51f5cd7279fd.md; sed -n '4425,4425p' bin/fgos.mjs; sed -n '4513,4513p' bin/fgos.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "candidate-content-owner",
+        "route": "Step 4",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      },
+      "after": {
+        "id": "X-DEFECT-08",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "candidate-citation",
+        "authorityKind": "architecture",
+        "statement": "Disposition of bounded observation TRUTH-27",
+        "statementPath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": null,
+        "statementFileSha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+        "alignment": "aligned",
+        "alignmentMeaning": "Candidate citation/visible label correction already accepted in Step 4; no new edit or rationale rework.",
+        "evidence": [
+          {
+            "ref": "bin/fgos.mjs:4426,4514",
+            "fileSha256": "d0f3ba59a9d946897b93dde6e10391324aa98ee150411cba4280ab5f3cfab5c3",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "span": "4426",
+                "command": "sed -n '4426,4426p' bin/fgos.mjs",
+                "probeLine": 4426,
+                "probe": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);",
+                "spanSha256": "8275484837f34e1c057f7308b098d12f0a155dd6b7748270402b168a3791abd6"
+              },
+              {
+                "span": "4514",
+                "command": "sed -n '4514,4514p' bin/fgos.mjs",
+                "probeLine": 4514,
+                "probe": "    refuseHelp(`unknown verb \"${verb}\". Usage: fgos --help [<verb> [<sub>]] [--json]`);",
+                "spanSha256": "565984ebb4227e03e762e778b1947e37dc8449b963f0f72f51eee8403ad2b2d3"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/operations/h-51f5cd7279fd.md; sed -n '4426,4426p' bin/fgos.mjs; sed -n '4514,4514p' bin/fgos.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "candidate-content-owner",
+        "route": "Step 4",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only",
+          "n1R03ContentCommit": "1b3302680"
+        }
+      }
+    }
+  ],
+  "fileHashRebindings": [
+    {
+      "field": "pinVerification.rows[111].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[112].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[112].evidence[0].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[113].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[114].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[115].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[116].statementSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[116].evidence[2].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "pinVerification.rows[117].evidence[0].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[2].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[3].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[3].evidencePins[0].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[4].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[5].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[6].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[7].statementFileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[7].evidencePins[2].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    },
+    {
+      "field": "contractMatrix.rows[8].evidencePins[0].fileSha256",
+      "before": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "after": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a"
+    }
+  ],
+  "noApprovalCarry": true,
+  "dependentFileHashRebinding": {
+    "id": "X-CTR010-01",
+    "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-03-contract-boundary-matrix.json",
+    "sha256": "4495eb7387d4a7f6ee4ed368e3cdcf6f1b3d368d176a989d8db27ab9ce5cf4e9",
+    "reason": "Whole-file evidence pin follows the Assignment statement/evidence SHA refresh; alignment meaning unchanged."
+  }
+}

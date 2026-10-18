@@ -1,0 +1,17 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID node plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-bindings-check.mjs",
+  "exit": 0,
+  "passed": true,
+  "identitySources": [
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+    "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+  ],
+  "nativeTransitions": 6,
+  "knownIdsPreserved": 100042,
+  "queueBindings": 6,
+  "supplementalBindings": 4,
+  "targetRows": 4,
+  "newGapDispositions": 2,
+  "unchangedQueueRows": 1231,
+  "noApprovalCarry": true
+}

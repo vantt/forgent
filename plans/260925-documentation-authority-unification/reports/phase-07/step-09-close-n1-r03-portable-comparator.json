@@ -1,0 +1,7 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID node plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-portable-comparator-reproduce.mjs /tmp/fgos-work/p7-close-n1-r03/portable-replay",
+  "exit": 0,
+  "reproduced": true,
+  "comparatorExit": 1,
+  "errors": 24
+}

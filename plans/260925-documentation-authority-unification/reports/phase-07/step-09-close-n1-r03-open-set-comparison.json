@@ -1,0 +1,426 @@
+{
+  "contentCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+  "priorContentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "baseline": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-open-sets.json",
+  "current": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-open-sets.json",
+  "nativeCorrespondences": [
+    {
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "unitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+        "identityFingerprint": "07bf2207578aa1add403bc6e6b90cc73c4332fb3087c9577997d804c315f959b",
+        "claimId": "claim_f50eba28f12680323837c93d7c23ac1c",
+        "sourceAnchor": "assignment",
+        "unitKind": "heading",
+        "sourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605",
+        "claimKind": "contract",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+          "fromUnitDigest": "b7b789e9947e9fb14b5dda3031b62fb0e605e87b07d79a5df09e9095d7ca730f",
+          "toUnitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+          "fromSourceUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
+          "toSourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605"
+        }
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "unitDigest": "53ba6668a94ed58e3a20dbfb5ea4740f7caf741d3364f8eece42fa4e93015323",
+        "identityFingerprint": "7ce6cc984e8cae0be9c1a59262608d0d794ccc77373be3732dafd9d989219b14",
+        "claimId": "claim_f50eba28f12680323837c93d7c23ac1c",
+        "sourceAnchor": "assignment",
+        "unitKind": "heading",
+        "sourceUnitDigest": "0abb84611981f45fcbe02254cf1ee0ed03077c516ca0ccddab4dd9b10c143f32",
+        "claimKind": "contract",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "fromUnitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+          "toUnitDigest": "53ba6668a94ed58e3a20dbfb5ea4740f7caf741d3364f8eece42fa4e93015323",
+          "fromSourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605",
+          "toSourceUnitDigest": "0abb84611981f45fcbe02254cf1ee0ed03077c516ca0ccddab4dd9b10c143f32"
+        }
+      }
+    },
+    {
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "unitDigest": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+        "identityFingerprint": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+        "claimId": "claim_1e367448a5e9807953df6f9b2ef44e43",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-b919e2b9b53b2425cafef51d16f1327c81ecc68f"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "unitDigest": "6c18078811e4d1c41936a21d1b3118ad43a6aaf806667a2d7fc3cf99134e5735",
+        "identityFingerprint": "6c18078811e4d1c41936a21d1b3118ad43a6aaf806667a2d7fc3cf99134e5735",
+        "claimId": "claim_71946ae4195a82ae48ed8687182a5ba8",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3a9ab1486af4fec2e01a8706a54ff99e69ffef566fc5159eccf0ea8dd8dbc2d8",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6"
+      }
+    },
+    {
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "6fdbfdd64d9410e96bbf833c14f996332ac7db321a34ce6e716da898263678fa",
+        "identityFingerprint": "a754ad70126f0322045ec2d37325a2edce5eb350f149e33e5e385caad27c3d71",
+        "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
+        "sourceAnchor": "decision",
+        "unitKind": "heading",
+        "sourceUnitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "e79f2192c833aff881fadf5d07e57f860602b20d30e487234b4056e180fec632",
+        "identityFingerprint": "6698fe728ed0b085a2dc3eef172e7348aa6d29c842985c8724fb8ec4854eb1ad",
+        "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
+        "sourceAnchor": "decision",
+        "unitKind": "heading",
+        "sourceUnitDigest": "9b6db8cf898c893be2e9cdd064f69d9ce70fe81b7578c4ada9f253a6987453d7",
+        "claimKind": "decision",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "fromUnitDigest": "6fdbfdd64d9410e96bbf833c14f996332ac7db321a34ce6e716da898263678fa",
+          "toUnitDigest": "e79f2192c833aff881fadf5d07e57f860602b20d30e487234b4056e180fec632",
+          "fromSourceUnitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
+          "toSourceUnitDigest": "9b6db8cf898c893be2e9cdd064f69d9ce70fe81b7578c4ada9f253a6987453d7"
+        }
+      }
+    },
+    {
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "858b629624ffe2dc822780e6165b88c5d269361180af6bf1de9eb47ed008f196",
+        "identityFingerprint": "858b629624ffe2dc822780e6165b88c5d269361180af6bf1de9eb47ed008f196",
+        "claimId": "claim_1a0fd8e46885b7343da2f7c6cae17f2d",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "3f104cef0e88025ae8ab8c617e7f52504f2c6c368266833a496e0c6387f4f50b",
+        "identityFingerprint": "3f104cef0e88025ae8ab8c617e7f52504f2c6c368266833a496e0c6387f4f50b",
+        "claimId": "claim_a452409dbfc7f36e75f6f53b2b292c20",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5247ba7e74bc97221d21e9d31e58d1313cfd5f7f9deb7aa9735905c7e1f26228",
+        "claimKind": "decision",
+        "status": "future",
+        "origin": "added-since-6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6"
+      }
+    }
+  ],
+  "rule": "Only four native recarried occurrences change identity/digest. Strict conservation scope is exactly the prior 1084 paths; all existing open-set memberships and comparator errors must be preserved under native correspondence. ADR-006 does not join the 35 scoped files; repository-wide D and global strict-E candidate rows still check its changed units.",
+  "scopeBoundary": {
+    "priorScopeCount": 1084,
+    "currentScopeCount": 1084,
+    "scopeUnchanged": true,
+    "addedScopePaths": [],
+    "changedSourcesOutsideConservationScope": [
+      "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+    ],
+    "outsideSourceUnits": [
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "0166357991ff48b45645dc35a529049ec9a58dfb7be2e70fb5a2874d97b507e9",
+        "identityFingerprint": "ab9ad56de939a764c192be5d8c76609a5dbdefc22d18f8849bcc8799ee4d25d3",
+        "claimId": "claim_9e78656a9656a956d8d18436eb513951",
+        "sourceAnchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
+        "unitKind": "heading",
+        "sourceUnitDigest": "0f92ff45e3f725fe4903ac850e30385d1199d6278c8a8ec2afd54232cce813bd",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "7a0b0a9a630004c9534d8bddbb6dcf2db980ddd00a50efc9b8fc096d9b3d90e7",
+        "identityFingerprint": "13e0bf6414450e8976ecdc3818e781dcf9f7a45b11bb031f83d2ac1b1d2c84af",
+        "claimId": "claim_966a448be6530851e8b1fd7b72d75d4e",
+        "sourceAnchor": "consequences",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c491b01f041338f5d863d88928183788353c2e9d4d75dfb1aff97b00043825cb",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "9e8e74ed63a1b74e92abe4a7a4300e3e5ba8e9029f1736c49cfe5531fd95ad61",
+        "identityFingerprint": "472b6b62a9c45facead832920c124c2238f70a5780b71494b96292fe2b89af67",
+        "claimId": "claim_9950fd6826b0086a4413fdb3d1834075",
+        "sourceAnchor": "context",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c91b14b9a4ae7b59bba753d6cb386d9d883a3ddd59a3abcd0da593e34d1c6029",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "e79f2192c833aff881fadf5d07e57f860602b20d30e487234b4056e180fec632",
+        "identityFingerprint": "6698fe728ed0b085a2dc3eef172e7348aa6d29c842985c8724fb8ec4854eb1ad",
+        "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
+        "sourceAnchor": "decision",
+        "unitKind": "heading",
+        "sourceUnitDigest": "9b6db8cf898c893be2e9cdd064f69d9ce70fe81b7578c4ada9f253a6987453d7",
+        "claimKind": "decision",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "fromUnitDigest": "6fdbfdd64d9410e96bbf833c14f996332ac7db321a34ce6e716da898263678fa",
+          "toUnitDigest": "e79f2192c833aff881fadf5d07e57f860602b20d30e487234b4056e180fec632",
+          "fromSourceUnitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
+          "toSourceUnitDigest": "9b6db8cf898c893be2e9cdd064f69d9ce70fe81b7578c4ada9f253a6987453d7"
+        }
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "878b5246fb6f4630159b52a445fd5b60685ca501df2020688ee3e8074612b180",
+        "identityFingerprint": "99e5ca80a43eb197ce89d490543c1930dbae02a3a80340b824fe8c55f426f19f",
+        "claimId": "claim_2c0a9022795029da6e29468ff4d22c58",
+        "sourceAnchor": "rejected-alternatives",
+        "unitKind": "heading",
+        "sourceUnitDigest": "795233c738fbfe11a0585530726e028071646ae87f4849f4ef0b79bffe963e8b",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "8371e6c5fd51d10773a984a2515ef5983b2fb764a890e6996c67b7942cf1e9a1",
+        "identityFingerprint": "8371e6c5fd51d10773a984a2515ef5983b2fb764a890e6996c67b7942cf1e9a1",
+        "claimId": "claim_b0ff7d91d7ea1dec87539ceeea8080fb",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c1c9de828c627cfdc6f15f074dd343a03180110fc17f405cb7e5af065a36c205",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "f466f76ed9bf0f54822ed194f46d5a08beec805a3a10dd944ea0710e2e0f0356",
+        "identityFingerprint": "f466f76ed9bf0f54822ed194f46d5a08beec805a3a10dd944ea0710e2e0f0356",
+        "claimId": "claim_25a8cfce7bd6938196e6b4ef2e4c02d9",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "71a2d0b002b69d549be7a107e175e1dd8c54903c28734e84dbf75218eb5319de",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "2cab81b9a67d9362b485de1cab99f3abe9e2ef8adae9a4961e642bb52fbb9df5",
+        "identityFingerprint": "2cab81b9a67d9362b485de1cab99f3abe9e2ef8adae9a4961e642bb52fbb9df5",
+        "claimId": "claim_a8344e1a43226394f04114d9f4270ce2",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0e13876e4a761e17e1a93c5a254d556e8dddabefcd233e548e78bbf825030604",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "f03f63c060d929cac0e8d9d55329801a115b698735c529908f6667e1f19daf75",
+        "identityFingerprint": "f03f63c060d929cac0e8d9d55329801a115b698735c529908f6667e1f19daf75",
+        "claimId": "claim_8ee5968cfb90880c4645e60329680069",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4924d8b75234f6a7d379effde942bc41f16a094a5ea9cbd9d31d636433e6baf5",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "3f104cef0e88025ae8ab8c617e7f52504f2c6c368266833a496e0c6387f4f50b",
+        "identityFingerprint": "3f104cef0e88025ae8ab8c617e7f52504f2c6c368266833a496e0c6387f4f50b",
+        "claimId": "claim_a452409dbfc7f36e75f6f53b2b292c20",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5247ba7e74bc97221d21e9d31e58d1313cfd5f7f9deb7aa9735905c7e1f26228",
+        "claimKind": "decision",
+        "status": "future",
+        "origin": "added-since-6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "2369960b4ef1ec822678d860d7306460574a3f1785414525b1010ad9dbc69588",
+        "identityFingerprint": "2369960b4ef1ec822678d860d7306460574a3f1785414525b1010ad9dbc69588",
+        "claimId": "claim_37e2cb81ce8c6334f6f1dd6342e4c1ec",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8c0964079141b74dbe89abde9e7c28eaf9dfa8e6548a01bdb015119ba8a6637f",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "bd70a82bb85c976a32e9e1640f8a57a42bfb6e9b5d02cfb07c41fa0ba7cf9d0e",
+        "identityFingerprint": "bd70a82bb85c976a32e9e1640f8a57a42bfb6e9b5d02cfb07c41fa0ba7cf9d0e",
+        "claimId": "claim_d9b0e2e7c22729b31685d343fd45bea8",
+        "sourceAnchor": "unheaded-block-7",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b4afa8d61c58a9f860f769095db369a3f159092b11d775e368ebfbb5151c455a",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "f29d58adf1bb1548784b4a5d816702670346dac93961d3b37bb25779948b8831",
+        "identityFingerprint": "f29d58adf1bb1548784b4a5d816702670346dac93961d3b37bb25779948b8831",
+        "claimId": "claim_6b37c0f096e39d19a2760bb7f93a2adb",
+        "sourceAnchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "120235d0e88da58627523727b96d7233f6439404ad308e034131c04dac2028a1",
+        "claimKind": "decision",
+        "status": "future"
+      }
+    ],
+    "outsidePriorGaps": [
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "02203c4b26c9897dc32ce138cf793cb78a4983c7cb1f3aa2135476e4393749dd",
+        "identityFingerprint": "02203c4b26c9897dc32ce138cf793cb78a4983c7cb1f3aa2135476e4393749dd",
+        "claimId": "claim_31b1af9538f9628fbbd150892e03b73a",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "34c327107c249b87967152649078fb8284651421b2d06b3aa26f9282c82c8819",
+        "claimKind": "decision",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "aade044e56a0858908c645517ae1fe687624d99c3f2c5db5306fe6e514215f93",
+        "identityFingerprint": "aade044e56a0858908c645517ae1fe687624d99c3f2c5db5306fe6e514215f93",
+        "claimId": "claim_f60842664eded9c4e86c4467b8f0db42",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bb5b2e679cb28d07ca9599ee3161259069abd3a99b8e56596b6fa07789564838",
+        "claimKind": "decision",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "unitDigest": "0f1029e387f339a3a4fb4fdf8c9d303ecfbe69a6484fbcc4ff390fbb4a5f8dfa",
+        "identityFingerprint": "0f1029e387f339a3a4fb4fdf8c9d303ecfbe69a6484fbcc4ff390fbb4a5f8dfa",
+        "claimId": "claim_b29336161c4c0f8135cbc1e646ce2b16",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "89152814fa184a4e1fafedc63902ba18f8f88b7d61791f7ae7d14c16dd3d04bb",
+        "claimKind": "decision",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      }
+    ],
+    "scopeFacts": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-ADR-scope-facts.json",
+    "authority": "Brief 1 requires only re-carried tuples to change in the recorded open sets. Preserve the exact prior strict conservation scope; D remains repository-wide and strict E candidate validation remains global, so both Lead sources and their four candidate occurrences are checked. ADR-006 does not join the 35 scoped file opens. Its historical gaps are not silently imported as new scoped findings.",
+    "noGateOutputUsed": true
+  },
+  "comparisons": {
+    "filesUnknownBlocking": {
+      "expectedCount": 35,
+      "actualCount": 35,
+      "unexpected": [],
+      "missing": []
+    },
+    "claimsUnknownBlocking": {
+      "expectedCount": 2436,
+      "actualCount": 2436,
+      "unexpected": [],
+      "missing": []
+    },
+    "claimsWithoutOwnRationale": {
+      "expectedCount": 2436,
+      "actualCount": 2436,
+      "unexpected": [],
+      "missing": []
+    },
+    "registryGapsWithoutDisposition": {
+      "expectedCount": 233,
+      "actualCount": 233,
+      "unexpected": [],
+      "missing": []
+    },
+    "pendingHolds": {
+      "expectedCount": 4504,
+      "actualCount": 4504,
+      "unexpected": [],
+      "missing": []
+    },
+    "partialCarries": {
+      "expectedCount": 28,
+      "actualCount": 28,
+      "unexpected": [],
+      "missing": []
+    },
+    "identicalUnits": {
+      "expectedCount": 362,
+      "actualCount": 362,
+      "unexpected": [],
+      "missing": []
+    },
+    "candidateUnits": {
+      "expectedCount": 2716,
+      "actualCount": 2716,
+      "unexpected": [],
+      "missing": []
+    },
+    "comparatorErrors": {
+      "expectedCount": 24,
+      "actualCount": 24,
+      "unexpected": [],
+      "missing": []
+    }
+  },
+  "allThreeStrictEOutputsEqual": true,
+  "D": [
+    {
+      "priors": "both",
+      "exit": 0,
+      "fatal": 0
+    },
+    {
+      "priors": "identity",
+      "exit": 0,
+      "fatal": 0
+    },
+    {
+      "priors": "phase02",
+      "exit": 0,
+      "fatal": 0
+    }
+  ],
+  "ratchet": {
+    "clean": true,
+    "findings": [],
+    "stats": {
+      "baselineFilesCount": 994,
+      "onDiskFilesCount": 995,
+      "accountedEditsCount": 26,
+      "accountedNewFilesCount": 1,
+      "findingsCount": 0
+    }
+  },
+  "H2": "pending owner/Lead; equality is continuity proof, never attribution or approval",
+  "passed": true
+}

@@ -185,13 +185,13 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-10",
-      "successorClaimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
+      "successorClaimId": "claim_71946ae4195a82ae48ed8687182a5ba8",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_85872e0eff1738d734a4ec5551b9b4ef. Original and successor shown text are retained here; no approval carries. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Closing L11-26 Assignment citation repair: rebind target digest to current production-extractor output; source tuple/evidence and claimId unchanged; native carry and independent re-review pending. No approval carries.",
-      "shownTargetText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in\n`src/runner/dispatch/execution-contract.mjs:47` and\n`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is\nwritten by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
-      "shownTargetDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
-      "targetUnitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_85872e0eff1738d734a4ec5551b9b4ef. Original and successor shown text are retained here; no approval carries. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Closing L11-26 Assignment citation repair: rebind target digest to current production-extractor output; source tuple/evidence and claimId unchanged; native carry and independent re-review pending. No approval carries. N1 -03 current target supersedes the digest binding at 7ba806025; committed source 1b3302680be9ba9559d431cbef4c83cacca91216, native successor claim_71946ae4195a82ae48ed8687182a5ba8; independent review pending, no approval carry.",
+      "shownTargetText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in\n`src/runner/dispatch/execution-contract.mjs:47` and\n`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is\nwritten by `execution/run.mjs:569-576`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
+      "shownTargetDigest": "3a9ab1486af4fec2e01a8706a54ff99e69ffef566fc5159eccf0ea8dd8dbc2d8",
+      "targetUnitDigest": "3a9ab1486af4fec2e01a8706a54ff99e69ffef566fc5159eccf0ea8dd8dbc2d8",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"

@@ -1,0 +1,40 @@
+{
+  "authority": "Brief 1 N1 PACKAGE -03: exact approved manifest-data procedure only if reproduction fails",
+  "priorPairBoundary": "6f88f5d8e",
+  "scanCommand": [
+    "git",
+    "log",
+    "--first-parent",
+    "--no-merges",
+    "--format=%H",
+    "--name-only",
+    "6f88f5d8e..HEAD",
+    "--",
+    "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+    "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+    "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+    "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+  ],
+  "laterTrackedPlanCommitScan": [],
+  "newPairs": [],
+  "reason": "Required reproduction tests pass 67/67 with existing manifests; neither 7ba806025 nor 1b3302680 touches a tracked historical plan file. No runner commit exists yet in this turn. No manifest data or embedded checker logic changed.",
+  "manifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "502562f0aba27229878d3f5ad3a2165b23a66a15ff576b4dca0bf393507fae08",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "7bd8e281d2efbbfbbc8b40b349f2c8ddb5e9aa4d9de5a90cae286292bedfa413",
+      "byteEqualToHEAD": true
+    }
+  ],
+  "finalDeliveryRerun": {
+    "exit": 0,
+    "tests": 67,
+    "pass": 67,
+    "fail": 0,
+    "newPairs": []
+  }
+}

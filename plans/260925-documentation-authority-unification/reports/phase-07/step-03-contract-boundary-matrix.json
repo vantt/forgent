@@ -219,7 +219,7 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "src/runner/dispatch/execution-contract.mjs:47",
@@ -277,11 +277,11 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-          "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+          "fileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
           "probes": [
             {
               "command": "sha256sum docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -364,7 +364,7 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "src/runner/dispatch/assignment-runner.mjs:638-670",
@@ -434,7 +434,7 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "src/runner/dispatch/effective-execution-contract.mjs",
@@ -500,7 +500,7 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "src/runner/dispatch/agent-result-claim-contract.mjs:5",
@@ -557,7 +557,7 @@
       },
       "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "status": "compatible",
-      "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+      "statementFileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
       "evidencePins": [
         {
           "ref": "src/runner/dispatch/run-result.mjs:289-351",
@@ -587,7 +587,7 @@
         },
         {
           "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:239-333",
-          "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+          "fileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
           "probes": [
             {
               "span": "239-333",
@@ -631,7 +631,7 @@
       "evidencePins": [
         {
           "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:308-333",
-          "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+          "fileSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
           "probes": [
             {
               "span": "308-333",
