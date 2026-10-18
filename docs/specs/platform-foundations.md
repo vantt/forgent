@@ -72,6 +72,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
 - **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum trong phạm vi việc đang làm thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ; tùm lum thấy ngoài phạm vi thì ghi thành item riêng, và gom mà phải xây công cụ mới là một câu hỏi quyết định; đích là ranh giới rõ và contract tường minh (ADR0054 (thêm vế phạm vi cho RUL11 theo phát biểu của người dùng 2026-10-08, supersede ADR0036)).
+- **RUL104 (tốt hơn, không to hơn).** Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang có tốt hơn — ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn, API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn — trong phạm vi code đang có, không làm nó to ra; không thêm tính năng, lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt (L10); một tính năng chỉ được thêm khi thật sự đáng: mọi ý tưởng thêm được gom vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật, bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn (ADR0061 (khoá RUL104 theo phát biểu của owner 2026-10-18)).
 
 ## Edge Cases Settled
 
@@ -485,3 +486,28 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 - `plans/261008-1353-decision-question-template-and-cleanup/` — plan thực hiện.
 - 0036 — quyết định bị supersede.
 
+### 0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
+
+#### Bối cảnh
+
+Phát biểu của owner (2026-10-18, giữ nguyên văn làm nguồn — luật ở Business Rules là bản chưng):
+
+> "trong phạm vi code đang có (scope đang có) nếu có thể làm api và signature, contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn thì làm, tuyệt đối không mở rộng scope (scope creep), chỉ tốt hơn không bự hơn."
+
+> "Chỉ thêm tính năng nếu nó thật sự đáng, trong báo cáo gom tất cả những ý tưởng cần thêm vào một chỗ để báo cáo. Nhớ giải thích rõ lý do và lợi ích."
+
+Phát biểu ra đời khi owner giao luồng HARDEN (hội đồng soát và làm cứng các lớp tầng thấp sau khi GIT và ES land, bảng chương trình 10-18 21:27). Rủi ro nó chặn: một đợt audit thấy chỗ yếu rồi "sửa" bằng cách thêm cơ chế, cờ hay lớp mới, khiến hệ thống to thêm đúng lúc cần gọn lại; và ý tưởng tính năng lẫn vào danh sách sửa, được làm mà owner chưa chọn.
+
+#### Quyết định
+
+Khoá thành RUL104 (`docs/specs/platform-foundations.md`'s Business Rules): mọi lần audit, soát lại hay làm cứng phần đã có đều theo luật này. Được làm: sửa bug, ổn định, nhanh, nhẹ, code đơn giản, API/signature/contract rõ ràng, tường minh, dễ dùng, uyển chuyển hơn — trong phạm vi code đang có. Không được làm: tính năng, lớp, cơ chế mới. Ý tưởng thêm tính năng đi vào một mục riêng của báo cáo, mỗi ý có lý do và lợi ích, chờ owner chọn.
+
+#### Hệ quả
+
+- `AGENTS.md` có mục RUL104 (tốt hơn, không to hơn) với câu neo riêng dòng `tốt hơn, không to hơn`; `test/docs/rul104-anchor-phrase.test.mjs` khoá câu neo và chữ của luật.
+- Brief và đầu vào hội đồng của mọi đợt audit chép luật này nguyên văn.
+- Đi cùng RUL11 (tùm lum không phải nặng): luật đó gom cái tùm lum về một hình dạng; luật này giữ cho việc gom không phình ra thành việc mới.
+
+#### Tham chiếu
+
+- Bảng chương trình `plans/261017-1313-fgos-platform-program-board/plan.md`, luồng HARDEN.
