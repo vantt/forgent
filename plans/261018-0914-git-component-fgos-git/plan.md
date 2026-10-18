@@ -127,6 +127,10 @@ Parallel lanes: 02 ∥ 04; 03 ∥ 05 after 02. File ownership per phase is in ea
 
 ## Open questions for the owner
 
+**Owner answers, 2026-10-18 10:05 (Asia/Saigon).** Q1 agreed: a read-only workflow (Units without `writes`) runs outside a git repository; Inspect returns `notARepository`, a Unit with `writes` still needs a repository (closes Git spec §18 item 8; the runner change lands in phase 07 with V-CONSUMER). Q2 agreed: `fgos worktree create` ships in phase 03 before the Event Store cutover, since creating a worktree touches no event file. Q3: the owner runs the E1/P-SPACE script once with `sudo` on a loop device; phase 08 ships the script and a one-page run guide. Q4: the controller explains `e3-budgets.md` to the owner; no E3 measurement before the owner-set commit. Q5 agreed: this plan owns the cwd lease across the runner commit (phase 04); 6.4 drops its folded phase (checked 2026-10-18: nothing implemented yet; `src/run-supervisor/direct-launch.mjs` holds `dispatch-cwd` only during the attempt, `commitUnitWork` holds none). Q6 agreed: on Windows, lock-taking Git operations are refused by name (`git-lockscope-unavailable-windows`) and a follow-up item tracks the Windows LockScope handoff; no Windows workspace is activated today.
+
+The questions below are kept as asked.
+
 Each follows `core/skills/_shared/decision-question.md`. Until answered, the plan uses the recommendation marked as default.
 
 **Q1. Read-only workflow outside a git repository (spec §18 item 8).**
