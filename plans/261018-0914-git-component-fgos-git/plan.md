@@ -1,7 +1,7 @@
 ---
 title: "Git component fgos-git: implement the signed G0 spec"
 description: "Build the Rust fgos-git component behind one combined N-API addon, starting with the refs/fgos/* Publication port the Event Store consumes, then every typed port, the custody lease, and the one-release switch that deletes the three parallel Node git cores."
-status: pending
+status: in-progress
 priority: P1
 effort: 254h
 branch: main
@@ -12,6 +12,8 @@ created: 2026-10-18
 ---
 
 # Plan GIT: the fgos-git component
+
+**Approved by the owner 2026-10-18 11:44 (Asia/Saigon).** Writer machines: two, the owner machine (workspaces forgentX, mdview, mcp-skill-hub) and the second machine (`~/projects/forgent`). The third machine runs no fgOS today; if it starts, it activates the then-current release and is added to the landing list before any cutover.
 
 ## Sources (binding)
 

@@ -1,7 +1,7 @@
 ---
 title: "Event Store fgos-event-store: implement the signed D-ADR0055 spec"
 description: "Build the Rust fgos-event-store crate and its Node facade in the combined addon, publish sealed events through Git's Publication port on per-machine refs, then cut Work and porting over in one stop-everything change on every machine and workspace."
-status: pending
+status: in-progress
 priority: P1
 effort: 272h
 branch: main
@@ -12,6 +12,8 @@ created: 2026-10-18
 ---
 
 # Plan ES: the fgos-event-store component
+
+**Approved by the owner 2026-10-18 11:44 (Asia/Saigon).** Writer machines: two, the owner machine (workspaces forgentX, mdview, mcp-skill-hub) and the second machine (`~/projects/forgent`). The third machine runs no fgOS today; if it starts, it activates the then-current release and is added to the landing list before any cutover.
 
 ## Sources (binding)
 
