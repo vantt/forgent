@@ -1,5 +1,8 @@
 [workspace]
 members = [
+    "packages/canonical-json/rust",
+    "packages/event-store/rust",
+    "packages/durable-file/rust",
     "apps/fgos",
     "apps/fgctl",
     "packages/host-runtime/rust",

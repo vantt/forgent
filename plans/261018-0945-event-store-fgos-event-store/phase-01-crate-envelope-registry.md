@@ -55,10 +55,10 @@
 ```bash
 cargo test --locked -p fgos-event-store -p fgos-canonical-json -p fgos-distribution -p fgos-run-supervisor
 cargo clippy -p fgos-event-store -p fgos-canonical-json --all-targets -- -D warnings
-cargo fmt --all -- --check
-node --test test/event-store/legacy-order-parity.test.mjs
+cargo fmt -p fgos-event-store -p fgos-canonical-json -- --check
+node --test test/event-store/
 env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID -u FGOS_SESSION_ID npm test
-node scripts/event-store/v-spawn-bench.mjs --root .fgos/runtime/tmp/v-spawn-ext4 --out .fgos/runtime/tmp/v-spawn-ext4/results.json   # lane B; root must be ext4
+node scripts/event-store/v-spawn-bench.mjs --entry host --root .fgos/runtime/tmp/v-spawn-ext4/fixture --out .fgos/runtime/tmp/v-spawn-ext4/results.json   # lane B; root must be ext4
 ```
 
 Success: vectors reproduce byte for byte in Rust; legacy order equals `replay.mjs` on every fixture; baseline report exists with the commit id and filesystem type.
@@ -74,3 +74,23 @@ Success: vectors reproduce byte for byte in Rust; legacy order equals `replay.mj
 ## Rollback
 
 Additive and dormant: revert the merge. The two moved callers return to their own serializers with the revert.
+
+## Deferred one-door moves
+
+These are explicit phase-01 exceptions to requirement 2; no consumer serializer changes in unit 3. This section is the scoped tracking record (backlog and program-board files are outside this assignment).
+
+| Move | Blocker / trigger | Owner and delivery phase | Proof before completion |
+|---|---|---|---|
+| Run-supervisor adopts `fgos-canonical-json` with its existing integer/safe-range pre-walk | Running 6.3 lane owns `packages/run-supervisor`; wait until its edits land | Event Store integration lead, phase 02 prerequisite checkpoint after 6.3 releases ownership | Existing run-supervisor golden bytes/digests stay identical; unsafe/non-integer values remain refused; canonical leaf tests pass |
+| Distribution adopts the leaf under a versioned digest contract | Q1 owner condition fails: float `1.0` and non-BMP key vectors change existing digest bytes. Existing distribution serializer stays | Distribution owner, separate digest-v2 migration phase after explicit digest-version approval; not part of Event Store phases 02–09 | Recompute every installed manifest digest and float/non-BMP vectors; prove old-version verification unchanged and new-version digest behavior explicit |
+
+## Unit 3 integration handoff
+
+- Review fixes: [unit 3 report](../reports/phase-lead-261018-1207-es-p01-u3-review-fixes.md).
+- Baseline of record: [standard-door ext4 experiment](../reports/experiment-261018-1207-event-store-ext4-baseline-v-spawn.md); the earlier Node-payload measurement is retained there as historical raw evidence. Its old source-tree fixture/reproduce command and `scripts/event-store/baseline-ext4.json` are superseded.
+- Phase 02 must hold the real `event-append` lock across recovery, `StoreIdentity::sweep_temps_under_append_lock`, initialization and append. The no-overwrite hard-link publish independently prevents racing initialization from replacing an identity; a 16-thread real-filesystem test proves one winner and identical returned ids.
+- Life-long registry scope: phase 03's open/reader must call `Registry::validate_historical_scope` for every v4 event type/scope encountered in active, closed and sealed content before appending under a newly loaded registry. A registration is not evidence of its historical scope. Test: load `observe.trace` as local, persist an event, reopen with project registration and refuse `event-store-integrity`; repeat for sealed-only history. Unit 3 tests the reconciliation method across reconstructed registries; persistence/open integration belongs to phase 03.
+- Branch key mapping: lowercase ASCII alphanumeric characters; collapse every other run into `-`, trim edges, truncate to 128 ASCII bytes, trim trailing `-`, refuse an empty result. The mapping can collide; callers use the resulting stream key consistently from first append.
+- Stored v4 parse requires exactly the canonical record bytes plus one LF. Legacy raw lines remain unreformatted and verify their historical trailing-h suffix (no LF in that historical digest).
+- Layout stream directories contain literal colons (`branch:x`, `project:porting`) on the supported Linux filesystem. Identity drivers now refuse non-Linux targets. Git resolution remains phase 06.
+- Impact-analysis: inactive (zero registered providers). Package-scoped fmt replaces the phase-wide check because the unrelated pre-existing fgctl Windows test is unformatted (review L12); no out-of-scope formatter edits.

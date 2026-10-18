@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Event Store consumer type registrations v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "types"
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "domain",
+          "schemaVersion",
+          "scope",
+          "sealOnWrite"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "domain": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "not": {
+              "const": "store"
+            }
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "scope": {
+            "enum": [
+              "project",
+              "branch",
+              "local"
+            ]
+          },
+          "sealOnWrite": {
+            "type": "boolean"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "decision"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "domain": {
+                  "const": "decisions"
+                },
+                "scope": {
+                  "const": "project"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "pattern": "^work\\."
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "scope": {
+                  "const": "project"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

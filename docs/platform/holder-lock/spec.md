@@ -99,7 +99,7 @@ The borrower test used by a hook has three conditions, all required: `FGOS_LOCK_
 
 | Kind | Mechanism | Used for |
 |---|---|---|
-| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot; later observe, activation, install |
+| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot, `event-seal` (58), `event-append` (70); later observe, activation, install |
 | `lease` | Kernel lock, held for the length of a long job; may be handed to a gate | gateway, runner, dispatch cwd, full-suite; later the attempt lock, whose file lives in the run directory |
 | `hot-mutex` | link-created record for the fast path; the row's kernel lock (`<resource>.reclaim.lock`) only serialises cleanup of a dead holder's record (section 15) | `state`, `porting-events` |
 | `beacon` | Not a lock | the main-checkout activity file (read by the hook only when the commit is not a borrower, section 14) |
@@ -110,7 +110,9 @@ Run control is not a kind: its ledger and CAS stay as they are, with no garbage 
 
 [`packages/holder-lock/contracts/lock-registry.v1.json`](../../../packages/holder-lock/contracts/lock-registry.v1.json) (schema [`lock-registry.schema.v1.json`](../../../packages/holder-lock/contracts/lock-registry.schema.v1.json)) is the only list of which locks exist, in which order they may be taken, and which fence the cutover places for them. Rust and Node read the same file; the Node facade resolves the path templates (`<fgosDir>`, `<lockRoot>`, `<runDir>`, `<workflowRunDir>`).
 
-One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
+`<eventOpenRoot>` is the resolved Git common directory plus `fgos/events`; Event Store owns its two repo mutexes, `event-seal` (58) and `event-append` (70), at `<eventOpenRoot>/locks/<name>.lock`. Both have no legacy shape/path and fence `none`. Only Rust resolves this template; Node refuses these rows with `lock-not-node-owned`. Append is released before Git calls; seal is never taken inside the Work gate.
+
+One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
 
 Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
@@ -123,7 +125,9 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 40 | `worktree-admin` | mutex |
 | 50 | `main-checkout` | mutex |
 | 55 | git's own `index.lock`: outside fgOS, no row; the hook tries rank 50 once | — |
+| 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
+| 70 | `event-append` | mutex |
 | 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `observe`, `activation`, `install` | mutex, lease |
 
 Locks cut over by this track: `gateway`, `runner`, `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.

@@ -124,6 +124,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-canonical-json"
+version = "0.2.0"
+dependencies = [
+ "ryu-js",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-convention"
 version = "0.2.0"
 dependencies = [
@@ -148,6 +157,28 @@ dependencies = [
  "thiserror",
  "tokio",
  "unicode-normalization",
+]
+
+[[package]]
+name = "fgos-durable-file"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "windows-sys",
+]
+
+[[package]]
+name = "fgos-event-store"
+version = "0.2.0"
+dependencies = [
+ "fgos-canonical-json",
+ "fgos-distribution",
+ "fgos-durable-file",
+ "fgos-holder-lock",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
 ]
 
 [[package]]
@@ -383,6 +414,12 @@ name = "ryu"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
+
+[[package]]
+name = "ryu-js"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd29631678d6fb0903b69223673e122c32e9ae559d0960a38d574695ebc0ea15"
 
 [[package]]
 name = "serde"

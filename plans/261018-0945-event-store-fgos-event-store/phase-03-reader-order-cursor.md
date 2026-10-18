@@ -26,6 +26,9 @@
 9. **Provisional success.** The reader reports concurrency (events whose writer had not seen each other); it never picks a winner (the reducer rule is Work's, phase 09).
 10. **Model re-check.** Extract the corrected model's Python source from the report into `packages/event-store/proofs/model/` unchanged, add the two unchecked rules (promote placement, in-gate bound) and run it; the run is a `fable` architecture unit; its report goes through `fgos convention path --kind report --type experiment --slug event-store-model-check-promote-ingate`.
 
+
+- **P02 review L5 — lost local receipt and hint.** Cross-check the own ref tip outside the Work gate when locally recovered high is zero and active starts at seq 1 on a stream with an existing ref. Rebuild coverage/receipt through the shared ref walk before allowing sequence reuse; test simultaneous loss of `sealed.json` and `hwm.json` after closed-segment deletion. A local zero must never silently restart a published stream.
+
 ## Files
 
 | Action | File |
