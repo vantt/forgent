@@ -504,7 +504,7 @@ fn repeated_identical_objects_have_the_same_commit_and_explicit_last_event_date(
     let mut h = match fgos_holder_lock::acquire(
         &fgos_holder_lock::Resource::new("event-seal", r.layout.seal_lock()),
         fgos_holder_lock::Mode::Ex,
-        fgos_holder_lock::Wait::Try,
+        fgos_holder_lock::Wait::Ms(5000),
         2000,
     ) {
         fgos_holder_lock::Acquire::Acquired(h) => h,
@@ -590,7 +590,7 @@ fn altered_published_blob_stops_with_durable_integrity_evidence_and_deletes_noth
     let mut h = match fgos_holder_lock::acquire(
         &fgos_holder_lock::Resource::new("event-seal", r.layout.seal_lock()),
         fgos_holder_lock::Mode::Ex,
-        fgos_holder_lock::Wait::Try,
+        fgos_holder_lock::Wait::Ms(5000),
         2000,
     ) {
         fgos_holder_lock::Acquire::Acquired(h) => h,
@@ -809,7 +809,7 @@ fn pre_epoch_event_seals_with_epoch_date_and_identical_retry() {
     let mut guard = match fgos_holder_lock::acquire(
         &fgos_holder_lock::Resource::new("event-seal", r.layout.seal_lock()),
         fgos_holder_lock::Mode::Ex,
-        fgos_holder_lock::Wait::Try,
+        fgos_holder_lock::Wait::Ms(5000),
         2000,
     ) {
         fgos_holder_lock::Acquire::Acquired(h) => h,
