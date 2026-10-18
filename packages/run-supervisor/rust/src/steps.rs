@@ -102,11 +102,11 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
 /// The `release-slot` builtin: `terminal-control.release(key, close | retain)`.
 /// `kept-unknown` leaves the step without a receipt, so adopt tries again.
 fn release_slot(envelope: &Value, run_dir: &Path, earlier_steps_done: bool) -> Result<Option<Value>, StepFailure> {
-    use crate::terminal_slot::{disposition_for, release, Backend, ReleaseFailure};
+    use crate::terminal_slot::{disposition_for, release, retain_window, Backend, ReleaseFailure};
     let key = envelope["slot"]["key"].as_str().ok_or_else(|| StepFailure::Failed("release-slot needs envelope.slot.key".into()))?;
     let receipt: Option<Value> = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|text| serde_json::from_str(&text).ok());
     let disposition = disposition_for(receipt.as_ref(), earlier_steps_done);
-    match release(&Backend::from_env(run_dir), key, disposition) {
+    match release(&Backend::from_env(run_dir), key, disposition, retain_window(envelope)) {
         Ok(detail) => Ok(Some(detail)),
         Err(ReleaseFailure::Retry(reason)) => Err(StepFailure::Retry(reason)),
         Err(ReleaseFailure::Unsupported(reason)) => Err(StepFailure::Failed(format!("terminal-mode-unsupported: {reason}"))),

@@ -218,7 +218,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     createdAt: boottimeNow(),
     ...(terminal ? {
       slot: { key: attemptId, groupKey: terminal.groupKey },
-      terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs },
+      terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs, ...(terminal.retainFailedPaneMs !== undefined ? { retainFailedPaneMs: terminal.retainFailedPaneMs } : {}) },
     } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile } : {}),
   };

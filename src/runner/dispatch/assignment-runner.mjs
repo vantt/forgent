@@ -101,6 +101,7 @@ import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin } from './terminal-slot.mjs';
+import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
@@ -2416,6 +2417,7 @@ export async function executeAssignment(assignment, opts = {}) {
               socketPath: terminalSocket,
               exitCommand: resolvedCmd.interactiveMode?.exitCommand ?? null,
               orphanSettleMs: ORPHAN_SETTLE_MS,
+              retainFailedPaneMs: retainFailedPaneMsOf(root),
               briefPath: terminalPrep.briefPath,
               outboxDir: terminalPrep.outboxDir,
               groupKey: terminalPrep.slot.groupKey,

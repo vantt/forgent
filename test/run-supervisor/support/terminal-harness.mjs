@@ -216,7 +216,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
         for (const entry of entries) {
           if (!entry.isDirectory()) continue;
           const child = path.join(dir, entry.name);
-          if (path.basename(dir) === 'runs') found.push(child); else walk(child);
+          // An attempt directory is `runs/NN`; admission builds it under a staging name first.
+          if (path.basename(dir) === 'runs') { if (/^\d{2}$/.test(entry.name)) found.push(child); } else walk(child);
         }
       };
       walk(root);
@@ -249,7 +250,9 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       } catch { /* no pane was ever started */ }
       for (const pid of project.agentStarts()) { try { process.kill(pid, 'SIGKILL'); } catch { /* gone */ } }
       server.close();
-      fs.rmSync(scratch, { recursive: true, force: true });
+      // FGOS_KEEP_TEST_FIXTURES=1 keeps the project for a look at what a failed run left.
+      if (process.env.FGOS_KEEP_TEST_FIXTURES) process.stderr.write(`kept terminal test project: ${scratch} (${outside})\n`);
+      else fs.rmSync(scratch, { recursive: true, force: true });
     },
   };
   project.setVerdict('idle');

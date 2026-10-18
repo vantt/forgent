@@ -258,3 +258,31 @@ test('the brief a reviewer reads says its claim needs assessment.verdict; the pr
     assert.doesNotMatch(fs.readFileSync(path.join(dir, 'run-producer', 'brief-1.md'), 'utf8'), /assessment\.verdict/);
   } finally { fake.cleanup(); }
 });
+
+test('a controller that died after the allocation leaves the pane alone; the reconcile scan reports it and nobody closes it', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    await seat({ dir, fake, name: 'orphan', groupKey: 'g-orphan' });
+    // The controller is gone: nothing was handed over, nothing launches, nothing releases.
+    const tc = createTerminalControl({ herdrBin: fake.herdrBin, config: { allocationGraceMs: 0 } });
+    const scan = tc.reconcileScan({ olderThanMs: 0 });
+    assert.equal(scan.result, 'scan');
+    assert.ok(scan.findings.some((f) => f.key === 'cmd_orphan' && f.kind === 'allocated-not-launched-bare-shell'), JSON.stringify(scan.findings));
+    assert.deepEqual(fake.closedPaneIds(), [], 'nobody closes a pane because time passed');
+    assert.equal(tc.inspect({ key: 'cmd_orphan' }).pane, 'live');
+  } finally { fake.cleanup(); }
+});
+
+test('a controller that fails before the handover gives the pane back and takes the trust entry out again', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    const work = path.join(dir, 'work');
+    fs.mkdirSync(work);
+    const storePath = claudeStore(dir, dir);
+    const seated = await seat({ dir, fake, name: 'abandon', groupKey: 'g-abandon', cwd: work, trustStore: { kind: 'claude-json', path: storePath } });
+    assert.deepEqual(trusted(storePath), [dir, work].sort());
+    await seated.abandon();
+    assert.deepEqual(fake.closedPaneIds(), ['mock-pane-1'], 'the pane it opened is closed, by its key');
+    assert.deepEqual(trusted(storePath), [dir], 'the entry it wrote is gone');
+  } finally { fake.cleanup(); }
+});

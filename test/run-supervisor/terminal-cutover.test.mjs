@@ -37,6 +37,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   const envelope = readJson(path.join(attemptDir, 'envelope.json'));
   assert.equal(envelope.mode, 'terminal');
   assert.equal(envelope.slot.key, envelope.attemptId);
+  assert.equal(envelope.terminal.retainFailedPaneMs, null, 'the configured retain window travels with the attempt (the default keeps a failed pane until a person closes it)');
   assert.equal(envelope.agentProtocol.cli, 'claude');
   assert.deepEqual(envelope.steps.map((s) => s.stepId), ['settle-attempt', 'finalize-home', 'cleanup-trust', 'release-slot']);
   assert.equal(envelope.identity.writerId, `att-${envelope.attemptId}`);
