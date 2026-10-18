@@ -228,7 +228,7 @@ impl Run {
             .output()
             .unwrap();
         assert_eq!(out.status.code(), Some(0), "adopt exits 0");
-        String::from_utf8_lossy(&out.stdout).lines().filter_map(|l| serde_json::from_str::<Value>(l).ok()).last().expect("one adopt line")
+        String::from_utf8_lossy(&out.stdout).lines().filter_map(|l| serde_json::from_str::<Value>(l).ok()).next_back().expect("one adopt line")
     }
 }
 

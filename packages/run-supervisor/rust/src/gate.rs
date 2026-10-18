@@ -357,6 +357,21 @@ pub(crate) fn publish_gate_exit(config: &Config, exit_code: Value, signal: Value
     Ok(())
 }
 
+/// Replace the content of an existing regular file, never through a symlink, and make it durable.
+fn write_in_place(target: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut options = fs::OpenOptions::new();
+    options.write(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW);
+    }
+    let mut file = options.open(target)?;
+    file.write_all(bytes)?;
+    file.sync_all()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -379,19 +394,4 @@ mod tests {
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e"])), Err(ArgsError::Usage(_))));
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "5", "--go-socket", "p"])), Err(ArgsError::Usage(_))));
     }
-}
-
-/// Replace the content of an existing regular file, never through a symlink, and make it durable.
-fn write_in_place(target: &Path, bytes: &[u8]) -> std::io::Result<()> {
-    use std::io::Write;
-    let mut options = fs::OpenOptions::new();
-    options.write(true).truncate(true);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW);
-    }
-    let mut file = options.open(target)?;
-    file.write_all(bytes)?;
-    file.sync_all()
 }

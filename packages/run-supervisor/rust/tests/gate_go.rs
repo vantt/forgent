@@ -71,7 +71,7 @@ fn a_correct_go_runs_the_agent_and_reports_its_tuple() {
     let attempt = Attempt::new("ok", &options);
     let mut gate = start_gate(&*driver, &attempt, None);
     let agent = start_agent(&mut gate, &attempt);
-    assert_eq!(agent["tuple"]["pid"].as_u64().is_some(), true);
+    assert!(agent["tuple"]["pid"].as_u64().is_some());
     assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), 0);
     assert!(agent_marker.exists());
     assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
