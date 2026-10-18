@@ -264,6 +264,7 @@
     "src/setup/instruction-composition.mjs": "infra",
     "src/setup/instruction-projections.mjs": "infra",
     "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/unit-control.mjs": "infra",
     "src/runner/execution/bind.mjs": "infra",
     "src/runner/execution/account-pin.mjs": "infra",
     "src/runner/execution/account-rotation.mjs": "infra",
