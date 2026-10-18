@@ -174,6 +174,7 @@ dependencies = [
  "fgos-canonical-json",
  "fgos-distribution",
  "fgos-durable-file",
+ "fgos-git",
  "fgos-holder-lock",
  "serde",
  "serde_json",

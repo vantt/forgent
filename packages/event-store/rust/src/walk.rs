@@ -1,0 +1,301 @@
+//! Complete certified-commit walk through Git's typed Inspect port.
+use crate::{
+    append::Positions,
+    envelope::{sha256, Envelope, Scope, Seal},
+    errors::{invalid, Error, ErrorCode},
+    layout::StreamId,
+    open_read::decode,
+};
+use fgos_git::{Inspect, Oid, PathValue, RepoHandle, WalkBounds};
+use std::collections::{BTreeMap, BTreeSet};
+pub(crate) fn git_error(e: fgos_git::OperationError) -> Error {
+    Error::new(ErrorCode::EventStoreIo, format!("Git: {}", e.cause))
+}
+pub fn blob(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    oid: &Oid,
+    path: &[u8],
+) -> Result<Option<Vec<u8>>, Error> {
+    let mut values = port
+        .read_paths_at(repo, oid, &[path.to_vec()], 32 * 1024 * 1024)
+        .map_err(git_error)?;
+    match values
+        .pop()
+        .ok_or_else(|| invalid("missing path observation"))?
+        .value
+    {
+        PathValue::Blob(b) => Ok(Some(b)),
+        PathValue::Absent => Ok(None),
+        PathValue::Error(e) => Err(git_error(e)),
+        PathValue::NotABlob(_) => Err(invalid("expected blob")),
+    }
+}
+pub fn header(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<Seal, Error> {
+    let bytes = blob(port, repo, oid, b"seal.json")?
+        .ok_or_else(|| Error::new(ErrorCode::EventStoreGap, "seal.json missing"))?;
+    parse_header(&bytes)
+}
+fn parse_header(bytes: &[u8]) -> Result<Seal, Error> {
+    let seal: Seal = serde_json::from_slice(bytes).map_err(|e| invalid(e.to_string()))?;
+    if seal.canonical_line()? != bytes {
+        return Err(invalid("noncanonical seal"));
+    }
+    Ok(seal)
+}
+#[derive(Debug, Default)]
+pub struct Walked {
+    pub events: Vec<Envelope>,
+    pub published: Positions,
+    pub visited: BTreeSet<String>,
+}
+/// Never mutates supplied coverage/certificates, including on an error after
+/// several successful pages. Git owns traversal, stops and object decoding.
+pub fn walk(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tips: &[Oid],
+    cover: &Positions,
+    certified: &BTreeSet<String>,
+) -> Result<Walked, Error> {
+    walk_inner(port, repo, tips, cover, certified, None)
+}
+pub fn walk_verified(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tip: &Oid,
+    cover: &Positions,
+    certified: &BTreeSet<String>,
+    machine: &str,
+    scope: Scope,
+) -> Result<Walked, Error> {
+    walk_inner(
+        port,
+        repo,
+        std::slice::from_ref(tip),
+        cover,
+        certified,
+        Some((machine, scope)),
+    )
+}
+fn walk_inner(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tips: &[Oid],
+    cover: &Positions,
+    certified: &BTreeSet<String>,
+    identity: Option<(&str, Scope)>,
+) -> Result<Walked, Error> {
+    let mut scopes: BTreeMap<String, Scope> = tips
+        .iter()
+        .map(|o| {
+            (
+                o.as_str().into(),
+                identity.map(|i| i.1).unwrap_or(Scope::Project),
+            )
+        })
+        .collect();
+    let stops = certified
+        .iter()
+        .map(|s| Oid::parse(s, repo.object_format()).map_err(|e| invalid(e.to_string())))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut cursor = None;
+    let mut out = Walked::default();
+    loop {
+        let page = port
+            .walk_commits(
+                repo,
+                tips,
+                &stops,
+                cursor,
+                WalkBounds {
+                    max_commits: 256,
+                    max_bytes: 4 * 1024 * 1024,
+                },
+            )
+            .map_err(git_error)?;
+        for commit in page.commits {
+            if !out.visited.insert(commit.oid.as_str().into()) {
+                continue;
+            }
+            if certified.contains(commit.oid.as_str()) && identity.is_none() {
+                continue;
+            }
+            let paths = if certified.contains(commit.oid.as_str()) {
+                vec![b"seal.json".to_vec()]
+            } else {
+                vec![b"seal.json".to_vec(), b"events.jsonl".to_vec()]
+            };
+            let mut observed = port
+                .read_paths_at(repo, &commit.oid, &paths, 32 * 1024 * 1024)
+                .map_err(git_error)?
+                .into_iter();
+            let seal = match observed.next().map(|p| p.value) {
+                Some(PathValue::Blob(bytes)) => parse_header(&bytes)?,
+                Some(PathValue::Error(e)) => return Err(git_error(e)),
+                _ => return Err(Error::new(ErrorCode::EventStoreGap, "seal.json missing")),
+            };
+            let scope = scopes
+                .get(commit.oid.as_str())
+                .copied()
+                .unwrap_or(Scope::Project);
+            if let Some((machine, _)) = identity {
+                verify_tip(&seal, machine, scope)?;
+            }
+            if certified.contains(commit.oid.as_str()) {
+                continue;
+            }
+            let mut promoted = false;
+            match seal {
+                Seal::Seal {
+                    origin,
+                    stream,
+                    scope,
+                    first_seq,
+                    last_seq,
+                    count,
+                    sha256: hash,
+                    ..
+                } => {
+                    out.published
+                        .entry(format!("{origin}:{stream}"))
+                        .and_modify(|n| *n = (*n).max(last_seq))
+                        .or_insert(last_seq);
+                    let bytes = match observed.next().map(|p| p.value) {
+                        Some(PathValue::Blob(bytes)) => bytes,
+                        Some(PathValue::Error(e)) => return Err(git_error(e)),
+                        _ => return Err(invalid("seal events missing")),
+                    };
+                    if sha256(&bytes) != hash {
+                        return Err(Error::new(
+                            ErrorCode::EventStoreSealMismatch,
+                            "segment digest mismatch",
+                        ));
+                    }
+                    let framed = decode(&bytes, &origin, &StreamId::parse(&stream)?, true)
+                        .map_err(|e| Error::new(ErrorCode::EventStoreRefTampered, e.to_string()))?;
+                    if framed.events.first().map(|e| e.seq) != Some(first_seq)
+                        || framed.events.last().map(|e| e.seq) != Some(last_seq)
+                        || framed.events.len() as u64 != count
+                        || framed.events.iter().any(|e| e.scope != scope)
+                    {
+                        return Err(Error::new(
+                            ErrorCode::EventStoreRefTampered,
+                            "seal/event identity, scope or range mismatch",
+                        ));
+                    }
+                    if commit.parents.len() > 1 {
+                        promoted = framed.events.iter().any(|e| {
+                            e.event_type == "store.promote"
+                                && e.payload["tip"].as_str() == Some(commit.parents[1].as_str())
+                        });
+                        if identity.is_some()
+                            && (!promoted || scope != Scope::Project || commit.parents.len() != 2)
+                        {
+                            return Err(Error::new(
+                                ErrorCode::EventStoreRefTampered,
+                                "invalid promote ancestry",
+                            ));
+                        }
+                    }
+                    let high = cover
+                        .get(&format!("{origin}:{stream}"))
+                        .copied()
+                        .unwrap_or(0);
+                    out.events
+                        .extend(framed.events.into_iter().filter(|e| e.seq > high));
+                }
+                Seal::Merge { parents, .. } => {
+                    if commit
+                        .parents
+                        .iter()
+                        .map(|p| p.as_str())
+                        .collect::<Vec<_>>()
+                        != parents.iter().map(String::as_str).collect::<Vec<_>>()
+                    {
+                        return Err(invalid("merge parent mismatch"));
+                    }
+                }
+                Seal::Legacy { .. } => return Err(invalid("legacy ref passed to event walk")),
+            }
+            for (index, parent) in commit.parents.iter().enumerate() {
+                let expected = if promoted && index == 1 {
+                    Scope::Branch
+                } else {
+                    scope
+                };
+                if scopes
+                    .insert(parent.as_str().into(), expected)
+                    .is_some_and(|old| old != expected)
+                    && identity.is_some()
+                {
+                    return Err(Error::new(
+                        ErrorCode::EventStoreRefTampered,
+                        "ancestor reached through incompatible scopes",
+                    ));
+                }
+            }
+        }
+        if page.complete {
+            break;
+        }
+        cursor = Some(
+            page.next_cursor
+                .ok_or_else(|| invalid("incomplete walk without continuation"))?,
+        );
+    }
+    if identity.is_none() {
+        check_contiguous(&out.events, cover)?;
+    }
+    Ok(out)
+}
+pub fn check_contiguous(events: &[Envelope], base: &Positions) -> Result<(), Error> {
+    let mut streams: BTreeMap<String, BTreeMap<u64, String>> = BTreeMap::new();
+    for e in events {
+        let s = streams.entry(crate::order::stream_key(e)).or_default();
+        if s.insert(e.seq, e.h.clone()).is_some_and(|h| h != e.h) {
+            return Err(Error::new(
+                ErrorCode::EventStoreSeqConflict,
+                "conflicting stream position",
+            ));
+        }
+    }
+    for (s, positions) in streams {
+        let mut high = base.get(&s).copied().unwrap_or(0);
+        for seq in positions
+            .keys()
+            .copied()
+            .filter(|n| *n > high)
+            .collect::<Vec<_>>()
+        {
+            if high.checked_add(1) != Some(seq) {
+                return Err(Error::new(
+                    ErrorCode::EventStoreGap,
+                    format!("hole in {s} after {high}"),
+                ));
+            }
+            high = seq;
+        }
+    }
+    Ok(())
+}
+/// Authenticate each commit against its ref and promote-parent traversal context.
+pub fn verify_tip(seal: &Seal, machine: &str, scope: Scope) -> Result<(), Error> {
+    let valid = match seal {
+        Seal::Seal {
+            machine_id,
+            scope: s,
+            ..
+        } => machine_id == machine && *s == scope,
+        Seal::Merge { machine_id, .. } => machine_id == machine && scope == Scope::Project,
+        Seal::Legacy { .. } => false,
+    };
+    if valid {
+        Ok(())
+    } else {
+        Err(Error::new(
+            ErrorCode::EventStoreRefTampered,
+            "tip machine/scope differs from ref",
+        ))
+    }
+}

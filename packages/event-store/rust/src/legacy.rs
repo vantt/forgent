@@ -16,6 +16,7 @@ pub struct LegacyEvent {
     pub raw: String,
     pub provenance: Provenance,
     timestamp: String,
+    sort_file: String,
 }
 impl LegacyEvent {
     /// Verify the raw historical suffix without re-encoding the event.
@@ -83,6 +84,7 @@ pub fn parse_file(file: &str, raw: &str) -> Result<Vec<LegacyEvent>, Error> {
             }
             let parsed = LegacyEvent {
                 timestamp: event["ts"].as_str().unwrap().to_owned(),
+                sort_file: file.to_owned(),
                 event,
                 raw: line.to_owned(),
                 provenance: Provenance {
@@ -102,12 +104,7 @@ pub fn order(mut events: Vec<LegacyEvent>) -> Vec<LegacyEvent> {
         a.timestamp
             .encode_utf16()
             .cmp(b.timestamp.encode_utf16())
-            .then_with(|| {
-                a.provenance
-                    .file
-                    .encode_utf16()
-                    .cmp(b.provenance.file.encode_utf16())
-            })
+            .then_with(|| a.sort_file.encode_utf16().cmp(b.sort_file.encode_utf16()))
             .then_with(|| {
                 let seq =
                     |e: &LegacyEvent| e.event.get("seq").and_then(Value::as_f64).unwrap_or(0.0);

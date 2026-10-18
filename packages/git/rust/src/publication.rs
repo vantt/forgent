@@ -7,7 +7,7 @@ use crate::wal::{
 };
 use crate::*;
 use fgos_holder_lock::Handle;
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -677,86 +677,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .map_err(|e| self.pending_error(repo, id, i, werr(e)))?;
         self.finish(repo, &terminal)
     }
-    fn commit_batch(
-        &self,
-        repo: &RepoHandle,
-        seeds: &[String],
-        stop: &BTreeSet<&str>,
-        count: usize,
-        byte_budget: usize,
-    ) -> Result<BTreeMap<String, Vec<u8>>> {
-        let mut revisions = seeds.join("\n");
-        revisions.push('\n');
-        for oid in stop {
-            revisions.push('^');
-            revisions.push_str(oid);
-            revisions.push('\n');
-        }
-        let limit = format!("--max-count={}", count.min(256));
-        let revisions = self.call(repo, &["rev-list", &limit, "--stdin"], revisions.as_bytes())?;
-        let mut seen = BTreeSet::new();
-        let ids: Vec<String> = seeds
-            .iter()
-            .cloned()
-            .chain(text(&revisions)?.lines().map(str::to_owned))
-            .filter(|id| seen.insert(id.clone()))
-            .collect();
-        let input = format!("{}\n", ids.join("\n"));
-        let headers = self.call(repo, &["cat-file", "--batch-check"], input.as_bytes())?;
-        let mut selected = Vec::new();
-        let mut remaining = byte_budget;
-        let lines: Vec<_> = text(&headers)?.lines().collect();
-        if lines.len() != ids.len() {
-            return Err(err("invalid-batch-headers"));
-        }
-        for (n, (oid, header)) in ids.iter().zip(lines).enumerate() {
-            let fields: Vec<_> = header.split(' ').collect();
-            if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
-                if n == 0 {
-                    return Err(err("commit-missing-or-invalid"));
-                }
-                continue; // Future reads remain subject to their own page.
-            }
-            let size: usize = fields[2].parse().map_err(|_| err("invalid-object-size"))?;
-            if size <= remaining {
-                selected.push(oid.clone());
-                remaining -= size;
-            } else if n == 0 {
-                return Ok(BTreeMap::new());
-            }
-        }
-        let ids = selected;
-        let input = format!("{}\n", ids.join("\n")).into_bytes();
-        let bytes = self.call(repo, &["cat-file", "--batch"], &input)?;
-        let mut at = 0;
-        let mut objects = BTreeMap::new();
-        for oid in ids {
-            let end = bytes[at..]
-                .iter()
-                .position(|b| *b == b'\n')
-                .ok_or_else(|| err("invalid-object-header"))?
-                + at;
-            let fields: Vec<_> = text(&bytes[at..end])?.split(' ').collect();
-            if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
-                return Err(err("commit-missing-or-invalid"));
-            }
-            let size: usize = fields[2].parse().map_err(|_| err("invalid-object-size"))?;
-            let start = end + 1;
-            let end = start
-                .checked_add(size)
-                .filter(|e| *e < bytes.len())
-                .ok_or_else(|| err("invalid-object-size"))?;
-            if bytes[end] != b'\n' {
-                return Err(err("invalid-object-size"));
-            }
-            objects.insert(oid, bytes[start..end].to_vec());
-            at = end + 1;
-        }
-        if at != bytes.len() {
-            return Err(err("unexpected-batch-output"));
-        }
-        Ok(objects)
-    }
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
         let wal = self.wal(repo)?;
@@ -961,34 +881,7 @@ fn identity(i: &Identity, date: &str) -> Result<String> {
     }
     Ok(format!("{} <{}> {date}", i.name, i.email))
 }
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Cursor {
-    binding: String,
-    pending: VecDeque<String>,
-    visited: BTreeSet<String>,
-}
-
 impl<F: FileSystem> Publication for PublicationPort<'_, F> {
-    fn list_refs(
-        &self,
-        repo: &RepoHandle,
-        prefixes: &[RefPrefix],
-        cursor: Option<RefCursor>,
-        max_entries: usize,
-    ) -> Result<RefPage> {
-        Inspect::list_refs(self.driver, repo, prefixes, cursor, max_entries)
-    }
-    fn read_paths_at(
-        &self,
-        repo: &RepoHandle,
-        revision: &Oid,
-        paths: &[Vec<u8>],
-        max_blob_bytes: usize,
-    ) -> Result<Vec<PathRead>> {
-        Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)
-    }
-
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
         self.object_write(repo, "blob", bytes)
     }
@@ -1134,139 +1027,6 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         Ok(ReadObject::Present {
             kind: expected_type,
             bytes: bytes[end + 1..bytes.len() - 1].to_vec(),
-        })
-    }
-    fn walk_commits(
-        &self,
-        repo: &RepoHandle,
-        tips: &[Oid],
-        stop: &[Oid],
-        cursor: Option<WalkCursor>,
-        bounds: WalkBounds,
-    ) -> Result<WalkPage> {
-        if bounds.max_commits == 0
-            || bounds.max_commits > 100_000
-            || bounds.max_bytes == 0
-            || bounds.max_bytes > 64 * 1024 * 1024
-        {
-            return Err(err("invalid-walk-bounds"));
-        }
-        for o in tips.iter().chain(stop) {
-            self.check_oid(repo, o)?;
-        }
-        let binding = wal::canonical_digest(&(
-            tips.iter().map(Oid::as_str).collect::<Vec<_>>(),
-            stop.iter().map(Oid::as_str).collect::<Vec<_>>(),
-            &self.authority.repo_identity,
-        ))
-        .map_err(werr)?;
-        let mut c: Cursor = match cursor {
-            Some(c) if c.0.len() <= 64 * 1024 * 1024 => {
-                serde_json::from_slice(&c.0).map_err(|_| err("invalid-walk-cursor"))?
-            }
-            Some(_) => return Err(err("walk-cursor-overflow")),
-            None => Cursor {
-                binding: binding.clone(),
-                pending: tips.iter().map(|o| o.as_str().into()).collect(),
-                visited: BTreeSet::new(),
-            },
-        };
-        if c.binding != binding {
-            return Err(err("walk-cursor-request-mismatch"));
-        }
-        let stop: BTreeSet<_> = stop.iter().map(Oid::as_str).collect();
-        let shallow: BTreeSet<String> = if repo.layout.shallow {
-            fs::read_to_string(repo.common_dir().join("shallow"))
-                .map_err(|e| err(e.to_string()))?
-                .lines()
-                .map(str::to_owned)
-                .collect()
-        } else {
-            BTreeSet::new()
-        };
-        let mut commits = vec![];
-        let mut cached = BTreeMap::new();
-        let mut total = 0;
-        while let Some(o) = c.pending.pop_front() {
-            if c.visited.contains(&o) {
-                continue;
-            }
-            let oid =
-                Oid::parse(&o, repo.object_format()).map_err(|_| err("invalid-cursor-oid"))?;
-            if !cached.contains_key(&o) {
-                let mut seeds = vec![o.clone()];
-                let count = bounds.max_commits - commits.len();
-                seeds.extend(c.pending.iter().take(count.min(256) - 1).cloned());
-                cached = self.commit_batch(repo, &seeds, &stop, count, bounds.max_bytes - total)?;
-            }
-            let Some(bytes) = cached.remove(&o) else {
-                if commits.is_empty() {
-                    return Err(err("walk-commit-exceeds-byte-bound"));
-                }
-                c.pending.push_front(o);
-                break;
-            };
-            if total + bytes.len() > bounds.max_bytes {
-                if commits.is_empty() {
-                    return Err(err("walk-commit-exceeds-byte-bound"));
-                }
-                c.pending.push_front(o);
-                break;
-            }
-            let header = bytes
-                .windows(2)
-                .position(|w| w == b"\n\n")
-                .ok_or_else(|| err("invalid-commit"))?;
-            let mut tree = None;
-            let mut parents = vec![];
-            for l in bytes[..header].split(|b| *b == b'\n') {
-                if let Some(v) = l.strip_prefix(b"tree ") {
-                    if tree.is_some() {
-                        return Err(err("invalid-commit-tree"));
-                    }
-                    tree = Some(self.oid(repo, v)?);
-                }
-                if let Some(v) = l.strip_prefix(b"parent ") {
-                    parents.push(self.oid(repo, v)?);
-                }
-            }
-            if !stop.contains(o.as_str()) {
-                if shallow.contains(&o) {
-                    return Err(err("shallow-history-incomplete"));
-                }
-                for p in &parents {
-                    if !c.visited.contains(p.as_str()) {
-                        c.pending.push_back(p.as_str().into());
-                    }
-                }
-            }
-            total += bytes.len();
-            c.visited.insert(o);
-            commits.push(WalkCommit {
-                oid,
-                parents,
-                tree: tree.ok_or_else(|| err("invalid-commit-tree"))?,
-            });
-            if commits.len() == bounds.max_commits {
-                break;
-            }
-        }
-        // Remove duplicate queued entries before declaring completion.
-        c.pending.retain(|o| !c.visited.contains(o));
-        let complete = c.pending.is_empty();
-        let next_cursor = if complete {
-            None
-        } else {
-            let bytes = serde_json::to_vec(&c).map_err(|_| err("invalid-walk-cursor"))?;
-            if bytes.len() > 64 * 1024 * 1024 {
-                return Err(err("walk-cursor-overflow"));
-            }
-            Some(WalkCursor(bytes))
-        };
-        Ok(WalkPage {
-            commits,
-            next_cursor,
-            complete,
         })
     }
     fn compare_and_swap(
@@ -1807,5 +1567,75 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         }
         wal.compact(&chain, &BoundReader { port: self, repo }, &self.authority)
             .map_err(werr)
+    }
+}
+
+impl<F: FileSystem> Inspect for PublicationPort<'_, F> {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
+        Inspect::resolve_head(self.driver, repo)
+    }
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage> {
+        Inspect::list_tree(self.driver, repo, revision, prefix, cursor, max_entries)
+    }
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage> {
+        Inspect::list_refs(self.driver, repo, prefixes, cursor, max_entries)
+    }
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>> {
+        Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)
+    }
+
+    fn walk_commits(
+        &self,
+        repo: &RepoHandle,
+        tips: &[Oid],
+        stop: &[Oid],
+        cursor: Option<WalkCursor>,
+        bounds: WalkBounds,
+    ) -> Result<WalkPage> {
+        Inspect::walk_commits(self.driver, repo, tips, stop, cursor, bounds)
+    }
+    fn configured_fetch_refspecs(&self, r: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>> {
+        Inspect::configured_fetch_refspecs(self.driver, r, remote)
+    }
+    fn push_refspecs(&self, r: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>> {
+        Inspect::push_refspecs(self.driver, r, remote)
+    }
+    fn remote_url(&self, r: &RepoHandle, remote: &str) -> Result<String> {
+        Inspect::remote_url(self.driver, r, remote)
+    }
+    fn machine_id(&self, r: &RepoHandle) -> Result<Option<ConfigFact>> {
+        Inspect::machine_id(self.driver, r)
+    }
+    fn git_floor_verdict(&self) -> Result<GitFloorVerdict> {
+        Inspect::git_floor_verdict(self.driver)
+    }
+    fn fetch_mapping_provenance(
+        &self,
+        r: &RepoHandle,
+        remote: &str,
+    ) -> Result<Option<FetchMappingProvenance>> {
+        Inspect::fetch_mapping_provenance(self.driver, r, remote)
+    }
+    fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {
+        Inspect::resolve_repo(self.driver, path)
     }
 }
