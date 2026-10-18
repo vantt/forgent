@@ -66,10 +66,37 @@ pub fn objects(
             ],
         )
         .map_err(git_error)?;
+    event_commit(
+        port,
+        repo,
+        tree,
+        parents,
+        timestamp_seconds(&last.ts)?,
+        format!(
+            "fgos-events seal {}:{} {}..{}",
+            first.origin,
+            stream.as_str(),
+            first.seq,
+            last.seq
+        )
+        .into_bytes(),
+    )
+}
+
+/// Seal and merge commits use one identity and one deterministic date encoder.
+pub(crate) fn event_commit(
+    port: &dyn Publication,
+    repo: &RepoHandle,
+    tree: Oid,
+    parents: Vec<Oid>,
+    seconds: i64,
+    message: Vec<u8>,
+) -> Result<Oid, Error> {
     let identity = || Identity {
         name: "fgOS Event Store".into(),
         email: "event-store@fgos.invalid".into(),
     };
+    let date = format!("{} +0000", seconds.max(0));
     port.write_commit(
         repo,
         &CommitInput {
@@ -77,16 +104,9 @@ pub fn objects(
             parents,
             author: identity(),
             committer: identity(),
-            author_date: format!("{} +0000", timestamp_seconds(&last.ts)?.max(0)),
-            committer_date: format!("{} +0000", timestamp_seconds(&last.ts)?.max(0)),
-            message: format!(
-                "fgos-events seal {}:{} {}..{}",
-                first.origin,
-                stream.as_str(),
-                first.seq,
-                last.seq
-            )
-            .into_bytes(),
+            author_date: date.clone(),
+            committer_date: date,
+            message,
         },
     )
     .map_err(git_error)

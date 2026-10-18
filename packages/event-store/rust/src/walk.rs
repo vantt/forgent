@@ -355,3 +355,22 @@ pub fn verify_tip(seal: &Seal, machine: &str, scope: Scope) -> Result<(), Error>
         ))
     }
 }
+
+/// D17: mirrors cannot publish this clone's unreceipted origin.
+pub fn own_origin_bounded(
+    published: &Positions,
+    origin: &str,
+    bounds: &Positions,
+) -> Result<(), Error> {
+    let prefix = format!("{origin}:");
+    if published
+        .iter()
+        .any(|(key, seq)| key.starts_with(&prefix) && *seq > bounds.get(key).copied().unwrap_or(0))
+    {
+        return Err(Error::new(
+            ErrorCode::EventStoreRefTampered,
+            "mirror claims own origin above receipt",
+        ));
+    }
+    Ok(())
+}

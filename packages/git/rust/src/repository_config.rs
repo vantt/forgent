@@ -171,6 +171,7 @@ impl GitDriver {
                 return Err(error("operation-id-conflict"));
             }
             return match old.outcome() {
+                Some(Outcome::ConfigApproved) => Ok(receipt(id, &digest)),
                 Some(Outcome::Transfer {
                     acknowledged: true, ..
                 }) => Ok(receipt(id, &digest)),
@@ -232,8 +233,10 @@ impl GitDriver {
             }
         };
         if missing.is_empty() {
+            // Approval has no target effect. Preserve URL provenance in Intent
+            // with one typed terminal record, never a fictitious transfer.
             chain = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                .append(&chain, Phase::Outcome(Outcome::ConfigApproved))
                 .map_err(error)?;
             return Ok(receipt(id, &chain.intent().request_digest));
         }

@@ -49,3 +49,58 @@ impl Receipt {
         Ok(())
     }
 }
+
+/// Exact candidate authorized under event-seal before reconciliation's CAS.
+/// Retain both the observed prior tip and candidate, covering death on either
+/// side of CAS without accumulating the whole reconciliation history.
+pub(crate) fn reconciled_tips(
+    layout: &crate::layout::Layout,
+    reference: &fgos_git::RefName,
+) -> Result<Vec<String>, Error> {
+    let tips: std::collections::BTreeMap<String, Vec<String>> =
+        read_optional(&layout.root.join("reconciled.json"))?
+            .map(|b| serde_json::from_slice(&b).map_err(|e| invalid(e.to_string())))
+            .transpose()?
+            .unwrap_or_default();
+    Ok(tips.get(reference.as_str()).cloned().unwrap_or_default())
+}
+pub(crate) fn authorize_reconcile(
+    layout: &crate::layout::Layout,
+    reference: &fgos_git::RefName,
+    previous: Option<&fgos_git::Oid>,
+    oid: &fgos_git::Oid,
+) -> Result<(), Error> {
+    let mut tips: std::collections::BTreeMap<String, Vec<String>> =
+        read_optional(&layout.root.join("reconciled.json"))?
+            .map(|b| serde_json::from_slice(&b).map_err(|e| invalid(e.to_string())))
+            .transpose()?
+            .unwrap_or_default();
+    let mut candidates = vec![oid.as_str().to_owned()];
+    if let Some(previous) = previous {
+        candidates.push(previous.as_str().to_owned());
+    }
+    tips.insert(reference.as_str().into(), candidates);
+    fgos_durable_file::replace_durably(&layout.root, "reconciled.json", &line(&tips)?)
+        .map_err(Error::from_install_error)?;
+    Ok(())
+}
+
+/// Load each stream receipt once, independent of history length.
+pub(crate) fn own_bounds(layout: &crate::layout::Layout, origin: &str) -> Result<Positions, Error> {
+    let mut bounds = Positions::new();
+    for entry in std::fs::read_dir(&layout.root).map_err(crate::errors::io)? {
+        let entry = entry.map_err(crate::errors::io)?;
+        let name = entry.file_name();
+        if let Some(name) = name.to_str() {
+            if crate::layout::StreamId::parse(name).is_ok()
+                && entry.file_type().map_err(crate::errors::io)?.is_dir()
+            {
+                bounds.insert(
+                    format!("{origin}:{name}"),
+                    crate::append::read_last_seq(&entry.path().join("sealed.json"))?.unwrap_or(0),
+                );
+            }
+        }
+    }
+    Ok(bounds)
+}

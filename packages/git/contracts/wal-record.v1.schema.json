@@ -550,6 +550,18 @@
                   "required": [
                     "kind"
                   ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "configApproved"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
                 }
               ]
             }
