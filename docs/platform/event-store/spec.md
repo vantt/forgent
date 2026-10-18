@@ -9,15 +9,16 @@ Implementation status: Not started
 Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
-Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over an N-API addon of the crate
+Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
-Last reviewed: 2026-10-17
+Last reviewed: 2026-10-18
 Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
 - docs/platform/holder-lock/spec.md
 - docs/platform/session-identity/spec.md
 - docs/platform/component-boundary.md
+- docs/platform/git/spec.md (Publication port, section 4; combined addon, owner decision Q1)
 - plans/261016-1306-main-checkout-single-door-hot-lock/plan.md (4.3-S)
 - plans/261017-1313-fgos-platform-program-board/plan.md
 - plans/reports/council-261017-1210-event-store-final-packet.md
@@ -110,12 +111,12 @@ Readiness: once section 26 is signed, this spec is the contract for starting imp
 | The stream registry: type, scope, `sealOnWrite`, schema version | Which domain owns which type (the consumer registers it) |
 | The machine id and the store id (section 5) | Writer identity (Session Identity) |
 | Open logs: location, append, batch framing, `fsync`, recovery of uncommitted batches, per-stream sequence and its high-water mark | Business preconditions and the Work critical section (the consumer, under its own gate) |
-| Sealing: rotation, git object layout, compare-and-swap ref update, receipt, recovery | Locks as a mechanism (holder-lock); Event Store only declares its two lock rows |
+| Sealing: rotation, git object layout, compare-and-swap ref update (through the Git component's Publication port), receipt, recovery | Locks as a mechanism (holder-lock); Event Store only declares its two lock rows |
 | Reading: the reader protocol, verification, dedupe, deterministic order, cursors | Claims, leases, worker slots (runtime) |
-| Sharing: fetch refspec, push of the own ref, reconciliation of the own ref, mirrors | Work-tree commits, merges and land (Git component; today the 4.3-R main door) |
+| Sharing: fetch refspec, push of the own ref, reconciliation of the own ref, mirrors (fetch and push run through the Publication port) | Work-tree commits, merges and land (Git component; today the 4.3-R main door); git plumbing and the publication of `refs/fgos/*` (the Git component's Publication port) |
 | The verbs `fgos events sync|status|export`, the store part of `fgos rebuild`, the doctor checks of section 21, the migration | Scheduling any process; there is no daemon |
 
-There is one implementation of the core: the Rust crate `fgos-event-store`. The Node facade `src/event-store/` decides nothing. Rust consumers (observe, `fgos-work-state`) link the crate. Git access for `refs/fgos/*` goes through one publication port inside the crate; its git driver is the only code in fgOS that writes those refs, and it moves behind the Git component's port when that component exists (section 20).
+There is one implementation of the core: the Rust crate `fgos-event-store`. The Node facade `src/event-store/` decides nothing. Rust consumers (observe, `fgos-work-state`) link the crate. Git access for `refs/fgos/*` goes through the Git component's Publication port (`docs/platform/git/spec.md` section 4: write objects, compare-and-swap a ref, read and walk a chain, fetch, push). Event Store is the only production writer of event refs and calls that port for every one of them; the crate has no git driver of its own. Event Store still decides everything the protocol decides: it supplies the seal and merge manifests and the parent order, and Git never computes an event union, coverage or a business conflict outcome. The protocol of sections 10 and 14 is unchanged by this placement (section 20).
 
 ## 4. Layering and locks
 
@@ -124,12 +125,13 @@ consumers (Work, porting, observe ...)    register streams; own gates, reducers,
      |  read(cursor) / append(stream, events, cursor) / seal / sync / export
 Event Store (fgos-event-store)            envelope, open logs, seal, reader, order, sharing
      |                 |                    |
-holder-lock         Session Identity     publication port -> git object store (refs/fgos/*)
-(event-append,      (writer id, src)      plumbing only: no index, no work tree, no HEAD,
- event-seal)                              no main-checkout lock, no main door
+holder-lock         Session Identity     Git component (fgos-git): Publication port
+(event-append,      (writer id, src)      -> git object store (refs/fgos/*)
+ event-seal)                              plumbing only: no index, no work tree, no HEAD,
+                                          no main-checkout lock, no main door
 ```
 
-Event Store never imports a consumer. A consumer never writes an open log or a ref itself.
+Event Store never imports a consumer. Event Store depends on the Git component, never the reverse: Git imports no consumer. A consumer never writes an open log or a ref itself.
 
 Two new registry rows in `packages/holder-lock/contracts/lock-registry.v1.json`, both kind `mutex`, scope `repo`, path template `<eventOpenRoot>/locks/<name>.lock` (a new template resolved by section 8):
 
@@ -483,14 +485,14 @@ Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twic
 
 ## 17. Node to Rust route and latency budget
 
-**Route** (owner decision 2026-10-17 15:13): the route is an N-API addon of the crate, loaded by the Node payload. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/session-identity/spec.md` section 5).
+**Route** (owner decision 2026-10-17 15:13; packaging amended by Git G0 owner decision Q1, 2026-10-17): the route is an N-API addon, loaded by the Node payload. It is the one combined N-API addon that links both `fgos-event-store` and `fgos-git` and exports both facades (`docs/platform/git/spec.md` section 4), so a Node process holds one in-process instance of each crate; a second, separate addon load of either crate in the same process fails closed. Seal and sync reach the Git Publication port through this same load. The combination changes packaging only, not the route rule below. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/session-identity/spec.md` section 5).
 
 - The per-call host facade (`fgos internal event-store ...` per call, like `lock-fd`) is excluded, because it spawns inside the gate.
 - A persistent pipe to a running host is not available, because no host runs on the plain CLI path and no daemon is dedicated to Event Store.
 - Seal, sync, export and status run outside the gate and may still spawn, for example git plumbing as a subprocess.
 - Rust consumers link the crate and pay no route.
 
-The route has a cost: a native addon for every supported platform and Node ABI, carried in the npm package and the legacy-node payload, plus build, activation and doctor checks (section 21; section 23.2 item 9).
+The route has a cost: the combined native addon for every supported platform and Node ABI, carried in the npm package and the legacy-node payload, plus build, activation and doctor checks (section 21; section 23.2 item 9).
 
 **Baseline.** V-SPAWN-01 measured today's path end to end, from CLI spawn to exit, on 2026-10-17 ([experiment-261017-1431-event-store-v-spawn-01.md](../../../plans/reports/experiment-261017-1431-event-store-v-spawn-01.md); Intel i7-13700, `/tmp` on tmpfs, git 2.53.0, Node 24.22.0, 40 samples per row):
 
@@ -554,7 +556,7 @@ Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-r
 
 **Plan 4.3-S.** The draft's re-cut "around claims only" is withdrawn (C1). The 4.3 lane re-cut its state part on 2026-10-17 18:50 as wave S from main ([plan 4.3](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), block "CẮT LẠI 18:50"): P01 (`hot-lock.mjs`, `withStateTx`, `state` hot-mutex) stays as written and is the Work gate; P02 (claims into `state`, callers onto `withStateTx`) stays, and inside the transaction appends go to the Event Store facade at the cutover, through a route that respects the P01 exec guard (section 17); P04 lands whole in one commit, the capacity check inside `state` together with narrowing `main-checkout` to the checkpoint. The Event Store cutover later only removes the checkpoint call from the claim path, since no event file needs a checkpoint. `withStateTx` does not depend on where events are stored, so wave S lands before the Event Store cutover and unblocks 6.2 P09.
 
-**Git component.** It will own git operations; the publication port of section 3 (write objects, compare-and-swap a ref, read a chain, fetch, push) is a candidate first slice of G0, and the Event Store driver moves behind it without a protocol change. "Seal before land" and `store.promote` plug into land as consumer policy. The catalogue entries this spec retires are whole mechanism families, not a percentage (the 43/182 figure was rejected by the first packet): tracked event files dirtying checkouts (G-092, G-093, G-120, part of G-029), merges of append-only logs (G-089, G-121, G-170), truncation detection (G-210, G-211, half of G-184), event checkpoints and their cadence (G-118, G-212, G-213), and file compaction (G-090, G-214). Experiment 1 classified the first three families with the files still in the tree; the last two die only because sealed events leave the tree. The exact list is checked in the acceptance review against catalogue freeze 234. Lessons tied to other tracked `.fgos` files (G-054, G-069, G-086, G-088, the rest of G-166) remain.
+**Git component** (`docs/platform/git/spec.md`). It owns git operations. Its Publication port (Git spec section 4: write objects, compare-and-swap a ref, read and walk a chain, fetch, push) is the port of section 3; Event Store is the only production writer of event refs and calls it, with no protocol change. Node reaches both crates through the one combined addon of section 17. Order (Git spec section 12): Publication ships before replacement Land, and the legacy cutover of section 18 lands before, or in the same release as, the release that exposes replacement Land. "Seal before land" and `store.promote` plug into land as consumer policy. The catalogue entries this spec retires are whole mechanism families, not a percentage (the 43/182 figure was rejected by the first packet): tracked event files dirtying checkouts (G-092, G-093, G-120, part of G-029), merges of append-only logs (G-089, G-121, G-170), truncation detection (G-210, G-211, half of G-184), event checkpoints and their cadence (G-118, G-212, G-213), and file compaction (G-090, G-214). Experiment 1 classified the first three families with the files still in the tree; the last two die only because sealed events leave the tree. The exact list is checked in the acceptance review against catalogue freeze 234. Lessons tied to other tracked `.fgos` files (G-054, G-069, G-086, G-088, the rest of G-166) remain.
 
 **Observe and `fgos-work-state`.** They read events through the crate (`work_source.rs:470-480` today reads files). Observe's own stores become `local` streams in a later change.
 
@@ -586,7 +588,7 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 | `event-store-unsealed` | section 16 thresholds |
 | `event-store-integrity` | a seal blob whose hash differs from `seal.json`, an event `h` that does not verify, a batch commit marker that does not verify inside a closed segment or a sealed blob, a sequence gap in an own stream, `event-store-seq-conflict`, `event-store-seq-recovery-conflict` that a seal did not resolve, `event-store-order-cycle`, `event-store-ref-moved` or `seal-mismatch` recorded |
 | `event-store-sync` | warns when the last push failed or is older than 24 h with a remote configured; reports ahead/behind |
-| `event-store-native-addon` | the N-API addon of the crate is missing from the active payload, fails to load, or was built for another Node ABI or platform (section 17) |
+| `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
 | `event-store-orphan-branches` | warns per orphan branch stream |
 
@@ -794,3 +796,11 @@ The model check was run again on the corrected rules ([report](../../../plans/re
 
 1. **N1, rebuild-install livelock (section 13, 23.2).** Under sustained writes a rebuild computed outside the gate can be rejected forever. Retries are now bounded by `eventStore.rebuild.maxAttempts` (agent default 5) and end in `event-store-rebuild-busy` with the current cache kept valid.
 2. **Certification of a new seal (section 10 step 2.4).** The receipt keeps `lastSeq` apart from emitted coverage, and `<new>` is certified only when it and its ancestors are fully emitted with nothing deferred, matching sections 11 and 12.
+
+## Changes with the Git G0 signature (2026-10-18)
+
+Amended 2026-10-18 with the Git G0 signature: publication port moves to Git, combined addon (Git G0 Q1); no protocol change.
+
+1. **Publication port (header, sections 3, 4, 20).** The port for `refs/fgos/*` is the Git component's Publication port (`docs/platform/git/spec.md` section 4), not a driver inside the crate. Event Store stays the only production writer of event refs and calls that port; it keeps every decision of sections 10 and 14.
+2. **Combined addon (header, sections 17, 21).** The Node route is the one combined N-API addon that links `fgos-event-store` and `fgos-git` (Git G0 owner decision Q1, 2026-10-17). There is still no exception to the exec guard and no per-call host facade; `event-store-native-addon` checks the combined addon.
+3. **Unchanged.** No protocol step, lock row, lock rank or decision of D-ADR0055 changes. The dissent "Git component as a precondition" is answered in placement only: publication runs through the Git port, and the Event Store cutover follows the order of Git spec section 12.

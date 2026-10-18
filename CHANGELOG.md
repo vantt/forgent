@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config key `dispatch.gateKillGraceMs` (default 10000 ms, at least 1000): the wait between SIGTERM and SIGKILL when the gate stops an agent. Project config overrides global; `fgos setup` does not write it.
 
 ### Changed
+- The Git component spec (`fgos-git`, `docs/platform/git/spec.md`) is accepted: it is the single owner of every fgOS git mutation (commits, merges and land, worktrees, refs, fetch and push, and the publication of `refs/fgos/*` for the Event Store), and Workflow, Execution, Work, Event Store and setup become its consumers. No behavior changes yet; today's git writers stay until the Git plan replaces them.
 - Doctor check `herdr-available` is replaced by `terminal-control`, which asks the terminal port instead of running `herdr --version` itself and keeps the `FGOS_HERDR_ANCHOR_PANE` diagnosis. A machine without herdr now gets a warning, not a failure.
 - A later step of one run whose earlier tab already closed itself opens a new tab with the same label instead of failing to find the old one.
 - Windows: every terminal operation answers `unsupported` until herdr ships a Windows build; doctor says so, and direct (headless) mode is unaffected.
