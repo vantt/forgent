@@ -97,6 +97,7 @@ import {
   writeSettleContext,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
+import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt } from '../../run-supervisor/cancel-registry.mjs';
 import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
@@ -2491,6 +2492,8 @@ export async function executeAssignment(assignment, opts = {}) {
       // pane's screen, read only to show it (nothing here decides anything from it).
       const stopScreen = terminalPrep ? followPaneScreen({ tc: terminalPrep.tc, key: terminalPrep.slot.key, onChunk: opts.onChunk }) : null;
       let settledResult;
+      // From the binding until the answer is read, a Ctrl-C of this controller asks the supervisor to cancel.
+      registerDeliveredAttempt(attemptRunDir);
       try {
         settledResult = await awaitSettledResult({
           runDir: attemptRunDir,
@@ -2501,6 +2504,7 @@ export async function executeAssignment(assignment, opts = {}) {
           ceilingMs: timeoutMs + attemptSettings.gateKillGraceMs + 120_000,
         });
       } finally {
+        unregisterDeliveredAttempt(attemptRunDir);
         stopScreen?.();
       }
       if (!settledResult) {
