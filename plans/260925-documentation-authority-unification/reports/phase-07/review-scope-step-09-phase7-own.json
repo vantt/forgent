@@ -1,0 +1,294 @@
+{
+  "request": "a38-step-09-package-02 (Phase 7 scope under A46)",
+  "basedOnIndex": "review-input-step-09-package-02/index.json",
+  "rule": "A46: review only Phase 7's own changed units and plan-owned accounting; every other set moves to the Phase 9 main-import accounting step",
+  "mechanical": "run the one portable auth script over ALL parts (cheap); deep-read only the sets below",
+  "inScopeSets": [
+    {
+      "set": "current-unheaded-block-candidate",
+      "entries": 522,
+      "minimumIncludingMandatory": 79,
+      "parts": [
+        "part-006.json",
+        "part-007.json",
+        "part-008.json",
+        "part-009.json",
+        "part-010.json",
+        "part-011.json",
+        "part-012.json",
+        "part-013.json",
+        "part-014.json"
+      ]
+    },
+    {
+      "set": "current-heading-candidate",
+      "entries": 73,
+      "minimumIncludingMandatory": 11,
+      "parts": [
+        "part-019.json",
+        "part-020.json"
+      ]
+    },
+    {
+      "set": "current-file-block-candidate",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-021.json"
+      ]
+    },
+    {
+      "set": "displaced-unheaded-block-candidate",
+      "entries": 497,
+      "minimumIncludingMandatory": 75,
+      "parts": [
+        "part-026.json",
+        "part-027.json",
+        "part-028.json",
+        "part-029.json",
+        "part-030.json",
+        "part-031.json",
+        "part-032.json",
+        "part-033.json",
+        "part-034.json"
+      ]
+    },
+    {
+      "set": "displaced-heading-candidate",
+      "entries": 67,
+      "minimumIncludingMandatory": 11,
+      "parts": [
+        "part-034.json",
+        "part-035.json",
+        "part-036.json"
+      ]
+    },
+    {
+      "set": "displaced-file-block-candidate",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-036.json"
+      ]
+    },
+    {
+      "set": "routing-binding-nav",
+      "entries": 4,
+      "minimumIncludingMandatory": 4,
+      "parts": [
+        "part-036.json"
+      ]
+    },
+    {
+      "set": "routing-binding-defect",
+      "entries": 14,
+      "minimumIncludingMandatory": 14,
+      "parts": [
+        "part-036.json"
+      ]
+    },
+    {
+      "set": "routing-binding-family",
+      "entries": 13,
+      "minimumIncludingMandatory": 13,
+      "parts": [
+        "part-036.json"
+      ]
+    },
+    {
+      "set": "A34-join",
+      "entries": 15,
+      "minimumIncludingMandatory": 15,
+      "parts": [
+        "part-091.json"
+      ]
+    },
+    {
+      "set": "identical-owner-join",
+      "entries": 7,
+      "minimumIncludingMandatory": 7,
+      "parts": [
+        "part-091.json"
+      ]
+    },
+    {
+      "set": "N2",
+      "entries": 3,
+      "minimumIncludingMandatory": 3,
+      "parts": [
+        "part-114.json",
+        "part-115.json"
+      ]
+    },
+    {
+      "set": "N1-native-recarry",
+      "entries": 3,
+      "minimumIncludingMandatory": 3,
+      "parts": [
+        "part-121.json"
+      ]
+    },
+    {
+      "set": "N1-gap-decision",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-121.json"
+      ]
+    },
+    {
+      "set": "N1-document",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-121.json"
+      ]
+    },
+    {
+      "set": "accounting-ratchet",
+      "entries": 7,
+      "minimumIncludingMandatory": 7,
+      "parts": [
+        "part-122.json"
+      ]
+    },
+    {
+      "set": "accounting-post-B0-file-provenance",
+      "entries": 3,
+      "minimumIncludingMandatory": 3,
+      "parts": [
+        "part-132.json"
+      ]
+    },
+    {
+      "set": "accounting-closing-carry-declaration",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-133.json"
+      ]
+    },
+    {
+      "set": "accounting-citation-baseline",
+      "entries": 3,
+      "minimumIncludingMandatory": 3,
+      "parts": [
+        "part-134.json"
+      ]
+    },
+    {
+      "set": "accounting-reproduction-exact-pairs",
+      "entries": 16,
+      "minimumIncludingMandatory": 16,
+      "parts": [
+        "part-135.json"
+      ]
+    },
+    {
+      "set": "accounting-reproduction-authorized-lanes",
+      "entries": 2,
+      "minimumIncludingMandatory": 2,
+      "parts": [
+        "part-136.json"
+      ]
+    },
+    {
+      "set": "accounting-later-main-drift",
+      "entries": 1,
+      "minimumIncludingMandatory": 1,
+      "parts": [
+        "part-137.json"
+      ]
+    }
+  ],
+  "inScopeEntries": 1255,
+  "inScopeDeepReadMinimum": 272,
+  "deferredToPhase9Sets": [
+    "current-heading-imported",
+    "current-unheaded-block-imported",
+    "current-file-block-imported",
+    "current-unheaded-preamble-imported",
+    "current-unheaded-block-inherited-canonical",
+    "current-heading-inherited-canonical",
+    "displaced-heading-imported",
+    "displaced-unheaded-block-imported",
+    "displaced-file-block-imported",
+    "displaced-unheaded-preamble-imported",
+    "decision-b-behaviors-claims",
+    "decision-b-data-dictionary-claims",
+    "decision-b-data-dictionary-registryGaps",
+    "decision-b-decisions-first-claims",
+    "decision-b-decisions-second-claims",
+    "decision-b-entry-actors-rules-pointers-claims",
+    "decision-b-files-registryGaps",
+    "decision-b-io-contract-claims",
+    "decision-s10-closing-instructions-claims",
+    "decision-s10-closing-instructions-registryGaps",
+    "decision-s10-round3-native-predecessors-registryGaps",
+    "decision-s10-systemic-native-predecessors-registryGaps",
+    "decision-s2-agent-coordination-classifications-candidateClassifications",
+    "decision-s2-agent-coordination-closure-successors-registryGaps",
+    "decision-s2-agent-coordination-current-closure-classifications-candidateClassifications",
+    "decision-s2-agent-coordination-exact-01-claims",
+    "decision-s2-agent-coordination-judgment-01-claims",
+    "decision-s2-agent-coordination-registry-projection-candidateClassifications",
+    "decision-s2-agent-coordination-truth-classifications-candidateClassifications",
+    "decision-s2-agent-coordination-truth-judgment-claims",
+    "decision-s3-host-invocation-boundary-gaps-registryGaps",
+    "decision-s4-packaging-distribution-architecture-claims",
+    "decision-s4-packaging-distribution-architecture-registryGaps",
+    "decision-s4-packaging-distribution-distribution-claims",
+    "decision-s4-packaging-distribution-distribution-registryGaps",
+    "decision-s4-packaging-distribution-successors-registryGaps",
+    "decision-s4-packaging-main-recarry-registryGaps",
+    "decision-s5-root-authorities-boundary-gaps-registryGaps",
+    "decision-s5-root-boundary-sync-claims",
+    "decision-s5-root-boundary-sync-registryGaps",
+    "decision-s5-root-historical-gaps-registryGaps",
+    "decision-s5-root-main-recarry-registryGaps",
+    "decision-s5-root-retained-navigation-proposal-claims",
+    "decision-s5-root-retained-navigation-proposal-registryGaps",
+    "decision-s5-root-source-completion-claims",
+    "decision-s5-root-source-completion-registryGaps",
+    "decision-s5-root-source-native-successors-registryGaps",
+    "decision-s5-root-truth-successors-registryGaps",
+    "decision-s6-whole-system-architecture-intent-claims",
+    "decision-s6-whole-system-architecture-map-claims",
+    "decision-s6-whole-system-component-component-boundary-advisory-claims",
+    "decision-s6-whole-system-component-readme-claims",
+    "decision-s6-whole-system-component-repo-layout-vision-claims",
+    "decision-s6-whole-system-portal-classifications-registryGaps",
+    "decision-s6-whole-system-portal-classifications-candidateClassifications",
+    "decision-s6-whole-system-portal-evidence-rework-candidateClassifications",
+    "decision-s7-proposals-redesigns-08-component-authority-boundary-map-claims",
+    "decision-s7-proposals-redesigns-15-readme-claims",
+    "decision-s8-agent-confinement-01-claims",
+    "decision-s8-observe-01-claims",
+    "decision-s8-observe-01-registryGaps",
+    "decision-s9-runner-01-claims",
+    "decision-s9-runner-01-registryGaps",
+    "native-change-None-units",
+    "native-change-units-units",
+    "native-change-units-identityGaps",
+    "native-change-units-retiredUnits",
+    "candidate-list-rebind",
+    "candidate-current",
+    "native-document",
+    "native-metadata",
+    "historical",
+    "candidate-authority-exclusion",
+    "native-inventory-gap",
+    "global-candidate-mismatch",
+    "accounting-source-reclassify-out-of-platform-scope",
+    "accounting-source-merge",
+    "accounting-native-predecessor-supersede",
+    "accounting-post-B0-main-authored-platform-sources",
+    "accounting-unmatched-source-blockers",
+    "accounting-suite-attribution-limited",
+    "accounting-native-alias-projection",
+    "accounting-source-referenced-expectations",
+    "accounting-canonical-candidate-unverified",
+    "accounting-canonical-status-blockers"
+  ],
+  "deferredEntries": 6447
+}

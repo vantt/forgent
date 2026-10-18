@@ -472,6 +472,25 @@ the independent findings without authorizing promotion, cutover or retirement.
   4. The 7,250-entry review runs after the checks are green or declared, sized per A36.
 - **Affected rows/steps:** Step 9.
 
+## A46 — Close Phase 7 on its own work; main-import accounting moves to Phase 9
+
+- **Date:** 2026-10-18 · **Decided by:** owner (option B)
+- **Question:** Step 9 accounting kept growing with main drift (strict E: 2,112 unexplained
+  claims, 32 files, 233 gaps; comparator 24 errors; review 7,702 entries / 2,794 deep reads;
+  main moved again by 18 identity-scope files).
+- **Answer:** Phase 7 closes on its own work. Its closing review covers only the units
+  Phase 7 changed and plan-owned accounting (`review-scope-step-09-phase7-own.json`:
+  22 sets, 1,255 entries, deep-read minimum 272; mechanical auth still covers all parts).
+  Every main-import accounting set (85 sets, 6,447 entries: imported/inherited-canonical
+  units, decision and native-change rows, candidate lists, exclusions, gaps, aliases,
+  global mismatches, the post-B0 main-authored sources) becomes ONE dedicated step at the
+  start of Phase 9, run once against the final main bytes before cutover.
+- **Closing criteria change (supersedes the L11-2 green-E/comparator requirement for these
+  sets only):** D 0 fatal and the ratchet stay required; strict E and the comparator may be
+  red only for the exact open sets recorded in `step-09-package-blocker.json` and this
+  scope file; the rest of Step 9 (changed-row review, red-team/checkpoint, scorecard)
+  still runs. Phase 7 close pin is main `eab4d617b`.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should

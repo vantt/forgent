@@ -410,6 +410,8 @@ Phase 7 unit to Phase 9 for later accounting.
    reaches awaiting-owner-review only with zero open Critical/High findings, zero
    unresolved authority conflict and all mechanical boundaries proven.
 
+**Scope amendment (A46, owner, 2026-10-18):** items 3-4 apply to Phase 7's own changed units and plan-owned accounting only; main-import accounting moves to one step at the start of Phase 9; strict E and the comparator may stay red only for the exact recorded main-import open sets. See `reports/phase-07/owner-answers.md#a46`.
+
 **Closing re-entry rule (N1):** if the closing red-team, truth sample or changed-row
 review finds a candidate-content defect after the native carry, return to item 1, fix
 the defect, re-carry only the changed units, obtain a bounded independent re-review of
