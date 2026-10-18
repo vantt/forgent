@@ -5,6 +5,7 @@
 #![allow(dead_code)]
 
 pub mod adopt_fixture;
+pub mod herdr;
 pub mod supervisor;
 pub mod terminal;
 
