@@ -151,6 +151,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-durable-file"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "windows-sys",
+]
+
+[[package]]
+name = "fgos-git"
+version = "0.2.0"
+dependencies = [
+ "fgos-durable-file",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-holder-lock"
 version = "0.2.0"
 dependencies = [

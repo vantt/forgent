@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "source": "docs/platform/git/spec.md \u00a73\u20134",
+  "implementationStatus": "dormant-contract-skeleton",
+  "ports": {
+    "Inspect": [
+      "resolveRepo",
+      "resolveRef",
+      "status",
+      "diff",
+      "ancestry",
+      "readObjects",
+      "pathsAtRevision",
+      "listWorktrees",
+      "compareContent",
+      "snapshotWrites"
+    ],
+    "Refs": [
+      "ensureBranch",
+      "advanceRef",
+      "deleteRef",
+      "fastForwardCheckedOut"
+    ],
+    "Worktree": [
+      "create",
+      "createDetached",
+      "relocate",
+      "remove",
+      "inspectOrphans",
+      "repairRegistration"
+    ],
+    "ScopedCommit": [
+      "preflight",
+      "commit"
+    ],
+    "Sync": [
+      "start",
+      "inspect",
+      "continue",
+      "abort"
+    ],
+    "Land": [
+      "prepare",
+      "publish",
+      "recover"
+    ],
+    "SafeRestore": [
+      "preview",
+      "apply",
+      "recover"
+    ],
+    "Checkpoint adapter": [
+      "checkpointTrackedFiles"
+    ],
+    "RepositoryConfig": [
+      "ensureFetchMapping",
+      "ensureHooks",
+      "removeOwnedHooksConfig"
+    ],
+    "Remote": [
+      "fetchRefs",
+      "pushRefs",
+      "inspectRemote"
+    ],
+    "Recovery": [
+      "inspectOperation",
+      "listPending",
+      "reconcile"
+    ],
+    "Publication": [
+      "writeBlob",
+      "writeTree",
+      "writeCommit",
+      "readRef",
+      "readObject",
+      "walkCommits",
+      "compareAndSwap",
+      "fetchRefs",
+      "pushRefs"
+    ]
+  },
+  "publicationExtensions": {
+    "writeCommit": "explicit author and committer dates",
+    "walkCommits": "caller stop set, ordered parents, tree, bounded opaque continuation",
+    "compareAndSwap": "expected and next are independently Absent or Oid",
+    "pushRefs": [
+      "accepted",
+      "rejected-non-fast-forward",
+      "rejected-other",
+      "remote-outcome-unknown"
+    ]
+  },
+  "inspectFacts": [
+    "configuredFetchRefspecs",
+    "pushRefspecs",
+    "remoteUrl",
+    "configValue(fgos.machineId)",
+    "gitFloorVerdict",
+    "fetchMappingProvenance"
+  ]
+}
