@@ -463,8 +463,13 @@ async function rollback(root, fgctl, descriptor, index, loader) {
   const receipts = fs.readFileSync(log, 'utf8').trim().split('\n').map(l => JSON.parse(l));
   const port = index.createGitPublication({ stateRoot: privateDir(path.join(base, 'verify-state')), repoPath: fs.realpathSync(ws), trustedMain: fs.realpathSync(ws), reference, writer: WRITER }, loader);
   let lost = 0;
+  // Each receipt is read back by replaying its exact request: the writer moved
+  // its tip only after a receipt, so the expected value is the previous next.
+  // A compacted id answers from its ledger entry, a retained one from its chain.
+  let expected = null;
   for (const r of receipts) {
-    try { const again = port.recover({ operationId: r.id }); if (again.attribution !== 'thisInvocationWonCas' || again.localEffect.publishedOid !== r.next) lost++; } catch { lost++; }
+    try { const again = port.compareAndSwap({ expected, next: r.next, operationId: r.id }); if (again.operationId !== r.id || again.attribution !== 'thisInvocationWonCas' || again.localEffect.publishedOid !== r.next) lost++; } catch { lost++; }
+    expected = r.next;
   }
   const tipMatches = port.readRef({ name: reference }).oid === receipts[receipts.length - 1].next;
   port.close();
