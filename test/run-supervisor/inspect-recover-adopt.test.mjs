@@ -169,3 +169,12 @@ test('abandon-legacy settles a legacy run only on proof that every recorded proc
   assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).attemptState, 'abandoned-legacy');
   assert.equal(recoverObserveUseCase(dead, { runId: 'run-1', intent: 'abandon-legacy' }).kind, 'park');
 });
+
+test('a unit whose only attempt the legacy sweep settled is terminal for the unit and awaits resume', { skip }, () => {
+  const p = project({ supervised: false, extraRun: { status: 'died', settlement: 'abandoned-legacy', settledAt: '2026-10-18T00:00:00.000Z' } });
+  unitOf(p);
+  const view = showRunUseCase(p.ctx, { runId: 'run-1' });
+  assert.equal(view.attemptState, 'abandoned-legacy');
+  assert.equal(view.unitState, 'awaiting-resume');
+  assert.equal(view.resumeCommand, 'fgos run --resume unit-run-1');
+});

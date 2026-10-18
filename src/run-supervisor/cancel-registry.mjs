@@ -9,14 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { publishImmutableProof } from '../runner/dispatch/proof-helpers.mjs';
 import { getBootId, getPidNs, getProcessStartTime } from '../runner/dispatch/process-identity.mjs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { mergeWithGlobalConfig } from '../config/global-config.mjs';
-import { DEFAULT_GATE_KILL_GRACE_MS, resolveGateKillGrace } from './gate-kill-grace.mjs';
 
-export const CANCEL_WAIT_KEY = 'dispatch.cancelWaitMs';
-/** Slack past the kill grace: the supervisor's own domain sweep and the steps after the receipt. */
-const CANCEL_WAIT_SLACK_MS = 5000;
-export const MIN_CANCEL_WAIT_MS = 1000;
 const POLL_MS = 50;
 const EXIT_CODES = Object.freeze({ SIGINT: 130, SIGTERM: 143 });
 
@@ -37,28 +30,6 @@ export function unregister(runDir) {
 
 export function registeredRuns() {
   return [...delivered].sort();
-}
-
-/**
- * `dispatch.cancelWaitMs` of the project rooted at `projectRoot`: project over global, default
- * `gateKillGraceMs + 5000`. Setup never writes the key; a present but unusable value throws.
- */
-export function readCancelWaitMs({ projectRoot } = {}) {
-  let merged;
-  try {
-    merged = mergeWithGlobalConfig(projectRoot ? readSharedConfigOrEmpty(projectRoot) : {});
-  } catch {
-    merged = {};
-  }
-  const value = merged?.dispatch?.cancelWaitMs;
-  if (value === undefined) {
-    const grace = resolveGateKillGrace({ project: merged }).value;
-    return (Number.isInteger(grace) ? grace : DEFAULT_GATE_KILL_GRACE_MS) + CANCEL_WAIT_SLACK_MS;
-  }
-  if (!Number.isInteger(value) || value < MIN_CANCEL_WAIT_MS) {
-    throw new Error(`${CANCEL_WAIT_KEY} must be an integer of at least ${MIN_CANCEL_WAIT_MS} ms, got ${JSON.stringify(value)}`);
-  }
-  return value;
 }
 
 function selfTuple() {

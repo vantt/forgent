@@ -28,7 +28,7 @@ test('awaiting-resume needs a closed last attempt, no unit-summary and no live c
   assert.match(rule, /closed/);
   assert.match(rule, /unit-summary\.json does not exist/);
   assert.match(rule, /no live controller/);
-  assert.match(unitState.unitState.liveController.judge, /only `dead` counts/);
+  assert.match(unitState.unitState.liveController.judge, /proven dead/);
 });
 
 test('abandoned-not-started agrees with the receipt outcome set', () => {
@@ -62,7 +62,7 @@ test('resume rules cover every attempt state a resume can meet', () => {
 });
 
 test('automatic resume stays deferred with its seam named', () => {
-  assert.match(unitState.deferred.automaticResume, /controller\.json/);
+  assert.match(unitState.deferred.automaticResume, /unit-control/);
   assert.match(unitState.deferred.automaticResume, /single-taker/);
 });
 
