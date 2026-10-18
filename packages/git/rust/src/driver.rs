@@ -1905,11 +1905,12 @@ impl Inspect for GitDriver {
             if let Ok(chain) = wal.inspect(&entry.operation_id) {
                 if matches!(
                     chain.outcome(),
-                    Some(crate::wal::Outcome::Transfer {
-                        acknowledged: true,
-                        unknown: false,
-                        ..
-                    })
+                    Some(crate::wal::Outcome::ConfigApproved)
+                        | Some(crate::wal::Outcome::Transfer {
+                            acknowledged: true,
+                            unknown: false,
+                            ..
+                        })
                 ) {
                     if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
                         let crate::wal::ConfigChange {

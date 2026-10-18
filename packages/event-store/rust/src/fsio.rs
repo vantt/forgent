@@ -12,6 +12,7 @@ use std::{
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Point {
+    AfterSyncReconcile,
     BeforeSealIntent,
     BeforeSealTargetCas,
     AfterSealTargetCas,

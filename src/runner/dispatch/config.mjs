@@ -1209,6 +1209,11 @@ function validateExecutorSupportsShape(supports, label) {
       throw new RunnerConfigError(`runner config (${label}) "reasoningEffort" must be a non-empty array whose entries are each one of ${REASONING_EFFORT_VALUES.join('/')} when present.`);
     }
   }
+  if (supports.skills !== undefined) {
+    if (!Array.isArray(supports.skills) || supports.skills.length === 0 || !supports.skills.every((skill) => typeof skill === 'string' && skill.trim())) {
+      throw new RunnerConfigError(`runner config (${label}) "skills" must be a non-empty array of non-empty skill names when present.`);
+    }
+  }
   if (supports.systemPrompt !== undefined && typeof supports.systemPrompt !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "systemPrompt" must be a boolean when present.`);
   }

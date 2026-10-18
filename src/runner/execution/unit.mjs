@@ -131,6 +131,10 @@ function isSyncRef(ref) {
  * - persona?: non-empty string
  * - timeoutMs?: the time each of its runs may take instead of `runner.timeoutMs` (whole ms, 1m..4h);
  *   the size of the work, not how it is executed
+ * - verify?: shell command the runner runs in the unit's worktree after each producing round; a non-zero
+ *   exit, or running past `runner.timeoutMs`, is a failed verify. Absent: nothing is verified.
+ * - skills?: skill names the work needs; only executors whose `supports.skills` lists all of them bind
+ *   (checker and panel roles are not asked for them)
  * - syncBase?: ref the runner merges into the unit's branch before the worker runs (needs writes)
  * - syncOnly?: set when a unit with a syncBase leaves out its objective: no worker unless the merge conflicts
  * - MUST NOT contain: executor, provider, model, tier, invocation, actors, overrides (G2)
@@ -147,6 +151,8 @@ function isSyncRef(ref) {
  *   prefer?: readonly (string|{executor: string, invocation?: string})[],
  *   persona?: string,
  *   timeoutMs?: number,
+ *   verify?: string,
+ *   skills?: readonly string[],
  *   inputs: readonly string[],
  *   expectedOutputs: readonly string[]
  * }>}
@@ -284,6 +290,18 @@ export function validateUnit(raw) {
 
   if (raw.timeoutMs !== undefined) assertRunTimeoutMs(raw.timeoutMs, 'unit.timeoutMs');
 
+  if (raw.verify !== undefined && (typeof raw.verify !== 'string' || !raw.verify.trim())) {
+    throw new RunnerConfigError('unit.verify must be a non-empty shell command string when present.');
+  }
+
+  let skills;
+  if (raw.skills !== undefined) {
+    if (!Array.isArray(raw.skills) || raw.skills.length === 0 || raw.skills.some((skill) => typeof skill !== 'string' || !skill.trim())) {
+      throw new RunnerConfigError('unit.skills must be a non-empty array of non-empty skill names when present.');
+    }
+    skills = Object.freeze([...new Set(raw.skills.map((skill) => skill.trim()))]);
+  }
+
   // expectedOutputs
   if (raw.expectedOutputs !== undefined && !Array.isArray(raw.expectedOutputs)) {
     throw new RunnerConfigError('unit.expectedOutputs must be an array of strings.');
@@ -311,6 +329,8 @@ export function validateUnit(raw) {
     ...(prefer !== undefined ? { prefer } : {}),
     ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
     ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
+    ...(raw.verify !== undefined ? { verify: raw.verify.trim() } : {}),
+    ...(skills !== undefined ? { skills } : {}),
     ...(syncBase !== undefined ? { syncBase } : {}),
     ...(syncOnly ? { syncOnly: true } : {}),
     inputs: Object.freeze(inputs),

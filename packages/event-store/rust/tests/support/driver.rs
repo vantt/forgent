@@ -101,6 +101,29 @@ fn main() {
             .unwrap();
             println!("SEALED");
         }
+        "sync" => {
+            use fgos_git::ResolveRepo;
+            let root = layout.common_dir.parent().unwrap();
+            let driver = fgos_git::GitDriver::new(root).unwrap();
+            let repo = match driver.resolve_repo(root, root).unwrap() {
+                ResolveRepo::Repository(r) => r,
+                _ => panic!(),
+            };
+            fgos_event_store::sync::sync_with_fs(
+                &driver,
+                &repo,
+                fgos_event_store::sync::SyncRequest {
+                    layout: &layout,
+                    machine: "test-aa2345",
+                    remote: "origin",
+                    no_push: false,
+                    held_ranks: &[],
+                    hot_lock_depth: 0,
+                },
+                &fault,
+            )
+            .unwrap();
+        }
         "rotate" => {
             rotate_with_fs(&layout, "test-aa2345", &stream, &[], &fault).unwrap();
             println!("ROTATED");

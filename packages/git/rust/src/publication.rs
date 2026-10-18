@@ -589,13 +589,18 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         // Only outcomes without an observed tip of their own report the
         // current one; the others never read the ref again.
         let current = match outcome {
-            Outcome::AbandonedBeforeAttempt | Outcome::Transfer { .. } | Outcome::Superseded { .. } => {
+            Outcome::ConfigApproved
+            | Outcome::AbandonedBeforeAttempt
+            | Outcome::Transfer { .. }
+            | Outcome::Superseded { .. } => {
                 tip(&self.ref_tip(repo, &i.resource_set[0])?)
             }
             Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
         };
         let (observed, state, attribution) = match outcome {
-            Outcome::AbandonedBeforeAttempt | Outcome::Transfer { .. } => (
+            Outcome::ConfigApproved
+            | Outcome::AbandonedBeforeAttempt
+            | Outcome::Transfer { .. } => (
                 &current,
                 PublicationState::NotPublished,
                 Attribution::Uncertain,

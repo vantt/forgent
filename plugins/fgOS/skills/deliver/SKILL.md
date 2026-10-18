@@ -1,35 +1,38 @@
 ---
-name: cook
+name: deliver
 description: >-
   Use when the user wants a free-text task driven end-to-end through fgOS's
   whole lifecycle in one session — submit, discovery, planning, real
-  implementation, and return — invoked as /fgOS:cook <free-text task
+  implementation, and return — invoked as /fgOS:deliver <free-text task
   description>. Each dev-skill gate (fgos-coding-exploring's context gate,
   fgos-coding-validating's single merged plan/proof gate) auto-approves
   when the repo's configured gate-bypass level covers it, otherwise pauses
   for real human approval — auto-
-  implements at stage executing, and stops once the item (and every
+  implements at position executing, and stops once the item (and every
   child it split into) reaches status awaiting-approval — final merge
   review always stays a human decision, never auto-approved, regardless
-  of gate-bypass. Examples: "/fgOS:cook add pagination to the list view",
-  "/fgOS:cook fix the flaky retry test".
+  of gate-bypass. Examples: "/fgOS:deliver add pagination to the list view",
+  "/fgOS:deliver fix the flaky retry test".
 ---
 
-# fgOS cook
+# fgOS deliver
 
 Drives a task from a single sentence to a real, verified, `awaiting-approval`
 change — chaining the same verbs and dev-skills a person would use one at a
 time (`submit` → `fgos-coding-exploring` → `fgos-coding-planning`/`fgos-coding-validating` →
 real implementation → `return`), so the user doesn't have to drive each
-stage by hand. Every state transition goes through the `fgos` CLI (one-door-
+step by hand. Every state transition goes through the `fgos` CLI (one-door-
 write, CTR001) — this skill never writes `.fgos/` state directly, and it
 never re-implements a dev-skill's substance inline; it invokes them.
+An item's position is its workflow step while live and its status once
+frozen, the same words `fgos-coding-driving` uses; Work itself carries no
+`stage`.
 
 ## Hard rules
 
 - **Never bypass a gate beyond what its own dev-skill already permits.**
   `fgos-coding-exploring`'s CONTEXT.md gate and `fgos-coding-validating`'s
-  single merged plan/proof gate (the one gate in stage `planning`, per
+  single merged plan/proof gate (the one gate at position `planning`, per
   `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —
   `fgos-coding-planning` itself has no gate) each check the repo's
   configured gate-bypass level themselves (`canAutoApprove`/
@@ -48,9 +51,9 @@ never re-implements a dev-skill's substance inline; it invokes them.
   review gate is a human decision, always.
 - **This skill now claims before handing an id to the driver, one id at a
   time** — `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4)
-  still only claims a worktree right before the `executing`-stage skill
+  still only claims a worktree right before the `executing`-position skill
   when the caller hasn't already claimed it, but nothing forces a caller
-  to wait that long: without an earlier claim, every stage before
+  to wait that long: without an earlier claim, every position before
   `executing` (`discovery`/`exploring`/`planning`) writes and commits its
   own docs (`CONTEXT.md`, `plan.md`) straight onto whatever checkout this
   skill was invoked from, dirtying it the same way
@@ -73,7 +76,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
   `fgos-fanout` is a real capability (`fgos-coding-driving`'s own "Caller
   contract" section says a caller MAY opt into it for concurrency) but this
   skill deliberately never opts in — one item, one queue, one flow, so the
-  person driving `/fgOS:cook` never has to reason about what several
+  person driving `/fgOS:deliver` never has to reason about what several
   concurrent Agents did to the backlog while it ran (see step 2).
 - **Never bypass the driver's own claim step with a raw `git checkout
   <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-
@@ -115,10 +118,10 @@ never re-implements a dev-skill's substance inline; it invokes them.
    the driver's own implicit stops already cover everything this step used
    to hand-roll: `awaiting-approval`, an anchor by open children, a
    person-shaped stop, or a no-progress read). This skill never re-derives
-   which skill a stage maps to, never applies a stage/status transition
+   which skill a position maps to, never applies a position/status transition
    itself, and never decides claim-timing on its own — the driver already
-   owns all three (its own hard rules: registry-only stage lookup, "engine's
-   verb always wins", "claim right before the first `executing`-stage
+   owns all three (its own hard rules: registry-only position lookup, "engine's
+   verb always wins", "claim right before the first `executing`-position
    invocation, never earlier"). This step's whole job is the QUEUE the
    driver itself has no concept of — one id at a time, front to back — and
    relaying the driver's stop reason:
@@ -154,7 +157,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
    - **no-progress** — same treatment as a real block: stop, report, let a
      person look at it.
 
-   Every real gate a stage-skill hits along the way (`fgos-coding-exploring`'s
+   Every real gate a position's skill hits along the way (`fgos-coding-exploring`'s
    "Approve CONTEXT.md?", `fgos-coding-planning`'s "Approve before execution?",
    `fgos-coding-validating`'s "Approve moving to executing?") still surfaces
    exactly as before — the driver invokes those skills unchanged, it does
@@ -186,8 +189,8 @@ was rejected outright ("not in the frontier yet (stage/deps/lineage)"),
 while `pick --id <id>` accepted the same claim. `choke-point-
 take-vs-pick-claim-eligibility` closed that gap: `take`'s explicit `--id`
 branch now checks deps-done + no-open-descendant only, the same
-stage-independent stance `pick` already took, so the prose is accurate
+position-independent stance `pick` already took, so the prose is accurate
 again. This skill's own sequencing now uses that same `take`/`pick`
-eligibility directly — it claims before stage `executing` too (see the
+eligibility directly — it claims before position `executing` too (see the
 hard rule above), the fix this file's own branch-isolation follow-up
 made, not a workaround for a broken `take`.

@@ -50,3 +50,33 @@ fn strip_digest(value: &Value) -> Value {
     }
     value
 }
+
+#[test]
+fn nested_unsafe_numbers_keep_their_original_error() {
+    for raw in [
+        "1.0",
+        "-0.0",
+        "1.5",
+        "9007199254740992",
+        "-9007199254740992",
+        "18446744073709551615",
+    ] {
+        let number: Value = serde_json::from_str(raw).unwrap();
+        let value = serde_json::json!({"nested": [null, {"number": number}]});
+        assert_eq!(
+            canonical_json(&value),
+            Err(CanonicalError::UnsafeNumber(number.to_string()))
+        );
+    }
+}
+
+#[test]
+fn unicode_key_order_and_all_control_escapes_keep_golden_bytes() {
+    let value = serde_json::json!({"\u{e000}": 9007199254740991_i64, "😀": -9007199254740991_i64,
+        "controls": (0u8..32).map(char::from).collect::<String>()});
+    let expected = concat!(
+        r#"{"controls":"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f"#,
+        r#"\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f","😀":-9007199254740991,"":9007199254740991}"#
+    );
+    assert_eq!(canonical_json(&value).unwrap(), expected);
+}

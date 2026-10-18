@@ -455,7 +455,8 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
 
 /**
  * The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope
- * (none: a read-only unit), `--provider` its soft executor preference and `--persona` its persona.
+ * (none: a read-only unit), `--provider` its soft executor preference, `--persona` its persona,
+ * `--input` the files it is handed (Unit `inputs`) and `--verify` the command that checks its work.
  * Every flag is checked against the config and the persona tiers here, so a wrong one leaves no
  * unit run behind. A writing unit needs a linked worktree; this never creates one.
  */
@@ -476,6 +477,10 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
   }
   if (writes.length > 0 && !isLinkedWorktree()) {
     throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
+  }
+  const inputs = parseListFlag(flags.input);
+  if (flags.input !== undefined && inputs.length === 0) {
+    throw new StoreError('validation', 'fgos run "<prompt>" --input needs at least one repo-relative path (comma-separated); omit it for a unit with no input files');
   }
   const prefer = parseListFlag(flags.provider);
   if (flags.provider !== undefined) {
@@ -508,6 +513,8 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
     ...(flags.rigor !== undefined ? { rigor: requireField(flags.rigor, '--rigor requires a level') } : {}),
     ...(prefer.length > 0 ? { prefer } : {}),
     ...(flags.persona !== undefined ? { persona: flags.persona } : {}),
+    ...(inputs.length > 0 ? { inputs } : {}),
+    ...(flags.verify !== undefined ? { verify: requireField(flags.verify, '--verify requires a command, e.g. --verify "npm test"') } : {}),
   };
 }
 
@@ -2815,7 +2822,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', '--sync only applies to fgos run "<prompt>" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with');
       }
       const buildsUnit = prompt !== undefined || flags.sync !== undefined;
-      const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor'].find((f) => flags[f] !== undefined);
+      const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor', 'input', 'verify'].find((f) => flags[f] !== undefined);
       if (promptOnlyFlag) {
         throw new StoreError('validation', `--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
       }

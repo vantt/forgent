@@ -2419,6 +2419,13 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     confinement: { mode: 'unconfined' },
     serves: { outputKind: 'finding', mutates: false },
   },
+  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`
+  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.
+  'docs:write': {
+    description:
+      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a "prefer" pool to choose which executors serve it.',
+    serves: { outputKind: 'change', domain: 'docs', mutates: true },
+  },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
@@ -3358,11 +3365,11 @@ registerFix({
 
 // tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
 // binary is reachable -- it says nothing about whether the coding-domain
-// dev-skills the plugin's own slash-command skills (cook/discover/plan/
+// dev-skills the plugin's own slash-command skills (deliver/discover/plan/
 // pick) dispatch into via the Skill tool are actually shipped in
 // plugins/fgOS/skills/ (they were not, before tsk-32b's own fix -- a
 // plugin-only consumer got "Unknown skill: fgos-coding-driving" the first
-// time cook/discover/plan/pick tried to dispatch into one, with the CLI
+// time deliver/discover/plan/pick tried to dispatch into one, with the CLI
 // itself fully reachable the whole time). This check only ever fires
 // against THIS repo's own source tree -- it derives the expected dev-skill
 // set from `.claude/skills/fgos-*` and confirms each one also exists under

@@ -912,10 +912,25 @@ fn remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admiss
     assert!(blocked.cause.contains(&pending));
     // Remove the remote completely: recovery must use only local observations.
     fs::remove_dir_all(&remote).unwrap();
+    // Automatic admission preserves interrupted transfers under signed rule 4.
+    assert_eq!(
+        port.recover_publications(&repo).unwrap_err().code,
+        ResultCode::RecoveryRequired
+    );
+    assert!(wal.inspect(&pending).unwrap().outcome().is_none());
+    // Explicit recovery reports remote uncertainty from local observations.
     assert!(matches!(
         port.recover(&repo, &pending).unwrap().remote,
         Remote::Unknown
     ));
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Oid(a.clone()),
+        &ExpectedTip::Oid(a.clone()),
+        "local-after-interrupted-transfer",
+    )
+    .unwrap();
     assert!(matches!(
         wal.compacted(&pending).unwrap().unwrap().outcome().unwrap(),
         wal::Outcome::Transfer { unknown: true, .. }
@@ -1720,9 +1735,41 @@ fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
         .fetch_mapping_provenance(&repo, "origin")
         .unwrap()
         .unwrap();
-    assert_eq!(provenance.operation_id, "mapping-first");
+    assert_eq!(provenance.operation_id, "mapping-second");
     assert_eq!(provenance.remote_url, "https://example.invalid/project.git");
     assert_eq!(provenance.refspecs, maps);
+    git(
+        &root,
+        &[
+            "remote",
+            "set-url",
+            "origin",
+            "https://example.invalid/moved.git",
+        ],
+    );
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-reapprove")
+        .unwrap();
+    let approved = driver
+        .fetch_mapping_provenance(&repo, "origin")
+        .unwrap()
+        .unwrap();
+    assert_eq!(approved.operation_id, "mapping-reapprove");
+    assert_eq!(approved.remote_url, "https://example.invalid/moved.git");
+    let approval = wal::Wal::open(&repo)
+        .unwrap()
+        .inspect("mapping-reapprove")
+        .unwrap();
+    assert!(matches!(
+        approval.outcome(),
+        Some(wal::Outcome::ConfigApproved)
+    ));
+    assert_eq!(approval.records().len(), 2);
+    assert!(!approval
+        .records()
+        .iter()
+        .any(|r| matches!(r.phase, wal::Phase::TargetAttempt { .. })));
+
     assert_eq!(
         wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
         0

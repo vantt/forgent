@@ -49,6 +49,7 @@ test('every DEFAULT_CAPABILITY_SLOTS entry declares a "serves" attribute set mat
     advise: { outputKind: 'decision', mutates: false },
     execute: { outputKind: 'change', mutates: true },
     review: { outputKind: 'finding', mutates: false },
+    'docs:write': { outputKind: 'change', domain: 'docs', mutates: true },
     'code:implement': { outputKind: 'change', domain: 'code', mutates: true },
     'code:review': { outputKind: 'finding', domain: 'code', mutates: false },
     'code:test': { outputKind: 'verification', domain: 'code' },
@@ -205,7 +206,7 @@ test('decide --for resolves a capability to a tool/MCP provider, never assuming 
 
 test('shared capability catalog exists, lists the registered vocabulary, and never registers a "research" capability', () => {
   const content = fs.readFileSync(CATALOG_PATH, 'utf8');
-  for (const name of ['advise', 'execute', 'review', 'code:implement', 'code:review', 'code:test', 'code:debug', 'code:refactor', 'impact-analysis']) {
+  for (const name of ['advise', 'execute', 'review', 'docs:write', 'code:implement', 'code:review', 'code:test', 'code:debug', 'code:refactor', 'impact-analysis']) {
     assert.ok(content.includes(`\`${name}\``), `catalog should document "${name}"`);
   }
   assert.ok(!/\|\s*`research`\s*\|/.test(content), 'catalog must never register a "research" capability');

@@ -5,7 +5,7 @@ description: >-
   Drive one coding-domain work item through its own lifecycle, one stage at
   a time, until it hits a ceiling, a question only a person can answer, or
   the ceiling stage/status is reached. This is the mechanical loop every
-  coding-domain caller (`/fgOS:cook`, `/fgOS:pick`, a discovery/planning/
+  coding-domain caller (`/fgOS:deliver`, `/fgOS:pick`, a discovery/planning/
   execution sweep) is built on top of, never a second routing judgment of
   its own. Use when a session already knows which item and how far to carry
   it (the ceiling), and just needs the loop that gets it there. Examples:

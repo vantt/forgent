@@ -83,7 +83,7 @@ pub fn install_ordered(
     before_install: &mut dyn FnMut() -> io::Result<()>,
     also_sync: &[&Path],
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, &mut |step| match step {
+    write_durably(dir, name, bytes, false, 0o600, &mut |step| match step {
         "file-fsync" => {
             filesystem.checkpoint(step)?;
             before_install()
@@ -113,9 +113,20 @@ pub fn sync_directories(dirs: &[&Path]) -> io::Result<()> {
     }
 }
 
+/// Install with the caller's historical Unix creation mode (still filtered by
+/// umask). Other platforms use their normal creation permissions.
+pub fn install_once_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
+    write_durably(dir, name, bytes, false, mode, &mut |_| Ok(()), &[], None)
+}
+
 /// Replace a name atomically without opening its old target, then sync its parent.
 pub fn replace_durably(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed, InstallError> {
     replace_durably_observed(dir, name, bytes, |_| Ok(()))
+}
+
+/// Replace with a caller-selected Unix creation mode, filtered by umask.
+pub fn replace_durably_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
+    write_durably(dir, name, bytes, true, mode, &mut |_| Ok(()), &[], None)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -133,7 +144,7 @@ pub fn replace_durably_observed(
     bytes: &[u8],
     mut observe: impl FnMut(ReplacePoint) -> io::Result<()>,
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, true, &mut |step| match step {
+    write_durably(dir, name, bytes, true, 0o600, &mut |step| match step {
         "bytes-written" => observe(ReplacePoint::Written),
         "file-fsync" => observe(ReplacePoint::Synced),
         "name-installed" => observe(ReplacePoint::Renamed),
@@ -150,6 +161,7 @@ fn write_durably(
     name: &str,
     bytes: &[u8],
     replace: bool,
+    mode: u32,
     checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
     also_sync: &[&Path],
     alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
@@ -171,8 +183,10 @@ fn write_durably(
     #[cfg(unix)]
     {
         use std::os::unix::fs::OpenOptionsExt;
-        options.mode(0o600).custom_flags(libc::O_NOFOLLOW);
+        options.mode(mode).custom_flags(libc::O_NOFOLLOW);
     }
+    #[cfg(not(unix))]
+    let _ = mode;
     let (temporary, mut file) = loop {
         let seq = NEXT_TEMP.fetch_add(1, Ordering::Relaxed);
         let path = dir.join(format!(".durable-file-{}-{seq}.tmp", std::process::id()));

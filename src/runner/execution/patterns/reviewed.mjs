@@ -4,6 +4,7 @@
  */
 
 import { roleUnit } from './role-tasks.mjs';
+import { resolveStrongerRigor } from '../../rigor.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -57,19 +58,38 @@ export function resolveCheckers(unit, cfg, params = {}) {
 }
 
 /**
- * Check if a verify command exists on unit, config, or preset params.
+ * The verify command of a unit: its own `verify`, else its capability's. Nothing else supplies one,
+ * so a unit without either is not verified, and says so.
  *
  * @param {object} unit
  * @param {object} cfg
- * @param {object} [params]
+ * @returns {string|undefined}
+ */
+export function verifyCommandOf(unit, cfg) {
+  const command = unit?.verify || cfg?.capabilities?.[unit?.capability]?.verify;
+  return typeof command === 'string' && command.trim() ? command : undefined;
+}
+
+/**
+ * Check if a verify command exists on the unit or its capability.
+ *
+ * @param {object} unit
+ * @param {object} cfg
  * @returns {boolean}
  */
-export function hasVerifyCommand(unit, cfg, params = {}) {
-  return Boolean(
-    unit?.verify ||
-    cfg?.capabilities?.[unit?.capability]?.verify ||
-    params?.verify
-  );
+export function hasVerifyCommand(unit, cfg) {
+  return verifyCommandOf(unit, cfg) !== undefined;
+}
+
+/**
+ * At rigor high or critical (the unit's, or its capability's floor, the same stronger-of rule
+ * bind() applies) every seat of the unit runs on its own provider family: the producer and each
+ * checker differ from one another, and a pool without enough families refuses the seat that
+ * cannot be placed. Standard and low only require checkers to differ from the producer.
+ */
+export function requiresDistinctFamilies(unit, cfg) {
+  const rigor = resolveStrongerRigor(unit?.rigor, cfg?.capabilities?.[unit?.capability]?.rigor) ?? 'standard';
+  return rigor === 'high' || rigor === 'critical';
 }
 
 /**
@@ -137,7 +157,7 @@ function assessRound(results) {
 export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}) {
   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
   const checkerList = resolveCheckers(unit, cfg, params);
-  const hasVerify = hasVerifyCommand(unit, cfg, params);
+  const hasVerify = hasVerifyCommand(unit, cfg);
   for (let round = 1; round <= maxRounds; round++) {
     if (!isRoundSettledInHistory(round, priorResults, checkerList, hasVerify)) return null;
     const producer = priorResults.find((res) => res.role === 'producer' && (res.round ?? 1) === round);
@@ -169,7 +189,8 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
   const checkerList = resolveCheckers(unit, cfg, params);
-  const hasVerify = hasVerifyCommand(unit, cfg, params);
+  const hasVerify = hasVerifyCommand(unit, cfg);
+  const distinctFamilies = requiresDistinctFamilies(unit, cfg);
 
   const allResults = [];
   const allFindings = [];
@@ -303,7 +324,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
         // Told to check rather than to do the work, and handed the producer's account of this round.
         unit: roleUnit(unit, { role: checkerRole, params }),
         readOnly: true,
-        independentOf: ['producer'],
+        independentOf: distinctFamilies ? ['producer', ...checkerList.filter((role) => role !== checkerRole)] : ['producer'],
         round: r,
         inputs: [producerResult],
       })),
