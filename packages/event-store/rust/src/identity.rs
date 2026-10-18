@@ -1,18 +1,17 @@
 //! Event Store owns machine and clone identities; setup owns machine-id minting.
+use crate::errors::invalid;
 use crate::{
     envelope::{line, valid_timestamp},
     errors::{Error, ErrorCode},
     layout::Layout,
 };
+use crate::{errors::io, validation::valid_store_id};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, File, OpenOptions},
     io::{Read, Write},
     path::Path,
 };
-fn invalid(detail: impl Into<String>) -> Error {
-    Error::new(ErrorCode::EventStoreIntegrity, detail)
-}
 fn moved(detail: impl Into<String>) -> Error {
     Error::new(ErrorCode::EventStoreStoreMoved, detail)
 }
@@ -27,12 +26,24 @@ pub fn machine_id(config_value: Option<&str>, state_root: &Path) -> Result<Strin
     let value = match config_value {
         Some(value) => value.to_owned(),
         None => fs::read_to_string(state_root.join("machine-id"))
-            .map_err(|e| invalid(format!("machine id missing: {e}")))?
+            .map_err(|e| {
+                if e.kind() == std::io::ErrorKind::NotFound {
+                    Error::new(
+                        ErrorCode::EventStoreMachineId,
+                        format!("machine id missing: {e}"),
+                    )
+                } else {
+                    io(e)
+                }
+            })?
             .trim_end_matches(['\r', '\n'])
             .to_owned(),
     };
     if !valid_machine_id(&value) {
-        return Err(invalid("invalid machine id; run setup fix"));
+        return Err(Error::new(
+            ErrorCode::EventStoreMachineId,
+            "invalid machine id; run setup fix",
+        ));
     }
     Ok(value)
 }
@@ -46,28 +57,28 @@ pub struct StoreIdentity {
     pub common_dir: String,
     pub common_dir_dev_ino: String,
 }
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 fn dev_ino(path: &Path) -> Result<String, Error> {
     use std::os::unix::fs::MetadataExt;
-    let meta = fs::metadata(path).map_err(|e| invalid(e.to_string()))?;
+    let meta = fs::metadata(path).map_err(io)?;
     Ok(format!("{}:{}", meta.dev(), meta.ino()))
 }
-#[cfg(not(unix))]
+#[cfg(not(target_os = "linux"))]
 fn dev_ino(_: &Path) -> Result<String, Error> {
     Err(Error::new(
         ErrorCode::EventStoreUnsupportedPlatform,
         "store identity requires a native file identity driver",
     ))
 }
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 fn random_id() -> Result<String, Error> {
     let mut bytes = [0u8; 16];
     File::open("/dev/urandom")
         .and_then(|mut f| f.read_exact(&mut bytes))
-        .map_err(|e| invalid(e.to_string()))?;
+        .map_err(io)?;
     Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
 }
-#[cfg(not(unix))]
+#[cfg(not(target_os = "linux"))]
 fn random_id() -> Result<String, Error> {
     Err(Error::new(
         ErrorCode::EventStoreUnsupportedPlatform,
@@ -75,15 +86,36 @@ fn random_id() -> Result<String, Error> {
     ))
 }
 impl StoreIdentity {
+    /// Recovery only: caller must hold event-append and exclude live initializers.
+    /// Phase 02 calls this before initialization, never concurrently with publication.
+    pub fn sweep_temps_under_append_lock(layout: &Layout) -> Result<(), Error> {
+        let entries = match fs::read_dir(&layout.root) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(e) => return Err(io(e)),
+        };
+        for entry in entries {
+            let entry = entry.map_err(io)?;
+            let name = entry.file_name();
+            if name
+                .to_str()
+                .and_then(|n| n.strip_prefix("store."))
+                .and_then(|n| n.strip_suffix(".tmp"))
+                .is_some_and(valid_store_id)
+            {
+                fs::remove_file(entry.path()).map_err(io)?;
+            }
+        }
+        File::open(&layout.root)
+            .and_then(|f| f.sync_all())
+            .map_err(io)
+    }
+
     pub fn open(layout: &Layout, machine: &str) -> Result<Self, Error> {
-        let bytes = fs::read(layout.store()).map_err(|e| invalid(e.to_string()))?;
+        let bytes = fs::read(layout.store()).map_err(io)?;
         let identity: Self = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
         if identity.v != 1
-            || identity.store_id.len() != 32
-            || !identity
-                .store_id
-                .bytes()
-                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+            || !valid_store_id(&identity.store_id)
             || !valid_timestamp(&identity.created_at)
         {
             return Err(invalid("malformed store identity"));
@@ -107,7 +139,7 @@ impl StoreIdentity {
         match fs::symlink_metadata(layout.store()) {
             Ok(_) => return Self::open(layout, machine),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-            Err(e) => return Err(invalid(e.to_string())),
+            Err(e) => return Err(io(e)),
         }
         if !valid_machine_id(machine) || !valid_timestamp(created_at) {
             return Err(invalid("invalid machine id or creation timestamp"));
@@ -124,12 +156,10 @@ impl StoreIdentity {
                 .into(),
             common_dir_dev_ino: dev_ino(&layout.common_dir)?,
         };
-        fs::create_dir_all(&layout.root).map_err(|e| invalid(e.to_string()))?;
+        fs::create_dir_all(&layout.root).map_err(io)?;
         // Persist newly created directory entries as well as store.json itself.
         for parent in [layout.root.parent().unwrap(), layout.common_dir.as_path()] {
-            File::open(parent)
-                .and_then(|f| f.sync_all())
-                .map_err(|e| invalid(e.to_string()))?;
+            File::open(parent).and_then(|f| f.sync_all()).map_err(io)?;
         }
         let tmp = layout.root.join(format!("store.{}.tmp", identity.store_id));
         let write = || -> Result<(), Error> {
@@ -137,14 +167,19 @@ impl StoreIdentity {
                 .write(true)
                 .create_new(true)
                 .open(&tmp)
-                .map_err(|e| invalid(e.to_string()))?;
+                .map_err(io)?;
             file.write_all(&line(&identity)?)
                 .and_then(|_| file.sync_all())
-                .map_err(|e| invalid(e.to_string()))?;
-            fs::rename(&tmp, layout.store()).map_err(|e| invalid(e.to_string()))?;
+                .map_err(io)?;
+            match fs::hard_link(&tmp, layout.store()) {
+                Ok(()) => (),
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => (),
+                Err(e) => return Err(io(e)),
+            }
+            fs::remove_file(&tmp).map_err(io)?;
             File::open(&layout.root)
                 .and_then(|f| f.sync_all())
-                .map_err(|e| invalid(e.to_string()))?;
+                .map_err(io)?;
             Ok(())
         };
         let result = write();
@@ -152,6 +187,6 @@ impl StoreIdentity {
             let _ = fs::remove_file(tmp);
         }
         result?;
-        Ok(identity)
+        Self::open(layout, machine)
     }
 }

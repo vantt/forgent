@@ -11,6 +11,15 @@ use std::{
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
+fn git() -> Command {
+    let mut cmd = Command::new("git");
+    for (key, _) in std::env::vars_os() {
+        if key.to_string_lossy().starts_with("GIT_") {
+            cmd.env_remove(key);
+        }
+    }
+    cmd
+}
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Repo(PathBuf);
 impl Repo {
@@ -21,7 +30,7 @@ impl Repo {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(&root).unwrap();
-        assert!(Command::new("git")
+        assert!(git()
             .args(["init", "-q"])
             .arg(&root)
             .status()
@@ -219,7 +228,7 @@ fn layouts_and_linked_worktrees_share_common_root() {
     }
     assert!(layout.append_lock().ends_with("locks/event-append.lock"));
     assert!(layout.seal_lock().ends_with("locks/event-seal.lock"));
-    assert!(Command::new("git")
+    assert!(git()
         .current_dir(&repo.0)
         .args([
             "-c",
@@ -235,14 +244,14 @@ fn layouts_and_linked_worktrees_share_common_root() {
         .unwrap()
         .success());
     let linked = repo.0.join("linked");
-    assert!(Command::new("git")
+    assert!(git()
         .current_dir(&repo.0)
         .args(["worktree", "add", "-q", "-b", "linked"])
         .arg(&linked)
         .status()
         .unwrap()
         .success());
-    let output = Command::new("git")
+    let output = git()
         .current_dir(linked)
         .args(["rev-parse", "--path-format=absolute", "--git-common-dir"])
         .output()
@@ -270,4 +279,50 @@ fn envelope_and_seen_keys_use_the_same_safe_stream_grammar() {
     event.seen.insert("other:branch:../escape".into(), 1);
     event.h = event.compute_hash().unwrap();
     assert!(event.validate().is_err());
+}
+
+#[test]
+fn concurrent_initializers_return_one_durable_identity() {
+    let repo = Repo::new();
+    let layout = repo.layout();
+    let barrier = std::sync::Arc::new(std::sync::Barrier::new(16));
+    let threads: Vec<_> = (0..16)
+        .map(|_| {
+            let layout = layout.clone();
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                StoreIdentity::initialize_under_append_lock(
+                    &layout,
+                    "machine-1",
+                    "2026-10-18T00:00:00.000Z",
+                )
+                .unwrap()
+            })
+        })
+        .collect();
+    let ids: Vec<_> = threads.into_iter().map(|t| t.join().unwrap()).collect();
+    let stored = StoreIdentity::open(&layout, "machine-1").unwrap();
+    assert!(ids.iter().all(|id| id == &stored));
+    assert_eq!(fs::read_dir(&layout.root).unwrap().count(), 1);
+}
+
+#[test]
+fn locked_recovery_sweeps_only_identity_temps() {
+    let repo = Repo::new();
+    let layout = repo.layout();
+    fs::create_dir_all(&layout.root).unwrap();
+    let stale = layout.root.join(format!("store.{}.tmp", "a".repeat(32)));
+    fs::write(&stale, "interrupted").unwrap();
+    fs::write(layout.root.join("store.other.tmp"), "keep").unwrap();
+    let id = StoreIdentity::initialize_under_append_lock(
+        &layout,
+        "machine-1",
+        "2026-10-18T00:00:00.000Z",
+    )
+    .unwrap();
+    StoreIdentity::sweep_temps_under_append_lock(&layout).unwrap();
+    assert!(!stale.exists());
+    assert!(layout.root.join("store.other.tmp").exists());
+    assert_eq!(StoreIdentity::open(&layout, "machine-1").unwrap(), id);
 }

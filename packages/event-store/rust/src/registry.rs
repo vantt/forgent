@@ -26,9 +26,7 @@ pub struct ConsumerContract {
 pub struct Registry {
     types: BTreeMap<String, Registration>,
 }
-fn invalid(detail: impl Into<String>) -> Error {
-    Error::new(ErrorCode::EventStoreIntegrity, detail)
-}
+use crate::errors::invalid;
 impl Default for Registry {
     fn default() -> Self {
         let promote = Registration {
@@ -44,11 +42,20 @@ impl Default for Registry {
     }
 }
 impl Registry {
+    /// Reconcile durable event metadata on open (reader integration in phase 03).
+    /// Call for every historical type before accepting appends with this registry.
+    pub fn validate_historical_scope(&self, event_type: &str, scope: Scope) -> Result<(), Error> {
+        if self.get(event_type)?.scope != scope {
+            return Err(invalid("historical type scope changed"));
+        }
+        Ok(())
+    }
+
     /// Load transactionally: a bad file never leaves a partial registration set.
     pub fn load_files(&mut self, paths: &[impl AsRef<Path>]) -> Result<(), Error> {
         let mut next = self.clone();
         for path in paths {
-            let bytes = fs::read(path).map_err(|e| invalid(e.to_string()))?;
+            let bytes = fs::read(path).map_err(crate::errors::io)?;
             let contract: ConsumerContract =
                 serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
             next.register(contract)?;
@@ -71,6 +78,11 @@ impl Registry {
                 || item.schema_version > 9_007_199_254_740_991
             {
                 return Err(invalid("invalid domain or schemaVersion"));
+            }
+            if item.domain == "store"
+                || (item.event_type == "decision" && item.domain != "decisions")
+            {
+                return Err(invalid("reserved namespace or legacy type owner"));
             }
             let prefix = format!("{}.", item.domain);
             if item.event_type != "decision"

@@ -1,5 +1,9 @@
 //! Canonical protocol records. Hashes include the single framing newline.
-use crate::errors::{Error, ErrorCode};
+use crate::{
+    errors::Error,
+    identity::valid_machine_id,
+    validation::{lowercase_hex, valid_object_id, valid_store_id},
+};
 use fgos_canonical_json::canonical_line;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -12,9 +16,7 @@ fn positive_counter(n: u64) -> bool {
     n > 0 && n <= MAX_SAFE_COUNTER
 }
 
-fn invalid(detail: impl Into<String>) -> Error {
-    Error::new(ErrorCode::EventStoreIntegrity, detail)
-}
+use crate::errors::invalid;
 pub fn sha256(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
@@ -61,7 +63,7 @@ impl Envelope {
             || !positive_counter(self.schema_version)
             || self.event_type.is_empty()
             || self.src.is_empty()
-            || self.origin.is_empty()
+            || !valid_store_id(&self.origin)
         {
             return Err(invalid("invalid v4 envelope fields"));
         }
@@ -92,9 +94,14 @@ impl Envelope {
         self.validate()?;
         line(self)
     }
+    /// Accepts only the stored canonical form, including exactly one final LF.
     pub fn parse(raw: &[u8]) -> Result<Self, Error> {
         let event: Self = serde_json::from_slice(raw).map_err(|e| invalid(e.to_string()))?;
-        event.validate()?;
+        if raw != event.canonical_line()? {
+            return Err(invalid(
+                "expected canonical event bytes including exactly one trailing newline",
+            ));
+        }
         Ok(event)
     }
 }
@@ -103,13 +110,11 @@ fn scope_matches(scope: Scope, stream: &str) -> bool {
 }
 fn valid_seen_key(key: &str) -> bool {
     key.split_once(':').is_some_and(|(origin, stream)| {
-        !origin.is_empty() && crate::layout::StreamId::parse(stream).is_ok()
+        valid_store_id(origin) && crate::layout::StreamId::parse(stream).is_ok()
     })
 }
 pub fn is_digest(s: &str) -> bool {
-    s.len() == 64
-        && s.bytes()
-            .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+    lowercase_hex(s, 64)
 }
 pub fn valid_timestamp(s: &str) -> bool {
     let b = s.as_bytes();
@@ -168,7 +173,7 @@ impl BatchCommit {
     pub fn validate(&self) -> Result<(), Error> {
         if self.v != 4
             || self.kind != "batch-commit"
-            || self.origin.is_empty()
+            || !valid_store_id(&self.origin)
             || crate::layout::StreamId::parse(&self.stream).is_err()
             || !positive_counter(self.first_seq)
             || !positive_counter(self.last_seq)
@@ -238,7 +243,7 @@ impl Seal {
                     sha256: sha256.clone(),
                 };
                 marker.validate()?;
-                if *v != 1 || machine_id.is_empty() || !scope_matches(*scope, stream) {
+                if *v != 1 || !valid_machine_id(machine_id) || !scope_matches(*scope, stream) {
                     return Err(invalid("invalid seal header"));
                 }
             }
@@ -248,8 +253,8 @@ impl Seal {
                 parents,
             } => {
                 if *v != 1
-                    || machine_id.is_empty()
-                    || parents.iter().any(String::is_empty)
+                    || !valid_machine_id(machine_id)
+                    || parents.iter().any(|p| !valid_object_id(p))
                     || parents[0] == parents[1]
                 {
                     return Err(invalid("invalid merge header"));
@@ -259,7 +264,7 @@ impl Seal {
                 from_commit,
                 tree_of_fgos_events,
             } => {
-                if from_commit.is_empty() || tree_of_fgos_events.is_empty() {
+                if !valid_object_id(from_commit) || !valid_object_id(tree_of_fgos_events) {
                     return Err(invalid("invalid legacy header"));
                 }
             }

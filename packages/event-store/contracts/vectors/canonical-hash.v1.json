@@ -34,14 +34,15 @@
       "src": "writer-1",
       "schemaVersion": 1,
       "payload": {
-        "value": 1e-7,
+        "value": 1e-07,
         "negativeZero": 0,
         "huge": 1e+21
       }
     },
     "canonicalWithoutHash": "{\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"huge\":1e+21,\"negativeZero\":0,\"value\":1e-7},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
     "h": "3dc1b247ddb80f594a9e06933e6d5099cf6f780273d16756bcbc648ac7bcffa4",
-    "canonical": "{\"h\":\"3dc1b247ddb80f594a9e06933e6d5099cf6f780273d16756bcbc648ac7bcffa4\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"huge\":1e+21,\"negativeZero\":0,\"value\":1e-7},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n"
+    "canonical": "{\"h\":\"3dc1b247ddb80f594a9e06933e6d5099cf6f780273d16756bcbc648ac7bcffa4\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"payload\":{\"huge\":1e+21,\"negativeZero\":0,\"value\":1e-7},\"schemaVersion\":1,\"scope\":\"project\",\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"seq\":1,\"src\":\"writer-1\",\"stream\":\"project\",\"ts\":\"2026-10-18T04:46:00.000Z\",\"type\":\"work.created\",\"v\":4}\n",
+    "rawInput": "{\"v\":4,\"type\":\"work.created\",\"scope\":\"project\",\"origin\":\"0123456789abcdef0123456789abcdef\",\"stream\":\"project\",\"seq\":1,\"seen\":{\"abcdef0123456789abcdef0123456789:project:porting\":2},\"ts\":\"2026-10-18T04:46:00.000Z\",\"src\":\"writer-1\",\"schemaVersion\":1,\"payload\":{\"value\":1e-07,\"negativeZero\":-0,\"huge\":1e+21}}"
   },
   {
     "input": {

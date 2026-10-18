@@ -5,3 +5,4 @@ pub mod identity;
 pub mod layout;
 pub mod legacy;
 pub mod registry;
+pub mod validation;

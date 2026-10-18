@@ -15,3 +15,13 @@ impl Error {
         }
     }
 }
+
+pub(crate) fn invalid(detail: impl Into<String>) -> Error {
+    Error::new(ErrorCode::EventStoreIntegrity, detail)
+}
+pub(crate) fn io(error: std::io::Error) -> Error {
+    Error::new(
+        ErrorCode::EventStoreIo,
+        format!("{:?}: {error}", error.kind()),
+    )
+}

@@ -22,7 +22,7 @@
     },
     "origin": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{32}$"
     },
     "stream": {
       "type": "string",

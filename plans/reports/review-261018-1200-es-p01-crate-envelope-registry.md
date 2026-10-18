@@ -198,3 +198,7 @@ None.
 
 Status: DONE_WITH_CONCERNS
 Summary: Phase 01 core math (envelope `h`, canonical JSON, legacy order) conforms and all package tests pass. Before merge: the half-done canonical one door must be finished or ticketed (H1). Ten Medium gaps (non-canonical parse, identifier formats, unverified v3 `h`, missing branch-key rule, registry rule 1, error classification, store.json no-replace, bench placement, entry and report path) should be fixed or ticketed before phase 02.
+
+## Unit 3 disposition (2026-10-18)
+
+The original findings above remain the review record. See [review fixes](phase-lead-261018-1207-es-p01-u3-review-fixes.md) for fixes and exact proof, and [baseline experiment](experiment-261018-1207-event-store-ext4-baseline-v-spawn.md) for the corrected standard-door measurement, reproduce command and relocated raw evidence. The source-tree fixture command in the older unit-2 report is obsolete. H1 deferrals and registry history integration are tracked in the phase-01 plan.

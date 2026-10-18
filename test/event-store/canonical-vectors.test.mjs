@@ -16,9 +16,18 @@ test('canonical leaf vectors match ECMAScript numbers and UTF-16 key order', () 
 });
 test('event hash vectors include exactly one newline and exclude h', () => {
   for (const v of read('../../packages/event-store/contracts/vectors/canonical-hash.v1.json')) {
-    const bytes = canonical(v.input) + '\n';
+    const input = v.rawInput === undefined ? v.input : JSON.parse(v.rawInput);
+    const bytes = canonical(input) + '\n';
     assert.equal(bytes, v.canonicalWithoutHash);
     assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), v.h);
-    assert.equal(canonical({ ...v.input, h: v.h }) + '\n', v.canonical);
+    assert.equal(canonical({ ...input, h: v.h }) + '\n', v.canonical);
+  }
+});
+
+test('batch and seal records share canonical bytes and digest vectors', () => {
+  for (const v of read('../../packages/event-store/contracts/vectors/records.v1.json')) {
+    const bytes = canonical(v.input) + '\n';
+    assert.equal(bytes,v.canonical);
+    assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),v.sha256);
   }
 });

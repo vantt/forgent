@@ -26,11 +26,11 @@
         },
         "machineId": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
         },
         "origin": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-f0-9]{32}$"
         },
         "stream": {
           "type": "string",
@@ -83,7 +83,7 @@
         },
         "machineId": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
         },
         "parents": {
           "type": "array",
@@ -92,7 +92,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
           }
         }
       }
@@ -111,11 +111,11 @@
         },
         "fromCommit": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
         },
         "treeOfFgosEvents": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
         }
       }
     }

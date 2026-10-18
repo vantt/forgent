@@ -12,15 +12,27 @@ export function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.max(0, Math.ceil(sorted.length * fraction) - 1)];
 }
-export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20], hostBin } = {}) {
+export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20], hostBin, entry = 'host' } = {}) {
+  if (!['host', 'node-payload'].includes(entry)) throw new Error('entry must be host or node-payload');
   if (!root || !out) throw new Error('--root and --out required');
   if (!Number.isInteger(samples) || samples < 1 || sessions.some(n => !Number.isInteger(n) || n < 1)) throw new Error('invalid samples/sessions');
   root = path.resolve(root); out = path.resolve(out);
   if (fs.existsSync(root)) throw new Error('root must be fresh (will not reuse or delete an existing project)');
+  const checkout = fs.realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'));
+  // Resolve existing ancestors so a symlink cannot disguise a source-tree fixture.
+  const realDestination = value => {
+    let ancestor = value; const tail = [];
+    while (!fs.existsSync(ancestor)) { tail.unshift(path.basename(ancestor)); ancestor = path.dirname(ancestor); }
+    return path.join(fs.realpathSync(ancestor), ...tail);
+  };
+  for (const destination of [root, out]) {
+    const relative = path.relative(checkout, realDestination(destination));
+    if (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative)
+        && !relative.startsWith(`.fgos${path.sep}runtime${path.sep}`)) throw new Error('checkout writes must be under .fgos/runtime/');
+  }
   const parent = path.dirname(root);
   const filesystem = execFileSync('findmnt', ['-T', parent, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (filesystem !== 'ext4') throw new Error(`ext4 required; got ${filesystem}`);
-  const checkout = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   hostBin ??= resolveActiveHostBin({ cwd: checkout }).bin;
   if (!hostBin) throw new Error('pass --host-bin (real activated Rust host required)');
   hostBin = fs.realpathSync(hostBin);
@@ -34,7 +46,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20
   let active = 0; let peak = 0;
   const call = (args, writer) => new Promise(resolve => {
     const start = performance.now();
-    const child = spawn(process.execPath, [path.join(checkout, 'bin/fgos.mjs'), ...args], { cwd: root, env: { ...env, FGOS_SESSION_ID: writer }, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(entry === 'host' ? 'fgos' : process.execPath, entry === 'host' ? args : [path.join(checkout, 'bin/fgos.mjs'), ...args], { cwd: root, env: { ...env, FGOS_SESSION_ID: writer }, stdio: ['ignore', 'pipe', 'pipe'] });
     active++; peak = Math.max(peak, active);
     let stdout = ''; let stderr = '';
     child.stdout.on('data', d => stdout += d); child.stderr.on('data', d => stderr += d);
@@ -45,7 +57,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 20
   const seed = `import {initStore,addWork} from ${JSON.stringify(pathToFileURL(path.join(checkout, 'src/state/store.mjs')).href)};
 const dir=process.argv[1]; initStore(dir); for(const id of JSON.parse(process.argv[2])) addWork(dir,{id,title:id,kind:'task',status:'todo',workflowStep:'executing',deps:[],risk:'light',refs:[],verify:'true'});`;
   const rows = [];
-  const result = { contract: 'v-spawn-benchmark.v1', generatedAt: new Date().toISOString(), checkout, commit: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: checkout, encoding: 'utf8'}).trim(), containsReadClaimsFix: (() => { try {execFileSync('git', ['merge-base', '--is-ancestor', 'a4b1278ae', 'HEAD'], {cwd: checkout}); return true;} catch {return false;} })(), filesystem, mount: execFileSync('findmnt', ['-T', parent, '-n', '-o', 'SOURCE,FSTYPE'], {encoding:'utf8'}).trim(), root, hostBin, node: process.version, cpu: os.cpus()[0].model, logicalCpus: os.cpus().length, samples, sessions, rows };
+  const result = { contract: 'v-spawn-benchmark.v1', entry, command: entry === 'host' ? 'fgos (PATH shim, activated release)' : 'node bin/fgos.mjs (working-tree payload)', generatedAt: new Date().toISOString(), checkout, commit: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: checkout, encoding: 'utf8'}).trim(), containsReadClaimsFix: (() => { try {execFileSync('git', ['merge-base', '--is-ancestor', 'a4b1278ae', 'HEAD'], {cwd: checkout}); return true;} catch {return false;} })(), filesystem, mount: execFileSync('findmnt', ['-T', parent, '-n', '-o', 'SOURCE,FSTYPE'], {encoding:'utf8'}).trim(), root, hostBin, node: process.version, cpu: os.cpus()[0].model, logicalCpus: os.cpus().length, samples, sessions, rows };
   for (const mutation of ['claim', 'move', 'settle']) for (const concurrency of sessions) {
     const ids = Array.from({length: samples}, (_, i) => `bench-${mutation}-${concurrency}-${i}`);
     execFileSync(process.execPath, ['--input-type=module', '-e', seed, path.join(root, '.fgos'), JSON.stringify(ids)], {cwd: root, env: {...env, FGOS_SESSION_ID:'bench-seed'}, stdio:'pipe'});
@@ -70,7 +82,7 @@ const dir=process.argv[1]; initStore(dir); for(const id of JSON.parse(process.ar
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2); const options = {};
   for(let i=0;i<args.length;i+=2) {
-    const key = {'--root':'root','--out':'out','--samples':'samples','--sessions':'sessions','--host-bin':'hostBin'}[args[i]];
+    const key = {'--root':'root','--out':'out','--samples':'samples','--sessions':'sessions','--host-bin':'hostBin','--entry':'entry'}[args[i]];
     if (!key || args[i+1] === undefined) throw new Error(`unknown/missing argument ${args[i]}`);
     options[key] = key==='samples' ? Number(args[i+1]) : key==='sessions' ? args[i+1].split(',').map(Number) : args[i+1];
   }

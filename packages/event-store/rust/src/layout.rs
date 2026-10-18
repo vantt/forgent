@@ -116,3 +116,22 @@ impl StreamLayout {
         self.root.join("sealed.json")
     }
 }
+
+/// Lowercase ASCII; collapse other character runs to hyphens; trim, then cap at
+/// 128 ASCII bytes and trim a trailing separator. Empty results are refused.
+pub fn branch_key(branch: &str) -> Result<String, Error> {
+    let mut slug = String::new();
+    for c in branch.chars() {
+        if c.is_ascii_alphanumeric() {
+            slug.push(c.to_ascii_lowercase());
+        } else if !slug.is_empty() && !slug.ends_with('-') {
+            slug.push('-');
+        }
+    }
+    slug.truncate(128);
+    let slug = slug.trim_end_matches('-');
+    if !valid_slug(slug) {
+        return Err(crate::errors::invalid("branch has no slug characters"));
+    }
+    Ok(slug.into())
+}

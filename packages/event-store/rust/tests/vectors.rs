@@ -7,17 +7,30 @@ fn canonical_hash_vectors() {
     ))
     .unwrap();
     for v in vectors.as_array().unwrap() {
-        let mut input = v["input"].clone();
+        let mut input = v
+            .get("rawInput")
+            .and_then(Value::as_str)
+            .map(|raw| serde_json::from_str(raw).unwrap())
+            .unwrap_or_else(|| v["input"].clone());
         input["h"] = v["h"].clone();
         let event: Envelope = serde_json::from_value(input).unwrap();
         assert_eq!(event.compute_hash().unwrap(), v["h"]);
+        let mut without = serde_json::to_value(&event).unwrap();
+        without.as_object_mut().unwrap().remove("h");
+        assert_eq!(
+            line(&without).unwrap(),
+            v["canonicalWithoutHash"].as_str().unwrap().as_bytes()
+        );
         assert_eq!(
             event.canonical_line().unwrap(),
             v["canonical"].as_str().unwrap().as_bytes()
         );
         assert_eq!(
-            Envelope::parse(v["canonical"].as_str().unwrap().as_bytes()).unwrap(),
-            event
+            Envelope::parse(v["canonical"].as_str().unwrap().as_bytes())
+                .unwrap()
+                .canonical_line()
+                .unwrap(),
+            event.canonical_line().unwrap()
         );
         let mut tampered = event.clone();
         tampered.payload = json!({"tampered":true});
@@ -50,7 +63,7 @@ fn batch_marker_is_a_distinct_record() {
     let marker = BatchCommit {
         v: 4,
         kind: "batch-commit".into(),
-        origin: "origin".into(),
+        origin: "0123456789abcdef0123456789abcdef".into(),
         stream: "project".into(),
         first_seq: 1,
         last_seq: 2,
@@ -71,9 +84,9 @@ fn batch_marker_is_a_distinct_record() {
 #[test]
 fn seal_kinds_roundtrip() {
     let records = [
-        json!({"v":1,"kind":"seal","machineId":"machine-1","origin":"origin","stream":"project","scope":"project","firstSeq":1,"lastSeq":1,"count":1,"sha256":sha256(b"segment")}),
-        json!({"v":1,"kind":"merge","machineId":"machine-1","parents":["a","b"]}),
-        json!({"kind":"legacy","fromCommit":"a","treeOfFgosEvents":"b"}),
+        json!({"v":1,"kind":"seal","machineId":"machine-1","origin":"0123456789abcdef0123456789abcdef","stream":"project","scope":"project","firstSeq":1,"lastSeq":1,"count":1,"sha256":sha256(b"segment")}),
+        json!({"v":1,"kind":"merge","machineId":"machine-1","parents":["a".repeat(40),"b".repeat(40)]}),
+        json!({"kind":"legacy","fromCommit":"a".repeat(40),"treeOfFgosEvents":"b".repeat(40)}),
     ];
     for value in records {
         let seal: Seal = serde_json::from_value(value.clone()).unwrap();
@@ -118,10 +131,10 @@ fn frozen_legacy_order_and_provenance() {
 #[test]
 fn malformed_record_headers_are_refused() {
     for value in [
-        json!({"v":2,"kind":"merge","machineId":"machine","parents":["a","b"]}),
+        json!({"v":2,"kind":"merge","machineId":"machine","parents":["a".repeat(40),"b".repeat(40)]}),
         json!({"v":1,"kind":"merge","machineId":"machine","parents":["a","a"]}),
         json!({"kind":"legacy","fromCommit":"","treeOfFgosEvents":"b"}),
-        json!({"v":1,"kind":"seal","machineId":"machine","origin":"origin","stream":"local","scope":"project","firstSeq":1,"lastSeq":2,"count":1,"sha256":sha256(b"bytes")}),
+        json!({"v":1,"kind":"seal","machineId":"machine","origin":"0123456789abcdef0123456789abcdef","stream":"local","scope":"project","firstSeq":1,"lastSeq":2,"count":1,"sha256":sha256(b"bytes")}),
     ] {
         let seal: Seal = serde_json::from_value(value).unwrap();
         assert!(seal.canonical_line().is_err());
@@ -149,5 +162,26 @@ fn protocol_counters_cannot_collapse_to_the_same_jcs_number() {
         }
         event.h = event.compute_hash().unwrap();
         assert!(event.validate().is_err());
+    }
+}
+
+#[test]
+fn shared_record_bytes_and_digests() {
+    let records: Value =
+        serde_json::from_str(include_str!("../../contracts/vectors/records.v1.json")).unwrap();
+    for record in records.as_array().unwrap() {
+        let bytes = if record["input"]["kind"] == "batch-commit" {
+            serde_json::from_value::<BatchCommit>(record["input"].clone())
+                .unwrap()
+                .canonical_line()
+                .unwrap()
+        } else {
+            serde_json::from_value::<Seal>(record["input"].clone())
+                .unwrap()
+                .canonical_line()
+                .unwrap()
+        };
+        assert_eq!(bytes, record["canonical"].as_str().unwrap().as_bytes());
+        assert_eq!(sha256(&bytes), record["sha256"]);
     }
 }

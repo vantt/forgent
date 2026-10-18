@@ -15,10 +15,31 @@ pub struct LegacyEvent {
     pub event: Value,
     pub raw: String,
     pub provenance: Provenance,
+    timestamp: String,
 }
 impl LegacyEvent {
-    /// `h` is the historical identity, including its original 16 hex digits.
-    /// It is never replaced by a v4 canonical hash.
+    /// Verify the raw historical suffix without re-encoding the event.
+    pub fn verify(&self) -> Result<(), Error> {
+        if let Some(h) = self
+            .event
+            .get("h")
+            .and_then(Value::as_str)
+            .filter(|h| !h.is_empty())
+        {
+            let suffix = format!(",\"h\":\"{h}\"}}");
+            let raw = self.raw.strip_suffix('\r').unwrap_or(&self.raw);
+            let prefix = raw
+                .strip_suffix(&suffix)
+                .ok_or_else(|| crate::errors::invalid("legacy hash suffix missing"))?;
+            if !crate::validation::lowercase_hex(h, 16)
+                || crate::envelope::sha256(format!("{prefix}}}").as_bytes())[..16] != *h
+            {
+                return Err(crate::errors::invalid("legacy hash mismatch"));
+            }
+        }
+        Ok(())
+    }
+    /// Historical `h` remains the identity; absent or empty `h` uses the raw line.
     pub fn identity(&self) -> String {
         match self
             .event
@@ -60,14 +81,17 @@ pub fn parse_file(file: &str, raw: &str) -> Result<Vec<LegacyEvent>, Error> {
                     format!("invalid legacy event {file}:{}", index + 1),
                 ));
             }
-            Ok(LegacyEvent {
+            let parsed = LegacyEvent {
+                timestamp: event["ts"].as_str().unwrap().to_owned(),
                 event,
                 raw: line.to_owned(),
                 provenance: Provenance {
                     file: file.to_owned(),
                     line: index + 1,
                 },
-            })
+            };
+            parsed.verify()?;
+            Ok(parsed)
         })
         .collect()
 }
@@ -75,11 +99,9 @@ pub fn parse_file(file: &str, raw: &str) -> Result<Vec<LegacyEvent>, Error> {
 /// Baseline uses file tag "". Caller supplies files in discovery order.
 pub fn order(mut events: Vec<LegacyEvent>) -> Vec<LegacyEvent> {
     events.sort_by(|a, b| {
-        a.event["ts"]
-            .as_str()
-            .unwrap()
+        a.timestamp
             .encode_utf16()
-            .cmp(b.event["ts"].as_str().unwrap().encode_utf16())
+            .cmp(b.timestamp.encode_utf16())
             .then_with(|| {
                 a.provenance
                     .file
