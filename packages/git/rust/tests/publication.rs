@@ -1516,6 +1516,161 @@ fn literal_ref_pages_and_batched_tree_paths() {
 }
 
 #[test]
+fn bound_recovery_compacts_observed_attempt_and_nonidentical_successor_supersedes() {
+    for point in ["before-pin-cas", "before-target-cas", "after-target-cas"] {
+        let t = Temp::new();
+        let root = t.0.join("repo");
+        init(&root, "sha1", "files");
+        let driver = GitDriver::new(&t.0).unwrap();
+        let repo = resolve(&driver, &root);
+        let mut h = handle(&t.0.join("seal.lock"));
+        let plain = PublicationPort::new(&driver, authority(&repo, &mut h));
+        let a = commit(&plain, &repo, vec![], "a");
+        let b = commit(&plain, &repo, vec![], "different retry");
+        drop(plain);
+        let faulty =
+            PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), Fault(point));
+        assert!(faulty
+            .compare_and_swap(
+                &repo,
+                &reference(),
+                &ExpectedTip::Absent,
+                &ExpectedTip::Oid(a.clone()),
+                "old-seal"
+            )
+            .is_err());
+        drop(faulty);
+        let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+        let pending = port.recover_publications(&repo).unwrap();
+        if point == "before-pin-cas" {
+            assert!(pending.is_empty());
+            assert!(matches!(
+                wal::Wal::open(&repo)
+                    .unwrap()
+                    .compacted("old-seal")
+                    .unwrap()
+                    .unwrap()
+                    .outcome()
+                    .unwrap(),
+                wal::Outcome::AbandonedBeforeAttempt
+            ));
+        } else if point == "after-target-cas" {
+            assert!(pending.is_empty());
+            let old = wal::Wal::open(&repo)
+                .unwrap()
+                .compacted("old-seal")
+                .unwrap()
+                .unwrap()
+                .outcome()
+                .unwrap();
+            assert!(matches!(
+                old,
+                wal::Outcome::Success {
+                    attribution: wal::Attribution::EffectObservedOnly,
+                    ..
+                }
+            ));
+        } else {
+            assert_eq!(pending, vec!["old-seal"]);
+            port.compare_and_swap(
+                &repo,
+                &reference(),
+                &ExpectedTip::Absent,
+                &ExpectedTip::Oid(b),
+                "new-seal",
+            )
+            .unwrap();
+            let old = port.recover(&repo, "old-seal").unwrap_err();
+            assert_eq!(old.code, ResultCode::Superseded);
+            // Both terminal chains, including the successor, are reclaimed.
+            assert!(port.recover_publications(&repo).unwrap().is_empty());
+            assert!(wal::Wal::open(&repo)
+                .unwrap()
+                .compacted("old-seal")
+                .unwrap()
+                .is_some());
+            assert!(wal::Wal::open(&repo)
+                .unwrap()
+                .compacted("new-seal")
+                .unwrap()
+                .is_some());
+        }
+        assert_eq!(
+            std::fs::read_dir(root.join("fgos/git/operations"))
+                .unwrap()
+                .count(),
+            0
+        );
+    }
+}
+
+#[test]
+fn sigkill_before_target_allows_a_new_nonidentical_operation_and_terminal_supersession() {
+    use std::io::Write;
+    use std::os::unix::process::ExitStatusExt;
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let mut child = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "crash_child", "--ignored", "--nocapture"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&(&root, &t.0, "before-target-cas")).unwrap())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.signal(),
+        Some(9),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let old = wal::Wal::open(&repo)
+        .unwrap()
+        .inspect("crashed")
+        .unwrap()
+        .intent()
+        .next
+        .clone();
+    let next = commit(&port, &repo, vec![], "nonidentical after real kill");
+    assert_ne!(old, wal::Tip::Oid(next.as_str().into()));
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(next),
+        "fresh-operation-id",
+    )
+    .unwrap();
+    assert_eq!(
+        port.recover(&repo, "crashed").unwrap_err().code,
+        ResultCode::Superseded
+    );
+    assert!(port.recover_publications(&repo).unwrap().is_empty());
+    assert!(wal::Wal::open(&repo)
+        .unwrap()
+        .active(100)
+        .unwrap()
+        .is_empty());
+    assert_eq!(
+        fs::read_dir(root.join("fgos/git/operations"))
+            .unwrap()
+            .count(),
+        0
+    );
+}
+
+#[test]
 fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
     let t = Temp::new();
     let root = t.0.join("repo");

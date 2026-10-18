@@ -211,3 +211,143 @@ fn sigkill_at_new_active_file_ack_boundaries_preserves_rotated_and_new_events() 
         recover_and_check(&r, &a.ack.origin, expected, expected);
     }
 }
+
+#[test]
+fn sigkill_at_seven_seal_boundaries_recovers_without_loss_or_duplicate() {
+    for point in [
+        "AfterSealObjects",
+        "BeforeSealTargetCas",
+        "AfterSealTargetCas",
+        "AfterSealCas",
+        "AfterSealReceiptWrite",
+        "AfterSealReceiptFsync",
+        "AfterSealReceiptRename",
+        "AfterSealReceiptDirectoryFsync",
+        "AfterSealReceipt",
+        "AfterSealDelete",
+        "AfterSealDeleteDirFsync",
+    ] {
+        let r = Repo::new();
+        let a = r.append(3);
+        kill_at(&r, "seal", point, None);
+        let driver = fgos_git::GitDriver::new(&r.root).unwrap();
+        let repo = match driver.resolve_repo(&r.root, &r.root).unwrap() {
+            fgos_git::ResolveRepo::Repository(r) => r,
+            _ => panic!(),
+        };
+        fgos_event_store::seal::seal(
+            &driver,
+            &repo,
+            fgos_event_store::seal::SealRequest {
+                layout: &r.layout,
+                machine: "test-aa2345",
+                stream: &r.stream,
+                held_ranks: &[],
+                hot_lock_depth: 0,
+                opportunistic: false,
+            },
+        )
+        .unwrap();
+        let receipt =
+            fgos_event_store::receipt::Receipt::read(&r.layout.stream(&r.stream).sealed()).unwrap();
+        assert_eq!(receipt.last_seq, 3, "{point}");
+        let tip = fgos_git::Oid::parse(&receipt.commit, repo.object_format()).unwrap();
+        let walked = fgos_event_store::walk::walk(
+            &driver,
+            &repo,
+            &[tip],
+            &Default::default(),
+            &Default::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            walked
+                .events
+                .iter()
+                .map(|e| &e.h)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len(),
+            3,
+            "{point}"
+        );
+        assert_eq!(
+            walked
+                .events
+                .iter()
+                .map(|e| e.origin.as_str())
+                .collect::<std::collections::BTreeSet<_>>(),
+            std::collections::BTreeSet::from([a.ack.origin.as_str()])
+        );
+        assert_eq!(r.append(1).ack.first_seq, 4);
+        assert!(
+            fgos_git::wal::Wal::open(&repo)
+                .unwrap()
+                .active(100)
+                .unwrap()
+                .is_empty(),
+            "{point}"
+        );
+    }
+}
+
+#[test]
+fn shared_ref_sigkill_then_sibling_and_seal_all_recover() {
+    use fgos_event_store::{
+        append::{append, AppendRequest},
+        layout::StreamId,
+        receipt::Receipt,
+        seal::seal_all,
+    };
+    for all_first in [false, true] {
+        let r = Repo::new();
+        r.append(2);
+        kill_at(&r, "seal", "AfterSealTargetCas", None);
+        let sibling = StreamId::parse("project:porting").unwrap();
+        append(
+            &r.layout,
+            &r.registry,
+            AppendRequest {
+                stream: &sibling,
+                events: &common::inputs(1),
+                cursor: &Positions::new(),
+                writer: "test",
+                machine: "test-aa2345",
+                held_ranks: &[],
+            },
+        )
+        .unwrap();
+        let d = fgos_git::GitDriver::new(&r.root).unwrap();
+        let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+            fgos_git::ResolveRepo::Repository(r) => r,
+            _ => panic!(),
+        };
+        let streams = if all_first {
+            vec![sibling.clone(), r.stream.clone()]
+        } else {
+            vec![sibling.clone()]
+        };
+        seal_all(&d, &repo, &r.layout, "test-aa2345", &streams, &[], 0).unwrap();
+        seal_all(
+            &d,
+            &repo,
+            &r.layout,
+            "test-aa2345",
+            &[sibling.clone(), r.stream.clone()],
+            &[],
+            0,
+        )
+        .unwrap();
+        assert_eq!(
+            Receipt::read(&r.layout.stream(&r.stream).sealed())
+                .unwrap()
+                .last_seq,
+            2
+        );
+        assert_eq!(
+            Receipt::read(&r.layout.stream(&sibling).sealed())
+                .unwrap()
+                .last_seq,
+            1
+        );
+    }
+}

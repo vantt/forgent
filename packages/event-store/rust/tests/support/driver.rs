@@ -77,6 +77,30 @@ fn main() {
             .unwrap();
             println!("ACK {}", a.ack.last_seq);
         }
+        "seal" => {
+            use fgos_git::ResolveRepo;
+            let root = layout.common_dir.parent().unwrap();
+            let driver = fgos_git::GitDriver::new(root).unwrap();
+            let repo = match driver.resolve_repo(root, root).unwrap() {
+                ResolveRepo::Repository(r) => r,
+                _ => panic!(),
+            };
+            fgos_event_store::seal::seal_with_fs(
+                &driver,
+                &repo,
+                fgos_event_store::seal::SealRequest {
+                    layout: &layout,
+                    machine: "test-aa2345",
+                    stream: &stream,
+                    held_ranks: &[],
+                    hot_lock_depth: 0,
+                    opportunistic: false,
+                },
+                &fault,
+            )
+            .unwrap();
+            println!("SEALED");
+        }
         "rotate" => {
             rotate_with_fs(&layout, "test-aa2345", &stream, &[], &fault).unwrap();
             println!("ROTATED");

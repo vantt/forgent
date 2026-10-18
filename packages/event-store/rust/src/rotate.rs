@@ -32,7 +32,18 @@ pub fn rotate_with_fs(
     held_ranks: &[u32],
     fs: &dyn FileSystem,
 ) -> Result<Rotation, Error> {
-    let guard = acquire_append(layout, held_ranks, fs)?;
+    let seal = crate::locks::acquire_seal(layout, held_ranks, 0, false)?.expect("waited seal");
+    rotate_guarded(layout, machine, stream, &seal, fs)
+}
+pub fn rotate_guarded(
+    layout: &Layout,
+    machine: &str,
+    stream: &StreamId,
+    seal: &crate::locks::SealGuard,
+    fs: &dyn FileSystem,
+) -> Result<Rotation, Error> {
+    seal.validate(layout)?;
+    let guard = acquire_append(layout, &[crate::locks::SEAL_RANK], fs)?;
     StoreIdentity::sweep_temps_under_append_lock(layout)?;
     let identity = StoreIdentity::open(layout, machine)?;
     let paths = prepare_stream(layout, stream, fs)?;

@@ -678,6 +678,42 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .map_err(|e| self.pending_error(repo, id, i, werr(e)))?;
         self.finish(repo, &terminal)
     }
+    /// Recover retained PublicationCas records for this bound ref. Unknown
+    /// attempts remain pending for a fresh-id successor; no CAS is replayed.
+    pub fn recover_publications(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        let wal = self.wal(repo)?;
+        // No valid operation id is empty. Admission closes only records that
+        // have not reached TargetAttempt; it never reissues an old CAS.
+        self.admit_pending(repo, &wal, "")?;
+        let mut pending = Vec::new();
+        for chain in wal.retained(100_000).map_err(werr)? {
+            if chain.intent().kind != wal::OperationKind::PublicationCas
+                || chain.intent().resource_set != vec![self.authority.reference.as_str().to_owned()]
+            {
+                continue;
+            }
+            self.authority
+                .validate_publication_borrow(chain.intent())
+                .map_err(werr)?;
+            let id = &chain.last().operation_id;
+            if chain.outcome().is_some() {
+                self.release_pin_and_compact(repo, id)?;
+                continue;
+            }
+            match self.recover(repo, id) {
+                Ok(_) => {
+                    self.release_pin_and_compact(repo, id)?;
+                }
+                Err(e) if e.code == ResultCode::RecoveryRequired => pending.push(id.clone()),
+                Err(e) if e.code == ResultCode::Stale || e.code == ResultCode::Superseded => {
+                    self.release_pin_and_compact(repo, id)?;
+                }
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(pending)
+    }
+
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
         let wal = self.wal(repo)?;

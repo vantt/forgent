@@ -12,6 +12,18 @@ use std::{
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Point {
+    BeforeSealIntent,
+    BeforeSealTargetCas,
+    AfterSealTargetCas,
+    AfterSealObjects,
+    AfterSealCas,
+    AfterSealReceiptWrite,
+    AfterSealReceiptFsync,
+    AfterSealReceiptRename,
+    AfterSealReceiptDirectoryFsync,
+    AfterSealReceipt,
+    AfterSealDelete,
+    AfterSealDeleteDirFsync,
     AfterActiveOpen,
     AfterActiveRead,
     AfterClosedList,
