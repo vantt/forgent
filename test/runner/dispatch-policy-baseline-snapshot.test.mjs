@@ -100,27 +100,21 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  * (what a reader of the fixture, or a "fact" test, still keys off) --
  * `executorId`/`invocationId` are what actually gets resolved post
  * executor-id-consolidation Step 2. A descriptor with no `invocationId`
- * either predates consolidation (pi/codex-pi/glm-cli/claude's own default)
+ * either predates consolidation (pi/glm-cli/claude's own default)
  * or is a CAPABILITY name (fgos-coding-implement) that resolves its own
  * invocation internally via capabilities.<name>.prefer (Step 2.2) --
  * nothing here needs to pin one explicitly for that case.
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
-  { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap-gemini-tetcu72' },
-  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-gemini-tetcu72' },
+  { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap' },
+  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr' },
   { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
-  { label: 'codex-cli', executorId: 'openai', invocationId: 'codex-cli-bypass-fgovn' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
-  // `pi` and `codex-pi` were literal config duplicates of each other even
-  // before executor-provider-naming (2026-09-17) -- both were "pi coding
-  // agent (openai-codex/gpt-5.5)" with no account override. The merge
-  // (`codex`+`pi` -> one `openai` executor) makes that duplication
-  // explicit instead of hiding it: both historic labels now point at the
-  // same real invocation (pi-cli-fgovn, fgovn chosen as pi's first-wired
-  // shared account, same account `codex-cli-*` above already uses).
-  { label: 'pi', executorId: 'openai', invocationId: 'pi-cli-fgovn' },
-  { label: 'codex-pi', executorId: 'openai', invocationId: 'pi-cli-fgovn' },
+  // `pi` was a literal config duplicate of `codex-pi` before executor-provider-naming (2026-09-17); the
+  // merged `openai` executor keeps one pi invocation, and an account is leased at launch rather than named
+  // by the invocation.
+  { label: 'pi', executorId: 'openai', invocationId: 'pi-cli-bwrap' },
   { label: 'glm-cli', executorId: 'glm' },
 ];
 
@@ -145,7 +139,7 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
  * Golden fixture captured from current production resolvers and .fgos/config.json.
  * Note on matrix coverage: All 36 (executorId × workTier) pairs for the 12 executors
  * in [claude, claude-reviewer, claude-reviewer-herdr, gemini-cli, gemini-herdr, fgos-coding-implement,
- * codex-cli, codex-bwrap, codex-readonly, pi, codex-pi, glm-cli] across tiers
+ * codex-bwrap, codex-readonly, pi, glm-cli] across tiers
  * [light, standard, heavy] resolve successfully in the legacy config without errors.
  * None are skipped.
  * `claude-herdr`/`pi-herdr` were removed from both config and this matrix
@@ -402,7 +396,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -432,7 +433,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -462,7 +470,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -488,7 +503,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -514,7 +536,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -540,7 +569,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -566,7 +602,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -592,7 +635,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
@@ -618,82 +668,20 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
-    credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' },
+    credentialStore: {
+      use: 'omp',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'agent.db',
+        'config.yml'
+      ]
+    },
     adapter: 'herdr-spawn',
     promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
-    selector: 'codex-cli',
-    workTier: 'light',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-5.6-luna',
-    command: 'codex',
-    args: [
-      'exec',
-      '--dangerously-bypass-approvals-and-sandbox',
-      '--model',
-      'gpt-5.6-luna',
-      '<prompt>'
-    ],
-    envKeys: [
-      'CODEX_HOME'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'codex-cli',
-    workTier: 'standard',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-5.6-terra',
-    command: 'codex',
-    args: [
-      'exec',
-      '--dangerously-bypass-approvals-and-sandbox',
-      '--model',
-      'gpt-5.6-terra',
-      '<prompt>'
-    ],
-    envKeys: [
-      'CODEX_HOME'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'codex-cli',
-    workTier: 'heavy',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-6-astra',
-    command: 'codex',
-    args: [
-      'exec',
-      '--dangerously-bypass-approvals-and-sandbox',
-      '--model',
-      'gpt-6-astra',
-      '<prompt>'
-    ],
-    envKeys: [
-      'CODEX_HOME'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
     selector: 'codex-bwrap',
     workTier: 'light',
     bindingSource: 'executor-id',
@@ -710,7 +698,10 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
+    credentialStore: {
+      use: 'codex',
+      homeEnv: 'CODEX_HOME'
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -733,7 +724,10 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
+    credentialStore: {
+      use: 'codex',
+      homeEnv: 'CODEX_HOME'
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -756,7 +750,10 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [],
-    credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
+    credentialStore: {
+      use: 'codex',
+      homeEnv: 'CODEX_HOME'
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'bwrap',
@@ -857,10 +854,20 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -886,10 +893,20 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -915,97 +932,20 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'codex-pi',
-    workTier: 'light',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-5.6-luna',
-    command: 'pi',
-    args: [
-      '--model',
-      'gpt-5.6-luna',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,find,ls',
-      '--mode',
-      'json',
-      '--approve',
-      '-p',
-      '<prompt>'
-    ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'codex-pi',
-    workTier: 'standard',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-5.6-terra',
-    command: 'pi',
-    args: [
-      '--model',
-      'gpt-5.6-terra',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,find,ls',
-      '--mode',
-      'json',
-      '--approve',
-      '-p',
-      '<prompt>'
-    ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'codex-pi',
-    workTier: 'heavy',
-    bindingSource: 'executor-id',
-    provider: 'openai',
-    model: 'gpt-6-astra',
-    command: 'pi',
-    args: [
-      '--model',
-      'gpt-6-astra',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,find,ls',
-      '--mode',
-      'json',
-      '--approve',
-      '-p',
-      '<prompt>'
-    ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
-    credentialStore: null,
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -1029,13 +969,22 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
-      'OPENROUTER_API_KEY'
+      'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -1059,13 +1008,22 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
-      'OPENROUTER_API_KEY'
+      'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -1089,13 +1047,22 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
-      'OPENROUTER_API_KEY'
+      'PI_CODING_AGENT_DIR'
     ],
-    credentialStore: null,
+    credentialStore: {
+      use: 'pi',
+      homeEnv: 'PI_CODING_AGENT_DIR',
+      files: [
+        'auth.json',
+        'models-store.json',
+        'settings.json',
+        'trust.json',
+        'bin/fd'
+      ]
+    },
     adapter: 'cli-spawn',
     promptDelivery: undefined,
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   }
 ];
@@ -1181,7 +1148,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
-      assert.equal(resolvedInvocationId, 'omp-gemini-tetcu72', 'resolvedInvocationId pins gemini\'s omp pane invocation');
+      assert.equal(resolvedInvocationId, 'omp-herdr', 'resolvedInvocationId pins gemini\'s omp pane invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
       assert.equal(fgosImplementHeavy.model, 'gemini-4-argon-high', 'fgos-coding-implement heavy model must be gemini-4-argon-high');
@@ -1216,7 +1183,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       }
     });
 
-    // (e) codex-bwrap reads the codex login store through CODEX_HOME while the unconfined codex invocation reads none
+    // (e) codex-bwrap reads the codex login store through CODEX_HOME while an invocation with no account reads none
     test('fact (e): credentialStore captures the codex-bwrap CODEX_HOME store', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
@@ -1227,8 +1194,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           `codex-bwrap [${tier}] must read the codex store through CODEX_HOME`
         );
 
-        const cliRow = resolveSnapshotRowByLabel(cfg, 'codex-cli', tier, throwawayDir);
-        assert.equal(cliRow.credentialStore, null, `codex-cli [${tier}] reads no store through a private home`);
+        const claudeRow = resolveSnapshotRowByLabel(cfg, 'claude', tier, throwawayDir);
+        assert.equal(claudeRow.credentialStore, null, `claude [${tier}] reads no store through a private home`);
       }
     });
   });

@@ -253,7 +253,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('Codex CLI family', () => {
       test('codex-cli: detects dangerous bypass flag and model', () => {
-        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-bypass-fgovn').args;
+        const template = ['exec', '--dangerously-bypass-approvals-and-sandbox', '--model', '{model}', '{prompt}'];
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -361,7 +361,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('Pi CLI family', () => {
       test('pi: detects --model, --tools, --mode, --approve (no --provider -- executor-provider-naming 2026-09-17 dropped it: confirmed via a real invocation that pi infers provider from its single-provider account dir)', () => {
-        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-fgovn').args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'pi',
           command: 'pi',
@@ -381,7 +381,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-pi resolves Pi CLI adapter by command', () => {
-        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-tetnu').args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'pi',
@@ -397,15 +397,16 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     });
 
     describe('glm (z-ai via pi and OpenRouter)', () => {
-      test('glm: renders a pi invocation under the z-ai family, with the OpenRouter key variable', () => {
+      test('glm: renders a pi invocation under the z-ai family; a key variable in env is substituted, and the committed invocation carries none (the key lives in its login store)', () => {
         const inv = cfg.executors['glm'].invocations[0];
+        assert.equal(inv.env?.OPENROUTER_API_KEY, undefined, 'the committed invocation leaves the key to the store it reads');
         const res = renderProviderInvocation({
           providerFamily: 'z-ai',
           command: 'pi',
           baseArgs: inv.args,
           promptPlaceholder: '<prompt>',
           model: 'z-ai/glm-5.2',
-          executorFacts: { env: inv.env },
+          executorFacts: { env: { ...inv.env, OPENROUTER_API_KEY: '${GLM_OPENROUTER_API_KEY}' } },
         });
 
         assert.equal(res.command, 'pi', 'the adapter follows the command, not the vendor family');

@@ -1990,7 +1990,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     prompt,
     model: effectivePolicy.model,
     executorId: 'openai',
-    invocationId: 'codex-cli-bypass-fgovn',
+    invocationId: 'codex-cli-bwrap',
   });
 
   assert.equal(resolved.command, 'codex');
@@ -2002,7 +2002,9 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   assert.equal(resolved.args[resolved.args.length - 1], prompt, '{prompt} must remain a separate argv element, not shell-concatenated');
   assert.deepEqual(resolved.args, [
     'exec',
-    '--dangerously-bypass-approvals-and-sandbox',
+    '--skip-git-repo-check',
+    '-s',
+    'danger-full-access',
     '--model',
     flagshipModel,
     prompt,
