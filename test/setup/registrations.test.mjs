@@ -44,7 +44,7 @@ process.env.FGOS_CLAUDE_COMMAND = '/nonexistent/fgos-test-claude-binary';
 const REGISTERED_CHECK_IDS = DOCTOR_CHECKS.map((c) => c.id);
 const REGISTERED_FIX_IDS = FIX_REGISTRATIONS.map((f) => f.id);
 
-const SPEC_PATH = new URL('../../docs/specs/distribution.md', import.meta.url);
+const SPEC_PATH = new URL('../../docs/platform/packaging-distribution/contracts/setup-doctor-registry.md', import.meta.url);
 
 /**
  * The ids a Data Dictionary row enumerates after its "Today's registered
@@ -55,7 +55,7 @@ const SPEC_PATH = new URL('../../docs/specs/distribution.md', import.meta.url);
 function specEnumeratedIds(marker) {
   const spec = fs.readFileSync(SPEC_PATH, 'utf8');
   const start = spec.indexOf(marker);
-  assert.notEqual(start, -1, `docs/specs/distribution.md no longer contains the marker "${marker}"`);
+  assert.notEqual(start, -1, `setup-doctor-registry.md no longer contains the marker "${marker}"`);
   const rest = spec.slice(start + marker.length);
   const end = rest.indexOf('. ');
   assert.notEqual(end, -1, `the "${marker}" enumeration is not terminated by a sentence break`);

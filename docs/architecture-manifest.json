@@ -214,6 +214,7 @@
     "src/setup/agent-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",
+    "src/setup/git-checks.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/terminal-control-checks.mjs": "infra",
     "src/setup/lock-record-checks.mjs": "infra",

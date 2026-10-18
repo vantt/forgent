@@ -147,7 +147,7 @@ impl GitPublication {
                 let result = port.push_refs(repo, text(&args,"remote")?, &refs).map_err(operation)?;
                 Ok(json!({"receipt":result.receipt,"refs":result.refs.into_iter().map(|(name,outcome)| { let value = match outcome { PushOutcome::Accepted => json!({"kind":"accepted"}), PushOutcome::RejectedNonFastForward { advertised_tip } => json!({"kind":"rejected-non-fast-forward","advertisedTip":advertised_tip}), PushOutcome::RejectedOther { reason } => json!({"kind":"rejected-other","reason":reason}), PushOutcome::RemoteOutcomeUnknown => json!({"kind":"remote-outcome-unknown"}) }; json!({"name":name,"outcome":value}) }).collect::<Vec<_>>()}))
             }
-            "ensureFetchMapping" => Err(error("git-publication-unavailable: ensure-fetch-mapping not implemented by fgos-git")),
+            "ensureFetchMapping" => Ok(json!(self.driver.ensure_fetch_mapping(repo, text(&args,"remote")?, &strings(&args,"refspecs")?, text(&args,"operationId")?).map_err(operation)?)),
             "recover" => Ok(json!(port.recover(repo,text(&args,"operationId")?).map_err(operation)?)),
             "supersede" => Ok(json!(port.supersede(repo,text(&args,"oldId")?,text(&args,"laterId")?).map_err(operation)?)),
             "configuredFetchRefspecs" | "pushRefspecs" => {
@@ -161,5 +161,90 @@ impl GitPublication {
             "gitFloorVerdict" => { let f = self.driver.git_floor_verdict().map_err(operation)?; Ok(json!({"version":f.version,"minimum":f.minimum,"supported":f.supported,"probes":f.probes.iter().map(|p| json!({"name":p.name,"passed":p.passed,"evidence":p.evidence})).collect::<Vec<_>>()})) },
             _ => Err(error("unknown-publication-method")),
         }
+    }
+}
+
+/// Inspection never acquires event-seal or initializes a repository WAL.
+#[napi]
+pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) -> Result<Value> {
+    check()?;
+    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    let floor = driver.git_floor_verdict().map_err(operation)?;
+    let floor = json!({"version":floor.version,"minimum":floor.minimum,"supported":floor.supported,"probes":floor.probes.iter().map(|p| json!({"name":p.name,"passed":p.passed,"evidence":p.evidence})).collect::<Vec<_>>()});
+    let repo = match driver
+        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
+        .map_err(operation)?
+    {
+        ResolveRepo::Repository(repo) => repo,
+        ResolveRepo::NotARepository => return Ok(json!({"notARepository":true,"floor":floor})),
+    };
+    let wal_present = match std::fs::symlink_metadata(repo.common_dir().join("fgos/git")) {
+        Ok(_) => true,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
+        Err(e) => return Err(error(e)),
+    };
+    let journal = if wal_present {
+        let wal = wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;
+        let scan = wal.scan(100_000).map_err(error)?;
+        json!({"initialized":true,"complete":scan.complete,"pendingCount":scan.unresolved,"retainedBytes":scan.retained_bytes,"ledgerBytes":scan.ledger_bytes,"oldestUnresolved":scan.oldest_unresolved.map(|(id,time)| json!({"operationId":id,"unixMillis":time.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis().to_string()})),"errors":scan.entries.iter().filter_map(|e| e.error.as_ref()).collect::<Vec<_>>()})
+    } else {
+        json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"oldestUnresolved":null,"errors":[]})
+    };
+    let mappings = driver
+        .configured_fetch_refspecs(&repo, "origin")
+        .map_err(operation)?;
+    let native_locks = [
+        "index.lock",
+        "config.lock",
+        "packed-refs.lock",
+        "shallow.lock",
+    ]
+    .iter()
+    .filter(|name| repo.common_dir().join(name).exists())
+    .collect::<Vec<_>>();
+    Ok(
+        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+    )
+}
+#[napi]
+pub fn initialize_git_wal(
+    state_root: String,
+    repo_path: String,
+    trusted_main: String,
+) -> Result<()> {
+    check()?;
+    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    match driver
+        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
+        .map_err(operation)?
+    {
+        ResolveRepo::Repository(repo) => {
+            wal::Wal::open(&repo).map_err(error)?;
+            Ok(())
+        }
+        ResolveRepo::NotARepository => Err(error("not-a-repository")),
+    }
+}
+
+/// Repository configuration has its own rank-80 authority, independent of a seal.
+#[napi]
+pub fn ensure_git_fetch_mapping(
+    state_root: String,
+    repo_path: String,
+    trusted_main: String,
+    remote: String,
+    refspecs: Vec<String>,
+    operation_id: String,
+) -> Result<Value> {
+    check()?;
+    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    match driver
+        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
+        .map_err(operation)?
+    {
+        ResolveRepo::Repository(repo) => Ok(json!(driver
+            .ensure_fetch_mapping(&repo, &remote, &refspecs, &operation_id)
+            .map_err(operation)?)),
+        ResolveRepo::NotARepository => Err(error("not-a-repository")),
     }
 }

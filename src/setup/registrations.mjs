@@ -1,3 +1,4 @@
+import { checkGit, fixGitWal, fixGitFetchMapping } from './git-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -6622,3 +6623,10 @@ registerCheck({
   description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
+
+// Git and Event Store share one addon ABI admission row.
+for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+  registerCheck({ id, description: id, check: (cwd) => checkGit(cwd, id) });
+}
+registerFix({ id: 'git-wal-dir', fix: fixGitWal });
+registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

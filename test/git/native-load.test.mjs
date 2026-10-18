@@ -112,3 +112,35 @@ test('staged release and npm-relative manifests resolve their own addon without 
     }
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
+
+test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-inspect-'));
+  const repo = path.join(temp, 'repo');
+  execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
+  const git = (...args) => execFileSync('git', ['--git-dir', repo, ...args], { encoding: 'utf8' }).trim();
+  git('config', 'remote.origin.url', '/fixture/remote');
+  git('config', '--add', 'remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*');
+  let port;
+  try {
+    const facts = addon.inspectGit(temp, repo, repo);
+    assert.equal(facts.journal.initialized, false);
+    assert.equal(fs.existsSync(path.join(repo, 'fgos/git')), false);
+    addon.initializeGitWal(temp, repo, repo);
+    assert.equal(addon.inspectGit(temp, repo, repo).journal.initialized, true);
+    fs.mkdirSync(path.join(repo, 'fgos/events/locks'), { recursive: true, mode: 0o700 });
+    port = createGitPublication({ stateRoot: temp, repoPath: repo, trustedMain: repo, reference: 'refs/fgos/events/fixture', writer: 'fixture' }, options);
+    const refspecs = ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*', '+refs/fgos/legacy:refs/fgos/remotes/origin/legacy'];
+    port.ensureFetchMapping({ remote: 'origin', refspecs, operationId: 'mapping-one' });
+    const installed = git('config', '--get-all', 'remote.origin.fetch');
+    assert.equal(installed.split('\n').length, 3);
+    addon.ensureGitFetchMapping(temp, repo, repo, 'origin', refspecs, 'mapping-two');
+    assert.equal(git('config', '--get-all', 'remote.origin.fetch'), installed);
+    assert.equal(port.fetchMappingProvenance({ remote: 'origin' }).remoteUrl, '/fixture/remote');
+    const after = addon.inspectGit(temp, repo, repo);
+    assert.equal(after.journal.pendingCount, 0);
+    assert.equal(after.fetchRefspecs.length, 3);
+    fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');
+    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);
+    assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');
+  } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }
+});
