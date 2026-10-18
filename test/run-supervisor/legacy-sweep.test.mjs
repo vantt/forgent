@@ -41,7 +41,7 @@ function holdByThisProcess(dir, { withStartTime = true } = {}) {
   fs.writeFileSync(file, JSON.stringify(record));
 }
 
-test('finds the runs left running without an attempt lock, and only those', () => {
+test('finds the runs left running without an attempt lock or a v3 envelope, and only those', () => {
   const p = project();
   const closed = p.runDir('unit-run-cli/producer/1/runs/02');
   fs.mkdirSync(closed);
@@ -51,12 +51,18 @@ test('finds the runs left running without an attempt lock, and only those', () =
   fs.mkdirSync(supervised);
   fs.writeFileSync(path.join(supervised, 'run.json'), JSON.stringify({ runId: 'r-supervised', status: 'running' }));
   fs.writeFileSync(path.join(supervised, 'attempt.lock'), '');
+  fs.writeFileSync(path.join(supervised, 'envelope.json'), JSON.stringify({ v: 3 }));
+  const lockOnly = p.runDir('unit-run-cli/producer/1/runs/05');
+  fs.mkdirSync(lockOnly);
+  fs.writeFileSync(path.join(lockOnly, 'run.json'), JSON.stringify({ runId: 'r-old-envelope', status: 'running' }));
+  fs.writeFileSync(path.join(lockOnly, 'attempt.lock'), '');
+  fs.writeFileSync(path.join(lockOnly, 'envelope.json'), JSON.stringify({ v: 2 }));
   const settled = p.runDir('unit-run-cli/producer/1/runs/04');
   fs.mkdirSync(settled);
   fs.writeFileSync(path.join(settled, 'run.json'), JSON.stringify({ runId: 'r-settled', status: 'died' }));
 
   const found = findLegacyStuck({ assignmentsRoot: p.assignmentsRoot }).map((entry) => entry.runDir).sort();
-  assert.deepEqual(found, [p.runDir(CLI), p.runDir(HERDR)].sort());
+  assert.deepEqual(found, [p.runDir(CLI), lockOnly, p.runDir(HERDR)].sort());
 });
 
 test('every recorded process dead settles abandoned-legacy, and a second sweep changes nothing', { skip }, () => {
