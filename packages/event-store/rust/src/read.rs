@@ -467,18 +467,26 @@ pub fn read(
         .filter(|e| e.seq > req.cursor.cover.get(&stream_key(e)).copied().unwrap_or(0))
         .cloned()
         .collect();
-    let fold = fold_answer(
-        req.cursor,
-        &cursor,
-        &old_order,
-        &ordered
-            .events
-            .iter()
-            .map(|e| e.h.clone())
-            .collect::<Vec<_>>(),
-        &delta,
-        req.origin,
-    );
+    // Coverage cannot stand in for a lost consumer view. The full sequence was
+    // recovered above, but the coverage-relative delta cannot rebuild that view.
+    let fold = if have_history {
+        fold_answer(
+            req.cursor,
+            &cursor,
+            &old_order,
+            &ordered
+                .events
+                .iter()
+                .map(|e| e.h.clone())
+                .collect::<Vec<_>>(),
+            &delta,
+            req.origin,
+        )
+    } else {
+        Fold::RebuildRequired {
+            first_difference: 0,
+        }
+    };
     Ok(ReadResult {
         events: delta,
         sequence: ordered.events,

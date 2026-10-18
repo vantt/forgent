@@ -469,3 +469,74 @@ fn mirror_rewind_refuses_and_preserves_the_previous_cursor() {
     );
     assert_eq!(first.cursor.canonical_bytes().unwrap(), saved);
 }
+
+#[test]
+fn lost_folded_history_with_coverage_requires_rebuild_from_zero() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let e = event('a', 1, 2);
+    let streams = [StreamId::parse("project").unwrap()];
+    let oid = seal(&p, &f.repo, vec![], std::slice::from_ref(&e), "test-aa");
+    publish(&p, &f.repo, "refs/fgos/events/test-aa", None, oid, "first");
+    let first = read(
+        &p,
+        &f.repo,
+        request(&f, &e.origin, &streams, &Cursor::default(), &[]),
+    )
+    .unwrap();
+    assert_eq!(first.sequence, vec![e.clone()]);
+    assert!(!first.cursor.cover.is_empty());
+    assert!(!first.cursor.certified.is_empty());
+    let recovered = read(
+        &p,
+        &f.repo,
+        request(&f, &e.origin, &streams, &first.cursor, &[]),
+    )
+    .unwrap();
+    assert_eq!(
+        recovered.fold,
+        Fold::RebuildRequired {
+            first_difference: 0
+        }
+    );
+    // Delta is still relative to coverage; recovery must refold sequence.
+    assert!(recovered.events.is_empty());
+    assert_eq!(recovered.sequence, vec![e.clone()]);
+    let full = read(
+        &p,
+        &f.repo,
+        request(&f, &e.origin, &streams, &Cursor::default(), &[]),
+    )
+    .unwrap();
+    assert_eq!(recovered.sequence, full.sequence);
+    assert_eq!(recovered.full_order, full.full_order);
+    assert_eq!(recovered.cursor, full.cursor);
+}
+
+#[test]
+fn retained_folded_history_with_coverage_keeps_empty_delta_incremental() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let e = event('a', 1, 2);
+    let streams = [StreamId::parse("project").unwrap()];
+    let oid = seal(&p, &f.repo, vec![], std::slice::from_ref(&e), "test-aa");
+    publish(&p, &f.repo, "refs/fgos/events/test-aa", None, oid, "first");
+    let first = read(
+        &p,
+        &f.repo,
+        request(&f, &e.origin, &streams, &Cursor::default(), &[]),
+    )
+    .unwrap();
+    let next = read(
+        &p,
+        &f.repo,
+        request(&f, &e.origin, &streams, &first.cursor, &first.sequence),
+    )
+    .unwrap();
+    assert_eq!(next.fold, Fold::Incremental);
+    assert!(next.events.is_empty());
+    assert_eq!(next.sequence, vec![e]);
+    assert_eq!(next.sequence, first.sequence);
+}
