@@ -550,7 +550,7 @@ pub fn seal_if_due(
 
 // Project and project:<consumer> share one own ref. Another stream's durable
 // receipt is equally valid evidence of this store's most recent publication.
-fn known_receipt_tip(
+pub(crate) fn known_receipt_tip(
     port: &dyn fgos_git::Inspect,
     repo: &RepoHandle,
     layout: &Layout,
@@ -584,6 +584,14 @@ fn known_receipt_tip(
     if known {
         return Ok(true);
     }
+    // Only a candidate durably authorized by this store's reconciliation may
+    // extend receipts with a merge or a shared-machine fast-forward.
+    for oid in crate::receipt::reconciled_tips(layout, reference)? {
+        if oid == tip.as_str() {
+            return Ok(true);
+        }
+        stops.push(Oid::parse(&oid, repo.object_format()).map_err(|e| invalid(e.to_string()))?);
+    }
     // Authenticate every unreceipted commit against a retained local segment.
     // Origin alone is insufficient evidence: an outside writer could copy it.
     let mut current = tip.clone();
@@ -614,13 +622,14 @@ fn known_receipt_tip(
             .ok_or_else(|| invalid("publication commit missing"))?;
         let parent = commit.parents.first().cloned();
         {
+            let header = walk::header(port, repo, &commit.oid)?;
             let crate::envelope::Seal::Seal {
                 origin: o,
                 stream,
                 first_seq,
                 last_seq,
                 ..
-            } = walk::header(port, repo, &commit.oid)?
+            } = header
             else {
                 return Ok(false);
             };

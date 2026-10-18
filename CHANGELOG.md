@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Codex terminal runs deliver the brief through the terminal-control prompt door instead of typing it and pressing Enter, so a long brief is no longer left unsubmitted in the composer; the paste-chip matcher also recognizes codex's `[Pasted Content N chars]`.
 - Releases ship a combined Git/Event Store Node addon through optional `components.nativeAddon`; its manifest attests build inputs without binding future upgrades to the verifier's Cargo.lock. Only Linux advertises `git-wal-v1` while C5 scan/fence support is Linux-only; Windows activation remains available and lock-taking Git ports refuse with `git-lockscope-unavailable-windows`.
 - Config mapping failures resolve their WAL chain and remove only their own native staging lock. Re-running activation installs a missing Git fence; WAL writers refuse an unfenced workspace. Older `fgctl` stops with `EISDIR` at the fenced legacy activation lock. Channels without the optional addon report informational Git checks until M10.
 
@@ -14,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Git WAL admission in `fgctl` uses `activation-v2.lock` and fences old controllers at first WAL-capable activation. Pending operations block rollback to a release without `git-wal-v1`; corrupt or incomplete WAL scans refuse activation. Atomic fence placement currently requires Linux.
 - The Rust Git component can install additive Event Store fetch mappings under `repo-config` 80, preserving user settings and recording the effective remote URL in WAL provenance. The combined Node binding and doctor/setup integration are registered.
+- Event Store sync authenticates its own reconciliation merges (the exact verified prior tip and candidate are authorized before the ref CAS), verifies each mirror independently so a rewound or forged foreign mirror becomes a typed warning instead of blocking own publication, and reports every tracked-fence mismatch as `event-store-legacy-mismatch`. Re-running fetch-mapping setup when mappings already exist records an effect-free `configApproved` WAL outcome.
 
 ### Added
 - `fgos run "<prompt>" --input <a>,<b> --verify "<cmd>"` hands the Unit its input files and the command that checks its work; both are Unit fields (`inputs`, `verify`) that units files and workflow templates carry too, and a Unit may also name `skills`, which only executors declaring them in `supports.skills` can serve (refusal reason `skills-unavailable`).

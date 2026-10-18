@@ -448,7 +448,9 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     ) -> Result<Receipt> {
         let current = tip(&self.ref_tip(repo, &i.resource_set[0])?);
         let (observed, state, attribution) = match outcome {
-            Outcome::AbandonedBeforeAttempt | Outcome::Transfer { .. } => (
+            Outcome::ConfigApproved
+            | Outcome::AbandonedBeforeAttempt
+            | Outcome::Transfer { .. } => (
                 &current,
                 PublicationState::NotPublished,
                 Attribution::Uncertain,

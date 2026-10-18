@@ -114,6 +114,8 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    /// Effect-free approval; URL and mappings live in the ConfigChange intent.
+    ConfigApproved,
     AbandonedBeforeAttempt,
     Transfer {
         acknowledged: bool,
@@ -348,6 +350,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     };
     let prev = &records.last().ok_or_else(|| corrupt("empty"))?.phase;
     let valid = match (prev, phase) {
+        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
+            matches!(i.kind, OperationKind::ConfigChange(_))
+        }
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
@@ -368,7 +373,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == &i.expected && next == &i.next,
         (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
-            Outcome::AbandonedBeforeAttempt => false,
+            Outcome::AbandonedBeforeAttempt | Outcome::ConfigApproved => false,
             Outcome::Transfer {
                 acknowledged,
                 unknown,
@@ -816,6 +821,7 @@ fn compaction_suffix(dir: &Directory, id: &str) -> WalResult<Vec<Record>> {
             r.phase,
             Phase::PinReleased
                 | Phase::Outcome(Outcome::Transfer { .. })
+                | Phase::Outcome(Outcome::ConfigApproved)
                 | Phase::Outcome(Outcome::AbandonedBeforeAttempt)
         )
     }) {
@@ -976,6 +982,7 @@ pub struct CompactReceipt {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::ConfigApproved => vec!["c".into()],
         Outcome::AbandonedBeforeAttempt => vec!["a".into()],
         Outcome::Transfer {
             acknowledged,
@@ -1031,7 +1038,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
-        Some("a") => o.len() == 1,
+        Some("a" | "c") => o.len() == 1,
         Some("t") => {
             o.len() == 4
                 && matches!(o[1].as_str(), "true" | "false")
@@ -1066,6 +1073,7 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "c" => Outcome::ConfigApproved,
             "a" => Outcome::AbandonedBeforeAttempt,
             "t" => Outcome::Transfer {
                 acknowledged: r[1] == "true",

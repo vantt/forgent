@@ -1,0 +1,62 @@
+//! Mirror configuration is owned and journaled by Git, never by the store.
+use crate::{
+    errors::{invalid, Error, ErrorCode},
+    seal::operation_id,
+    walk::git_error,
+};
+use fgos_git::{Inspect, RepoHandle, RepositoryConfig};
+pub fn mappings(remote: &str) -> Result<Vec<String>, Error> {
+    if remote.is_empty()
+        || !remote
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
+    {
+        return Err(invalid("invalid remote name"));
+    }
+    Ok(vec![
+        format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
+        format!("+refs/fgos/legacy:refs/fgos/remotes/{remote}/legacy"),
+    ])
+}
+pub fn ensure_refspecs(
+    git: &impl RepositoryConfig,
+    repo: &RepoHandle,
+    remote: &str,
+) -> Result<(), Error> {
+    git.ensure_fetch_mapping(repo, remote, &mappings(remote)?, &operation_id()?)
+        .map_err(git_error)?;
+    Ok(())
+}
+pub fn pinned_url(git: &dyn Inspect, repo: &RepoHandle, remote: &str) -> Result<String, Error> {
+    let wanted = mappings(remote)?;
+    let actual = git
+        .configured_fetch_refspecs(repo, remote)
+        .map_err(git_error)?;
+    let provenance = git
+        .fetch_mapping_provenance(repo, remote)
+        .map_err(git_error)?;
+    let provenance = provenance
+        .filter(|p| wanted.iter().all(|r| p.refspecs.contains(r)))
+        .ok_or_else(|| {
+            Error::new(
+                ErrorCode::EventStoreRefspecMissing,
+                "run setup to install mirror fetch mappings",
+            )
+        })?;
+    if wanted
+        .iter()
+        .any(|r| !actual.iter().any(|v| v.value == r.as_bytes()))
+    {
+        return Err(Error::new(
+            ErrorCode::EventStoreRefspecMissing,
+            "mirror fetch mapping missing",
+        ));
+    }
+    if git.remote_url(repo, remote).map_err(git_error)? != provenance.remote_url {
+        return Err(Error::new(
+            ErrorCode::EventStoreRemoteChanged,
+            "remote URL changed; rerun setup",
+        ));
+    }
+    Ok(provenance.remote_url)
+}

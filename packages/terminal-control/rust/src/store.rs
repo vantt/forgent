@@ -6,11 +6,8 @@ use crate::port::ServerIncarnation;
 use crate::record::{AllocationRecord, GroupHint, MarkerKind};
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs;
-use std::io::{self, Write};
+use std::io;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-
-static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 /// The state root every fgOS component resolves the same way.
 pub fn default_state_root() -> PathBuf {
@@ -116,8 +113,7 @@ impl Store {
     /// Rewrite the hint of a group (temp file, rename over).
     pub fn write_hint(&self, hint: &GroupHint) -> io::Result<()> {
         let dir = self.dir.join("groups");
-        let tmp = temp_file(&dir, &hint.group_key, &serde_json::to_vec(hint)?)?;
-        fs::rename(tmp, dir.join(format!("{}.json", hint.group_key)))
+        install_result(fgos_durable_file::replace_durably_with_mode(&dir, &format!("{}.json", hint.group_key), &serde_json::to_vec(hint)?, 0o666)).map(|_| ())
     }
 
     pub fn read_hint(&self, group_key: &str) -> io::Result<Option<GroupHint>> {
@@ -141,23 +137,84 @@ fn read_json<T: DeserializeOwned>(path: &Path) -> io::Result<Option<T>> {
     }
 }
 
-/// Write `bytes` to a fresh temp file in `dir`, synced, and return its path.
-fn temp_file(dir: &Path, stem: &str, bytes: &[u8]) -> io::Result<PathBuf> {
-    let n = TEMP_COUNTER.fetch_add(1, Ordering::Relaxed);
-    let tmp = dir.join(format!(".{stem}.{}.{n}.tmp", std::process::id()));
-    let mut file = fs::OpenOptions::new().write(true).create_new(true).open(&tmp)?;
-    file.write_all(bytes)?;
-    file.sync_all()?;
-    Ok(tmp)
+fn publish_once<T: Serialize>(dir: &Path, name: &str, value: &T) -> io::Result<bool> {
+    install_result(fgos_durable_file::install_once_with_mode(dir, name, &serde_json::to_vec(value)?, 0o666))
 }
 
-fn publish_once<T: Serialize>(dir: &Path, name: &str, value: &T) -> io::Result<bool> {
-    let tmp = temp_file(dir, name, &serde_json::to_vec(value)?)?;
-    let linked = fs::hard_link(&tmp, dir.join(name));
-    let _ = fs::remove_file(&tmp);
-    match linked {
-        Ok(()) => Ok(true),
-        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => Ok(false),
-        Err(e) => Err(e),
+fn install_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<bool> {
+    let installed = match result {
+        Ok(installed) => installed,
+        Err(error) => {
+            // The old store ignored cleanup errors and did not sync the parent.
+            // Preserve its result once the final name exists.
+            match error.installed {
+                Some(installed) => {
+                    if let Some(temp) = error.temporary {
+                        let _ = fs::remove_file(temp);
+                    }
+                    installed
+                }
+                None => return Err(error.source),
+            }
+        }
+    };
+    Ok(installed == fgos_durable_file::Installed::Created)
+}
+
+#[cfg(test)]
+mod install_mapping_tests {
+    use super::*;
+    struct FailAt(&'static str);
+    impl fgos_durable_file::FileSystem for FailAt {
+        fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+            if step == self.0 {
+                Err(io::Error::other("boundary failure"))
+            } else {
+                Ok(())
+            }
+        }
+    }
+    #[test]
+    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-terminal-control-mapping-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        for step in [
+            "temp-created",
+            "bytes-written",
+            "file-fsync",
+            "name-installed",
+            "temp-removed",
+            "parent-fsync",
+        ] {
+            let name = step;
+            let result = install_result(fgos_durable_file::install_with(
+                &dir,
+                name,
+                b"original",
+                &FailAt(step),
+            ));
+            if matches!(step, "temp-created" | "bytes-written" | "file-fsync") {
+                assert_eq!(result.unwrap_err().kind(), io::ErrorKind::Other);
+                assert!(!dir.join(name).exists());
+            } else {
+                assert!(result.unwrap());
+                assert_eq!(std::fs::read(dir.join(name)).unwrap(), b"original");
+                assert!(!install_result(fgos_durable_file::install_with(
+                    &dir,
+                    name,
+                    b"changed",
+                    &FailAt(step)
+                ))
+                .unwrap());
+            }
+        }
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

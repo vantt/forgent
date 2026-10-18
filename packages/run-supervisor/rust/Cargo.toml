@@ -4,6 +4,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-process = { path = "../../process/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }

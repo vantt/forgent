@@ -26,6 +26,10 @@
     "event-store-machine-id",
     "event-store-io",
     "event-store-lock-dir-invalid",
-    "event-store-lock-timeout"
+    "event-store-lock-timeout",
+    "event-store-remote-changed",
+    "event-store-machine-ref-shared",
+    "event-store-legacy-mismatch",
+    "event-store-push-rejected-non-fast-forward"
   ]
 }
