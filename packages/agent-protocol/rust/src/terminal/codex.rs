@@ -6,5 +6,8 @@ pub const PROFILE: Profile = Profile {
     cli: "codex",
     exit: ExitCommand::Text("/quit"),
     enter_gap_ms: 600,
-    trust_markers: &["do you trust the contents of this directory"],
+    trust_markers: &[
+        "do you trust the contents of this directory",
+        "trust this folder?",
+    ],
 };

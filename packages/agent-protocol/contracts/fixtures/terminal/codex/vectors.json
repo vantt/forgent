@@ -478,6 +478,57 @@
       },
       "message": "# Brief 1\n\n- Brief file on disk (re-read after compaction or restart): /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/brief-1.md\n\n## Execution contract\n\n- Mutation: read-only\n- Result claim path: /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/result-1.json\n- Timeout: 240000ms\n- Persisted contract: /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/effective-execution-contract.json\n\n## Acknowledge first\n\nBefore you start, write this file:\n\n    /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/ack-1.json\n\nwith exactly:\n\n    {\"round\": 1, \"agent\": \"fgos-run_unit-run-179230bce1c6e2\", \"receivedAt\": \"<ISO 8601 timestamp>\"}\n\nWrite it as `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/ack-1.json.tmp` first, then rename it into place. Never write\na file in this directory in any other way -- a reader may look at it at any\nmoment, and a rename is the only step that is either done or not done.\n\n## Your task\n\nAssignment: unit-run-1792308158810-1c178768/producer/1\nWork: (none)\nRole: producer\nObjective: Probe task, read-only, change no files. With one shell command run: env | grep -E '^(FGOS_SESSION_ID|FGOS_PARENT_WRITER_ID|CLAUDE_CODE_SESSION_ID|CODEX_THREAD_ID)=' ; true  -- then copy that command's exact output into your report, and add the line PROBE-DONE-codex7.\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n\n- Also write a human-readable report to /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/report-1.md -- REQUIRED for this read-only operation: a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: read-only\n- Claim path: /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/result-1.json\n- Timeout: 240000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced\n\n## When you finish\n\nWrite these two files, in this order, each one `.tmp`-then-rename:\n\n1. `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/report-1.md` -- what you did, in prose. Anything a reader needs to\n   understand or check your work belongs here.\n2. `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/result-1.json` -- a JSON object:\n\n       {\"contract\":{\"id\":\"agent-result-claim\",\"version\":2},\n        \"status\": \"done\" | \"blocked\" | \"failed\" | \"no-evidence\",\n        \"summary\": \"<one or two sentences>\", \"evidenceRefs\": []}\n\n   Claim requirements:\n- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n\n   \"settled\" is not a valid status here -- that word names the run reaching\n   its end, not whether the work succeeded; a worker that writes \"settled\"\n   in this file fails schema validation and the round is scored failed.\n\nThe second file is what ends this round, so write it last and only once the\nfirst one is on disk. Nothing you write is treated as proof on its own; it is\nyour account of the work, and it is read alongside the repository itself.\n\nWrite only inside `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox`. Everything else under\n`/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01` belongs to whoever is watching you.\n",
       "source": "real screen recorded 2026-10-18 from codex v0.163 on herdr: the composer grew to hold the pasted brief and shows a window of it (the Enter 0.7 s after the paste was swallowed); promptText is the window title as herdr reports it; the working flash at 100 ms is the TUI ingesting the paste"
+    },
+    {
+      "name": "folder-trust-dialog-wording-of-v0.163-classifies",
+      "step": "classify-blocked",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "trust-dialog-folder-access"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "trust-dialog"
+      },
+      "source": "real screen recorded 2026-10-18 from codex v0.163 on herdr: the folder dialog opens about a second after the first prompt screen"
+    },
+    {
+      "name": "a-dialog-that-opens-after-the-first-ready-look-blocks-instead-of-taking-the-brief",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "matchedRule": true,
+              "promptText": "codex"
+            }
+          },
+          {
+            "at": 1000,
+            "file": "trust-dialog-folder-access",
+            "inspection": {
+              "state": "blocked",
+              "visibleBlocker": true,
+              "matchedRule": true,
+              "promptText": "codex"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "trust-dialog",
+        "readiness": "blocked"
+      },
+      "source": "real screen recorded 2026-10-18 from codex v0.163 on herdr: the folder dialog opens about a second after the first prompt screen"
     }
   ]
 }

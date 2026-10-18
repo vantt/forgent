@@ -239,6 +239,14 @@ impl Terminal {
     /// A ready verdict is only believed when the screen shows neither a trust
     /// dialog nor a dead login.
     fn ready_gate(&self, io: &mut dyn AgentIo, verdict: Readiness) -> Readiness {
+        // A dialog can open over a prompt that already looked ready (codex asks about the folder a
+        // moment after its first screen), so the detector is asked again after the settle wait.
+        if io
+            .inspect()
+            .is_ok_and(|seen| seen.visible_blocker || seen.state.as_deref() == Some("blocked"))
+        {
+            return self.blocked_readiness(io);
+        }
         match io
             .screen()
             .ok()
