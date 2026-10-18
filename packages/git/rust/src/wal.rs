@@ -2,7 +2,7 @@
 //! hold the stream's event-seal and borrow it into every effecting Git child.
 //! No method here executes, retries, rolls back or deletes a Git ref.
 use crate::{ObjectFormat, Oid, RefName, RepoHandle};
-use fgos_durable_file::{install_with, sync_directory, Installed};
+use fgos_durable_file::{install_ordered, Installed};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::{self, File, OpenOptions};
@@ -474,6 +474,18 @@ impl Directory {
         }
     }
     fn child(&self, name: &str, create: bool, fsys: &dyn FileSystem) -> WalResult<Self> {
+        self.child_synced(name, create, create, fsys)
+    }
+    /// `sync`: make the child and its name durable now. An operation
+    /// directory is created without it: its first record's install fsyncs
+    /// the directory and its parent before that record is acknowledged.
+    fn child_synced(
+        &self,
+        name: &str,
+        create: bool,
+        sync: bool,
+        fsys: &dyn FileSystem,
+    ) -> WalResult<Self> {
         let path = self.path().join(name);
         if create {
             #[cfg(unix)]
@@ -490,15 +502,51 @@ impl Directory {
         }
         let child = Self::open(&path)?;
         // Also sync pre-existing dirs: a preceding failed creator may have
-        // installed the name without ever syncing it.
-        if create {
-            child.file.sync_all()?;
-            fsys.checkpoint("directory-fsync")?;
-            self.file.sync_all()?;
-            fsys.checkpoint("parent-fsync")?;
+        // installed the name without ever syncing it. Once this process has
+        // synced a directory and its name, both stay durable until that
+        // directory is removed, so a later open of the same directory (same
+        // device, inode and birth time) needs no second fsync.
+        if sync {
+            let key = durable_key(&child.file);
+            if key.is_none() || !DURABLE_DIRECTORIES.lock().is_ok_and(|seen| seen.contains(&key)) {
+                child.file.sync_all()?;
+                fsys.checkpoint("directory-fsync")?;
+                self.file.sync_all()?;
+                fsys.checkpoint("parent-fsync")?;
+                if key.is_some() {
+                    if let Ok(mut seen) = DURABLE_DIRECTORIES.lock() {
+                        seen.insert(key);
+                    }
+                }
+            }
         }
         Ok(child)
     }
+}
+
+/// Directories this process has made durable, with their names, by
+/// `(device, inode, birth time)`.
+static DURABLE_DIRECTORIES: std::sync::Mutex<std::collections::BTreeSet<Option<(u64, u64, u128)>>> =
+    std::sync::Mutex::new(std::collections::BTreeSet::new());
+
+/// Identity of a directory that a removal and re-creation cannot reuse;
+/// `None` when the filesystem reports no birth time.
+fn durable_key(dir: &File) -> Option<(u64, u64, u128)> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let m = dir.metadata().ok()?;
+        let born = m.created().ok()?.duration_since(std::time::UNIX_EPOCH).ok()?.as_nanos();
+        Some((m.dev(), m.ino(), born))
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = dir;
+        None
+    }
+}
+
+impl Directory {
 }
 
 pub struct Wal<F = OsFileSystem> {
@@ -578,7 +626,8 @@ impl<F: FileSystem> Wal<F> {
         if !valid_id(id) {
             return Err(corrupt("operation id"));
         }
-        self.root.child(id, create, &self.fs)
+        // Record zero's install makes a created operation directory durable.
+        self.root.child_synced(id, create, false, &self.fs)
     }
     pub fn begin(
         &self,
@@ -604,8 +653,23 @@ impl<F: FileSystem> Wal<F> {
             }
             return Ok(Begin::Compacted(c));
         }
+        // An installed record zero already binds this id: the no-overwrite
+        // install below could only lose to it, so answer as that loser
+        // would, without writing (and syncing) a doomed temporary.
+        if dir.path().join(record_name(0)).try_exists()? {
+            return match self.existing(id, &intent) {
+                // A compactor may have removed the chain since: its ledger
+                // entry is then the binding, as after a lost install.
+                Err(e) => match self.compacted(id)? {
+                    Some(c) if c.matches(&intent)? => Ok(Begin::Compacted(c)),
+                    Some(_) => Err(WalError::OperationIdConflict),
+                    None => Err(e),
+                },
+                found => found,
+            };
+        }
         let r = make_record(id, 0, None, Phase::Intent(intent.clone()))?;
-        let installed = self.install(&dir, &record_name(0), &r)?;
+        let installed = self.install(&dir, &record_name(0), &r, true)?;
         // A concurrent compactor may have removed record zero after our first
         // ledger read. Its durable binding wins even if we installed a name
         // through a still-open operation directory descriptor.
@@ -617,34 +681,62 @@ impl<F: FileSystem> Wal<F> {
         }
         match installed {
             Installed::Created => Ok(Begin::Created(Chain { records: vec![r] })),
-            Installed::AlreadyExists => {
-                let c = self.inspect(id)?;
-                if c.intent().request_digest != intent.request_digest
-                    || binding_digest(c.intent())? != binding_digest(&intent)?
-                {
-                    return Err(WalError::OperationIdConflict);
-                }
-                Ok(Begin::Existing(c))
-            }
+            Installed::AlreadyExists => self.existing(id, &intent),
         }
     }
+    /// The established chain of `id`, when it binds the same request.
+    fn existing(&self, id: &str, intent: &Intent) -> WalResult<Begin> {
+        let c = self.inspect(id)?;
+        if c.intent().request_digest != intent.request_digest
+            || binding_digest(c.intent())? != binding_digest(intent)?
+        {
+            return Err(WalError::OperationIdConflict);
+        }
+        Ok(Begin::Existing(c))
+    }
+    /// Install one record: durable-file writes and fsyncs the file, installs
+    /// the name without overwrite and fsyncs `dir`. `new_directory`: `dir`
+    /// was created for this record (record zero), so its parent is fsynced
+    /// too before the record is acknowledged; a later record's directory
+    /// name is already durable.
     fn install<T: Serialize>(
         &self,
         dir: &Directory,
         name: &str,
         value: &T,
+        new_directory: bool,
+    ) -> WalResult<Installed> {
+        self.install_ordered(dir, name, value, new_directory, &|| Ok(()), &mut || Ok(()))
+    }
+    /// `alongside` runs while the record bytes are synced, `before_install`
+    /// after both and before its name exists (see
+    /// `fgos_durable_file::install_ordered`).
+    fn install_ordered<T: Serialize>(
+        &self,
+        dir: &Directory,
+        name: &str,
+        value: &T,
+        new_directory: bool,
+        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        before_install: &mut dyn FnMut() -> io::Result<()>,
     ) -> WalResult<Installed> {
         let bytes = serde_json::to_vec(value).map_err(|_| corrupt("serialize"))?;
         if bytes.len() as u64 > MAX_RECORD {
             return Err(corrupt("record byte bound"));
         }
-        let result = install_with(&dir.path(), name, &bytes, &FaultAdapter(&self.fs))
-            .map_err(|e| WalError::Io(e.source))?;
+        let root = self.root.path();
+        let parents: &[&Path] = if new_directory { &[&root] } else { &[] };
+        let result = install_ordered(
+            &dir.path(),
+            name,
+            &bytes,
+            &FaultAdapter(&self.fs),
+            alongside,
+            before_install,
+            parents,
+        )
+        .map_err(|e| WalError::Io(e.source))?;
         self.fs.checkpoint("record-install")?;
-        sync_directory(&dir.path())?;
-        self.fs.checkpoint("record-directory-fsync")?;
-        self.root.file.sync_all()?;
-        self.fs.checkpoint("record-parent-fsync")?;
         Ok(result)
     }
     pub fn inspect(&self, id: &str) -> WalResult<Chain> {
@@ -686,15 +778,35 @@ impl<F: FileSystem> Wal<F> {
     /// the next numbered name; the loser gets Busy and no effect permit.
     /// Supersession has a separate checked entry point.
     pub fn append(&self, chain: &Chain, phase: Phase) -> WalResult<Chain> {
+        self.append_ordered(chain, phase, &|| Ok(()), &mut || Ok(()))
+    }
+    /// [`Wal::append`] whose record is installed only after `alongside` (run
+    /// on another thread while the record's bytes are synced) and then
+    /// `before_install` returned `Ok`. A caller uses it to make another
+    /// durable effect that must precede this record durable together with
+    /// the record's own write.
+    pub fn append_ordered(
+        &self,
+        chain: &Chain,
+        phase: Phase,
+        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        before_install: &mut dyn FnMut() -> io::Result<()>,
+    ) -> WalResult<Chain> {
         if matches!(
             phase,
             Phase::Intent(_) | Phase::Outcome(Outcome::Superseded { .. })
         ) {
             return Err(WalError::RecoveryRequired);
         }
-        self.append_checked(chain, phase)
+        self.append_checked(chain, phase, alongside, before_install)
     }
-    fn append_checked(&self, chain: &Chain, phase: Phase) -> WalResult<Chain> {
+    fn append_checked(
+        &self,
+        chain: &Chain,
+        phase: Phase,
+        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        before_install: &mut dyn FnMut() -> io::Result<()>,
+    ) -> WalResult<Chain> {
         let id = &chain.last().operation_id;
         chain.validate(id)?;
         let actual = self.inspect(id)?;
@@ -709,7 +821,9 @@ impl<F: FileSystem> Wal<F> {
             phase,
         )?;
         let dir = self.operation(id, false)?;
-        if self.install(&dir, &record_name(r.sequence), &r)? != Installed::Created {
+        if self.install_ordered(&dir, &record_name(r.sequence), &r, false, alongside, before_install)?
+            != Installed::Created
+        {
             return Err(WalError::Busy);
         }
         let mut records = chain.records.clone();
@@ -767,6 +881,8 @@ impl<F: FileSystem> Wal<F> {
                 later_receipt_digest: receipt.digest.clone(),
                 attribution,
             }),
+            &|| Ok(()),
+            &mut || Ok(()),
         )
     }
     pub(crate) fn native_lock_present(&self, intent: &Intent) -> WalResult<bool> {
@@ -1226,7 +1342,7 @@ impl<F: FileSystem> Wal<F> {
         {
             return Err(corrupt("ledger entry exceeds 512 bytes"));
         }
-        if self.install(&self.ledger, id, &c)? == Installed::AlreadyExists {
+        if self.install(&self.ledger, id, &c, false)? == Installed::AlreadyExists {
             let existing = self
                 .compacted(id)?
                 .ok_or_else(|| corrupt("missing ledger"))?;
@@ -1234,8 +1350,7 @@ impl<F: FileSystem> Wal<F> {
                 return Err(WalError::OperationIdConflict);
             }
         }
-        self.ledger.file.sync_all()?;
-        self.fs.checkpoint("ledger-fsync")?;
+        // The install fsynced the ledger directory after the name.
         let dir = self.operation(id, false)?;
         // No recursive remove: unexpected files (including failed-write temps)
         // are evidence. Leave them attributable by the durable ledger.
@@ -1272,6 +1387,11 @@ pub struct Backlog {
     pub oldest_unresolved: Option<(String, std::time::SystemTime)>,
 }
 impl<F: FileSystem> Wal<F> {
+    /// When the operation's directory last changed (its last record was
+    /// installed). Scheduling only: it never decides a protocol outcome.
+    pub(crate) fn last_change(&self, id: &str) -> Option<std::time::SystemTime> {
+        fs::metadata(self.root.path().join(id)).ok()?.modified().ok()
+    }
     pub(crate) fn known_id(&self, id: &str) -> WalResult<bool> {
         if self.compacted(id)?.is_some() {
             return Ok(true);
@@ -1709,6 +1829,38 @@ mod tests {
                 Ok(())
             }
         }
+    }
+    /// Records every checkpoint name it sees.
+    struct Steps(std::sync::Mutex<Vec<&'static str>>);
+    impl FileSystem for Steps {
+        fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+            self.0.lock().unwrap().push(step);
+            Ok(())
+        }
+    }
+    #[test]
+    fn durable_directories_are_synced_once_per_process_and_records_keep_their_syncs() {
+        let t = Temp::new();
+        let first = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(first.fs.0.lock().unwrap().contains(&"directory-fsync"));
+        // Same directories, already durable: no second fsync of them.
+        let again = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(!again.fs.0.lock().unwrap().contains(&"directory-fsync"));
+        // A record still fsyncs its file and directory; record zero also
+        // the parent of its new operation directory.
+        let c = begun(&again, "one");
+        let steps = std::mem::take(&mut *again.fs.0.lock().unwrap());
+        assert_eq!(steps.iter().filter(|s| **s == "file-fsync").count(), 1);
+        assert_eq!(steps.iter().filter(|s| **s == "parent-fsync").count(), 1);
+        again.append(&c, Phase::Prepared).unwrap();
+        let steps = std::mem::take(&mut *again.fs.0.lock().unwrap());
+        assert_eq!(steps.iter().filter(|s| **s == "file-fsync").count(), 1);
+        assert_eq!(steps.iter().filter(|s| **s == "parent-fsync").count(), 1);
+        // A directory removed and made again is a new directory: synced again.
+        drop((first, again));
+        fs::remove_dir_all(t.0.join("fgos")).unwrap();
+        let fresh = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        assert!(fresh.fs.0.lock().unwrap().contains(&"directory-fsync"));
     }
     #[test]
     fn crash_at_each_record_install_boundary_is_conservative() {

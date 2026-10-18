@@ -1891,3 +1891,63 @@ fn config_recovery_observes_attempted_changes_and_never_replays_old_ids() {
         }
     }
 }
+
+/// Each publication compacts the ref's older terminal chains: their pins
+/// are released and their id bindings and receipts move to the ledger, so
+/// retained operation directories stay bounded however long the stream
+/// runs. A recent id keeps its whole chain for `recover`; a compacted id
+/// replayed with the same request still returns its receipt, and with a
+/// different request is refused.
+#[test]
+fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let mut tip = ExpectedTip::Absent;
+    let mut done = Vec::new();
+    for n in 0..12 {
+        let parents = match &tip {
+            ExpectedTip::Oid(o) => vec![o.clone()],
+            ExpectedTip::Absent => vec![],
+        };
+        let next = commit(&port, &repo, parents, &format!("seal {n}"));
+        let id = format!("seal-{n:02}");
+        let receipt = port
+            .compare_and_swap(&repo, &reference(), &tip, &ExpectedTip::Oid(next.clone()), &id)
+            .unwrap();
+        assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
+        done.push((id, tip.clone(), next.clone()));
+        tip = ExpectedTip::Oid(next);
+        // Keep the change times of successive chains apart.
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    let operations = repo.common_dir().join("fgos/git/operations");
+    let retained = fs::read_dir(&operations).unwrap().count();
+    assert!(retained <= 5, "retained operation directories: {retained}");
+    let pins = fs::read_dir(repo.common_dir().join("refs/fgos/git-operations"))
+        .map(|d| d.count())
+        .unwrap_or(0);
+    assert!(pins <= 5, "retained pins: {pins}");
+    let ledger = fs::read_dir(repo.common_dir().join("fgos/git/compacted")).unwrap().count();
+    assert!(ledger >= 7, "compacted ids: {ledger}");
+    // The first id is compacted: same request returns its receipt.
+    let (id, old, next) = &done[0];
+    assert!(!operations.join(id).exists());
+    let receipt = port
+        .compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), id)
+        .unwrap();
+    assert_eq!(receipt.local_effect.published_oid.as_ref(), Some(next));
+    assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
+    // A different request under the same id is refused.
+    assert!(port
+        .compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(done[1].2.clone()), id)
+        .is_err());
+    // The latest id keeps its whole chain for recover.
+    let (last, _, last_next) = done.last().unwrap();
+    let recovered = port.recover(&repo, last).unwrap();
+    assert_eq!(recovered.local_effect.published_oid.as_ref(), Some(last_next));
+}

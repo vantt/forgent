@@ -17,6 +17,55 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 static GIT: OnceLock<Option<PathBuf>> = OnceLock::new();
 // One selected executable and one floor result, including failures, per process.
 static FLOOR: OnceLock<Result<GitFloorVerdict>> = OnceLock::new();
+/// The recorded floor verdict, in the driver's trusted state root.
+const FLOOR_RECORD: &str = "git-floor-verdict.json";
+
+fn floor_record(key: &serde_json::Value, v: &GitFloorVerdict) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "version": v.version,
+        "minimum": v.minimum,
+        "supported": v.supported,
+        "probes": v.probes.iter().map(|p| serde_json::json!({"name": p.name, "passed": p.passed, "evidence": p.evidence})).collect::<Vec<_>>(),
+    })
+}
+
+/// The recorded verdict when its key equals `key` exactly; anything
+/// unreadable, foreign or different is no record.
+fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVerdict> {
+    use std::io::Read;
+    #[cfg(unix)]
+    let file = {
+        use std::os::unix::fs::OpenOptionsExt;
+        fs::OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW).open(path).ok()?
+    };
+    #[cfg(not(unix))]
+    let file = fs::File::open(path).ok()?;
+    let mut bytes = Vec::new();
+    file.take(64 * 1024).read_to_end(&mut bytes).ok()?;
+    let record: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    if record.get("key")? != key {
+        return None;
+    }
+    let text = |v: &serde_json::Value| v.as_str().map(str::to_owned);
+    let probes = record
+        .get("probes")?
+        .as_array()?
+        .iter()
+        .map(|p| Some(FloorProbe { name: text(p.get("name")?)?, passed: p.get("passed")?.as_bool()?, evidence: text(p.get("evidence")?)? }))
+        .collect::<Option<Vec<_>>>()?;
+    let supported = record.get("supported")?.as_bool()?;
+    // A record never claims more than its own probes show.
+    if supported != (!probes.is_empty() && probes.iter().all(|p| p.passed)) {
+        return None;
+    }
+    Some(GitFloorVerdict {
+        version: text(record.get("version")?)?,
+        minimum: text(record.get("minimum")?)?,
+        supported,
+        probes,
+    })
+}
 
 /// Effective config record: origin, normalized key, byte-preserving value.
 type ConfigRecord = (Vec<u8>, String, Vec<u8>);
@@ -197,7 +246,7 @@ impl GitDriver {
     }
 
     pub fn git_floor_verdict(&self) -> Result<&GitFloorVerdict> {
-        match FLOOR.get_or_init(|| self.probe_floor()) {
+        match FLOOR.get_or_init(|| self.recorded_floor()) {
             Ok(verdict) => Ok(verdict),
             Err(error) => {
                 // Floor probes cannot publish or carry an operation receipt.
@@ -721,6 +770,56 @@ impl GitDriver {
             success: status.success(),
             code: status.code(),
         })
+    }
+    /// The floor verdict for the selected Git. Probing runs about fourteen
+    /// contained Git invocations; its verdict is kept in the state root,
+    /// keyed by everything the probes depend on (the Git binary's identity,
+    /// the floor contract, and the identity of every config file the
+    /// probes' Git could read), and reused by a later process only when
+    /// the whole key is unchanged. Anything else probes again.
+    fn recorded_floor(&self) -> Result<GitFloorVerdict> {
+        let record = self.state_root.join(FLOOR_RECORD);
+        let key = self.floor_key();
+        if let Some(verdict) = key.as_ref().and_then(|key| read_floor_record(&record, key)) {
+            return Ok(verdict);
+        }
+        let verdict = self.probe_floor()?;
+        if let Some(key) = key {
+            // A record that cannot be written only costs the next process a probe.
+            let _ = fgos_durable_file::replace_durably(
+                &self.state_root,
+                FLOOR_RECORD,
+                floor_record(&key, &verdict).to_string().as_bytes(),
+            );
+        }
+        Ok(verdict)
+    }
+    fn floor_key(&self) -> Option<serde_json::Value> {
+        let home = std::env::var_os("HOME").map(PathBuf::from);
+        let xdg = std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from);
+        let mut configs = vec![PathBuf::from("/etc/gitconfig")];
+        if let Some(prefix) = self.git.parent().and_then(Path::parent) {
+            configs.push(prefix.join("etc/gitconfig"));
+        }
+        match (&xdg, &home) {
+            (Some(xdg), _) => configs.push(xdg.join("git/config")),
+            (None, Some(home)) => configs.push(home.join(".config/git/config")),
+            _ => (),
+        }
+        if let Some(home) = &home {
+            configs.push(home.join(".gitconfig"));
+        }
+        let binary = ConfigStamp::read(vec![self.git.clone()]).ok()?;
+        let configs = ConfigStamp::read(configs).ok()?;
+        Some(serde_json::json!({
+            "v": 1,
+            "git": self.git,
+            "binary": binary.files,
+            "contract": crate::wal::canonical_digest(&include_str!("../../contracts/git-floor.v1.json")).ok()?,
+            "home": home,
+            "xdgConfigHome": xdg,
+            "configs": configs.paths.iter().zip(&configs.files).collect::<Vec<_>>(),
+        }))
     }
     fn probe_floor(&self) -> Result<GitFloorVerdict> {
         let out = self.invoke(
@@ -1875,6 +1974,48 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+    #[test]
+    fn floor_record_is_reused_only_for_the_same_key_and_consistent_verdict() {
+        let t = Temp::new();
+        let driver = GitDriver::new(&t.0).unwrap();
+        let key = driver.floor_key().expect("floor key");
+        let verdict = GitFloorVerdict {
+            version: "2.53.0".into(),
+            minimum: "2.53.0".into(),
+            supported: true,
+            probes: vec![FloorProbe { name: "hook-run".into(), passed: true, evidence: "e".into() }],
+        };
+        let path = t.0.join(FLOOR_RECORD);
+        fs::write(&path, floor_record(&key, &verdict).to_string()).unwrap();
+        let read = read_floor_record(&path, &key).expect("same key reuses the record");
+        assert!(read.supported && read.probes.len() == 1 && read.version == "2.53.0");
+        // Any change in what the probes depend on is a different key.
+        let mut other = key.clone();
+        other["binary"] = serde_json::json!(["changed"]);
+        assert!(read_floor_record(&path, &other).is_none());
+        // A record whose verdict disagrees with its own probes is ignored.
+        let mut lying = floor_record(&key, &verdict);
+        lying["probes"][0]["passed"] = serde_json::json!(false);
+        fs::write(&path, lying.to_string()).unwrap();
+        assert!(read_floor_record(&path, &key).is_none());
+        // A symlink is never followed.
+        fs::remove_file(&path).unwrap();
+        fs::write(t.0.join("elsewhere"), floor_record(&key, &verdict).to_string()).unwrap();
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink(t.0.join("elsewhere"), &path).unwrap();
+            assert!(read_floor_record(&path, &key).is_none());
+        }
+    }
+    #[test]
+    fn floor_key_names_the_git_binary_and_config_identities() {
+        let t = Temp::new();
+        let driver = GitDriver::new(&t.0).unwrap();
+        let key = driver.floor_key().expect("floor key");
+        assert_eq!(key["git"], serde_json::json!(driver.git));
+        assert!(key["binary"][0].is_string(), "the binary identity is recorded");
+        assert!(key["configs"].as_array().unwrap().iter().any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
     }
     fn git(dir: &Path, args: &[&str]) -> Vec<u8> {
         let out = Command::new("git")
