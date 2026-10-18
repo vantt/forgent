@@ -233,6 +233,7 @@
     "src/run-supervisor/client.mjs": "infra",
     "src/run-supervisor/direct-launch.mjs": "infra",
     "src/run-supervisor/gate-kill-grace.mjs": "infra",
+    "src/run-supervisor/legacy-sweep.mjs": "infra",
     "src/run-supervisor/payload-root.mjs": "infra",
     "src/run-supervisor/runtime-dir.mjs": "infra",
     "src/run-supervisor/step-support.mjs": "infra",
