@@ -55,6 +55,10 @@ fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVer
         .map(|p| Some(FloorProbe { name: text(p.get("name")?)?, passed: p.get("passed")?.as_bool()?, evidence: text(p.get("evidence")?)? }))
         .collect::<Option<Vec<_>>>()?;
     let supported = record.get("supported")?.as_bool()?;
+    let contract: serde_json::Value = serde_json::from_str(include_str!("../../contracts/git-floor.v1.json")).ok()?;
+    let required: BTreeSet<_> = contract["requiredProbes"].as_array()?.iter().map(|v| v.as_str()).collect();
+    let actual: BTreeSet<_> = probes.iter().map(|p| Some(p.name.as_str())).collect();
+    if actual != required || probes.len() != required.len() { return None; }
     // A record never claims more than its own probes show.
     if supported != (!probes.is_empty() && probes.iter().all(|p| p.passed)) {
         return None;
@@ -383,11 +387,7 @@ impl GitDriver {
         )
     }
 
-    fn publication_preflight(
-        &self,
-        repo: &RepoHandle,
-        handle: &fgos_holder_lock::Handle,
-    ) -> Result<()> {
+    fn config_paths(&self, repo: Option<&RepoHandle>, cwd: &Path, policy: Policy, loan: Option<&dyn BorrowedSpawn>) -> Result<Vec<PathBuf>> {
         let environment = (
             std::env::var_os("HOME"),
             std::env::var_os("XDG_CONFIG_HOME"),
@@ -405,11 +405,11 @@ impl GitDriver {
             // appears later, and a custom Git prefix must never be guessed.
             for variable in ["GIT_CONFIG_SYSTEM", "GIT_CONFIG_GLOBAL"] {
                 let out = self.invoke_input(
-                    Some(repo),
-                    &repo.trusted_main_root,
+                    repo,
+                    cwd,
                     &["var", variable],
-                    Policy::Publication,
-                    Some(handle),
+                    policy,
+                    loan,
                     true,
                     PATH_LIMIT,
                     Duration::from_secs(30),
@@ -433,6 +433,15 @@ impl GitDriver {
             paths
         };
         drop(sources);
+        Ok(globals)
+    }
+
+    fn publication_preflight(
+        &self,
+        repo: &RepoHandle,
+        handle: &fgos_holder_lock::Handle,
+    ) -> Result<()> {
+        let globals = self.config_paths(Some(repo), &repo.trusted_main_root, Policy::Publication, Some(handle))?;
         let mut paths = globals;
         paths.extend([
             repo.common_dir.join("config"),
@@ -797,22 +806,29 @@ impl GitDriver {
     fn floor_key(&self) -> Option<serde_json::Value> {
         let home = std::env::var_os("HOME").map(PathBuf::from);
         let xdg = std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from);
-        let mut configs = vec![PathBuf::from("/etc/gitconfig")];
-        if let Some(prefix) = self.git.parent().and_then(Path::parent) {
-            configs.push(prefix.join("etc/gitconfig"));
+        let mut configs = self.config_paths(None, &self.state_root, Policy::Inspect, None).ok()?;
+        let before = ConfigStamp::read(configs.clone()).ok()?;
+        // Includes may depend on gitdir/onbranch/hasconfig as well as files.
+        // Conservatively do not persist a verdict for any include directive,
+        // including missing or currently inactive includeIf targets.
+        let config = self.invoke(None, &self.state_root, &["config", "--null", "--show-origin", "--list"], Policy::Inspect, None, false, PATH_LIMIT, Duration::from_secs(10)).ok()?;
+        if !config.success { return None; }
+        for (origin, key, _) in parse_config(&config.stdout).ok()? {
+            if key == "include.path" || key.starts_with("includeif.") { return None; }
+            if let Some(path) = origin.strip_prefix(b"file:") {
+                let path = PathBuf::from(std::str::from_utf8(path).ok()?);
+                let path = self.state_root.join(path);
+                if !configs.contains(&path) { configs.push(path); }
+            }
         }
-        match (&xdg, &home) {
-            (Some(xdg), _) => configs.push(xdg.join("git/config")),
-            (None, Some(home)) => configs.push(home.join(".config/git/config")),
-            _ => (),
-        }
-        if let Some(home) = &home {
-            configs.push(home.join(".gitconfig"));
-        }
+        if before != ConfigStamp::read(before.paths.clone()).ok()? { return None; }
         let binary = ConfigStamp::read(vec![self.git.clone()]).ok()?;
         let configs = ConfigStamp::read(configs).ok()?;
         Some(serde_json::json!({
-            "v": 1,
+            "v": 2,
+            "hostVersion": env!("CARGO_PKG_VERSION"),
+            "probeCode": crate::wal::canonical_digest(&include_str!("driver.rs")).ok()?,
+            "path": std::env::var_os("PATH").map(|p| p.to_string_lossy().into_owned()),
             "git": self.git,
             "binary": binary.files,
             "contract": crate::wal::canonical_digest(&include_str!("../../contracts/git-floor.v1.json")).ok()?,
@@ -1984,12 +2000,12 @@ mod tests {
             version: "2.53.0".into(),
             minimum: "2.53.0".into(),
             supported: true,
-            probes: vec![FloorProbe { name: "hook-run".into(), passed: true, evidence: "e".into() }],
+            probes: ["hook-suppression", "no-lazy-fetch", "update-ref-no-deref", "hook-run"].into_iter().map(|name| FloorProbe { name: name.into(), passed: true, evidence: "e".into() }).collect(),
         };
         let path = t.0.join(FLOOR_RECORD);
         fs::write(&path, floor_record(&key, &verdict).to_string()).unwrap();
         let read = read_floor_record(&path, &key).expect("same key reuses the record");
-        assert!(read.supported && read.probes.len() == 1 && read.version == "2.53.0");
+        assert!(read.supported && read.probes.len() == 4 && read.version == "2.53.0");
         // Any change in what the probes depend on is a different key.
         let mut other = key.clone();
         other["binary"] = serde_json::json!(["changed"]);
@@ -1999,6 +2015,13 @@ mod tests {
         lying["probes"][0]["passed"] = serde_json::json!(false);
         fs::write(&path, lying.to_string()).unwrap();
         assert!(read_floor_record(&path, &key).is_none());
+        // Passing an incomplete or different probe set cannot certify the floor.
+        for name in ["different-probe", "hook-suppression"] {
+            let mut incomplete = floor_record(&key, &verdict);
+            incomplete["probes"] = serde_json::json!([{"name": name, "passed": true, "evidence": "e"}]);
+            fs::write(&path, incomplete.to_string()).unwrap();
+            assert!(read_floor_record(&path, &key).is_none());
+        }
         // A symlink is never followed.
         fs::remove_file(&path).unwrap();
         fs::write(t.0.join("elsewhere"), floor_record(&key, &verdict).to_string()).unwrap();
@@ -2014,8 +2037,19 @@ mod tests {
         let driver = GitDriver::new(&t.0).unwrap();
         let key = driver.floor_key().expect("floor key");
         assert_eq!(key["git"], serde_json::json!(driver.git));
+        assert_eq!(key["hostVersion"], env!("CARGO_PKG_VERSION"));
+        assert!(key["probeCode"].as_str().is_some_and(|s| s.len() == 64));
+        assert_eq!(key["path"], std::env::var("PATH").unwrap());
         assert!(key["binary"][0].is_string(), "the binary identity is recorded");
         assert!(key["configs"].as_array().unwrap().iter().any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
+    }
+    #[test]
+    fn include_directives_disable_persistent_floor_reuse_even_when_inactive() {
+        let t = Temp::new();
+        git(&t.0, &["init", "--quiet"]);
+        git(&t.0, &["config", "includeIf.gitdir:/never-a-probe/.path", "missing-include"]);
+        let driver = GitDriver::new(&t.0).unwrap();
+        assert!(driver.floor_key().is_none());
     }
     fn git(dir: &Path, args: &[&str]) -> Vec<u8> {
         let out = Command::new("git")

@@ -61,13 +61,14 @@ pub fn install_with(
     bytes: &[u8],
     filesystem: &dyn FileSystem,
 ) -> Result<Installed, InstallError> {
-    install_ordered(dir, name, bytes, filesystem, &|| Ok(()), &mut || Ok(()), &[])
+    install_ordered(dir, name, bytes, filesystem, None, &mut || Ok(()), &[])
 }
 
 /// [`install_with`] with additions for a caller that orders other durable
 /// effects around one record. `alongside` runs on another thread while the
-/// record's bytes are synced (other fsyncs that must precede the record can
-/// then share the filesystem's journal commit with it); `before_install`
+/// record's bytes are synced when present (`None` starts no worker thread).
+/// Other fsyncs that must precede the record can
+/// then share the filesystem's journal commit with it; `before_install`
 /// runs once both finished and before the name is installed. The record
 /// cannot exist until both returned `Ok`; an error leaves only the
 /// temporary. `also_sync` are further directories synced together with
@@ -78,7 +79,7 @@ pub fn install_ordered(
     name: &str,
     bytes: &[u8],
     filesystem: &dyn FileSystem,
-    alongside: &(dyn Fn() -> io::Result<()> + Sync),
+    alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
     before_install: &mut dyn FnMut() -> io::Result<()>,
     also_sync: &[&Path],
 ) -> Result<Installed, InstallError> {
@@ -138,7 +139,7 @@ pub fn replace_durably_observed(
         "name-installed" => observe(ReplacePoint::Renamed),
         "parent-fsync" => observe(ReplacePoint::DirectorySynced),
         _ => Ok(()),
-    }, &[], &|| Ok(()))
+    }, &[], None)
 }
 
 /// One write path for both modes. `replace` renames over the name; otherwise the
@@ -151,7 +152,7 @@ fn write_durably(
     replace: bool,
     checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
     also_sync: &[&Path],
-    alongside: &(dyn Fn() -> io::Result<()> + Sync),
+    alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
 ) -> Result<Installed, InstallError> {
     let mut components = Path::new(name).components();
     if name.is_empty()
@@ -216,13 +217,15 @@ fn write_durably(
             );
         }
     }
-    std::thread::scope(|scope| {
-        let other = scope.spawn(alongside);
-        let synced = file.sync_all();
-        let other = other.join().unwrap_or_else(|_| Err(io::Error::other("concurrent durable step panicked")));
-        synced.and(other)
-    })
-    .map_err(|e| error(e, None))?;
+    match alongside {
+        Some(alongside) => std::thread::scope(|scope| {
+            let other = scope.spawn(alongside);
+            let synced = file.sync_all();
+            let other = other.join().unwrap_or_else(|_| Err(io::Error::other("concurrent durable step panicked")));
+            synced.and(other)
+        }),
+        None => file.sync_all(),
+    }.map_err(|e| error(e, None))?;
     checkpoint("file-fsync").map_err(|e| error(e, None))?;
     drop(file);
     let target = dir.join(name);

@@ -417,6 +417,11 @@ pub fn created_since(mark: &CreationMark) -> Option<Vec<Relation>> {
 /// the age of a mark that [`created_since`] trusts.
 pub const ALLOCATION_RATE_BOUND: u64 = 4_000_000;
 
+/// Fields following the comm name, shared by all Linux stat readers.
+pub(crate) fn proc_stat_fields(line: &str) -> Option<std::str::SplitWhitespace<'_>> {
+    Some(line[line.rfind(')')? + 1..].split_whitespace())
+}
+
 /// Parent, group and start time of every process this observer can read,
 /// from one pass over the process table (Linux). `None` where the platform
 /// has no such pass. A process that exits during the pass is left out.
@@ -428,13 +433,13 @@ pub fn relations() -> Option<Vec<Relation>> {
 /// are counted from the last `)`, so a command name with spaces or
 /// parentheses cannot shift them.
 pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
-    let rest = &line[line.rfind(')')? + 1..];
-    let fields: Vec<&str> = rest.split_whitespace().collect();
+    let mut fields = proc_stat_fields(line)?;
+    fields.next()?; // state (field 3)
     Some(Relation {
         pid,
-        parent: fields.get(1)?.parse().ok()?,
-        group: fields.get(2)?.parse().ok()?,
-        start_ticks: fields.get(19)?.parse().ok()?,
+        parent: fields.next()?.parse().ok()?,
+        group: fields.next()?.parse().ok()?,
+        start_ticks: fields.nth(16)?.parse().ok()?, // field 22
     })
 }
 
@@ -492,11 +497,10 @@ pub fn scan(filter: &ScanFilter) -> Scan {
 /// counted from the last `)`: state is the first field after it, start
 /// time the twentieth.
 pub fn parse_proc_stat(line: &str) -> Option<(char, String)> {
-    let rest = &line[line.rfind(')')? + 1..];
-    let fields: Vec<&str> = rest.split_whitespace().collect();
-    let state = fields.first()?.chars().next()?;
-    let start_time = fields.get(19)?;
-    Some((state, (*start_time).to_string()))
+    let mut fields = proc_stat_fields(line)?;
+    let state = fields.next()?.chars().next()?;
+    let start_time = fields.nth(18)?;
+    Some((state, start_time.to_string()))
 }
 
 #[cfg(test)]

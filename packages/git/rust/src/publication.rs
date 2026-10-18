@@ -291,7 +291,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(werr)?;
-                let _ = self.release_pin_and_compact(repo, &terminal.last().operation_id);
+                if let Err(e) = self.release_pin_and_compact(repo, &terminal.last().operation_id) { eprintln!("git compaction deferred: {}: {}", terminal.last().operation_id, e.cause); }
             } else if chain.intent().kind != wal::OperationKind::PublicationCas {
                 let mut e = werr(WalError::RecoveryRequired);
                 e.operation_id = Some(blocking.clone());
@@ -302,7 +302,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         // Newest first; an unreadable change time sorts oldest.
         terminal.sort_by_key(|t| std::cmp::Reverse(t.0));
         for (_, old) in terminal.into_iter().skip(RECENT_TERMINAL) {
-            let _ = self.release_pin_and_compact(repo, &old);
+            if let Err(e) = self.release_pin_and_compact(repo, &old) { eprintln!("git compaction deferred: {old}: {}", e.cause); }
         }
         Ok(())
     }
@@ -471,7 +471,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 io
             })
         };
-        match wal.append_ordered(chain, phase, &sync, &mut points) {
+        match wal.append_ordered(chain, phase, Some(&sync), &mut points) {
             Ok(chain) => Ok(chain),
             Err(_) if refused.is_some() => Err(refused.take().expect("checked")),
             Err(WalError::Io(e)) if e.to_string().starts_with("directory-fsync") => Err(err(e.to_string())),
@@ -655,28 +655,22 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         })
     }
     fn finish(&self, repo: &RepoHandle, chain: &wal::Chain) -> Result<Receipt> {
-        let receipt = self.materialize(
-            repo,
-            &chain.last().operation_id,
-            chain.intent(),
-            chain
-                .outcome()
-                .ok_or_else(|| err("missing-terminal-outcome"))?,
-        )?;
+        self.finish_outcome(repo, &chain.last().operation_id, chain.intent(), chain.outcome().ok_or_else(|| err("missing-terminal-outcome"))?)
+    }
+    fn finish_outcome(&self, repo: &RepoHandle, id: &str, intent: &Intent, outcome: &Outcome) -> Result<Receipt> {
+        let receipt = self.materialize(repo, id, intent, outcome)?;
         if matches!(
-            chain.outcome(),
-            Some(
-                Outcome::Loss { .. } | Outcome::Superseded { .. } | Outcome::AbandonedBeforeAttempt
-            )
+            outcome,
+            Outcome::Loss { .. } | Outcome::Superseded { .. } | Outcome::AbandonedBeforeAttempt
         ) {
-            let mut e = err(match chain.outcome() {
-                Some(Outcome::Superseded { .. }) => "operation-superseded",
-                Some(Outcome::AbandonedBeforeAttempt) => "abandoned-before-attempt",
+            let mut e = err(match outcome {
+                Outcome::Superseded { .. } => "operation-superseded",
+                Outcome::AbandonedBeforeAttempt => "abandoned-before-attempt",
                 _ => "compare-and-swap-stale",
             });
-            e.code = match chain.outcome() {
-                Some(Outcome::Superseded { .. }) => ResultCode::Superseded,
-                Some(Outcome::AbandonedBeforeAttempt) => ResultCode::Refused,
+            e.code = match outcome {
+                Outcome::Superseded { .. } => ResultCode::Superseded,
+                Outcome::AbandonedBeforeAttempt => ResultCode::Refused,
                 _ => ResultCode::Stale,
             };
             e.operation_id = Some(receipt.operation_id.clone());
@@ -684,11 +678,11 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             return Err(e);
         }
         let mut receipt = receipt;
-        if let Some(Outcome::Transfer {
+        if let Outcome::Transfer {
             acknowledged,
             unknown,
             ..
-        }) = chain.outcome()
+        } = outcome
         {
             receipt.remote = if *acknowledged {
                 Remote::Acknowledged
@@ -871,21 +865,30 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
         let wal = self.wal(repo)?;
-        let chain = match wal.inspect(id) {
-            Ok(chain) => chain,
-            // A compacted id is settled: the ledger keeps its binding and
-            // terminal outcome, not its request. Its receipt is returned to
-            // a replay of the same request (compareAndSwap).
-            Err(WalError::Io(e))
-                if e.kind() == std::io::ErrorKind::NotFound
-                    && wal.compacted(id).map_err(werr)?.is_some() =>
-            {
-                let mut e = err("operation-compacted: replay the same request to read its receipt");
+        if let Some(c) = wal.compacted(id).map_err(werr)? {
+            if c.v == 1 {
+                let mut e = werr(WalError::RecoveryRequired);
+                e.cause = "legacy-compact-receipt-incomplete: expected and next were not recorded; exact-request replay remains available".into();
                 e.operation_id = Some(id.into());
                 return Err(e);
             }
-            Err(e) => return Err(werr(e)),
-        };
+            let decode_tip = |s: &str| if s == "-" { Tip::Absent } else { Tip::Oid(s.into()) };
+            let intent = Intent {
+                kind: wal::OperationKind::PublicationCas,
+                request_digest: c.request.clone(),
+                repo_identity: self.authority.repo_identity.clone(),
+                resource_set: vec![self.authority.reference.as_str().into()],
+                authority_binding: self.authority.binding.clone(),
+                writer_identity: self.authority.writer.clone(),
+                object_format: repo.object_format(),
+                expected: decode_tip(&c.expected),
+                next: decode_tip(&c.next),
+            };
+            if !c.matches(&intent).map_err(werr)? { return Err(err("publication-borrow-unavailable")); }
+            self.authority.validate_publication_borrow(&intent).map_err(werr)?;
+            return self.finish_outcome(repo, id, &intent, &c.outcome().map_err(werr)?);
+        }
+        let chain = wal.inspect(id).map_err(werr)?;
         self.authority
             .validate_publication_borrow(chain.intent())
             .map_err(werr)?;
@@ -1046,11 +1049,14 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
                     "--end-of-options",
                     &peeled,
                 ];
+                let excluded;
                 if let Tip::Oid(expected) = &i.expected {
-                    args.extend(["--not", expected.as_str()]);
+                    excluded = format!("^{expected}");
+                    args.push(&excluded);
                 }
                 if let Ok(out) = self.port.call(self.repo, &args, &[]) {
                     if out.split(|b| *b == b'\n').next() == Some(o.as_bytes()) {
+                        self.port.point("candidate-fast-path").map_err(|e| WalError::Io(std::io::Error::other(e.cause)))?;
                         return Ok(true);
                     }
                 }
@@ -1112,18 +1118,17 @@ mod durable_objects {
     const KEEP: Duration = Duration::from_secs(600);
     const BOUND: usize = 4096;
     type Key = (PathBuf, String);
-    /// (device, inode) of the loose file, and when it was made durable.
-    type Seen = HashMap<Key, ((u64, u64), Instant)>;
+    /// Device, inode and birth time of the loose file, and durability time.
+    type Seen = HashMap<Key, ((u64, u64, u128), Instant)>;
     static SEEN: Mutex<Option<Seen>> = Mutex::new(None);
     #[cfg(unix)]
-    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64)> {
-        use std::os::unix::fs::MetadataExt;
+    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {
         let s = oid.as_str();
         let m = std::fs::symlink_metadata(repo.common_dir().join("objects").join(&s[..2]).join(&s[2..])).ok()?;
-        m.is_file().then(|| (m.dev(), m.ino()))
+        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()
     }
     #[cfg(not(unix))]
-    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64)> {
+    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {
         None
     }
     pub(super) fn remember(repo: &RepoHandle, oid: &Oid) {
@@ -1387,31 +1392,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         let chain = match wal.begin(id, i.clone(), &self.authority).map_err(werr)? {
             Begin::Created(c) => c,
             Begin::Existing(_) => return self.recover(repo, id),
-            Begin::Compacted(c) => {
-                let outcome = c.outcome().map_err(werr)?;
-                let receipt = self.materialize(repo, id, &i, &outcome)?;
-                if matches!(
-                    outcome,
-                    Outcome::Loss { .. }
-                        | Outcome::Superseded { .. }
-                        | Outcome::AbandonedBeforeAttempt
-                ) {
-                    let mut e = err(match outcome {
-                        Outcome::Superseded { .. } => "operation-superseded",
-                        Outcome::AbandonedBeforeAttempt => "abandoned-before-attempt",
-                        _ => "compare-and-swap-stale",
-                    });
-                    e.code = match outcome {
-                        Outcome::Superseded { .. } => ResultCode::Superseded,
-                        Outcome::AbandonedBeforeAttempt => ResultCode::Refused,
-                        _ => ResultCode::Stale,
-                    };
-                    e.operation_id = Some(id.into());
-                    e.receipt = Some(Box::new(receipt));
-                    return Err(e);
-                }
-                return Ok(receipt);
-            }
+            Begin::Compacted(c) => return self.finish_outcome(repo, id, &i, &c.outcome().map_err(werr)?),
         };
         let i = chain.intent();
         let pin = format!("refs/fgos/git-operations/{id}/candidate");

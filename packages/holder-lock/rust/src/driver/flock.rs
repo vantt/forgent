@@ -233,8 +233,8 @@ fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: O
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
-pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)).map(|_| ())
+pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration) -> Result<(), Leftovers> {
+    drain_description(file, None, std::process::id(), kill_wait, Reach::Everyone).map(|_| ())
 }
 
 /// Which processes a drain reads descriptor tables of.
@@ -244,10 +244,9 @@ pub(crate) enum Reach {
     /// description could first have been copied (a helper handed someone
     /// else's description).
     Everyone,
-    /// No process but this one held the description at this mark (it was
-    /// opened after it, or a drain that began there proved it). A copy of a
-    /// description is only ever inherited across fork, so every other holder
-    /// now was created after the mark: the drain reads those processes only,
+    /// Lagged per-spawn floor, assuming fork inheritance and ordinary PID
+    /// allocation. Descriptor transfer to existing processes is covered by
+    /// the mandatory full admission and final drains. Reads processes
     /// found in pid allocation order while the mark is young enough
     /// (`fgos_process::facts::created_since`), otherwise by start time over
     /// every process. The borrowed child, its group and its descendants were
@@ -278,19 +277,8 @@ impl Tree {
             None => parent_and_group(pid),
         }
     }
-    fn in_borrow_domain(&self, mut pid: u32, root: u32) -> bool {
-        let mut seen = HashSet::new();
-        while pid > 1 && seen.insert(pid) {
-            if pid == root {
-                return true;
-            }
-            let Some((parent, group)) = self.parent_and_group(pid) else { return false };
-            if group == root {
-                return true;
-            }
-            pid = parent;
-        }
-        false
+    fn in_borrow_domain(&self, pid: u32, root: u32) -> bool {
+        in_domain(pid, root, |pid| self.parent_and_group(pid))
     }
 }
 
@@ -333,7 +321,7 @@ pub(crate) fn drain_description(
                         let mut pids: Vec<ProcId> = tree
                             .0
                             .iter()
-                            .filter(|(pid, (parent, _, start))| **pid == me || *parent == owner || *start >= mark.ticks)
+                            .filter(|(pid, (_, _, start))| **pid == me || *start >= mark.ticks)
                             .map(|(pid, _)| ProcId(*pid))
                             .collect();
                         if !pids.contains(&ProcId(me)) {
@@ -440,18 +428,21 @@ pub(crate) fn drain_description(
 /// Read-only local Linux domain facts; no process-control policy lives here.
 fn parent_and_group(pid: u32) -> Option<(u32, u32)> {
     let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-    let mut fields = stat[stat.rfind(')')? + 1..].split_whitespace();
-    fields.next()?;
-    Some((fields.next()?.parse().ok()?, fields.next()?.parse().ok()?))
+    let relation = fgos_process::facts::parse_relation(fgos_process::ProcId(pid), &stat)?;
+    Some((relation.parent, relation.group))
 }
 
-fn in_borrow_domain(mut pid: u32, root: u32) -> bool {
+fn in_borrow_domain(pid: u32, root: u32) -> bool {
+    in_domain(pid, root, parent_and_group)
+}
+
+fn in_domain(mut pid: u32, root: u32, relation: impl Fn(u32) -> Option<(u32, u32)>) -> bool {
     let mut seen = HashSet::new();
     while pid > 1 && seen.insert(pid) {
         if pid == root {
             return true;
         }
-        let Some((parent, group)) = parent_and_group(pid) else { return false };
+        let Some((parent, group)) = relation(pid) else { return false };
         if group == root {
             return true;
         }

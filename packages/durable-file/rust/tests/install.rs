@@ -215,10 +215,10 @@ fn ordered_install_waits_for_its_barrier_before_the_name_exists() {
         "record",
         b"bytes",
         &steps,
-        &|| {
+        Some(&|| {
             alongside_ran.store(true, std::sync::atomic::Ordering::SeqCst);
             Ok(())
-        },
+        }),
         &mut || {
             seen_at_barrier = Some((target.exists(), steps.0.lock().unwrap().clone()));
             Ok(())
@@ -239,7 +239,7 @@ fn ordered_install_waits_for_its_barrier_before_the_name_exists() {
             name,
             b"bytes",
             &steps,
-            &|| if alongside_fails { Err(std::io::Error::other("alongside refused")) } else { Ok(()) },
+            Some(&|| if alongside_fails { Err(std::io::Error::other("alongside refused")) } else { Ok(()) }),
             &mut || if alongside_fails { Ok(()) } else { Err(std::io::Error::other("barrier refused")) },
             &[],
         )

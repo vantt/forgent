@@ -14,7 +14,6 @@ use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
 use std::io;
 use std::path::{Path, PathBuf};
-#[cfg(unix)]
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
@@ -175,14 +174,10 @@ pub struct Handle {
     resource: Resource,
     pub(crate) mode: Mode,
     pub(crate) kill_wait_ms: u64,
-    /// A creation mark at which no process but this one held the
-    /// description: taken before it was opened, and moved to the start of
-    /// each drain or quiescence check that proved no other process held it.
-    /// A copy is only inherited across fork, so drains read only processes
-    /// created since this mark, never every process. `None`: unknown; drains
-    /// read every process.
+    /// Lagged per-spawn scan floor and latest successful proof start.
+    /// Admission and the final borrow drain always read every process.
     #[cfg_attr(not(unix), allow(dead_code))]
-    since: std::sync::Mutex<Option<fgos_process::facts::CreationMark>>,
+    since: std::sync::Mutex<(Option<fgos_process::facts::CreationMark>, Option<fgos_process::facts::CreationMark>)>,
 }
 
 impl Drop for Handle {
@@ -202,31 +197,30 @@ impl Handle {
         &self.resource.path
     }
 
+    /// The mark since which only this process held the description, when known.
+    #[cfg_attr(not(unix), allow(dead_code))]
+    fn since(&self) -> Option<fgos_process::facts::CreationMark> {
+        self.since.lock().ok().and_then(|since| since.0)
+    }
+
+    /// Advance the per-spawn floor by one successful proof.
+    #[cfg_attr(not(unix), allow(dead_code))]
+    fn proven_alone_at(&self, started: Option<fgos_process::facts::CreationMark>) {
+        if let Ok(mut since) = self.since.lock() {
+            // Keep the previous proof's start: a fork not yet visible during
+            // this proof must remain eligible for the next drain.
+            if started.is_some_and(|new| since.1.is_none_or(|old| new.at > old.at)) {
+                since.0 = since.1;
+                since.1 = started;
+            }
+        }
+    }
+
     /// Record the process domain this holder is about to create, before it
     /// creates it (`<lockFile>.predecessor.json`, temp file then rename). A
     /// later holder that finds this domain not empty ends it first.
     /// Only an exclusive holder may declare one: a second shared holder
     /// would find it populated and kill it.
-    /// The mark since which only this process held the description, when known.
-    #[cfg_attr(not(unix), allow(dead_code))]
-    fn since(&self) -> Option<fgos_process::facts::CreationMark> {
-        self.since.lock().ok().and_then(|since| *since)
-    }
-
-    /// A drain or quiescence check that began at `started` proved that no
-    /// other process held the description. Processes created before then can
-    /// no longer get a copy, so later drains need not read them.
-    #[cfg_attr(not(unix), allow(dead_code))]
-    fn proven_alone_at(&self, started: Option<fgos_process::facts::CreationMark>) {
-        if let Ok(mut since) = self.since.lock() {
-            match (started, *since) {
-                // Never move back (a concurrent check may have finished later).
-                (Some(new), Some(old)) if new.at <= old.at => {}
-                (new, _) => *since = new,
-            }
-        }
-    }
-
     pub fn declare_domain(&self, domain: &Domain) -> io::Result<()> {
         if self.mode != Mode::Ex {
             return Err(io::Error::new(io::ErrorKind::InvalidInput, "only an exclusive holder declares a domain"));
@@ -605,7 +599,7 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
             return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
         }
         locked.keep();
-        return Acquire::Acquired(Handle { file, resource: resource.clone(), mode, kill_wait_ms, since: std::sync::Mutex::new(opened_after) });
+        return Acquire::Acquired(Handle { file, resource: resource.clone(), mode, kill_wait_ms, since: std::sync::Mutex::new((opened_after, opened_after)) });
     }
 }
 
@@ -644,7 +638,7 @@ pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
     #[cfg(target_os = "linux")]
     {
         let started = fgos_process::facts::creation_mark();
-        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms), handle.since())
+        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms))
             .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
         handle.proven_alone_at(started);
         // Resource identity can change while transient holders drain.
@@ -723,7 +717,17 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
     let pid = child.id();
     let waited = wait_exited_unreaped(pid).map_err(BorrowError::Wait);
     let started = fgos_process::facts::creation_mark();
-    let leftovers = driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms), handle.since());
+    let since = handle.since();
+    let leftovers = driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms), since)
+        .and_then(|killed| {
+            // Returning permits immediate close. Only a full scan may prove it
+            // safe: older processes may have received the fd via SCM_RIGHTS.
+            if cfg!(target_os = "linux") && since.is_some() {
+                driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms), None).map(|last| killed + last)
+            } else {
+                Ok(killed)
+            }
+        });
     if leftovers.is_ok() {
         handle.proven_alone_at(started);
     }
@@ -884,8 +888,8 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
     let outcome = finish_borrowed(handle, &mut child)?;
     transfer?;
     // Drain bytes already in the pipes after root exit and leftover cleanup.
-    while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? {}
-    while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")? {}
+    while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? == Some(true) {}
+    while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")? == Some(true) {}
     Ok(BorrowIoOutcome { outcome, stdout: out, stderr: err })
 }
 
@@ -903,19 +907,11 @@ fn nonblocking(pipe: &impl std::os::fd::AsRawFd) -> Result<(), BorrowError> {
 /// Read everything the pipe has now. `Ok(false)` once the writer side closed.
 #[cfg(unix)]
 fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<bool, BorrowError> {
-    let mut buf = [0; 65536];
     loop {
-        match pipe.read(&mut buf) {
-            Ok(0) => return Ok(false),
-            Ok(n) => {
-                if n > limit.saturating_sub(bytes.len()) {
-                    return Err(BorrowError::OutputLimit(stream));
-                }
-                bytes.extend_from_slice(&buf[..n]);
-            }
-            Err(e) if e.kind() == io::ErrorKind::WouldBlock => return Ok(true),
-            Err(e) if e.kind() == io::ErrorKind::Interrupted => {}
-            Err(e) => return Err(BorrowError::Io(e)),
+        match capture_chunk(pipe, bytes, limit, stream)? {
+            Some(true) => {},
+            Some(false) => return Ok(false),
+            None => return Ok(true),
         }
     }
 }
@@ -940,7 +936,7 @@ fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
 }
 
 #[cfg(unix)]
-fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<bool, BorrowError> {
+fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<Option<bool>, BorrowError> {
     let mut buf = [0; 8192];
     match pipe.read(&mut buf) {
         Ok(n) => {
@@ -948,10 +944,10 @@ fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usiz
                 return Err(BorrowError::OutputLimit(stream));
             }
             bytes.extend_from_slice(&buf[..n]);
-            Ok(n != 0)
+            Ok(Some(n != 0))
         }
-        Err(e) if e.kind() == io::ErrorKind::WouldBlock => Ok(false),
-        Err(e) if e.kind() == io::ErrorKind::Interrupted => Ok(true),
+        Err(e) if e.kind() == io::ErrorKind::WouldBlock => Ok(None),
+        Err(e) if e.kind() == io::ErrorKind::Interrupted => Ok(Some(true)),
         Err(e) => Err(BorrowError::Io(e)),
     }
 }
@@ -1115,4 +1111,61 @@ pub fn holders(resource: &Resource) -> io::Result<HoldersList> {
 /// What the driver guarantees for lock files in `dir`.
 pub fn guarantee(dir: &Path) -> Guarantee {
     driver::current().guarantee(dir)
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod proof_tests {
+    use super::*;
+
+    #[test]
+    fn old_or_unreadable_pid_marks_use_the_start_time_fallback_and_kill_holders() {
+        for unreadable in [false, true] {
+            let path = std::env::temp_dir().join(format!("fgos-proof-fallback-{}-{unreadable}", std::process::id()));
+            let handle = match acquire(&Resource::new("proof", &path), Mode::Ex, Wait::Try, 2000) {
+                Acquire::Acquired(h) => h,
+                other => panic!("{other:?}"),
+            };
+            let mut mark = fgos_process::facts::creation_mark().unwrap();
+            if unreadable { mark.last_pid = None; } else { mark.at -= Duration::from_secs(60); }
+            assert!(fgos_process::facts::created_since(&mark).is_none());
+            let request = borrowed_request(&handle, &BorrowSpec { argv: vec!["sh".into(), "-c".into(), "sleep 30 &".into()], ..Default::default() }).unwrap();
+            let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &handle.file)]).unwrap();
+            wait_exited_unreaped(child.id()).unwrap();
+            let killed = driver::current().end_leftovers(&handle.file, child.id(), Duration::from_secs(2), Some(mark)).unwrap();
+            assert!(killed > 0);
+            child.wait().unwrap();
+            drop(handle);
+            std::fs::remove_file(path).unwrap();
+        }
+    }
+
+    #[test]
+    fn proof_boundary_keeps_processes_created_during_the_previous_proof_eligible() {
+        let path = std::env::temp_dir().join(format!("fgos-proof-boundary-{}", std::process::id()));
+        let handle = match acquire(&Resource::new("proof", &path), Mode::Ex, Wait::Try, 2000) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        let first = fgos_process::facts::creation_mark().unwrap();
+        handle.proven_alone_at(Some(first));
+        let mut child = std::process::Command::new("sleep").arg("30").spawn().unwrap();
+        let second = fgos_process::facts::creation_mark().unwrap();
+        // Model an in-flight fork absent from proof two's table snapshot.
+        handle.proven_alone_at(Some(second));
+        let floor = handle.since().unwrap();
+        assert_eq!(floor.at, first.at);
+        if let Some(candidates) = fgos_process::facts::created_since(&floor) {
+            assert!(candidates.iter().any(|r| r.pid.0 == child.id()));
+        } else {
+            assert!(fgos_process::facts::relations().unwrap().iter().any(|r| r.pid.0 == child.id() && r.start_ticks >= floor.ticks));
+        }
+        // Failed or older concurrent proofs never advance or reverse the floor.
+        handle.proven_alone_at(None);
+        handle.proven_alone_at(Some(first));
+        assert_eq!(handle.since().unwrap().at, first.at);
+        child.kill().unwrap();
+        child.wait().unwrap();
+        drop(handle);
+        std::fs::remove_file(path).unwrap();
+    }
 }

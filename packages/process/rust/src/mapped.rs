@@ -234,14 +234,20 @@ mod posix {
             .map(|(_, v)| v.clone())
             .or_else(|| if request.clear_env { None } else { std::env::var_os("PATH") })
             .unwrap_or_else(|| OsString::from("/usr/bin:/bin"));
+        let cwd = std::env::current_dir()?;
+        let cwd = request.cwd.as_ref().map_or(cwd.clone(), |p| cwd.join(p));
+        let mut denied = false;
         for dir in std::env::split_paths(&path) {
-            let candidate = dir.join(name);
+            let candidate = cwd.join(dir).join(name);
+            if !candidate.is_file() { continue; }
             let Ok(c) = cstring(candidate.into_os_string().into_vec()) else { continue };
             // SAFETY: access only reads a NUL-terminated path.
             if unsafe { libc::access(c.as_ptr(), libc::X_OK) } == 0 {
                 return Ok(c);
             }
+            denied |= io::Error::last_os_error().raw_os_error() == Some(libc::EACCES);
         }
+        if denied { return Err(io::Error::from_raw_os_error(libc::EACCES)); }
         Err(io::Error::new(io::ErrorKind::NotFound, format!("program not found: {}", name.to_string_lossy())))
     }
 
@@ -354,7 +360,16 @@ mod posix {
         }
         let mut pid: libc::pid_t = 0;
         // SAFETY: every pointer stays valid until posix_spawn returns.
-        check(unsafe { libc::posix_spawn(&mut pid, program.as_ptr(), &actions.0, &attr.0, argv_ptrs.as_ptr(), envp_ptrs.as_ptr()) })?;
+        let rc = unsafe { libc::posix_spawn(&mut pid, program.as_ptr(), &actions.0, &attr.0, argv_ptrs.as_ptr(), envp_ptrs.as_ptr()) };
+        if rc == libc::ENOEXEC {
+            let shell = cstring(b"/bin/sh".to_vec())?;
+            let mut shell_argv = vec![shell.as_ptr() as *mut _, program.as_ptr() as *mut _];
+            shell_argv.extend_from_slice(&argv_ptrs[1..]);
+            // SAFETY: same owned actions/environment, with shell argv alive.
+            check(unsafe { libc::posix_spawn(&mut pid, shell.as_ptr(), &actions.0, &attr.0, shell_argv.as_ptr(), envp_ptrs.as_ptr()) })?;
+        } else {
+            check(rc)?;
+        }
         drop(child_ends);
         drop(sources);
         let [stdin, stdout, stderr] = parent_ends;

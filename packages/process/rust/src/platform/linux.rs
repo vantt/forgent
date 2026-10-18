@@ -252,7 +252,7 @@ fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) 
         String::from_utf8_lossy(&rest).into_owned()
     };
     let relation = facts::parse_relation(pid, &line)?;
-    let exit_signal = line[line.rfind(')')? + 1..].split_whitespace().nth(35)?;
+    let exit_signal = facts::proc_stat_fields(&line)?.nth(35)?;
     Some((relation, exit_signal != "-1"))
 }
 

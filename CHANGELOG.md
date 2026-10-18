@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git Publication now checks changing candidates through the successful connectivity fast path, makes replayed Intent directories durable, preserves full recoverable receipts through compaction, and tolerates scans racing terminal compaction. Recreated loose objects get fresh directory durability; deferred compaction failures are reported.
+- The optional `git-floor-verdict.json` cache binds Git/config/PATH and host/probe identities and requires the exact probe set; include directives disable persistent reuse. Holder-lock keeps full scans for quiescent admission and final borrow cleanup, with a lagged floor for intermediate scans, and fixes its Windows time imports. Mapped process spawning resolves relative PATH entries in the child directory and runs executable scripts without a shebang.
+
 - Releases ship a combined Git/Event Store Node addon through optional `components.nativeAddon`; its manifest attests build inputs without binding future upgrades to the verifier's Cargo.lock. Only Linux advertises `git-wal-v1` while C5 scan/fence support is Linux-only; Windows activation remains available and lock-taking Git ports refuse with `git-lockscope-unavailable-windows`.
 - Config mapping failures resolve their WAL chain and remove only their own native staging lock. Re-running activation installs a missing Git fence; WAL writers refuse an unfenced workspace. Older `fgctl` stops with `EISDIR` at the fenced legacy activation lock. Channels without the optional addon report informational Git checks until M10.
 

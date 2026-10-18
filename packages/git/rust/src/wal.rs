@@ -532,21 +532,21 @@ static DURABLE_DIRECTORIES: std::sync::Mutex<std::collections::BTreeSet<Option<(
 /// Identity of a directory that a removal and re-creation cannot reuse;
 /// `None` when the filesystem reports no birth time.
 fn durable_key(dir: &File) -> Option<(u64, u64, u128)> {
+    durable_identity(&dir.metadata().ok()?)
+}
+
+pub(crate) fn durable_identity(m: &fs::Metadata) -> Option<(u64, u64, u128)> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
-        let m = dir.metadata().ok()?;
         let born = m.created().ok()?.duration_since(std::time::UNIX_EPOCH).ok()?.as_nanos();
         Some((m.dev(), m.ino(), born))
     }
     #[cfg(not(unix))]
     {
-        let _ = dir;
+        let _ = m;
         None
     }
-}
-
-impl Directory {
 }
 
 pub struct Wal<F = OsFileSystem> {
@@ -657,6 +657,8 @@ impl<F: FileSystem> Wal<F> {
         // install below could only lose to it, so answer as that loser
         // would, without writing (and syncing) a doomed temporary.
         if dir.path().join(record_name(0)).try_exists()? {
+            fgos_durable_file::sync_directories(&[&dir.path(), &self.root.path()])?;
+            self.fs.checkpoint("existing-intent-parent-fsync")?;
             return match self.existing(id, &intent) {
                 // A compactor may have removed the chain since: its ledger
                 // entry is then the binding, as after a lost install.
@@ -706,7 +708,7 @@ impl<F: FileSystem> Wal<F> {
         value: &T,
         new_directory: bool,
     ) -> WalResult<Installed> {
-        self.install_ordered(dir, name, value, new_directory, &|| Ok(()), &mut || Ok(()))
+        self.install_ordered(dir, name, value, new_directory, None, &mut || Ok(()))
     }
     /// `alongside` runs while the record bytes are synced, `before_install`
     /// after both and before its name exists (see
@@ -717,7 +719,7 @@ impl<F: FileSystem> Wal<F> {
         name: &str,
         value: &T,
         new_directory: bool,
-        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
         before_install: &mut dyn FnMut() -> io::Result<()>,
     ) -> WalResult<Installed> {
         let bytes = serde_json::to_vec(value).map_err(|_| corrupt("serialize"))?;
@@ -778,7 +780,7 @@ impl<F: FileSystem> Wal<F> {
     /// the next numbered name; the loser gets Busy and no effect permit.
     /// Supersession has a separate checked entry point.
     pub fn append(&self, chain: &Chain, phase: Phase) -> WalResult<Chain> {
-        self.append_ordered(chain, phase, &|| Ok(()), &mut || Ok(()))
+        self.append_ordered(chain, phase, None, &mut || Ok(()))
     }
     /// [`Wal::append`] whose record is installed only after `alongside` (run
     /// on another thread while the record's bytes are synced) and then
@@ -789,7 +791,7 @@ impl<F: FileSystem> Wal<F> {
         &self,
         chain: &Chain,
         phase: Phase,
-        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
         before_install: &mut dyn FnMut() -> io::Result<()>,
     ) -> WalResult<Chain> {
         if matches!(
@@ -804,7 +806,7 @@ impl<F: FileSystem> Wal<F> {
         &self,
         chain: &Chain,
         phase: Phase,
-        alongside: &(dyn Fn() -> io::Result<()> + Sync),
+        alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
         before_install: &mut dyn FnMut() -> io::Result<()>,
     ) -> WalResult<Chain> {
         let id = &chain.last().operation_id;
@@ -881,7 +883,7 @@ impl<F: FileSystem> Wal<F> {
                 later_receipt_digest: receipt.digest.clone(),
                 attribution,
             }),
-            &|| Ok(()),
+            None,
             &mut || Ok(()),
         )
     }
@@ -1083,12 +1085,75 @@ pub struct CompactReceipt {
     pub v: u8,
     pub id: String,
     #[serde(rename = "q")]
+    #[serde(with = "ledger_hex")]
     pub request: String,
     #[serde(rename = "b")]
+    #[serde(with = "ledger_hex")]
     pub binding: String,
     #[serde(rename = "r")]
+    #[serde(with = "ledger_hex_vec")]
     pub receipt: Vec<String>,
+    #[serde(default, rename = "e", with = "ledger_hex")]
+    pub expected: String,
+    #[serde(default, rename = "n", with = "ledger_hex")]
+    pub next: String,
+    #[serde(with = "ledger_hex")]
     pub digest: String,
+}
+// Lossless base64url representation of hex hashes keeps full SHA-256 receipts
+// below the signed 512-byte ledger bound, including maximum-length ids.
+mod ledger_hex {
+    use serde::{Deserialize, Deserializer, Serializer};
+    const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    pub(super) fn encode(s: &str) -> String {
+        if !matches!(s.len(), 40 | 64) || !s.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+            return s.into();
+        }
+        let mut out = String::from("~");
+        let mut bits = 0u32;
+        let mut n = 0;
+        for byte in s.as_bytes().as_chunks::<2>().0 {
+            let hex = |b: u8| if b <= b'9' { b - b'0' } else { b - b'a' + 10 };
+            bits = (bits << 8) | u32::from(hex(byte[0]) * 16 + hex(byte[1]));
+            n += 8;
+            while n >= 6 {
+                n -= 6;
+                out.push(ALPHABET[((bits >> n) & 63) as usize] as char);
+            }
+        }
+        if n > 0 { out.push(ALPHABET[((bits << (6 - n)) & 63) as usize] as char); }
+        out
+    }
+    pub(super) fn decode(s: String) -> Result<String, String> {
+        let Some(encoded) = s.strip_prefix('~') else { return Ok(s) };
+        let mut out = String::new();
+        let mut bits = 0u32;
+        let mut n = 0;
+        for c in encoded.bytes() {
+            let v = ALPHABET.iter().position(|b| *b == c).ok_or("invalid ledger hash")?;
+            bits = (bits << 6) | v as u32;
+            n += 6;
+            if n >= 8 {
+                n -= 8;
+                let b = ((bits >> n) & 255) as u8;
+                use std::fmt::Write;
+                write!(out, "{b:02x}").unwrap();
+            }
+        }
+        if encode(&out) != s { return Err("noncanonical ledger hash".into()); }
+        Ok(out)
+    }
+    pub fn serialize<S: Serializer>(s: &str, serializer: S) -> Result<S::Ok, S::Error> { serializer.serialize_str(&encode(s)) }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> { decode(String::deserialize(d)?).map_err(serde::de::Error::custom) }
+}
+mod ledger_hex_vec {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    pub fn serialize<S: Serializer>(values: &[String], serializer: S) -> Result<S::Ok, S::Error> {
+        values.iter().map(|s| super::ledger_hex::encode(s)).collect::<Vec<_>>().serialize(serializer)
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<String>, D::Error> {
+        Vec::<String>::deserialize(d)?.into_iter().map(|s| super::ledger_hex::decode(s).map_err(serde::de::Error::custom)).collect()
+    }
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
@@ -1211,7 +1276,7 @@ impl CompactReceipt {
             },
         })
     }
-    fn matches(&self, i: &Intent) -> WalResult<bool> {
+    pub(crate) fn matches(&self, i: &Intent) -> WalResult<bool> {
         Ok(self.request == i.request_digest && self.binding == binding_digest(i)?)
     }
 }
@@ -1277,12 +1342,24 @@ impl<F: FileSystem> Wal<F> {
             Err(WalError::Io(e)) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e),
         };
-        let d = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?;
-        if c.v != 1
+        // Version 1 omitted expected/next. Keep its immutable binding and
+        // exact-request replay readable; missing facts must never be guessed.
+        let d = if c.v == 1 {
+            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
+        } else {
+            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?
+        };
+        let tips_valid = if c.v == 1 {
+            c.expected.is_empty() && c.next.is_empty()
+        } else {
+            [&c.expected, &c.next].iter().all(|s| *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        };
+        if !matches!(c.v, 1 | 2)
             || c.id != id
             || c.digest != d
             || !digest_valid(&c.request)
             || !digest_valid(&c.binding)
+            || !tips_valid
             || !valid_compact_outcome(&c.receipt)
         {
             return Err(corrupt("ledger hash/version/id"));
@@ -1326,14 +1403,16 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: 1,
+            v: 2,
             id: id.clone(),
             request: i.request_digest.clone(),
             binding: binding_digest(i)?,
+            expected: compact_tip(&i.expected),
+            next: compact_tip(&i.next),
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
             digest: String::new(),
         };
-        c.digest = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?;
+        c.digest = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?;
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -1470,58 +1549,48 @@ impl<F: FileSystem> Wal<F> {
                 seen += 1;
                 let entry = entry?;
                 let id = entry.file_name().to_string_lossy().into_owned();
-                let metadata = entry.metadata()?;
+                // The ledger is installed durably before any chain deletion.
+                // Re-read it after every failed observation of a root entry.
+                let inspect_entry = || -> WalResult<(bool, u64, Option<std::time::SystemTime>, bool)> {
+                    let metadata = entry.metadata()?;
+                    if ledger {
+                        self.compacted(&id)?.ok_or_else(|| corrupt("missing ledger"))?;
+                        return Ok((true, metadata.len(), metadata.modified().ok(), false));
+                    }
+                    if self.compacted(&id)?.is_some() {
+                        return Ok((true, 0, None, false));
+                    }
+                    let operation = self.operation(&id, false)?;
+                    let terminal = !self.has_intent(&operation)? || self.inspect(&id)?.outcome().is_some();
+                    let mut bytes = metadata.len();
+                    let mut incomplete = false;
+                    for (n, file) in fs::read_dir(operation.path())?.enumerate() {
+                        if n >= MAX_RECORDS * 2 { incomplete = true; break; }
+                        bytes += file?.metadata()?.len();
+                    }
+                    Ok((terminal, bytes, metadata.modified().ok(), incomplete))
+                };
+                let (terminal, bytes, modified, incomplete, error) = match inspect_entry() {
+                    Ok((t, bytes, modified, incomplete)) => (t, bytes, modified, incomplete, None),
+                    Err(e) if !ledger => match self.compacted(&id) {
+                        Ok(Some(_)) => (true, 0, None, false, None),
+                        _ => (false, 0, None, false, Some(e.to_string())),
+                    },
+                    Err(e) => (false, entry.metadata().map(|m| m.len()).unwrap_or(0), None, false, Some(e.to_string())),
+                };
                 if ledger {
-                    result.ledger_bytes += metadata.len();
+                    result.ledger_bytes += bytes;
                     result.ledger_entries += 1;
-                    result.ledger_capacity_warning =
-                        result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
+                    result.ledger_capacity_warning = result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
-                    result.retained_bytes += metadata.len();
+                    result.retained_bytes += bytes;
                 }
-                let check = if ledger {
-                    self.compacted(&id).map(|_| true)
-                } else {
-                    self.compacted(&id).and_then(|c| {
-                        if c.is_some() {
-                            self.operation(&id, false)
-                                .and_then(|dir| compaction_suffix(&dir, &id))
-                                .map(|_| true)
-                        } else {
-                            self.operation(&id, false).and_then(|dir| {
-                                if !self.has_intent(&dir)? {
-                                    return Ok(true);
-                                }
-                                self.inspect(&id).map(|c| c.outcome().is_some())
-                            })
-                        }
-                    })
-                };
-                let (terminal, error) = match check {
-                    Ok(t) => (t, None),
-                    Err(e) => (false, Some(e.to_string())),
-                };
+                result.complete &= !incomplete;
                 if !terminal {
                     result.unresolved += 1;
-                    if let Ok(time) = metadata.modified() {
-                        if result
-                            .oldest_unresolved
-                            .as_ref()
-                            .is_none_or(|(_, old)| time < *old)
-                        {
+                    if let Some(time) = modified {
+                        if result.oldest_unresolved.as_ref().is_none_or(|(_, old)| time < *old) {
                             result.oldest_unresolved = Some((id.clone(), time));
-                        }
-                    }
-                }
-                if !ledger && metadata.is_dir() {
-                    let operation = self.operation(&id, false);
-                    if let Ok(operation) = operation {
-                        for (n, file) in fs::read_dir(operation.path())?.enumerate() {
-                            if n >= MAX_RECORDS * 2 {
-                                result.complete = false;
-                                break;
-                            }
-                            result.retained_bytes += file?.metadata()?.len();
                         }
                     }
                 }
@@ -1839,6 +1908,68 @@ mod tests {
         }
     }
     #[test]
+    fn begin_replay_syncs_both_directories_after_creator_stopped_before_parent_fsync() {
+        struct StopBeforeSync;
+        impl FileSystem for StopBeforeSync {
+            fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+                if step == "temp-removed" { Err(io::Error::other("creator stopped before directory sync")) } else { Ok(()) }
+            }
+        }
+        let t = Temp::new();
+        let creator = Wal::with_filesystem(&t.0, StopBeforeSync).unwrap();
+        assert!(creator.begin("replay", intent(&creator), &Authority).is_err());
+        assert!(creator.inspect("replay").is_ok(), "record zero exists despite failed begin");
+        let replay = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
+        replay.fs.0.lock().unwrap().clear();
+        assert!(matches!(replay.begin("replay", intent(&replay), &Authority).unwrap(), Begin::Existing(_)));
+        assert_eq!(&*replay.fs.0.lock().unwrap(), &["existing-intent-parent-fsync"]);
+        let mut different = intent(&replay);
+        different.request_digest = "f".repeat(64);
+        assert!(matches!(replay.begin("replay", different, &Authority), Err(WalError::OperationIdConflict)));
+    }
+
+    #[test]
+    fn scan_remains_terminal_while_compaction_removes_records_and_directories() {
+        struct SlowRemoval;
+        impl FileSystem for SlowRemoval {
+            fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+                if step == "remove-record" { std::thread::sleep(std::time::Duration::from_millis(1)); }
+                Ok(())
+            }
+        }
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, SlowRemoval).unwrap();
+        let mut terminal = Vec::new();
+        for n in 0..16 {
+            let c = success(&wal, &attempted(&wal, &format!("race-{n}")));
+            let c = wal.append(&c, Phase::PinReleaseAttempt { prior_target_attempt: None, expected: c.intent().next.clone(), next: Tip::Absent }).unwrap();
+            terminal.push(wal.append(&c, Phase::PinReleased).unwrap());
+        }
+        let done = std::sync::atomic::AtomicBool::new(false);
+        std::thread::scope(|scope| {
+            let worker = scope.spawn(|| {
+                for chain in &terminal {
+                    let mut r = reader(chain.intent());
+                    r.pin = ObservedRef::Direct(Tip::Absent);
+                    wal.compact(chain, &r, &Authority).unwrap();
+                }
+                done.store(true, Ordering::SeqCst);
+            });
+            let mut scans = 0;
+            while !done.load(Ordering::SeqCst) && scans < 1000 {
+                let backlog = wal.scan(100).unwrap();
+                assert!(backlog.complete);
+                assert_eq!(backlog.unresolved, 0, "{:?}", backlog.entries);
+                assert!(backlog.entries.iter().all(|e| e.error.is_none()));
+                scans += 1;
+            }
+            worker.join().unwrap();
+            assert!(scans > 0);
+        });
+        assert_eq!(wal.scan(100).unwrap().ledger_entries, 16);
+    }
+
+    #[test]
     fn durable_directories_are_synced_once_per_process_and_records_keep_their_syncs() {
         let t = Temp::new();
         let first = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
@@ -1910,6 +2041,23 @@ mod tests {
         assert!(scan.entries[0].error.is_some());
         assert!(path.exists());
     }
+    #[test]
+    fn legacy_compact_entries_keep_their_binding_and_exact_request_replay() {
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let i = intent(&wal);
+        let receipt = compact_outcome(&Outcome::Success { observed: i.next.clone(), attribution: Attribution::ThisInvocationWonCas });
+        let binding = binding_digest(&i).unwrap();
+        let digest = canonical_digest(&(1u8, "legacy", &i.request_digest, &binding, &receipt)).unwrap();
+        let old = serde_json::json!({"v": 1, "id": "legacy", "q": i.request_digest, "b": binding, "r": receipt, "digest": digest});
+        fgos_durable_file::install_once(&wal.ledger.path(), "legacy", old.to_string().as_bytes()).unwrap();
+        assert!(matches!(wal.begin("legacy", i.clone(), &Authority).unwrap(), Begin::Compacted(_)));
+        let mut other = i;
+        other.expected = Tip::Oid("c".repeat(40));
+        assert!(matches!(wal.begin("legacy", other, &Authority), Err(WalError::OperationIdConflict)));
+        assert_eq!(wal.scan(10).unwrap().unresolved, 0);
+    }
+
     #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
         let t = Temp::new();
@@ -2152,14 +2300,21 @@ mod tests {
             attribution: Attribution::Uncertain,
         };
         let c = CompactReceipt {
-            v: 1,
+            v: 2,
             id: "x".repeat(80),
             request: "b".repeat(64),
             binding: "c".repeat(64),
+            expected: "e".repeat(64),
+            next: "f".repeat(64),
             receipt: compact_outcome(&o),
             digest: "d".repeat(64),
         };
-        assert!(serde_json::to_vec(&c).unwrap().len() < 512);
+        let bytes = serde_json::to_vec(&c).unwrap();
+        assert!(bytes.len() < 512, "{} bytes", bytes.len());
+        let restored: CompactReceipt = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(restored.expected, c.expected);
+        assert_eq!(restored.next, c.next);
+        assert_eq!(restored.receipt, c.receipt);
     }
     #[test]
     fn ten_thousand_terminal_operations_have_no_record_directories() {

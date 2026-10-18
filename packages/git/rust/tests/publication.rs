@@ -1053,6 +1053,8 @@ fn historical_ledger_over_admission_bound_does_not_block_new_publication() {
             &receipt.request,
             &receipt.binding,
             &receipt.receipt,
+            &receipt.expected,
+            &receipt.next,
         ))
         .unwrap();
         fs::write(
@@ -1900,9 +1902,10 @@ fn config_recovery_observes_attempted_changes_and_never_replays_old_ids() {
 /// different request is refused.
 #[test]
 fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
+    for (format, backend) in [("sha1", "files"), ("sha256", "files"), ("sha1", "reftable"), ("sha256", "reftable")] {
     let t = Temp::new();
     let root = t.0.join("repo");
-    init(&root, "sha1", "files");
+    init(&root, format, backend);
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
     let mut h = handle(&t.0.join("seal.lock"));
@@ -1935,13 +1938,14 @@ fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
     let ledger = fs::read_dir(repo.common_dir().join("fgos/git/compacted")).unwrap().count();
     assert!(ledger >= 7, "compacted ids: {ledger}");
     // The first id is compacted: same request returns its receipt.
-    let (id, old, next) = &done[0];
+    let (id, old, next) = &done[1];
     assert!(!operations.join(id).exists());
-    // Compacting it again returns its ledger entry; recover names it compacted.
+    // Compaction preserves the full durable terminal receipt for recovery.
     assert_eq!(&port.release_pin_and_compact(&repo, id).unwrap().id, id);
-    let compacted = port.recover(&repo, id).unwrap_err();
-    assert_eq!(compacted.code, ResultCode::Refused);
-    assert!(compacted.cause.starts_with("operation-compacted"));
+    let compacted = port.recover(&repo, id).unwrap();
+    assert_eq!(&compacted.local_effect.expected, old);
+    assert_eq!(compacted.local_effect.published_oid.as_ref(), Some(next));
+    assert!(matches!(compacted.attribution, Attribution::ThisInvocationWonCas));
     let receipt = port
         .compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), id)
         .unwrap();
@@ -1951,8 +1955,72 @@ fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
     assert!(port
         .compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(done[1].2.clone()), id)
         .is_err());
+    // Old experimental entries lack expected/next. Preserve their bindings
+    // and exact replay; read-only recovery must report the missing evidence.
+    let journal = wal::Wal::open(&repo).unwrap();
+    let compacted = journal.compacted(id).unwrap().unwrap();
+    let legacy_digest = wal::canonical_digest(&(1u8, "legacy-receipt", &compacted.request, &compacted.binding, &compacted.receipt)).unwrap();
+    let legacy = serde_json::json!({"v": 1, "id": "legacy-receipt", "q": compacted.request, "b": compacted.binding, "r": compacted.receipt, "digest": legacy_digest});
+    fgos_durable_file::install_once(&repo.common_dir().join("fgos/git/compacted"), "legacy-receipt", legacy.to_string().as_bytes()).unwrap();
+    let incomplete = port.recover(&repo, "legacy-receipt").unwrap_err();
+    assert_eq!(incomplete.code, ResultCode::RecoveryRequired);
+    assert!(incomplete.cause.starts_with("legacy-compact-receipt-incomplete"));
+    assert_eq!(port.compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), "legacy-receipt").unwrap().local_effect.published_oid.as_ref(), Some(next));
     // The latest id keeps its whole chain for recover.
     let (last, _, last_next) = done.last().unwrap();
     let recovered = port.recover(&repo, last).unwrap();
     assert_eq!(recovered.local_effect.published_oid.as_ref(), Some(last_next));
+    }
+}
+
+#[test]
+fn changing_cas_uses_the_intact_candidate_fast_path() {
+    struct FastPath(std::sync::atomic::AtomicUsize);
+    impl FileSystem for FastPath {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "candidate-fast-path" { self.0.fetch_add(1, Ordering::SeqCst); }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha256", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let fast = FastPath(Default::default());
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &fast);
+    let a = commit(&port, &repo, vec![], "a");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "fast-a").unwrap();
+    fast.0.store(0, Ordering::SeqCst);
+    let b = commit(&port, &repo, vec![a.clone()], "b");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Oid(a), &ExpectedTip::Oid(b), "fast-b").unwrap();
+    assert_eq!(fast.0.load(Ordering::SeqCst), 1, "the changing CAS was decided by one successful rev-list");
+}
+
+#[test]
+fn recreated_loose_object_gets_directory_durability_again() {
+    struct Syncs(AtomicU64);
+    impl FileSystem for Syncs {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "publication-directory-fsync" { self.0.fetch_add(1, Ordering::SeqCst); }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let syncs = Syncs(AtomicU64::new(0));
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &syncs);
+    let oid = port.write_blob(&repo, b"recreated").unwrap();
+    syncs.0.store(0, Ordering::SeqCst);
+    assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
+    assert_eq!(syncs.0.load(Ordering::SeqCst), 0);
+    let hex = oid.as_str();
+    fs::remove_file(repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..])).unwrap();
+    assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
+    assert!(syncs.0.load(Ordering::SeqCst) >= 2);
 }

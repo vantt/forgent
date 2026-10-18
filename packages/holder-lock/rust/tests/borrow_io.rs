@@ -50,6 +50,8 @@ fn pids_gone(dir: &std::path::Path) {
 
 #[test]
 fn child_entry() {
+    #[cfg(target_os = "linux")]
+    if scm_role() { return; }
     common::child_entry()
 }
 
@@ -448,4 +450,89 @@ fn refused_admission_keeps_finding_the_same_leaked_holder() {
     }
     release(handle);
     fs::remove_dir_all(dir).unwrap();
+}
+
+/// The receiver exists before acquire, so neither PID order nor start time
+/// can find it. Only the final full descriptor scan can prove release safe.
+#[cfg(target_os = "linux")]
+#[test]
+fn descriptor_sent_to_a_preexisting_process_is_killed_before_release() {
+    let _serial = serial();
+    let dir = temp_dir("scm-rights");
+    let mut process = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "child_entry", "--nocapture"]).env("SCM_ROLE", "parent").current_dir(&dir)
+        .stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::inherit()).spawn().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !dir.join("ready").exists() {
+        assert!(Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    let pid: u32 = fs::read_to_string(dir.join("ready")).unwrap().parse().unwrap();
+    let res = resource(&dir, "io");
+    let handle = held(&res);
+    let out = run_borrowed_io(&handle, &BorrowSpec {
+        argv: vec![std::env::current_exe().unwrap().to_str().unwrap().into(), "--exact".into(), "child_entry".into(), "--nocapture".into()],
+        env: [("SCM_ROLE".into(), "sender".into())].into(),
+        cwd: Some(dir.clone()),
+        ..Default::default()
+    }, &bounds(vec![])).unwrap();
+    assert_eq!(out.outcome.exit, Some(0));
+    assert!(out.outcome.leftovers_killed >= 1);
+    gone(pid);
+    assert!(process.wait().unwrap().success());
+    release(handle);
+    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Acquired(_)));
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[cfg(target_os = "linux")]
+fn scm_role() -> bool {
+    use std::io::{Read, Write};
+    use std::os::fd::{AsRawFd, FromRawFd};
+    use std::os::unix::net::{UnixListener, UnixStream};
+    let Ok(role) = std::env::var("SCM_ROLE") else { return false; };
+    if role == "parent" {
+        let mut child = Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "child_entry", "--nocapture"]).env("SCM_ROLE", "receiver").spawn().unwrap();
+        let status = child.wait().unwrap();
+        use std::os::unix::process::ExitStatusExt;
+        assert_eq!(status.signal(), Some(libc::SIGKILL));
+        return true;
+    }
+    let mut stream = if role == "receiver" {
+        let listener = UnixListener::bind("socket").unwrap();
+        fs::write("ready", std::process::id().to_string()).unwrap();
+        listener.accept().unwrap().0
+    } else { UnixStream::connect("socket").unwrap() };
+    let mut data = *b"x";
+    let mut control = [0usize; 8];
+    let mut iov = libc::iovec { iov_base: data.as_mut_ptr().cast(), iov_len: 1 };
+    // SAFETY: zeroed msghdr, aligned ancillary buffer, live stream and payload.
+    unsafe {
+        let mut msg: libc::msghdr = std::mem::zeroed();
+        msg.msg_iov = &mut iov;
+        msg.msg_iovlen = 1;
+        msg.msg_control = control.as_mut_ptr().cast();
+        msg.msg_controllen = libc::CMSG_SPACE(std::mem::size_of::<i32>() as u32) as usize;
+        if role == "sender" {
+            let cmsg = libc::CMSG_FIRSTHDR(&msg);
+            (*cmsg).cmsg_level = libc::SOL_SOCKET;
+            (*cmsg).cmsg_type = libc::SCM_RIGHTS;
+            (*cmsg).cmsg_len = libc::CMSG_LEN(std::mem::size_of::<i32>() as u32) as usize;
+            std::ptr::write_unaligned(libc::CMSG_DATA(cmsg).cast::<i32>(), 3);
+            assert_eq!(libc::sendmsg(stream.as_raw_fd(), &msg, 0), 1);
+            let mut ack = [0];
+            stream.read_exact(&mut ack).unwrap();
+        } else {
+            assert_eq!(libc::recvmsg(stream.as_raw_fd(), &mut msg, libc::MSG_CMSG_CLOEXEC), 1);
+            let cmsg = libc::CMSG_FIRSTHDR(&msg);
+            assert!(!cmsg.is_null());
+            assert_eq!((*cmsg).cmsg_type, libc::SCM_RIGHTS);
+            let fd = std::ptr::read_unaligned(libc::CMSG_DATA(cmsg).cast::<i32>());
+            let _description = std::fs::File::from_raw_fd(fd);
+            stream.write_all(b"a").unwrap();
+            std::thread::sleep(Duration::from_secs(30));
+        }
+    }
+    true
 }

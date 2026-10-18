@@ -112,3 +112,23 @@ fn a_slot_below_three_is_refused() {
     assert!(spawn_mapped(&request("true"), &[(FdSlot(2), &file)]).is_err());
     fs::remove_dir_all(dir).ok();
 }
+
+#[test]
+fn path_lookup_skips_directories_uses_child_cwd_and_runs_scripts_without_shebang() {
+    use std::os::unix::fs::PermissionsExt;
+    let dir = temp_dir("path");
+    fs::create_dir_all(dir.join("first/probe")).unwrap();
+    fs::create_dir(dir.join("second")).unwrap();
+    let script = dir.join("second/probe");
+    fs::write(&script, "printf 'script:%s' \"$1\"\n").unwrap();
+    fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut req = request("unused");
+    req.argv = vec!["probe".into(), "arg".into()];
+    req.cwd = Some(dir.clone());
+    req.env = vec![("PATH".into(), "first:second".into())];
+    assert_eq!(output(req.clone(), &[]), ("script:arg".into(), 0));
+    fs::rename(script, dir.join("probe")).unwrap();
+    req.env = vec![("PATH".into(), "".into())];
+    assert_eq!(output(req, &[]), ("script:arg".into(), 0));
+    fs::remove_dir_all(dir).unwrap();
+}
