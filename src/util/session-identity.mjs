@@ -182,3 +182,69 @@ export function resolveWriterIdentity(fgosDir) {
   else envAnswers.set(answerKey, answer);
   return { ...answer };
 }
+
+const attemptAnswers = new Map();
+
+/**
+ * mintAttemptWriterId(attemptId, { bin }) -> writerId
+ *
+ * The writer id of one attempt, computed by the Rust crate
+ * (`fgos internal identity mint-attempt`), never by a copy of the rule here.
+ * A pure function of the attempt id, so a resume or a second reader gets the
+ * same id. Refuses while this process holds a state lock, like the resolver.
+ * `bin` overrides the host binary lookup (tests, doctor).
+ */
+export function mintAttemptWriterId(attemptId, { bin, fgosDir } = {}) {
+  if (typeof attemptId !== 'string') {
+    throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string');
+  }
+  const cached = attemptAnswers.get(attemptId);
+  if (cached) return cached;
+  if (heldLocks > 0) {
+    throw new WriterIdentityError(
+      'identity-in-lock',
+      'minting an attempt writer id would exec the host while the state lock is held; mint before taking the lock',
+    );
+  }
+  let hostBin = bin;
+  if (!hostBin) {
+    const found = resolveActiveHostBin({ fgosDir });
+    if (!found.bin) {
+      throw new WriterIdentityError(
+        'host-missing',
+        `no fgos host binary found (tried: ${found.tried.join('; ')}); run through the \`fgos\` command of an activated workspace, or set FGOS_HOST_BIN to a host binary`,
+      );
+    }
+    hostBin = found.bin;
+  }
+  const env = { ...process.env };
+  delete env.FGOS_INVOCATION_RECORD_PATH;
+  let stdout;
+  try {
+    stdout = execFileSync(hostBin, ['internal', 'identity', 'mint-attempt', '--attempt', attemptId, '--protocol', '1'], {
+      env,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: TIMEOUT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_OUTPUT_BYTES,
+      windowsHide: true,
+    });
+  } catch (err) {
+    if (err.status === 65) {
+      throw new WriterIdentityError('invalid-attempt-id', `${JSON.stringify(attemptId)} is not a usable attempt id`);
+    }
+    throw classifyExecError(err, hostBin);
+  }
+  let writerId;
+  try {
+    writerId = JSON.parse(stdout)?.writerId;
+  } catch {
+    // falls through to the shape check
+  }
+  if (typeof writerId !== 'string' || writerId.length === 0) {
+    throw new WriterIdentityError('bad-output', `${hostBin} internal identity printed an unexpected answer: ${String(stdout).slice(0, 200)}`);
+  }
+  attemptAnswers.set(attemptId, writerId);
+  return writerId;
+}

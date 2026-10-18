@@ -62,6 +62,10 @@ The rule lives in `packages/session-identity/rust/src/resolve.rs`; the OS is rea
 
 Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing`, `host-version-mismatch` (the active release has no `identity` verb), `timeout`, `host-error`, `bad-output`, `identity-in-lock`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
 
+## 5a. Attempt writer id (launcher half)
+
+An agent run (attempt) writes under its own id: `mint_attempt_writer_id(attemptId)` = `att-<attemptId>`, a pure function so a resume gets the same id and the same env digest (`packages/session-identity/contracts/attempt-writer-id.v1.json`, vectors beside it). Node reaches it only through `fgos internal identity mint-attempt --attempt <id> --protocol 1` (facade `mintAttemptWriterId`; exit 65 / `invalid-attempt-id` for an unusable id); same lock rule as the resolver. The launcher applies `scrub_and_set(env, writerId, parentWriterId)`: it removes `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and any inherited `FGOS_PARENT_WRITER_ID`, overwrites `FGOS_SESSION_ID` (never empty, so an inherited empty value cannot reach the agent) and sets `FGOS_PARENT_WRITER_ID` to the controller's writer id. `workerBaseEnv` no longer passes any of the three session ids. Codex only carries a minted id through `-c shell_environment_policy.set={FGOS_SESSION_ID=...}`; the other CLIs inherit the env.
+
 ## 6. Known limits
 
 - A terminal or IDE started from a shell without a new session: its terminals share the launching shell's id.
