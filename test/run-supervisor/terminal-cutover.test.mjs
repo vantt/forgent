@@ -100,3 +100,31 @@ test('an agent that never started settles as a failed attempt with a named reaso
   assert.equal(project.callsStarting('pane close').length, 0);
   assert.equal(project.agentStarts().length, 0, 'no agent ran');
 });
+
+test('a pane stopped on the provider\'s own limit screen settles as a provider limit, not as a person to wait for', { skip: noHost, timeout: 180_000 }, async () => {
+  const project = await newProject('limit');
+  project.setVerdict('blocked');
+  project.setScreen("■ You've hit your usage limit. Upgrade to Pro or try again at 11:40 PM.\n");
+  const run = project.startController();
+  const exit = await run.exited;
+  assert.equal(exit.code, 0, JSON.stringify(run.output()));
+  const { result } = run.answer();
+  assert.equal(result.classification.failure.code, 'provider-limit', JSON.stringify(result.classification));
+  assert.equal(result.classification.failure.family, 'provider');
+  assert.equal(readJson(path.join(project.attemptDir(), 'steps', 'release-slot.json')).detail.disposition, 'retain', 'the screen that says when it resets stays');
+});
+
+test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and the failure names the screen and the repair', { skip: noHost, timeout: 180_000 }, async () => {
+  const project = await newProject('trustprompt');
+  project.setVerdict('blocked');
+  project.setScreen('  Trust this folder? Codex can read, edit, and run files here.\n› 1. Trust and continue\n  2. Back to Agent Command Center\n');
+  const run = project.startController();
+  assert.equal((await run.exited).code, 0, JSON.stringify(run.output()));
+  const { result } = run.answer();
+  assert.equal(result.classification.failure.code, 'blocked');
+  assert.equal(result.classification.outcome.category, 'blocked');
+  assert.match(result.runnerNote.summary, /Back to Agent Command Center/);
+  assert.match(result.runnerNote.summary, /grant trust for this project in the agent's own home/);
+  assert.equal(project.callsStarting('pane close').length, 0, 'the pane stays for the person');
+  assert.equal(project.callsStarting('tab create').length, 1, 'no second candidate was tried');
+});

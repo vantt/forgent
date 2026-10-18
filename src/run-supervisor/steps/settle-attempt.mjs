@@ -13,6 +13,7 @@ import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifact
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from '../../runner/dispatch/provider-auth-failure.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
@@ -93,13 +94,49 @@ function paneScreenOf(runDir, envelope) {
   } catch { return ''; }
 }
 
-/** The adapter outcome a terminal early end names for the settlement: an agent waiting on a person. */
-function terminalAdapterOutcome(receipt) {
-  return /^terminal:(blocked|needs-human)/.test(receipt.reason ?? '') ? 'blocked' : null;
+/**
+ * What a pane screen says when an agent is paused by its provider rather than by a person: a used-up
+ * quota, a rate limit, a model at capacity. Generic wordings on purpose -- a miss costs a "blocked"
+ * instead of a "provider-limit", never a worker, because the pane is kept either way. Only read for an
+ * attempt the supervisor already stopped early, so a working agent's own text never counts.
+ */
+const SCREEN_LIMIT_PATTERNS = Object.freeze([
+  /usage limit/i,
+  /rate limit/i,
+  /quota (?:exceeded|reached)/i,
+  /too many requests/i,
+  /try again (?:later|in \d)/i,
+  /model is at capacity/i,
+]);
+const SCREEN_TAIL_LINES = 15;
+
+function screenSaysProviderStop(screenText) {
+  const lines = String(screenText ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(-SCREEN_TAIL_LINES);
+  if (lines.some((line) => SCREEN_LIMIT_PATTERNS.some((pattern) => pattern.test(line)))) return true;
+  const tail = { tailLines: AUTH_FAILURE_TAIL_LINES };
+  return matchQuotaLimitLine(screenText, tail) !== null || matchAuthFailureLine(screenText, tail) !== null;
+}
+
+/**
+ * The adapter outcome a terminal early end names for the settlement. A screen that ends on the provider's
+ * own words is a provider stop, which moves the caller to another account or candidate; anything else the
+ * agent stopped on is a person to wait for.
+ */
+function terminalAdapterOutcome(receipt, screenText) {
+  if (!/^terminal:(blocked|needs-human|delivery-unknown)/.test(receipt.reason ?? '')) return null;
+  if (screenSaysProviderStop(screenText)) return 'provider-limit';
+  return /^terminal:delivery-unknown/.test(receipt.reason) ? null : 'blocked';
+}
+
+/** Why a terminal attempt was stopped, in the words of its screen: a person reads this, not a log. */
+function terminalStopMessage(receipt, screenText) {
+  const tail = String(screenText ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(-6).join(' / ');
+  const waitingOnPerson = /^terminal:(blocked|needs-human)/.test(receipt.reason);
+  return `the agent was stopped: ${receipt.reason}.${tail ? ` Its screen ended with: ${tail}.` : ''}${waitingOnPerson ? " Answer the prompt in the pane, or grant trust for this project in the agent's own home, then run again. The pane is left open." : ''}`;
 }
 
 /** The process facts settleRunOutcome takes, from what the receipt says happened. */
-function rawResultOf(receipt, outboxClaimPresent) {
+function rawResultOf(receipt, outboxClaimPresent, screenText = '') {
   const gate = receipt.gateExit ?? null;
   const stopped = receipt.outcome !== 'exited';
   const settledAt = gate?.exitedAt ?? receipt.publishedAt ?? new Date().toISOString();
@@ -113,7 +150,7 @@ function rawResultOf(receipt, outboxClaimPresent) {
   // A terminal attempt the supervisor ended early names why in the receipt reason (the agent waits on a
   // person, the brief could not be confirmed): that is a failed attempt with a reason, not a cancellation.
   if (receipt.outcome === 'cancelled' && /^terminal:/.test(receipt.reason ?? '')) {
-    return { exitCode: 1, signal: null, isTimeout: false, settledAt, executionError: new Error(`the agent was stopped: ${receipt.reason}`) };
+    return { exitCode: 1, signal: null, isTimeout: false, settledAt, executionError: new Error(terminalStopMessage(receipt, screenText)) };
   }
   switch (receipt.outcome) {
     case 'abandoned-before-brief':
@@ -147,7 +184,6 @@ export async function settleAttempt({ runDir, envelope }) {
   const assignment = readJson(path.join(runDir, 'assignment.json')) ?? readJson(path.join(path.dirname(runDir), '..', 'assignment.json'));
   const baseline = evaluatorBaseline(runDir, receipt.outcome);
   const outboxClaim = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-  const raw = rawResultOf(receipt, fs.existsSync(outboxClaim));
   const { capture } = envelope.launch;
   // What the launching controller knew and no file of the attempt carries (policy, provider account,
   // fallback). Absent for an attempt whose controller died before it wrote it: the settlement then
@@ -157,9 +193,12 @@ export async function settleAttempt({ runDir, envelope }) {
     ? strayWriteWarning({ repoRoot: context.strayWatch.repoRoot, strayPaths: watchWritesOutsideWorkspace(context.strayWatch).strayPaths() })
     : null;
   const strayWarnings = strayWarning ? [strayWarning] : [];
-  const screenText = paneScreenOf(runDir, envelope);
+  const screenText = paneScreenOf(runDir, envelope).replace(/\s+$/, '');
+  const raw = rawResultOf(receipt, fs.existsSync(outboxClaim), screenText);
   const stdoutText = readTail(capture.stdout) || screenText;
-  const stderrText = readTail(capture.stderr);
+  // The screen is where a pane agent says why it stopped, the way stderr is for a process: the tail the
+  // settlement reads for a used-up quota or a dead login is the screen's.
+  const stderrText = [readTail(capture.stderr), screenText].filter(Boolean).join('\n');
 
   try {
     const settled = await settleRunOutcome({
@@ -176,7 +215,7 @@ export async function settleAttempt({ runDir, envelope }) {
       stdoutText,
       stderrText,
       executionError: raw.executionError,
-      adapterOutcome: terminalAdapterOutcome(receipt),
+      adapterOutcome: terminalAdapterOutcome(receipt, screenText),
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
