@@ -2,7 +2,7 @@
 // supervisor path had no per-cwd dispatch lock coverage at all, so two
 // DIFFERENT MUTATING Assignments (real, independent admission ledgers)
 // could mutate the SAME cwd concurrently. This proves the fix against the
-// REAL cli-spawn adapter path (useSupervisorRecovery, the default adapter
+// REAL cli-spawn adapter path (the run supervisor, the default adapter
 // for Assignment execution) with a real detached supervisor/worker
 // subprocess tree, not a hand-constructed fixture -- mirroring
 // assignment-dispatch.test.mjs's own S1 live-probe test style for the same
@@ -91,19 +91,14 @@ function admissionRunnerConfig(executorScript) {
   return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
+// The supervisor and the gate of an attempt, as the supervisor bound them (host pids).
 function supervisorBindingPids(runDir) {
-  const bindingDir = path.join(runDir, 'protected', 'supervisor-binding');
-  if (!fs.existsSync(bindingDir)) return [];
-  const pids = [];
-  for (const f of fs.readdirSync(bindingDir)) {
-    if (!f.endsWith('.json')) continue;
-    try {
-      const rec = JSON.parse(fs.readFileSync(path.join(bindingDir, f), 'utf8'));
-      if (rec.supervisor?.pid) pids.push(rec.supervisor.pid);
-      if (rec.worker?.pid) pids.push(rec.worker.pid);
-    } catch {}
+  try {
+    const binding = JSON.parse(fs.readFileSync(path.join(runDir, 'supervisor-binding.json'), 'utf8'));
+    return [binding.supervisor?.pid, binding.gate?.pid].filter(Number.isInteger);
+  } catch {
+    return [];
   }
-  return pids;
 }
 
 test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd is refused while the first cli-spawn Run is still live, and --force-shared-cwd (opts.forceSharedCwd) lets it proceed anyway', { timeout: 30000 }, async () => {
@@ -153,7 +148,8 @@ test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd i
       (err) => {
         assert.equal(err.errorClass, 'dispatch-in-flight', `expected dispatch-in-flight, got ${err.errorClass}: ${err.message}`);
         assert.equal(err.cwd, tempDir);
-        assert.equal(err.holderPid, process.pid, 'the refusal must name the process holding the lock');
+        // After the hand-over the lease belongs to A's supervisor and its gate, no longer to this process.
+        assert.ok(supervisorBindingPids(runDirA).includes(err.holderPid), `the refusal must name a process holding the lock (got ${err.holderPid}, attempt holds ${supervisorBindingPids(runDirA)})`);
         assert.ok(err.message.includes(tempDir), 'refusal message must name the contended cwd');
         return true;
       },

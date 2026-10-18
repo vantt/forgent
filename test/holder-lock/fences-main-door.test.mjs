@@ -2,7 +2,8 @@
 // cutover's base commit): the main checkout lock and every merge slot become
 // tombstones, so each old acquire, the old hook's inspection and the old merge
 // slot fail by name instead of taking a lock next to the new kernel lock. The
-// state store locks are not part of this cutover and stay unfenced.
+// state store's old locks (`events.lock`, `runtime/claims.lock`,
+// `porting/events.lock`) are fenced the same way.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -45,7 +46,7 @@ function makeWorkspace(name) {
 const options = (ws) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
 const mainDoorTargets = (ws) => fenceTargets(options(ws)).filter((t) => ['main-checkout', 'merge-slot'].includes(t.lock));
 
-test('the main checkout lock and one merge slot per local branch are tombstoned, and nothing of the state store is', () => {
+test('the main checkout lock, one merge slot per local branch and the three old state store locks are tombstoned', () => {
   const ws = makeWorkspace('targets');
   const targets = mainDoorTargets(ws);
   assert.deepEqual(
@@ -54,15 +55,17 @@ test('the main checkout lock and one merge slot per local branch are tombstoned,
   );
   assert.ok(targets.every((t) => t.fence === 'tombstone'));
 
-  const everyPath = fenceTargets(options(ws)).map((t) => t.path);
-  for (const stateLock of ['events.lock', path.join('runtime', 'claims.lock'), path.join('porting', 'events.lock')]) {
-    assert.ok(!everyPath.includes(path.join(ws.fgosDir, stateLock)), `${stateLock} is not fenced`);
-  }
-  assert.ok(!fenceTargets(options(ws)).some((t) => ['state', 'porting-events', 'worktree-admin'].includes(t.lock)));
+  const stateTargets = fenceTargets(options(ws)).filter((t) => ['state', 'porting-events'].includes(t.lock));
+  assert.deepEqual(
+    stateTargets.map((t) => `${t.lock}:${path.relative(ws.fgosDir, t.path)}`).sort(),
+    ['porting-events:porting/events.lock', `state:${path.join('runtime', 'claims.lock')}`, 'state:events.lock'].sort(),
+  );
+  assert.ok(stateTargets.every((t) => t.fence === 'tombstone'));
+  assert.ok(!fenceTargets(options(ws)).some((t) => t.lock === 'worktree-admin'));
 
   const result = placeFences(options(ws));
   assert.equal(result.ok, true, JSON.stringify(result));
-  for (const target of targets) {
+  for (const target of [...targets, ...stateTargets]) {
     const record = JSON.parse(fs.readFileSync(path.join(target.path, TOMBSTONE_FILE), 'utf8'));
     assert.equal(record.by, fenceBy('4.3'));
     assert.equal(record.lock, target.lock);
@@ -94,6 +97,32 @@ test('the v1 main checkout acquire, the old hook inspection and the old merge sl
     assert.ok(failedByName(observed), `${name} failed in an unexpected way: ${JSON.stringify(observed)}`);
   }
   for (const target of mainDoorTargets(ws)) assert.ok(fenceStatus(options(ws)).targets.find((t) => t.path === target.path).fenced, `${target.path} still fenced`);
+});
+
+test('the v1 events lock, claims lock and porting events lock all fail by name on the tombstones, none takes the lock', () => {
+  const ws = makeWorkspace('v1-state-probes');
+  assert.equal(placeFences(options(ws)).ok, true);
+  const fgosDir = JSON.stringify(ws.fgosDir);
+  const portingLog = JSON.stringify(path.join(ws.fgosDir, 'porting', 'events.jsonl'));
+  const eventsLog = JSON.stringify(path.join(ws.fgosDir, 'events.jsonl'));
+
+  const probes = {
+    withEventsLock: `async (v1) => { const m = await v1('src/state/events.mjs'); return m.withEventsLock(${eventsLog}, () => 'acquired', ${fgosDir}); }`,
+    withEventsLockPorting: `async (v1) => { const m = await v1('src/state/events.mjs'); return m.withEventsLock(${portingLog}, () => 'acquired', ${JSON.stringify(path.join(ws.fgosDir, 'porting'))}); }`,
+    withClaimsLock: `async (v1) => { const m = await v1('src/state/runtime-coordination.mjs'); return m.withClaimsLock(${fgosDir}, () => 'acquired', { timeoutMs: 300 }); }`,
+  };
+  // A fenced path is a directory: the old code reads it as a file and fails
+  // with EISDIR. It never takes the lock and never hangs.
+  const failedByName = (r) => r.outcome === 'threw' && (r.code === 'EISDIR' || /EISDIR|illegal operation on a directory/.test(r.message));
+  const env = { ...process.env, FGOS_EVENTS_LOCK_TIMEOUT_MS: '300' };
+
+  for (const [name, body] of Object.entries(probes)) {
+    const observed = probeV1(v1, body, { timeoutMs: PROBE_TIMEOUT_MS, cwd: ws.root, env });
+    assert.notEqual(observed.outcome, 'hung', `${name} hung on the tombstone`);
+    assert.notEqual(observed.outcome, 'no-report', `${name} died without reporting: ${observed.stderr}`);
+    assert.ok(observed.value !== 'acquired', `${name} took the lock through a tombstone`);
+    assert.ok(failedByName(observed), `${name} failed in an unexpected way: ${JSON.stringify(observed)}`);
+  }
 });
 
 test('a v1 main checkout lock file that is still there stops the placement before anything is written', () => {

@@ -9,7 +9,7 @@
   },
   "record": {
     "v": 1,
-    "domainKind": { "enum": ["linux-gate", "windows-job", "macos-tree"] },
+    "domainKind": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
     "domainId": {
       "linux-gate": {
         "host": "string",
@@ -19,9 +19,21 @@
         "startTime": "string",
         "meaning": "process tuple of the gate; the domain is empty iff judge(tuple) == dead"
       },
+      "linux-pgroup": {
+        "host": "string",
+        "bootId": "string",
+        "pidNs": "string",
+        "pid": "integer",
+        "startTime": "string",
+        "meaning": "process tuple of the group leader (Linux without user namespaces, best-effort); the domain is empty when judge(tuple) == dead and no process is left in its process group"
+      },
       "windows-job": {
-        "type": "string",
-        "meaning": "named Job Object; the name carries the attempt id and a unique token"
+        "job": "string, Local\\fgos-borrow-<sanitized lock name>-<pid>-<creation>-<counter>",
+        "sessionId": "string, the Windows session of the holder",
+        "declaredAt": "string, FILETIME (decimal) at declare",
+        "holder": { "host": "string", "pid": "integer", "startTime": "string, creation FILETIME as a decimal string" },
+        "keeper": "{ host, pid, startTime } | null; filled by rewriting the record (temp + rename) right after the keeper's ack and before any member exists",
+        "meaning": "named kill-on-close Job Object plus the process tuples that bound the tree view. A string domainId (the old shape) is an unknown shape and stays fail-closed."
       },
       "macos-tree": {
         "host": "string",
@@ -46,6 +58,24 @@
     "domain empty -> proceed; deadline passed -> release the kernel lock and return held (predecessor-domain-not-empty) naming the domain",
     "after proceeding, a holder that will create a domain itself overwrites the record before creating it"
   ],
+  "windowsJobViews": {
+    "jobView": {
+      "usedBy": "the release rule (step 0) and the keeper",
+      "empty": "ActiveProcesses == 0 AND every member ever named by the job's process id list, plus every process Toolhelp reports as IsProcessInJob, is signaled",
+      "never": "uses the holder tree, includes the holder or the keeper, kills outside the job, or opens a snapshot in the keeper"
+    },
+    "contenderView": {
+      "usedBy": "admit, after the kernel lock is held; re-read on every poll",
+      "holderAlive": "recorded holder (pid + creation time) alive: it released normally. Judge with the job view; if not empty, TerminateJobObject only. Never signal the holder or the keeper.",
+      "holderDead": "union of three sources: (1) the job list; (2) the in-job scan; (3) the tree = descendants of the recorded holder created at or after declaredAt, excluding the keeper tuple. Empty only when all three are empty.",
+      "failClosed": "a tree process whose parent is a tree node but whose creation time cannot be read, and any named pid whose OpenProcess(SYNCHRONIZE) fails with anything but ERROR_INVALID_PARAMETER, is an unopenable member: while present in the snapshot the domain is not empty",
+      "jobNotOpenable": "Toolhelp fallback over the tree source only, same rules, and two consecutive quiet snapshots are required",
+      "kill": "TerminateJobObject, plus a kill by identity for tree members that are not in the job",
+      "otherSession": "record sessionId differs from the contender's session: not empty, reason predecessor-other-session; the fallback is never used across sessions"
+    },
+    "keeperExit": "the job-keeper exits only when BOTH hold: (i) the holder wrote its finished line, or the holder's handle is signaled; and (ii) the job view is empty. It polls every 50 ms with the list and count only, and never exits because its stdin closed.",
+    "unknownShape": "v stays 1; a windows-job record whose domainId is not this object is unknown and judged not empty"
+  },
   "parameters": {
     "killWaitMs": {
       "default": 2000,
@@ -60,7 +90,8 @@
   },
   "driverSupport": {
     "linux-gate": "implemented: judge(gate) == dead; kill_all = SIGKILL by identity",
-    "windows-job": "contract only; driver written after the Windows probes are green on a real machine",
+    "linux-pgroup": "written by the run supervisor (containment.port.v1.json); until its driver lands a holder-lock driver answers unknown, which is never treated as empty",
+    "windows-job": "implemented by the Windows driver: contender view and job view above",
     "macos-tree": "contract only until a consumer declares a tree domain; best-effort"
   },
   "runBorrowedWithoutDomain": "On Linux run_borrowed declares no domain; the leftovers it kills are the other processes that still hold the lock description (holders()). On macOS the leftovers are the child's process group."

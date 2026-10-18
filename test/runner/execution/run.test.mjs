@@ -851,35 +851,6 @@ test('a panel whose every provider family is taken by panelists still runs the s
   assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['panelist-1']);
 });
 
-test('fgos run reclaims a private home whose owning process is gone before it does anything else', async () => {
-  const base = makeFixtureDir('fgos-run-reap-');
-  const previousTmp = process.env.TMPDIR;
-  process.env.TMPDIR = base;
-  try {
-    const root = path.join(base, 'fgos-confinement');
-    const home = path.join(root, 'disp_stale', 'home');
-    fs.mkdirSync(home, { recursive: true });
-    fs.writeFileSync(path.join(home, 'auth.json'), '{}');
-    fs.writeFileSync(
-      path.join(home, '.fgos-confinement-owner.json'),
-      JSON.stringify({
-        contract: 'confinement-resource-ownership.v1',
-        creator: 'fgos-confinement',
-        dispatchId: 'disp_stale',
-        resource: 'private-home',
-        pid: 2 ** 22 + 1, // above the kernel's pid ceiling: never alive
-        createdAt: new Date().toISOString(),
-      }),
-    );
-    // No unit given: the run refuses, but only after the reap.
-    await assert.rejects(() => runUnit({ cwd: base }), RunnerConfigError);
-    assert.equal(fs.existsSync(path.join(root, 'disp_stale')), false);
-  } finally {
-    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
-    fs.rmSync(base, { recursive: true, force: true });
-  }
-});
-
 // A worker that writes a file in its worktree and never touches git.
 function writeFileWritingWorker(repoRoot, verdict = 'pass') {
   const script = path.join(repoRoot, 'settling-worker.mjs');
@@ -1794,4 +1765,113 @@ test('a unit persona whose file cannot be parsed or has the wrong shape refuses 
   await assert.rejects(attempt('mapping-keeper'), /persona "mapping-keeper" \(fgos\/agents\/mapping-keeper\.yaml\) decision_boundary\.must_escalate\[0\] is a mapping/);
   const assignments = path.join(repoRoot, '.fgos', 'assignments');
   assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
+});
+
+// Gives each named executor family its own model for every tier a rigor may ask for.
+function withModelPolicies(repoRoot, families, patch = {}) {
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  for (const family of families) cfg.runner.modelPolicies[family] = { standard: `${family}-std`, flagship: `${family}-flagship`, frontier: `${family}-frontier` };
+  Object.assign(cfg.runner, patch);
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+}
+
+function reviewedRun(repoRoot, worktreeDir, unitData, pattern = 'reviewed') {
+  return runUnit({ unitData: { objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed', ...unitData }, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern });
+}
+
+test('a reviewed run at rigor high puts the producer and both checkers on three provider families', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
+  withModelPolicies(repoRoot, ['alpha', 'beta', 'gamma']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-3', rigor: 'high' });
+  assert.equal(res.outcome, 'pass');
+  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  assert.equal(new Set([byRole.producer, byRole.reviewer, byRole['red-team']]).size, 3, JSON.stringify(byRole));
+});
+
+test('a reviewed run at rigor high refuses the checker that no unused family can serve', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  withModelPolicies(repoRoot, ['alpha', 'beta']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-2', rigor: 'high' });
+  assert.equal(res.outcome, 'policy-refusal');
+  const refused = res.results.find((r) => r.refused);
+  assert.equal(refused.role, 'red-team');
+  assert.equal(refused.refused.reason, 'independence');
+});
+
+test('a reviewed run at rigor standard lets two checkers share a family, as before', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  withModelPolicies(repoRoot, ['alpha', 'beta']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-std-2', rigor: 'standard' }, { pattern: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } });
+  assert.equal(res.outcome, 'pass');
+  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  assert.equal(byRole.reviewer, byRole['red-team']);
+  assert.notEqual(byRole.producer, byRole.reviewer);
+});
+
+test('a unit verify command runs in the worktree after the producing round and a zero exit passes', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-ok', verify: `node -e "require('fs').writeFileSync('verify-ran.txt', process.cwd())"` });
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.verify, undefined, 'a run that verified says nothing about missing verify');
+  assert.equal(res.results.filter((r) => r.role === 'verify' && r.outcome === 'pass').length, 1);
+  assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
+});
+
+test('a failing unit verify becomes findings that carry its exit status and output', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-red', verify: `node -e "console.error('assertion exploded'); process.exit(3)"` });
+  assert.equal(res.outcome, 'findings');
+  assert.ok(res.findings.some((f) => /exited 3/.test(f) && /assertion exploded/.test(f)), res.findings.join('\n'));
+});
+
+test('a verify command that outlives runner.timeoutMs fails the verify with the timeout named, never hangs', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  withModelPolicies(repoRoot, [], { timeoutMs: 4000 });
+  const started = Date.now();
+  const res = await reviewedRun(
+    repoRoot,
+    worktreeDir,
+    { id: 'u-verify-slow', verify: `node -e "setTimeout(() => {}, 9000)"` },
+    { pattern: 'reviewed', params: { maxRounds: 1 } },
+  );
+  assert.equal(res.outcome, 'findings');
+  assert.ok(res.findings.some((f) => /timed out after 4000ms/.test(f)), res.findings.join('\n'));
+  assert.ok(Date.now() - started < 9000, 'the run did not wait for the verify command to finish by itself');
+});
+
+test('a verify declared on the capability is used when the unit names none', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.capabilities['docs:write'].verify = 'node -e "process.exit(5)"';
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-cap' });
+  assert.equal(res.outcome, 'findings');
+  assert.ok(res.findings.some((f) => /exited 5/.test(f)));
+});
+
+test('a reviewed run with no verify command passes but says it verified nothing; the code-change preset pins none', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-no-verify', pattern: 'code-change' }, 'code-change');
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.verify.ran, false);
+  assert.match(res.verify.reason, /no verify command/);
+  assert.equal(res.results.some((r) => r.role === 'verify'), false);
+});
+
+test('a solo run needs no verify and does not claim to have skipped one', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-solo-no-verify', pattern: 'solo' }, 'solo');
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.verify, undefined);
 });

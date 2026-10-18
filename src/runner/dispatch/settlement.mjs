@@ -1,8 +1,8 @@
 // dispatch/settlement.mjs — Unified Run settlement pipeline and primitives (R3, Phase 09)
 //
-// Consolidates the three former settlement implementations in assignment-runner.mjs
-// (inline execution settlement, settleReceiptRunFromOutcome, and settleFailedRunFromOutcome)
-// into a single cohesive settlement pipeline.
+// The one settlement pipeline: the settle-attempt step of a supervised attempt
+// (src/run-supervisor/steps/settle-attempt.mjs) and the inline paths both end in
+// settleRunOutcome.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -29,12 +29,10 @@ import { parseUsageForAdapter } from './usage-parsers.mjs';
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
   return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
 }
-import { finalizeConfinementResources } from './confinement/authority.mjs';
 import {
   publishMutableProjection,
   publishImmutableProof,
-  readDetachedRunAdapterReceipt,
-} from './detached-run-supervisor.mjs';
+} from './proof-helpers.mjs';
 import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
@@ -845,183 +843,4 @@ export async function settleRunOutcome({
   }
 
   return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
-}
-
-/**
- * Settle a failed Run from a recorded command outcome (e.g. supervisor exit or submission refusal).
- */
-export async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken, opts = {}) {
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (fs.existsSync(resultJsonPath)) {
-    try {
-      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
-      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-        // Do not rehydrate a contract-corrupt result
-      } else {
-        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
-      }
-    } catch {}
-  }
-
-  const settledAt = new Date().toISOString();
-  const root = resolveSafeRoot(runDir, opts?.repoRoot, true);
-
-  const stdoutText = '';
-  const stderrText = command.outcome?.failureDetail?.message || 'submission-refused';
-
-  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
-  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-
-  const exitInfoData = {
-    exitCode: 1,
-    signal: null,
-    timedOut: false,
-    settledAt,
-    durationMs: null,
-  };
-  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
-
-  const evidenceData = {
-    operationMutability: 'mutates-repo',
-    gitBefore: null,
-    gitAfter: null,
-    gitBeforeSource: 'pre-launch',
-    dirtyBefore: [],
-    dirtyAfter: [],
-    mutatedDirtyBeforeFiles: [],
-    changedFiles: [],
-    changedFileReasons: {},
-    attribution: [],
-    artifacts: [],
-    tests: [],
-  };
-  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-
-  const runResult = normalizeRunResultV2({
-    runId: runMeta.runId,
-    assignmentId: runMeta.assignmentId,
-    controlEpoch,
-    controlToken,
-    confidence: 'failed',
-    confidenceLevel: 'failed',
-    runtime: {
-      exitCode: 1,
-      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-    },
-    runnerNote: stderrText,
-    evidence: {
-      gitBefore: null,
-      gitAfter: null,
-      gitBeforeSource: 'pre-launch',
-      changedFiles: [],
-      mutatedDirtyBeforeFiles: [],
-      attribution: [],
-      artifacts: [],
-      tests: [],
-    },
-  });
-
-  const settled = commitRunSettlement({
-    runDir,
-    runId: runMeta.runId,
-    controlEpoch,
-    controlToken,
-    runResult,
-    _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
-  });
-
-  const runJsonPath = path.join(runDir, 'run.json');
-  let runJsonMeta = runMeta || {};
-  if (fs.existsSync(runJsonPath)) {
-    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-  }
-  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'failed', settledAt });
-  await finalizeConfinementResources({ runDir, launchCommandId: command?.launchCommandId });
-
-  return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
-}
-
-/**
- * Settle a Run from an adapter receipt and recorded evaluator baseline.
- */
-export async function settleReceiptRunFromOutcome(
-  runDir,
-  runMeta,
-  command,
-  baseline,
-  controlEpoch,
-  controlToken,
-  receiptOpt = null,
-  opts = {},
-) {
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (fs.existsSync(resultJsonPath)) {
-    try {
-      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
-      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-        // Do not rehydrate a contract-corrupt result
-      } else {
-        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
-      }
-    } catch {}
-  }
-
-  const launchCommandId = command.launchCommandId;
-  const receipt = receiptOpt || readDetachedRunAdapterReceipt(runDir, launchCommandId);
-  const root = resolveSafeRoot(runDir, opts?.repoRoot, true);
-
-  const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
-  const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
-  let stdoutText = '';
-  let stderrText = '';
-  try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
-  try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
-
-  const isTimeout = receipt?.completion?.kind === 'timeout' || receipt?.completion?.kind === 'idle-timeout';
-  const exitCode = receipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
-  const signal = receipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
-  const durationMs = typeof receipt?.completion?.durationMs === 'number' ? receipt.completion.durationMs : null;
-  const settledAt = receipt?.completion?.settledAt ?? new Date().toISOString();
-
-  const candidateAssignmentPaths = [
-    path.join(path.dirname(runDir), '..', 'assignment.json'),
-    path.join(runDir, 'assignment.json'),
-  ];
-  let asgn = null;
-  for (const p of candidateAssignmentPaths) {
-    if (fs.existsSync(p)) {
-      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
-    }
-  }
-
-  // Settle outcome using unified pipeline
-  const outcome = await settleRunOutcome({
-    runDir,
-    runMeta,
-    assignment: asgn,
-    controlEpoch,
-    controlToken,
-    exitCode,
-    signal,
-    isTimeout,
-    durationMs,
-    settledAt,
-    stdoutText,
-    stderrText,
-    effectiveCwd: baseline?.cwd || root,
-    gitBefore: baseline?.gitBefore ?? null,
-    gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
-    dirtyBefore: baseline?.dirtyBefore || [],
-    dirtyBeforeSnapshots: baseline?.dirtyBeforeSnapshots || null,
-    launchCommandId,
-    receipt,
-    opts: { ...opts, updateRunJson: 'settled' },
-  });
-
-  if (launchCommandId) {
-    await finalizeConfinementResources({ runDir, launchCommandId, receipt });
-  }
-
-  return outcome;
 }

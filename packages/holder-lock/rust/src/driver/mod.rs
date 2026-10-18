@@ -5,7 +5,6 @@
 use std::fs::File;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::time::Duration;
 
 use crate::port::{Guarantee, HoldersList, Mode};
@@ -29,6 +28,8 @@ pub enum TryLock {
 pub struct Leftovers {
     /// How many were signaled.
     pub killed: u32,
+    /// A description holder outside the borrowing domain was not signaled.
+    pub foreign: bool,
     /// Pids (Linux) or the process group id (macOS) still there.
     pub pids: Vec<u32>,
 }
@@ -50,13 +51,26 @@ pub trait LockDriver: Sync {
     fn description_path(&self, file: &File) -> io::Result<PathBuf>;
     /// Who holds a lock on `file`.
     fn holders(&self, file: &File) -> HoldersList;
-    /// Shape the borrowing child's command before spawn (macOS: own
-    /// process group, so what it leaves behind can be ended).
-    fn prepare_borrow(&self, cmd: &mut Command);
+    /// Shape the borrowing child's request before spawn (own process group,
+    /// so what it leaves behind can be ended).
+    #[cfg(unix)]
+    fn prepare_borrow(&self, request: &mut fgos_process::mapped::MappedSpawn);
     /// After the borrowing child `child_pid` exited: end whatever still
     /// holds `file`'s description apart from this process and wait up to
     /// `kill_wait` for it to be gone. `Ok(killed)` when nothing is left.
-    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers>;
+    /// `since`: a mark at which no process other than this one held the
+    /// description (it was opened after it, or a drain that began there
+    /// proved it), so a driver may read only processes created since.
+    /// `None`: read every process.
+    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<fgos_process::facts::CreationMark>) -> Result<u32, Leftovers>;
+    /// Called by the port right before it closes or abandons a description
+    /// that holds a lock. POSIX: nothing (a lock lives with the open file
+    /// description, and a borrowed copy may still share it). Windows: an
+    /// explicit unlock, safe because no other process can share the lock.
+    fn before_close(&self, file: &File);
+    /// Whether `file`, locked just now, is still the file at `path` (a lock
+    /// file replaced between open and lock is retried by the port).
+    fn same_file(&self, file: &File, path: &Path) -> bool;
 }
 
 /// The driver of the platform this binary runs on.
@@ -67,6 +81,6 @@ pub fn current() -> &'static dyn LockDriver {
     }
     #[cfg(windows)]
     {
-        &windows::WindowsDriver
+        &windows::LockFileExDriver
     }
 }

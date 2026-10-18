@@ -1,0 +1,11 @@
+{
+  "name": "empty-group-352x69",
+  "input": {
+    "groupKey": "g",
+    "tabs": [{ "tabId": "t1", "area": { "x": 0, "y": 0, "width": 352, "height": 69 }, "panes": [] }],
+    "groupPanes": [],
+    "request": { "label": "w" },
+    "limits": { "minCols": 80, "minRows": 20, "maxPanesPerTab": 8 }
+  },
+  "expected": { "newTab": {} }
+}

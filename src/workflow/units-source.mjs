@@ -78,6 +78,8 @@ export function translateUnitsToWorkflow(unitsPath) {
           ...(unit.persona !== undefined ? { persona: unit.persona } : {}),
           ...(unit.prefer !== undefined ? { prefer: structuredClone(unit.prefer) } : {}),
           ...(unit.timeoutMs !== undefined ? { timeoutMs: unit.timeoutMs } : {}),
+          ...(unit.verify !== undefined ? { verify: unit.verify } : {}),
+          ...(unit.skills !== undefined ? { skills: [...unit.skills] } : {}),
           contextRefs: [...unit.inputs],
           ...(unit.stanceOptions !== undefined ? { stanceOptions: [...unit.stanceOptions] } : {}),
           ...(unit.anonymizeInputs ? { anonymizeInputs: true } : {}),

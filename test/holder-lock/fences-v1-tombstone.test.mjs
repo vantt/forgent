@@ -71,7 +71,8 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
     path.join('workflow-runs', 'wf-1', 'advance.lock'),
     path.join('assignments', 'a1', 'runs', '01', '.recovery.lock'),
     path.join('installation', 'activation.lock'), path.join('observe', '.lock'),
-    'main-checkout.lock', ...branchesOf(ws.root).map((ref) => `merge-slot--${encodeURIComponent(ref)}.lock`),
+    'main-checkout.lock', 'events.lock', path.join('runtime', 'claims.lock'), path.join('porting', 'events.lock'),
+    ...branchesOf(ws.root).map((ref) => `merge-slot--${encodeURIComponent(ref)}.lock`),
   ].map((rel) => path.join(ws.fgosDir, rel));
   expected.push(path.join(ws.stateRoot, 'install.lock'));
   const cwds = new Set();
@@ -91,7 +92,7 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
     assert.ok(!Number.isNaN(Date.parse(record.at)), 'records when');
   }
   const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => t.lock));
-  assert.deepEqual([...locks].sort(), ['activation', 'advance', 'dispatch-cwd', 'gateway', 'install', 'main-checkout', 'merge-slot', 'observe', 'reconcile', 'recovery', 'runner', 'sessions']);
+  assert.deepEqual([...locks].sort(), ['activation', 'advance', 'dispatch-cwd', 'gateway', 'install', 'main-checkout', 'merge-slot', 'observe', 'porting-events', 'reconcile', 'recovery', 'runner', 'sessions', 'state']);
   assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).complete, true);
 });
 
@@ -184,10 +185,13 @@ test('fenceStatus lists every missing path before placement and none after', () 
   const ws = makeWorkspace('status');
   const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(before.complete, false);
-  assert.equal(before.missing.length, before.targets.length);
+  // Every path is missing: the ones this module places in `missing`, fgctl's controller path in `controllerMissing`.
+  assert.equal(before.missing.length + before.controllerMissing.length, before.targets.length);
+  assert.deepEqual(before.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')]);
   assert.deepEqual(before.v1Present, []);
   placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(afterwards.complete, true);
   assert.deepEqual(afterwards.missing, []);
+  assert.deepEqual(afterwards.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')], 'placeFences leaves the controller fence to fgctl');
 });

@@ -1,0 +1,68 @@
+
+  >_ OpenAI Codex (v0.163.0)
+     ~/projects/forgentX/.claude/worktrees/tm-p09a
+  permissions: YOLO mode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+›     /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/ack-1.json                                                                                                                                                                                                                                    ↑
+
+  with exactly:
+
+      {"round": 1, "agent": "fgos-run_unit-run-179230bce1c6e2", "receivedAt": "<ISO 8601 timestamp>"}
+
+  Write it as `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/ack-1.json.tmp` first, then rename it into place. Never write
+  a file in this directory in any other way -- a reader may look at it at any
+  moment, and a rename is the only step that is either done or not done.
+
+  ## Your task
+
+  Assignment: unit-run-1792308158810-1c178768/producer/1
+  Work: (none)
+  Role: producer
+  Objective: Probe task, read-only, change no files. With one shell command run: env | grep -E '^(FGOS_SESSION_ID|FGOS_PARENT_WRITER_ID|CLAUDE_CODE_SESSION_ID|CODEX_THREAD_ID)=' ; true  -- then copy that command's exact output into your report, and add the line PROBE-DONE-codex7.
+  Context refs:
+  - (none)
+  Expected outputs:
+  - (none)
+  Result artifact:
+  - This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.
+
+  - Also write a human-readable report to /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/report-1.md -- REQUIRED for this read-only operation: a "done" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.
+  - Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.
+  Effective execution contract:
+  - Contract: effective-execution-contract.v1
+  - Mutation: read-only
+  - Claim path: /home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/result-1.json
+  - Timeout: 240000ms
+  - Write scope: none in the workspace (read-only); your result files are still required
+  - Permission enforcement: enforced
+
+  ## When you finish
+
+  Write these two files, in this order, each one `.tmp`-then-rename:
+
+  1. `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/report-1.md` -- what you did, in prose. Anything a reader needs to
+     understand or check your work belongs here.
+  2. `/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792308158810-1c178768/producer/1/runs/01/outbox/result-1.json` -- a JSON object:
+
+         {"contract":{"id":
+
+  GPT-5.6-Luna default · ~/projects/forgentX/.claude/worktrees/tm-p09a

@@ -14,11 +14,17 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
-import { manifestTargetForHost } from '../src/util/release-targets.mjs';
+import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const REPO_ROOT = path.resolve(__dirname, '..');
+
+/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */
+export function gitCapabilitiesForHost(platform = process.platform, arch = process.arch) {
+  const target = releaseTargetForHost(platform, arch);
+  return target?.manifestTarget.os === 'linux' ? ['git-wal-v1'] : [];
+}
 
 /**
  * Deterministic, key-sorted canonical JSON serializer (RFC 8785 / JCS compatible).
@@ -42,6 +48,31 @@ export function canonicalJson(value) {
 export function hashFile(filePath) {
   const content = fs.readFileSync(filePath);
   return 'sha256:' + crypto.createHash('sha256').update(content).digest('hex');
+}
+
+/** Native library name emitted by Cargo on the selected host. */
+export function nativeAddonLibraryName(platform = process.platform) {
+  return platform === 'win32' ? 'fgos_node_addon.dll' : platform === 'darwin' ? 'libfgos_node_addon.dylib' : 'libfgos_node_addon.so';
+}
+
+/** ABI provenance shared by release staging and the development host. */
+export function nativeAddonComponent(file, relativePath, repoRoot = REPO_ROOT) {
+  const target = releaseTargetForHost();
+  if (!target) throw new Error('Native addon release target unsupported');
+  const lock = fs.readFileSync(path.join(repoRoot, 'Cargo.lock'), 'utf8');
+  const crateChecksums = {};
+  for (const block of lock.split('[[package]]')) {
+    const field = (name) => block.match(new RegExp(`^${name} = "([^"\\n]+)"$`, 'm'))?.[1];
+    const name = field('name');
+    if (['napi', 'napi-derive', 'napi-build'].includes(name)) {
+      const version = field('version');
+      const checksum = field('checksum');
+      if (!version || !/^[0-9a-f]{64}$/.test(checksum ?? '')) throw new Error(`Missing locked checksum: ${name}`);
+      crateChecksums[`${name}@${version}`] = checksum;
+    }
+  }
+  if (Object.keys(crateChecksums).length !== 3) throw new Error('Expected three locked napi crates');
+  return { path: relativePath, digest: hashFile(file).slice(7), target: `${target.platform}-${target.arch}`, napiVersion: 8, crateChecksums };
 }
 
 /**
@@ -247,7 +278,12 @@ export function buildRustDistribution({
     throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);
   }
 
-  const releaseBin = releaseBinaryPath(path.join(resolvedRepo, 'target', 'release'), 'fgos');
+  const outputDir = path.resolve(resolvedRepo, process.env.CARGO_TARGET_DIR || 'target', 'release');
+  const releaseBin = releaseBinaryPath(outputDir, 'fgos');
+  const addonLibrary = path.join(outputDir, nativeAddonLibraryName());
+  if (!fs.existsSync(addonLibrary) || !fs.lstatSync(addonLibrary).isFile()) {
+    throw new Error(`Compiled native addon not found at ${addonLibrary}; run cargo build --locked --release --workspace first`);
+  }
   if (!fs.existsSync(releaseBin)) {
     throw new Error(`Compiled Rust binary not found at ${releaseBin}. Run "cargo build --release --workspace" first.`);
   }
@@ -313,6 +349,14 @@ export function buildRustDistribution({
   // purpose (the checkout's tree holds dev tooling too); without this the staged CLI cannot
   // import them and every verb that does (workflow, setup registrations) fails after install.
   stageProductionDependencies(resolvedRepo, pkg, legacyNodeRoot);
+
+  // The release manifest owns this single physical copy, outside the Node sources.
+  const addonRelative = 'libexec/native/fgos.node';
+  const stagedAddon = path.join(resolvedOut, addonRelative);
+  fs.mkdirSync(path.dirname(stagedAddon), { recursive: true });
+  fs.copyFileSync(addonLibrary, stagedAddon);
+  fs.chmodSync(stagedAddon, 0o644);
+  const nativeAddon = nativeAddonComponent(stagedAddon, addonRelative, resolvedRepo);
 
   // 4. Build files[] descriptor array over the staged tree
   const stagedFiles = [];
@@ -387,7 +431,9 @@ export function buildRustDistribution({
       fgos: 'bin/fgos',
       fgosRunner: 'bin/fgos-runner',
     },
+    capabilities: gitCapabilitiesForHost(),
     components: {
+      nativeAddon,
       legacyNode: {
         root: 'libexec/legacy-node',
         entry: 'bin/fgos.mjs',
@@ -416,6 +462,7 @@ export function buildRustDistribution({
       : {}),
     entries: manifestWithoutDigest.entries,
     components: manifestWithoutDigest.components,
+    capabilities: manifestWithoutDigest.capabilities,
     requires: manifestWithoutDigest.requires,
     target: manifestWithoutDigest.target,
     ...(manifestWithoutDigest.stateSchemas

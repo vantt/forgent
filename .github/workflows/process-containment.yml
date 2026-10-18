@@ -1,0 +1,32 @@
+name: process-containment
+
+# Runs on pushes to run-supervisor, terminal-mode and controller-death branches and on demand: runs the process-containment driver tests on real Windows,
+# macOS and Linux runners (Job Objects, process groups, pid namespaces).
+on:
+  push:
+    branches: ['run-supervisor/**', 'terminal-mode/**', 'controller-death/**']
+    paths:
+      - 'packages/process/**'
+      - 'packages/run-supervisor/**'
+      - 'packages/holder-lock/**'
+      - 'packages/agent-protocol/**'
+      - 'Cargo.lock'
+      - '.github/workflows/process-containment.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  containment:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test containment drivers
+        shell: bash
+        run: cargo test -p fgos-process -p fgos-run-supervisor -p fgos-agent-protocol

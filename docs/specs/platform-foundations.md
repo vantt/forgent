@@ -63,7 +63,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 
 - **RUL1 (Log hay State ngay lúc thiết kế).** Mọi mẩu dữ liệu bền khai là Log hoặc State ngay lúc thiết kế; không khai được là lỗi thiết kế (L1, per ca7de3cf).
 - **RUL2 (memory hai tầng — lower hai-physics, higher 4-loại + consolidation).** Memory chạy đồng thời hai tầng: lower chỉ dùng hai-physics; higher dùng 4 loại memory + consolidation human-gated — hai mô hình không phủ định nhau (L2, per ca7de3cf).
-- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).
+- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy) thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).
 - **RUL4 (không routing toàn cục — mỗi interface chọn theo audience).** Không có mô hình routing toàn cục — mỗi interface chọn theo audience: prose-handoff cho agent↔agent trong chain; kỷ luật data (branch theo exit-code, decision-table, rediscover trước retry) cho consumer không-chắc-là-agent (L4, per 14ebeea9).
 - **RUL5 (việc kế tiếp luôn là truy vấn dẫn xuất từ state).** Việc kế tiếp luôn là truy vấn dẫn xuất từ state, không bao giờ là danh sách tay (L4, per 14ebeea9).
 - **RUL6 (agent lạ trả lời được sáu câu hỏi).** Platform "có harness" chỉ khi agent lạ không chat history trả lời được sáu câu: đọc gì trước / việc loại gì / chạm contract nào / rủi ro bao nhiêu / proof gì thì xong / bài học nào để lại — mọi phase nghiệm thu bằng sáu câu này (L5).
@@ -72,6 +72,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
 - **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum trong phạm vi việc đang làm thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ; tùm lum thấy ngoài phạm vi thì ghi thành item riêng, và gom mà phải xây công cụ mới là một câu hỏi quyết định; đích là ranh giới rõ và contract tường minh (ADR0054 (thêm vế phạm vi cho RUL11 theo phát biểu của người dùng 2026-10-08, supersede ADR0036)).
+- **RUL104 (tốt hơn, không to hơn).** Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang có tốt hơn — ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng được, API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn — trong phạm vi code đang có, không làm nó to ra; không thêm tính năng, lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt (L10); một tính năng chỉ được thêm khi thật sự đáng: mọi ý tưởng thêm được gom vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật, bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn (ADR0062 (RUL104 thêm clean code và hexagonal theo owner 2026-10-18, supersede ADR0061)).
 
 ## Edge Cases Settled
 
@@ -485,3 +486,48 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 - `plans/261008-1353-decision-question-template-and-cleanup/` — plan thực hiện.
 - 0036 — quyết định bị supersede.
 
+### 0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
+
+> Superseded bởi 0062 (2026-10-18): RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal. Phát biểu gốc dưới đây giữ nguyên.
+
+#### Bối cảnh
+
+Phát biểu của owner (2026-10-18, giữ nguyên văn làm nguồn — luật ở Business Rules là bản chưng):
+
+> "trong phạm vi code đang có (scope đang có) nếu có thể làm api và signature, contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn thì làm, tuyệt đối không mở rộng scope (scope creep), chỉ tốt hơn không bự hơn."
+
+> "Chỉ thêm tính năng nếu nó thật sự đáng, trong báo cáo gom tất cả những ý tưởng cần thêm vào một chỗ để báo cáo. Nhớ giải thích rõ lý do và lợi ích."
+
+Phát biểu ra đời khi owner giao luồng HARDEN (hội đồng soát và làm cứng các lớp tầng thấp sau khi GIT và ES land, bảng chương trình 10-18 21:27). Rủi ro nó chặn: một đợt audit thấy chỗ yếu rồi "sửa" bằng cách thêm cơ chế, cờ hay lớp mới, khiến hệ thống to thêm đúng lúc cần gọn lại; và ý tưởng tính năng lẫn vào danh sách sửa, được làm mà owner chưa chọn.
+
+#### Quyết định
+
+Khoá thành RUL104 (`docs/specs/platform-foundations.md`'s Business Rules): mọi lần audit, soát lại hay làm cứng phần đã có đều theo luật này. Được làm: sửa bug, ổn định, nhanh, nhẹ, code đơn giản, API/signature/contract rõ ràng, tường minh, dễ dùng, uyển chuyển hơn — trong phạm vi code đang có. Không được làm: tính năng, lớp, cơ chế mới. Ý tưởng thêm tính năng đi vào một mục riêng của báo cáo, mỗi ý có lý do và lợi ích, chờ owner chọn.
+
+#### Hệ quả
+
+- `AGENTS.md` có mục RUL104 (tốt hơn, không to hơn) với câu neo riêng dòng `tốt hơn, không to hơn`; `test/docs/rul104-anchor-phrase.test.mjs` khoá câu neo và chữ của luật.
+- Brief và đầu vào hội đồng của mọi đợt audit chép luật này nguyên văn.
+- Đi cùng RUL11 (tùm lum không phải nặng): luật đó gom cái tùm lum về một hình dạng; luật này giữ cho việc gom không phình ra thành việc mới.
+
+#### Tham chiếu
+
+- Bảng chương trình `plans/261017-1313-fgos-platform-program-board/plan.md`, luồng HARDEN.
+
+### 0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)
+
+#### Bối cảnh
+
+Owner bổ sung cùng tối (2026-10-18, nguyên văn): "chổ ` ổn định, nhanh, nhẹ, code đơn giản hơn` thêm áp dụng clean code principles, hexagon nếu có thể."
+
+#### Quyết định
+
+Giữ nguyên ý và phát biểu của 0061; vế "code đơn giản hơn" mang thêm: theo các nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng được. Hexagonal ở đây là nguyên tắc thiết kế số 3 (`core/instructions/design-principles.md`: logic chung độc lập với công cụ, CLI/herdr/tmux/agent CLI là driver mỏng sau một port), áp vào phần đang có, không phải lý do thêm lớp mới.
+
+#### Hệ quả
+
+- Dòng RUL104 (tốt hơn, không to hơn) ở Business Rules trích 0062; `test/docs/rul104-law.txt` khớp chữ mới; mục `AGENTS.md` mang cùng vế; câu neo không đổi.
+
+#### Tham chiếu
+
+- 0061 — quyết định bị supersede.

@@ -121,6 +121,28 @@ test('the door gets a config pinned to the one account, and other providers and 
   assert.equal(pinned.executors, wide.executors);
 });
 
+test('a declared store key, not the command, decides which confined invocations lease the account', () => {
+  const wrapped = (id, credentialStore) => ({
+    id, via: 'cli', adapter: 'cli-spawn', command: '/opt/bin/agent-wrapper', args: [], confinement: { backend: 'bwrap' }, ...(credentialStore ? { credentialStore } : {}),
+  });
+  const wrappedCfg = {
+    providers: cfg.providers,
+    executors: {
+      openai: {
+        kind: 'agent',
+        providerModel: 'openai',
+        invocations: [
+          wrapped('wrapper-codex', { use: 'codex', homeEnv: 'CODEX_HOME' }),
+          wrapped('wrapper-pi', { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' }),
+          wrapped('wrapper-no-store'),
+        ],
+      },
+    },
+  };
+  const found = accountInvocations(wrappedCfg, { provider: 'openai', accountId: 'acct' }).invocations.map((i) => [i.invocationId, i.via]);
+  assert.deepEqual(found, [['wrapper-codex', 'lease']]);
+});
+
 test('every CLI starts before any finishes, each under a read-only posture binding, and left-open panes are closed', async () => {
   const repoRoot = tmp('fgos-account-probe-repo-');
   const runDirOf = (id) => {
@@ -151,7 +173,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     const dir = runDirOf(assignment.assignmentId);
     const runtime = { stdoutLog: path.relative(repoRoot, path.join(dir, 'stdout.log')) };
     if (assignment.binding.invocation === 'codex-herdr-static') {
-      fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ paneId: 'p-1', herdrSession: 'fgos-workers' }));
+      fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ paneId: 'p-1', terminalKey: 'k-1', herdrSession: 'fgos-workers' }));
       fs.writeFileSync(path.join(dir, 'herdr-diagnosis.json'), JSON.stringify({ explain: { matchedRule: 'trust_directory', promptText: 'Trust this folder?' } }));
       return record(`run_${assignment.assignmentId}`, runtime, {
         execution: { status: 'failed', exitCode: null },
@@ -185,7 +207,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     assert.equal(assignment.provenance.contract.mutation, 'read-only');
     assert.deepEqual(Object.keys(runnerConfig.providers.openai.accounts), ['acct']);
   }
-  assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers' }]);
+  assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers', terminalKey: 'k-1' }]);
   const row = report.results.find((r) => r.invocationId === 'codex-herdr-static');
   assert.equal(row.outcome, 'blocked-trust-prompt');
   assert.equal(row.pane, 'closed-by-probe');

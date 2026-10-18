@@ -36,7 +36,6 @@ import {
   OWNERSHIP_MARKER_FILE,
   cleanupConfinementResource,
   extendOwnershipMarker,
-  reapOrphanedConfinementResources,
   writeOwnershipMarker,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
@@ -644,6 +643,21 @@ test('the credential copy refuses an escaping or missing entry with the caller\'
   } finally { w.cleanup(); }
 });
 
+test('with skipMissing the credential copy leaves out a path that does not exist and still refuses a dangling or escaping one', () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + HOUR));
+    const makeError = (message) => Object.assign(new Error(message), { code: 'credential-provisioning' });
+    const destination = path.join(w.tmp, 'd');
+    assert.deepEqual(copyCredentialFiles(destination, w.home, ['auth.json', 'missing.json', 'bin/fd'], { makeError, skipMissing: true }), ['auth.json']);
+    assert.equal(fs.existsSync(path.join(destination, 'missing.json')), false);
+    assert.deepEqual(copyCredentialFiles(path.join(w.tmp, 'e'), w.home, ['missing.json'], { makeError, skipMissing: true }), []);
+    fs.symlinkSync('no-such-target', path.join(w.home, 'dangling'));
+    assert.throws(() => copyCredentialFiles(path.join(w.tmp, 'f'), w.home, ['dangling'], { makeError, skipMissing: true }), /"dangling" is missing/);
+    assert.throws(() => copyCredentialFiles(path.join(w.tmp, 'g'), w.home, ['../x'], { makeError, skipMissing: true }), { code: 'credential-provisioning' });
+  } finally { w.cleanup(); }
+});
+
 test('the ownership marker records the write-back account only when asked, and only names and paths', async () => {
   const w = workspace();
   try {
@@ -655,7 +669,7 @@ test('the ownership marker records the write-back account only when asked, and o
       const request = {
         dispatchId,
         executorId: 'omp-bwrap',
-        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
         providerCapacity: {
           provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home),
           ...(withWriteBack ? { credentialWriteBack: { runtimeDir: w.runtimeDir } } : {}),
@@ -735,17 +749,6 @@ test('the finalizer of a settled dispatch writes back before it removes the home
       descriptor: { resources: [{ kind: 'temporary-directory', pathRef: dir }] },
     });
     assert.equal(result.cleanupState, 'cleaned');
-    assert.equal(fs.existsSync(dir), false);
-    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
-  } finally { w.cleanup(); }
-});
-
-test('the orphan reaper writes back before it removes a home whose owner is gone', () => {
-  const w = workspace();
-  try {
-    const dir = privateHomeWithRenewedLogin(w);
-    const result = reapOrphanedConfinementResources({ tempRoot: path.join(w.tmp, 'fgos-confinement'), checkLiveness: () => false });
-    assert.equal(result.reaped.length, 1);
     assert.equal(fs.existsSync(dir), false);
     assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
   } finally { w.cleanup(); }
@@ -1346,9 +1349,6 @@ test('a home kept because staging failed is retried a bounded number of times, t
     assert.equal(markerOf(dir).credentialKept.attempts, CREDENTIAL_KEEP_MAX_ATTEMPTS, 'a held home is not counted again');
     assert.equal(readPi(dir).xai.refresh, FAKE.newRefresh, 'the renewed login is still in the home');
 
-    // Age never deletes it either: the reaper skips a home whose marker is long past its age limit.
-    const reaped = reapOrphanedConfinementResources({ tempRoot: path.join(w.tmp, 'fgos-confinement'), checkLiveness: () => false, maxAgeMs: 1 });
-    assert.equal(reaped.reaped.length, 0);
     assert.equal(fs.existsSync(dir), true);
     assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'the source was not written by a held home');
   } finally { w.cleanup(); }
@@ -1907,7 +1907,7 @@ async function prepareCodexHome(codexHome, dispatchId) {
   const request = {
     dispatchId,
     executorId: 'codex-bwrap',
-    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+    invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
     providerCapacity: { provider: 'openai', accountId: 'acct', credentialSource: { kind: 'codex-home', home: codexHome } },
     context: { cwd: os.tmpdir(), runDir: os.tmpdir() },
   };

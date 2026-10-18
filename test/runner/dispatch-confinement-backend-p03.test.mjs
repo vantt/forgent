@@ -37,7 +37,6 @@ import {
   writeOwnershipMarker,
   readOwnershipMarker,
   cleanupConfinementResource,
-  reapOrphanedConfinementResources,
   OWNERSHIP_MARKER_FILE,
   OWNERSHIP_CONTRACT,
   OWNERSHIP_CREATOR,
@@ -431,12 +430,9 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
       dispatchId: 'disp_test_prep',
       invocation: {
         command: 'agent-cli',
-        args: ['--work', '{HOME_TOKEN}'],
-        env: { FOO: 'bar' },
-        resourceBindings: [
-          { resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } },
-          { resource: 'private-home', target: { kind: 'argument', token: '{HOME_TOKEN}' } },
-        ],
+        args: ['--work'],
+        env: { FOO: 'bar', AGENT_HOME: '/real/store' },
+        credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' },
       },
       context: { cwd: wsDir, runDir },
     };
@@ -463,7 +459,7 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
     const wsIdx = args.indexOf(wsDir);
     assert.ok(wsIdx > 0 && args[wsIdx - 1] === '--bind');
 
-    // Generic bindings applied
+    // The declared home variable points at the private home, over the value the invocation's own env carried
     assert.equal(prepared.invocation.env.AGENT_HOME, '/home/sandbox');
     assert.ok(args.includes('/home/sandbox'));
 
@@ -500,7 +496,7 @@ test('provider capacity: prepareBwrap copies selected account auth.json into pri
     const req = {
       dispatchId: 'disp_selected_home',
       executorId: 'codex-bwrap',
-      invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+      invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
       providerCapacity: {
         provider: 'openai-codex',
         accountId: 'tetnu',
@@ -558,7 +554,7 @@ test('provider capacity: old FGOS_CODEX_CREDENTIAL_HOMES hash rotation is ignore
         env: {
           FGOS_CODEX_CREDENTIAL_HOMES: poolHome,
         },
-        resourceBindings: [],
+        credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' },
       },
       providerCapacity: {
         provider: 'openai-codex',
@@ -605,7 +601,7 @@ test('provider capacity: selected missing credential fails closed before spawn',
       () => prepareBwrap(plan, {
         dispatchId: 'disp_missing_home',
         executorId: 'codex-bwrap',
-        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
         providerCapacity: {
           provider: 'openai-codex',
           accountId: 'missing',
@@ -650,7 +646,7 @@ function homeFilesFixture() {
   const request = (credentialSource) => ({
     dispatchId: 'disp_home_files',
     executorId: 'agent-bwrap',
-    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } }] },
+    invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
     providerCapacity: { provider: 'p', accountId: 'a', credentialSource },
     context: { cwd: tmp, runDir: tmp },
   });
@@ -682,8 +678,10 @@ test('provider capacity: a home-files credential that is missing, escapes its ho
   const f = homeFilesFixture();
   try {
     fs.symlinkSync('/etc/hostname', path.join(f.source, 'link-out'));
+    fs.symlinkSync('no-such-target', path.join(f.source, 'dangling'));
     const cases = [
-      [['auth.json', 'gone.json'], /selected credential file "gone\.json" is missing/],
+      [['gone.json'], /credential-store-empty: account "a" has none of \[gone\.json\] of store "agent-cli"/],
+      [['dangling'], /selected credential file "dangling" is missing/],
       [['../outside'], /must be a relative path without "\.\."/],
       [['/etc/hostname'], /must be a relative path without "\.\."/],
       [['link-out'], /not a regular file inside the credential home/],
@@ -707,6 +705,82 @@ test('provider capacity: a home-files credential that is missing, escapes its ho
     );
   } finally {
     fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: the files present are copied, a listed file that is absent is left out', async () => {
+  const f = homeFilesFixture();
+  try {
+    const prepared = await prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'gone.json', 'bin/absent'] }), { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['auth.json']);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: the files the invocation declares replace the account list', async () => {
+  const f = homeFilesFixture();
+  try {
+    const request = f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'nested/settings.json'] });
+    request.invocation.credentialStore = { use: 'agent-cli', homeEnv: 'AGENT_HOME', files: ['bin/helper'] };
+    const prepared = await prepareBwrap(f.plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['bin/helper']);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: an invocation that declares no store gets no login and no home variable, whatever account was leased', async () => {
+  const f = homeFilesFixture();
+  try {
+    const request = f.request({ kind: 'home-files', home: f.source, files: ['auth.json'] });
+    delete request.invocation.credentialStore;
+    const prepared = await prepareBwrap(f.plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement'));
+      assert.deepEqual(listed, []);
+      assert.equal(prepared.providerCapacity, undefined);
+      assert.equal(prepared.invocation.env.AGENT_HOME, undefined);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('assessBwrap: a store read through a private home needs a policy that grants one', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-grant-'));
+  try {
+    const request = (grants) => ({
+      dispatchId: 'disp_store_grant',
+      invocation: { command: 'codex', args: [], env: {}, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants,
+        },
+      },
+    });
+    fs.mkdirSync(path.join(tmp, 'run'), { recursive: true });
+    const backend = { id: 'bwrap', config: { type: 'bwrap' } };
+    const without = assessBwrap(request([{ resource: 'run-output', access: 'write', scope: 'dispatch' }]), backend);
+    assert.ok(without.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /login store "codex".*grants no "private-home"/.test(m.detail)));
+    const granted = assessBwrap(request([{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'private-home', access: 'read-write', scope: 'dispatch' }]), backend);
+    assert.ok(!granted.mismatches.some((m) => /private-home/.test(m.detail)));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
@@ -769,58 +843,6 @@ test('R5: cleanup stops a process still running from inside the directory it rem
     assert.equal(alive(child.pid), false, 'nothing keeps running from a directory that was deleted');
   } finally {
     try { if (child) process.kill(child.pid, 'SIGKILL'); } catch { /* already gone */ }
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('R5: reapOrphanedConfinementResources removes empty per-dispatch shells once they are old enough, and nothing else without a marker', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
-  try {
-    const oldEmpty = path.join(tmp, 'disp_1_old');
-    const freshEmpty = path.join(tmp, 'disp_2_fresh');
-    const foreign = path.join(tmp, 'disp_3_foreign');
-    fs.mkdirSync(oldEmpty);
-    fs.mkdirSync(freshEmpty);
-    fs.mkdirSync(path.join(foreign, 'home'), { recursive: true });
-    fs.writeFileSync(path.join(foreign, 'home', 'keep.txt'), 'not ours');
-    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
-    fs.utimesSync(oldEmpty, longAgo, longAgo);
-
-    const pass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.ok(!fs.existsSync(oldEmpty), 'an empty shell left behind is removed');
-    assert.ok(fs.existsSync(freshEmpty), 'a new empty directory may still be filled by a dispatch that is starting');
-    assert.ok(fs.existsSync(path.join(foreign, 'home', 'keep.txt')), 'a directory without our marker is never touched');
-    assert.deepEqual(pass.reaped.map((r) => [r.dispatchId, r.reason]), [['disp_1_old', 'empty']]);
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('R5: reapOrphanedConfinementResources is idempotent and ignores living processes', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
-  try {
-    const deadDir = path.join(tmp, 'dead-dispatch', 'home');
-    const aliveDir = path.join(tmp, 'alive-dispatch', 'home');
-    fs.mkdirSync(deadDir, { recursive: true });
-    fs.mkdirSync(aliveDir, { recursive: true });
-
-    // Write marker with dead pid (e.g. 99999999)
-    writeOwnershipMarker(deadDir, { dispatchId: 'dead-1', pid: 99999999 });
-    // Write marker with current living process pid
-    writeOwnershipMarker(aliveDir, { dispatchId: 'alive-1', pid: process.pid });
-
-    // First reaper pass: dead process allocation is reaped, alive is kept
-    const firstPass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.equal(firstPass.reaped.length, 1);
-    assert.equal(firstPass.reaped[0].dispatchId, 'dead-1');
-    assert.ok(!fs.existsSync(deadDir));
-    assert.ok(fs.existsSync(aliveDir));
-
-    // Second reaper pass: IDEMPOTENT (no error, double-acting, or crash)
-    const secondPass = reapOrphanedConfinementResources({ tempRoot: tmp });
-    assert.equal(secondPass.reaped.length, 0);
-    assert.ok(fs.existsSync(aliveDir));
-  } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
@@ -1288,7 +1310,7 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     const prepared = await prepareBwrap(plan, {
       dispatchId: 'disp_wt_commit',
       executorId: 'x',
-      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') }, resourceBindings: [] },
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') } },
       context: { cwd: wt, runDir: base },
     }, { id: 'bwrap', type: 'bwrap', config: {} });
     const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: wt, env: prepared.invocation.env, encoding: 'utf8' });

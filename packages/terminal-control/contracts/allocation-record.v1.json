@@ -1,0 +1,45 @@
+{
+  "contract": { "id": "terminal-control-allocation-record", "version": 1 },
+  "description": "The one thing terminal-control writes: an allocation record published once at allocate (or attach), plus one-shot markers. Everything else (is the pane alive, what runs in it, which panes a tab holds) is read live from the driver.",
+  "location": {
+    "record": "<stateRoot>/terminal/<driver>/<incarnationId>/allocations/<key>.json",
+    "markers": "<stateRoot>/terminal/<driver>/<incarnationId>/allocations/<key>.<marker>.json, marker in launch-requested | launched | released",
+    "groupHint": "<stateRoot>/terminal/<driver>/<incarnationId>/groups/<groupKey>.json",
+    "incarnationId": "<bootId>-<pid>-<startTime> of the multiplexer server; a different server incarnation is a different directory, so records of a dead server never match a live pane",
+    "publish": "write to a temp file in the same directory, fsync, link(2) to the final name; EEXIST means the record already exists and is never overwritten",
+    "permissions": "directories 0700"
+  },
+  "record": {
+    "v": { "const": 1 },
+    "key": "port key",
+    "groupKey": "port groupKey",
+    "driver": "string, e.g. herdr",
+    "serverIncarnation": {
+      "host": "string",
+      "bootId": "string",
+      "pidNs": "string, e.g. pid:[4026531836]",
+      "pid": "integer",
+      "startTime": "string",
+      "endpoint": "socket path the incarnation was read from"
+    },
+    "tabId": "string",
+    "paneId": "string",
+    "allocatedAt": "epoch ms",
+    "display": { "label": "string", "role": "optional string", "agent": "optional string", "model": "optional string" },
+    "origin": { "enum": ["allocated", "attached"] }
+  },
+  "markers": {
+    "launch-requested": { "v": 1, "key": "key", "at": "epoch ms", "rule": "written before the driver runs anything in the pane" },
+    "launched": { "v": 1, "key": "key", "at": "epoch ms", "identity": { "pid": "integer", "startTime": "string", "bootId": "string", "pgid": "integer" } },
+    "released": { "v": 1, "key": "key", "at": "epoch ms", "disposition": { "enum": ["close", "retain"] }, "until": "retain only: epoch ms or null", "outcome": { "enum": ["closed", "retained", "kept-unknown", "unlinked"] } }
+  },
+  "groupHint": {
+    "shape": { "v": 1, "groupKey": "groupKey", "tabId": "string", "updatedAt": "epoch ms" },
+    "rule": "a hint for finding the group's tab fast; always checked live before use, ignored when wrong; the only file rewritten (rename over)"
+  },
+  "rules": [
+    "no holder of a slot is stored: who may use a slot is the upper layer's business",
+    "a record is never edited; state changes are new markers",
+    "records of another incarnation are invalid for every operation and only reported by reconcile-scan"
+  ]
+}

@@ -122,6 +122,8 @@ fn two_guards_in_one_process_exclude_each_other_and_drop_releases() {
     fs::remove_dir_all(&ws).ok();
 }
 
+// Linux only: it lists the child's open descriptors through /proc.
+#[cfg(target_os = "linux")]
 #[test]
 fn the_activation_description_does_not_leak_into_a_spawned_child() {
     let _serial = serial();
@@ -163,4 +165,60 @@ fn the_main_checkout_probe_sees_a_kernel_holder_and_passes_over_a_tombstone() {
     fs::write(v1.join("TOMBSTONE"), "moved\n").unwrap();
     assert!(check_main_checkout_lock(&ws).is_ok());
     fs::remove_dir_all(&ws).ok();
+}
+
+#[test]
+fn a_live_old_controller_blocks_the_new_activation_door() {
+    let _serial = serial();
+    let ws = temp_workspace("old-controller");
+    let old = ws.join(".fgos/locks/activation.lock");
+    fs::create_dir_all(old.parent().unwrap()).unwrap();
+    let mut holder = Holder::spawn(&old, &ws.join("ready"));
+    assert!(matches!(
+        ActivationLockGuard::acquire(&ws),
+        Err(InitError::ActivationLockHeld(_))
+    ));
+    holder.kill();
+    let guard = ActivationLockGuard::acquire(&ws).unwrap();
+    assert!(activation_lock_path(&ws).ends_with("activation-v2.lock"));
+    drop(guard);
+    fs::remove_dir_all(ws).unwrap();
+}
+
+#[test]
+fn atomic_fence_refuses_an_old_door_and_the_new_door_reenters() {
+    let _serial = serial();
+    let ws = temp_workspace("fenced-controller");
+    fs::create_dir_all(ws.join(".fgos/locks")).unwrap();
+    let old = ws.join(".fgos/locks/activation.lock");
+    let handle = match acquire(
+        &Resource::new("activation", &old),
+        Mode::Ex,
+        Wait::Try,
+        2000,
+    ) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    fgos_holder_lock::tombstone::replace_held_file(
+        &handle,
+        "activation",
+        "fgos git",
+        "2026-10-18T00:00:00Z",
+    )
+    .unwrap();
+    assert!(fgos_holder_lock::tombstone::is_tombstone(
+        &old,
+        "activation",
+        "fgos git"
+    ));
+    assert!(fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&old)
+        .is_err());
+    drop(handle);
+    let guard = ActivationLockGuard::acquire(&ws).unwrap();
+    drop(guard);
+    fs::remove_dir_all(ws).unwrap();
 }

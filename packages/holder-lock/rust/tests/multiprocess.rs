@@ -36,9 +36,9 @@ fn two_descriptions_in_one_process_exclude_each_other() {
         Acquire::Held { reason: HeldReason::KernelLockHeld, domain: None } => {}
         other => panic!("second description must be held out: {other:?}"),
     }
-    release(first);
+    assert!(matches!(release(first), fgos_holder_lock::Release::Released { .. }));
     let second = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
-    release(second);
+    assert!(matches!(release(second), fgos_holder_lock::Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -54,7 +54,7 @@ fn a_sigkilled_holder_frees_the_lock_at_once() {
     assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { reason: HeldReason::KernelLockHeld, .. }));
     kill_and_reap(&mut holder);
     assert_eq!(probe(&res).unwrap(), Probe::Free);
-    release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000)));
+    assert!(matches!(release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))), fgos_holder_lock::Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -128,7 +128,7 @@ fn predecessor_gate_is_killed_before_the_next_holder_proceeds() {
         assert!(gone(gate), "round {round}: acquired while the gate {gate} was still alive");
         assert!(!record_path(&res.path).exists(), "an emptied domain's record is removed");
         extra.push(took.as_secs_f64() * 1000.0);
-        release(handle);
+        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     }
     extra.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let (p50, p95) = (percentile(&extra, 0.5), percentile(&extra, 0.95));
@@ -159,12 +159,12 @@ fn a_stale_predecessor_record_lets_the_next_holder_through_at_once() {
         let handle = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
         extra.push(started.elapsed().as_secs_f64() * 1000.0);
         assert!(!record_path(&res.path).exists());
-        release(handle);
+        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     }
     let mut plain = Vec::new();
     for _ in 0..20 {
         let started = Instant::now();
-        release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000)));
+        assert!(matches!(release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))), fgos_holder_lock::Release::Released { .. }));
         plain.push(started.elapsed().as_secs_f64() * 1000.0);
     }
     extra.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -234,6 +234,6 @@ fn only_an_exclusive_holder_declares_a_domain() {
     let me = identity_of(ProcId(std::process::id())).unwrap();
     assert!(shared.declare_domain(&Domain::LinuxGate(me)).is_err());
     assert!(!record_path(&res.path).exists());
-    release(shared);
+    assert!(matches!(release(shared), fgos_holder_lock::Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }

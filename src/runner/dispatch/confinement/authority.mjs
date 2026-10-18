@@ -9,7 +9,6 @@ import { claudeMcpApprovalArgs } from "../trust-store.mjs";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
-import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
 import {
   saveAttestationRecord,
@@ -27,7 +26,8 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -36,7 +36,6 @@ import {
   publishSecretSideFile,
   updateCommandEnvelope,
   commitCommandOutcome,
-  normalizeAgentName,
 } from "../proof-helpers.mjs";
 
 export {
@@ -1138,14 +1137,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     adapterOpts.preparedInvocationDigest = preparedLaunch.preparedInvocationDigest;
   }
 
-  // The binding functions of the homes this dispatch prepared (drivers/bwrap.mjs `bind`/`markLaunched`).
-  // Handed to the adapter as functions only: it calls them before (herdr) or right after (cli-spawn
-  // supervisor) the worker starts, and never sees a home path or writes a marker itself.
-  const confinementBinding = bindingForPrepared([preparedConfinement, preparedLaunch?.preparedConfinement]);
-  if (confinementBinding) adapterOpts.confinementBinding = confinementBinding;
-
   let adapterResult;
-  let retainedHomes = [];
   try {
     adapterResult = await adapterFn(preparedInvocation, adapterOpts);
     if (preparedLaunch && adapterResult?.receipt) {
@@ -1174,21 +1166,6 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       }
     }
   } catch (err) {
-    // A failed round whose pane was left open still has a worker running in
-    // that pane against the private home, so the home stays and is tagged
-    // with the pane; every other failure takes the home (and the login copy
-    // in it) away in the finally below.
-    if (err?.paneRetained === true && err.paneId) {
-      for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
-        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId, herdrSession: err.herdrSession }) ?? [])); } catch { /* best effort */ }
-      }
-      if (retainedHomes.length > 0) {
-        err.retainedPrivateHomes = [...retainedHomes];
-        // The message is what lands in the run's failure record (stderr.log / runnerNote), so the
-        // path of a login copy kept alive for a pane is written down where an operator looks.
-        err.message = `${err.message} Private home kept for the open pane (removed once the pane is closed): ${retainedHomes.join(', ')}.`;
-      }
-    }
     if (preparedLaunch) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
@@ -1278,17 +1255,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         cleanup: failedAttestation.cleanup,
         result: adapterResult,
         cause: err.message,
-        ...(retainedHomes.length > 0 ? { retainedPrivateHomes: [...retainedHomes] } : {}),
       },
     );
   } finally {
     // An assignment-owned launch prepared its confinement in prepareConfinementForLaunch, so its
     // resources (a private home holding a copy of the account login) are not on the outer variable.
-    // They are removed whether the worker returned or threw -- the one exception is a failure that
-    // left its pane open, whose home was retained above and is reaped once that pane closes.
+    // They are removed whether the worker returned or threw.
     for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
       if (!prepared?.cleanup) continue;
-      if (retainedHomes.length > 0 && prepared.retain) continue;
       try {
         await prepared.cleanup();
       } catch {
@@ -1384,7 +1358,13 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
-  const workerCommand = sourceInvocation.command;
+  // A supervised attempt runs the agent under the gate: the sandbox prefix travels in the envelope and
+  // the worker is the agent argv itself, never the sandbox wrapper command line.
+  const supervisedAttempt = typeof request.attemptId === 'string' && request.attemptId !== '';
+  const attemptAgentArgv = supervisedAttempt
+    ? (preparedConfinement?.agentArgv ?? [request.invocation.command, ...(request.invocation.args || [])])
+    : null;
+  const workerCommand = supervisedAttempt ? attemptAgentArgv[0] : sourceInvocation.command;
   const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
   // A prepared record that already exists is the invocation this launch was published with: its
   // args do not change with files that can change between attempts (.mcp.json, the trust store).
@@ -1392,7 +1372,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   let publishedArgs = null;
   try { publishedArgs = JSON.parse(fs.readFileSync(publishedInvocationPath, 'utf8'))?.workerInvocation?.args ?? null; } catch { /* first attempt */ }
   const workerArgs = Array.isArray(publishedArgs) ? publishedArgs : [
-    ...(sourceInvocation.args || []),
+    ...(supervisedAttempt ? attemptAgentArgv.slice(1) : (sourceInvocation.args || [])),
     // The target project's own MCP servers are approved for this worker only, so the claude
     // dialog that asks a person cannot stop an unattended seat.
     ...(claudeTrust?.kind === 'claude-json'
@@ -1405,14 +1385,12 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   ];
   const workerCwd = request.context.cwd;
   const depth = currentDispatchDepth();
-  const writerId = resolveWriterIdentity(request.context.fgosDir).id;
   const rawEnv = sourceInvocation.env || {};
   const resolvedExecutorEnv = resolveExecutorEnv(rawEnv);
   const workerEnv = {
     ...workerBaseEnv(),
     ...resolvedExecutorEnv,
     [DISPATCH_DEPTH_ENV]: String(depth + 1),
-    FGOS_SESSION_ID: writerId,
   };
 
   const workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
@@ -1427,7 +1405,9 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const redactedEnv = redactEnvForPersistence(workerEnv);
   const secretsRefRelative = path.join('protected', 'secrets', `${launchCommandId}.env.json`);
   const secretsPath = path.join(runDir, secretsRefRelative);
-  publishSecretSideFile(secretsPath, workerEnv);
+  // An attempt keeps its secret environment in the attempt side file the controller writes next to the
+  // envelope, so no second copy is published here.
+  if (!supervisedAttempt) publishSecretSideFile(secretsPath, workerEnv);
 
   // Resource bindings with ownership marker digests
   const resourceBindingsList = [];
@@ -1614,73 +1594,37 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const finalizationPath = path.join(runDir, 'protected', 'confinement-finalization', `${launchCommandId}.json`);
   publishMutableProjection(finalizationPath, finalizationDescBody);
 
-  if (adapterName === 'herdr-spawn') {
-    // Must be the exact same normalization the launch call itself applies
-    // (herdr-round.mjs's `agentName`) -- otherwise a long runId/
-    // launchCommandId records an un-truncated herdrName here while herdr
-    // actually starts the truncated one, and `agentGet(command.herdrName)`
-    // misses even a live, healthy worker.
-    const herdrName = normalizeAgentName(`fgos-${launchContext.run.runId}-${launchCommandId}`);
-    const commandsDir = path.join(runDir, 'controller', 'commands');
-    fs.mkdirSync(commandsDir, { recursive: true });
-    const launchCommandPath = path.join(commandsDir, `${launchCommandId}.json`);
-
-    const existingFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
-    let existingCmd = null;
-    for (const f of existingFiles) {
-      try {
-        const existing = JSON.parse(fs.readFileSync(path.join(commandsDir, f), 'utf8'));
-        if (existing.runId === launchContext.run.runId && (existing.state === 'pending' || existing.state === 'reconciled')) {
-          if (existing.launchCommandId !== launchCommandId || f !== `${launchCommandId}.json`) {
-            throw new DispatchError('launch-collision', `launch command for run ${launchContext.run.runId} already exists as ${existing.launchCommandId}`, {
-              code: 'launch-collision',
-              runId: launchContext.run.runId,
-              existingCommandId: existing.launchCommandId,
-              existingCommand: existing,
-            });
-          }
-          existingCmd = existing;
-        }
-      } catch (err) {
-        if (err.code === 'launch-collision') throw err;
-      }
-    }
-
-    const launchCommandBody = {
-      contract: 'herdr-launch-command.v1',
-      runId: launchContext.run.runId,
-      launchCommandId,
-      controlEpoch: launchContext.command.controlEpoch,
-      controlTokenDigest: launchContext.command.controlTokenDigest,
-      state: existingCmd?.state || 'pending',
-      requestDigest: launchContextDigest,
-      preparedInvocationDigest,
-      herdrName,
-      agentSession: existingCmd?.agentSession || null,
-      paneId: existingCmd?.paneId || null,
-      herdrSession: existingCmd?.herdrSession || null,
-      resourceIncarnation: existingCmd?.resourceIncarnation || null,
-      outcome: existingCmd?.outcome || null,
-    };
-    publishMutableProjection(launchCommandPath, launchCommandBody);
-
+  if (supervisedAttempt) {
     return {
-      launchCommand: launchCommandBody,
-      launchCommandPath,
-      envelope: launchCommandBody,
-      envelopePath: launchCommandPath,
+      attempt: {
+        command: workerCommand,
+        args: workerArgs,
+        cwd: workerCwd,
+        env: redactedEnv,
+        secretEnv: workerEnv,
+        envDigest,
+        bwrapPrefix: preparedConfinement?.bwrapPrefix ?? null,
+        bwrapExecutable: preparedConfinement?.bwrapPrefix ? (backendInstance?.config?.executable || '/usr/bin/bwrap') : null,
+        launchDigest: preparedConfinement?.launchDigest ?? null,
+      },
       preparedInvocation: preparedInvocationRecord,
       preparedInvocationDigest,
       providerCapacity: preparedConfinement?.providerCapacity || null,
       finalizationPath,
       finalizationDescriptor: finalizationDescBody,
-      // H9: the caller's own completed/failed attestation must reflect what
-      // THIS call actually prepared -- these are this function's own local
-      // backendPlan/preparedConfinement, never the caller's same-named outer
-      // variables (which the assignment/Run-owned launch path never sets).
       backendPlan,
       preparedConfinement,
     };
+  }
+
+  if (adapterName === 'herdr-spawn') {
+    // A pane launch is an attempt of the run supervisor (terminal mode); the launch-command file of the
+    // old herdr round has no writer left.
+    throw new DispatchError('attempt-required', 'a herdr-spawn launch needs a supervised attempt (the request carries no attemptId)', {
+      code: 'attempt-required',
+      runId: launchContext.run.runId,
+      launchCommandId,
+    });
   }
 
   // 3. Publish cli-spawn-launch-envelope.v2 (H11: v1 -> v2, `env` redacted,
@@ -1765,20 +1709,6 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 }
 
 /**
- * One `{ bind, markLaunched }` over every prepared confinement that can bind its homes, or null when none
- * can (an unconfined dispatch, or a backend that allocates no home). `bind` throws when any home cannot be
- * bound, so the caller can fail closed.
- */
-export function bindingForPrepared(preparedList) {
-  const binders = [...new Set((preparedList ?? []).filter((p) => typeof p?.bind === 'function'))];
-  if (binders.length === 0) return null;
-  return Object.freeze({
-    bind: (binding) => { for (const p of binders) p.bind(binding); },
-    markLaunched: () => { for (const p of binders) p.markLaunched?.(); },
-  });
-}
-
-/**
  * Finalize confinement resources idempotently.
  */
 export async function finalizeConfinementResources({
@@ -1845,11 +1775,9 @@ export async function finalizeConfinementResources({
             try {
               const parsed = JSON.parse(raw);
               markerDispatchId = parsed?.dispatchId ?? null;
-              // `credentialKept` is added by a failed removal after the digest was taken, and the binding
-              // fields by Confinement Authority's own bind/launch record (OWNERSHIP_BINDING_FIELDS); neither
-              // is tampering. Every other field must still match the prepare-time digest.
-              const { credentialKept: _kept, ...rest } = parsed ?? {};
-              const atPrepare = Object.fromEntries(Object.entries(rest).filter(([k]) => !OWNERSHIP_BINDING_FIELDS.includes(k)));
+              // `credentialKept` is added by a failed removal after the digest was taken; it is not
+              // tampering. Every other field must still match the prepare-time digest.
+              const { credentialKept: _kept, ...atPrepare } = parsed ?? {};
               markerDigest = computeSha256Digest(parsed && typeof parsed === 'object' ? atPrepare : parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
@@ -1899,4 +1827,97 @@ export async function finalizeConfinementResources({
     cleanupResult: updatedDesc.cleanupResult,
     descriptor: updatedDesc,
   };
+}
+
+
+/** A home that does not belong to the attempt, or whose marker cannot be read: nothing is removed. */
+export class AttemptHomeError extends Error {
+  constructor(code, message) {
+    super(`${code}: ${message}`);
+    this.name = 'AttemptHomeError';
+    this.code = code;
+  }
+}
+
+function attemptFinalizationDescriptors(runDir) {
+  const dir = path.join(runDir, 'protected', 'confinement-finalization');
+  let names;
+  try { names = fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort(); } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw new AttemptHomeError('finalization-descriptor-unreadable', `${dir}: ${err.code ?? err.message}`);
+  }
+  const found = [];
+  for (const name of names) {
+    const file = path.join(dir, name);
+    try { found.push({ file, descriptor: JSON.parse(fs.readFileSync(file, 'utf8')) }); } catch {
+      throw new AttemptHomeError('finalization-descriptor-unreadable', `${name} cannot be read`);
+    }
+  }
+  return found;
+}
+
+function readAttemptHomeMarker(homeDir, attemptId, runDir) {
+  let marker;
+  try { marker = JSON.parse(fs.readFileSync(path.join(homeDir, OWNERSHIP_MARKER_FILE), 'utf8')); } catch {
+    throw new AttemptHomeError('home-marker-unreadable', `${homeDir} has no readable ownership marker`);
+  }
+  if (marker?.contract !== ATTEMPT_HOME_MARKER_CONTRACT || marker.creator !== 'fgos-confinement' || marker.attemptId !== attemptId || marker.runDir !== runDir) {
+    throw new AttemptHomeError('home-marker-mismatch', `${homeDir} is not a version 2 home of attempt ${attemptId} in ${runDir}`);
+  }
+  return marker;
+}
+
+/**
+ * Give the credential back and remove every private home of one attempt, whatever way the attempt
+ * ended. The caller (supervisor or adopt step) holds the attempt lock and the process domain is
+ * empty, so no agent still uses a home. Unlike `finalizeConfinementResources` this never keeps a home
+ * for the kind of ending; it keeps one only when its renewed login is not safe anywhere else yet.
+ *
+ * Every marker is checked before anything is removed: a marker that is not version 2 or names another
+ * attempt throws `AttemptHomeError` and leaves all homes in place.
+ *
+ * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number}}
+ */
+export function finalizeAttemptHome({ runDir, attemptId } = {}) {
+  if (typeof runDir !== 'string' || typeof attemptId !== 'string' || attemptId === '') {
+    throw new AttemptHomeError('invalid-arguments', 'runDir and attemptId are required');
+  }
+  const descriptors = attemptFinalizationDescriptors(runDir);
+  const homes = [];
+  for (const { descriptor } of descriptors) {
+    for (const res of descriptor.resources || descriptor.temporaryDirectories || []) {
+      const target = res.pathRef || res.path;
+      if (!target || homes.some((h) => h.target === target) || !fs.existsSync(target)) continue;
+      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir) });
+    }
+  }
+  let kept = 0;
+  let held = 0;
+  for (const { target, marker } of homes) {
+    // A home whose staging already failed the allowed number of times is not tried again; adopt stops
+    // retrying and `fgos doctor` reports it.
+    if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
+    const result = writeBackRenewedCredential(target, marker);
+    if (result.status === 'failed' && result.keepHome) {
+      const isHeld = countCredentialKeep(target, marker) >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
+      if (isHeld) held += 1; else kept += 1;
+      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${isHeld ? 'held for the owner' : 'kept for a later retry'}\n`);
+      continue;
+    }
+    if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+    fs.rmSync(target, { recursive: true, force: true });
+    removeEmptyDispatchParent(target, marker.dispatchId);
+  }
+  if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, homes: homes.length };
+  const cleanupState = held > 0 ? 'retained' : 'cleaned';
+  for (const { file, descriptor } of descriptors) {
+    if (descriptor.cleanupState === cleanupState) continue;
+    publishMutableProjection(file, {
+      ...descriptor,
+      cleanupState,
+      cleanupResult: { kind: cleanupState },
+      updatedAt: new Date().toISOString(),
+    });
+  }
+  return { state: held > 0 ? CREDENTIAL_HOME_HELD : 'cleaned', homes: homes.length };
 }

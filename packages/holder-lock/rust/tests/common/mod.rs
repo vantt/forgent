@@ -173,8 +173,14 @@ pub fn child_entry() {
                 if let Ok(text) = fs::read_to_string(&marker) {
                     // A marker left by a holder that was killed inside the
                     // critical section is fine; one of a live process is not.
+                    // The kernel drops a SIGKILLed holder's lock while the
+                    // process is still tearing down, before it turns into a
+                    // zombie, so a killed holder can still read as live here:
+                    // the test names every pid it kills before the signal.
                     let pid: u32 = text.trim().parse().unwrap_or(0);
-                    if matches!(fgos_process::facts::observe(ProcId(pid)), fgos_process::facts::Observed::Live { .. }) {
+                    let killed = fs::read_to_string(lock.with_extension("killed")).unwrap_or_default();
+                    let was_killed = killed.lines().any(|line| line.trim() == pid.to_string());
+                    if !was_killed && matches!(fgos_process::facts::observe(ProcId(pid)), fgos_process::facts::Observed::Live { .. }) {
                         use std::io::Write;
                         let mut f = fs::OpenOptions::new().create(true).append(true).open(&violations).unwrap();
                         writeln!(f, "{} entered while {pid} was inside", std::process::id()).unwrap();
@@ -183,7 +189,7 @@ pub fn child_entry() {
                 fs::write(&marker, std::process::id().to_string()).unwrap();
                 std::thread::sleep(Duration::from_micros(500 + u64::from(std::process::id() % 7) * 300));
                 fs::remove_file(&marker).unwrap();
-                release(handle);
+                assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
             }
             std::process::exit(0);
         }

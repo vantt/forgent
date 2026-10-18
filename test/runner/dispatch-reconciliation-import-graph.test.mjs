@@ -78,13 +78,13 @@ export function moduleSpecifiers(source) {
 // own exact-set assertion further down is the load-bearing proof, this is
 // the human-readable cross-check for it.
 const BANNED_FILES = [
-  'src/runner/dispatch/detached-run-supervisor.mjs', // process-control adapter: child_process.spawn, worker PGID signalling, receipt publication
+  'src/run-supervisor/direct-launch.mjs', // process-control: starts the detached run supervisor and hands it the attempt's locks
   'src/runner/dispatch/herdr-round.mjs', // process-control: prepares/briefs/signals one interactive herdr round
-  'src/runner/dispatch/herdr-agent.mjs', // herdr client: spawns/queries live herdr panes
+  'src/runner/dispatch/terminal-slot.mjs', // a round's pane through terminal-control: launches, types at and closes live panes
+  'src/terminal-control/client.mjs', // terminal-control client: runs the host route that drives herdr
   'src/runner/dispatch/worker-home.mjs', // creates/removes a spawned worker's confined home directory
   'src/runner/dispatch/trust-store.mjs', // seeds trust for a spawned worker
   'src/runner/dispatch/worker-session-boot.mjs', // resume/reattach: ensures a live worker session exists
-  'src/runner/dispatch/liveness.mjs', // process-control signal ladder / pane-fate escalation
   'src/runner/dispatch/assignment-runner.mjs', // launch/execution and Run-lifecycle driving
   'src/runner/dispatch/plan.mjs', // admission: DispatchPlan compiler, Run generation admission
   'src/runner/dispatch/recovery-planner.mjs', // resume/reassign/retry recommendation planning
@@ -117,8 +117,12 @@ const builtinName = (specifier) => specifier.replace(/^node:/, '').split('/')[0]
 const LOCK_DOOR_FILES = new Set([
   'src/holder-lock/index.mjs',
   'src/holder-lock/driver.mjs',
+  // The Windows transport: one `fgos internal lock-hold` helper per held lock,
+  // its release, and the borrowed child's sweep.
+  'src/holder-lock/hold-transport.mjs',
 ].map((p) => path.join(root, p)));
-const LOCK_DOOR_BUILTINS = new Set(['child_process']);
+// events and stream: the Windows transport hands back a ChildProcess-shaped borrow.
+const LOCK_DOOR_BUILTINS = new Set(['child_process', 'events', 'stream']);
 
 // Defense in depth: even a file legitimately in the graph must never itself
 // perform a process-control call. The scan runs on the lexed code view, so
@@ -209,7 +213,7 @@ const EXPECTED_CLOSURE = [
   // best-effort shadow-binder telemetry append, no process control) ...
   'src/runner/dispatch/provider-adapter.mjs',
   // ... the auth-failure wording table, a leaf with no imports, kept apart
-  // so provider-capacity never imports liveness.mjs for it ...
+  // so provider-capacity never imports a process-control module for it ...
   'src/runner/dispatch/provider-auth-failure.mjs',
   // ... and /proc boot-id/start-time reads that decide lease holder
   // identity (node:fs only; no signals, no spawn).
@@ -218,6 +222,7 @@ const EXPECTED_CLOSURE = [
   // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
   'src/holder-lock/index.mjs',
   'src/holder-lock/driver.mjs',
+  'src/holder-lock/hold-transport.mjs',
   'src/holder-lock/protocol.mjs',
   'src/holder-lock/registry.mjs',
   'src/holder-lock/lock-scope.mjs',
@@ -233,10 +238,7 @@ const EXPECTED_CLOSURE = [
 // The lazy edges inside the closure. These modules are not loaded by reconcile;
 // they are listed so a new or retargeted dynamic import in the closure is a
 // reviewed change rather than a silent one.
-const EXPECTED_LAZY_EDGES = [
-  'src/runner/dispatch/visibility-session.mjs -> ./assignment-runner.mjs',
-  'src/runner/dispatch/visibility-session.mjs -> ./herdr-round.mjs',
-];
+const EXPECTED_LAZY_EDGES = [];
 
 test('reconcile use-case + reconciliation-planner transitive import graph excludes process-control/retry/admission/resume/reassignment/cancellation/takeover modules', () => {
   const seen = new Set();
@@ -460,7 +462,6 @@ test('boundary test: dispatch core modules import no Work-layer module and name 
     'src/runner/dispatch/runtime-inspection.mjs',
     'src/runner/dispatch/brief.mjs',
     'src/runner/dispatch/proof-helpers.mjs',
-    'src/runner/dispatch/herdr-reconcile.mjs',
     'src/runner/dispatch/recovery-planner.mjs',
   ];
 

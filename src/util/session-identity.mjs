@@ -11,7 +11,7 @@
 //
 // Exec happens at most once per process for a given session env (pid-branch
 // answers) or per session env and fgos dir (env/registry answers), and never
-// while this process holds events.lock or claims.lock: the lock helpers prime
+// while this process holds the state lock: the lock helpers prime
 // the cache before taking the lock and report each lock they hold here, and
 // probeIdentity refuses to exec while any is held.
 
@@ -46,12 +46,12 @@ export class WriterIdentityError extends Error {
 
 let heldLocks = 0;
 
-/** Called by withEventsLock/withClaimsLock right after taking a lock. */
+/** Called by withStateTx right after taking a lock. */
 export function noteLockHeld() {
   heldLocks += 1;
 }
 
-/** Called by withEventsLock/withClaimsLock exactly once when that lock is
+/** Called by withStateTx exactly once when that lock is
  * really released. */
 export function noteLockReleased() {
   heldLocks = Math.max(0, heldLocks - 1);
@@ -102,14 +102,14 @@ function classifyExecError(err, bin) {
  *
  * The one place that runs the verb: no cache, so doctor can ask each
  * candidate binary directly. Refuses to exec while this process holds an
- * events/claims lock. The child gets this process's env minus
+ * state lock. The child gets this process's env minus
  * FGOS_INVOCATION_RECORD_PATH, so the verb writes nothing.
  */
 export function probeIdentity(bin, fgosDir) {
   if (heldLocks > 0) {
     throw new WriterIdentityError(
       'identity-in-lock',
-      'resolving the writer identity would exec the host while events.lock/claims.lock is held; resolve before taking the lock',
+      'resolving the writer identity would exec the host while the state lock is held; resolve before taking the lock',
     );
   }
   const env = { ...process.env };
@@ -181,4 +181,70 @@ export function resolveWriterIdentity(fgosDir) {
   if (answer.source === PID || answer.source === UNRESOLVED) pidAnswers.set(envKey, answer);
   else envAnswers.set(answerKey, answer);
   return { ...answer };
+}
+
+const attemptAnswers = new Map();
+
+/**
+ * mintAttemptWriterId(attemptId, { bin }) -> writerId
+ *
+ * The writer id of one attempt, computed by the Rust crate
+ * (`fgos internal identity mint-attempt`), never by a copy of the rule here.
+ * A pure function of the attempt id, so a resume or a second reader gets the
+ * same id. Refuses while this process holds a state lock, like the resolver.
+ * `bin` overrides the host binary lookup (tests, doctor).
+ */
+export function mintAttemptWriterId(attemptId, { bin, fgosDir } = {}) {
+  if (typeof attemptId !== 'string' || attemptId.includes('\0')) {
+    throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string without NUL');
+  }
+  const cached = attemptAnswers.get(attemptId);
+  if (cached) return cached;
+  if (heldLocks > 0) {
+    throw new WriterIdentityError(
+      'identity-in-lock',
+      'minting an attempt writer id would exec the host while the state lock is held; mint before taking the lock',
+    );
+  }
+  let hostBin = bin;
+  if (!hostBin) {
+    const found = resolveActiveHostBin({ fgosDir });
+    if (!found.bin) {
+      throw new WriterIdentityError(
+        'host-missing',
+        `no fgos host binary found (tried: ${found.tried.join('; ')}); run through the \`fgos\` command of an activated workspace, or set FGOS_HOST_BIN to a host binary`,
+      );
+    }
+    hostBin = found.bin;
+  }
+  const env = { ...process.env };
+  delete env.FGOS_INVOCATION_RECORD_PATH;
+  let stdout;
+  try {
+    stdout = execFileSync(hostBin, ['internal', 'identity', 'mint-attempt', '--attempt', attemptId, '--protocol', '1'], {
+      env,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: TIMEOUT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_OUTPUT_BYTES,
+      windowsHide: true,
+    });
+  } catch (err) {
+    if (err.status === 65) {
+      throw new WriterIdentityError('invalid-attempt-id', `${JSON.stringify(attemptId)} is not a usable attempt id`);
+    }
+    throw classifyExecError(err, hostBin);
+  }
+  let writerId;
+  try {
+    writerId = JSON.parse(stdout)?.writerId;
+  } catch {
+    // falls through to the shape check
+  }
+  if (typeof writerId !== 'string' || writerId.length === 0) {
+    throw new WriterIdentityError('bad-output', `${hostBin} internal identity printed an unexpected answer: ${String(stdout).slice(0, 200)}`);
+  }
+  attemptAnswers.set(attemptId, writerId);
+  return writerId;
 }

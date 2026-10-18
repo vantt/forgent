@@ -25,7 +25,7 @@ r6 §7.6 (hàng promise theo `groupKey` trong process điều phối), §7.10, �
 ## Test
 
 1. Mỗi op qua binary thật + fake herdr → kết quả đúng contract.
-2. `--protocol 2` → exit 4 `host-version-mismatch`.
+2. `--protocol 2` → exit 3 `host-version-mismatch`.
 3. Hàng theo nhóm: 5 `allocate` + 2 `release(close)` đồng thời cùng nhóm → log fake herdr cho thấy tuần tự, không tách trên pane đang bị đóng.
 4. `fgos help` không có `internal`.
 
@@ -34,3 +34,5 @@ Lệnh: `cargo test -p fgos`; `env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID 
 ## Tiêu chí nghiệm thu / rollback
 
 Bốn test xanh; số đo latency trong báo cáo. Rollback: revert (chưa caller production).
+
+Điều chỉnh 2026-10-18 (sau khi hot-lock 4.3-S land trên main): client Node chạy `spawnSync fgos internal terminal-control` không được gọi khi đang giữ state hot lock (`src/state/hot-lock.mjs` ném `exec-under-hot-lock` khi sinh subprocess dưới lock). Mọi chỗ P05/P06 gọi client phải đứng ngoài đoạn giữ hot lock; route Rust nhận `stateRoot` từ `fgos_terminal_control::store::default_state_root()` (cùng cửa `fgos_holder_lock::state_root`).

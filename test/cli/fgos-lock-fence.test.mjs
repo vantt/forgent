@@ -187,3 +187,43 @@ test('main-checkout-reset while another process holds main: refuses with the loc
   assert.equal(gitHead(cwd), target, 'once main is free the reset runs');
   assert.equal(lockStatus(cwd).mainCheckout.outcome, 'free', 'the reset released main');
 });
+
+test('lock fence state: an unreadable record needs --attest-stopped, then the record is removed; a live holder is ended by --yes', async () => {
+  const cwd = initGitCwdFast();
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
+  const record = path.join(fgosDir, 'locks', 'state.hot');
+
+  fs.writeFileSync(record, '{"v":1,"pid":');
+  const refused = await runAsync(cwd, ['lock', 'fence', 'state']);
+  assert.notEqual(refused.status, 0);
+  assert.match(refused.stderr, /attest-stopped/);
+  assert.equal(fs.existsSync(record), true, 'nothing was removed without the attestation');
+  const attested = await runAsync(cwd, ['lock', 'fence', 'state', '--attest-stopped']);
+  assert.equal(attested.status, 0, attested.stderr);
+  assert.equal(envelopeData(attested.stdout).status, 'attested-free');
+  assert.equal(fs.existsSync(record), false, 'the garbage record is gone');
+
+  const free = await runAsync(cwd, ['lock', 'fence', 'state']);
+  assert.equal(envelopeData(free.stdout).status, 'free');
+
+  // A live holder: a real process whose full tuple is in the record.
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  try {
+    const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: child.pid, startTime: getProcessStartTime(child.pid), bootId: getBootId(), pidNs: getPidNs() }));
+    const unconfirmed = await runAsync(cwd, ['lock', 'fence', 'state']);
+    assert.notEqual(unconfirmed.status, 0);
+    assert.match(unconfirmed.stderr, /nothing was signalled/);
+    assert.equal(alive(child.pid), true);
+    assert.equal(fs.existsSync(record), true);
+    const fenced = await runAsync(cwd, ['lock', 'fence', 'state', '--yes']);
+    assert.equal(fenced.status, 0, fenced.stderr);
+    const data = envelopeData(fenced.stdout);
+    assert.equal(data.status, 'fenced');
+    assert.deepEqual(data.holders.map((h) => h.pid), [child.pid]);
+    assert.equal(fs.existsSync(record), false);
+  } finally {
+    child.kill('SIGKILL');
+  }
+});

@@ -33,7 +33,7 @@ export class RecoveryPlannerError extends Error {
 // The only evidence types this planner can interpret. Evidence of any other
 // type is never guessed at -- it parks the recommendation (Staleness Rules:
 // "unknown/unrecognized external evidence -> park, never a guessed action").
-const RECOGNIZED_EVIDENCE_TYPES = Object.freeze(['liveness', 'worker-result', 'replacement-authority']);
+const RECOGNIZED_EVIDENCE_TYPES = Object.freeze(['liveness', 'worker-result', 'replacement-authority', 'attempt-receipt', 'legacy-holders']);
 
 // The only requestedIntent values a caller may declare. An intent outside
 // this set is a malformed call (not a park-worthy runtime fact), so it
@@ -41,7 +41,15 @@ const RECOGNIZED_EVIDENCE_TYPES = Object.freeze(['liveness', 'worker-result', 'r
 // show-run.mjs draws between "invalid-run-id" (thrown) and "run-not-found"
 // (thrown, but for a legitimate lookup miss); an unrecognized intent is
 // caller misuse, closer to the former.
-const RECOGNIZED_INTENTS = Object.freeze(['resume', 'reassign']);
+const RECOGNIZED_INTENTS = Object.freeze(['resume', 'reassign', 'abandon-legacy']);
+
+// What the run supervisor's read-only adopt probe says about the attempt directory (snapshot.attempt.state).
+// A free lock with the attempt not closed is `needs-adopt` (nobody holds it) or `open` (an adopter left a
+// step undone): `adopt` finishes it. A held lock belongs to a supervisor or an adopter: nothing to recover.
+const ADOPTABLE_ATTEMPT_STATES = Object.freeze(['needs-adopt', 'open']);
+const LIVE_ATTEMPT_STATES = Object.freeze(['running', 'being-adopted']);
+const attemptStateOf = (snapshot) => snapshot.attempt?.state ?? null;
+const isAdoptable = (snapshot) => ADOPTABLE_ATTEMPT_STATES.includes(attemptStateOf(snapshot));
 
 // Mirrors visibility-session.mjs's own DRIVER_FRESH_MS rationale (six
 // missed 10s heartbeats): long enough that a slow filesystem or a busy
@@ -85,7 +93,7 @@ function evidenceIdsOf(evidence) {
  * write path's re-check can never drift into two different notions of
  * "what is legal right now" (Acceptance: "Read and write paths ... must
  * derive from and return identical authorization and legal-next facts"). */
-function checkPreconditions(snapshot, evidence) {
+function checkPreconditions(snapshot, evidence, { legacySweep = false } = {}) {
   const unknown = evidence.filter((e) => !RECOGNIZED_EVIDENCE_TYPES.includes(e.type));
   if (unknown.length > 0) {
     return {
@@ -93,15 +101,47 @@ function checkPreconditions(snapshot, evidence) {
       reason: `unrecognized evidence type(s): ${unknown.map((e) => `${e.id}:${e.type}`).join(', ')} -- never guessing an action over evidence this door cannot interpret`,
     };
   }
+  // A closed attempt has nothing left for any action; an adoptable one may carry a result.json its settle
+  // step wrote before the post-receipt steps finished, which is exactly what `adopt` completes.
+  if (attemptStateOf(snapshot) === 'closed') {
+    return { status: 'park', reason: 'the attempt is already closed -- there is nothing to recover' };
+  }
+  // A supervisor or an adopter that holds the attempt is working on it, whatever the outbox already shows.
+  if (LIVE_ATTEMPT_STATES.includes(attemptStateOf(snapshot))) {
+    return { status: 'park', reason: `attempt is ${attemptStateOf(snapshot)}: a supervisor or an adopter owns it -- nothing to recover while it runs` };
+  }
   // R3: consult the settled-outcome signal (F1's own snapshot field), not
   // just run.json.status -- a run whose result.json already landed is
   // "nothing to recover" even before run.json.status has been reconciled to
   // 'settled'. Read-door defense-in-depth alongside recover.mjs's own F5
   // write-door re-check, not a substitute for it.
-  if (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled') {
+  // The one exception: the legacy sweep settles a run from before the supervisor whose worker result nobody
+  // read (its status still says running), which is the run the sweep exists for.
+  const unreadLegacyResult = legacySweep && attemptStateOf(snapshot) === 'legacy-run' && snapshot.run?.status !== 'settled';
+  if (!isAdoptable(snapshot) && !unreadLegacyResult && (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled')) {
     return { status: 'park', reason: 'run already settled -- there is nothing to recover' };
   }
   return null;
+}
+
+/** `abandon-legacy`: a run from before the run supervisor, left running, is settled only on proof that every
+ * process it recorded is dead (supplied by the caller as `legacy-holders` evidence); no proof is not a guess. */
+function abandonLegacyFacts(snapshot, evidence) {
+  if (snapshot.run?.settlement === 'abandoned-legacy') {
+    return { status: 'park', reason: 'the run was already settled as abandoned-legacy -- there is nothing to recover' };
+  }
+  const state = attemptStateOf(snapshot);
+  if (state !== 'legacy-run') {
+    return { status: 'park', reason: `abandon-legacy applies to a run from before the run supervisor (legacy-run), this attempt is ${state ?? 'unprobed'}` };
+  }
+  const holders = evidence.find((e) => e.type === 'legacy-holders');
+  if (!holders) {
+    return { status: 'needs-input', reason: 'abandon-legacy requested but no legacy-holders evidence was supplied -- dead holders cannot be guessed' };
+  }
+  if (holders.allDead !== true) {
+    return { status: 'park', reason: `abandon-legacy refused: ${holders.reason ?? 'a recorded holder is alive or could not be judged'}` };
+  }
+  return { status: 'ok', action: { type: 'abandon-legacy' }, reason: 'every process the run recorded is dead and no marker points at it' };
 }
 
 /**
@@ -122,10 +162,25 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
       `requestedIntent must be one of ${RECOGNIZED_INTENTS.join('/')}, got: ${JSON.stringify(requestedIntent)}`,
     );
   }
-  const blocked = checkPreconditions(snapshot, evidence);
+  const blocked = checkPreconditions(snapshot, evidence, { legacySweep: requestedIntent === 'abandon-legacy' });
   if (blocked) return blocked;
 
+  if (requestedIntent === 'abandon-legacy') return abandonLegacyFacts(snapshot, evidence);
+
   if (requestedIntent === 'resume') {
+    // An attempt of the supervisor era is finished through the adopt door, never by a second driver.
+    const state = attemptStateOf(snapshot);
+    if (isAdoptable(snapshot)) {
+      const attemptId = snapshot.attempt?.attemptId;
+      if (typeof attemptId !== 'string') {
+        return { status: 'park', reason: 'the attempt has no readable attemptId in its envelope -- never guessing what to adopt' };
+      }
+      return {
+        status: 'ok',
+        action: { type: 'adopt', attemptId },
+        reason: `attempt ${attemptId} is ${state} (no holder, not closed) -- adopt settles it and closes it`,
+      };
+    }
     // Phase 03 R3/M15a: `collectEvidence` already computes a `liveness`
     // entry (`fresh` from `visibility.lastSeenAt` vs. the same freshness
     // window a live driver's own heartbeat renews), but this branch never
@@ -180,11 +235,23 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
  * `checkPreconditions` gate `deriveRecoveryFacts` uses, so "legal right now"
  * can never diverge between the two paths. */
 export function isActionLegal(snapshot, evidence, action) {
-  const blocked = checkPreconditions(snapshot, evidence);
+  const blocked = checkPreconditions(snapshot, evidence, { legacySweep: action?.type === 'abandon-legacy' });
   if (blocked) return blocked;
 
   if (!action || typeof action !== 'object' || typeof action.type !== 'string') {
     return { status: 'park', reason: 'action is missing or malformed -- never guessing what was meant' };
+  }
+  if (action.type === 'adopt') {
+    const state = attemptStateOf(snapshot);
+    if (action.attemptId !== snapshot.attempt?.attemptId) {
+      return { status: 'park', reason: 'adopt names a different attempt than the one this run directory now holds' };
+    }
+    if (isAdoptable(snapshot)) return { status: 'ok', reason: `adopt remains legal: attempt is ${state}` };
+    return { status: 'park', reason: `adopt no longer legal: attempt is ${state ?? 'unprobed'}` };
+  }
+  if (action.type === 'abandon-legacy') {
+    const facts = abandonLegacyFacts(snapshot, evidence);
+    return facts.status === 'ok' ? { status: 'ok', reason: facts.reason } : facts;
   }
   if (action.type === 'resume-driver') {
     // Phase 03 R3/M15a: the same strict `fresh === false` requirement
@@ -322,7 +389,7 @@ export function checkApply({ snapshot, evidence, action, expectedSnapshot, expec
  * MUST be issued by a controller/supervisor into controller/, never read from the
  * worker-writable outbox/.
  * File-naming convention: `replacement-authority--<driverId>.json` in controller/
- * names a fresh driver's authorization; `ack-*`/`report-*`/`result.json` in outbox/
+ * names a fresh driver's authorization; `ack-*`/`report-*`/`result-*.json`/`result.json` in outbox/
  * are the worker's own result artifacts (same prefixes findWorkerResult/the outbox
  * convention already use elsewhere); anything else is `unknown` -- which is
  * exactly what routes a recommendation to `park` rather than a guess. */
@@ -349,9 +416,15 @@ export function collectEvidence(snapshot, opts = {}) {
     }
   }
 
+  // The attempt directory's own contract files (receipt, gate exit, step receipts) are named evidence.
+  for (const name of snapshot.attemptFiles ?? []) evidence.push({ id: name, type: 'attempt-receipt' });
+  if (snapshot.legacyHolders) {
+    evidence.push({ id: 'legacy-holders', type: 'legacy-holders', allDead: snapshot.legacyHolders.allDead === true, reason: snapshot.legacyHolders.reason ?? null });
+  }
+
   for (const entry of snapshot.outbox ?? []) {
     const name = entry.name;
-    if (/^(ack|report)-/.test(name) || name === 'result.json') {
+    if (/^(ack|report|result)-/.test(name) || name === 'result.json') {
       evidence.push({ id: name, type: 'worker-result' });
       continue;
     }

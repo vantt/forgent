@@ -2,6 +2,8 @@
 
 Wave 2. Nhánh `run-supervisor/p09-cutover-direct`, worktree `.claude/worktrees/rs-p09`. Phụ thuộc: P01–P08, P10 đã vào nhánh tích hợp; **4.3 đã land**. Chủ duy nhất của `assignment-runner.mjs`, `transport.mjs`, `detached-run-supervisor.mjs` trong plan này. Blast radius HIGH: chạy `impact` trên `executeAssignment`, `cliSpawnAdapter`, `startDetachedRunSupervisorProcess`, `bindingForPrepared` và báo trước khi sửa.
 
+> **Amendment 2026-10-18:** 4.3-S đã land. Spawn supervisor (và mọi child_process) **không** được chạy trong `withStateTx`: guard `exec-under-hot-lock` (`src/state/hot-lock.mjs`) ném ngay. Resolve `FGOS_HOST_BIN`, `payloadRoot`, dựng envelope trước mọi tx; ghi state sau khi spawn xong. Tiền đề "4.3 landed" đã thoả. Windows không còn bị chặn bởi `lock-driver-unavailable` (4.4b).
+
 ## Đọc trước
 
 r6 §9.4 (năm bước), §9.6 ("controller không tự settle"), §9.9, §11 entry 6.2 (Xoá, Bằng chứng); [T8 §6](../reports/spike-t8-261015-1841-controller-crash-during-herdr-and-cli-runs.md); [`assignment-runner.mjs:2127`](../../src/runner/dispatch/assignment-runner.mjs) (`useSupervisorRecovery`), [`:2155-2180`](../../src/runner/dispatch/assignment-runner.mjs) (lease cwd hôm nay), [`:2511`](../../src/runner/dispatch/assignment-runner.mjs) (envelope), [`:2534`](../../src/runner/dispatch/assignment-runner.mjs) (`bindConfinedHomesToSupervisor`), [`:2742`](../../src/runner/dispatch/assignment-runner.mjs) (`settleRunOutcome` của controller), [`:2783-2790`](../../src/runner/dispatch/assignment-runner.mjs) (`finally`); [`transport.mjs:370-420`](../../src/runner/dispatch/transport.mjs), [`:540-553`](../../src/runner/dispatch/transport.mjs).

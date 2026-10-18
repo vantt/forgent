@@ -29,12 +29,14 @@ test('glm has no pane invocation: in a herdr pane GLM loops on one tool call, so
   assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.3');
 });
 
-test('glm is headless pi through OpenRouter with the same key variable and no claude gateway variables', () => {
+test('glm is headless pi through OpenRouter, its key read from its login store, with no claude gateway variables', () => {
   const glm = runner.executors.glm;
   assert.equal(glm.providerModel, 'z-ai');
   assert.ok(glm.invocations.length > 0 && glm.invocations.every((inv) => inv.command === 'pi'));
   for (const inv of glm.invocations) {
-    assert.equal(inv.env.OPENROUTER_API_KEY, '${GLM_OPENROUTER_API_KEY}');
+    assert.equal(inv.credentialStore.use, 'pi');
+    assert.ok(inv.credentialStore.files.includes('auth.json'), 'the OpenRouter key is in the auth.json of the store');
+    assert.equal(inv.env.OPENROUTER_API_KEY, undefined, 'no key variable: the store carries it');
     assert.equal(inv.env.ANTHROPIC_BASE_URL, undefined);
     assert.equal(inv.env.ANTHROPIC_AUTH_TOKEN, undefined);
   }
@@ -55,9 +57,7 @@ test('each agent family has exactly one executor', () => {
   for (const [family, ids] of byFamily) assert.equal(ids.length, 1, `${family} is served by ${ids.join(', ')}`);
 });
 
-test('a herdr round has an idle limit even when the runner config sets none, so a stalled agent is noticed', async () => {
-  const { groupDeadlines, DEFAULT_IDLE_TIMEOUT_MS } = await import('../../src/runner/dispatch/herdr-round.mjs');
+test('a terminal attempt has an idle limit even when the runner config sets none, so a stalled agent is noticed', async () => {
+  const { DEFAULT_IDLE_TIMEOUT_MS } = await import('../../src/runner/dispatch/herdr-round.mjs');
   assert.ok(DEFAULT_IDLE_TIMEOUT_MS > 0);
-  assert.equal(groupDeadlines({ timeoutMs: 1000 }).round.idleMs, DEFAULT_IDLE_TIMEOUT_MS);
-  assert.equal(groupDeadlines({ timeoutMs: 1000, idleTimeoutMs: 1500 }).round.idleMs, 1500, 'a configured value wins');
 });

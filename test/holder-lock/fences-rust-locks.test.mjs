@@ -91,7 +91,9 @@ test('placeFences tombstones the three old paths, install once for the machine, 
   assert.equal(other.ok, true, JSON.stringify(other));
   assert.ok(other.skipped.includes(secondPaths.install), 'install is already fenced for the machine');
   assert.ok(other.placed.includes(secondPaths.activation) && other.placed.includes(secondPaths.observe));
-  assert.equal(fenceStatus(options(second)).complete, true);
+  const secondStatus = fenceStatus(options(second));
+  assert.equal(secondStatus.complete, true);
+  assert.deepEqual(secondStatus.controllerMissing, [path.join(second.fgosDir, 'locks', 'activation.lock')], 'the controller fence is reported and left to fgctl');
 });
 
 test('an old observe lock file still there stops the placement and is left alone', () => {
@@ -120,7 +122,7 @@ test('behind the fences the new fgctl activates the workspace and the Observe CL
   assert.equal(open.status, 0, `metrics case open: ${open.stdout}${open.stderr}`);
   const locks = path.join(ws.fgosDir, 'locks');
   assert.ok(fs.statSync(path.join(locks, 'observe.lock')).isFile(), 'observe takes its kernel lock file');
-  assert.ok(fs.statSync(path.join(locks, 'activation.lock')).isFile(), 'fgctl takes its kernel lock file');
+  assert.ok(fs.statSync(path.join(locks, 'activation-v2.lock')).isFile(), 'fgctl takes its kernel lock file');
   assert.ok(fs.statSync(path.join(stateHome, 'locks', 'install.lock')).isFile(), 'the release store takes its kernel lock file');
   for (const lockPath of Object.values(rustLockPaths(ws))) assert.ok(fs.statSync(lockPath).isDirectory(), `${lockPath} still a tombstone`);
 });
@@ -143,8 +145,8 @@ test('doctor names the three locks: lock-fences before the fences, lock-holders 
   };
 
   // `fgctl init` ends in `doctor --fix`, which fences the workspace whenever no other fgOS process is running on the machine.
-  // Put the workspace in the state under test either way: the Node locks fenced, the three the Rust callers take missing.
-  assert.equal(placeFences(options(ws, { owners: ['4.2'], stateRoot: ownState })).ok, true);
+  // Put the workspace in the state under test either way: the Node and main door locks fenced, the three the Rust callers take missing.
+  assert.equal(placeFences(options(ws, { owners: ['4.2', '4.3'], stateRoot: ownState })).ok, true);
   const paths = rustLockPaths(ws, ownState);
   for (const lockPath of Object.values(paths)) fs.rmSync(lockPath, { recursive: true, force: true });
   const fences = doctor()['lock-fences'];

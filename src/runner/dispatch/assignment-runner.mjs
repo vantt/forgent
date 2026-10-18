@@ -21,8 +21,6 @@ import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
   settleRunOutcome,
-  settleFailedRunFromOutcome,
-  settleReceiptRunFromOutcome,
   isSubstantiveReportText,
   safeGitHead,
   safeGitStatusFiles,
@@ -30,7 +28,6 @@ import {
   computeChangedFiles,
   resolveRunWorkerArtifactPath,
 } from './settlement.mjs';
-import { reconcileCliSpawnRun } from './reconcile-cli-spawn.mjs';
 
 // Shared with reconciliation, which must never disagree with this collector
 // about which file is the worker's claim. Re-exported because callers and
@@ -40,24 +37,23 @@ export {
   resolveRunWorkerArtifactPath,
   commitRunSettlement,
   settleRunOutcome,
-  settleFailedRunFromOutcome,
-  settleReceiptRunFromOutcome,
   isSubstantiveReportText,
   safeGitHead,
   safeGitStatusFiles,
   safeGitCommittedDiffFiles,
   computeChangedFiles,
-  reconcileCliSpawnRun,
 };
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
-import { executeExecutorCli } from './cli.mjs';
+import { executeExecutorCli, withRunDirReadAccess } from './cli.mjs';
+import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
+import { resolveExecutorEnv, workerBaseEnv } from './adapters.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
@@ -82,27 +78,41 @@ import {
   inspectRunControl,
   resolveHolderLiveness,
 } from './run-lock.mjs';
-import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, bindConfinedHomesToSupervisor } from './transport.mjs';
-import { acquireDispatchCwdLock } from './cwd-lock.mjs';
-import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
-import { prepareConfinementForLaunch, finalizeConfinementResources, bindingForPrepared } from './confinement/authority.mjs';
+import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, agentArgsWithoutPrompt } from './transport.mjs';
+import {
+  acquireAttemptLocks,
+  attemptGateCommand,
+  identityEnv,
+  prepareAttemptFiles,
+  terminalSocketPath,
+  attemptStepEnv as attemptStepEnvOf,
+  awaitSettledResult,
+  buildEnvelope,
+  readLaunchSettings,
+  readSettledResult,
+  resolveAttemptHost,
+  startSupervisor,
+  waitForBinding,
+  writeAttemptFiles,
+  writeSettleContext,
+} from '../../run-supervisor/direct-launch.mjs';
+import { adoptRun } from '../../run-supervisor/client.mjs';
+import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt } from '../../run-supervisor/cancel-registry.mjs';
+import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
+import { resolveLock } from '../../holder-lock/index.mjs';
+import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
+import { resolveHerdrBin } from './terminal-slot.mjs';
+import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
+import { prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
 import { sha256FileSync } from './proof-helpers.mjs';
 import {
-  startDetachedRunSupervisorProcess,
-  readDetachedRunSupervisorBinding,
-  readDetachedRunWorkerBinding,
-  readDetachedRunAdapterReceipt,
-  getBootId,
-  getProcessStartTime,
-  getProcessPgid,
   publishImmutableProof,
   publishMutableProjection,
   computeSha256Digest,
   canonicalJson,
-  isDetachedRunProcessAlive,
-} from './detached-run-supervisor.mjs';
+} from './proof-helpers.mjs';
 import {
   buildEffectiveExecutionContract,
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
@@ -113,6 +123,7 @@ import {
   classifyProviderCapacityFault,
   commandCli,
   credentialSourceForCli,
+  credentialStoreOf,
   defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
   probeQuarantinedAccounts,
@@ -165,20 +176,23 @@ function resolveExecutorCommandFallback(entry, executorId) {
 }
 
 /**
- * The CLIs a launch of `executorId` may run, before the invocation is settled: the pinned invocation's CLI
- * when the caller pinned one, else the CLIs of the executor's `cli` invocations in declaration order (the
- * first is the one an unpinned launch takes). Used to pick an account's per-CLI login store for the lazy
- * probe and for refresh-ahead; the launch itself takes the store of the command it really runs.
+ * The login stores a launch of `executorId` may read, before the invocation is settled: the store key of the
+ * pinned invocation when the caller pinned one, else of the executor's `cli` invocations in declaration
+ * order (the first is the one an unpinned launch takes). An invocation that declares no store is keyed by
+ * its command's CLI. Used to pick an account's per-CLI login store for the lazy probe and for
+ * refresh-ahead; the launch itself takes the store its invocation reads.
  */
+const storeKeyOf = (invocation) => credentialStoreOf(invocation)?.use ?? commandCli(invocation?.command);
+
 function launchCandidateClis(cfg, executorId, pinnedInvocationId) {
   const entry = cfg?.executors?.[executorId] ?? cfg?.executor;
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
   if (pinnedInvocationId) {
     const pinned = invocations.find((inv) => inv.id === pinnedInvocationId);
-    if (pinned?.command) return [commandCli(pinned.command)];
+    if (pinned?.command) return [storeKeyOf(pinned)];
   }
-  const commands = invocations.length > 0 ? invocations.map((inv) => inv.command) : [entry?.command];
-  return [...new Set(commands.map(commandCli).filter(Boolean))];
+  const keys = invocations.length > 0 ? invocations.map(storeKeyOf) : [storeKeyOf(entry)];
+  return [...new Set(keys.filter(Boolean))];
 }
 
 function resolveProviderFamilyForExecutor(entry, executorId) {
@@ -565,42 +579,46 @@ function validateAssignmentLegality(asgn, opts = {}) {
   return matchedOp;
 }
 
+/** The CLIs whose screens the terminal adapters of the agent protocol know. */
+const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
+
 /**
- * Whether a cli-spawn Run's DETACHED supervisor or worker -- published
- * under `runDir/protected/(supervisor-binding|bindings)/*` by
- * detached-run-supervisor.mjs -- is still doing real work, independent of
- * whether the RUNNER process that spawned it (the control holder
- * `inspectRunControl` tracks) is alive. The supervisor is spawned
- * `detached: true` and deliberately outlives its parent; a runner-only
- * liveness check (`inspectRunControl`) reads `held: false` the instant the
- * runner dies even while its supervisor/worker keeps mutating the cwd (S1).
- * Both `admitRunAttempt`'s in-flight check and provider-capacity's lease
- * reclaim need this SAME real-worker signal, not just the runner's.
- *
- * Mirrors reconcile-cli-spawn.mjs's own "latest command file" discovery
- * (sorted `controller/commands/*.json`, last wins) so this reads the same
- * launchCommandId that reconciliation would use. A herdr-spawn Run (no
- * supervisor/worker bindings ever published for it) or a Run with no
- * commands at all correctly reads back `false` here -- falls through to
- * the existing holder-only check, unchanged from before this fix.
+ * The argv an interactive agent starts with in a pane: the executor's own args without the prompt (the
+ * supervisor types the brief at the prompt instead), the read access to the run directory a claude seat
+ * needs to open the brief, and -- for codex, whose shell commands run under a shared daemon that does not
+ * inherit the pane's environment -- the attempt's writer id as an explicit setting.
  */
-function isCliSpawnRunStillWorking(runDir) {
-  const commandsDir = path.join(runDir, 'controller', 'commands');
-  if (!fs.existsSync(commandsDir)) return false;
-  let commandFiles;
+function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId }) {
+  const args = withRunDirReadAccess({
+    adapter: 'herdr-spawn',
+    interactiveMode: resolvedCmd.interactiveMode,
+    args: agentArgsWithoutPrompt({ argsTemplate: resolvedCmd.argsTemplate, args: resolvedCmd.args, prompt, model }),
+    runDir,
+  });
+  return commandCli(resolvedCmd.command) === 'codex'
+    ? [...args, '-c', `shell_environment_policy.set={FGOS_SESSION_ID="${writerId}"}`]
+    : args;
+}
+
+/**
+ * Whether a supervised attempt (`direct` or `terminal`) is still doing real work, independent of whether the RUNNER process that
+ * started it (the control holder `inspectRunControl` tracks) is alive. The supervisor and the agent
+ * outlive their controller, so a runner-only liveness check reads `held: false` the instant the runner
+ * dies even while the agent keeps mutating the cwd. Both `admitRunAttempt`'s in-flight check and
+ * provider-capacity's lease reclaim need this SAME real-attempt signal.
+ *
+ * The answer is the adopt door's own read-only probe of the attempt lock and the domain it declared
+ * (`running`, `being-adopted`, `held`). A Run with no v3 envelope (never launched) reads
+ * `false`. A probe that cannot run reads `true`: undecidable liveness fails closed.
+ */
+function isSupervisedAttemptStillWorking(runDir) {
+  if (!fs.existsSync(path.join(runDir, 'envelope.json'))) return false;
   try {
-    commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
+    const { state } = adoptRun(runDir, { probeOnly: true });
+    return state === 'running' || state === 'being-adopted' || state === 'held';
   } catch {
-    return false;
+    return true;
   }
-  const latestCommandFile = commandFiles[commandFiles.length - 1];
-  if (!latestCommandFile) return false;
-  const launchCommandId = path.basename(latestCommandFile, '.json');
-  const supervisorBinding = readDetachedRunSupervisorBinding(runDir, launchCommandId);
-  if (supervisorBinding?.supervisor && isDetachedRunProcessAlive(supervisorBinding.supervisor)) return true;
-  const workerBinding = readDetachedRunWorkerBinding(runDir, launchCommandId);
-  if (workerBinding?.worker && isDetachedRunProcessAlive(workerBinding.worker)) return true;
-  return false;
 }
 
 /**
@@ -638,7 +656,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false, herdrLivenessPreCheck = null },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -773,7 +791,7 @@ function admitRunAttempt(
         // `executeAssignment`, not part of this same CAS commit. In that
         // narrow window `priorControl.held` is false (no control record
         // exists at all, `priorControl.controlEpoch` is undefined) and
-        // `isCliSpawnRunStillWorking` is also false (no supervisor/worker
+        // `isSupervisedAttemptStillWorking` is also false (no supervisor/worker
         // spawned yet either), so neither signal below would ever catch a
         // second admission racing INSIDE that window -- confirmed via a
         // real two-process race (test/runner/coordination-dag-concurrency
@@ -787,26 +805,10 @@ function admitRunAttempt(
         // stale against the real control ledger.
         const admitterAlive =
           !priorControl.controlEpoch && current.record.admittedBy && resolveHolderLiveness(current.record.admittedBy) === 'held';
-        // Part 2 (herdr-spawn liveness): the prior attempt's own adapter
-        // (buildRunMeta's `adapter` field, run.json) decides which
-        // detached-run-supervisor implementation to consult.
-        // isCliSpawnRunStillWorking is local/instant, so it stays exactly as
-        // before, called inline here. herdr-spawn's own signal was already
-        // computed OUTSIDE this synchronous CAS section (see the caller's
-        // own herdrLivenessPreCheck comment) -- consult it ONLY when it was
-        // computed for this EXACT current generation (`runId` match); a
-        // mismatch means a concurrent commit changed `current` between that
-        // pre-check and this CAS running (a real but narrow race), and per
-        // this track's own repeated "fail closed on undecidable liveness"
-        // rule, an unmatched/never-computed pre-check is treated the SAME as
-        // "still working", never silently ignored.
-        let priorRunAdapter = null;
-        try {
-          priorRunAdapter = JSON.parse(fs.readFileSync(path.join(priorRunDir, 'run.json'), 'utf8'))?.adapter;
-        } catch {}
-        const priorDetachedRunStillWorking = priorRunAdapter === 'herdr-spawn'
-          ? (herdrLivenessPreCheck?.runId === current.record.runId ? herdrLivenessPreCheck.result !== false : true)
-          : isCliSpawnRunStillWorking(priorRunDir);
+        // The prior attempt's supervisor and agent outlive the controller that started it, so the adopt
+        // door's own probe of its attempt lock and domain decides whether it still works (cli-spawn and
+        // herdr-spawn alike).
+        const priorDetachedRunStillWorking = isSupervisedAttemptStillWorking(priorRunDir);
         if (priorControl.held || priorDetachedRunStillWorking || admitterAlive) {
           return {
             stop: true,
@@ -1278,16 +1280,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const cwd = opts.cwd ?? process.cwd();
   const root = opts.repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const rawCfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
-  const cfg = { ...rawCfg };
-  if (rawCfg.executor) {
-    const defaultExec = { ...rawCfg.executor };
-    cfg.executor = defaultExec;
-    cfg.executors = {
-      ...(rawCfg.executors || {}),
-      claude: { ...(rawCfg.executors?.claude || {}), ...rawCfg.executor },
-      ...(rawCfg.executor.command ? { [rawCfg.executor.command]: defaultExec } : {}),
-    };
-  }
+  const cfg = withDefaultExecutor(rawCfg);
 
   // Storage setup under .fgos/assignments/<assignmentId>/
   const fgosDir = fgosDirFromRoot(root);
@@ -1309,7 +1302,7 @@ export async function executeAssignment(assignment, opts = {}) {
     const prefix = `run_${lease.assignmentId}_`;
     if (!runId.startsWith(prefix)) return false;
     const attemptStr = runId.slice(prefix.length);
-    return isCliSpawnRunStillWorking(path.join(assignmentsDir, lease.assignmentId, 'runs', attemptStr));
+    return isSupervisedAttemptStillWorking(path.join(assignmentsDir, lease.assignmentId, 'runs', attemptStr));
   });
 
   fs.mkdirSync(runsDir, { recursive: true });
@@ -1509,46 +1502,12 @@ export async function executeAssignment(assignment, opts = {}) {
     .update(JSON.stringify({ assignment: effectiveAssignment, compiledPlan }))
     .digest('hex');
 
-  // Part 2 (herdr-spawn liveness): admitRunAttempt's own M1 in-flight check
-  // (below) is a synchronous CAS critical section that must never block on
-  // anything external -- but herdr-spawn's own liveness signal
-  // (isHerdrSpawnRunStillWorking) is a real, non-deterministic-availability
-  // herdr CLI subprocess call. Pre-compute it here, OUTSIDE the CAS section,
-  // as a best-effort peek at whatever generation is current RIGHT NOW; if a
-  // concurrent commit changes the current generation between this peek and
-  // the real CAS below (a narrow, expected race -- currentGeneration is a
-  // plain read, not part of the same atomic transaction), M1's own check
-  // notices the runId mismatch and fails closed (treats it as still
-  // working) rather than trusting a pre-check computed for the wrong
-  // attempt. Skipped entirely when there is no live candidate to check
-  // (no generation yet, an already-settled attempt, or a non-herdr-spawn
-  // adapter -- isCliSpawnRunStillWorking's own synchronous, local check
-  // already covers that case unchanged, inside the CAS section itself).
-  let herdrLivenessPreCheck = null;
-  const admissionGenerationsDirPeek = path.join(assignmentDir, 'admission', 'generations');
-  const currentGenPeek = currentGeneration(admissionGenerationsDirPeek);
-  if (currentGenPeek?.record) {
-    const peekAttemptStr = currentGenPeek.record.attemptStr || String(currentGenPeek.record.attempt).padStart(2, '0');
-    const peekRunDir = path.join(runsDir, peekAttemptStr);
-    if (!fs.existsSync(path.join(peekRunDir, 'result.json'))) {
-      let peekAdapter = null;
-      try {
-        peekAdapter = JSON.parse(fs.readFileSync(path.join(peekRunDir, 'run.json'), 'utf8'))?.adapter;
-      } catch {}
-      if (peekAdapter === 'herdr-spawn') {
-        const result = await isHerdrSpawnRunStillWorking(peekRunDir, { cwd: effectiveCwd });
-        herdrLivenessPreCheck = { runId: currentGenPeek.record.runId, result };
-      }
-    }
-  }
-
   const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
     retryId: opts.retryId,
     predecessorRunId: opts.predecessorRunId ?? null,
     destination: opts.destination ?? effectiveCwd,
     payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
     expectedRunId: opts.expectedRunId,
-    herdrLivenessPreCheck,
     // M1: operator escape valve for a prior attempt this host can no
     // longer observe correctly (e.g. its control ledger identity is on an
     // unreachable filesystem) -- never the default, always an explicit opt
@@ -1956,57 +1915,33 @@ export async function executeAssignment(assignment, opts = {}) {
         );
       }
     }
-    const commandsDir = path.join(runDir, 'controller', 'commands');
-    if (fs.existsSync(commandsDir)) {
-      // The commands/<launchCommandId>.json record's own `contract` field
-      // says which reconcile shape actually applies -- cli-spawn's
-      // 'assignment-command-state.v1' (envelopeDigest/bindingDigest) and
-      // herdr-spawn's 'herdr-launch-command.v1' (herdrName/paneId/
-      // agentSession) are different contracts sharing this one path, and
-      // reconcileCliSpawnRun's own window checks (e.g. `command.envelopeDigest`)
-      // never match a herdr record, so a herdr-spawn resume always fell
-      // through to a duplicate fresh dispatch attempt instead of finding
-      // its live/settled worker.
-      let reconcileFn = reconcileCliSpawnRun;
+    // An attempt of the supervisor era carries an envelope: the adopt door judges it, and a resume
+    // never starts a second agent over it.
+    if (fs.existsSync(path.join(runDir, 'envelope.json'))) {
+      let judged;
       try {
-        const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
-        const latestCommandFile = commandFiles[commandFiles.length - 1];
-        if (latestCommandFile) {
-          const latestCommand = JSON.parse(fs.readFileSync(path.join(commandsDir, latestCommandFile), 'utf8'));
-          if (latestCommand?.contract === 'herdr-launch-command.v1') {
-            reconcileFn = reconcileHerdrSpawnRun;
-          }
-        }
-      } catch {}
-      const rec = await reconcileFn(runDir);
-      if (rec.settled && rec.runResult) {
-        return rec.runResult;
-      }
-      // C1a: a resumed Run whose reconcile did NOT come back settled has a
-      // dispatch attempt already on record -- launching a second worker over
-      // it is exactly the double-materialization this phase exists to close.
-      // Allow-listed by SAFETY, not by enumerating every status both
-      // adapters can return (that list already includes 'waiting', 'held',
-      // 'stale', 'observed', 'observed-stale', 'refused', and herdr's own
-      // 'failed' for a receipt-backed outcome whose outbox file could not be
-      // verified -- none of them mean "nothing was ever dispatched"). The
-      // ONLY state that legitimately means that is `parked` with reason
-      // `command-missing` (no commands/*.json ever got written, or none
-      // parsed) -- everything else falls through to a refusal below instead
-      // of silently becoming a fresh launch attempt.
-      const isCommandMissing = rec.status === 'parked' && rec.reason === 'command-missing';
-      if (!isCommandMissing) {
-        const confirmedLive = rec.status === 'waiting';
+        judged = adoptRun(runDir);
+      } catch (err) {
         throw new RunnerConfigError(
-          `executeAssignment: Run "${runId}" resume found an existing dispatch attempt in a non-settled state (status: "${rec.status}"${rec.reason ? `, reason: "${rec.reason}"` : ''}) -- refusing to launch a second worker over it`,
-          {
-            code: confirmedLive ? 'run-in-flight' : 'run-unreconciled',
-            phase: 'post-admission',
-            reconcileStatus: rec.status,
-            ...(rec.reason ? { reconcileReason: rec.reason } : {}),
-          },
+          `executeAssignment: Run "${runId}" resume could not ask the adopt door about its attempt (${err.message})`,
+          { code: 'run-unreconciled', phase: 'post-admission' },
         );
       }
+      const settledAttempt = readSettledResult(runDir, runId);
+      if (settledAttempt) return settledAttempt;
+      const live = judged.state === 'running' || judged.state === 'being-adopted' || judged.state === 'held';
+      throw new RunnerConfigError(
+        `executeAssignment: Run "${runId}" resume found its attempt in state "${judged.state}"${judged.reason ? ` (${judged.reason})` : ''} -- refusing to launch a second worker over it`,
+        { code: live ? 'run-in-flight' : 'run-unreconciled', phase: 'post-admission', reconcileStatus: judged.state, ...(judged.reason ? { reconcileReason: judged.reason } : {}) },
+      );
+    }
+    // A launch record that is not an envelope is a run from before the run supervisor: it is refused by
+    // name rather than relaunched.
+    if (fs.existsSync(path.join(runDir, 'controller', 'commands'))) {
+      throw new RunnerConfigError(
+        `executeAssignment: Run "${runId}" resume found a launch record from before the run supervisor -- refusing to launch a second worker over it`,
+        { code: 'run-unreconciled', phase: 'post-admission', reconcileReason: 'legacy-run' },
+      );
     }
   }
 
@@ -2115,26 +2050,21 @@ export async function executeAssignment(assignment, opts = {}) {
   // including a real herdr-spawn `invocations[]` executor -- misrouting it
   // into the cli-spawn supervisor, which then spawns against a herdr
   // launch-command file it cannot parse.
-  const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
-  // Both cli-spawn (via the local supervisor process, below) and herdr-spawn
-  // (via `executeExecutorCli`'s own confinement-authority door) are
-  // Assignment-owned recoverable dispatches: a resume must find the same
-  // launchCommandId/controlEpoch/controlToken identity a first attempt
-  // admitted, and a receipt must land under the same runDir. This is the
-  // ONE decision that determines that identity is built and threaded --
-  // never left to each adapter branch to remember independently (RT059-F2:
-  // the herdr-spawn branch used to skip this entirely and fall back to
-  // legacy behavior with no controller/protected tree and no receipt).
-  const needsAssignmentLaunchContext = (resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn') && !opts.legacySpawn;
+  // Both shapes run under the run supervisor: `direct` keeps the agent in a process tree the supervisor
+  // owns, `terminal` runs it in a pane of the terminal-control port. The controller prepares and hands
+  // over; it never settles, signals the agent or closes a pane.
+  const terminalMode = resolvedAdapter === 'herdr-spawn';
+  const supervised = resolvedAdapter === 'cli-spawn' || terminalMode;
+  // A supervised dispatch is an Assignment-owned recoverable one: a resume finds the same launchCommandId
+  // identity a first attempt admitted, and the receipt lands under the same runDir.
+  const needsAssignmentLaunchContext = supervised;
 
   let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-  let commandState = null;
-  let commandPath = null;
-  let supervisorReceipt = null;
   let assignmentLaunchContext = null;
 
-  // The per-cwd dispatch lock (cwd-lock.mjs) for a cli-spawn Assignment. A
-  // herdr-spawn Assignment already holds it through its own executeExecutorCli()
+  // The attempt lock and, for a writing agent, the per-cwd dispatch lease (cwd-lock.mjs) of a cli-spawn
+  // Assignment, taken before anything is prepared and handed to the supervisor. A
+  // herdr-spawn Assignment already holds the lease through its own executeExecutorCli()
   // call for the whole of that call; taking it here too would refuse that inner
   // acquire (two descriptions of one lock, even in one process, exclude each
   // other), so this is scoped to cli-spawn only. Both shapes and a direct
@@ -2146,7 +2076,13 @@ export async function executeAssignment(assignment, opts = {}) {
   // acquisition entirely. Gated on `effectiveMutation === 'mutating'`:
   // concurrent READ-ONLY dispatch to the SAME cwd is intentional, relied-upon
   // behavior (assignment-cwd-mutex-concurrency.test.mjs proves both).
-  let cwdLock = null;
+  let attemptLocks = null;
+  let attemptSettled = false;
+  // Set once the supervisor owns the attempt: from then on the run control token belongs to its settle
+  // step (side file) and this controller no longer releases it unless it saw the result.
+  let attemptHandedOver = false;
+  // Set once a terminal attempt has its pane; until the handover it is this controller's to give back.
+  let terminalPrep = null;
 
   // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
   // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
@@ -2190,8 +2126,22 @@ export async function executeAssignment(assignment, opts = {}) {
   }
 
   try {
-    if (useSupervisorRecovery && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true) {
-      cwdLock = acquireDispatchCwdLock(fgosDir, cwd);
+    // Everything that can still refuse the launch without side effects (the host binary, the settings
+    // the envelope carries) is resolved before the first lock, and outside any state transaction.
+    const attemptHost = supervised ? resolveAttemptHost() : null;
+    const attemptSettings = supervised ? readLaunchSettings(root) : null;
+    // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
+    // and was not before is reported on the result.
+    const strayWatch = supervised ? watchWritesOutsideWorkspace({ repoRoot: root, cwd: effectiveCwd }) : null;
+    const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
+    if (supervised) {
+      attemptLocks = acquireAttemptLocks({
+        fgosDir,
+        assignmentDir,
+        attemptStr,
+        cwd,
+        mutating: effectiveMutation === 'mutating' && opts.forceSharedCwd !== true,
+      });
     }
     if (needsAssignmentLaunchContext) {
       const depth = currentDispatchDepth();
@@ -2223,28 +2173,6 @@ export async function executeAssignment(assignment, opts = {}) {
       const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
       publishImmutableProof(baselinePath, baselineRecord);
 
-      // 2. Commit Command State V1 not-requested -> pending. For herdr-spawn
-      // this initial record is immediately superseded by the
-      // herdr-launch-command.v1 shape `prepareConfinementForLaunch` publishes
-      // to the same path (confinement/authority.mjs) -- harmless, since that
-      // publish already preserves any prior pending/reconciled state for
-      // this exact launchCommandId, and this write's only real job is
-      // admitting the identity before anything downstream can race it.
-      commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-      commandState = {
-        contract: 'assignment-command-state.v1',
-        runId,
-        launchCommandId,
-        controlEpoch,
-        controlTokenDigest: computeSha256Digest(controlToken),
-        state: 'pending',
-        envelopeDigest: null,
-        bindingDigest: null,
-        receiptDigest: null,
-        outcome: null,
-      };
-      publishMutableProjection(commandPath, commandState);
-
       // 3. Build Assignment Launch Context
       assignmentLaunchContext = {
         contract: 'assignment-cli-spawn-launch-context.v1',
@@ -2263,7 +2191,7 @@ export async function executeAssignment(assignment, opts = {}) {
       };
     }
 
-    if (useSupervisorRecovery) {
+    if (supervised) {
       // 4. Resolve executor command params
       let resolvedCmd;
       try {
@@ -2321,23 +2249,19 @@ export async function executeAssignment(assignment, opts = {}) {
         launchModelCheck = resolvedCmd.modelCheck;
         launchReasoningEffort = resolvedCmd.reasoningEffort;
       } catch (err) {
-        const commandOutcome = {
-          kind: 'submission-refused',
-          reason: 'launch-envelope-invalid',
-          failureDetail: { message: err.message, code: 'config-invalid', source: 'controller' },
-          failedAt: new Date().toISOString(),
-        };
-        commandOutcome.failureDigest = computeSha256Digest({
-          kind: commandOutcome.kind,
-          reason: commandOutcome.reason,
-          failureDetail: commandOutcome.failureDetail,
-          failedAt: commandOutcome.failedAt,
-        });
-        commandState.state = 'reconciled';
-        commandState.outcome = commandOutcome;
-        publishMutableProjection(commandPath, commandState);
         throw err;
       }
+
+      // The attempt's writer id is a pure function of its id, so a resume of the attempt sees the same one.
+      // `parentWriterId` is the controller's own, so a writer can be traced from the agent back to it.
+      const attemptWriterId = mintAttemptWriterId(launchCommandId, { bin: attemptHost.hostBin });
+      let parentWriterId = null;
+      try { parentWriterId = String(resolveWriterIdentity(fgosDir).id); } catch { /* no controller identity: the lineage stays empty */ }
+      const attemptIdentity = { writerId: attemptWriterId, parentWriterId };
+      const terminalSocket = terminalMode ? terminalSocketPath(launchCommandId) : null;
+      const attemptArgs = terminalMode
+        ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: path.resolve(runDir), writerId: attemptWriterId })
+        : resolvedCmd.args;
 
       // 5. Prepare Confinement For Launch via Confinement Authority
       let prepResult;
@@ -2350,7 +2274,7 @@ export async function executeAssignment(assignment, opts = {}) {
           assignmentLaunchContext,
           invocation: {
             command: resolvedCmd.command,
-            args: resolvedCmd.args,
+            args: attemptArgs,
             argsTemplate: resolvedCmd.argsTemplate,
             prompt,
             env: resolvedCmd.env,
@@ -2364,7 +2288,7 @@ export async function executeAssignment(assignment, opts = {}) {
             url: resolvedCmd.url,
             headers: resolvedCmd.headers,
             body: resolvedCmd.body,
-            resourceBindings: resolvedCmd.resourceBindings,
+            credentialStore: resolvedCmd.credentialStore,
           },
           providerCapacity: providerCapacityForLaunch,
           ...(opts.blind === true ? { blind: true } : {}),
@@ -2383,30 +2307,23 @@ export async function executeAssignment(assignment, opts = {}) {
             workId: resolvedExecutorId,
             tier: effectivePolicy.tier,
             model: effectivePolicy.model,
-            dispatchBatchKey: opts.dispatchBatchKey,
+            // The panes of one unit run share a tab: its attempts and rounds are one group.
+            dispatchBatchKey: opts.dispatchBatchKey
+              ?? effectiveAssignment.unitRunId
+              ?? effectiveAssignment.provenance?.unitRunId
+              ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
             controlToken,
             controlEpoch,
             launchCommandId,
           },
           requirement: confinementRequirement,
+          attemptId: launchCommandId,
+          launchMode: terminalMode ? 'terminal' : 'direct',
+          gateCommand: attemptGateCommand(attemptHost.hostBin, runDir, { goSocket: terminalSocket }),
+          attemptBinds: prepareAttemptFiles(runDir, launchCommandId),
         });
         prepResult = await prepareConfinementForLaunch(confReq, { adapterPort: opts.adapterPort });
       } catch (err) {
-        const commandOutcome = {
-          kind: 'submission-refused',
-          reason: err.code || 'confinement-refused',
-          failureDetail: { message: err.message, code: err.code || null, source: 'confinement-authority' },
-          failedAt: new Date().toISOString(),
-        };
-        commandOutcome.failureDigest = computeSha256Digest({
-          kind: commandOutcome.kind,
-          reason: commandOutcome.reason,
-          failureDetail: commandOutcome.failureDetail,
-          failedAt: commandOutcome.failedAt,
-        });
-        commandState.state = 'reconciled';
-        commandState.outcome = commandOutcome;
-        publishMutableProjection(commandPath, commandState);
         throw err;
       }
 
@@ -2441,138 +2358,175 @@ export async function executeAssignment(assignment, opts = {}) {
       });
       publishMutableProjection(effectiveContractPath, effectiveContract);
 
-      // 6. Guarded update of pending command with envelopeDigest
-      commandState.envelopeDigest = prepResult.envelope.digest;
-      publishMutableProjection(commandPath, commandState);
+      // A terminal attempt gets what only its controller can give before the supervisor exists: the brief
+      // on disk, the pane the port allocates for the attempt's key, the folder-trust entry.
+      if (terminalMode) {
+        const interactive = resolvedCmd.interactiveMode ?? {};
+        terminalPrep = await prepareTerminalAttempt({
+          attemptId: launchCommandId,
+          runId,
+          runDir,
+          cwd: effectiveCwd,
+          repoRoot: root,
+          prompt,
+          workId: resolvedExecutorId,
+          tier: effectivePolicy.tier,
+          model: effectivePolicy.model,
+          herdrBin: resolveHerdrBin(opts.herdrBin),
+          fullEnv: { ...workerBaseEnv(), ...resolveExecutorEnv(resolvedCmd.env) },
+          attemptEnv: prepResult.attempt.secretEnv,
+          confinement: resolvedCmd.confinement,
+          permissionMode: resolvedCmd.permissionMode,
+          agentKind: interactive.kind ?? path.basename(prepResult.attempt.command),
+          delivery: opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline',
+          trustStore: interactive.trustStore,
+          trustAccountSource: providerCapacityForLaunch?.status === 'selected'
+            ? (resolvedCmd.credentialStore ? credentialSourceForCli(providerCapacityForLaunch, resolvedCmd.credentialStore.use) : null) ?? null
+            : null,
+          dispatchBatchKey: opts.dispatchBatchKey
+            ?? effectiveAssignment.unitRunId
+            ?? effectiveAssignment.provenance?.unitRunId
+            ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
+          anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
+          terminalConfig: opts.terminalConfig,
+          // The persisted contract does not name the role; the brief a pane worker reads has to
+          // (an assessment role must be told its claim needs assessment.verdict).
+          effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } },
+        });
+      }
 
-      // 7. Submit supervisor
-      let supervisorProc;
+      // 6. The envelope, the secret side file and the context the settle step needs. The envelope is
+      // immutable from here on; nothing the controller still learns changes what the attempt runs.
+      const unitRunIdOf = effectiveAssignment.unitRunId
+        ?? effectiveAssignment.provenance?.unitRunId
+        ?? effectiveAssignment.assignmentId;
+      const attemptEnvelopeBody = buildEnvelope({
+        attemptId: launchCommandId,
+        unitRunId: unitRunIdOf,
+        runDir: path.resolve(runDir),
+        host: attemptHost,
+        cwd: prepResult.attempt.cwd,
+        mutating: effectiveMutation === 'mutating' && opts.forceSharedCwd !== true,
+        attempt: terminalMode ? { ...prepResult.attempt, env: withoutPaneEnv(prepResult.attempt.env) } : prepResult.attempt,
+        timeoutMs,
+        idleTimeoutMs: terminalMode ? (cfg.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS) : cfg.idleTimeoutMs,
+        maxOutputBytes: cfg.maxBuffer || 10485760,
+        cli: terminalMode && TERMINAL_CLIS.has(resolvedCmd.interactiveMode?.kind) ? resolvedCmd.interactiveMode.kind : commandCli(prepResult.attempt.command),
+        stepEnv: attemptStepEnv,
+        gateKillGraceMs: attemptSettings.gateKillGraceMs,
+        killWaitMs: attemptSettings.killWaitMs,
+        identity: attemptIdentity,
+        ...(terminalMode
+          ? {
+            terminal: {
+              socketPath: terminalSocket,
+              exitCommand: resolvedCmd.interactiveMode?.exitCommand ?? null,
+              orphanSettleMs: ORPHAN_SETTLE_MS,
+              retainFailedPaneMs: retainFailedPaneMsOf(root),
+              briefPath: terminalPrep.briefPath,
+              outboxDir: terminalPrep.outboxDir,
+              groupKey: terminalPrep.slot.groupKey,
+            },
+            extraSteps: ['cleanup-trust'],
+          }
+          : {}),
+        ...(process.platform === 'win32' && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true
+          ? { cwdLeaseFile: resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path }
+          : {}),
+      });
+      publishMutableProjection(path.join(path.resolve(runDir), 'assignment.json'), effectiveAssignment);
+      writeSettleContext(path.resolve(runDir), {
+        launchCommandId,
+        repoRoot: root,
+        strayWatch: { repoRoot: root, cwd: effectiveCwd, before: strayWatch.before },
+        resolvedExecutorId,
+        effectivePolicy,
+        executorRedirected,
+        reasoningEffort: launchReasoningEffort,
+        modelCheck: launchModelCheck ?? null,
+        providerCapacitySelection,
+        providerCapacityEvidence,
+        fallbackEvidence,
+        inputDigests,
+        providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir ?? null,
+      });
+      const attemptEnvelope = writeAttemptFiles({
+        runDir: path.resolve(runDir),
+        body: attemptEnvelopeBody,
+        // The side file is merged over the envelope's own environment, so the dispatcher's id the
+        // authority put in it must not win over the attempt's.
+        secretEnv: { ...(terminalMode ? withoutPaneEnv(prepResult.attempt.secretEnv) : prepResult.attempt.secretEnv), ...identityEnv(attemptIdentity) },
+        controlEpoch,
+        controlToken,
+      });
+
+      // 7. Hand the attempt to the supervisor and wait only for its binding (r6 9.4). Whatever the
+      // outcome, this process's copies of the locks close here: the supervisor holds its own.
+      let bound;
+      let supervisor;
       try {
-        supervisorProc = startDetachedRunSupervisorProcess({
-          envelopePath: prepResult.envelopePath,
-          detached: true,
+        supervisor = startSupervisor({ envelope: attemptEnvelope, locks: attemptLocks, stepEnv: attemptStepEnv, extraEnv: terminalPrep?.endpointEnv });
+        attemptHandedOver = true;
+        bound = await waitForBinding(path.resolve(runDir), supervisor.child);
+      } finally {
+        attemptLocks.release();
+        attemptLocks = null;
+      }
+      const attemptRunDir = path.resolve(runDir);
+      if (bound.state !== 'bound') {
+        // The supervisor may have finished the attempt (or refused it) in the same breath: adopt
+        // judges what is on disk. Without a settled answer the launch is unknown, never "not started".
+        if (bound.state === 'exited') {
+          try { adoptRun(attemptRunDir); } catch { /* adopt names its own failure */ }
+          const early = readSettledResult(attemptRunDir, runId);
+          if (early) {
+            attemptSettled = true;
+            return early;
+          }
+        }
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" supervisor did not bind the attempt (${bound.state}${bound.exit != null ? `, exit ${bound.exit}` : ''}) -- the launch is unknown; see supervisor.log in the run directory`,
+          { code: 'launch-unknown', phase: 'post-admission', launchState: bound.state },
+        );
+      }
+
+      // 8. From here the controller only reads: live output from the capture files, the answer from
+      // result.json that the settle step writes after the receipt.
+      // A terminal attempt writes no capture files; what a person watching this controller sees is the
+      // pane's screen, read only to show it (nothing here decides anything from it).
+      const stopScreen = terminalPrep ? followPaneScreen({ tc: terminalPrep.tc, key: terminalPrep.slot.key, onChunk: opts.onChunk }) : null;
+      let settledResult;
+      // From the binding until the answer is read, a Ctrl-C of this controller asks the supervisor to cancel.
+      registerDeliveredAttempt(attemptRunDir);
+      try {
+        settledResult = await awaitSettledResult({
+          runDir: attemptRunDir,
+          runId,
+          child: supervisor.child,
+          capture: attemptEnvelope.launch.capture,
           onChunk: opts.onChunk,
+          ceilingMs: timeoutMs + attemptSettings.gateKillGraceMs + 120_000,
         });
-      } catch (err) {
-        const commandOutcome = {
-          kind: 'submission-refused',
-          reason: 'supervisor-spawn-refused',
-          failureDetail: { message: err.message, code: 'supervisor-spawn-fail', source: 'supervisor-launch' },
-          failedAt: new Date().toISOString(),
-        };
-        commandOutcome.failureDigest = computeSha256Digest({
-          kind: commandOutcome.kind,
-          reason: commandOutcome.reason,
-          failureDetail: commandOutcome.failureDetail,
-          failedAt: commandOutcome.failedAt,
-        });
-        commandState.state = 'reconciled';
-        commandState.outcome = commandOutcome;
-        publishMutableProjection(commandPath, commandState);
-        throw err;
+      } finally {
+        unregisterDeliveredAttempt(attemptRunDir);
+        stopScreen?.();
       }
-      // The confined homes now belong to the supervisor running the worker, not to this controller.
-      bindConfinedHomesToSupervisor(bindingForPrepared([prepResult?.preparedConfinement]), supervisorProc);
-
-      // 8. Wait for receipt in live execution (event-driven with fs.watch + 20ms fallback)
-      const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
-      const receiptsDir = path.dirname(receiptPath);
-      let watcher = null;
-      let watcherTrigger = null;
-      try {
-        fs.mkdirSync(receiptsDir, { recursive: true });
-        watcher = fs.watch(receiptsDir, (eventType, filename) => {
-          if (!filename || filename === path.basename(receiptPath)) {
-            if (watcherTrigger) watcherTrigger();
-          }
-        });
-      } catch {}
-
-      const pollStart = Date.now();
-      const pollDeadline = pollStart + timeoutMs + 10000;
-      while (Date.now() < pollDeadline) {
-        if (fs.existsSync(receiptPath)) {
-          try {
-            supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
-            break;
-          } catch {}
+      if (!settledResult) {
+        // A fresher controller took the run control over while the agent ran: the settle step refused to append
+        // (it preserves its work product as result.superseded.json), and this controller says so by name.
+        if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+          throw new RunnerConfigError(
+            `executeAssignment: control of Run "${runId}" was superseded while its attempt ran -- no settlement was appended`,
+            { code: 'run-control-superseded', phase: 'post-admission' },
+          );
         }
-        if (supervisorProc.exitCode !== null) {
-          if (fs.existsSync(receiptPath)) {
-            try { supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8')); } catch {}
-          }
-          break;
-        }
-        await new Promise((r) => {
-          const timer = setTimeout(r, 20);
-          watcherTrigger = () => {
-            clearTimeout(timer);
-            r();
-          };
-        });
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" has no settled result after its supervisor ended -- the adopt door owns it now`,
+          { code: 'run-unreconciled', phase: 'post-admission' },
+        );
       }
-      if (watcher) {
-        try { watcher.close(); } catch {}
-        watcher = null;
-      }
-
-      // 9. Guarded update: command reconciled with receipt-backed outcome
-      if (supervisorReceipt) {
-        commandState.state = 'reconciled';
-        commandState.receiptDigest = supervisorReceipt.digest;
-        commandState.bindingDigest = supervisorReceipt.bindingDigest;
-        commandState.outcome = {
-          kind: 'receipt-backed',
-          receiptDigest: supervisorReceipt.digest,
-          adapterCompletion: supervisorReceipt.completion,
-        };
-        publishMutableProjection(commandPath, commandState);
-      } else {
-        commandState.state = 'reconciled';
-        commandState.outcome = {
-          kind: 'submission-refused',
-          reason: 'worker-state-unknown',
-          failureDetail: {
-            message: 'supervisor exited before adapter receipt was published',
-          },
-        };
-        publishMutableProjection(commandPath, commandState);
-        let runMeta = null;
-        const runJsonPath = path.join(runDir, 'run.json');
-        if (fs.existsSync(runJsonPath)) {
-          try { runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-        }
-        if (!runMeta) {
-          runMeta = {
-            contract: 'run-meta.v1',
-            runId,
-            assignmentId: effectiveAssignment.assignmentId,
-            workId: effectiveAssignment.workId,
-            attempt: admitted.attemptNum,
-            executorId,
-          };
-        }
-        const settledFailed = await settleFailedRunFromOutcome(runDir, runMeta, commandState, controlEpoch, controlToken, opts);
-        return settledFailed.runResult;
-      }
-
-      const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
-      const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
-      let stdoutText = '';
-      let stderrText = '';
-      try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
-      try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
-
-      const isTimeout = supervisorReceipt?.completion?.kind === 'timeout' || supervisorReceipt?.completion?.kind === 'idle-timeout';
-      const exitCode = supervisorReceipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
-      const signal = supervisorReceipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
-      rawResult = {
-        status: isTimeout ? 'timeout' : (exitCode === 0 ? 0 : 'failed'),
-        exitCode,
-        signal,
-        stdout: stdoutText,
-        stderr: stderrText,
-      };
+      attemptSettled = true;
+      return settledResult;
     } else {
       // Legacy/non-supervisor adapters retain the existing pre-spawn write
       // guarantee. cli-spawn writes later, immediately after Authority
@@ -2602,19 +2556,6 @@ export async function executeAssignment(assignment, opts = {}) {
           effectiveContract: effectiveContract
             ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
             : effectiveContract,
-          // needsAssignmentLaunchContext (herdr-spawn, and any other
-          // out-of-process adapter besides cli-spawn) reuses the SAME
-          // assignmentLaunchContext identity built above -- executeExecutorCli
-          // already accepts and threads these through buildConfinementRequest
-          // -> executeThroughConfinement -> confinement/authority.mjs, which
-          // resolves 'herdr-spawn' onto `herdrSpawnInteractiveAdapter`
-          // (transport.mjs) -> `runHerdrRound` (herdr-round.mjs), the real
-          // worker-command seam that publishes a receipt to
-          // runDir/protected/adapter-receipts/<launchCommandId>.json. A plain
-          // `opts.legacySpawn`/unrecognized-adapter caller never sets
-          // `needsAssignmentLaunchContext`, so `assignmentLaunchContext` stays
-          // null here and this call is byte-identical to before this fix.
-          ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
           ...(providerCapacityForLaunch ? { providerCapacity: providerCapacityForLaunch } : {}),
           // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
           // herdr door holds its own, so it is told the same thing or a panel's panelists collide.
@@ -2643,22 +2584,6 @@ export async function executeAssignment(assignment, opts = {}) {
           stderr: err.stderr || err.message || String(err),
           ...(limitOutcome ? { adapterOutcome: limitOutcome } : {}),
         };
-      }
-
-      // The herdr door prepares confinement inside executeExecutorCli, so the account provisioning it did
-      // is only visible in the prepared-invocation record it published, not in a return value here.
-      if (providerCapacityEvidence && providerCapacityEvidence.credentialProvisioned !== true && needsAssignmentLaunchContext && launchCommandId) {
-        try {
-          const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
-          if (record?.providerCapacity?.credentialProvisioned === true) {
-            providerCapacityEvidence = { ...providerCapacityEvidence, credentialProvisioned: true };
-            const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
-            fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
-            fsyncFileBestEffort(selectionPath);
-          }
-        } catch {
-          // No record, or an unreadable one: the evidence keeps saying "not provisioned", which is the safe claim.
-        }
       }
 
       // The adapter call above is the ONE async gap this control token has to
@@ -2712,8 +2637,7 @@ export async function executeAssignment(assignment, opts = {}) {
       providerCapacityEvidence,
       fallbackEvidence,
       executionError,
-      launchCommandId: useSupervisorRecovery ? launchCommandId : null,
-      receipt: supervisorReceipt,
+      launchCommandId: null,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
       // Which sandbox really ran: the herdr door's prepared launch or the dispatch's own attestation.
       attestation: rawResult?.attestation ?? null,
@@ -2723,15 +2647,15 @@ export async function executeAssignment(assignment, opts = {}) {
     });
     return outcome.runResult;
   } finally {
-    if (cwdLock) cwdLock.release();
-    if (useSupervisorRecovery && launchCommandId) {
-      try {
-        await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
-      } catch {}
-    }
-    if (providerCapacitySelection?.status === 'selected') {
+    // A supervised attempt that never produced its result is still the supervisor's (and, after it,
+    // the adopt door's): its run control token stays, the settle step uses it.
+    if (attemptLocks) attemptLocks.release();
+    if (terminalPrep && !attemptHandedOver) await terminalPrep.abandon();
+    // An agent the supervisor still owns keeps the account it was given; the lease is reclaimed through
+    // isSupervisedAttemptStillWorking once its attempt has really ended.
+    if (providerCapacitySelection?.status === 'selected' && (!attemptHandedOver || attemptSettled)) {
       releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
     }
-    releaseRunControl(runDir, { controlEpoch, controlToken });
+    if (!attemptHandedOver || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });
   }
 }

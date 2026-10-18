@@ -38,13 +38,14 @@ export const CUTOVER_RELEASE = '4.2';
 export const CUTOVER_OWNERS = ['4.2', '4.3', '4.4'];
 
 /**
- * The repo locks of the main checkout cutover, by registry name. The state
- * store locks (`state`, `porting-events`) carry the same owner but stay on
- * their old files until the event store decision, so they are not fenced here.
+ * The repo locks of the main checkout cutover, by registry name: the main
+ * door (`main-checkout`, `merge-slot`) and the two hot mutexes of the state
+ * store (`state` replaces `events.lock` and `runtime/claims.lock`,
+ * `porting-events` replaces `porting/events.lock`).
  */
 const MAIN_DOOR_RELEASE = '4.3';
 /** The repo locks of the main checkout cutover; `worktree-admin` is new and has no old path to fence. */
-export const MAIN_DOOR_LOCKS = ['main-checkout', 'merge-slot', 'worktree-admin'];
+export const MAIN_DOOR_LOCKS = ['main-checkout', 'merge-slot', 'state', 'porting-events', 'worktree-admin'];
 const MAIN_DOOR_FENCED = new Set(MAIN_DOOR_LOCKS);
 
 /** Whether a registry row is a lock a cutover moved onto a kernel lock. */
@@ -182,6 +183,7 @@ const STATE_ROOT_PREFIX = '<stateRoot>/';
 function v1PathsOf(lock, context) {
   const enumerate = ENUMERATED_V1_PATHS[lock.name];
   if (enumerate) return enumerate(context);
+  if (Array.isArray(lock.v1Path)) return lock.v1Path.flatMap((v1Path) => v1PathsOf({ ...lock, v1Path }, context));
   if (typeof lock.v1Path === 'string' && lock.v1Path.startsWith(STATE_ROOT_PREFIX) && !lock.v1Path.slice(STATE_ROOT_PREFIX.length).includes('<')) {
     return [path.join(context.stateRoot(), ...lock.v1Path.slice(STATE_ROOT_PREFIX.length).split('/'))];
   }
@@ -211,7 +213,7 @@ export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defa
   const targets = [];
   for (const lock of readRegistry().locks) {
     if (!owners.includes(lock.owner) || !isCutOverLock(lock) || !lock.fence || lock.fence === 'none') continue;
-    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p });
+    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p, ...(lock.name === 'activation' && p === path.join(context.fgosDir, 'locks/activation.lock') ? { managedBy: 'fgctl' } : {}) });
   }
   return targets;
 }
@@ -360,18 +362,24 @@ function stateOf(target) {
 
 /**
  * Whether each old path of this workspace already carries its fence.
- * Returns `{targets, missing, v1Present, complete}`; `targets` carry a
- * `state` and a `fenced` flag per path. A path at state `v1-present` is an
- * old lock that is still there and blocks placement.
+ * Returns `{targets, missing, v1Present, complete, controllerMissing}`;
+ * `targets` lists every path, each with a `state` and a `fenced` flag.
+ * `missing`, `v1Present` and `complete` cover the fences this module places;
+ * a path marked `managedBy: 'fgctl'` is placed only by fgctl inside its
+ * activation, so it is reported in `targets` and, while unfenced, in
+ * `controllerMissing`, never in `missing`. A path at state `v1-present` is
+ * an old lock that is still there and blocks placement.
  */
 export function fenceStatus(options = {}) {
   const targets = fenceTargets(options).map((target) => {
     const state = stateOf(target);
     return { ...target, state, fenced: state === 'fenced' };
   });
-  const missing = targets.filter((target) => !target.fenced).map((target) => target.path);
-  const v1Present = targets.filter((target) => target.state === 'v1-present').map((target) => target.path);
-  return { targets, missing, v1Present, complete: missing.length === 0 };
+  const placedHere = targets.filter((target) => target.managedBy !== 'fgctl');
+  const missing = placedHere.filter((target) => !target.fenced).map((target) => target.path);
+  const v1Present = placedHere.filter((target) => target.state === 'v1-present').map((target) => target.path);
+  const controllerMissing = targets.filter((target) => target.managedBy === 'fgctl' && !target.fenced).map((target) => target.path);
+  return { targets, missing, v1Present, complete: missing.length === 0, controllerMissing };
 }
 
 /**
@@ -391,6 +399,8 @@ export function placeFences({ now = new Date().toISOString(), ...options } = {})
   const placed = [];
   const skipped = [];
   for (const target of status.targets) {
+    // Only fgctl may replace the old kernel file while holding both descriptions.
+    if (target.managedBy === 'fgctl') continue;
     let outcome;
     try {
       outcome = target.fence === 'blocking-generation' ? publishBlockingGeneration(target, now) : placeTombstone(target, now);

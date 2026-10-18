@@ -54,7 +54,7 @@ Two canonical shapes are valid:
 
 Each capability may declare a `serves` attribute set — the machine-readable promise of what demand profile it fulfills (see [`capability-matching.md`](./capability-matching.md)). Attributes include:
 - `outputKind`: `change`, `verification`, `finding`, or `decision`.
-- `domain`: `code`, or omitted for domain-neutral work.
+- `domain`: `code` or `docs`, or omitted for domain-neutral work.
 - `mutates`: boolean (`true` or `false`).
 - `behaviorPreserving`: optional boolean for structural refactoring.
 
@@ -65,6 +65,7 @@ Each capability may declare a `serves` attribute set — the machine-readable pr
 | `advise` | generic | decision, mutates: false | Async product-decision consult — value comes from disagreement, never changes state, one question/one answer. | agent executor |
 | `execute` | generic | change, mutates: true | Compliance-driven work — value comes from following a plan, changes files, must pass verify. | agent executor |
 | `review` | generic | finding, mutates: false | Independent read-only review of non-code artifacts (docs, design, spec, config) before merge/decision. | agent executor |
+| `docs:write` | domain-scoped | change, domain: docs, mutates: true | Documentation authoring — write or update documents (README, specs, guides). | agent executor |
 | `code:implement` | domain-scoped | change, domain: code, mutates: true | Coding implementation — write/change source to satisfy a spec. | agent executor |
 | `code:review` | domain-scoped | finding, domain: code, mutates: false | Independent review of a coding implementation unit before merge. | agent executor |
 | `code:test` | domain-scoped | verification, domain: code | Author or run tests for a coding implementation unit. | agent executor |

@@ -98,8 +98,13 @@ export function currentDispatchDepth() {
  * whenever that guard is inherited; an inherited `OMP_PROFILE`/`PI_PROFILE` makes a child `omp`
  * ignore its own `PI_CODING_AGENT_DIR` (private home), and `OMPCODE=1` disables `herdr-omp-agent-state`.
  *
+ * No session id crosses either: `FGOS_SESSION_ID`, `CLAUDE_CODE_SESSION_ID` and `CODEX_THREAD_ID` name
+ * the caller, and a worker that inherited one would write as its parent. The worker's own writer id is
+ * minted from its attempt id (`mintAttemptWriterId`) and set by whoever launches it.
+ *
  * Lock authority never crosses this boundary: `FGOS_LOCK_FD` (a borrowed description's slot, useless
- * without the description and wrong if believed) and `FGOS_MAIN_LOCK_HOLDER_PID` are dropped. The
+ * without the description and wrong if believed), `FGOS_LOCK_JOB` (a borrow job's name, only meaningful
+ * inside that job) and `FGOS_MAIN_LOCK_HOLDER_PID` are dropped. The
  * state root is pinned to this process's own resolved root (`FGOS_STATE_ROOT`), so a worker with a
  * sandbox HOME still shares the machine-scope locks of its parent instead of moving them; when no
  * host can resolve that root the pin is left out rather than failing the spawn.
@@ -112,8 +117,12 @@ export function workerBaseEnv(baseEnv = process.env) {
     PI_PROFILE: _piProfile,
     PI_CONFIG_FILES: _piConfigFiles,
     FGOS_LOCK_FD: _lockFd,
+    FGOS_LOCK_JOB: _lockJob,
     FGOS_MAIN_LOCK_HOLDER_PID: _mainLockHolderPid,
     FGOS_STATE_ROOT: _inheritedStateRoot,
+    FGOS_SESSION_ID: _sessionId,
+    CLAUDE_CODE_SESSION_ID: _claudeSessionId,
+    CODEX_THREAD_ID: _codexThreadId,
     ...rest
   } = baseEnv;
   let stateRoot;

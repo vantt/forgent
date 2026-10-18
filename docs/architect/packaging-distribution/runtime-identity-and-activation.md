@@ -474,9 +474,8 @@ workspace binding, never a half-prepared runtime.
 rolling back, or quarantining release content. It must also hold the workspace
 activation lock (kernel lock `.fgos/locks/activation.lock`) before writing that
 workspace's `activation.json`. Both are kernel locks without TTL or stale
-reclaim: a killed holder frees the lock at once. On Windows, `fgctl init`,
-`upgrade` and `repair` refuse with `lock-driver-unavailable` until the Windows
-lock driver exists. Projection writes are not part of the activation publish;
+reclaim: a killed holder frees the lock at once. On Windows the same
+locks work through the Windows lock driver (`LockFileEx`). Projection writes are not part of the activation publish;
 they belong to local `fgos init` / `fgos doctor --fix` under projection locks
 defined by workspace topology.
 

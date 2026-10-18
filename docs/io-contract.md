@@ -33,6 +33,8 @@ Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình g�
   giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/session-identity/spec.md);
   nguồn duy nhất là crate Rust `fgos-session-identity`.
 
+**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att-<attemptId>`, tính xác định từ attempt id (một resume ra đúng id cũ). Id được đặt vào `FGOS_SESSION_ID` của agent ở cả hai cách khởi động (headless và pane); biến `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` và `FGOS_PARENT_WRITER_ID` của cha bị gỡ trước khi agent chạy, và `FGOS_PARENT_WRITER_ID` được đặt lại bằng writer id của controller để lần theo dòng dõi (agent này do lần chạy nào sinh ra). Với `source` thì id đi theo luật env thường (`env` hoặc `registry`). Giới hạn đã biết: lệnh do codex chạy dưới daemon dùng chung chỉ thấy id của attempt khi codex được khởi động có tuỳ chọn `shell_environment_policy.set` (adapter pane tự thêm); nếu không, lệnh đó ghi dưới `CODEX_THREAD_ID`. Chi tiết: [spec Session Identity §5a và giới hạn](platform/session-identity/spec.md), cách đặt: [spec Run Supervisor](platform/run-supervisor/spec.md).
+
 **Đây là quy thuộc, không phải xác thực** (D1): CLI local không xác thực
 được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/`
 được. Cổng này mua về dấu vết audit + chống nhầm giữa các phiên, không mua
@@ -91,6 +93,8 @@ Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông �
 
 **Kết cục thực thi (`fgos run` và `fgos workflow start|resume|answer --foreground`, RUL99):**
 Khi lệnh chạy kết thúc với một outcome không phải `pass`, tiến trình CLI trả mã lỗi tương ứng theo bảng mã kết cục thực thi (`policy-refusal`: 4, `provider-limit`: 10, `execution-failure`: 11, `partial-writes`: 12, `blocked`: 13, `findings`: 14), trong khi toàn bộ luồng stdout JSON envelope `fgos.v1` vẫn được giữ nguyên vẹn 100%. Các lệnh chỉ-đọc như `fgos workflow status` luôn trả mã thoát 0 bất kể outcome của workflow run. Lệnh `fgos workflow start` chạy detached trả exit code 0 khi tiến trình daemon được kích hoạt thành công.
+**Tín hiệu (`fgos run`, 2026-10-18):** khi người bấm Ctrl-C (SIGINT) hoặc tiến trình nhận SIGTERM, controller của `fgos run` gửi `cancel` cho các attempt nó đã giao, chờ biên nhận tối đa `dispatch.cancelWaitMs`, in dòng `unit <id> chờ resume: fgos run --resume <id>` ra stderr rồi thoát **130** (SIGINT) hoặc **143** (SIGTERM); tín hiệu lần hai thoát ngay với cùng mã. Hai mã này nằm ngoài các bảng trên (không phải kết cục thực thi): chúng là quy ước shell `128 + số tín hiệu`, không phải `EXIT_CODES` hay `OUTCOME_EXIT_CODES`. Unit dừng ở `awaiting-resume`; chỉ `fgos run --resume <unit>` đi tiếp ([run-supervisor spec §9.1](platform/run-supervisor/spec.md#91-controller-death)).
+
 ### Ngoại lệ có lý do
 
 Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung

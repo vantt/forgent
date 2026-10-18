@@ -78,6 +78,10 @@ const CALLBACK_METHODS = 'forEach|map|flatMap|filter|some|every|find|findLast|re
 // entry is an existing direct reader with a reason it is not a competing tree
 // walker.
 const ALLOWED = new Map([
+  // The legacy sweep judges one already-resolved run directory: it lists the
+  // record files inside that run (control generations, supervisor bindings,
+  // controller commands, confinement finalization), never the assignments tree.
+  ['src/run-supervisor/legacy-sweep.mjs: listJson: readdirSync(dir)', { count: 1, reason: 'one resolved run directory: its own record files' }],
   // Unit semantics (latest round, fallback seat, outcome mapping) belong to
   // the unit owner. It walks one known unit directory's seats and rounds, not
   // the assignments tree, and its nested shape is the layout's own shape.
@@ -102,9 +106,8 @@ const ALLOWED = new Map([
   // Run-attempt admission and command queues of one already-resolved
   // assignment or run directory; never discovery across assignments.
   ['src/runner/dispatch/assignment-runner.mjs: admitRunAttempt: readdirSync(runsDir)', { count: 2, reason: 'attempt numbering and abandoned-staging cleanup of one resolved assignment' }],
-  ['src/runner/dispatch/assignment-runner.mjs: executeAssignment: readdirSync(commandsDir)', { count: 1, reason: 'command queue of one resolved run' }],
-  ['src/runner/dispatch/assignment-runner.mjs: isCliSpawnRunStillWorking: readdirSync(commandsDir)', { count: 1, reason: 'command queue of one resolved run' }],
-  ['src/runner/dispatch/herdr-reconcile.mjs: reconcileHerdrSpawnRun: readdirSync(od)', { count: 1, reason: 'worker outbox of one resolved run' }],
+  ['src/run-supervisor/client.mjs: walk: readdirSync(dir)', { count: 1, reason: 'the adopt scan walks the assignments root it was handed and recurses through every level, collecting the attempt directories that are not closed' }],
+  ['src/run-supervisor/client.mjs: walk: readdirSync(child)', { count: 1, reason: 'attempt directories of one resolved runs directory found by that same walk' }],
   ['src/runner/dispatch/runtime-inspection.mjs: admissions: readdirSync(genDir)', { count: 1, reason: 'generation records of one resolved run' }],
   ['src/runner/dispatch/runtime-inspection.mjs: derivePhase: readdirSync(commandsDir)', { count: 1, reason: 'command queue of one resolved run' }],
   // Maintainer script: replays a coordination measurement corpus in a scratch

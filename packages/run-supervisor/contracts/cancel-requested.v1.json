@@ -1,0 +1,16 @@
+{
+  "contract": { "id": "run-supervisor-cancel-requested", "version": 1 },
+  "description": "<attemptDir>/cancel-requested.json. Published once by anyone allowed to cancel the attempt (Ctrl-C in the controller, recover). The supervisor polls for it and reads only attemptId; it then publishes stop-requested {cause: cancel} and SIGTERMs the gate. `by` and `requester` say who asked and are for the unit-state view and the audit trail, never for the supervisor's decision.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "requestedBy": "required, string, free text label for a person reading the file (e.g. controller pid or user)",
+    "by": {"note": "required; `recover` is reserved for a recover action that cancels a live attempt; no such action exists yet",  "enum": ["signal:SIGINT", "signal:SIGTERM", "recover"] },
+    "requester": "processTuple (supervisor-binding.v1.json) of the process that wrote the file",
+    "at": "string, ISO-8601 UTC, when the request was made"
+  },
+  "exitCodes": {
+    "signal:SIGINT": 130,
+    "signal:SIGTERM": 143
+  }
+}

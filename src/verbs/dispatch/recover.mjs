@@ -26,6 +26,7 @@ import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, b
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';
+import { adoptRun } from '../../run-supervisor/client.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {
@@ -93,8 +94,42 @@ function toRunLockExpectedEpoch(epoch) {
  * would make the hash sensitive to where the same logical run happens to
  * live on disk (the same reason `settledSignal` stores a path relative to
  * `runDir`, not `resultPath` itself). */
-function buildSnapshot(runDir) {
+function readEnvelopeAttemptId(runDir) {
+  try {
+    const envelope = JSON.parse(fs.readFileSync(path.join(runDir, 'envelope.json'), 'utf8'));
+    return typeof envelope.attemptId === 'string' ? envelope.attemptId : null;
+  } catch { return null; }
+}
+
+/** What the run supervisor's read-only adopt probe says about this attempt directory. A host that cannot
+ * judge reads as `unprobed`, which no action keys on: the door then behaves as it did before the probe. */
+function probeAttempt(runDir) {
+  try {
+    const verdict = adoptRun(runDir, { probeOnly: true });
+    return { state: verdict.state, attemptId: readEnvelopeAttemptId(runDir) };
+  } catch {
+    return { state: 'unprobed', attemptId: null };
+  }
+}
+
+const ATTEMPT_CONTRACT_FILES = ['receipt.json', 'gate-exit.json', 'closed.json'];
+
+/** The contract files the supervisor left in the attempt directory, named as evidence. */
+function listAttemptFiles(runDir) {
+  const names = ATTEMPT_CONTRACT_FILES.filter((name) => fs.existsSync(path.join(runDir, name)));
+  try {
+    for (const step of fs.readdirSync(path.join(runDir, 'steps')).sort()) names.push(`steps/${step}`);
+  } catch { /* no steps directory yet */ }
+  return names;
+}
+
+function buildSnapshot(runDir, ctx) {
   const { run, visibility, outbox, controller = [], visibilityError = null } = readRunSnapshot(runDir);
+  const attempt = probeAttempt(runDir);
+  // Whoever settles a legacy run supplies the proof that every process it recorded is dead; without a
+  // judge the door has no such proof and asks for it.
+  const legacyHolders = attempt.state === 'legacy-run' && typeof ctx?.judgeLegacyHolders === 'function'
+    ? ctx.judgeLegacyHolders(runDir) : null;
   const controlEpoch = readRealControlEpoch(runDir);
   const settled = classifyRunOutcome(runDir, { liveness: 'unknown' });
   return {
@@ -104,6 +139,9 @@ function buildSnapshot(runDir) {
     controller,
     visibilityError,
     controlEpoch,
+    attempt,
+    attemptFiles: listAttemptFiles(runDir),
+    legacyHolders,
     settledSignal: { outcome: settled.outcome, resultPath: settled.resultPath ? path.relative(runDir, settled.resultPath) : null },
   };
 }
@@ -118,7 +156,7 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
   requireRunId(runId);
   const runDir = resolveRunDir(ctx, runId);
   const nowFn = typeof now === 'function' ? now : now ? () => now : undefined;
-  const snapshot = buildSnapshot(runDir);
+  const snapshot = buildSnapshot(runDir, ctx);
   const evidence = collectEvidence(snapshot, nowFn ? { now: nowFn } : {});
   let recommendation;
   try {
@@ -216,6 +254,48 @@ function clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, action) {
   }
 }
 
+function recordApplied(runDir, params, nowIso, extra = {}) {
+  const record = {
+    actionKey: params.actionKey,
+    action: params.action,
+    appliedAt: nowIso,
+    controlEpochBefore: params.expectedControlEpoch,
+    controlEpochAfter: params.expectedControlEpoch,
+    snapshotHash: params.expectedSnapshot,
+    ...extra,
+  };
+  appendRecoveryCommand(runDir, record);
+  return record;
+}
+
+// `adopt` settles the attempt through the run supervisor's adopt door: it takes the attempt lock, writes the
+// receipt, runs the steps after it and publishes closed.json. It never starts an agent or a second
+// supervisor, and the control epoch is not touched (no driver is being replaced).
+function applyAdopt(runId, runDir, params, nowIso) {
+  const verdict = adoptRun(runDir);
+  if (verdict.state !== 'adopted' && verdict.state !== 'closed') {
+    return {
+      runId,
+      runDir,
+      outcome: verdict.state === 'open' ? 'adopt-incomplete' : 'held',
+      reason: `adopt left the attempt ${verdict.state}${verdict.pendingStep ? ` (step ${verdict.pendingStep} is not done)` : ''}${verdict.reason ? `: ${verdict.reason}` : ''}`,
+    };
+  }
+  const record = recordApplied(runDir, params, nowIso, { adoptState: verdict.state, ...(verdict.outcome ? { adoptOutcome: verdict.outcome } : {}) });
+  return { runId, runDir, outcome: 'applied', ...record };
+}
+
+// `abandon-legacy` settles a run from before the run supervisor that was left `running`: the legality check
+// already required proof that every process it recorded is dead.
+function applyAbandonLegacy(runId, runDir, params, nowIso) {
+  writeRunJsonPatch(runDir, { status: 'died', settlement: 'abandoned-legacy', settledAt: nowIso });
+  const record = recordApplied(runDir, params, nowIso);
+  return { runId, runDir, outcome: 'applied', ...record };
+}
+
+// Actions that finish or settle a run: never over a run a CoordinationSession owns.
+const SESSION_REFUSED_ACTIONS = ['resume-driver', 'adopt', 'abandon-legacy'];
+
 const REQUIRED_APPLY_FIELDS = ['action', 'expectedSnapshot', 'expectedControlEpoch', 'expectedExpiresAt', 'actionKey'];
 
 function isMissing(value) {
@@ -258,12 +338,12 @@ export function recoverApplyUseCase(ctx, params = {}) {
   // and get out of the way, is the opposite of that -- the same refusal
   // `planClearAssignmentClaim` already applies for the narrower guard-repair
   // action this action's own claim-clear now routes through below.
-  if (params.action?.type === 'resume-driver' && assignmentId) {
+  if (SESSION_REFUSED_ACTIONS.includes(params.action?.type) && assignmentId) {
     const sessionOwner = findCoordinationSessionOwningAssignment(repoRoot, assignmentId);
     if (sessionOwner) {
       throw new RecoveryError(
         'session-owned',
-        `run "${runId}" (assignment "${assignmentId}") is owned by CoordinationSession "${sessionOwner.id}" -- resume-driver recovery belongs to that session's own recovery door (${sessionOwner.observeCommand}), not dispatch recover`,
+        `run "${runId}" (assignment "${assignmentId}") is owned by CoordinationSession "${sessionOwner.id}" -- ${params.action.type} recovery belongs to that session's own recovery door (${sessionOwner.observeCommand}), not dispatch recover`,
         { runId, assignmentId, sessionId: sessionOwner.id },
       );
     }
@@ -276,7 +356,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
       return { runId, runDir, outcome: 'already-applied', ...already };
     }
 
-    const snapshot = buildSnapshot(runDir);
+    const snapshot = buildSnapshot(runDir, ctx);
     const evidence = collectEvidence(snapshot, { now: nowIso });
     const check = checkApply({
       snapshot,
@@ -291,6 +371,9 @@ export function recoverApplyUseCase(ctx, params = {}) {
     if (check.outcome !== 'ok') {
       return { runId, runDir, outcome: check.outcome, reason: check.reason };
     }
+
+    if (params.action?.type === 'adopt') return applyAdopt(runId, runDir, params, nowIso);
+    if (params.action?.type === 'abandon-legacy') return applyAbandonLegacy(runId, runDir, params, nowIso);
 
     // H1: the actual control-epoch mutation goes through run-lock's own
     // real CAS primitive -- the same generation ledger a live controller's

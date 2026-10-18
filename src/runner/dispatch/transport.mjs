@@ -47,11 +47,10 @@ import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
+import { credentialStoreOf } from './provider-capacity.mjs';
 import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
-import { runHerdrRound } from './herdr-round.mjs';
+import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
-import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
-import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import {
   DEFAULT_ADAPTER,
@@ -84,9 +83,7 @@ export {
   resolveExecutorEnv,
 };
 
-export function resolveHerdrBin(optsHerdrBin) {
-  return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
-}
+export { resolveHerdrBin };
 
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
@@ -272,7 +269,8 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     url: executor.url,
     headers: executor.headers,
     body: executor.body,
-    resourceBindings: executor.resourceBindings,
+    // The login store this launch reads, declared or inferred from an older config; null when it reads none.
+    credentialStore: credentialStoreOf(executor),
     // What the effort flag rendered to, when one was requested.
     ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
     // The pre-spawn half of the model check; collectModelWarnings adds what
@@ -362,170 +360,15 @@ function killChildTree(child, signal) {
 }
 
 /**
- * Bind a cli-spawn round's confined homes to the detached run supervisor that runs its worker, so the
- * orphan reaper keeps them while the supervisor lives even after this controller is gone. The supervisor
- * is already running when its pid exists, so a binding that cannot be written leaves the home as prepare
- * wrote it (bound to this controller), reported by a fixed code; it never stops the run.
+ * The short-call cli-spawn adapter: it starts the agent as a child of the caller and returns when the
+ * child has exited. It serves the callers whose agent lives and dies with the calling process (an account
+ * probe, a panel judge, a goal check, `executeExecutorCli`). An attempt of a unit that must survive its
+ * controller never comes here: it runs through `fgos internal supervise`
+ * (src/run-supervisor/direct-launch.mjs), whose supervisor owns the agent's process tree.
  */
-export function bindConfinedHomesToSupervisor(binding, supervisorProc) {
-  if (!binding || !Number.isInteger(supervisorProc?.pid)) return false;
-  try {
-    binding.bind({ binderPid: supervisorProc.pid });
-    return true;
-  } catch {
-    process.stderr.write('fgos: confined home not bound to its run supervisor (confinement-bind-failed)\n');
-    return false;
-  }
-}
-
 export function cliSpawnAdapter(invocation, opts) {
   const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
-
-  if (opts.envelopePath) {
-    const launchCommandId = opts.launchCommandId || path.basename(opts.envelopePath, '.json');
-    const runDir = opts.runDir || path.dirname(path.dirname(path.dirname(opts.envelopePath)));
-    const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
-
-    return new Promise((resolve, reject) => {
-      let supervisorProc = null;
-      try {
-        supervisorProc = startDetachedRunSupervisorProcess({
-          envelopePath: opts.envelopePath,
-          detached: true,
-          onChunk: opts.onChunk,
-        });
-      } catch (err) {
-        return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": ${err.message}`, {
-          workId,
-          tier,
-          model,
-          cause: err.message,
-        }));
-      }
-      bindConfinedHomesToSupervisor(opts.confinementBinding, supervisorProc);
-
-      let settled = false;
-      let pollInterval = null;
-      let watcher = null;
-
-      const cleanupWatcher = () => {
-        if (watcher) {
-          try { watcher.close(); } catch {}
-          watcher = null;
-        }
-      };
-
-      function finishWithReceipt() {
-        if (settled) return;
-        if (!fs.existsSync(receiptPath)) return;
-        settled = true;
-        if (pollInterval) clearInterval(pollInterval);
-        cleanupWatcher();
-
-        let receipt;
-        try {
-          receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
-        } catch (err) {
-          return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": failed to parse receipt: ${err.message}`, {
-            workId,
-            tier,
-            model,
-          }));
-        }
-
-        const stdoutPath = path.join(runDir, receipt.output.stdoutPath);
-        const stderrPath = path.join(runDir, receipt.output.stderrPath);
-        let stdout = '';
-        let stderr = '';
-        try { stdout = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
-        try { stderr = fs.readFileSync(stderrPath, 'utf8'); } catch {}
-
-        const kind = receipt.completion?.kind;
-        if (kind === 'timeout' || kind === 'idle-timeout') {
-          return reject(new DispatchError(
-            'worker-timeout',
-            kind === 'idle-timeout'
-              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
-              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-            { workId, tier, model, stdout, stderr, receipt },
-          ));
-        }
-
-        if (kind === 'max-buffer') {
-          return reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr, receipt },
-          ));
-        }
-
-        if (kind === 'spawn-failed') {
-          return reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor failed to start for work "${workId}": ${receipt.completion?.cause || 'spawn failed'}`,
-            { workId, tier, model, cause: receipt.completion?.cause, stdout, stderr, receipt },
-          ));
-        }
-
-        return resolve({
-          status: receipt.completion?.exitCode ?? 0,
-          exitCode: receipt.completion?.exitCode ?? 0,
-          signal: receipt.completion?.signal ?? null,
-          stdout,
-          stderr,
-          tier,
-          model,
-          receipt,
-        });
-      }
-
-      // Event-driven receipt detection: watch the receipts directory for immediate resolution
-      const receiptsDir = path.dirname(receiptPath);
-      try {
-        fs.mkdirSync(receiptsDir, { recursive: true });
-        watcher = fs.watch(receiptsDir, (eventType, filename) => {
-          if (!filename || filename === path.basename(receiptPath)) {
-            if (fs.existsSync(receiptPath)) {
-              finishWithReceipt();
-            }
-          }
-        });
-      } catch {}
-
-      // Fast fallback poll interval (20ms) ensures p95 latency is bounded tightly <= 100ms
-      pollInterval = setInterval(() => {
-        if (fs.existsSync(receiptPath)) {
-          finishWithReceipt();
-        }
-      }, 20);
-
-      if (supervisorProc) {
-        supervisorProc.on('close', () => {
-          if (fs.existsSync(receiptPath)) {
-            finishWithReceipt();
-            return;
-          }
-          setTimeout(() => {
-            if (!settled) {
-              if (fs.existsSync(receiptPath)) {
-                finishWithReceipt();
-              } else {
-                settled = true;
-                if (pollInterval) clearInterval(pollInterval);
-                cleanupWatcher();
-                reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": supervisor exited without receipt`, {
-                  workId,
-                  tier,
-                  model,
-                }));
-              }
-            }
-          }, 20);
-        });
-      }
-    });
-  }
 
   const depth = currentDispatchDepth();
   if (depth >= MAX_DISPATCH_DEPTH) {
@@ -550,7 +393,7 @@ export function cliSpawnAdapter(invocation, opts) {
       shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: true,
-      env: { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1), FGOS_SESSION_ID: resolveWriterIdentity(opts.fgosDir).id },
+      env: { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
     });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
@@ -786,154 +629,13 @@ async function httpAdapter(invocation, opts) {
 }
 
 /**
- * The `herdr-spawn` executor adapter: run the worker as a real interactive
- * agent in a pane a person can watch, and conclude nothing about the work
- * from anything except a file the worker itself wrote.
- *
- * Three things this adapter refuses to do, each because doing it failed in
- * production:
- *
- * 1. It never types the prompt as a shell command. The old path quoted the
- *    prompt into an argv string and let `herdr pane run` type it as
- *    keystrokes, which corrupts every multi-line prompt there is -- and a
- *    real implementation prompt is always multi-line. The prompt goes to
- *    disk; one line pointing at it goes through the terminal.
- *
- * 2. It never treats `agent_status` as completion. That reading was wrong
- *    twice in measured production: `idle` before the agent had started at
- *    all, and an `idle`-looking dip between two tool calls of one turn.
- *    Completion is `outbox/result-<round>.json` existing, nothing else.
- *
- * 3. It never closes the pane on failure. A failed dispatch's pane is the
- *    only place the reason is still legible, so it stays open and the error
- *    carries its id.
- *
- * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a
- * reused one. Delivering a dispatch into a finished worker's pane sends it
- * as chat to an idle REPL.
- *
- * Startup goes through `herdr agent start`, which returns only once herdr
- * has confirmed a ready agent in the pane -- that is what absorbs the shell
- * boot race the old path had to poll around, and it fails by name
- * (`agent_not_ready`) instead of hanging.
+ * The `herdr-spawn` executor adapter is registered so the executor config, the planner and the
+ * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact
+ * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a
+ * `terminal` attempt of the run supervisor (`executeAssignment`, which prepares the brief, the pane
+ * and the folder-trust entry and hands the attempt over; docs/specs/runner.md). A caller that reaches
+ * this function directly has no attempt to hand over and is refused by name.
  */
-function herdrSpawnInteractiveAdapter(invocation, opts) {
-  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;
-  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;
-  const {
-    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,
-    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,
-    // An automated sweep may close the panes of failed rounds. It never
-    // closes one paused on a provider limit -- that screen is the only place
-    // the reset time is written.
-    closeAlways = false,
-    // A pane already sitting in the caller's own tab (one lead's coding panel
-    // or fanout batch), so this round's fresh pane lands beside it instead of
-    // wherever the operator happens to be focused. Absent for a standalone
-    // dispatch -- today's implicit-focus behaviour is unchanged.
-    //
-    // Deliberately NOT threaded through `cli.mjs`/`assignment-runner.mjs`:
-    // "pane" is herdr's own vocabulary, and neither of those is herdr-aware
-    // (`executeExecutorCli` serves cli-spawn/http too). Read directly off
-    // this adapter's own `opts` instead -- a direct caller of this adapter
-    // (or a test) may still pass one explicitly, but the only real caller
-    // today is the env-var default: a cross-process caller (fanout's
-    // independently-launched children) sets FGOS_HERDR_ANCHOR_PANE in its
-    // own env, the same door FGOS_HERDR_BIN already uses for a herdr-only
-    // knob neither of those two files carries either. The in-process case
-    // (one coordination round's own actors) uses `dispatchBatchKey` below
-    // instead, which IS threaded through both -- a plain string is not
-    // herdr's vocabulary the way an explicit pane id is.
-    anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
-    // A caller-supplied batch key (see `batchTabFor` in herdr-round.mjs), for
-    // a batch whose first round doesn't yet know an explicit anchor pane.
-    // Plain data, in-process only -- the batch tab itself is created and
-    // looked up from inside the round that first needs it, never passed as
-    // a live value, so there is no environment-variable equivalent.
-    dispatchBatchKey,
-  } = opts;
-
-  const depth = currentDispatchDepth();
-  if (depth >= MAX_DISPATCH_DEPTH) {
-    return Promise.reject(new DispatchError(
-      'dispatch-depth-exceeded',
-      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
-      { workId, tier, model, depth },
-    ));
-  }
-
-  // herdr launches the canonical executable for a kind; `command` only tells
-  // us which kind that is. An unrecognized kind is herdr's own refusal, and
-  // it is reported as one -- never silently downgraded to typing at a shell.
-  const isBwrap = command === 'bwrap' || (Array.isArray(args) && args.includes('bwrap'));
-  const agentKind = kind ?? (command && !isBwrap ? path.basename(command) : (isBwrap ? 'bwrap' : null));
-  if (!agentKind) {
-    return Promise.reject(new DispatchError(
-      'invalid-config',
-      `executor for work "${workId}" refused: herdr-spawn needs an agent kind -- declare interactiveMode.kind, or a command whose basename names one.`,
-      { workId, tier, model },
-    ));
-  }
-
-  const resolvedEnv = resolveExecutorEnv(rawEnv);
-  const herdrBin = resolveHerdrBin(optsHerdrBin);
-  const fullEnv = { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
-  const delivery = opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? promptDelivery ?? 'inline';
-
-  return runHerdrRound({
-    herdrBin,
-    fullEnv,
-    confinement,
-    permissionMode,
-    command,
-    args,
-    envelopePath: opts.envelopePath,
-    envelope: opts.envelope,
-    workerInvocation: invocation.workerInvocation,
-    confinementRequirement: invocation.requirement ?? opts.requirement,
-    launchCommandId: opts.launchCommandId ?? invocation.launchCommandId,
-    runId: opts.runId ?? invocation.runId,
-    assignmentId: opts.assignmentId ?? invocation.assignmentId,
-    controlEpoch: opts.controlEpoch ?? invocation.controlEpoch,
-    controlToken: opts.controlToken ?? invocation.controlToken,
-    preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
-    effectiveContract: opts.effectiveContract ?? invocation.effectiveContract ?? null,
-    // Confinement Authority's binding functions for this dispatch's homes (absent when unconfined).
-    confinementBinding: opts.confinementBinding ?? null,
-    agentKind,
-    agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
-    prompt: prompt ?? '',
-    delivery,
-    exitCommand,
-    // Not config: the round owns its transport deadlines. This is the seam a
-    // test uses to keep a mock round short, and production never sets it.
-    transportDeadlines: opts.transportDeadlines,
-    trustStore,
-    // The leased account's credential source: a private home derives its trust from that account's own store.
-    trustAccountSource: opts.trustAccountSource ?? null,
-    runDir: optsRunDir,
-    anchorPaneId,
-    dispatchBatchKey,
-    paneEnv: resolvedEnv,
-    cwd,
-    repoRoot: opts.repoRoot,
-    timeoutMs,
-    idleTimeoutMs,
-    usageLimitPatterns,
-    closeAlways,
-    workId,
-    tier,
-    model,
-  }).then((result) => {
-    // Teeing belongs to the adapter, not to the round: the round produces a
-    // result, and handing that result to whoever asked to watch is this
-    // layer's job. It is also what keeps `herdr-round.mjs` from needing
-    // anything out of this module.
-    if (result.stdout) teeChunk(onChunk, 'stdout', result.stdout);
-    return result;
-  });
-}
-
 /**
  * The agent's own argv, with the prompt taken out of it.
  *
@@ -943,7 +645,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
  * caller that passes no template compares against the prompt text, which is
  * long and unique enough to be reliable but is a fallback, not the contract.
  */
-function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
+export function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
   if (Array.isArray(argsTemplate)) {
     return argsTemplate
       .filter((arg) => typeof arg === 'string' && !arg.includes('{prompt}'))
@@ -955,12 +657,9 @@ function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
 }
 
 export function herdrSpawnAdapter(invocation, opts) {
-  if (invocation.interactiveMode) {
-    return herdrSpawnInteractiveAdapter(invocation, opts);
-  }
   return Promise.reject(new DispatchError(
-    'invalid-config',
-    `executor for work "${opts?.workId}" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,
+    'herdr-spawn-supervised-only',
+    `executor for work "${opts?.workId}" refused: herdr-spawn runs as an attempt of the run supervisor, started by executeAssignment (fgos run); it cannot be executed directly.`,
     { workId: opts?.workId, tier: opts?.tier, model: opts?.model },
   ));
 }

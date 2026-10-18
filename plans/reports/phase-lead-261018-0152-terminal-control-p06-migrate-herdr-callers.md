@@ -1,0 +1,50 @@
+# Phase 06: migrate every herdr caller of Node to terminal-control
+
+Status: DONE_WITH_CONCERNS. Branch `terminal-control/p06-migrate` merged `--no-ff` into `terminal-control/integration` (main was merged into integration first; it carried one docs commit).
+
+## What landed
+- `src/runner/dispatch/terminal-slot.mjs` (new): one round's view of its pane through the thin client: `read`, `state`, `explain`, `foreground`, `prompt`, `type`, `sendKeys`, `reportAgent`, `release`. A refusal becomes a thrown `TerminalSlotError`; the driver's own error code (`agent_blocked`, `pane_not_found`, ...) is parsed from the refusal reason. One client per route configuration per process, so rounds of one batch share the per-group queue.
+- `herdr-round.mjs`: `allocate` replaces `batchTabFor` + `paneSplit`; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` into the round's group; `launch` replaces `paneRun`/`agentStart` and returns the identity; the confined tamper checks (exe, env, cwd) now run on the identity the port returned; every `paneClose` and `paneFateFor` is a `release`. The wait/regex logic (`awaitPromptReady`, `confirmBriefSubmitted`, ...) stayed, with `io` in place of `client`.
+- `herdr-reconcile.mjs`: slot found by key through `inspect` (`slotIo`), never by label or argv scan. `worker-session-boot.mjs`: server probe through `capabilities`; the first workspace of a fresh session is created by the driver. `cli.mjs` account probe: close by `terminalKey`. `confinement/cleanup.mjs` reaper: asks `inspect(key)` and closes with `release(key, close)`; marker gains `terminalKey` (bind and retain); a marker without a key is never asked about and its pane never closed.
+- Deleted: `createHerdrClient`, `createBatchTab`, `batchTabFor`, `closeIfEmpty`, `batchTabsByKey`, the `process.once('exit')` hook, the `fgos-lead-<key>-<ts>` label. `herdr-agent.mjs` keeps only `READY_STATES`, `isReadyState`, `normalizeAgentName`. `rg 'createHerdrClient|createBatchTab|batchTabFor|closeIfEmpty|fgos-lead-' src plugins` is empty. The only `'herdr'` default left in `src` is `resolveHerdrBin` plus the server-start spawn in `worker-session-boot.mjs` (a server lifecycle, not a pane operation).
+- Unit-run attempts and rounds share a group: `assignment-runner.mjs` defaults `dispatchBatchKey` to the unit run id.
+
+## Port and driver additions (needed by the mapping; contract updated)
+- `allocate`: `cwd`, `env` (the old split passed `--cwd`/`--env`).
+- `attach`: optional `groupKey` so an attached pane joins a group.
+- `launch`: `activity.timeoutMs`; `expect {argv0, command, args}` for a launcher script that `exec -a`s the worker.
+- `inspect`: `detail` (detector verdict from `agent explain`: blocker/idle/working flags, matched rule, prompt text), `foreground`/`activity` parts to leave out, `activity.session`. `agent get` answering `agent_not_found` is an answer (`unknown`), any other failure stays a refusal, so an unreadable status still counts as blind time.
+- `label`: `reportState` (`pane report-agent` for an agent herdr does not recognise).
+- Driver: `agent prompt` for submit, `agent get` for activity, first workspace of a fresh session, inherited `HERDR_SOCKET_PATH`. Core: an `exec`'d root (pid == shell pid) is found through the launched marker.
+
+## Decisions (made by the lead, no owner question)
+1. Slot key = the round's normalized agent name (`fgos-<runId>-<launchCommandId>` for an assignment run). Deterministic, already valid for herdr and the port, so reconcile derives it from `herdrName`. Group key = batch key, else unit run id, else run id.
+2. A kept failed pane stays allocated instead of `release(retain)` (D5 default `null`): a retained slot refuses a later `close` by key (core test `close_after_retain_does_not_pretend_to_close`), and the account probe and the reaper close by key. An explicit `ctx.retainFailedPaneMs` records `retain` with `until`.
+3. Confined launch line is `bash -c 'bash "$1"; exec "${SHELL:-bash}"' fgos-launch <script>`: measured on real herdr 0.9.1, a pane whose root process exits closes with it (the plain `exec` line loses the screen of a worker that died). The pane now ends in an interactive shell like before.
+4. `worker-session-boot` stays the one place that starts a herdr server process; adding a port op for it was not needed once the driver creates the first workspace.
+5. `terminal.*` config is not wired here (P08): the round reads `ctx.terminalConfig` and `ctx.retainFailedPaneMs`, absent today, so route defaults apply.
+
+## Evidence
+- `cargo test -p fgos-terminal-control -p fgos`: every result ok, 0 failed (new: spawn env, attach group, expect match, detector parse, read shapes, workspace fallback, exec root, agent_not_found). clippy clean; `cargo check -p fgos-terminal-control` ok for x86_64-pc-windows-msvc and aarch64-apple-darwin.
+- Real herdr 0.9.1 smoke (own sessions, stopped and removed afterwards): fresh session got its workspace from `allocate`; two seats of one group shared a tab; `launch` returned identity; `send`/`read`/`inspect`/`label`/`release` answered; the confined wrapper kept the pane and its screen after the worker exited and `expect` matched the `exec -a` argv0.
+- Integration worktree, host built from it (private target), `FGOS_HOST_BIN` set, session env unset:
+  `node --test test/runner/herdr-*.test.mjs test/runner/execution/run-herdr.test.mjs test/runner/dispatch-*.test.mjs test/verbs/dispatch-observe.test.mjs test/terminal-control/*.test.mjs test/architecture.test.mjs`: 815 tests, 804 pass, 0 fail, 1 skipped (live agy), 10 todo (existing).
+- Full `npm test` on the integration worktree (host built from it, `FGOS_HOST_BIN` set, session env unset), two runs on a machine whose load average was 8 to 21 from other sessions' builds:
+  - Run 1: 8043 tests, 7922 pass, 16 fail. Five files hit the 600 s per-file limit (run-herdr, run.test, run-provider-failover, loop, fgctl-upgrade); run together afterwards they pass (238 tests, 270 s), and run alone: run 17 s, failover 12 s, loop 45 s, spawn-worker 18 s, operation-choice 8 s, 0 fail. Three real failures were mine and fixed (account probe expectation gained `terminalKey`; unix socket paths longer than ~100 chars in two tests; the in-session call-site test).
+  - Run 2 (final code): 8168 tests, 8058 pass, 5 fail, 30 skipped, 75 todo: (1) `herdr-spawn-adapter` working-stall case asserted a 10 s bound, a timing assertion the load broke, widened (ceiling 90 s, bound 45 s) and green; (2) `spawn-worker` output-budget case: load flake, green alone; (3) `fgctl-upgrade` hit the 600 s limit under load, green in the five-file run; (4) `hot-lock-host-judge` "a host that cannot be run": fails the same on main (the shared `target` fallback finds a host), no diff of mine in `src/state`/`src/util`; (5) `skill-wrappers` projection: the generated `.claude/skills/instruction-audit` wrapper is absent in worktrees (passes on main, no diff of mine in those paths).
+  - So the suite is not literally green here: three of the five are load or environment flakes and two are failures that exist without this branch. A run on a quiet machine, with `target` pointing at a private release build for the fgctl tests, is the P09 gate.
+- New `test/runner/herdr-round-terminal-control.test.mjs` (6): round end to end (no `tab close`, no empty pane), three seats of one batch share a tab, closed first pane continues in a same-label tab, caller anchor attached and never closed, failed round keeps its pane and a later close by key works, controller dead after `allocate` leaves the pane and the scan reports it. Reaper cases are in `dispatch-confinement-reaper-fence` and `-credential-hygiene` (live pane kept, gone pane reaped, marker without key never asked).
+- Test migration: `run-herdr`, `herdr-spawn-adapter` (51), `herdr-reconciliation` (30), `herdr-spawn-assignment-dispatch` (4), `dispatch-production-call-sites`, `dispatch-governance-operability`, `dispatch-worker-session-boot`, reaper-fence, credential-hygiene, prompt-ready, read-agent-state moved to the fake herdr and the real route; old-client argv cases of `herdr-agent.test.mjs` were deleted because `herdr_driver_fake.rs`/`herdr_driver_fixtures.rs` cover the same (argv per command, stderr envelopes, plain and enveloped screens, detector verdict). Helpers: `fake-herdr-pane` (rewritten for the driver's commands, locked state), `fake-herdr-session`, `herdr-pane-model`, `terminal-host-harness`.
+- GitNexus: `createHerdrClient` upstream CRITICAL (7 direct callers, all moved; function deleted), `driveRound` LOW (1 caller), `reconcileHerdrSpawnRun` LOW. `detect_changes` vs integration: risk high, 68 symbols, all inside dispatch/confinement/tests as intended. Index stale, cross-checked with grep.
+- Review: the Sonnet subagent migrated the three bespoke-mock test files; the lead reviewed its diff. No separate reviewer round (the owner reserves that for an explicit B run).
+
+## Concerns
+- Dispatch now needs a host with the `fgos internal terminal-control` route. A plain `fgos` on an older staged release answers `host-version-mismatch` (named, not silent). The `terminal-control` doctor check and `terminal.*` config belong to P08.
+- Every route call also runs `herdr --version` and `pane layout --help` (driver probe): about 3 herdr spawns per operation; the poll loop does inspect parts to keep it to one or two. Measured earlier at 12-16 ms per op on real herdr. If poll load matters, make the layout probe lazy.
+- `docs/.../visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs` (two copies, historical proof scripts) import the deleted `createHerdrClient`; left as history.
+- `herdr-reconciliation` test 20 talks to the machine's real herdr (existing behavior); it closes what it opened.
+- Windows: client and route unchanged; the herdr driver reports `unsupported` there, so a dispatch through herdr is refused by name.
+
+## Unresolved
+- Owner/P09: real 5-CLI run through `fgos run` (acceptance 6) is P09's.
+- Whether `terminal.retainFailedPaneMs` should map to `retain` (refuses later close by key) or to "stay allocated": the default now keeps the slot allocated.

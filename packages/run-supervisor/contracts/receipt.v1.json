@@ -1,0 +1,26 @@
+{
+  "contract": { "id": "run-supervisor-receipt", "version": 1 },
+  "description": "<attemptDir>/receipt.json. The physical result of the attempt, published once by the supervisor (or by adopt when the supervisor is gone). It is not the work result: the settle-attempt step judges the work.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "outcome": { "enum": ["exited", "timeout", "cancelled", "output-limit", "gate-lost", "carrier-lost", "abandoned-not-started", "abandoned-before-brief"] },
+    "gateExit": "the gate-exit.v1 object, or absent when no gate-exit.json exists",
+    "captureDigests": { "stdout": "\"sha256:<hex>\" of the capture file bytes or null when absent", "stderr": "same" },
+    "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir",
+    "reason": "optional string; `start-refused:<code>` on abandoned-not-started when the supervisor named why it never bound (start-refused.json), e.g. lock-held on Windows; `terminal:<outcome>` or `terminal:blocked:<reason>` when a terminal adapter outcome (agent-protocol terminal-outcomes.v1.json) ended the run early",
+    "synthesizedBy": { "enum": ["supervisor", "adopt"] },
+    "publishedAt": "string, ISO-8601 UTC"
+  },
+  "outcomeRule": [
+    "exited: gate-exit.stoppedBy == agent",
+    "timeout: gate-exit.stoppedBy in {soft-deadline, idle, hard-ceiling}",
+    "cancelled: gate-exit.stoppedBy == cancel",
+    "output-limit: gate-exit.stoppedBy == output-limit (the capture files passed launch.maxOutputBytes and the supervisor stopped the agent)",
+    "gate-lost: a binding exists but the gate died without gate-exit.json (the domain is empty because the lock is free)",
+    "carrier-lost: terminal mode; the terminal carrier died or was replaced (terminal-control inspect: pane gone or incarnation changed) while the gate had not published gate-exit.json",
+    "abandoned-not-started: no binding; adopt found the lock free",
+    "orphan with cause orphan-result maps to exited when an outbox result exists, else to gate-lost; orphan with cause abandoned-before-brief maps to abandoned-before-brief (terminal mode; nothing ran after GO)"
+  ],
+  "outboxWins": "an outbox result is settled whatever the outcome; the Run Result Evaluator still judges it"
+}

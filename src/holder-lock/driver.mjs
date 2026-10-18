@@ -21,6 +21,32 @@ export const ROUTE_CALL_TIMEOUT_MS = 2000;
 /** Headroom added to every bounded wait, so the helper is only killed when it really hung. */
 export const ROUTE_SLACK_MS = 1000;
 
+/**
+ * How a lock reaches the kernel from Node: `fd` hands an open description to
+ * `lock-fd` (POSIX flock), `hold` keeps one `lock-hold` helper alive per held
+ * lock (Windows LockFileEx belongs to the process that took it). The only
+ * place that looks at the platform; the facade branches on this answer.
+ */
+export function lockTransport(platform = process.platform) {
+  return platform === 'win32' ? 'hold' : 'fd';
+}
+
+/**
+ * How a borrow on the fd transport finds what its child left behind: `holders`
+ * lists the processes that hold the description (Linux /proc), `group`
+ * signals the child's process group (macOS). The hold transport never asks:
+ * its helper ends the borrow's job itself.
+ */
+export function leftoverSweep(platform = process.platform) {
+  return platform === 'linux' ? 'holders' : 'group';
+}
+
+/** Whether a borrowed child on the fd transport must lead its own process
+ * group: when the group sweep needs it, or the caller signals the group. */
+export function borrowLeadsGroup(spec, platform = process.platform) {
+  return spec.detached === true || (platform !== 'linux' && platform !== 'win32');
+}
+
 let resolvedBin = null;
 
 /**
@@ -81,7 +107,12 @@ function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin
     const how = signal ? `signal ${signal}` : `exit ${status}`;
     throw new HolderLockError('lock-route-bad-output', `${bin} ${verb} printed nothing (${how})${err ? `: ${err.slice(0, 300)}` : ''}`, { status, signal, stderr: err.slice(0, 300) });
   }
-  const line = parseRouteLine(text, bin);
+  return routeLineOrThrow(parseRouteLine(text, bin), bin, verb, status);
+}
+
+/** A parsed route line, or the named error when the route answered `error`.
+ * Shared by the fd transport (stdout) and the hold transport (`ready.json`). */
+export function routeLineOrThrow(line, bin, verb, status = null) {
   if (line.result === 'error') {
     if (line.code === 'host-version-mismatch') throw unavailable('host-version-mismatch', `${bin} ${verb}: ${line.message}`);
     if (line.code === 'usage') throw new HolderLockError('lock-route-usage', `${bin} ${verb}: ${line.message}`, { argv: verb });
@@ -232,6 +263,31 @@ export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
   return { stateRoot: line.stateRoot, lockRoot: line.lockRoot, source: line.source };
 }
 
+/** Run `fgos internal process-observe --pid N` once: `{ state: 'live' |
+ * 'zombie' | 'absent' | 'unreadable', startTime?, cause? }`, the reading of
+ * the process facts crate. The Node payload asks it where it has no process
+ * table of its own to read (a Windows creation time). */
+export function runProcessObserveRoute({ fgosDir, pid } = {}) {
+  const bin = hostBin({ fgosDir });
+  const res = spawnSync(bin, ['internal', 'process-observe', '--protocol', String(PROTOCOL), '--pid', String(pid)], {
+    env: routeEnv(),
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: ROUTE_CALL_TIMEOUT_MS,
+    killSignal: 'SIGKILL',
+    maxBuffer: MAX_OUTPUT_BYTES,
+    windowsHide: true,
+  });
+  const line = interpretRoute(res, bin, 'process-observe');
+  if (line.result === 'killed') {
+    throw new HolderLockError('lock-route-error', `${bin} process-observe did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed`);
+  }
+  if (!['live', 'zombie', 'absent', 'unreadable'].includes(line.state) || (line.state === 'live' && typeof line.startTime !== 'string')) {
+    throw new HolderLockError('lock-route-bad-output', `${bin} process-observe answered without a usable state: ${String(res.stdout ?? '').slice(0, 200)}`);
+  }
+  return line;
+}
+
 function fdTargetMatches(target, real) {
   return target === real || target === `${real} (deleted)`;
 }
@@ -308,23 +364,4 @@ export function descriptionHolders(lockPath, { excludePid } = {}) {
     }
   }
   return { kind: 'list', pids };
-}
-
-/** One sweep: SIGKILL every process other than `excludePid` that still holds
- * a description of `lockPath`. Returns the pids signalled and the pids this
- * process could not signal (another user's, or already gone). */
-export function killDescriptionHoldersOnce(lockPath, { excludePid }) {
-  const holders = descriptionHolders(lockPath, { excludePid });
-  if (holders.kind !== 'list') return { listable: false, killed: [], refused: [] };
-  const killed = [];
-  const refused = [];
-  for (const pid of holders.pids) {
-    try {
-      process.kill(pid, 'SIGKILL');
-      killed.push(pid);
-    } catch (err) {
-      if (err.code !== 'ESRCH') refused.push(pid);
-    }
-  }
-  return { listable: true, killed, refused };
 }

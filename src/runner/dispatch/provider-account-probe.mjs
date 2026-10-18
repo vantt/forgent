@@ -17,7 +17,7 @@ import path from 'node:path';
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 import { expandCredentialHome } from './provider-credential-probe.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { accountCredentialSources, commandCli, credentialSourceForCli, providerAccountInventory } from './provider-capacity.mjs';
+import { accountCredentialSources, commandCli, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
@@ -46,9 +46,9 @@ const CREDENTIAL_ENV = ['CODEX_HOME', 'PI_CODING_AGENT_DIR', 'HOME'];
 
 /**
  * The invocations of `provider`'s executors that run as `accountId`, each with how the account reaches it:
- * - `lease`: a confined invocation with a private home whose CLI the account has a login store for (its
- *   per-CLI store, or the one store whose layout that CLI logs in); the capacity layer copies that store
- *   into the home, exactly as a real dispatch does;
+ * - `lease`: a confined invocation that reads a login store the account has (its per-CLI store of that key,
+ *   or the one store whose layout that CLI logs in); the capacity layer copies that store into the home,
+ *   exactly as a real dispatch does;
  * - `env`: the invocation's own credential env names one of the account's store homes;
  * - `name`: the invocation id ends with `-<accountId>` (config convention `<bin>-<mode>-<account>`),
  *   for a CLI that keeps its own login of the same account in its own directory.
@@ -68,9 +68,9 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
     for (const inv of Array.isArray(executor?.invocations) ? executor.invocations : []) {
       if (inv?.via !== 'cli' || !inv.id) continue;
       const confined = Boolean((inv.confinement ?? executor.confinement)?.backend);
-      const privateHome = (inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home');
+      const store = credentialStoreOf(inv);
       let via = null;
-      if (confined && privateHome && account && leases(cliOf(inv))) via = 'lease';
+      if (confined && store && account && leases(store.use)) via = 'lease';
       else if (CREDENTIAL_ENV.some((key) => homes.has(expandCredentialHome(inv.env?.[key])))) via = 'env';
       else if (inv.id.endsWith(`-${accountId}`)) via = 'name';
       if (via) found.push({ executorId: id, invocationId: inv.id, cli: cliOf(inv), adapter: inv.adapter ?? 'cli-spawn', confined, via });
@@ -207,6 +207,7 @@ export function readRunOutcome(runResult, { repoRoot }) {
     runDir,
     runId: runResult?.runId ?? null,
     paneId: visibility?.paneId ?? null,
+    terminalKey: visibility?.terminalKey ?? null,
     herdrSession: visibility?.herdrSession ?? null,
   };
 }
@@ -215,7 +216,7 @@ export function readRunOutcome(runResult, { repoRoot }) {
  * Start every invocation of the account at once and report one row per CLI, then close the panes the
  * rounds left open. `createAssignment(contract)` builds and claims an inline Assignment;
  * `dispatch(assignment, { runnerConfig })` is the Assignment door and resolves to a RunResult;
- * `closePane({ paneId, herdrSession })` closes one pane. All three are injectable for tests.
+ * `closePane({ paneId, herdrSession, terminalKey })` closes one pane by its terminal-control key. All three are injectable for tests.
  */
 export async function runAccountProbe({
   cfg, provider, accountId, executorId = null, invocationIds = null, repoRoot,
@@ -243,11 +244,11 @@ export async function runAccountProbe({
       const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId };
       run = readRunOutcome(await dispatch(assignment, { runnerConfig, cliOverride }), { repoRoot });
     } catch (err) {
-      run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, herdrSession: err?.herdrSession ?? null };
+      run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, terminalKey: err?.terminalKey ?? null, herdrSession: err?.herdrSession ?? null };
     }
     const { outcome, evidence, matchedRule } = classifyAccountProbe(run);
     // A settled round closes its own pane, so a refused close here means there was nothing left open.
-    const pane = run.paneId ? (closePane({ paneId: run.paneId, herdrSession: run.herdrSession }) ? 'closed-by-probe' : 'not-open') : null;
+    const pane = run.paneId ? (closePane({ paneId: run.paneId, herdrSession: run.herdrSession, terminalKey: run.terminalKey }) ? 'closed-by-probe' : 'not-open') : null;
     return {
       cli: inv.cli,
       invocationId: inv.invocationId,

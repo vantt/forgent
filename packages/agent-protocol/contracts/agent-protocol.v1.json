@@ -1,0 +1,44 @@
+{
+  "contract": { "id": "agent-protocol", "version": 1 },
+  "description": "Agent protocol (L3, crate fgos-agent-protocol): one pure state machine per CLI x launch mode. It reads what the agent shows and names what happened; it never opens a tab, picks a model, changes a timeout or decides a retry. It does not build argv: argv comes from the executor configuration through resolveExecutorCommand (src/runner/dispatch/transport.mjs) and is written into the envelope (owner decision 2026-10-16).",
+  "io": {
+    "description": "Port the supervisor wires to the adapter: a capture file tail (direct) or terminal-control by key (terminal, 6.3).",
+    "send": { "input": { "text": "string or null", "keys": "string[] or null", "submit": "boolean" }, "modes": ["terminal"] },
+    "read": { "output": { "lines": "string[], new lines since the previous read (stdout capture in direct mode, screen in terminal mode)" } },
+    "activity": { "output": "monotonic counter or absent; increments on anything the idle timer counts as activity" },
+    "screen": { "output": "string, the whole visible screen right now", "modes": ["terminal"] },
+    "inspect": { "output": { "state": "string or null (idle, working, blocked, done)", "visibleBlocker": "boolean", "visibleIdle": "boolean", "visibleWorking": "boolean", "matchedRule": "boolean, a screen rule vouched for the verdict", "promptText": "string, the composer text the rule saw" }, "modes": ["terminal"], "meaning": "the multiplexer's own agent detection for the pane (terminal-control inspect with detail); never a guess of the supervisor" },
+    "clock": { "output": "now_ms (monotonic) and pause(ms); every wait of an adapter goes through them so a vector can run on a virtual clock" }
+  },
+  "results": {
+    "ready": "terminal: the CLI shows an empty prompt and can take the brief",
+    "blocked": { "reason": { "enum": ["trust-dialog", "login", "usage-limit"] }, "meaning": "the CLI waits for something only a person can do" },
+    "delivered": "terminal: the brief is confirmed submitted (not merely visible)",
+    "delivery-unknown": "terminal: could not confirm; never resend blind",
+    "completed": { "resultPath": "absolute path of outbox/result-<N>.json", "meaning": "the agent finished and its result file exists" },
+    "needs-human": "the agent asked a question in its result or output that only a person can answer",
+    "exited": { "code": "integer or null", "meaning": "the agent process exited without a result file" }
+  },
+  "directAdapter": {
+    "inputs": "envelope.launch (stdinPolicy, briefPath, outboxDir, capture paths), the agent exit reported by gate-exit, and the capture tail",
+    "decides": [
+      "stdinPolicy for the CLI (codex must use null: it probes piped stdin and blocks; transport.mjs comment at the stdin: 'ignore' spawn)",
+      "activity source for idle: growth of the stdout capture, or JSON events when the executor's liveOutput says the CLI streams events",
+      "completion: agent exited and outbox/result-<N>.json exists -> completed; exited without it -> exited(code) unless a blocked/needs-human pattern was read",
+      "named blocked results from known output patterns (login prompt, trust dialog, usage limit)"
+    ]
+  },
+  "matrix": {
+    "rows": ["claude", "codex", "agy", "pi", "omp"],
+    "columns": ["direct", "terminal"],
+    "cells": {
+      "claude": { "direct": "6.2", "terminal": "6.3" },
+      "codex": { "direct": "6.2 (stdinPolicy null)", "terminal": "6.3" },
+      "agy": { "direct": "6.2", "terminal": "6.3" },
+      "pi": { "direct": "6.2", "terminal": "6.3" },
+      "omp": { "direct": "6.2", "terminal": "6.3" }
+    },
+    "unknownCli": "direct: an unknown CLI gets the generic adapter (exit and outbox only, no output patterns); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
+  },
+  "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct and terminal cells exist; terminal vectors replay recorded screens on a virtual clock)"
+}

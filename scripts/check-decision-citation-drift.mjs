@@ -310,7 +310,7 @@ function loadSourceFiles(
 // own -- its generated wrapper is byte-derived from `.agents/skills` and
 // never carries independent citation text (confirmed by direct read).
 // `plugins/fgOS/skills` stays in the roots too (it is NOT purely
-// redundant: ~35 launcher/orchestrator skills there -- cook/submit/pick/
+// redundant: ~35 launcher/orchestrator skills there -- deliver/submit/pick/
 // etc. -- have no `.agents/skills` counterpart at all). Its ~15 dev-skill
 // files ARE byte-identical mirrors of `.agents/skills` (CI-enforced,
 // `test/skills/fgos-mirror.test.mjs`), so a stale citation living in one

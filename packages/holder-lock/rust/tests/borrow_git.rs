@@ -1,6 +1,6 @@
 //! Borrowing with real git: the four vectors and the sibling check are
 //! green; a control without the gc switch shows the vector catches a real
-//! leak; the release rule kills a hook's setsid escaper before
+//! leak; the release rule refuses an unprovable setsid escaper before
 //! `run_borrowed` returns.
 #![cfg(target_os = "linux")]
 
@@ -9,7 +9,7 @@ mod common;
 use std::fs;
 use std::path::Path;
 use std::process::{Command, Stdio};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use common::*;
 use fgos_holder_lock::borrow_vectors::{self, add_loose_objects, git_env, init_repo};
@@ -36,10 +36,15 @@ fn borrowing_git_disables_automatic_gc_and_maintenance() {
     assert_eq!(borrowed_argv(&other), other);
 }
 
+/// POSIX borrowing never starts a helper; the path only fills the parameter.
+fn helper() -> fgos_holder_lock::HelperExe {
+    fgos_holder_lock::HelperExe::current().expect("current exe")
+}
+
 #[test]
 fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
     let _serial = serial();
-    let report = borrow_vectors::run(git(), &[], false).expect("vectors run");
+    let report = borrow_vectors::run(git(), &helper(), &[], false).expect("vectors run");
     for v in &report.vectors {
         println!("vector {}: {} in {} ms ({})", v.name, if v.pass { "pass" } else { "FAIL" }, v.elapsed_ms, v.detail);
     }
@@ -51,7 +56,7 @@ fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
 #[test]
 fn an_unknown_vector_name_is_a_usage_error() {
     let _serial = serial();
-    assert!(matches!(borrow_vectors::run(git(), &["nope".to_string()], false), Err(borrow_vectors::RunError::Usage(_))));
+    assert!(matches!(borrow_vectors::run(git(), &helper(), &["nope".to_string()], false), Err(borrow_vectors::RunError::Usage(_))));
 }
 
 fn others_holding(lock: &Path) -> Vec<u32> {
@@ -85,25 +90,18 @@ fn control_without_the_gc_switch_leaks_the_lock_to_background_gc() {
     assert!(st.success());
     add_loose_objects(git(), &repo).unwrap();
     let res = resource(&dir, "control");
-    let handle = match acquire(&res, Mode::Ex, Wait::Try, 2000) {
-        Acquire::Acquired(h) => h,
-        other => panic!("{other:?}"),
-    };
-    // The holder's own description, duplicated (dup shares it; reopening
-    // the path would make a new, conflicting one).
-    let shared = {
-        use std::os::fd::FromRawFd;
-        let fd = unsafe { libc::dup(fd_of_handle(&res.path)) };
-        assert!(fd >= 0);
-        unsafe { fs::File::from_raw_fd(fd) }
-    };
+    // This is intentionally below Handle: its Drop and release now settle
+    // daemonized copies too. Use the existing raw-description lock door to
+    // retain the negative control's absence of the release rule.
+    let shared = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(&res.path).unwrap();
+    assert!(matches!(fgos_holder_lock::port::lock_description(&shared, Mode::Ex, Wait::Try).unwrap(),
+        fgos_holder_lock::port::DescriptionLock::Locked));
     let mut cmd = Command::new("git");
     cmd.arg("-C").arg(&repo).args(["commit", "-q", "--allow-empty", "-m", "control"]).envs(git_env());
     cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
     let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(3), &shared)]).unwrap();
     child.wait().unwrap();
     drop(shared);
-    release(handle);
     let leaked = probe(&res).unwrap();
     let holders = others_holding(&res.path);
     println!("control: probe after git and owner closed = {leaked:?}, background holders {holders:?}");
@@ -113,23 +111,8 @@ fn control_without_the_gc_switch_leaks_the_lock_to_background_gc() {
 }
 
 /// The fd number this process holds `path` open under (the handle's).
-fn fd_of_handle(path: &Path) -> i32 {
-    let want = fs::canonicalize(path).unwrap();
-    for entry in fs::read_dir("/proc/self/fd").unwrap().flatten() {
-        if let Ok(target) = fs::read_link(entry.path()) {
-            if target == want {
-                return entry.file_name().to_string_lossy().parse().unwrap();
-            }
-        }
-    }
-    panic!("handle fd not found");
-}
-
-/// Release rule: a hook starts a setsid escaper that the gc switch cannot
-/// prevent; `run_borrowed` kills it before it returns, and the lock is free
-/// as soon as the owner releases.
 #[test]
-fn run_borrowed_kills_a_setsid_escaper_before_returning() {
+fn run_borrowed_kills_reparented_setsid_description_holder() {
     let _serial = serial();
     let dir = temp_dir("escaper");
     let repo = dir.join("repo");
@@ -150,17 +133,27 @@ fn run_borrowed_kills_a_setsid_escaper_before_returning() {
         argv: vec!["git".into(), "-C".into(), repo.to_string_lossy().into_owned(), "commit".into(), "-q".into(), "--allow-empty".into(), "-m".into(), "hooked".into()],
         cwd: None,
         env: git_env(),
+        clear_env: false,
         stdio: BorrowStdio::Null,
     };
-    let started = Instant::now();
-    let outcome = run_borrowed(&handle, &spec).expect("run_borrowed");
-    assert_eq!(outcome.exit, Some(0));
-    assert!(outcome.leftovers_killed >= 1, "{outcome:?}");
+    let result = run_borrowed(&handle, &spec, &helper());
     let escaper: u32 = fs::read_to_string(&pidfile).unwrap().trim().parse().unwrap();
-    assert!(matches!(observe(ProcId(escaper)), Observed::Absent | Observed::Zombie), "escaper {escaper} outlived run_borrowed");
-    assert!(others_holding(&res.path).is_empty(), "only the holder may hold the description after run_borrowed");
-    println!("release rule: escaper killed, run_borrowed took {:?}", started.elapsed());
-    release(handle);
+    // Always end the test-created process, including on an assertion failure.
+    struct Cleanup(u32);
+    impl Drop for Cleanup {
+        fn drop(&mut self) { kill_pids(&[self.0]); }
+    }
+    let cleanup = Cleanup(escaper);
+    let outcome = result.expect("escaped borrowed descendants must drain");
+    assert!(outcome.leftovers_killed > 0);
+    assert_eq!(probe(&res).unwrap(), Probe::Held);
+    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    drop(cleanup);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !matches!(observe(ProcId(escaper)), Observed::Absent | Observed::Zombie) {
+        assert!(Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(1));
+    }
     assert_eq!(probe(&res).unwrap(), Probe::Free);
     let _ = fs::remove_dir_all(&dir);
 }

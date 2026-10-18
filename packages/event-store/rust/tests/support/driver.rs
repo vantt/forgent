@@ -1,0 +1,133 @@
+//! Real child-process fixture. Faults are injected through FileSystem, never env.
+use fgos_event_store::{
+    append::{append_with_fs, AppendRequest, Positions},
+    fsio::{FileSystem, Point},
+    layout::{Layout, StreamId},
+    rotate::rotate_with_fs,
+};
+use std::{
+    fs::File,
+    io::{self, Write},
+    path::Path,
+};
+#[path = "../common/mod.rs"]
+mod common;
+struct Fault {
+    point: String,
+    prefix: Option<usize>,
+}
+impl Fault {
+    fn stop(&self) -> io::Result<()> {
+        println!("STOP");
+        io::stdout().flush()?;
+        let mut line = String::new();
+        io::stdin().read_line(&mut line)?;
+        Err(io::Error::new(
+            io::ErrorKind::Interrupted,
+            "fault driver released without kill",
+        ))
+    }
+}
+impl FileSystem for Fault {
+    fn checkpoint(&self, p: Point) -> io::Result<()> {
+        if format!("{p:?}") == self.point {
+            self.stop()?;
+        }
+        Ok(())
+    }
+    fn write_batch(&self, file: &mut File, bytes: &[u8]) -> io::Result<usize> {
+        if let Some(prefix) = self.prefix {
+            file.write_all(&bytes[..prefix.min(bytes.len())])?;
+            self.stop()?;
+            unreachable!()
+        }
+        file.write(bytes)
+    }
+}
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.get(3).is_some_and(|s| s == "barrier") {
+        println!("READY");
+        io::stdout().flush().unwrap();
+        let mut go = String::new();
+        io::stdin().read_line(&mut go).unwrap();
+        assert_eq!(go.trim(), "GO");
+    }
+    let layout = Layout::from_common_dir(Some(Path::new(&args[2]))).unwrap();
+    let stream = StreamId::parse("project").unwrap();
+    let fault = Fault {
+        point: args.get(3).cloned().unwrap_or_default(),
+        prefix: args.get(4).map(|p| p.parse().unwrap()),
+    };
+    match args[1].as_str() {
+        "append" => {
+            let a = append_with_fs(
+                &layout,
+                &common::registry(),
+                AppendRequest {
+                    stream: &stream,
+                    events: &common::inputs(3),
+                    cursor: &Positions::new(),
+                    writer: "child-writer",
+                    machine: "test-aa2345",
+                    held_ranks: &[],
+                },
+                &fault,
+            )
+            .unwrap();
+            println!("ACK {}", a.ack.last_seq);
+        }
+        "seal" => {
+            use fgos_git::ResolveRepo;
+            let root = layout.common_dir.parent().unwrap();
+            let driver = fgos_git::GitDriver::new(root).unwrap();
+            let repo = match driver.resolve_repo(root, root).unwrap() {
+                ResolveRepo::Repository(r) => r,
+                _ => panic!(),
+            };
+            fgos_event_store::seal::seal_with_fs(
+                &driver,
+                &repo,
+                fgos_event_store::seal::SealRequest {
+                    layout: &layout,
+                    machine: "test-aa2345",
+                    stream: &stream,
+                    held_ranks: &[],
+                    hot_lock_depth: 0,
+                    opportunistic: false,
+                },
+                &fault,
+            )
+            .unwrap();
+            println!("SEALED");
+        }
+        "sync" => {
+            use fgos_git::ResolveRepo;
+            let root = layout.common_dir.parent().unwrap();
+            let driver = fgos_git::GitDriver::new(root).unwrap();
+            let repo = match driver.resolve_repo(root, root).unwrap() {
+                ResolveRepo::Repository(r) => r,
+                _ => panic!(),
+            };
+            fgos_event_store::sync::sync_with_fs(
+                &driver,
+                &repo,
+                fgos_event_store::sync::SyncRequest {
+                    layout: &layout,
+                    machine: "test-aa2345",
+                    remote: "origin",
+                    no_push: false,
+                    held_ranks: &[],
+                    hot_lock_depth: 0,
+                },
+                &fault,
+            )
+            .unwrap();
+        }
+        "rotate" => {
+            rotate_with_fs(&layout, "test-aa2345", &stream, &[], &fault).unwrap();
+            println!("ROTATED");
+        }
+        _ => panic!("unknown operation"),
+    }
+}

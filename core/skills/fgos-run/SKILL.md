@@ -20,9 +20,9 @@ When the user gives a natural language task or ad-hoc request:
 2. **One task → the one-liner.** Run it as one Unit straight from the prompt:
    ```sh
    fgos run "<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]
-   fgos run "<prompt>" --writes <path>[,<path>...] --worktree <linked-worktree>
+   fgos run "<prompt>" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify "<cmd>"]
    ```
-   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `git worktree add`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`.
+   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `git worktree add`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).
 3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):
    - `id`: descriptive kebab-case identifier (a safe branch-name segment)
    - `objective`: concise semantic description of what must be done
@@ -31,6 +31,7 @@ When the user gives a natural language task or ad-hoc request:
    - `writes`: list of repo-relative paths or `*`/`**` globs the unit may modify (empty = read-only)
    - `dependsOn`: array of prerequisite unit IDs
    - `pattern`: `solo` | `reviewed` | `panel` (optional, defaults to config rule)
+   - `verify` (optional): shell command a reviewed unit runs after each producing round; `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them
    - `prefer` / `persona` (optional, ad-hoc Units only): a soft executor preference and a persona name
 4. Save Units to a temporary or workspace YAML file (`{ id?, title?, units: [...] }` or a list) and start them through the Workflow runner:
    ```sh

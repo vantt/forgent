@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": "docs/platform/git/spec.md \u00a72, D-ADR0057 / D-ADR0058",
+  "codes": [
+    "unchanged",
+    "created",
+    "committed",
+    "landed",
+    "conflicted-open",
+    "conflict-aborted",
+    "busy",
+    "stale",
+    "refused",
+    "cancelled",
+    "failed",
+    "published-checkout-pending",
+    "committed-but-contract-violation",
+    "remote-outcome-unknown",
+    "recovery-required",
+    "superseded"
+  ],
+  "superseded": {
+    "terminal": true,
+    "operationKind": "PublicationCas",
+    "effect": "record-only",
+    "conditions": "Every condition of \u00a710 rule 4a; never equality alone"
+  }
+}

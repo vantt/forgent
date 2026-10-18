@@ -292,6 +292,14 @@ export function validateWorkflow(raw, { source } = {}) {
         const timeoutProblem = timeoutMs === undefined ? null : runTimeoutProblem(timeoutMs, `${unitLabel} timeoutMs`);
         if (timeoutProblem) throw new WorkflowDefinitionError(timeoutProblem);
 
+        if (template.verify !== undefined && (typeof template.verify !== 'string' || !template.verify.trim())) {
+          throw new WorkflowDefinitionError(`${unitLabel} verify must be a non-empty command string`);
+        }
+        if (template.skills !== undefined && (!Array.isArray(template.skills) || template.skills.length === 0
+          || template.skills.some((skill) => typeof skill !== 'string' || !skill.trim()))) {
+          throw new WorkflowDefinitionError(`${unitLabel} skills must be a non-empty array of non-empty skill names`);
+        }
+
         const rigor = template.rigor ? String(template.rigor).trim() : undefined;
         if (rigor && !VALID_RIGORS.has(rigor)) {
           throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
@@ -361,6 +369,8 @@ export function validateWorkflow(raw, { source } = {}) {
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
               ...(timeoutMs !== undefined ? { timeoutMs } : {}),
+              ...(template.verify !== undefined ? { verify: template.verify.trim() } : {}),
+              ...(template.skills !== undefined ? { skills: Object.freeze([...new Set(template.skills.map((skill) => skill.trim()))]) } : {}),
               // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
               ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),

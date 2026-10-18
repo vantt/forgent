@@ -152,6 +152,30 @@ fn main() {
     // can inherit a descriptor handed to a route; not listed in
     // command-routes.json or help.
     if args.get(1).is_some_and(|a| a == "internal") {
+        // `holder-lock-helper <role>`: the roles a re-executed binary plays
+        // for the holder-lock port (see `fgos_holder_lock::helper`).
+        if args.get(2).is_some_and(|a| a == "holder-lock-helper") {
+            std::process::exit(fgos_holder_lock::helper::main(&args[3..]));
+        }
+        // `terminal-control <op>`: the key-addressed terminal port, one
+        // operation per process (see `fgos_terminal_control::route`).
+        if args.get(2).is_some_and(|a| a == "terminal-control") {
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            std::process::exit(fgos_terminal_control::route::main(&rest));
+        }
+        // `identity <op>`: the writer-id rules the Node payload must not copy
+        // (see `fgos_session_identity::route`).
+        if args.get(2).is_some_and(|a| a == "identity") {
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            std::process::exit(fgos_session_identity::route::main(&rest));
+        }
+        // The run supervisor's routes: supervise, gate, adopt, attempt-step.
+        let rest: Vec<String> = args[2..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+        if let Some(route) = rest.first() {
+            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..]) {
+                std::process::exit(code);
+            }
+        }
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 

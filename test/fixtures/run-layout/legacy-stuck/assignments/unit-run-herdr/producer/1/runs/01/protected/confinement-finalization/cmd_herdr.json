@@ -1,0 +1,1 @@
+{"contract":"confinement-finalization.v1","runId":"run_unit-run-herdr/producer/1_01","launchCommandId":"cmd_herdr","dispatchId":"disp_legacy_herdr","resources":[{"kind":"temporary-directory","resourceId":"private-home","pathRef":"/nonexistent/fgos-confinement/disp_legacy_herdr/home"}],"cleanupState":"pending"}

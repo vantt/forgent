@@ -27,6 +27,17 @@ fn main() {
         print_usage_and_exit();
     }
 
+    // Hidden, unlisted: the holder-lock helper roles. The activation gate must
+    // not run anything from a candidate release, so it re-executes `fgctl`.
+    if args.len() >= 3 && args[1] == "internal" && args[2] == "holder-lock-helper" {
+        let helper_args: Vec<std::ffi::OsString> = std::env::args_os().skip(3).collect();
+        std::process::exit(fgos_holder_lock::helper::main(&helper_args));
+    }
+
+    if args.get(1).is_some_and(|a| a == "internal") && args.get(2).is_some_and(|a| a == "quiesce-scan") {
+        let route_args: Vec<std::ffi::OsString> = std::env::args_os().skip(2).collect();
+        std::process::exit(fgos_holder_lock::route::main(&route_args));
+    }
     match args[1].as_str() {
         "stage" => {
             let mut from_path: Option<PathBuf> = None;

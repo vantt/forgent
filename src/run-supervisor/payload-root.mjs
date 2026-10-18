@@ -1,0 +1,52 @@
+// The legacy-node payload root of a release, read from the manifest that sits next to its host binary.
+// The controller writes it into the envelope; the attempt step checks it again from the other side.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** The payload this module belongs to (the checkout or release tree that holds src/). */
+export const OWN_PAYLOAD_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+export function realpathOrNull(p) {
+  try { return fs.realpathSync(p); } catch { return null; }
+}
+
+/**
+ * The legacy-node payload root of the release that holds `hostBin`, read from that release's
+ * manifest the way apps/fgos/src/legacy_exec.rs finds it: next to the host binary, never through
+ * PATH, the cwd or the active-release variables (the active release may be another one by now).
+ */
+export function releasePayloadRoot(hostBin) {
+  const found = releasePayloadManifest(hostBin);
+  const root = found?.manifest?.components?.legacyNode?.root;
+  if (typeof root !== 'string' || path.isAbsolute(root) || root.split(/[\\/]/).includes('..')) return null;
+  return realpathOrNull(path.join(found.releaseRoot, root));
+}
+
+/** Manifest locator shared by native components. A dev pointer is tied to this payload. */
+export function releasePayloadManifest(hostBin, manifestPath = process.env.FGOS_ACTIVE_MANIFEST_PATH) {
+  const host = realpathOrNull(hostBin);
+  if (manifestPath && host) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const entry = manifest.entries?.fgos;
+      if (typeof entry === 'string' && !path.isAbsolute(entry) && !entry.split(/[\\/]/).includes('..')
+          && realpathOrNull(path.join(OWN_PAYLOAD_ROOT, entry)) === host
+          && manifest.components?.legacyNode?.root === '.') {
+        return { manifest, releaseRoot: OWN_PAYLOAD_ROOT };
+      }
+    } catch {}
+  }
+  if (!host) return null;
+  const up = (n) => { let p = host; for (let i = 0; i < n; i += 1) p = path.dirname(p); return p; };
+  for (const [releaseRoot, file] of [[up(3), path.join(up(3), 'manifest.json')], [up(3), path.join(up(3), 'target/dev-manifest.json')], [up(2), path.join(up(2), 'manifest.json')]]) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+      const root = manifest.components?.legacyNode?.root;
+      if (typeof root !== 'string' || path.isAbsolute(root) || root.split(/[\\/]/).includes('..')) continue;
+      return { manifest, releaseRoot };
+    } catch {}
+  }
+  return null;
+}

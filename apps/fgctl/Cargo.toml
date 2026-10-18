@@ -5,4 +5,9 @@ edition.workspace = true
 
 [dependencies]
 fgos-distribution = { path = "../../packages/distribution/rust" }
+fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 serde_json = { workspace = true }
+
+[dev-dependencies]
+fgos-git = { path = "../../packages/git/rust" }
+sha2.workspace = true

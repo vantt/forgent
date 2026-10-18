@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
-use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, KillOutcome, ProcId};
+use fgos_process::{domain_watch, Domain, DomainState, KillOutcome, ProcId, WatchTrace, WindowsJob};
 use serde_json::{json, Value};
 
 /// `<lockFile>.predecessor.json`.
@@ -52,9 +52,24 @@ pub fn domain_json(domain: &Domain) -> Value {
     }
     match domain {
         Domain::LinuxGate(t) => json!({ "domainKind": "linux-gate", "domainId": tuple(t, true) }),
-        Domain::WindowsJob(name) => json!({ "domainKind": "windows-job", "domainId": name }),
+        Domain::LinuxPgroup(t) => json!({ "domainKind": "linux-pgroup", "domainId": tuple(t, true) }),
+        Domain::WindowsJob(job) => json!({
+            "domainKind": "windows-job",
+            "domainId": {
+                "job": job.job,
+                "sessionId": job.session_id.to_string(),
+                "declaredAt": job.declared_at.to_string(),
+                "holder": windows_tuple(&job.holder),
+                "keeper": job.keeper.as_ref().map(windows_tuple),
+            },
+        }),
         Domain::MacosTree(t) => json!({ "domainKind": "macos-tree", "domainId": tuple(t, false) }),
     }
+}
+
+/// `{host, pid, startTime}`: a Windows tuple has no boot id and no namespace.
+fn windows_tuple(t: &ProcTuple) -> Value {
+    json!({ "host": t.host, "pid": t.pid.0, "startTime": t.start_time })
 }
 
 fn tuple_from(id: &Value, with_ns: bool) -> Option<ProcTuple> {
@@ -68,6 +83,25 @@ fn tuple_from(id: &Value, with_ns: bool) -> Option<ProcTuple> {
     })
 }
 
+/// A decimal string as the contract writes `sessionId` and `declaredAt`.
+fn decimal<T: std::str::FromStr>(id: &Value, key: &str) -> Option<T> {
+    id.get(key)?.as_str()?.parse().ok()
+}
+
+fn windows_job_from(id: &Value) -> Option<WindowsJob> {
+    let keeper = match id.get("keeper")? {
+        Value::Null => None,
+        tuple => Some(tuple_from(tuple, false)?),
+    };
+    Some(WindowsJob {
+        job: id.get("job")?.as_str()?.to_string(),
+        session_id: decimal(id, "sessionId")?,
+        declared_at: decimal(id, "declaredAt")?,
+        holder: tuple_from(id.get("holder")?, false)?,
+        keeper,
+    })
+}
+
 /// Parse a record. `None`: unknown version, kind or shape.
 pub fn parse_record(record: &Value) -> Option<Domain> {
     if record.get("v")?.as_u64()? != 1 {
@@ -76,7 +110,8 @@ pub fn parse_record(record: &Value) -> Option<Domain> {
     let id = record.get("domainId")?;
     match record.get("domainKind")?.as_str()? {
         "linux-gate" => tuple_from(id, true).map(Domain::LinuxGate),
-        "windows-job" => id.as_str().map(|name| Domain::WindowsJob(name.to_string())),
+        "linux-pgroup" => tuple_from(id, true).map(Domain::LinuxPgroup),
+        "windows-job" => windows_job_from(id).map(Domain::WindowsJob),
         "macos-tree" => tuple_from(id, false).map(Domain::MacosTree),
         _ => None,
     }
@@ -97,14 +132,29 @@ pub fn declare(path: &Path, domain: &Domain) -> io::Result<()> {
     })
 }
 
-fn remove_record(path: &Path) {
-    // The record is only ever removed by a holder (under the lock); a
-    // failure leaves it to be judged again next time, which is safe.
+/// Remove the record at `path`. Only ever called by a holder under the lock;
+/// a failure leaves the record to be judged again next time, which is safe.
+pub(crate) fn remove_record(path: &Path) {
     let _ = std::fs::remove_file(path);
 }
 
 /// Run the rule for the record at `path`, after the kernel lock is held.
 pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
+    admit_with_trace(path, kill_wait).0
+}
+
+/// [`admit`], plus what the domain watch saw while it judged (the sources
+/// that named each pid, whether the job opened). The same code path as
+/// `admit`; the trace is the one the watch already keeps. Used by the
+/// predecessor stress test to attribute a violation.
+#[doc(hidden)]
+pub fn admit_with_trace(path: &Path, kill_wait: Duration) -> (Admit, WatchTrace) {
+    let mut trace = WatchTrace::default();
+    let answer = admit_traced(path, kill_wait, &mut trace);
+    (answer, trace)
+}
+
+fn admit_traced(path: &Path, kill_wait: Duration, trace: &mut WatchTrace) -> Admit {
     let text = match std::fs::read_to_string(path) {
         Ok(text) => text,
         Err(err) if err.kind() == io::ErrorKind::NotFound => return Admit::Proceed,
@@ -119,16 +169,25 @@ pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
         return Admit::NotEmpty { domain: raw };
     };
     let named = domain_json(&domain);
-    if domain_is_empty(&domain) == DomainState::Empty {
+    // One watch for the whole wait: a Windows watch keeps the handle of every
+    // member it has seen.
+    let mut watch = domain_watch(&domain);
+    let answer = judge(path, &mut watch, named, kill_wait);
+    *trace = watch.trace();
+    answer
+}
+
+fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_wait: Duration) -> Admit {
+    if watch.is_empty() == DomainState::Empty {
         remove_record(path);
         return Admit::Proceed;
     }
-    if domain_kill_all(&domain) == KillOutcome::Refused {
+    if watch.kill_all() == KillOutcome::Refused {
         return Admit::NotEmpty { domain: named };
     }
     let deadline = Instant::now() + kill_wait;
     loop {
-        if domain_is_empty(&domain) == DomainState::Empty {
+        if watch.is_empty() == DomainState::Empty {
             remove_record(path);
             return Admit::Proceed;
         }

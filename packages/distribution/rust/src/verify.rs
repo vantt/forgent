@@ -181,6 +181,27 @@ pub fn verify_release_files(
     Ok(())
 }
 
+/// Verifies a present native addon through the existing canonical file verifier.
+/// The component stays optional until Git phase 05 (M10).
+pub fn verify_native_addon(
+    release_root: &Path,
+    manifest: &ReleaseManifest,
+) -> Result<(), VerificationError> {
+    manifest
+        .validate_native_addon_invariant()
+        .map_err(|error| {
+            VerificationError::Canonical(CanonicalError::MalformedSegment(error.to_string()))
+        })?;
+    if let Some(addon) = &manifest.components.native_addon {
+        let mut component_manifest = manifest.clone();
+        component_manifest
+            .files
+            .retain(|file| file.path == addon.path);
+        verify_release_files(release_root, &component_manifest)?;
+    }
+    Ok(())
+}
+
 /// Verifies the legacy node component locator and payload file:
 /// 1. Enforces that `components.legacyNode.root` and `entry` are valid relative locators.
 /// 2. Rejects any symlink path component in `root` or `entry` (including unlisted payload symlinks).
@@ -190,6 +211,8 @@ pub fn verify_legacy_node(
     release_root: &Path,
     manifest: &ReleaseManifest,
 ) -> Result<std::path::PathBuf, VerificationError> {
+    // Every existing stage/activation/host admission boundary calls this door.
+    verify_native_addon(release_root, manifest)?;
     manifest.validate_legacy_node_invariant().map_err(|err| {
         VerificationError::Canonical(CanonicalError::MalformedSegment(err.to_string()))
     })?;
@@ -354,6 +377,7 @@ mod tests {
                 fgos_runner: None,
             },
             components: ComponentsInfo {
+                native_addon: None,
                 legacy_node: LegacyNodeComponent {
                     root: "libexec".to_string(),
                     entry: "bin/fgos.mjs".to_string(),
@@ -367,6 +391,7 @@ mod tests {
                 git: None,
             },
             state_schemas: None,
+            capabilities: vec![],
             files: vec![ManifestFileEntry {
                 path: "bin/fgos".to_string(),
                 kind: "file".to_string(),
@@ -426,6 +451,7 @@ mod tests {
                 fgos_runner: None,
             },
             components: ComponentsInfo {
+                native_addon: None,
                 legacy_node: LegacyNodeComponent {
                     root: "libexec".to_string(),
                     entry: "bin/fgos.mjs".to_string(),
@@ -439,6 +465,7 @@ mod tests {
                 git: None,
             },
             state_schemas: None,
+            capabilities: vec![],
             files: vec![ManifestFileEntry {
                 path: "bin/fgos".to_string(),
                 kind: "file".to_string(),
@@ -577,6 +604,7 @@ mod tests {
                 fgos_runner: None,
             },
             components: ComponentsInfo {
+                native_addon: None,
                 legacy_node: LegacyNodeComponent {
                     root: "libexec/legacy-node".to_string(),
                     entry: "bin/fgos.mjs".to_string(),
@@ -590,6 +618,7 @@ mod tests {
                 git: None,
             },
             state_schemas: None,
+            capabilities: vec![],
             files: vec![],
         };
 

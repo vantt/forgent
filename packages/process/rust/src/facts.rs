@@ -333,6 +333,116 @@ pub fn lock_holders(dev: u64, ino: u64) -> Holders {
     platform::current().lock_holders(dev, ino)
 }
 
+/// [`lock_holders`] restricted to `pids`: only their descriptor tables are
+/// read. A caller that knows every possible holder is among `pids` gets the
+/// same answer without reading every process on the host.
+pub fn lock_holders_among(dev: u64, ino: u64, pids: &[ProcId]) -> Holders {
+    platform::current().lock_holders_among(dev, ino, pids)
+}
+
+/// One process's place in the process tree at the moment it was read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Relation {
+    /// The process.
+    pub pid: ProcId,
+    /// Its parent (Linux `ppid`).
+    pub parent: u32,
+    /// Its process group.
+    pub group: u32,
+    /// Start time in clock ticks since boot (Linux `starttime`): a process
+    /// created later never has a smaller value.
+    pub start_ticks: u64,
+}
+
+/// Now, in the unit and clock of [`Relation::start_ticks`]: clock ticks of
+/// the boot-time clock (Linux `CLOCK_BOOTTIME` / `USER_HZ`, the clock a
+/// process's `starttime` is taken from). A process created after this call
+/// returns has `start_ticks` no smaller than the value returned. `None`
+/// where the platform has no such clock.
+pub fn boot_ticks_now() -> Option<u64> {
+    #[cfg(target_os = "linux")]
+    {
+        // SAFETY: sysconf and clock_gettime only fill values owned here.
+        let hz = unsafe { libc::sysconf(libc::_SC_CLK_TCK) };
+        let mut now: libc::timespec = unsafe { std::mem::zeroed() };
+        if hz <= 0 || unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, &mut now) } != 0 {
+            return None;
+        }
+        let nanos = now.tv_sec as u128 * 1_000_000_000 + now.tv_nsec as u128;
+        Some((nanos * hz as u128 / 1_000_000_000) as u64)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        None
+    }
+}
+
+/// A point in process-creation order: every process created after it has a
+/// `start_ticks` no smaller than `ticks` and, unless the pid space wrapped
+/// all the way around since, a pid in the cyclic range after `last_pid`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CreationMark {
+    /// The last pid the kernel allocated in this process's pid namespace,
+    /// read first; `None` where unreadable.
+    pub last_pid: Option<u32>,
+    /// [`boot_ticks_now`] read after `last_pid`, less one tick.
+    pub ticks: u64,
+    /// When the mark was taken, to bound how far allocation can have run.
+    pub at: std::time::Instant,
+}
+
+/// Take a [`CreationMark`] now; `None` where the platform has no boot clock.
+pub fn creation_mark() -> Option<CreationMark> {
+    let at = std::time::Instant::now();
+    let last_pid = platform::current().last_pid();
+    let ticks = boot_ticks_now()?.saturating_sub(1);
+    Some(CreationMark { last_pid, ticks, at })
+}
+
+/// The processes that can have been created after `mark`, without reading
+/// every process: listed pids in the cyclic pid range after the mark's last
+/// pid, read in allocation order. The kernel hands out pids cyclically, so
+/// a process created later can only fall outside that range if the pid
+/// space wrapped all the way round since the mark. That is ruled out only
+/// while fewer than `pid_max` pids can have been allocated: the mark must be
+/// younger than `pid_max / ALLOCATION_RATE_BOUND` seconds. `None` when that
+/// window has passed, the range cannot be read, or `/proc` is not this
+/// process's pid namespace; the caller then reads every process.
+pub fn created_since(mark: &CreationMark) -> Option<Vec<Relation>> {
+    platform::current().created_since(mark)
+}
+
+/// Pid allocations per second no host reaches (a fork, even one refused after
+/// its pid was allocated, costs microseconds of kernel work per CPU); bounds
+/// the age of a mark that [`created_since`] trusts.
+pub const ALLOCATION_RATE_BOUND: u64 = 4_000_000;
+
+/// Fields following the comm name, shared by all Linux stat readers.
+pub(crate) fn proc_stat_fields(line: &str) -> Option<std::str::SplitWhitespace<'_>> {
+    Some(line[line.rfind(')')? + 1..].split_whitespace())
+}
+
+/// Parent, group and start time of every process this observer can read,
+/// from one pass over the process table (Linux). `None` where the platform
+/// has no such pass. A process that exits during the pass is left out.
+pub fn relations() -> Option<Vec<Relation>> {
+    platform::current().relations()
+}
+
+/// Parent, group and start time from one `/proc/<pid>/stat` line: fields
+/// are counted from the last `)`, so a command name with spaces or
+/// parentheses cannot shift them.
+pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
+    let mut fields = proc_stat_fields(line)?;
+    fields.next()?; // state (field 3)
+    Some(Relation {
+        pid,
+        parent: fields.next()?.parse().ok()?,
+        group: fields.next()?.parse().ok()?,
+        start_ticks: fields.nth(16)?.parse().ok()?, // field 22
+    })
+}
+
 /// What [`scan`] reads for each process.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ScanFilter {
@@ -387,16 +497,44 @@ pub fn scan(filter: &ScanFilter) -> Scan {
 /// counted from the last `)`: state is the first field after it, start
 /// time the twentieth.
 pub fn parse_proc_stat(line: &str) -> Option<(char, String)> {
-    let rest = &line[line.rfind(')')? + 1..];
-    let fields: Vec<&str> = rest.split_whitespace().collect();
-    let state = fields.first()?.chars().next()?;
-    let start_time = fields.get(19)?;
-    Some((state, (*start_time).to_string()))
+    let mut fields = proc_stat_fields(line)?;
+    let state = fields.next()?.chars().next()?;
+    let start_time = fields.nth(18)?;
+    Some((state, start_time.to_string()))
 }
+
+// Linux kernel lock facts belong to process, not a lock policy adapter.
+#[cfg(target_os = "linux")]
+pub use crate::platform::linux::{kcmp_same_file, lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_process_started_after_boot_ticks_now_has_no_smaller_start() {
+        let before = boot_ticks_now().expect("boot clock");
+        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let start = relations()
+            .unwrap()
+            .into_iter()
+            .find(|r| r.pid.0 == child.id())
+            .map(|r| r.start_ticks);
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert!(start.expect("child listed") >= before);
+    }
+
+    #[test]
+    fn parses_parent_group_and_start_from_a_stat_line_with_spaces_in_comm() {
+        let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
+        assert_eq!(
+            parse_relation(ProcId(4242), line),
+            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, start_ticks: 987654 })
+        );
+        assert_eq!(parse_relation(ProcId(1), "1 (x) S 0"), None);
+    }
 
     #[test]
     fn parses_state_and_start_time_from_a_stat_line_with_spaces_in_comm() {

@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import {
-  checkHerdrAvailable,
   checkTrustStoreWritable,
   checkExecutorConfinement,
   checkInvocationGitWriteGrants,
@@ -23,12 +22,6 @@ import {
 // a fresh worktree stops at a folder dialog; and a bypass executor missing its
 // confinement is the one configuration this phase refuses outright, so doctor
 // should say so on a machine where it slipped in some other way.
-
-test('checkHerdrAvailable reports a structured pass or fail, never throws', () => {
-  const r = checkHerdrAvailable();
-  assert.equal(typeof r.passed, 'boolean');
-  assert.ok(typeof r.message === 'string' && r.message.length > 0);
-});
 
 test('checkTrustStoreWritable passes for a readable store and fails by name for a broken one', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-trust-'));
@@ -176,83 +169,6 @@ test('when herdr cannot be asked, kinds are not evaluated rather than guessed', 
   assert.match(r.message, /not evaluated/);
 });
 
-test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  try {
-    process.env.FGOS_HERDR_BIN = '/no/such/custom-herdr-bin';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /\/no\/such\/custom-herdr-bin/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-  }
-});
-
-test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
-  // A bare 'herdr' is never guaranteed to be on PATH (it isn't in CI, which
-  // never installs the compiled binary there) -- mock FGOS_HERDR_BIN the
-  // same way the neighboring F5 test does, so this test exercises the
-  // empty-anchor-pane diagnostic itself rather than the host's PATH.
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
-  const mockScript = path.join(tmp, 'mock-herdr.mjs');
-  fs.writeFileSync(mockScript, `#!/usr/bin/env node
-if (process.argv[2] === '--version') {
-  process.stdout.write('herdr 0.8.0\\n');
-  process.exit(0);
-}
-process.exit(0);
-`, { mode: 0o755 });
-
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-  try {
-    process.env.FGOS_HERDR_BIN = mockScript;
-    process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
-    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('checkHerdrAvailable fails closed when FGOS_HERDR_ANCHOR_PANE cannot be resolved (F5)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
-  const mockScript = path.join(tmp, 'mock-herdr.mjs');
-  fs.writeFileSync(mockScript, `#!/usr/bin/env node
-if (process.argv[2] === '--version') {
-  process.stdout.write('herdr 0.8.0\\n');
-  process.exit(0);
-}
-if (process.argv[2] === 'pane' && process.argv[3] === 'get') {
-  process.stderr.write('error: pane not found\\n');
-  process.exit(1);
-}
-process.exit(0);
-`, { mode: 0o755 });
-
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-  try {
-    process.env.FGOS_HERDR_BIN = mockScript;
-    process.env.FGOS_HERDR_ANCHOR_PANE = 'non-existent-pane-12345';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /cannot be resolved/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
-    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
 // A confined pane that binds a private home gets its login only from the global provider account
 // inventory. Doctor says so per invocation instead of letting a run sit at a sign-in screen.
 function paneExecutors(providerModel = 'openai') {
@@ -261,7 +177,8 @@ function paneExecutors(providerModel = 'openai') {
       openai: {
         providerModel,
         invocations: [
-          { id: 'codex-herdr', adapter: 'herdr-spawn', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-herdr', adapter: 'herdr-spawn', command: 'codex', credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+          { id: 'codex-bwrap', adapter: 'cli-spawn', command: 'codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
           { id: 'codex-cli', adapter: 'cli-spawn' },
         ],
       },
@@ -269,23 +186,27 @@ function paneExecutors(providerModel = 'openai') {
   };
 }
 
-test('checkConfinedPaneAccounts fails by name when a private-home pane has no account inventory', () => {
+test('checkConfinedPaneAccounts fails by name when an invocation that reads a store has no account inventory', () => {
   const r = checkConfinedPaneAccounts(paneExecutors());
   assert.equal(r.passed, false);
   assert.match(r.message, /executor "openai" invocation "codex-herdr": no runner\.providers\.openai-codex\.accounts/);
-  assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that bind a private home are checked');
+  assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that read a login store are checked');
+  assert.match(r.message, /invocation "codex-bwrap": no runner\.providers/, 'a cli invocation is covered as well as a pane, and an older binding counts');
 });
 
-test('checkConfinedPaneAccounts passes when every listed credential file exists, and names a missing one', () => {
+test('checkConfinedPaneAccounts passes while some credential file of the store exists, and names the absent ones', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-'));
   try {
     fs.writeFileSync(path.join(home, 'auth.json'), '{}');
     const withInventory = (source) => ({ ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: source } } } } });
     assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'codex-home', home })).passed, true);
     assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json'] })).passed, true);
-    const missing = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
-    assert.equal(missing.passed, false);
-    assert.match(missing.message, /account "acct" is missing models\.json/);
+    const partial = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
+    assert.equal(partial.passed, true, 'a store with some of its files present still logs in');
+    assert.match(partial.message, /account "acct" has 1 of 2 credential file\(s\); absent: models\.json/);
+    const none = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['models.json', 'settings.json'] }));
+    assert.equal(none.passed, false);
+    assert.match(none.message, /account "acct" has none of models\.json, settings\.json under .*nothing is copied/);
     const invalid = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home }));
     assert.equal(invalid.passed, false);
     assert.match(invalid.message, /provider account inventory is invalid/);
@@ -311,10 +232,24 @@ test('checkConfinedPaneAccounts expands ~, $HOME and ${HOME} the way dispatch do
   }
 });
 
-test('checkConfinedPaneAccounts has nothing to say when no herdr invocation binds a private home', () => {
+test('checkConfinedPaneAccounts takes the files the invocation declares over the account list', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-declared-'));
+  try {
+    fs.writeFileSync(path.join(home, 'agent.db'), '');
+    const cfg = {
+      executors: { openai: { providerModel: 'openai', invocations: [{ id: 'omp-bwrap', command: 'omp', credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db'] } }] } },
+      providers: { openai: { accounts: { acct: { credentialSource: { kind: 'home-files', home, files: ['auth.json'] } } } } },
+    };
+    const r = checkConfinedPaneAccounts(cfg);
+    assert.equal(r.passed, true, r.message);
+    assert.match(r.message, /has its 1 credential file/);
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+});
+
+test('checkConfinedPaneAccounts has nothing to say when no invocation reads a login store', () => {
   const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
   assert.equal(r.passed, true);
-  assert.match(r.message, /no confined herdr invocation binds a private home/);
+  assert.match(r.message, /no confined invocation reads a login store/);
 });
 
 // The registered check judges the machine-global inventory whatever directory doctor runs in. Every test here
@@ -342,7 +277,7 @@ test('the registered confined-pane-accounts check reads the global inventory fro
     writeGlobalConfig(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
     const missing = withHome(home, () => entry.check(home));
     assert.equal(missing.passed, false, missing.message);
-    assert.match(missing.message, /account "acct" is missing auth\.json/);
+    assert.match(missing.message, /account "acct" has none of auth\.json/);
     fs.writeFileSync(path.join(creds, 'auth.json'), '{}');
     const ok = withHome(home, () => entry.check(home));
     assert.equal(ok.passed, true, ok.message);

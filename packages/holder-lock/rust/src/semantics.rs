@@ -4,15 +4,12 @@
 //! `fgos doctor` runs it for `lock-kernel-semantics`; the guarantee a driver
 //! claims for a mount is only trusted once this probe agrees on that mount.
 
-use std::fs::{self, OpenOptions};
+use std::fs;
 use std::path::Path;
-use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-use fgos_process::FdSlot;
-
-use crate::driver::{self, TryLock};
-use crate::port::{self, Mode, Probe, Resource};
+use crate::driver;
+use crate::port::{self, HelperExe, Probe, Resource};
 
 /// How long the probe waits for a dead holder's lock to be seen as free.
 /// The kernel drops it when the holder exits; the wait only covers a fork on
@@ -23,9 +20,16 @@ const FREE_WAIT: Duration = Duration::from_millis(500);
 /// could remove it (its holder child sleeps 60 s at most).
 const STALE_PROBE: Duration = Duration::from_secs(120);
 
+/// How long the probe waits for the holder process to report that it holds
+/// the lock (Windows: the helper role of `helper`).
+#[cfg(windows)]
+const READY_WAIT: Duration = Duration::from_secs(2);
+
 /// Run the probe in `dir` (created when missing). `Ok` carries the wall time
-/// in ms; `Err` says which half failed.
-pub fn two_process_probe(dir: &Path) -> Result<f64, String> {
+/// in ms; `Err` says which half failed. `helper` is the executable that
+/// plays the holder role where the holder must be a process that took the
+/// lock itself (Windows); POSIX hands a locked description to `sleep`.
+pub fn two_process_probe(dir: &Path, helper: &HelperExe) -> Result<f64, String> {
     let started = Instant::now();
     let drv = driver::current();
     if !drv.supported() {
@@ -34,7 +38,7 @@ pub fn two_process_probe(dir: &Path) -> Result<f64, String> {
     fs::create_dir_all(dir).map_err(|e| format!("create {}: {e}", dir.display()))?;
     sweep_stale_probes(dir);
     let path = dir.join(format!(".semantics-probe-{}.lock", std::process::id()));
-    let result = probe_at(&path);
+    let result = probe_at(&path, helper);
     let _ = fs::remove_file(&path);
     result.map(|()| (started.elapsed().as_secs_f64() * 1000.0 * 100.0).round() / 100.0)
 }
@@ -54,7 +58,16 @@ fn sweep_stale_probes(dir: &Path) {
     }
 }
 
-fn probe_at(path: &Path) -> Result<(), String> {
+#[cfg(unix)]
+fn probe_at(path: &Path, _helper: &HelperExe) -> Result<(), String> {
+    use std::fs::OpenOptions;
+    use std::process::{Command, Stdio};
+
+    use fgos_process::FdSlot;
+
+    use crate::driver::TryLock;
+    use crate::port::Mode;
+
     let resource = Resource::new("semantics-probe", path);
     let file = OpenOptions::new()
         .read(true)
@@ -88,6 +101,52 @@ fn probe_at(path: &Path) -> Result<(), String> {
     let while_alive = port::probe(&resource);
     let _ = child.kill();
     let _ = child.wait();
+    finish(&resource, while_alive)
+}
+
+/// Windows: a lock belongs to the process that took it and cannot be handed
+/// on, so the holder is a helper process that locks the file itself, reports
+/// `R`, and holds until it is killed.
+#[cfg(windows)]
+fn probe_at(path: &Path, helper: &HelperExe) -> Result<(), String> {
+    use std::io::Read;
+    use std::process::{Command, Stdio};
+
+    let resource = Resource::new("semantics-probe", path);
+    let mut argv = helper.argv().into_iter();
+    let program = argv.next().expect("helper argv starts with the executable");
+    let mut child = Command::new(program)
+        .args(argv)
+        .args(["probe-holder", "--path"])
+        .arg(path)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .map_err(|e| format!("holder helper {} could not be started: {e}", helper.0.display()))?;
+    let mut stdout = child.stdout.take().expect("piped stdout");
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut byte = [0u8; 1];
+        let _ = tx.send(stdout.read(&mut byte).map(|n| (n, byte[0])));
+    });
+    let ready = rx.recv_timeout(READY_WAIT);
+    let while_alive = match ready {
+        Ok(Ok((1, b'R'))) => port::probe(&resource),
+        other => {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(format!("the holder helper did not report that it holds the lock within {} ms: {other:?}", READY_WAIT.as_millis()));
+        }
+    };
+    let _ = child.kill();
+    let _ = child.wait();
+    finish(&resource, while_alive)
+}
+
+/// Judge the two halves: the holder was seen as holding while alive, and the
+/// lock is free within [`FREE_WAIT`] of its death.
+fn finish(resource: &Resource, while_alive: std::io::Result<Probe>) -> Result<(), String> {
     match while_alive {
         Ok(Probe::Held) => {}
         Ok(Probe::Free) => return Err("a lock held by a live child was seen as free".to_string()),
@@ -95,7 +154,7 @@ fn probe_at(path: &Path) -> Result<(), String> {
     }
     let deadline = Instant::now() + FREE_WAIT;
     loop {
-        match port::probe(&resource) {
+        match port::probe(resource) {
             Ok(Probe::Free) => return Ok(()),
             Ok(Probe::Held) if Instant::now() < deadline => {
                 std::thread::sleep(Duration::from_millis(5))
@@ -120,7 +179,7 @@ mod tests {
         let dir =
             std::env::temp_dir().join(format!("fgos-semantics-probe-test-{}", std::process::id()));
         let elapsed =
-            two_process_probe(&dir.join("locks")).expect("probe passes on a local tmp mount");
+            two_process_probe(&dir.join("locks"), &HelperExe::current().unwrap()).expect("probe passes on a local tmp mount");
         assert!(elapsed < 1000.0, "probe took {elapsed} ms");
         assert_eq!(
             fs::read_dir(dir.join("locks")).unwrap().count(),

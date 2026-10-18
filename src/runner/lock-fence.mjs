@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import { lockHolders, probe, resolveLock, lockEntry, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
 import { ownPidChain } from '../holder-lock/fences.mjs';
+import { hotPaths, readHotRecord, clearHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 
 export const TERM_WAIT_MS = 5000;
 export const KILL_WAIT_MS = 3000;
@@ -106,6 +107,7 @@ async function waitUntilGone(name, params, holders, ms) {
  * named HolderLockError and nothing was signalled.
  */
 export async function fenceLock({ name, fgosDir, params = {}, confirm, attestStopped = false }) {
+  if (lockEntry(name).kind === 'hot-mutex') return fenceHotRecord({ name, fgosDir, confirm, attestStopped });
   const filled = lockParamsFor({ fgosDir, params, scope: lockEntry(name).scope });
   const lock = resolveLock(name, filled);
   // A lock file that does not exist cannot be held; nothing is created to ask.
@@ -151,4 +153,49 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
     throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL${left.length ? ` (pid ${left.map((holder) => holder.pid).join(', ')})` : ''}`, { lock: name, pids: left.map((holder) => holder.pid) });
   }
   return { lock: name, path: lock.v3Path, status: 'fenced', holders, terminated, killed };
+}
+
+/**
+ * A hot mutex (`state`, `porting-events`) is held by the record file
+ * `<fgosDir>/locks/<name>.hot`, not by a kernel lock the holder keeps: the
+ * holder is the pid the record names. A record whose holder is provably alive
+ * is signalled by identity like any other holder; one that does not parse, or
+ * whose holder cannot be judged here, needs `attestStopped` (the person says
+ * the holder is gone). The record is then removed under the reclaim lock.
+ */
+async function fenceHotRecord({ name, fgosDir, confirm, attestStopped }) {
+  const { record: recordPath } = hotPaths(fgosDir, name);
+  const seen = readHotRecord(recordPath);
+  const result = (status, holders = [], terminated = [], killed = []) => ({ lock: name, path: recordPath, status, holders, terminated, killed });
+  if (seen.state === 'absent') return result('free');
+
+  let holders = [];
+  let terminated = [];
+  let killed = [];
+  const verdict = seen.state === 'ok' ? judgeHotRecord(seen.record, fgosDir) : 'unreadable';
+  if (verdict === 'alive') {
+    const holder = identityOf(seen.record.pid);
+    if (new Set(ownPidChain()).has(holder.pid)) {
+      throw new HolderLockError('lock-fence-self', `${name} is held by this process or one of its parents (pid ${holder.pid}); not fenced`, { lock: name, pids: [holder.pid] });
+    }
+    holders = [holder];
+    if (!(await confirm(holders))) {
+      throw new HolderLockError('lock-fence-not-confirmed', `${name} is held by pid ${holder.pid}; nothing was signalled (confirm, or pass --yes)`, { lock: name, holders });
+    }
+    terminated = holders.filter((h) => signalByIdentity(h, 'SIGTERM')).map((h) => h.pid);
+    let left = holders.filter((h) => startTimeOf(h.pid) === h.startTime);
+    for (const deadline = Date.now() + TERM_WAIT_MS; left.length > 0 && Date.now() < deadline; left = left.filter((h) => startTimeOf(h.pid) === h.startTime)) await sleep(POLL_MS);
+    killed = left.filter((h) => signalByIdentity(h, 'SIGKILL')).map((h) => h.pid);
+    for (const deadline = Date.now() + KILL_WAIT_MS; left.length > 0 && Date.now() < deadline; left = left.filter((h) => startTimeOf(h.pid) === h.startTime)) await sleep(POLL_MS);
+    if (left.length > 0) {
+      throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL (pid ${left.map((h) => h.pid).join(', ')})`, { lock: name, pids: left.map((h) => h.pid) });
+    }
+  } else if (verdict !== 'dead' && !attestStopped) {
+    const why = verdict === 'unreadable' ? 'its record does not parse' : 'its holder cannot be judged here';
+    throw new HolderLockError('lock-fence-unlistable', `${name}: ${why}; stop the holder yourself and re-run with --attest-stopped to remove the record (${recordPath})`, { lock: name, record: recordPath });
+  }
+  if (!clearHotRecord(fgosDir, name, seen.raw)) {
+    throw new HolderLockError('lock-fence-still-held', `${name}: the record at ${recordPath} changed while it was being cleared; nothing was removed`, { lock: name, record: recordPath });
+  }
+  return result(holders.length > 0 ? 'fenced' : 'attested-free', holders, terminated, killed);
 }

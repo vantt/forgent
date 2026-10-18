@@ -101,7 +101,7 @@ import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './dispatch/confinement/cleanup.mjs';
+import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 
@@ -1322,15 +1322,16 @@ export async function runOnce(options = {}) {
   }
 
   try {
-    // M8: reclaim confinement temp resources (worker homes etc.) whose
-    // owning process is dead -- best-effort, never blocks/fails runner
+    // Finish the attempts a dead supervisor left (adopt removes their private homes)
+    // -- best-effort, never blocks/fails runner
     // startup. `dryRun` skips it the same way it skips the claim reaper
     // above, since a dry run must never mutate the filesystem.
     if (!dryRun) {
       try {
-        const confinementReap = reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() });
-        if (confinementReap.reaped.length > 0) {
-          log(`fgos-runner: reaped ${confinementReap.reaped.length} orphaned confinement resource dir(s)`);
+        const { adopt } = sweepAttempts({ assignmentsRoot: path.join(dir, 'assignments') });
+        const adopted = (adopt ?? []).filter((verdict) => verdict.state === 'adopted').length;
+        if (adopted > 0) {
+          log(`fgos-runner: adopted ${adopted} unfinished attempt(s)`);
         }
       } catch (err) {
         log(`fgos-runner: confinement resource reap skipped: ${err.message}`);

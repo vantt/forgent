@@ -12,7 +12,7 @@ import {
   validateOverrideConfinementShape,
   ConfinementPolicyError,
 } from "./policies.mjs";
-import { providerCapacityForCommand } from "../provider-capacity.mjs";
+import { credentialStoreOf, credentialStoreProblem, providerCapacityForInvocation } from "../provider-capacity.mjs";
 
 /** A refusal that names why a blind dispatch cannot be enforced, before anything launches. */
 function blindRefusal(code, detail) {
@@ -38,6 +38,10 @@ const ALLOWED_REQUEST_KEYS = new Set([
   "authorityScope",
   "assignmentLaunchContext",
   "providerCapacity",
+  "attemptId",
+  "launchMode",
+  "gateCommand",
+  "attemptBinds",
 ]);
 
 export function crossCheckAssignmentLaunchContext(launchContext, context = null) {
@@ -221,6 +225,10 @@ export function validateConfinementRequest(request) {
   if (!request.invocation || typeof request.invocation !== "object" || Array.isArray(request.invocation)) {
     throw new Error("ConfinementRequest invocation must be an object.");
   }
+  if (request.invocation.credentialStore !== undefined) {
+    const problem = credentialStoreProblem(request.invocation.credentialStore);
+    if (problem) throw new Error(`ConfinementRequest invocation.credentialStore ${problem}.`);
+  }
   if (!request.context || typeof request.context !== "object" || Array.isArray(request.context)) {
     throw new Error("ConfinementRequest context must be an object.");
   }
@@ -282,6 +290,10 @@ export function buildConfinementRequest({
   assignmentLaunchContext = null,
   providerCapacity = null,
   dispatchId = null,
+  attemptId = null,
+  launchMode = null,
+  gateCommand = null,
+  attemptBinds = null,
 } = {}) {
   const cap = capability || executorId || "(unknown-capability)";
   const execId = executorId || cap;
@@ -411,7 +423,9 @@ export function buildConfinementRequest({
       permissionMode: invocation.permissionMode,
       confinement: invocation.confinement ? (normalizeLegacyConfinement(invocation.confinement, `executor.${execId}.confinement`) ?? invocation.confinement) : invocation.confinement,
       adapter: invocation.adapter || "cli-spawn",
-      resourceBindings: invocation.resourceBindings || [],
+      // The login store the launch reads (declared, or inferred from an older config): the driver hands
+      // that store's files to the private home and points `homeEnv` at it. Absent when it reads none.
+      ...(credentialStoreOf(invocation) ? { credentialStore: credentialStoreOf(invocation) } : {}),
       ...(invocation.method || invocation.url ? {
         method: invocation.method,
         url: invocation.url,
@@ -449,9 +463,12 @@ export function buildConfinementRequest({
     backendId: backendId ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
     ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+    // A supervised attempt: the driver names the gate as the command the sandbox runs and returns the
+    // prefix and the agent argv instead of a worker command line.
+    ...(attemptId ? { attemptId, launchMode: launchMode ?? 'direct', ...(Array.isArray(gateCommand) ? { gateCommand } : {}), ...(Array.isArray(attemptBinds) ? { attemptBinds } : {}) } : {}),
     // The account leased for this launch hands over the login store of the CLI this invocation runs
     // (an account may keep one per CLI); private-home provisioning, write-back and trust seeding read it.
-    ...(providerCapacity ? { providerCapacity: providerCapacityForCommand(providerCapacity, invocation?.command) } : {}),
+    ...(providerCapacity ? { providerCapacity: providerCapacityForInvocation(providerCapacity, invocation) } : {}),
   };
 
   return validateConfinementRequest(req);

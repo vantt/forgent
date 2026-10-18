@@ -146,6 +146,8 @@ fn test_recursion_trap_fails_closed() {
     );
 }
 
+// Unix only: the spy is a `sh` wrapper script and symlinks need no privilege.
+#[cfg(unix)]
 #[test]
 fn test_one_node_child_process_spy() {
     let manifest_path = ensure_dev_manifest();
@@ -938,6 +940,8 @@ fn test_host_rejects_full_manifest_with_path_traversal_before_launch() {
     let _ = fs::remove_dir_all(&temp_dir);
 }
 
+// Unix only: creating a symlink needs a privilege a Windows runner may lack.
+#[cfg(unix)]
 #[test]
 fn test_host_rejects_manifest_with_in_root_directory_symlink() {
     let temp_dir = std::env::temp_dir().join(format!(
@@ -1012,6 +1016,8 @@ fn test_host_rejects_manifest_with_in_root_directory_symlink() {
     let _ = fs::remove_dir_all(&temp_dir);
 }
 
+// Unix only: creating a symlink needs a privilege a Windows runner may lack.
+#[cfg(unix)]
 #[test]
 fn test_host_rejects_manifest_with_unlisted_payload_symlink() {
     let temp_dir = std::env::temp_dir().join(format!(

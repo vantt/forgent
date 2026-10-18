@@ -25,29 +25,23 @@ observe(status)
 ### Step 1: Observe (`status`)
 
 Derive active session state strictly from the runtime's authoritative inspection doors:
-- Query status: `fgos coordination status <coordinationId> [--detail]`
+- Query status: `fgos workflow status <workflowRunId>` for a Workflow run; for a single `fgos run` Unit, read its record under `.fgos/assignments/<unitRunId>/`.
 - Reconstruct context from the persistent session record and the designated continuity artifact.
 - Never guess state from unrecorded conversational narration, private agent memory, or expired assumptions. A fresh driver process must be able to resume cold with zero prior chat context using only the session status and continuity artifact.
 
 ### Step 2: Choose One Legal Action
 
-The control plane derives legal options directly from the immutable protocol definition and the append-only event log, surfaced via `coordination-actions.v1`:
-- Inspect projected legal actions in `status.actions[]`. Each action provides an `actionKey`, action `kind`, `target`, and `requiredInputs`.
+The runtime derives legal options from the Workflow definition and the run's persisted record. For a Workflow run, `fgos workflow operations <workflowRunId>` lists them:
 - The driver selects exactly **one** legal action to perform next based on facade objectives.
-- Never dispatch an action that is not currently projected as legal or whose preconditions are unsatisfied.
+- Never dispatch an action that is not currently legal or whose preconditions are unsatisfied.
 
 ### Step 3: Dispatch
 
-Execute the chosen action using the corresponding semantic CLI command:
-- `fgos coordination operation` — for initial or required operation execution.
-- `fgos coordination authorize-and-dispatch` — for optional, driver-authorized operations.
-- `fgos coordination fan-out` — for concurrent read-only branch execution.
-- `fgos coordination contribution` — for multi-party deliberation contributions.
-- `fgos coordination human-turn` — for attributing external input to a person.
-- `fgos coordination disposition` — for recording an explicit evaluation of an outcome.
-- `fgos coordination close` — for explicit termination.
+Execute the chosen action through one of the two doors:
+- `fgos run "<prompt>"` or `fgos run --unit <file>` — one Unit.
+- `fgos workflow start <preset>|--units <file>` — planned work, one step per Unit; `fgos workflow resume` and `fgos workflow answer` continue it and attribute a person's answer.
 
-Every mutating or state-advancing command requires the active `actionKey` and the trusted driver identity (`writerId`).
+Run `fgos dispatch decide` before any dispatch out of the current turn.
 
 ### Step 4: Verify Evidence
 
@@ -63,8 +57,7 @@ When an inspection or advisory operation reports findings, the driver must recor
 - `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
 - `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
 
-Dispositions are recorded via:
-`fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <value> --rationale <text>`
+Dispositions are recorded in the continuity artifact (Step 8).
 
 ### Step 6: Adapt (Revise, Recheck, Retry, Ask Human)
 
@@ -77,10 +70,8 @@ Based on dispositions and evidence outcomes:
 ### Step 7: Explicit Close or Continue
 
 - **Continue:** If further declared operations or authorized rechecks remain, cycle back to Step 1 (Observe).
-- **Explicit Close:** When all declared steps have settled, all findings are dispositioned, all required rechecks confirm resolution, and close prerequisites are satisfied, invoke:
-  `fgos coordination close --id <coordinationId> --action-key <actionKey> --writer-id <writerId>`
-  *(Any closeout summary or rationale is recorded in the continuity artifact, not passed as a CLI flag.)*
-- **Explicit Close Law:** Explicit close is the sole normal close action. A session never terminates automatically merely because operations finished. Automated or implicit completion is strictly prohibited. Quorum and prerequisite checks fail closed.
+- **Explicit Close:** When all declared steps have settled, all findings are dispositioned, all required rechecks confirm resolution, and close prerequisites are satisfied, record the closeout summary and rationale in the continuity artifact and report the result.
+- **Explicit Close Law:** Closing is a deliberate driver decision. A session never terminates automatically merely because operations finished. Quorum and prerequisite checks fail closed.
 
 ### Step 8: Continuity Artifact
 
@@ -109,7 +100,7 @@ Every consuming facade must explicitly define the following hook values:
 ## 3. Core Operating Invariants
 
 1. **Replay and Status Authority:** Session status is derived strictly from the append-only event log and definition snapshot. The driver never maintains private, uncommitted state.
-2. **Deterministic Preconditions:** Every state-advancing semantic command consumes an `actionKey` that binds the call to the session event sequence. Stale actions refuse with an explicit mismatch error.
-3. **Driver Identity Continuity:** The session driver identity (`writerId`) established at session creation is mandatory on all follow-up actions and cannot be reassigned or spoofed.
+2. **Deterministic Preconditions:** A stale or illegal action refuses with an explicit error; the driver re-observes instead of retrying blind.
+3. **Driver Identity Continuity:** The driver identity established at session creation stays the same on all follow-up actions.
 4. **Independent Proof:** Dispatched workers perform task execution. The driver independently verifies evidence before certifying any result.
-5. **Sole Close Action:** Sessions remain active until an explicit driver `close` command is validated and accepted by quorum rules.
+5. **Explicit Close:** Sessions remain active until the driver explicitly closes them after quorum and prerequisite checks pass.

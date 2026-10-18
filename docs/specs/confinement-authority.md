@@ -579,7 +579,8 @@ interface ConfinementRequestV1 {
     args: string[];
     env: Record<string, string>;
     adapter: string;
-    resourceBindings: RuntimeResourceBindingV1[];
+    // Login store invocation đọc; vắng khi nó không đọc store nào (runner.md RUL105).
+    credentialStore?: { use: string; homeEnv: string; files?: string[] };
     // Remote adapter dùng transport, không spawn command/args.
     transport?: { kind: 'http'; method: string; url: string;
       headers: Record<string, string>; body?: string };
@@ -767,9 +768,10 @@ tự đổi sang backend khác.
 Backend driver không được branch theo `executorId`, `providerModel`, Codex,
 Claude hay agent type khác. Nó chỉ nhận invocation, resolved semantic grants và
 control chuẩn. Provider adapter/normalizer chịu trách nhiệm diễn tả nhu cầu đặc
-thù thành binding chuẩn trước cửa, ví dụ bind resource `private-home` vào env
-`CODEX_HOME`; Authority resolve resource, còn backend chỉ áp dụng binding đã
-được duyệt. Nhờ vậy bỏ provider recipe mà không giấu recipe thành `if` trong
+thù thành khai báo chuẩn trước cửa, ví dụ
+`credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' }`; Authority resolve
+resource `private-home`, còn backend chỉ trỏ `homeEnv` vào đó và chép file của
+store đã duyệt. Nhờ vậy bỏ provider recipe mà không giấu recipe thành `if` trong
 driver.
 
 ### 6.6 `ConfinementAttestation`
@@ -1077,43 +1079,41 @@ thường, không phải backend fallback ẩn.
 
 Adapter mới chỉ chạy khi đã đăng ký metadata và được Authority gọi qua
 `adapterPort`. Adapter không hiểu confinement policy; nó chỉ nhận prepared
-invocation/context. Provider normalizer tạo `resourceBindings` chuẩn trước cửa;
-Authority resolve và validate chúng, còn backend driver chỉ materialize và áp
-dụng các binding đã được Authority duyệt.
+invocation/context. Invocation khai `credentialStore` (store nó đọc, biến env trỏ
+tới home, file cần chép) chuẩn trước cửa; Authority resolve và validate, còn
+backend driver chỉ trỏ biến đó vào private home và chép đúng file đã khai.
 
 ### 8.6 Crash và cleanup
 
 Nghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép
 dọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.
 Local-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership
-marker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra
-process identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private
-home không tự biến mất khi process exit. Không cần remote lease/journal engine
+marker trước allocation và finally idempotent. Home của một attempt (marker bản 2,
+`attemptId`) chỉ do bước finalize-home của adopt dọn, khi khoá attempt trống và
+miền tiến trình rỗng; không còn reaper phán home theo pid, pane hay tuổi.
+Host-disk private home không tự biến mất khi process exit. Không cần remote lease/journal engine
 cho default local. Phần journal/lease dưới đây áp dụng profile có resource sống
 ngoài process local (remote/container detached), không phải gate chung của S4.
 
 Attestation `prepared` được ghi trước adapter call. Cleanup chạy trong
 `finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở
-§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn
-lại. Cleanup failure không được biến execution chưa rõ thành thành công, và
+§6.5. Cleanup failure không được biến execution chưa rõ thành thành công, và
 không được che mất execution result đã có. Nếu Authority crash sau khi prepare,
-run record giữ phase cuối cùng và reaper xử lý resource chưa dọn.
+run record giữ phase cuối cùng và adopt kết thúc attempt còn dở (`sweepAttempts` ở `src/run-supervisor/sweep.mjs` là cửa duy nhất: đầu mỗi `fgos run`, đầu vòng runner, `fgos doctor --fix`).
 
-Reaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.
-
-**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe "reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá" (RT2-1) vẫn còn.
+**Home thuộc về attempt, không thuộc về tiến trình (2026-10-18, thay luật binding 2026-10-15).** Authority không còn `bind`/`markLaunched`/`retain` và marker không còn trường `paneId`, `terminalKey`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`, `retainedAt`; finalizer chỉ chấp nhận `credentialKept` là thay đổi sau prepare, mọi thay đổi khác là `ownership-marker-mismatch`. Pane do terminal-control giữ theo khoá, không liên quan tới việc home còn hay mất. Một lượt chạy herdr-spawn luôn là attempt của run supervisor: yêu cầu không mang `attemptId` bị từ chối với `attempt-required` và file herdr-launch-command không còn nơi ghi. Dispatch ngoài cửa assignment (không có attempt) vẫn ghi marker bản 1 (`pid`) và tự dọn home khi settle; nếu process của nó chết thì không sweep nào phán home đó: `fgos doctor` (`confinement-orphaned-resources-reaped`) nêu tên và chỉ `--fix` tường minh của chủ máy mới dọn (theo pid).
 
 Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi
 side effect prepare; driver tạo theo identity đó một cách idempotent. Journal
 ghi dispatch id, backend snapshot reference, resource locator, lease/execution
 identity và trạng thái allocation/collection/cleanup, không chứa credential.
 Callback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.
-Reaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution
+Recovery phải lấy lease độc quyền, kiểm tra liveness bằng execution
 identity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect
 và cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được
 remote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect
 hoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được
-giữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry
+giữ cho recovery, không xóa vì agent đã exit. Doctor dùng cùng registry
 setup/doctor; backend không có recovery contract này chưa được nhận required.
 
 Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu
@@ -1356,11 +1356,11 @@ Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P
 
 **Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):
 
-1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).
-2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.
-3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state."<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập.
+1. `credentialStore: { use: <codex | pi | omp>, homeEnv: <CODEX_HOME | PI_CODING_AGENT_DIR>, files?: [...] }` trên invocation (cùng dạng `codex-cli-bwrap`; runner.md RUL105 (an invocation declares the login store it reads)). Config viết trước field này (config toàn máy, project khác) vẫn khai `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <biến> } }]`; một hàm (`credentialStoreOf`) suy `credentialStore` từ đó, và nhánh suy này bị xoá khi các config ấy đã chuyển.
+2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn, theo `credentialStore.files` của invocation nếu có, không thì theo danh sách của account. **Luật chép (2026-10-19, thay luật "thiếu một file thì từ chối"):** file có mặt thì chép, file vắng thì bỏ qua, không file nào có mặt thì từ chối `credential-provisioning` (`credential-store-empty`); symlink treo hay trỏ ra ngoài home, file không thường, đường dẫn có `..` vẫn bị từ chối. Invocation không khai store thì không được chép gì dù account nào được lease (bài học `569f72d3b`), và `assessBwrap` từ chối policy không cấp `private-home` cho invocation đọc store. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là `credentialStore.use` của invocation); request của Authority (`buildConfinementRequest`) chọn store theo khoá đó, và khoá không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.
+3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state."<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo invocation confine nào đọc store mà account không có file nào của store đó (agent sẽ khởi động chưa đăng nhập), và ghi chú file vắng.
 
-**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` "dormant" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only).
+**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` "dormant" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only). 2026-10-19 (đợt model pool B2): binding chung `resourceBindings` được thay bằng `credentialStore` trên invocation, khoá chọn store là `use` thay vì tên lệnh, và id invocation bỏ tên account (`codex-herdr-fgovn` thành `codex-herdr`).
 
 **Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn "Codex bwrap" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase "facts" của kế hoạch chỉ hỏi về code hiện tại, không hỏi "trước đây đã có gì và vì sao bị bỏ". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` ("Before touching code").
 
@@ -1373,7 +1373,7 @@ Private home nhận một **bản chép** của login, bị xoá sau dispatch. H
 
 ### 13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên
 
-**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu.
+**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` (từ 2026-10-19 là `codex-herdr`) truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu.
 
 **Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home.
 
@@ -1397,5 +1397,5 @@ Private home nhận một **bản chép** của login, bị xoá sau dispatch. H
 - `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.
 - `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.
 - `src/setup/registrations.mjs`: doctor checks liên quan.
-- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).
+- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation confine có account khai thêm `credentialStore` (§13.1).
 - `docs/routing-handoff-contract.md`: worktree containment không phải sandbox.

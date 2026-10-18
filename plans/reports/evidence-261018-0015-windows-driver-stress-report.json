@@ -1,0 +1,32 @@
+{
+  "scenarios": {
+    "all-owners-dead": {
+      "repeats": 500,
+      "violations": 0,
+      "jobOpened": 0,
+      "extraWaitMs": { "p50": 96.643, "p95": 122.1649, "max": 184.92600000000002 },
+      "warmupP50Ms": 75.3241,
+      "namedByOneSourceOnly": 0,
+      "violationDetails": []
+    },
+    "borrow-hook-predecessor-check": {
+      "repeats": 500,
+      "violations": 0,
+      "jobOpened": 500,
+      "extraWaitMs": { "p50": 109.1063, "p95": 158.775, "max": 208.25959999999998 },
+      "warmupP50Ms": 103.1119,
+      "namedByOneSourceOnly": 0,
+      "violationDetails": []
+    },
+    "dying-job-open": {
+      "repeats": 500,
+      "violations": 0,
+      "jobOpened": 500,
+      "extraWaitMs": { "p50": 100.99950000000001, "p95": 142.936, "max": 171.3321 },
+      "warmupP50Ms": 126.32509999999999,
+      "namedByOneSourceOnly": 0,
+      "violationDetails": []
+    }
+  },
+  "windows": "Windows_NT"
+}

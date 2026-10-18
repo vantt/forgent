@@ -6,6 +6,8 @@ Wave 1. Nhánh `run-supervisor/p01-containment-linux`, worktree `.claude/worktre
 
 r6 §5.3 (bảng driver), §9.3 điểm 3 và 7, §12.7; kongming M1, M2, N3; 4.2 P01 (`domain_is_empty/kill_all` cho `linux-gate`, `spawn_with_fds`, `judge`).
 
+> **Amendment 2026-10-18:** `Domain` trong `packages/process/rust/src/lib.rs` chưa có `LinuxPgroup`; phase này thêm biến thể, `domain_is_empty/domain_kill_all` cho nó, và mọi `match` trên `Domain`. `LinuxGate` và `WindowsJob` đã có driver, không viết lại.
+
 ## Yêu cầu
 
 - `containment/mod.rs`: trait `ContainmentDriver` theo contract; `select(env) -> Box<dyn ContainmentDriver>`: Linux thử `bwrap-pidns` (có `bwrap` theo đường dẫn tuyệt đối trong envelope hoặc cấu hình confinement, và user namespace dùng được: chạy `bwrap --unshare-user --unshare-pid --as-pid-1 -- /bin/true` một lần mỗi process, cache) → không được thì `linux-pgroup`.

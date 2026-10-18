@@ -14,8 +14,12 @@ use serde_json::{json, Map, Value};
 
 use crate::borrow_vectors::{self, RunError};
 use crate::driver;
-use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, NotBorrowerReason, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV};
+#[cfg(not(windows))]
+use crate::port::{NotBorrowerReason, LOCK_FD_ENV};
+use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS};
 use crate::state_root;
+
+mod hold;
 
 /// The protocol these routes speak.
 pub const PROTOCOL: u64 = 1;
@@ -127,7 +131,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|state-root|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
+        return usage("fgos internal <lock-fd|lock-hold|state-root|process-observe|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -147,7 +151,9 @@ pub fn main(args: &[OsString]) -> i32 {
     }
     match route.as_str() {
         "lock-fd" => lock_fd(&others),
+        "lock-hold" => lock_hold(&others),
         "state-root" => state_root_route(&others),
+        "process-observe" => process_observe(&others),
         "quiesce-scan" => quiesce_scan(&others),
         "lock-borrow-vectors" => lock_borrow_vectors(&others),
         other => usage(&format!("unknown internal route {other}")),
@@ -159,16 +165,16 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee"].into_iter().filter(|m| flags.has(m)).collect();
+    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--drain-child"].into_iter().filter(|m| flags.has(m)).collect();
     if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
-        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>");
+        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>, --predecessor-state <lockFile>");
     }
     let mode = modes[0];
-    if mode != "--try" && mode != "--wait-ms" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
+    if mode != "--try" && mode != "--wait-ms" && mode != "--drain-child" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
         return usage("--kill-wait-ms and --predecessor apply only to --try and --wait-ms");
     }
     let parsed = (|| -> Result<(Option<u64>, u64, Option<PathBuf>), String> {
@@ -186,18 +192,43 @@ fn lock_fd(args: &[String]) -> i32 {
         let dir = if target.is_dir() { target } else { target.parent().map(Path::to_path_buf).unwrap_or(target) };
         return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json() }), EXIT_OK);
     }
+    if mode == "--predecessor-state" {
+        return predecessor_state(Path::new(flags.values("--predecessor-state")[0]));
+    }
     let drv = driver::current();
+    if mode == "--probe" {
+        // A fresh open and a non-blocking shared try, closed at once: it
+        // never obstructs a holder and needs no descriptor from the caller.
+        if !drv.supported() {
+            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
+        }
+        let path = PathBuf::from(flags.values("--probe")[0]);
+        return match port::probe(&port::Resource::new(path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default(), &path)) {
+            Ok(port::Probe::Free) => emit(Some("free"), json!({}), EXIT_OK),
+            Ok(port::Probe::Held) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+            Err(err) => error("io", &format!("probe {}: {err}", path.display()), EXIT_INTERNAL),
+        };
+    }
     if mode == "--borrowed-check" {
         let lock_path = PathBuf::from(flags.values("--borrowed-check")[0]);
         if !drv.supported() {
             return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
         }
-        let file = match take_slot3() {
-            Ok(file) => file,
-            Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+        #[cfg(windows)]
+        let answer = {
+            let env = std::env::var(crate::LOCK_JOB_ENV).ok();
+            crate::borrowed_check_job(&lock_path, env.as_deref())
         };
-        let env = std::env::var(LOCK_FD_ENV).ok();
-        return match port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT) {
+        #[cfg(not(windows))]
+        let answer = {
+            let file = match take_slot3() {
+                Ok(file) => file,
+                Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+            };
+            let env = std::env::var(LOCK_FD_ENV).ok();
+            port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT)
+        };
+        return match answer {
             BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
             BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
         };
@@ -209,6 +240,34 @@ fn lock_fd(args: &[String]) -> i32 {
         Ok(file) => file,
         Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
     };
+    #[cfg(target_os = "linux")]
+    if mode == "--drain-child" {
+        let child = match flags.values("--drain-child")[0].parse::<u32>() {
+            Ok(pid) if pid > 1 => pid,
+            _ => return usage("--drain-child requires a child pid"),
+        };
+        // This helper's parent owns the explicitly inherited description.
+        let owner = unsafe { libc::getppid() } as u32;
+        return match driver::flock::drain_description(
+            &file,
+            Some(child),
+            owner,
+            std::time::Duration::from_millis(kill_wait_ms),
+            // Nothing is known about the inherited description's history.
+            driver::flock::Reach::Everyone,
+        ) {
+            Ok(killed) => emit(
+                Some("drained"),
+                json!({"leftoversKilled": killed, "remaining": []}),
+                EXIT_OK,
+            ),
+            Err(left) => emit(
+                Some("not-drained"),
+                json!({"leftoversKilled": left.killed, "remaining": left.pids}),
+                EXIT_NEGATIVE,
+            ),
+        };
+    }
     match drv.file_guarantee(&file) {
         Ok(g) if !g.usable() => return emit(Some("unavailable"), json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
         Ok(_) => {}
@@ -246,6 +305,91 @@ fn lock_fd(args: &[String]) -> i32 {
     }
 }
 
+/// `lock-fd --predecessor-state <lockFile>`: one reading of the contender view
+/// on the record next to `lock_file`. Never kills, never edits the record.
+fn predecessor_state(lock_file: &Path) -> i32 {
+    use fgos_process::{domain_watch, DomainState};
+    let record_path = crate::predecessor::record_path(lock_file);
+    let text = match std::fs::read_to_string(&record_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return emit(Some("predecessor"), json!({ "state": "absent" }), EXIT_OK),
+        Err(err) => return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }), EXIT_OK),
+    };
+    let Ok(raw) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } }), EXIT_OK);
+    };
+    let Some(domain) = crate::predecessor::parse_record(&raw) else {
+        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw }), EXIT_OK);
+    };
+    let named = crate::predecessor::domain_json(&domain);
+    let mut watch = domain_watch(&domain);
+    // A dead holder whose job is gone is judged by the process tree alone, and
+    // that fallback needs two quiet polls in a row; a live member stays
+    // "not empty" through every poll.
+    let mut verdict = watch.is_empty();
+    for _ in 0..2 {
+        if verdict != DomainState::NotEmpty || watch.reason().is_some() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        verdict = watch.is_empty();
+    }
+    let state = match verdict {
+        DomainState::Empty => "empty",
+        DomainState::NotEmpty => "not-empty",
+        DomainState::Unknown => "unknown",
+    };
+    let mut fields = json!({ "state": state, "domain": named });
+    if state != "empty" {
+        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
+    }
+    emit(Some("predecessor"), fields, EXIT_OK)
+}
+
+/// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
+/// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
+fn lock_hold(args: &[String]) -> i32 {
+    let flags = match Flags::parse(args, &["--path", "--mode", "--work", "--wait-ms", "--kill-wait-ms"], &["--try"]) {
+        Ok(flags) => flags,
+        Err(message) => return usage(&message),
+    };
+    let parsed = (|| -> Result<hold::HoldArgs, String> {
+        let path = flags.one("--path")?.ok_or("--path <lockFile> is required")?;
+        let work = flags.one("--work")?.ok_or("--work <dir> is required")?;
+        let mode = match flags.one("--mode")?.ok_or("--mode ex|sh is required")? {
+            "ex" => Mode::Ex,
+            "sh" => Mode::Sh,
+            other => return Err(format!("--mode needs ex or sh, got {other}")),
+        };
+        let wait = match (flags.has("--try"), flags.one("--wait-ms")?) {
+            (true, None) => Wait::Try,
+            (false, Some(raw)) => Wait::Ms(positive_ms(raw, "--wait-ms", 1)?),
+            _ => return Err("exactly one of --try, --wait-ms N is required".to_string()),
+        };
+        if flags.values("--try").len() > 1 {
+            return Err("--try given more than once".to_string());
+        }
+        let kill_wait_ms = flags.one("--kill-wait-ms")?.map(|raw| positive_ms(raw, "--kill-wait-ms", 0)).transpose()?.unwrap_or(DEFAULT_KILL_WAIT_MS);
+        Ok(hold::HoldArgs { path: PathBuf::from(path), mode, wait, kill_wait_ms, work: PathBuf::from(work) })
+    })();
+    #[cfg_attr(not(windows), allow(unused_variables))]
+    let parsed = match parsed {
+        Ok(parsed) => parsed,
+        Err(message) => return usage(&message),
+    };
+    #[cfg(windows)]
+    {
+        match hold::watch_parent() {
+            Ok(parent_gone) => hold::run(&parsed, parent_gone),
+            Err(detail) => hold::parent_unopenable(&parsed, &detail),
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }), EXIT_UNAVAILABLE)
+    }
+}
+
 fn state_root_route(args: &[String]) -> i32 {
     if let Some(extra) = args.first() {
         return usage(&format!("unknown argument {extra}"));
@@ -259,13 +403,50 @@ fn state_root_route(args: &[String]) -> i32 {
     emit(None, fields, EXIT_OK)
 }
 
+/// `process-observe --pid N`: one look at `pid` by the process facts crate,
+/// the same reading the Rust judge decides from. Node asks it where it has no
+/// process table of its own to read (Windows creation time).
+fn process_observe(args: &[String]) -> i32 {
+    use fgos_process::facts::{observe, Observed, UnreadableCause};
+    let flags = match Flags::parse(args, &["--pid"], &[]) {
+        Ok(flags) => flags,
+        Err(message) => return usage(&message),
+    };
+    let pid = match flags.one("--pid") {
+        Ok(Some(raw)) => match raw.parse::<u32>() {
+            Ok(pid) if pid > 0 => pid,
+            _ => return usage(&format!("--pid needs a positive integer, got {raw}")),
+        },
+        Ok(None) => return usage("--pid N is required"),
+        Err(message) => return usage(&message),
+    };
+    let fields = match observe(fgos_process::ProcId(pid)) {
+        Observed::Absent => json!({ "state": "absent" }),
+        Observed::Zombie => json!({ "state": "zombie" }),
+        Observed::Live { start_time } => json!({ "state": "live", "startTime": start_time }),
+        Observed::Unreadable(cause) => {
+            let cause = match cause {
+                UnreadableCause::DriverMissing => "driver-missing",
+                UnreadableCause::Permission => "permission",
+                UnreadableCause::Timeout => "timeout",
+            };
+            json!({ "state": "unreadable", "cause": cause })
+        }
+    };
+    emit(None, fields, EXIT_OK)
+}
+
 fn lock_borrow_vectors(args: &[String]) -> i32 {
     let flags = match Flags::parse(args, &["--vector"], &["--keep-repo"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
     let only: Vec<String> = flags.values("--vector").into_iter().map(str::to_string).collect();
-    let report = match borrow_vectors::run(Path::new("git"), &only, flags.has("--keep-repo")) {
+    let ran = match crate::port::HelperExe::current() {
+        Ok(helper) => borrow_vectors::run(Path::new("git"), &helper, &only, flags.has("--keep-repo")),
+        Err(err) => Err(RunError::Unavailable(format!("the running executable is unknown: {err}"))),
+    };
+    let report = match ran {
         Ok(report) => report,
         Err(RunError::Usage(message)) => return usage(&message),
         Err(RunError::Unavailable(detail)) => return emit(Some("unavailable"), json!({ "detail": detail }), EXIT_UNAVAILABLE),
@@ -293,7 +474,7 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
 }
 
 fn quiesce_scan(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--root", "--exclude-pid"], &[]) {
+    let flags = match Flags::parse(args, &["--root", "--exclude-pid"], &["--workspace-only"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
@@ -308,7 +489,7 @@ fn quiesce_scan(args: &[String]) -> i32 {
             Err(_) => return usage(&format!("--exclude-pid needs a pid, got {raw}")),
         }
     }
-    quiesce::scan(&roots, &exclude)
+    quiesce::scan(&roots, &exclude, flags.has("--workspace-only"))
 }
 
 mod quiesce {
@@ -356,6 +537,36 @@ mod quiesce {
         })
     }
 
+    /// Explicit execution roots, rather than the installed payload's path,
+    /// establish workspace membership for C5. Resolve relative roots at cwd.
+    fn workspace_argument(argv: &[String], cwd: Option<&Path>, dirs: &[PathBuf]) -> bool {
+        argv.iter().enumerate().any(|(i, arg)| {
+            let value = if let Some((key, value)) = arg.split_once('=') {
+                matches!(key, "--dir" | "--worktree" | "--cwd").then_some(value)
+            } else if i > 0
+                && matches!(
+                    argv[i - 1].as_str(),
+                    "--dir" | "--worktree" | "--cwd" | "-C"
+                )
+            {
+                Some(arg.as_str())
+            } else {
+                None
+            };
+            value.is_some_and(|value| {
+                let p = Path::new(value);
+                let resolved = if p.is_absolute() {
+                    Some(p.to_path_buf())
+                } else {
+                    cwd.map(|cwd| cwd.join(p))
+                };
+                resolved
+                    .map(|p| p.canonicalize().unwrap_or(p))
+                    .is_some_and(|p| dirs.iter().any(|d| p.starts_with(d)))
+            })
+        })
+    }
+
     /// Whether a process whose cwd or environ could not be read may still be
     /// a fgOS process. Its argv stays readable without ptrace access: a
     /// session helper the user's own service manager runs without ptrace
@@ -386,7 +597,7 @@ mod quiesce {
         false
     }
 
-    pub(super) fn scan(roots: &[PathBuf], exclude: &[u32]) -> i32 {
+    pub(super) fn scan(roots: &[PathBuf], exclude: &[u32], workspace_only: bool) -> i32 {
         if !cfg!(target_os = "linux") {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }), EXIT_UNAVAILABLE);
         }
@@ -419,26 +630,33 @@ mod quiesce {
             for (root, dirs) in &per_root {
                 if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
                     hit = Some(("cwd", Some(root.as_path())));
-                } else if names_payload(&argv, dirs, &state_root) {
+                } else if (workspace_only && workspace_argument(&argv, view.cwd.as_deref(), dirs))
+                    || (!workspace_only && names_payload(&argv, dirs, &state_root))
+                {
                     hit = Some(("cmdline", Some(root.as_path())));
                 }
                 if hit.is_some() {
                     break;
                 }
             }
-            if hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
+            if !workspace_only && hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
                 hit = Some(("environ", None));
             }
             match hit {
-                Some((matched, root)) => processes.push(json!({
-                    "pid": view.pid.0,
-                    "startTime": view.tuple.as_ref().map(|t| t.start_time.clone()),
-                    "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
-                    "cmdline": argv.join(" "),
-                    "matched": matched,
-                    "root": root.map(|r| r.to_string_lossy().into_owned()),
-                })),
-                None if !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
+                Some((matched, root)) => {
+                    if workspace_only && view.cmdline.is_none() {
+                        unreadable += 1;
+                    }
+                    processes.push(json!({
+                        "pid": view.pid.0,
+                        "startTime": view.tuple.as_ref().map(|t| t.start_time.clone()),
+                        "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
+                        "cmdline": argv.join(" "),
+                        "matched": matched,
+                        "root": root.map(|r| r.to_string_lossy().into_owned()),
+                    }));
+                }
+                None if !workspace_only && !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
                 None => {}
             }
         }
@@ -453,9 +671,41 @@ mod quiesce {
     #[cfg(test)]
     mod tests {
         use super::could_be_fgos;
+        #[cfg(unix)]
+        use super::workspace_argument;
+        #[cfg(unix)]
+        use std::path::{Path, PathBuf};
 
         fn argv(parts: &[&str]) -> Vec<String> {
             parts.iter().map(|p| p.to_string()).collect()
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn workspace_membership_uses_execution_roots_not_payload_names() {
+            let dirs = vec![PathBuf::from("/workspace")];
+            assert!(!workspace_argument(
+                &argv(&["/workspace/bin/fgos", "run", "--dir", "/other"]),
+                Some(Path::new("/other")),
+                &dirs
+            ));
+            for args in [
+                argv(&["fgos", "--dir=/workspace/child"]),
+                argv(&["fgos", "--worktree", "/workspace/child"]),
+                argv(&["fgos", "--cwd", "child"]),
+                argv(&["git", "-C", "/workspace"]),
+            ] {
+                assert!(workspace_argument(
+                    &args,
+                    Some(Path::new("/workspace")),
+                    &dirs
+                ));
+            }
+            assert!(!workspace_argument(
+                &argv(&["fgos", "--dir", "/workspace-other"]),
+                None,
+                &dirs
+            ));
         }
 
         #[test]

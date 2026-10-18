@@ -9,7 +9,7 @@ use std::process::{Command, Output, Stdio};
 use std::time::{Duration, Instant};
 
 use fgos_holder_lock::predecessor::{declare, record_path};
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Resource, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Release, Resource, Wait};
 use fgos_process::facts::{identity_of, lock_holders, observe, Holders, Observed};
 use fgos_process::{Domain, FdSlot, ProcId};
 use serde_json::Value;
@@ -114,11 +114,11 @@ fn wait_ms_times_out_and_leaves_nothing_on_the_description() {
     assert_eq!(v["result"], "timeout");
     assert!(v["waitedMs"].as_u64().unwrap() >= 300);
     assert!(took >= Duration::from_millis(300) && took < Duration::from_secs(2), "{took:?}");
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     // The timed-out description holds nothing: a fresh acquire succeeds
     // while it is still open.
     match acquire(&res, Mode::Ex, Wait::Try, 2000) {
-        Acquire::Acquired(h) => release(h),
+        Acquire::Acquired(h) => assert!(matches!(release(h), Release::Released { .. })),
         other => panic!("timed-out description kept the lock: {other:?}"),
     }
     drop(file);
@@ -142,7 +142,7 @@ fn shared_try_answers_free_or_held_and_guarantee_names_the_driver() {
     let held = route_fd(&["lock-fd", "--protocol", "1", "--shared-try"], &file);
     assert_eq!((held.status.code(), json_line(&held)["result"].clone()), (Some(10), Value::from("held")));
     drop(file);
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     let g = route(&["lock-fd", "--protocol", "1", "--guarantee", &res.path.to_string_lossy()]);
     assert_eq!(g.status.code(), Some(0));
     let v = json_line(&g);
@@ -169,9 +169,10 @@ fn borrowed_check_accepts_the_borrowed_description_and_refuses_a_sibling() {
         argv: vec!["sh".into(), "-c".into(), format!("'{}' internal lock-fd --protocol 1 --borrowed-check '{lock}' > '{}'", fgos().display(), marker.display())],
         cwd: None,
         env: Default::default(),
+        clear_env: false,
         stdio: BorrowStdio::Null,
     };
-    let outcome = run_borrowed(&owner, &spec).unwrap();
+    let outcome = run_borrowed(&owner, &spec, &fgos_holder_lock::HelperExe(fgos())).unwrap();
     assert_eq!(outcome.exit, Some(0), "{}", fs::read_to_string(&marker).unwrap_or_default());
     assert_eq!(serde_json::from_str::<Value>(fs::read_to_string(&marker).unwrap().trim()).unwrap()["result"], "borrower");
     // A sibling with the same env that opened the file itself.
@@ -191,7 +192,7 @@ fn borrowed_check_accepts_the_borrowed_description_and_refuses_a_sibling() {
     cmd.env("FGOS_LOCK_FD", "main:3");
     let out = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(3), &stranger)]).unwrap().wait_with_output().unwrap();
     assert_eq!(json_line(&out)["reason"], "inode-mismatch");
-    release(owner);
+    assert!(matches!(release(owner), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -247,6 +248,86 @@ fn lock_fd_runs_the_predecessor_rule_before_answering_acquired() {
         assert_eq!(v["domain"]["domainId"]["pid"], 1);
         drop(file);
         assert_eq!(probe(&Resource::new("pred", &lock)).unwrap(), Probe::Free);
+    }
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn predecessor_state_reads_the_record_once_and_never_kills() {
+    let _serial = serial();
+    let dir = temp_dir("predecessor-state");
+    let lock = dir.join("state.lock");
+    let record = record_path(&lock);
+    let lock_arg = lock.to_str().unwrap();
+    let state = || {
+        let out = route(&["lock-fd", "--protocol", "1", "--predecessor-state", lock_arg]);
+        assert_eq!(out.status.code(), Some(0));
+        json_line(&out)
+    };
+    assert_eq!(state()["state"], "absent");
+    // A live, SIGTERM-ignoring gate: reported not empty, and left running.
+    let mut gate = spawn_term_ignoring_sleep();
+    declare(&record, &Domain::LinuxGate(tuple_of(&gate))).unwrap();
+    let v = state();
+    assert_eq!((v["result"].clone(), v["state"].clone(), v["domain"]["domainKind"].clone()), ("predecessor".into(), "not-empty".into(), "linux-gate".into()));
+    assert!(matches!(observe(ProcId(gate.id())), Observed::Live { .. }), "the read-only route must not kill");
+    assert!(record.exists());
+    let tuple = tuple_of(&gate);
+    let _ = gate.kill();
+    let _ = gate.wait();
+    declare(&record, &Domain::LinuxGate(tuple)).unwrap();
+    assert_eq!(state()["state"], "empty");
+    assert!(record.exists(), "an empty domain is not cleaned up by a read");
+    // A windows-job record cannot be judged on Linux.
+    fs::write(&record, r#"{"v":1,"domainKind":"windows-job","domainId":{"job":"Local\\j","sessionId":"1","declaredAt":"2","holder":{"host":"h","pid":7,"startTime":"3"},"keeper":null}}"#).unwrap();
+    let v = state();
+    assert_eq!((v["state"].clone(), v["reason"].clone()), ("unknown".into(), "no-judge-on-this-platform".into()));
+    fs::write(&record, "{not json").unwrap();
+    assert_eq!(state()["state"], "unknown");
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn probe_opens_its_own_description_and_answers_free_or_held() {
+    let _serial = serial();
+    let dir = temp_dir("probe");
+    let res = Resource::new("probe", dir.join("probe.lock"));
+    let path = res.path.to_string_lossy().into_owned();
+    // A lock file that does not exist is free, and the probe does not create it.
+    let none = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((none.status.code(), json_line(&none)["result"].clone()), (Some(0), Value::from("free")));
+    assert!(!res.path.exists());
+    let owner = match acquire(&res, Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let held = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((held.status.code(), json_line(&held)["result"].clone()), (Some(10), Value::from("held")));
+    assert!(matches!(release(owner), Release::Released { .. }));
+    let free = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((free.status.code(), json_line(&free)["result"].clone()), (Some(0), Value::from("free")));
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn lock_hold_is_refused_by_name_off_windows_and_checks_its_usage() {
+    let _serial = serial();
+    let dir = temp_dir("hold-usage");
+    let path = dir.join("hold.lock").to_string_lossy().into_owned();
+    let work = dir.to_string_lossy().into_owned();
+    let out = route(&["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work, "--try"]);
+    assert_eq!(out.status.code(), Some(12));
+    let v = json_line(&out);
+    assert_eq!((v["result"].as_str(), v["reason"].as_str()), (Some("unavailable"), Some("unsupported-platform")));
+    for args in [
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work],
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "rw", "--work", &work, "--try"],
+        vec!["lock-hold", "--protocol", "1", "--mode", "ex", "--work", &work, "--try"],
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work, "--try", "--wait-ms", "5"],
+    ] {
+        let out = route(&args);
+        assert_eq!(out.status.code(), Some(2), "{args:?}");
+        assert_eq!(json_line(&out)["code"], "usage", "{args:?}");
     }
     let _ = fs::remove_dir_all(&dir);
 }
@@ -354,4 +435,25 @@ fn lock_fd_try_latency_over_300_calls() {
     ms.sort_by(|a, b| a.partial_cmp(b).unwrap());
     println!("lock-fd --try x300: p50 {:.2} ms p95 {:.2} ms max {:.2} ms", ms[150], ms[284], ms[299]);
     let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn process_observe_route_reports_what_the_process_facts_read() {
+    let _serial = serial();
+    let mut child = Command::new("sleep").arg("30").stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+    let pid = child.id();
+    let seen = route(&["process-observe", "--protocol", "1", "--pid", &pid.to_string()]);
+    assert_eq!(seen.status.code(), Some(0));
+    let v = json_line(&seen);
+    let Observed::Live { start_time } = observe(ProcId(pid)) else { panic!("the child must be live") };
+    assert_eq!((v["state"].as_str(), v["startTime"].as_str()), (Some("live"), Some(start_time.as_str())));
+    child.kill().unwrap();
+    child.wait().unwrap();
+    let gone = json_line(&route(&["process-observe", "--protocol", "1", "--pid", &pid.to_string()]));
+    assert_eq!(gone["state"], "absent");
+    for args in [vec!["process-observe", "--protocol", "1"], vec!["process-observe", "--protocol", "1", "--pid", "0"], vec!["process-observe", "--protocol", "1", "--pid", "x"]] {
+        let out = route(&args);
+        assert_eq!(out.status.code(), Some(2), "{args:?}");
+        assert_eq!(json_line(&out)["code"], "usage", "{args:?}");
+    }
 }

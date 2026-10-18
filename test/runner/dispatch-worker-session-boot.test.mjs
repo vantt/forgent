@@ -5,20 +5,17 @@ import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from '../../src/runner/di
 // Everything that touches the outside world is injected, so the whole session
 // lifecycle is exercised here without a herdr install and without a terminal.
 
-function fakeHerdr({ panes = [], rootPane = 'w1:p1', failCreate = false } = {}) {
-  const calls = [];
-  const run = (bin, args) => {
-    calls.push(args);
-    const key = args.slice(0, 2).join(' ');
-    if (key === 'pane list') return { status: 0, stdout: JSON.stringify({ id: 'x', result: { panes: panes.map((p) => ({ pane_id: p })) } }), stderr: '' };
-    if (key === 'workspace create') {
-      return failCreate
-        ? { status: 1, stdout: JSON.stringify({ error: { code: 'no_space', message: 'nope' } }), stderr: '' }
-        : { status: 0, stdout: JSON.stringify({ id: 'x', result: { root_pane: { pane_id: rootPane } } }), stderr: '' };
-    }
-    return { status: 0, stdout: JSON.stringify({ id: 'x', result: {} }), stderr: '' };
+/** A terminal-control client whose `capabilities` answers come from `answers` (true = a server answers; the last repeats). */
+function fakeTerminal(answers = [true]) {
+  let asked = 0;
+  const client = {
+    capabilities() {
+      const up = answers[Math.min(asked, answers.length - 1)];
+      asked += 1;
+      return { result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: up ? { pid: 1 } : null };
+    },
   };
-  return { run, calls };
+  return { client, asked: () => asked, terminalControlFor: () => client };
 }
 
 const baseOpts = (over = {}) => ({
@@ -45,26 +42,25 @@ test('the session the caller is sitting in is refused too, whatever it is called
 });
 
 test('a session already up is reused, and its own socket is what addresses it', async () => {
-  const { run, calls } = fakeHerdr({ panes: ['w1:p7'] });
+  const terminal = fakeTerminal([true]);
   let spawned = 0;
   const out = await ensureWorkerSession('fgos-worker', baseOpts({
     existsSync: () => true,
     spawnFn: () => { spawned += 1; return { unref() {} }; },
-    run,
+    terminalControlFor: terminal.terminalControlFor,
   }));
   assert.equal(spawned, 0, 'a running session is not started again');
   assert.equal(out.startedServer, false);
   assert.equal(out.socketPath, '/home/op/.config/herdr/sessions/fgos-worker/herdr.sock');
   assert.equal(out.env.HERDR_SOCKET_PATH, out.socketPath);
   assert.equal(out.env.HERDR_SESSION, 'fgos-worker');
-  void run; void calls;
 });
 
 test('the addressing environment drops the caller pane identity', async () => {
   const out = await ensureWorkerSession('fgos-worker', baseOpts({
     callerEnv: { HOME: '/home/op', HERDR_PANE_ID: 'wS:p1', HERDR_TAB_ID: 'wS:t1', HERDR_WORKSPACE_ID: 'wS' },
     existsSync: () => true,
-    run: fakeHerdr({ panes: ['w1:p1'] }).run,
+    terminalControlFor: fakeTerminal([true]).terminalControlFor,
   }));
   assert.equal(out.env.HERDR_PANE_ID, undefined, 'a worker must not be handed a name for the operator\'s pane');
   assert.equal(out.env.HERDR_TAB_ID, undefined);
@@ -87,7 +83,7 @@ test('a session that never comes up is reported by name rather than hung on', as
 
 test('the caller environment is never mutated on the way through', async () => {
   const callerEnv = { HOME: '/home/op', HERDR_PANE_ID: 'wS:p1' };
-  await ensureWorkerSession('fgos-worker', baseOpts({ callerEnv, existsSync: () => true, run: fakeHerdr({ panes: ['w1:p1'] }).run }));
+  await ensureWorkerSession('fgos-worker', baseOpts({ callerEnv, existsSync: () => true, terminalControlFor: fakeTerminal([true]).terminalControlFor }));
   assert.equal(callerEnv.HERDR_PANE_ID, 'wS:p1', 'the caller keeps its own pane identity');
   assert.equal(callerEnv.HERDR_SESSION, undefined);
 });
@@ -104,23 +100,13 @@ test('a socket file a dead server left behind is cleared, not treated as a live 
   // deletes the file by hand.
   let unlinked = null;
   let spawned = 0;
-  let listCalls = 0;
-  const run = (bin, args) => {
-    const key = args.slice(0, 2).join(' ');
-    if (key === 'pane list') {
-      listCalls += 1;
-      // The first probe is the liveness check against the stale socket.
-      if (listCalls === 1) return { status: 1, stdout: '', stderr: JSON.stringify({ error: { code: 'connection_refused', message: 'nothing there' } }) };
-      return { status: 0, stdout: JSON.stringify({ id: 'x', result: { panes: [] } }), stderr: '' };
-    }
-    if (key === 'workspace create') return { status: 0, stdout: JSON.stringify({ id: 'x', result: { root_pane: { pane_id: 'w9:p1' } } }), stderr: '' };
-    return { status: 0, stdout: JSON.stringify({ id: 'x', result: {} }), stderr: '' };
-  };
+  // The first look is the liveness check against the stale socket; the server started after answers.
+  const terminal = fakeTerminal([false, true]);
 
   // Present at first; gone once unlinked, then written again by the server.
   let present = true;
   const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
-    run,
+    terminalControlFor: terminal.terminalControlFor,
     existsSync: () => present,
     unlinkFn: (p) => { unlinked = p; present = false; },
     spawnFn: () => { spawned += 1; present = true; return { unref() {} }; },
@@ -129,15 +115,13 @@ test('a socket file a dead server left behind is cleared, not treated as a live 
   assert.match(unlinked ?? '', /fgos-worker\/herdr\.sock$/, 'the dead socket was removed');
   assert.equal(spawned, 1, 'and a server was actually started in its place');
   assert.equal(res.startedServer, true);
-  assert.equal(res.rootPaneId, 'w9:p1');
 });
 
 test('a socket that answers is left alone -- a live session is never restarted', async () => {
-  const herdr = fakeHerdr({ panes: ['w1:p1'] });
   let unlinked = 0;
   let spawned = 0;
   const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
-    run: herdr.run,
+    terminalControlFor: fakeTerminal([true]).terminalControlFor,
     existsSync: () => true,
     unlinkFn: () => { unlinked += 1; },
     spawnFn: () => { spawned += 1; return { unref() {} }; },
@@ -145,5 +129,19 @@ test('a socket that answers is left alone -- a live session is never restarted',
   assert.equal(unlinked, 0);
   assert.equal(spawned, 0);
   assert.equal(res.startedServer, false);
-  assert.equal(res.rootPaneId, 'w1:p1');
+});
+
+test('a server that wrote its socket but never answers is reported by name', async () => {
+  let present = false;
+  await assert.rejects(
+    () => ensureWorkerSession('fgos-worker', baseOpts({
+      terminalControlFor: fakeTerminal([false]).terminalControlFor,
+      existsSync: () => present,
+      spawnFn: () => { present = true; return { unref() {} }; },
+      sleepFn: async () => {},
+      timeoutMs: 20,
+      pollMs: 1,
+    })),
+    (e) => e.code === 'session-unavailable' && /did not answer/.test(e.message),
+  );
 });

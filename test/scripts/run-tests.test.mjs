@@ -260,6 +260,7 @@ function spawnSyncNode(scriptPath) {
 const realScriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
 const realLibPath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
 const realQueueLibPath = fileURLToPath(new URL('../../scripts/lib/full-suite-queue.mjs', import.meta.url));
+const realDistributionPath = fileURLToPath(new URL('../../scripts/build-rust-distribution.mjs', import.meta.url));
 const mirroredRoots = [];
 
 after(() => {
@@ -274,6 +275,8 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
+  // run-tests.mjs builds the native addon record through the distribution builder's helpers.
+  fs.copyFileSync(realDistributionPath, path.join(root, 'scripts', 'build-rust-distribution.mjs'));
   // The queue lib imports the holder-lock facade (src/holder-lock), which
   // reads the lock registry under packages/: link both trees in whole, so
   // the mirror loads the real modules and their own imports.

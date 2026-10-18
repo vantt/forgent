@@ -11,6 +11,13 @@
       "the description is always FD_CLOEXEC except inside exactly one spawn that borrows it, through an explicit fd mapping",
       "after acquire, fstat(fd).ino must equal stat(path).ino; otherwise close and retry",
       "release and borrower close only; nobody calls LOCK_UN on any copy of a description"
+    ],
+    "windowsFileRules": [
+      "the lock is LockFileEx on the process's own handle, offset 0, length 1; an ERROR_IO_PENDING answer is an error, never a held lock",
+      "the lock belongs to the locking process and is never carried by an inheritable or duplicated handle: a child holding a handle does not hold the lock",
+      "every successful lock is unlocked explicitly (UnlockFileEx) before its handle closes; the close-only rule above applies to POSIX descriptions, which borrowed copies share",
+      "after acquire the locked handle and a fresh handle to the path must name the same file (volume serial plus the 128-bit file id, FileIdInfo); otherwise unlock, close and retry",
+      "a path on a remote volume (GetDriveTypeW == DRIVE_REMOTE, or FileRemoteProtocolInfo readable) is refused with unavailable/unsupported-filesystem and guarantee exclusion none"
     ]
   },
   "operations": {
@@ -35,16 +42,69 @@
     },
     "release": {
       "input": { "handle": "handle returned by acquire" },
-      "rule": "the holder releases only after its own domain is empty (run_borrowed already waited for the child, killed leftovers and waited for empty). Release closes every copy of the description it owns.",
-      "output": { "released": true }
+      "rule": "the holder releases only after its own domain is empty (run_borrowed already waited for the child, killed leftovers and waited for empty). Release closes every copy it owns, then (for exclusive Linux handles) uses positive kernel lock-table evidence and an inode-checked, noncreating shared try-lock probe to prove no copy of its description still holds the lock (a short table read is not EOF); a blocked or uncertain probe enters the full tagged scan, killing escaped holders of it (direct children waited, copies of this process's live handles spared); unresolved within the bounded wait returns lock-release-stuck. Drop uses the same settle; shared handles close directly. The brief shared probe may make a concurrent exclusive Try acquirer report held; no copy of the original description is retained.",
+      "output": { "released": true, "leftoversKilled": "integer >= 0" }
     },
     "run_borrowed": {
       "input": {
         "handle": "handle returned by acquire (EX)",
         "spec": { "argv": "string[]", "cwd": "string", "env": "string map" }
       },
-      "rule": "the only way a child command passes with the holder's authority. Hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
+      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
       "output": { "exit": "integer|null", "signal": "string|null", "leftoversKilled": "integer >= 0" }
+    },
+    "run_borrowed_io": {
+      "input": {
+        "handle": "opaque EX handle returned by acquire",
+        "spec": "BorrowSpec: argv, cwd, env, clear_env; stdio superseded by explicit I/O",
+        "io": {
+          "stdin": "binary bytes followed by EOF",
+          "stdout_limit": "maximum captured stdout bytes",
+          "stderr_limit": "maximum captured stderr bytes",
+          "deadline": "absolute monotonic execution deadline"
+        }
+      },
+      "rule": "Extended 2026-10-18 for Git Publication: run_borrowed with explicit input, bounded capture and deadline; same lifecycle as run_borrowed. Synchronous scoped lifecycle: no child, pipe or lock description escapes. Unix uses the same explicit fd mapping, preparation, predecessor handling and leftover cleanup as run_borrowed. Output overflow or deadline kills the child, waits without reaping, drains the existing borrow domain and reaps before returning the named refusal. Cleanup failure takes precedence as borrow-leftover-not-killed, as for run_borrowed. No new containment guarantee or admission barrier.",
+      "platforms": {
+        "unix": "implemented",
+        "windows": "borrow-io-unsupported before spawn; existing run_borrowed behavior unchanged"
+      },
+      "output": {
+        "outcome": "exit, signal, leftoversKilled",
+        "stdout": "binary bytes",
+        "stderr": "binary bytes"
+      },
+      "refusals": [
+        "borrow-output-limit: stdout",
+        "borrow-output-limit: stderr",
+        "borrow-deadline",
+        "borrow-io-failed",
+        "borrow-io-unsupported",
+        "borrow-leftover-not-killed"
+      ]
+    },
+    "borrowerCheck": {
+      "posix": "fd 3 has the same dev:ino as the lock file and a non-blocking exclusive lock on it succeeds (lock-fd --borrowed-check)",
+      "windows": {
+        "env": "FGOS_LOCK_JOB=<lock name>:<job name>; no slot is read",
+        "passesOnlyWhenAll": [
+          "(a) the env names this lock and a job",
+          "(b) the predecessor record names that job and a holder tuple",
+          "(c) IsProcessInJob(self, job)",
+          "(d) the recorded holder (pid + creation time) is in this process's ancestor chain and probe sees the lock held"
+        ],
+        "notBorrowerReason": {
+          "enum": ["job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"],
+          "meaning": {
+            "job-missing": "(a) fails: env absent, malformed, or naming another lock",
+            "record-mismatch": "(b) fails: record absent, unreadable, or naming another job or no holder tuple",
+            "not-in-job": "(c) fails",
+            "holder-not-ancestor": "(d) fails: the recorded holder is not an ancestor",
+            "lock-not-held": "(d) fails: probe sees the lock free"
+          }
+        },
+        "secrecy": "the job name is not a secret: it is written in the record and the env. The authority comes from (c) and (d)."
+      }
     },
     "probe": {
       "input": { "resource": "resource" },
@@ -59,7 +119,7 @@
           { "kind": "unlistable", "reason": "string" }
         ]
       },
-      "notes": "Linux scans /proc/*/fdinfo/* for a lock: line on the inode of the lock file. macOS and Windows-without-helper report unlistable."
+      "notes": "Linux scans /proc/*/fdinfo/* for a lock: line on the inode of the lock file. macOS and Windows report unlistable (Win32 has no API that lists byte-range lock holders)."
     },
     "guarantee": {
       "input": { "path": "directory the lock files live in" },
@@ -81,10 +141,14 @@
         "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "host-version-mismatch", "io-error"] },
         "detail": "string"
       },
+      "errors": {
+        "lock-release-stuck": "release could not prove the original description released or end its holders/helper within the bounded wait; reports leftoversKilled and remaining pids; the lock may still be held",
+        "borrow-busy": "run_borrowed was called while another borrow of the same handle is still running, or release was called during a borrow"
+      },
       "invariants": [
         "timeout and held never leave a description open: the lock is released before the result is returned",
         "predecessor-domain-not-empty is returned after the lock was released again",
-        "no result of any operation is ever derived from a pid, a TTL or an mtime"
+        "no result infers ownership or liveness from a pid, a TTL or an mtime; Linux release compares the kernel locker stamp only to this live process"
       ]
     }
   },
@@ -101,16 +165,26 @@
     "levelMeaning": {
       "kernel": "enforced by the kernel and measured on a real machine",
       "kernel-unmeasured": "kernel semantics expected, no measurement yet",
-      "job-scoped": "enforced through a job/helper process plus the predecessor rule (Windows driver)",
+      "job-scoped": "enforced through a job plus the predecessor rule; the borrow level of the Windows driver (not an exclusion level)",
       "unsupported": "the driver does not provide it; the caller must not rely on it",
       "none": "no guarantee (network filesystem); the driver refuses the lock with a named error"
     },
     "drivers": {
       "linux-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "kernel" },
       "macos-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "unsupported" },
-      "windows": { "exclusion": "unsupported", "borrow": "unsupported", "holders": "unsupported" },
-      "network-fs": { "exclusion": "none", "borrow": "none", "holders": "none" }
+      "windows": { "driver": "lockfileex", "exclusion": "kernel", "borrow": "job-scoped", "holders": "unsupported", "holdersResult": "unlistable" },
+      "network-fs": { "exclusion": "none", "borrow": "none", "holders": "none" },
+      "windows-remote-volume": { "driver": "lockfileex", "exclusion": "none", "borrow": "none", "holders": "none", "refusal": "unsupported-filesystem" }
     },
     "containment": "macOS holder-lock containment is best-effort and is reported in notes, not in a level"
+  },
+  "helperRoles": {
+    "entry": ["fgos internal holder-lock-helper <role> ...", "fgctl internal holder-lock-helper <role> ..."],
+    "roles": {
+      "probe-holder": { "argv": "--path P", "meaning": "takes the lock on P in its own process and reports, used by the two-process semantics probe" },
+      "job-keeper": { "argv": "--job NAME --record <recordPath>", "meaning": "second owner of a borrow job, outside it; exits only when the holder finished (or its handle is signaled) and the job view is empty (predecessor.v1.json keeperExit)" }
+    },
+    "status": "internal: no CLI promise, argv may change with the crate",
+    "helperExe": "the crate API takes the helper executable as an explicit HelperExe path parameter; production passes the current executable, tests of the binary crates pass their own binary"
   }
 }

@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
@@ -16,6 +16,8 @@ import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
+import { verifyCommandOf } from './patterns/reviewed.mjs';
+import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
@@ -28,7 +30,14 @@ import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
+import { adoptRun } from '../../run-supervisor/client.mjs';
+import { installCancelOnSignal } from '../../run-supervisor/cancel-registry.mjs';
+import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
+import { listGenerations } from '../dispatch/run-lock.mjs';
+import { acquireUnitControl } from './unit-control.mjs';
+import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -161,11 +170,6 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
   };
 }
 
-/** The last attempt of each role/round: the one a resume continues from. */
-function lastAttempts(unitRecord) {
-  return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
-}
-
 /**
  * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
@@ -189,6 +193,72 @@ function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
     ].join(', ');
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": commit ${commit.sha} is already on the branch but does not hold exactly the files of its write scope (${diff}; + is outside the scope, - is missing); inspect it and take it off the branch by hand (git reset HEAD~1 keeps its files in the worktree), then resume`);
   }
+}
+
+/**
+ * An attempt of the supervisor era whose outcome the controller never recorded: it was handed to a
+ * supervisor and the controller went away before reading the answer.
+ */
+function leftByDeadController(attempt, assignmentsDir) {
+  if (!attempt || attempt.outcome !== undefined || typeof attempt.assignmentId !== 'string') return false;
+  const prior = currentAttemptOf(assignmentsDir, attempt.assignmentId);
+  return prior !== null && fs.existsSync(path.join(prior.dir, 'envelope.json'));
+}
+
+/**
+ * A resume never starts a second agent over an attempt the previous controller left: an attempt whose
+ * supervisor still works (or an adopter) is named and refused, an attempt from before the run supervisor
+ * is refused for the doctor to settle. Only a closed attempt is carried on from. Asks the adopt door,
+ * read-only, for every attempt whose outcome the dead controller never recorded.
+ */
+function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
+  for (const attempt of lastAttempts(unitRecord)) {
+    if (!leftByDeadController(attempt, assignmentsDir)) continue;
+    const prior = currentAttemptOf(assignmentsDir, attempt.assignmentId);
+    const { state } = adoptRun(prior.dir, { probeOnly: true });
+    if (state === 'closed') continue;
+    const look = 'fgos dispatch inspect';
+    if (state === 'legacy-run') {
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": attempt "${prior.runId}" ran before the run supervisor and cannot be judged (${prior.dir}); fgos doctor --fix settles it`, { code: 'attempt-legacy-run' });
+    }
+    throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": attempt "${prior.runId}" is still ${state} (${prior.dir}); look with \`${look}\` and resume once it has closed`, { code: 'attempt-still-running', attemptState: state });
+  }
+}
+
+/**
+ * How one dispatch of `attempt` enters the admission ledger. A dispatch the previous controller started
+ * and never read the outcome of keeps its retry id, so the dispatch finds that attempt again and takes
+ * its settled result instead of running the agent; a dispatch with no such history, or whose attempt
+ * was abandoned before it started or cancelled by the person, gets a new id and names the attempt it follows.
+ */
+function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assignmentsDir }) {
+  const current = currentAttemptOf(assignmentsDir, assignmentId);
+  const abandoned = () => {
+    if (!current) return false;
+    // A run from before the supervisor that the legacy sweep settled has no result to carry on from.
+    try {
+      if (JSON.parse(fs.readFileSync(path.join(current.dir, 'run.json'), 'utf8')).settlement === 'abandoned-legacy') return true;
+    } catch { /* no status record: judged by its envelope below */ }
+    if (!fs.existsSync(path.join(current.dir, 'envelope.json'))) return false;
+    if (adoptRun(current.dir, { probeOnly: true }).state !== 'closed') return false;
+    try {
+      const outcome = String(JSON.parse(fs.readFileSync(path.join(current.dir, 'receipt.json'), 'utf8')).outcome);
+      // Never started, or stopped by the person's Ctrl-C: neither is a result to carry on from.
+      return outcome.startsWith('abandoned') || outcome === 'cancelled';
+    } catch { return false; }
+  };
+  // The ledger, not the directory, says whether the previous dispatch was admitted: a controller that
+  // died between the admission commit and the directory's publication is completed by the same id.
+  const generations = listGenerations(path.join(assignmentsDir, assignmentId, 'admission', 'generations'));
+  const admitted = attempt.dispatchRetryId !== undefined && generations.some((g) => g.record?.retryId === attempt.dispatchRetryId);
+  const continuing = attempt.outcome === undefined && admitted && !abandoned();
+  const retryId = continuing ? attempt.dispatchRetryId : `${assignmentId}~${crypto.randomBytes(6).toString('hex')}`;
+  return {
+    retryId,
+    predecessorRunId: generations.at(-1)?.record?.runId ?? null,
+    destination: worktree,
+    payloadDigest: crypto.createHash('sha256').update(`${unitRunId}|${assignmentId}`).digest('hex'),
+  };
 }
 
 /**
@@ -307,6 +377,33 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
+  const scope = { control: null };
+  const uninstall = holdCancelOnSignal(options);
+  try {
+    return await runUnitBody(options, scope);
+  } finally {
+    try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
+    uninstall();
+  }
+}
+
+// Ctrl-C of this process asks every attempt it delivered to stop (cancel-registry.mjs). One handler
+// serves all units running in the process: installed with the first, removed with the last.
+let cancelHolders = 0;
+let removeCancelHandlers = null;
+function holdCancelOnSignal(options) {
+  if (cancelHolders === 0) {
+    const projectRoot = options.repoRoot ?? (() => { try { return resolveGitRoots(options.cwd ?? process.cwd()).mainCheckoutRoot; } catch { return undefined; } })();
+    removeCancelHandlers = installCancelOnSignal({ cancelWaitMs: readCancelWaitMs({ projectRoot }) });
+  }
+  cancelHolders += 1;
+  return () => {
+    cancelHolders -= 1;
+    if (cancelHolders === 0) { removeCancelHandlers?.(); removeCancelHandlers = null; }
+  };
+}
+
+async function runUnitBody(options, scope) {
   if (options.resumeUnitRunId && options.stanceOptions !== undefined) {
     throw new RunnerConfigError('cannot provide stanceOptions when resuming a unit run: the stored question is immutable');
   }
@@ -314,11 +411,16 @@ export async function runUnit(options = {}) {
   // hold a copy of an account login; `fgos run` is the one door every such run
   // goes through, so it is also where the ones whose pane has since closed are
   // reclaimed. Best effort: a reap problem never blocks the run.
-  try { reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
-
   const cwd = options.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
+  // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
+  let roots = null;
+  let rootsFailure = null;
+  try { roots = resolveGitRoots(cwd); } catch (err) { rootsFailure = err; }
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
+  try {
+    sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
+  } catch { /* best effort */ }
+  if (rootsFailure) throw rootsFailure;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const workflowLink = normalizeWorkflowLink(options.workflow);
 
@@ -335,11 +437,21 @@ export async function runUnit(options = {}) {
     if (!fs.existsSync(unitJsonPath)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json not found at "${unitJsonPath}"`);
     }
+    // One controller per unit: a live one (the run itself, or another resume) refuses this resume; one
+    // that died is taken over. Taken before unit.json is read, so a resume that waited behind another
+    // never works from a record that other one has since moved on.
+    const control = acquireUnitControl(unitDir, unitRunId);
+    if (control.status !== 'acquired') {
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another controller drives it${control.holder?.pid ? ` (PID ${control.holder.pid})` : ''}`, { code: 'resume-in-progress' });
+    }
+    scope.control = control;
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     unit = validateUnit(unitRecord.unit);
     if (!Array.isArray(unitRecord.resolvedInputs)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
+
+    assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir);
 
     // A mutating dispatch holds the worktree's dispatch-cwd lock while its
     // worker runs; resuming under a live holder would launch a second worker
@@ -456,6 +568,9 @@ export async function runUnit(options = {}) {
     };
 
     fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
+    const fresh = acquireUnitControl(unitDir, unitRunId);
+    if (fresh.status !== 'acquired') throw new RunnerConfigError(`unit run "${unitRunId}" is already driven by another controller`, { code: 'resume-in-progress' });
+    scope.control = fresh;
     // Told once, as soon as the run exists and before any seat can start, so a caller can record
     // the id and resume this run if it dies. Not called for a resumed run: its id is already known.
     options.onUnitRunCreated?.(unitRunId);
@@ -487,8 +602,13 @@ export async function runUnit(options = {}) {
 
   // A producer round whose commit is still pending is not settled yet: the pattern asks for it
   // again, and runRole commits it without spawning the agent.
+  // The same for a round whose controller died before it read the outcome: the attempt may have settled
+  // on its own, and the resume carries on from that result (commit, then the rest) instead of skipping it.
   const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
-    .filter(([, attempts]) => commitPending(attempts[attempts.length - 1], unitRecord.worktree, mainRoot))
+    .filter(([, attempts]) => {
+      const last = attempts[attempts.length - 1];
+      return commitPending(last, unitRecord.worktree, mainRoot) || leftByDeadController(last, assignmentsDir);
+    })
     .map(([key]) => key));
   const history = () => {
     const pending = pendingCommitKeys();
@@ -513,7 +633,7 @@ export async function runUnit(options = {}) {
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
-  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective }) => {
+  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission }) => {
     // A pinned account leases from an inventory holding only that account (account-pin.mjs).
     const runnerConfig = runnerConfigForBinding(unitRecord.configSnapshot.runner, bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
@@ -597,6 +717,9 @@ export async function runUnit(options = {}) {
       cwd: unitRecord.worktree,
       repoRoot: mainRoot,
       runnerConfig,
+      // The admission identity of this dispatch: a resume of an attempt whose outcome was never read
+      // finds that attempt again (and its settled result) instead of admitting a new one.
+      ...admission,
       providerCredentialProbe: createCredentialProbe(),
       providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
       cliOverride: {
@@ -791,7 +914,12 @@ export async function runUnit(options = {}) {
 
       // A writing seat over a merge left open for it is told which files hold the conflicts.
       const objective = `${(rUnit || unit).objective}${readOnly ? '' : syncBrief(unitRecord.sync)}`;
-      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective });
+      // Recorded before the dispatch: a controller that dies from here on is resumed from this id.
+      const admission = admissionIdentityFor(attempts[attemptNo], { unitRunId, assignmentId, worktree: unitRecord.worktree, assignmentsDir });
+      attempts[attemptNo].dispatchRetryId = admission.retryId;
+      delete attempts[attemptNo].outcome;
+      persistUnitRecord();
+      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
 
       // The worker only writes files; this trusted code, outside the confinement, commits the
       // ones inside the write scope. No change is recorded as such, and a commit that cannot be
@@ -861,8 +989,13 @@ export async function runUnit(options = {}) {
       }
 
       if (credentialFault) credentialFaultFamilySet.add(getProviderFamily(runnerConfig, bound.executor).toLowerCase());
-      // The spread is read again now: sibling seats may have changed executors since this seat first bound.
-      const walkAsk = preferIndependentOf.length > 0 ? { ...ask, preferIndependentOf: roleLedger.seats(preferIndependentOf) } : ask;
+      // The independence and the spread are read again now: sibling seats may have changed executors
+      // since this seat first bound, and a hard `independentOf` must hold for the executor it falls back to.
+      const walkAsk = {
+        ...ask,
+        independentOf: resolveIndependence(independentOf),
+        ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
+      };
       const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', { excludeFamilies: [...credentialFaultFamilySet] });
       if (next.refused || next.mechanism === 'inline') {
         return {
@@ -882,28 +1015,24 @@ export async function runUnit(options = {}) {
     }
   };
 
-  // Helper for verify command
+  // The deterministic check a round ends with: the unit's own `verify`, else its capability's. It
+  // runs through the one bounded command runner (goal-check.mjs), for at most `runner.timeoutMs`;
+  // running past that is a failed verify that says so, never a hang.
   const verify = async (targetUnit) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
-    const verifyCmd = targetUnit.verify || runnerConfig.capabilities?.[targetUnit.capability]?.verify;
-    if (!verifyCmd || typeof verifyCmd !== 'string') {
-      return { pass: true };
-    }
+    const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
+    if (!verifyCmd) return { pass: true };
 
-    try {
-      execSync(verifyCmd, {
-        cwd: unitRecord.worktree,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        encoding: 'utf8',
-        timeout: 60000,
-      });
-      return { pass: true };
-    } catch (err) {
-      return {
-        pass: false,
-        findings: [`Verification command failed: ${verifyCmd} (${err.message})`],
-      };
-    }
+    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs);
+    if (outcome.passed) return { pass: true };
+    const how = outcome.timedOut
+      ? `timed out after ${runnerConfig.timeoutMs}ms`
+      : outcome.status === null ? 'could not run' : `exited ${outcome.status}`;
+    const tail = outcome.output.trim().split('\n').slice(-20).join('\n');
+    return {
+      pass: false,
+      findings: [`Verification command ${how}: ${verifyCmd}${tail ? `\n${tail}` : ''}`],
+    };
   };
 
   // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
@@ -940,6 +1069,8 @@ export async function runUnit(options = {}) {
     settle(patternResult.outcome);
   }
 
+  // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
+  const unverified = resolvePattern(patternName).patternName === 'reviewed' && !verifyCommandOf(unit, unitRecord.configSnapshot.runner);
   return {
     unitRunId,
     outcome: patternResult.outcome,
@@ -947,6 +1078,7 @@ export async function runUnit(options = {}) {
     results: patternResult.results,
     findings: patternResult.findings || [],
     ...(unitRecord.sync ? { sync: syncSummary(unitRecord.sync) } : {}),
+    ...(unverified ? { verify: { ran: false, reason: 'no verify command: set unit.verify, pass --verify, or declare capabilities.<capability>.verify' } } : {}),
   };
   } catch (error) {
     if (!executionSettled) {

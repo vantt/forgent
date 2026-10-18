@@ -1,0 +1,10 @@
+[package]
+name = "fgos-canonical-json"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+# Canonical decimal vectors require correctly rounded binary64 parsing.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+ryu-js = "=1.0.2"

@@ -159,6 +159,8 @@ function validateAccountId(accountId, label) {
 }
 
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
+const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files']);
 
 function normalizeCredentialSource(credentialSource, label) {
   if (!isPlainObject(credentialSource)) {
@@ -218,14 +220,52 @@ export function accountCredentialSources(account) {
 }
 
 /**
- * A capacity selection made ready for the invocation that is actually launched: an account with one store
- * per CLI hands over the store of `command`'s CLI as `credentialSource` (null when it declares none, which
- * the private-home provisioning refuses). A single-store selection is returned unchanged.
+ * Why `store` is not a valid `credentialStore` declaration, or null when it is. One reading of the shape for
+ * the config door and the confinement request door.
  */
-export function providerCapacityForCommand(selection, command) {
-  if (!selection?.credentialSources) return selection;
-  const cli = commandCli(command);
-  return { ...selection, credentialCli: cli, credentialSource: credentialSourceForCli(selection, cli) };
+export function credentialStoreProblem(store) {
+  if (!isPlainObject(store)) return 'must be an object {use, homeEnv, files?}';
+  for (const key of Object.keys(store)) {
+    if (!CREDENTIAL_STORE_KEYS.includes(key)) return `contains unknown key "${key}" (allowed: ${CREDENTIAL_STORE_KEYS.join(', ')})`;
+  }
+  if (typeof store.use !== 'string' || !CLI_KEY.test(store.use)) return '"use" must name a login store, a lowercase key such as "codex" or "pi"';
+  if (typeof store.homeEnv !== 'string' || !ENV_NAME.test(store.homeEnv)) return '"homeEnv" must be an environment variable name';
+  if (store.files !== undefined) {
+    const files = store.files;
+    if (!Array.isArray(files) || files.length === 0
+      || files.some((f) => typeof f !== 'string' || !f.trim() || path.isAbsolute(f) || f.split(/[\\/]/).includes('..'))) {
+      return '"files" must be a non-empty list of relative paths without ".."';
+    }
+    if (new Set(files).size !== files.length) return '"files" must not repeat a path';
+  }
+  return null;
+}
+
+/**
+ * The login store an invocation reads: the `credentialStore` it declares, else (config written before
+ * that field existed: the machine-global config and other projects still carry it) the one its
+ * `private-home` env binding implies, keyed by the CLI its command runs. Null when it reads none. The
+ * inference is the only reader of `resourceBindings`; it goes when those configs have moved.
+ */
+export function credentialStoreOf(invocation) {
+  if (!invocation) return null;
+  if (invocation.credentialStore) return invocation.credentialStore;
+  const binding = (invocation.resourceBindings ?? []).find((b) => b?.resource === 'private-home' && b.target?.kind === 'env' && b.target.name);
+  const use = commandCli(invocation.command);
+  return binding && use ? { use, homeEnv: binding.target.name } : null;
+}
+
+/**
+ * A capacity selection made ready for the invocation that is actually launched: the store the invocation
+ * reads (`credentialStoreOf`) picks the account's login store as `credentialSource` (null when the
+ * account declares none for it, which the private-home provisioning refuses). An invocation that reads no
+ * store gets none, so a lease never puts a login into a home that did not ask for one.
+ */
+export function providerCapacityForInvocation(selection, invocation) {
+  if (!selection) return selection;
+  const store = credentialStoreOf(invocation);
+  if (!store) return { ...selection, credentialCli: null, credentialSource: null };
+  return { ...selection, credentialCli: store.use, credentialSource: credentialSourceForCli(selection, store.use) };
 }
 
 export function providerAccountInventory(runnerConfig) {

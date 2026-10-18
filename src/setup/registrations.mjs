@@ -1,3 +1,4 @@
+import { checkGit, fixGitWal, fixGitFetchMapping } from './git-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -81,7 +82,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -104,7 +105,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
@@ -137,7 +138,12 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
+import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
+import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
+import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
+import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2288,6 +2294,11 @@ registerCheck({
   check: (cwd) => checkLockFences(cwd),
 });
 registerCheck({
+  id: 'lock-record-unreadable',
+  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',
+  check: (cwd) => checkLockRecordUnreadable(cwd),
+});
+registerCheck({
   id: 'lock-predecessor-kill-wait',
   description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',
   check: (cwd) => checkLockPredecessorKillWait(cwd),
@@ -2299,6 +2310,53 @@ registerCheck({
 });
 registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
+
+// Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
+// host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.
+// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.
+registerCheck({
+  id: 'process-containment',
+  description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',
+  check: (cwd) => checkProcessContainment(cwd),
+});
+registerCheck({
+  id: 'run-supervisor-route',
+  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1',
+  check: (cwd) => checkRunSupervisorRoute(cwd),
+});
+registerCheck({
+  id: 'runtime-socket-dir',
+  description: 'the runtime socket directory exists, is owned by this user and is 0700',
+  check: () => checkRuntimeSocketDir(),
+});
+registerCheck({
+  id: 'run-attempts-stuck',
+  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it)',
+  check: (cwd) => checkRunAttemptsStuck(cwd),
+});
+registerCheck({
+  id: 'gate-kill-grace',
+  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',
+  check: (cwd) => checkGateKillGrace(cwd),
+});
+registerCheck({
+  id: 'legacy-attempts-stuck',
+  description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',
+  check: (cwd) => checkLegacyAttemptsStuck(cwd),
+});
+registerCheck({
+  id: 'units-awaiting-resume',
+  description: 'lists unit runs whose controller is gone and whose last attempt is closed, with the fgos run --resume command (information, never a failure)',
+  check: (cwd) => checkUnitsAwaitingResume(cwd),
+});
+registerCheck({
+  id: 'cancel-wait',
+  description: 'dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than dispatch.gateKillGraceMs (default gateKillGraceMs + 5000)',
+  check: (cwd) => checkCancelWait(cwd),
+});
+registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
+registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
+registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
 registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
@@ -2360,6 +2418,13 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
       'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',
     confinement: { mode: 'unconfined' },
     serves: { outputKind: 'finding', mutates: false },
+  },
+  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`
+  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.
+  'docs:write': {
+    description:
+      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a "prefer" pool to choose which executors serve it.',
+    serves: { outputKind: 'change', domain: 'docs', mutates: true },
   },
   'code:implement': {
     description:
@@ -3300,11 +3365,11 @@ registerFix({
 
 // tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
 // binary is reachable -- it says nothing about whether the coding-domain
-// dev-skills the plugin's own slash-command skills (cook/discover/plan/
+// dev-skills the plugin's own slash-command skills (deliver/discover/plan/
 // pick) dispatch into via the Skill tool are actually shipped in
 // plugins/fgOS/skills/ (they were not, before tsk-32b's own fix -- a
 // plugin-only consumer got "Unknown skill: fgos-coding-driving" the first
-// time cook/discover/plan/pick tried to dispatch into one, with the CLI
+// time deliver/discover/plan/pick tried to dispatch into one, with the CLI
 // itself fully reachable the whole time). This check only ever fires
 // against THIS repo's own source tree -- it derives the expected dev-skill
 // set from `.claude/skills/fgos-*` and confirms each one also exists under
@@ -4306,37 +4371,6 @@ registerCheck({
 // of the same invariant is cheap, and it catches a config that arrived by some
 // route the loader never saw.
 
-/** herdr is the transport every interactive mechanism depends on; without it
- * there is nothing to dispatch into. */
-export function checkHerdrAvailable() {
-  const bin = resolveHerdrBin();
-  try {
-    const out = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    const anchorPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-    let anchorDetails = '';
-    if (anchorPane !== undefined) {
-      const trimmed = anchorPane.trim();
-      if (!trimmed) {
-        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE is empty` };
-      }
-      try {
-        const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3000 });
-        let parsed;
-        try { parsed = JSON.parse(paneOut); } catch {}
-        if (parsed?.error) {
-          return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${parsed.error.message || parsed.error.code}` };
-        }
-        anchorDetails = `; anchor pane "${trimmed}" verified`;
-      } catch (paneErr) {
-        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${paneErr.message}` };
-      }
-    }
-    return { passed: true, message: `herdr is available on PATH (${out})${anchorDetails}` };
-  } catch (err) {
-    return { passed: false, message: `herdr is not usable on PATH (${bin}): ${err.message}` };
-  }
-}
-
 /** The folder-trust store must be readable and well-formed, or every dispatch
  * into a fresh worktree stops at a trust dialog with nobody there to answer it. */
 export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.claude.json')) {
@@ -4403,10 +4437,11 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
 }
 
 /**
- * A confined herdr pane that binds `private-home` starts in an empty home: the account's login only gets
- * there when the machine-global provider account inventory names it. Without that entry the agent starts
- * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
- * doctor line that names it, per invocation, before a run does.
+ * A confined invocation that reads a login store starts in an empty private home: the account's login only
+ * gets there when the machine-global provider account inventory names it. Without that entry the agent
+ * starts logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This
+ * is the doctor line that names it, per invocation, before a run does. Files of the store that are absent
+ * are noted; a store with none of its files present fails, since nothing would be copied.
  */
 export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = undefined) {
   let inventory;
@@ -4426,7 +4461,8 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     for (const inv of executor?.invocations ?? []) {
-      if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
+      const store = credentialStoreOf(inv && { ...inv, command: inv.command ?? executor.command });
+      if (!store) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
       const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
       const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
@@ -4436,24 +4472,24 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
         problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
         continue;
       }
-      // An account that keeps one login per CLI reaches this pane only through the store of the pane's CLI.
-      const cli = commandCli(inv.command ?? executor.command);
+      // An account that keeps one login per CLI reaches this invocation only through the store it names.
       for (const account of accounts) {
-        const source = credentialSourceForCli(account, cli);
+        const source = credentialSourceForCli(account, store.use);
         if (!source) {
-          problems.push(`${label}: account "${account.id}" declares no credential source for CLI "${cli}", so a pane leased to it starts logged out`);
+          problems.push(`${label}: account "${account.id}" declares no credential source for store "${store.use}", so an agent leased to it starts logged out`);
           continue;
         }
         const home = expandHome(source.home);
-        const files = source.kind === 'home-files' ? source.files : ['auth.json'];
+        const files = store.files ?? (source.kind === 'home-files' ? source.files : ['auth.json']);
         const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
-        if (missing.length > 0) problems.push(`${label}: account "${account.id}" is missing ${missing.join(', ')} under ${home}`);
+        if (missing.length === files.length) problems.push(`${label}: account "${account.id}" has none of ${files.join(', ')} under ${home}, so nothing is copied and its agent starts logged out`);
+        else if (missing.length > 0) notes.push(`${label}: account "${account.id}" has ${files.length - missing.length} of ${files.length} credential file(s); absent: ${missing.join(', ')}`);
         else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
       }
     }
   }
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
-  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined herdr invocation binds a private home' };
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined invocation reads a login store' };
 }
 
 /** Second reading of the config door's own C5 invariant. Names the executor and
@@ -4513,7 +4549,7 @@ export function checkInvocationGitWriteGrants(runnerCfg = {}) {
 /** herdr's own list of agent kinds it can start, read from the command that
  * enforces it rather than copied into this repo where it would go stale in
  * silence. Returns null when herdr cannot be asked -- absence is already
- * `herdr-available`'s business, and reporting it twice helps nobody. */
+ * `terminal-control`'s business, and reporting it twice helps nobody. */
 export function readHerdrAgentKinds(run = defaultHerdrRun) {
   const help = run(['agent', 'start', '--help']);
   if (help === null) return null;
@@ -4622,10 +4658,22 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
 }
 
 registerCheck({
-  id: 'herdr-available',
-  description: 'herdr resolves on PATH and reports a version -- the transport every interactive dispatch mechanism needs',
-  check: () => checkHerdrAvailable(),
+  id: 'terminal-control',
+  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to; a bad FGOS_HERDR_ANCHOR_PANE fails, a missing herdr only warns',
+  check: () => checkTerminalControl(),
 });
+registerCheck({
+  id: 'terminal-config',
+  description: 'terminal.* after the config merge, each value with its source; allocationGraceMs, retainFailedPaneMs, the layout policy and limits must satisfy their rules',
+  check: (cwd) => checkTerminalConfig(cwd),
+});
+registerCheck({
+  id: 'terminal-allocations',
+  description: 'terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing',
+  check: (cwd) => checkTerminalAllocations(cwd),
+});
+registerConfigDefault({ id: 'terminal', key: TERMINAL_CONFIG_KEY, shape: DEFAULT_TERMINAL_CONFIG });
+registerFix({ id: 'terminal-dir', fix: (cwd) => fixTerminalDir(cwd) });
 
 registerCheck({
   id: 'herdr-executor-kinds',
@@ -4659,7 +4707,7 @@ registerCheck({
 
 registerCheck({
   id: 'confined-pane-accounts',
-  description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
+  description: 'every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store\'s credential files, so its agent starts logged in',
   check: (cwd) => {
     // The account inventory lives only in the global config, so it is read from there whatever the cwd.
     // Executors come from the project config merged with the global one; with no usable project config the
@@ -5364,13 +5412,9 @@ registerFix({
   fix: () => fixConfinementBackendRegistryReadable(),
 });
 
-// ─── Confinement orphan reaper (Phase 04 M8) ───────────────────────────────
-// `reapOrphanedConfinementResources` (confinement/cleanup.mjs) existed but
-// was never called from any production path -- only a test called it
-// directly, so a temporary confinement resource whose owning process died
-// (or timed out, see finalizeConfinementResources's own `retained` outcome)
-// stayed on disk forever. Wiring it in here (checked/fixed via `doctor
-// --fix`) and at runner start (loop.mjs) is what actually reclaims it.
+// ─── Confinement temp roots ────────────────────────────────────────────────
+// A private home belongs to one attempt and only adopt's finalize-home step removes it (the
+// `run-attempts-stuck` check names an attempt nobody holds). This check guards the roots they live under.
 
 export { defaultConfinementTempRoots, credentialScanRoots };
 
@@ -5390,56 +5434,46 @@ function looseConfinementRoots(roots) {
 }
 
 export function checkConfinementOrphanedResourcesReaped() {
-  // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
-  // own (it deletes), so this counts dead-owned markers itself instead of
-  // calling it -- a `check` must never mutate.
+  // Read-only. A home of a dispatch outside the assignment door removes itself when that dispatch
+  // settles; one whose process died is left for `doctor --fix`, since no sweep judges it. An attempt home
+  // (version 2 marker) is adopt's and is named by `run-attempts-stuck`.
   const roots = defaultConfinementTempRoots();
-  const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
+  const deadOwned = deadOwnedConfinementDirs(roots).length;
   const loose = looseConfinementRoots(roots);
-  const emptyShells = countEmptyDispatchShells(roots);
-  if (markedDeadOwnerDirs === 0 && emptyShells === 0 && loose.length === 0) {
-    return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
-  }
+  const emptyShells = emptyDispatchShells(roots).length;
+  if (deadOwned === 0 && emptyShells === 0 && loose.length === 0) return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   const problems = [];
-  if (emptyShells > 0) {
-    problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
-  }
-  if (markedDeadOwnerDirs > 0) {
-    problems.push(`${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
-  }
-  if (loose.length > 0) {
-    problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
-  }
+  if (emptyShells > 0) problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
+  if (deadOwned > 0) problems.push(`${deadOwned} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
+  if (loose.length > 0) problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
   return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
 }
 
-/** Empty per-dispatch directories old enough that the reaper removes them (see reapOrphanedConfinementResources). */
-function countEmptyDispatchShells(roots) {
-  let count = 0;
+/** How old an empty per-dispatch directory must be before it counts as left behind. */
+const EMPTY_SHELL_GRACE_MS = 600000;
+
+/** Empty per-dispatch directories old enough that no dispatch can still be about to fill them. */
+function emptyDispatchShells(roots) {
+  const found = [];
   for (const tempRoot of roots) {
     try {
       for (const entry of fs.readdirSync(tempRoot, { withFileTypes: true })) {
         if (!entry.isDirectory()) continue;
         const dir = path.join(tempRoot, entry.name);
-        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) count += 1;
+        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) found.push(dir);
       }
     } catch {
       // an unreadable or missing root has nothing to count
     }
   }
-  return count;
+  return found;
 }
 
-function countDeadOwnedConfinementDirs(roots) {
-  let count = 0;
+function deadOwnedConfinementDirs(roots) {
+  const found = [];
   for (const tempRoot of roots) {
-    if (!fs.existsSync(tempRoot)) continue;
     let entries = [];
-    try {
-      entries = fs.readdirSync(tempRoot, { withFileTypes: true });
-    } catch {
-      continue;
-    }
+    try { entries = fs.readdirSync(tempRoot, { withFileTypes: true }); } catch { continue; }
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const dispatchDir = path.join(tempRoot, entry.name);
@@ -5450,58 +5484,51 @@ function countDeadOwnedConfinementDirs(roots) {
         }
       } catch {}
       for (const cand of candidates) {
-        const markerPath = path.join(cand, OWNERSHIP_MARKER_FILE);
-        if (!fs.existsSync(markerPath)) continue;
-        try {
-          const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
-          // A home kept for a left-open pane is awaiting that pane, not orphaned.
-          if (marker.paneId) continue;
-          // A home held for its unstaged login is never reaped; credential-copies-retained reports it.
-          if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-          // A bound home (a cli-spawn run supervisor's) belongs to its binder, not to the controller that prepared it.
-          const ownerPid = marker.boundAt ? (marker.binderPid ?? marker.pid) : marker.pid;
-          const alive = Number.isInteger(ownerPid) && ownerPid > 0 && (() => {
-            try { process.kill(ownerPid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
-          })();
-          if (!alive) count += 1;
-        } catch {
-          // Unreadable marker: not this check's concern (ownership itself
-          // is what reapOrphanedConfinementResources trusts or refuses).
-        }
+        // Only a marker of this module's own first version names a process owner.
+        const marker = readOwnershipMarker(cand);
+        if (!marker) continue;
+        // A home held for its unstaged login is never removed; credential-copies-retained reports it.
+        if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
+        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
+          try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
+        })();
+        if (!alive) found.push({ dir: cand, dispatchId: marker.dispatchId });
       }
     }
   }
-  return count;
+  return found;
 }
 
 export function fixConfinementOrphanedResourcesReaped() {
   const roots = defaultConfinementTempRoots();
-  let totalReaped = 0;
-  const messages = [];
   const tightened = looseConfinementRoots(roots);
   for (const root of tightened) {
     try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
   }
-  for (const tempRoot of roots) {
-    const { reaped } = reapOrphanedConfinementResources({ tempRoot });
-    totalReaped += reaped.length;
-    if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
+  // A home whose recorded dispatcher process is dead holds a login copy nobody will remove: the owner's
+  // explicit --fix is the one place that judges it, by that pid alone. A home that cannot go (a login
+  // that could not be staged) stays and is counted by credential-copies-retained.
+  let removedHomes = 0;
+  for (const { dir, dispatchId } of deadOwnedConfinementDirs(roots)) {
+    try { if (cleanupConfinementResource(dir, dispatchId).cleaned) removedHomes += 1; } catch { /* kept */ }
   }
-  const tightenedNote = tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '';
+  let removedShells = 0;
+  for (const shell of emptyDispatchShells(roots)) {
+    try { fs.rmdirSync(shell); removedShells += 1; } catch { /* filled meanwhile */ }
+  }
   return {
-    changed: totalReaped > 0 || tightened.length > 0,
+    changed: removedHomes > 0 || removedShells > 0 || tightened.length > 0,
     message: [
-      totalReaped > 0
-        ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
-        : 'no orphaned confinement resources to reap',
-      tightenedNote,
+      removedHomes > 0 ? `removed ${removedHomes} home(s) left by a dead dispatch` : '',
+      removedShells > 0 ? `removed ${removedShells} empty per-dispatch dir(s)` : 'no empty per-dispatch dirs to remove',
+      tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '',
     ].filter(Boolean).join('; '),
   };
 }
 
 registerCheck({
   id: 'confinement-orphaned-resources-reaped',
-  description: 'no confinement temp resources are left behind by a dead owning process',
+  description: 'confinement temp roots are owner-only and no dispatch home is left behind by a dead process',
   check: () => checkConfinementOrphanedResourcesReaped(),
 });
 
@@ -6596,3 +6623,17 @@ registerCheck({
   description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
+
+// Git and Event Store share one addon ABI admission row.
+for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+  registerCheck({ id, description: {
+    'git-component-compatible': 'Combined addon contracts and Git feature floor',
+    'git-trust-topology': 'Trusted repository layout and common directory',
+    'git-operation-journal': 'Readable Git WAL with no unresolved operations',
+    'git-native-locks': 'Native Git lock residue (read-only detection)',
+    'git-publication-refspecs': 'Additive Event Store mirror fetch mappings',
+    'git-durability-capability': 'Measured Git durability guarantees',
+  }[id], check: (cwd) => checkGit(cwd, id) });
+}
+registerFix({ id: 'git-wal-dir', fix: fixGitWal });
+registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

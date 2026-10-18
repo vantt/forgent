@@ -1,8 +1,8 @@
 // identity-before-lock.test.mjs -- the identity bridge never runs the host
-// binary while the calling process holds events.lock or claims.lock.
+// binary while the calling process holds the state lock.
 //
 // FGOS_HOST_BIN is a small sh stand-in that, at each exec, reads the owner
-// pid of every events.lock/claims.lock under the store and records a
+// pid of every hot record (state.hot) under the store and records a
 // violation only when the owner is the caller itself (`--pid`), then execs
 // the real host. A fresh Node process (empty identity cache) runs the real
 // write paths against a real git repo reached through a symlinked path, so
@@ -15,13 +15,13 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { initStore, addWork } from '../../src/state/store.mjs';
-import { withEventsLock } from '../../src/state/events.mjs';
 import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 const UNIX = process.platform !== 'win32';
 const STORE_URL = new URL('../../src/state/store.mjs', import.meta.url).href;
 const EVENTS_URL = new URL('../../src/state/events.mjs', import.meta.url).href;
+const HOT_LOCK_URL = new URL('../../src/state/hot-lock.mjs', import.meta.url).href;
 const CLAIMS_URL = new URL('../../src/state/runtime-coordination.mjs', import.meta.url).href;
 const CLAIM_PORT_URL = new URL('../../src/runner/claim-port.mjs', import.meta.url).href;
 const PORTING_URL = new URL('../../src/state/porting-store.mjs', import.meta.url).href;
@@ -57,8 +57,9 @@ function setup({ store = 'main' } = {}) {
 caller=""; prev=""
 for a in "$@"; do [ "$prev" = "--pid" ] && caller="$a"; prev="$a"; done
 echo "$caller" >> "${base}/calls"
-for f in $(find "${path.join(base, 'real')}" -name events.lock -o -name claims.lock 2>/dev/null); do
-  owner=$(grep -o '[0-9][0-9]*' "$f" 2>/dev/null | head -n 1)
+for f in $(find "${path.join(base, 'real')}" -name state.hot -o -name porting-events.hot -o -name claims.lock 2>/dev/null); do
+  owner=$(sed -n 's/.*"pid":\\([0-9][0-9]*\\).*/\\1/p' "$f" 2>/dev/null | head -n 1)
+  [ -n "$owner" ] || owner=$(grep -o '[0-9][0-9]*' "$f" 2>/dev/null | head -n 1)
   [ -n "$owner" ] && [ "$owner" = "$caller" ] && echo "$f held by caller $caller" >> "${base}/violations"
 done
 exec "${HOST}" "$@"
@@ -126,21 +127,33 @@ for (const [label, extraEnv, store] of [
 test('resolving while another process holds the lock is fine and is not counted as a violation', async (t) => {
   if (!UNIX) return t.skip('the stand-in host is a sh script');
   const fixture = setup();
+  const marker = path.join(fixture.base, 'holder-in');
+  const release = path.join(fixture.base, 'holder-release');
+  const holderScript = `const { withStateTx } = await import(${JSON.stringify(HOT_LOCK_URL)});
+const fs = await import('node:fs');
+withStateTx(${JSON.stringify(fixture.dir)}, () => {
+  fs.writeFileSync(${JSON.stringify(marker)}, 'in');
+  while (!fs.existsSync(${JSON.stringify(release)})) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+});`;
+  const holder = spawn(process.execPath, ['--input-type=module', '-e', holderScript], {
+    env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'holder-process' }),
+    stdio: 'ignore',
+  });
+  const holderExit = new Promise((resolve) => holder.on('exit', resolve));
+  const deadline = Date.now() + 5000;
+  while (!fs.existsSync(marker) && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.ok(fs.existsSync(marker), 'the holder process took the lock');
   const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
 process.stdout.write(JSON.stringify(facade.resolveWriterIdentity(${JSON.stringify(fixture.dir)})));`;
-  const answer = await withEventsLock(path.join(fixture.dir, 'events.jsonl'), () => new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, ['--input-type=module', '-e', script], {
-      env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'other-process' }),
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    let out = '';
-    let err = '';
-    child.stdout.on('data', (chunk) => { out += chunk; });
-    child.stderr.on('data', (chunk) => { err += chunk; });
-    child.on('error', reject);
-    child.on('exit', (code) => (code === 0 ? resolve(JSON.parse(out)) : reject(new Error(err))));
-  }), fixture.dir);
-  assert.deepEqual(answer, { id: 'other-process', source: 'env' });
+  const resolved = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
+    env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'other-process' }),
+    encoding: 'utf8',
+  });
+  fs.writeFileSync(release, 'go');
+  assert.equal(await holderExit, 0);
+  assert.equal(resolved.status, 0, resolved.stderr);
+  assert.deepEqual(JSON.parse(resolved.stdout), { id: 'other-process', source: 'env' });
   assert.equal(read(path.join(fixture.base, 'violations')), '');
-  assert.equal(read(path.join(fixture.base, 'calls')).split('\n').length, 1);
+  // One host call per process, each made before that process took (or while another held) the lock.
+  assert.equal(read(path.join(fixture.base, 'calls')).split('\n').length, 2);
 });

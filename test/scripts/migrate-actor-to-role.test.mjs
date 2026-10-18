@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { migrateActorToRole } from "../../scripts/migrate-actor-to-role.mjs";
-import { withEventsLock } from "../../src/state/events.mjs";
+import { holdStateLockInChild } from "../helpers/hold-state-lock-in-child.mjs";
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -104,22 +104,23 @@ test("a second run is a no-op", () => {
 
 // --- (e) a held lock blocks then refuses -----------------------------------
 
-test("a held lock blocks then refuses", () => {
+test("a held lock blocks then refuses", async () => {
   const { logPath, backupPath } = setup("migrate-locked-");
 
-  let sawBlockThenRefuse = false;
+  // Another process is inside the critical section; this one waits out the lock timeout and refuses.
+  const holder = await holdStateLockInChild(path.dirname(logPath));
   const start = Date.now();
-  withEventsLock(logPath, () => {
+  try {
     assert.throws(
       () => migrateActorToRole(logPath, { backupPath }),
       (err) => err.category === "lock-timeout",
       "migration under a held lock must refuse via the lock-timeout category, not write",
     );
-    sawBlockThenRefuse = true;
-  });
+  } finally {
+    await holder.release();
+  }
   const elapsedMs = Date.now() - start;
 
-  assert.equal(sawBlockThenRefuse, true);
   assert.ok(elapsedMs >= 1900, `refusal must be preceded by the real block (measured ${elapsedMs}ms, expected >= ~2000ms)`);
   assert.equal(fs.readFileSync(logPath, "utf8"), fixtureLines().join("\n") + "\n", "a refused migration never wrote the target");
 });
