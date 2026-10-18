@@ -1,8 +1,10 @@
-//! Dormant Git component contract. No Git process or mutation is exposed yet.
+//! Git component contracts and hardened repository inspection.
 //!
 //! Publication is an implementor port, not a working backend. Authority,
 //! hardened driver, WAL and recovery must land before an implementation can
 //! issue effects. There is intentionally no public raw-argv escape hatch.
+mod driver;
+pub use driver::GitDriver;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -78,8 +80,14 @@ pub struct RepoHandle {
     common_dir: PathBuf,
     trusted_main_root: PathBuf,
     object_format: ObjectFormat,
+    git_dir: PathBuf,
+    work_tree: Option<PathBuf>,
+    layout: RepoLayout,
 }
 impl RepoHandle {
+    pub fn layout(&self) -> &RepoLayout {
+        &self.layout
+    }
     pub fn common_dir(&self) -> &std::path::Path {
         &self.common_dir
     }
@@ -365,4 +373,18 @@ pub trait RepositoryConfig {
         refspecs: &[String],
         operation_id: &str,
     ) -> Result<Receipt>;
+}
+
+/// Repository-owned compatibility features; none grants implicit network access.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RepoLayout {
+    pub refs: RefStorage,
+    pub shallow: bool,
+    pub alternates: bool,
+    pub promisor: bool,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RefStorage {
+    Files,
+    Reftable,
 }
