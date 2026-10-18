@@ -36,7 +36,6 @@ import {
   OWNERSHIP_MARKER_FILE,
   cleanupConfinementResource,
   extendOwnershipMarker,
-  reapOrphanedConfinementResources,
   writeOwnershipMarker,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
@@ -740,17 +739,6 @@ test('the finalizer of a settled dispatch writes back before it removes the home
   } finally { w.cleanup(); }
 });
 
-test('the orphan reaper writes back before it removes a home whose owner is gone', () => {
-  const w = workspace();
-  try {
-    const dir = privateHomeWithRenewedLogin(w);
-    const result = reapOrphanedConfinementResources({ tempRoot: path.join(w.tmp, 'fgos-confinement'), checkLiveness: () => false });
-    assert.equal(result.reaped.length, 1);
-    assert.equal(fs.existsSync(dir), false);
-    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
-  } finally { w.cleanup(); }
-});
-
 test('a busy account lock stages the copy instead of waiting; the next refresh-ahead applies it', async () => {
   const w = workspace();
   try {
@@ -1346,9 +1334,6 @@ test('a home kept because staging failed is retried a bounded number of times, t
     assert.equal(markerOf(dir).credentialKept.attempts, CREDENTIAL_KEEP_MAX_ATTEMPTS, 'a held home is not counted again');
     assert.equal(readPi(dir).xai.refresh, FAKE.newRefresh, 'the renewed login is still in the home');
 
-    // Age never deletes it either: the reaper skips a home whose marker is long past its age limit.
-    const reaped = reapOrphanedConfinementResources({ tempRoot: path.join(w.tmp, 'fgos-confinement'), checkLiveness: () => false, maxAgeMs: 1 });
-    assert.equal(reaped.reaped.length, 0);
     assert.equal(fs.existsSync(dir), true);
     assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'the source was not written by a held home');
   } finally { w.cleanup(); }

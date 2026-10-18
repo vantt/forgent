@@ -1,13 +1,14 @@
-// The sweep door: adopt first, then the reaper for what adopt does not own. Real directories and, for
-// the adopt cases, a real host binary (FGOS_HOST_BIN built from this checkout).
+// The sweep door: adopt is the only judge of an attempt directory, and only its finalize-home step removes a
+// private home, while the attempt's lock is free and its process domain is empty. Real directories and a real
+// host binary (FGOS_HOST_BIN built from this checkout).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
-import { ensurePrivateDir, writeOwnershipMarkerV2, writeOwnershipMarker, extendOwnershipMarker, reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { ensurePrivateDir, writeOwnershipMarkerV2, extendOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { sweepAttempts } from '../../src/run-supervisor/sweep.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
@@ -36,13 +37,13 @@ function attemptHome(w, { attemptId, runDir, ageMs = 0 }) {
  * An attempt directory a dead supervisor left: v3 envelope, free attempt lock, empty process domain, a
  * receipt, and one step that runs the real finalizer for the attempt's homes.
  */
-function deadAttempt(w, name, home) {
+function deadAttempt(w, name, home, { countFile } = {}) {
   const runDir = path.join(w.assignmentsRoot, 'asg-1', 'runs', name);
   fs.mkdirSync(path.join(runDir, 'protected', 'confinement-finalization'), { recursive: true });
   fs.writeFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), JSON.stringify({
     contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home }], cleanupState: 'pending', cleanupResult: null,
   }));
-  const script = `import(${JSON.stringify(path.join(REPO, 'src/runner/dispatch/confinement/authority.mjs'))}).then((m) => { const r = m.finalizeAttemptHome({ runDir: ${JSON.stringify(runDir)}, attemptId: ${JSON.stringify(`att-${name}`)} }); process.exit(r.state === 'cleaned' ? 0 : 75); });`;
+  const script = `import(${JSON.stringify(path.join(REPO, 'src/runner/dispatch/confinement/authority.mjs'))}).then((m) => { const r = m.finalizeAttemptHome({ runDir: ${JSON.stringify(runDir)}, attemptId: ${JSON.stringify(`att-${name}`)} }); ${countFile ? `if (r.state === 'cleaned') require('node:fs').appendFileSync(${JSON.stringify(countFile)}, 'x\\n'); ` : ''}process.exit(r.state === 'cleaned' ? 0 : 75); });`;
   const envelope = {
     v: 3, attemptId: `att-${name}`, unitRunId: 'unit-1', runDir, mode: 'direct', protocolId: 1,
     hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: runDir, mutation: 'read-only',
@@ -59,81 +60,94 @@ function deadAttempt(w, name, home) {
   return runDir;
 }
 
-test('an attempt home survives 50 reaper passes in any liveness and pane state', () => {
-  const w = workspace();
-  try {
-    const home = attemptHome(w, { attemptId: 'a1', runDir: path.join(w.root, 'run'), ageMs: 12 * HOUR });
-    for (let i = 0; i < 50; i += 1) {
-      const result = reapOrphanedConfinementResources({ tempRoot: w.tempRoot, checkLiveness: () => i % 2 === 0, checkPaneOpen: () => (i % 3 === 0 ? null : i % 3 === 1) });
-      assert.deepEqual(result.reaped, [], `pass ${i}`);
-      assert.equal(fs.existsSync(path.join(home, 'auth.json')), true, `pass ${i}`);
-    }
-  } finally { w.cleanup(); }
-});
-
-test('sweepAttempts: adopt finishes a dead attempt\'s finalize-home, so the reaper never gets to the home', { skip: NEEDS_HOST }, () => {
+test('lock free, domain empty, receipt present: adopt finalizes the home and nothing else touches it', { skip: NEEDS_HOST }, () => {
   const w = workspace();
   try {
     const runDir = path.join(w.assignmentsRoot, 'asg-1', 'runs', 'r1');
     const home = attemptHome(w, { attemptId: 'att-r1', runDir, ageMs: 12 * HOUR });
     deadAttempt(w, 'r1', home);
-    const seen = [];
-    const result = sweepAttempts({
-      assignmentsRoot: w.assignmentsRoot,
-      tempRoot: w.tempRoot,
-      reaperOptions: { checkLiveness: () => false, checkPaneOpen: (...a) => { seen.push(a); return false; } },
-    });
+    const result = sweepAttempts({ assignmentsRoot: w.assignmentsRoot });
     assert.equal(result.adoptError, null);
     assert.equal(result.adopt.length, 1);
     assert.equal(fs.existsSync(home), false, 'finalize-home removed the home');
-    assert.deepEqual(result.reap.reaped, []);
-    assert.deepEqual(seen, []);
+    assert.equal(fs.existsSync(path.join(w.tempRoot, 'disp_att-r1')), false, 'the emptied per-dispatch directory went with it');
   } finally { w.cleanup(); }
 });
 
-test('sweepAttempts without a host binary still runs the reaper and says why adopt did not run', () => {
+test('a home with no attempt directory to adopt is never removed, whatever its age', { skip: NEEDS_HOST }, () => {
+  const w = workspace();
+  try {
+    const home = attemptHome(w, { attemptId: 'att-r0', runDir: path.join(w.assignmentsRoot, 'asg-1', 'runs', 'r0'), ageMs: 48 * HOUR });
+    const result = sweepAttempts({ assignmentsRoot: w.assignmentsRoot });
+    assert.deepEqual(result.adopt, []);
+    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
+  } finally { w.cleanup(); }
+});
+
+test('the attempt lock is held: adopt does not finalize, and the home stays until the holder lets go', { skip: NEEDS_HOST || !fs.existsSync('/usr/bin/flock') }, async () => {
+  const w = workspace();
+  let holder;
+  try {
+    const runDir = path.join(w.assignmentsRoot, 'asg-1', 'runs', 'r3');
+    const home = attemptHome(w, { attemptId: 'att-r3', runDir });
+    deadAttempt(w, 'r3', home);
+    // flock forks its command, so the holder is the whole process group, killed together below.
+    holder = spawn('/usr/bin/flock', ['-x', path.join(runDir, 'attempt.lock'), 'sleep', '60'], { stdio: 'ignore', detached: true });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const during = sweepAttempts({ assignmentsRoot: w.assignmentsRoot });
+    assert.equal(during.adoptError, null);
+    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true, 'a held lock keeps the home');
+    process.kill(-holder.pid, 'SIGKILL');
+    await new Promise((resolve) => holder.once('exit', resolve));
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const after = sweepAttempts({ assignmentsRoot: w.assignmentsRoot });
+    assert.equal(after.adoptError, null);
+    assert.equal(fs.existsSync(home), false, 'the next sweep, with the lock free, finalizes it');
+  } finally {
+    try { if (holder) process.kill(-holder.pid, 'SIGKILL'); } catch { /* gone */ }
+    w.cleanup();
+  }
+});
+
+test('two adopters over one dead attempt remove its home once', { skip: NEEDS_HOST }, async () => {
+  const w = workspace();
+  try {
+    const runDir = path.join(w.assignmentsRoot, 'asg-1', 'runs', 'r4');
+    const home = attemptHome(w, { attemptId: 'att-r4', runDir });
+    const countFile = path.join(w.root, 'finalized.count');
+    deadAttempt(w, 'r4', home, { countFile });
+    const sweepScript = `import(${JSON.stringify(path.join(REPO, 'src/run-supervisor/sweep.mjs'))}).then((m) => { m.sweepAttempts({ assignmentsRoot: ${JSON.stringify(w.assignmentsRoot)} }); });`;
+    const run = () => new Promise((resolve) => {
+      const child = spawn(process.execPath, ['-e', sweepScript], { stdio: 'ignore', env: { ...process.env, FGOS_HOST_BIN: HOST } });
+      child.once('exit', resolve);
+    });
+    await Promise.all([run(), run()]);
+    assert.equal(fs.existsSync(home), false);
+    assert.equal(fs.readFileSync(countFile, 'utf8').trim().split('\n').length, 1, 'the finalizer ran to a cleaned home exactly once');
+  } finally { w.cleanup(); }
+});
+
+test('sweepAttempts without a usable host binary says why adopt did not run, and removes nothing', () => {
   const w = workspace();
   try {
     const runDir = path.join(w.assignmentsRoot, 'asg-1', 'runs', 'r2');
     fs.mkdirSync(runDir, { recursive: true });
-    // An unusable host: the route fails, the sweep reports it and goes on.
-    const result = sweepAttempts({ assignmentsRoot: w.assignmentsRoot, tempRoot: w.tempRoot, adoptOptions: { hostBin: '/nonexistent/fgos' } });
+    const home = attemptHome(w, { attemptId: 'att-r2', runDir, ageMs: 12 * HOUR });
+    const result = sweepAttempts({ assignmentsRoot: w.assignmentsRoot, adoptOptions: { hostBin: '/nonexistent/fgos' } });
     assert.equal(result.adopt, null);
     assert.equal(result.adoptError, 'adopt-route-failed');
-    assert.deepEqual(result.reap, { reaped: [], skipped: [] });
+    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
   } finally { w.cleanup(); }
 });
 
-test('sweepAttempts leaves the herdr rule alone: a version 1 home whose pane is closed is reaped, an open pane keeps it', () => {
-  const w = workspace();
-  try {
-    const mk = (id) => {
-      const dir = path.join(w.tempRoot, id, 'home');
-      ensurePrivateDir(dir, { root: w.tempRoot });
-      writeOwnershipMarker(dir, { dispatchId: id, pid: 424242 });
-      const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
-      fs.writeFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...marker, paneId: `w1:${id}`, retainedAt: new Date().toISOString() }));
-      return dir;
-    };
-    const closed = mk('disp_closed');
-    const open = mk('disp_open');
-    const result = sweepAttempts({
-      tempRoot: w.tempRoot,
-      reaperOptions: { checkPaneOpen: (paneId) => paneId.endsWith('disp_open') },
-    });
-    assert.equal(fs.existsSync(closed), false);
-    assert.equal(fs.existsSync(open), true);
-    assert.equal(result.reap.reaped.length, 1);
-  } finally { w.cleanup(); }
-});
-
-test('production call sites reach the reaper only through sweepAttempts', () => {
-  const out = execFileSync('grep', ['-rln', 'reapOrphanedConfinementResources(', 'src'], { cwd: REPO, encoding: 'utf8' }).split('\n').filter(Boolean).sort();
-  assert.deepEqual(out, [
-    'src/run-supervisor/sweep.mjs',
-    'src/runner/dispatch/confinement/cleanup.mjs',
-  ]);
-  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs', 'src/runner/dispatch/cli.mjs', 'src/setup/registrations.mjs']) {
+test('no production code reaches a home by any rule but adopt', () => {
+  const gone = ['reapOrphanedConfinementResources', 'bindOwnershipMarker', 'markOwnershipLaunched', 'markResourceRetained', 'paneOpenUnlessClosed', 'bindingForPrepared', 'herdrEndpointForEnv', 'envForEndpoint', 'OWNERSHIP_BINDING_FIELDS', 'LAUNCH_GRACE_MS'];
+  for (const name of gone) {
+    let out = '';
+    try { out = execFileSync('grep', ['-rln', name, 'src'], { cwd: REPO, encoding: 'utf8' }); } catch { /* no match */ }
+    assert.equal(out.trim(), '', `${name} is gone from src`);
+  }
+  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs', 'src/setup/run-supervisor-checks.mjs']) {
     assert.match(fs.readFileSync(path.join(REPO, file), 'utf8'), /sweepAttempts\(/, file);
   }
 });

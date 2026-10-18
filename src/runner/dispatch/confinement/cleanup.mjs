@@ -1,26 +1,18 @@
-// cleanup.mjs — cleanup and reaper for local temp/private-home resources (Phase 03 R5, spec §8.6).
+// cleanup.mjs — ownership markers and removal of local temp/private-home resources (spec §8.6).
 //
 // Ensures:
 //   - Ownership markers are written before any allocation side effect is exposed.
-//   - A cleanup or reaper never removes a directory it did not create.
-//   - Reaper is idempotent: running it multiple times never errors or double-acts.
+//   - A cleanup never removes a directory it did not create.
+//   - An attempt home is removed only by adopt's finalize-home step.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
-import { envForSession, envForEndpoint } from '../worker-session.mjs';
-import { createRoundTerminalControl, resolveHerdrBin } from '../terminal-slot.mjs';
-import { getProcessStartTime } from '../process-identity.mjs';
 import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
-import { RUN_TIMEOUT_MAX_MS } from '../run-timeout.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
-/** How old an empty per-dispatch directory must be before the reaper removes it. */
-export const EMPTY_SHELL_GRACE_MS = 600000;
-/** How long past its own run timeout a live dispatcher's home is kept, for the run to stop and settle. */
-export const RUN_SETTLE_GRACE_MS = 600000;
 export const OWNERSHIP_CONTRACT = 'confinement-resource-ownership.v1';
 export const OWNERSHIP_CREATOR = 'fgos-confinement';
 /** The marker of a home that belongs to one supervised attempt: its owner is that attempt, not a process. */
@@ -73,25 +65,9 @@ export function ensurePrivateDir(dir, { root } = {}) {
 }
 
 /**
- * Record that the pane this resource's worker runs in was left open, so the
- * home (and the login copy in it) must outlive the failed run. The reaper
- * reclaims it once the pane is gone.
- */
-export function markResourceRetained(dirPath, { paneId, terminalKey, herdrSession } = {}) {
-  const marker = readOwnershipMarker(dirPath);
-  if (!marker || !paneId) return false;
-  fs.writeFileSync(
-    path.join(dirPath, OWNERSHIP_MARKER_FILE),
-    JSON.stringify({ ...marker, paneId: String(paneId), ...(terminalKey ? { terminalKey: String(terminalKey) } : {}), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
-    { encoding: 'utf8', mode: 0o600 },
-  );
-  return true;
-}
-
-/**
  * Write ownership marker inside allocated directory.
  */
-export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-home', pid = process.pid, timeoutMs } = {}) {
+export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-home', pid = process.pid } = {}) {
   if (!dirPath || typeof dirPath !== 'string') {
     throw new Error('dirPath is required for writeOwnershipMarker.');
   }
@@ -106,9 +82,6 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
     resource,
     pid,
     createdAt: new Date().toISOString(),
-    // The run timeout of the dispatch that made this home: the reaper keeps a live dispatcher's home
-    // this long (capped), so a run longer than the reaper's default age is not reaped mid-turn.
-    ...(Number.isSafeInteger(timeoutMs) && timeoutMs > 0 ? { timeoutMs } : {}),
   };
 
   const markerPath = path.join(dirPath, OWNERSHIP_MARKER_FILE);
@@ -118,7 +91,7 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
 
 /**
  * Write the ownership marker of a home that belongs to one supervised attempt. Only adopt's
- * finalize-home step removes such a home; the orphan reaper never judges it. Written atomically.
+ * finalize-home step removes such a home. Written atomically.
  */
 export function writeOwnershipMarkerV2(dirPath, { attemptId, runDir, dispatchId, resource = 'private-home' } = {}) {
   if (!dirPath || typeof dirPath !== 'string') throw new Error('dirPath is required for writeOwnershipMarkerV2.');
@@ -164,57 +137,6 @@ export function extendOwnershipMarker(dirPath, fields) {
   // new content, never a half-written one (an unreadable marker would make the home look unowned).
   writeFileAtomic(path.join(dirPath, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...marker, ...fields }, null, 2));
   return true;
-}
-
-/** How long after binding a binder may still be launching its worker; part of a bound home's keep window. */
-export const LAUNCH_GRACE_MS = 120000;
-
-/**
- * The marker fields Confinement Authority may add after prepare, when it binds a home to the process
- * (and, for a herdr round, the pane) its worker runs under. The finalizer accepts exactly these (plus
- * `credentialKept`) as post-prepare changes; any other change is still an ownership-marker mismatch.
- */
-export const OWNERSHIP_BINDING_FIELDS = Object.freeze([
-  'paneId', 'terminalKey', 'herdrEndpoint', 'herdrSession', 'binderPid', 'binderStartTime', 'boundAt', 'launchedAt',
-]);
-
-/**
- * Bind a prepared home to the process its worker runs under, before that worker is launched (a herdr
- * round: the controller, with the pane and the herdr endpoint its client used) or as soon as it is
- * started (a cli-spawn round: the detached run supervisor). The reaper keeps a home whose binder is
- * alive for a window anchored at `boundAt`. Written atomically; throws when the home has no marker of
- * ours, so a caller can fail closed. A rebinding replaces the earlier binding (and keeps `launchedAt`,
- * which only a launch writes).
- */
-export function bindOwnershipMarker(dirPath, { paneId, terminalKey, herdrEndpoint, herdrSession, binderPid = process.pid, binderStartTime, boundAt = new Date().toISOString() } = {}) {
-  const marker = readOwnershipMarker(dirPath);
-  if (!marker) throw new Error('ownership-marker-missing');
-  if (!Number.isInteger(binderPid) || binderPid <= 0) throw new Error('binder-pid-invalid');
-  const startTime = binderStartTime === undefined ? getProcessStartTime(binderPid) : binderStartTime;
-  const { paneId: _p, terminalKey: _k, herdrEndpoint: _e, herdrSession: _s, binderPid: _b, binderStartTime: _t, boundAt: _a, ...rest } = marker;
-  const binding = {
-    ...(paneId ? { paneId: String(paneId) } : {}),
-    ...(terminalKey ? { terminalKey: String(terminalKey) } : {}),
-    ...(herdrEndpoint ? { herdrEndpoint: String(herdrEndpoint) } : {}),
-    ...(herdrSession ? { herdrSession: String(herdrSession) } : {}),
-    binderPid,
-    ...(startTime ? { binderStartTime: String(startTime) } : {}),
-    boundAt,
-  };
-  writeFileAtomic(path.join(dirPath, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...rest, ...binding }, null, 2));
-  return binding;
-}
-
-/**
- * Record that the bound worker is being launched. Written immediately before the launch is sent (or when
- * a resumed round finds its worker already running), so a bound marker without it proves no worker was
- * ever launched into the home. Throws when the home has no bound marker of ours.
- */
-export function markOwnershipLaunched(dirPath, { launchedAt = new Date().toISOString() } = {}) {
-  const marker = readOwnershipMarker(dirPath);
-  if (!marker?.boundAt) throw new Error('ownership-marker-unbound');
-  writeFileAtomic(path.join(dirPath, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...marker, launchedAt }, null, 2));
-  return launchedAt;
 }
 
 /**
@@ -280,7 +202,7 @@ export function countCredentialKeep(dirPath, marker, now = Date.now) {
 
 /**
  * Delete a confinement directory. The one removal every path goes through (the driver's cleanup, the
- * finalizer of a settled dispatch and the orphan reaper), so a login renewed inside a private home is
+ * finalizer of a settled dispatch and adopt's finalize-home step), so a login renewed inside a private home is
  * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
  * ask for write-back is removed exactly as before; a write-back problem is reported by a fixed code on
  * stderr and never stops the removal, except that a home whose renewed login could not be staged is kept
@@ -415,7 +337,7 @@ export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempR
       const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir));
       if (seen.has(dir)) continue;
       seen.add(dir);
-      // A home under a root no reaper or dispatch retries is never going to count its own attempts up, so
+      // A home under a root no dispatch retries is never going to count its own attempts up, so
       // it is treated as held from the start.
       if (!home.held && !unretried.has(canonicalRoot(root))) continue;
       if (provider !== undefined && (home.provider !== provider || home.accountId !== accountId)) continue;
@@ -433,232 +355,6 @@ export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempR
     }
   }
   return { settled, held };
-}
-
-/** The environment that addresses the herdr server a marker recorded: its endpoint (socket path) when
- * the binding wrote one, else its named session, else none (the pane cannot be asked). */
-function envForMarkerPane(herdrSession, herdrEndpoint) {
-  if (herdrEndpoint) return envForEndpoint(process.env, { herdrEndpoint, herdrSession });
-  if (herdrSession) return envForSession(process.env, herdrSession);
-  return null;
-}
-
-/** Whether the pane a marker recorded is still open: true / false, or null when it cannot be told
- * (herdr not installed, no reachable server, nothing recorded to ask, or a marker written before panes
- * were addressed by key, which names no slot to ask about). */
-function defaultPaneOpen(paneId, herdrSession, herdrEndpoint, terminalKey) {
-  try {
-    // The server that owns the pane: the recorded endpoint's (or session's), never whichever one this
-    // process's own environment happens to name. A marker recording neither cannot be asked, so the
-    // expiry rule decides.
-    const env = envForMarkerPane(herdrSession, herdrEndpoint);
-    if (!env || !terminalKey) return null;
-    const seen = createRoundTerminalControl({ herdrBin: resolveHerdrBin(), herdrEnv: env }).inspect({ key: terminalKey });
-    if (seen.pane === 'live') return true;
-    if (seen.pane === 'gone') return false;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-/** Close a pane a dead binder bound but never launched a worker into, by key. Best effort: a pane that
- * cannot be closed is a visible leftover, never a credential. A marker without a key closes nothing. */
-function defaultClosePane(paneId, herdrSession, herdrEndpoint, terminalKey) {
-  const env = envForMarkerPane(herdrSession, herdrEndpoint);
-  if (!env || !terminalKey) return;
-  try {
-    createRoundTerminalControl({ herdrBin: resolveHerdrBin(), herdrEnv: env }).release({ key: terminalKey, disposition: 'close' });
-  } catch { /* best effort */ }
-}
-
-/** The pane check for a sweep run right after the caller closed some panes itself: those panes are
- * closed, and every other pane is asked exactly as the regular sweep asks it. */
-export function paneOpenUnlessClosed(closedPanes) {
-  return (paneId, herdrSession, herdrEndpoint, terminalKey) => (closedPanes.has(paneId) ? false : defaultPaneOpen(paneId, herdrSession, herdrEndpoint, terminalKey));
-}
-
-function isProcessAlive(pid) {
-  if (typeof pid !== 'number' || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM'; // Process exists but owned by someone else
-  }
-}
-
-/** Liveness of a recorded pid, cross-checked against its recorded start time when there is one: a pid
- * reused by another process is dead. An unreadable start time is not proof of death. */
-function isRecordedProcessAlive(pid, startTime = null) {
-  if (!isProcessAlive(pid)) return false;
-  if (!startTime) return true;
-  const live = getProcessStartTime(pid);
-  return live === null || live === String(startTime);
-}
-
-/**
- * Idempotent reaper for orphaned confinement resources under a tempRoot (spec §8.6, R5).
- * Safe to run repeatedly; ignores unowned or still-active directories.
- *
- * Seams: `checkLiveness(pid, startTime)` (is the recorded process alive), `checkPaneOpen(paneId,
- * herdrSession, herdrEndpoint, terminalKey)` (true / false / null when herdr cannot be asked), `closePane(paneId,
- * herdrSession, herdrEndpoint, terminalKey)` (close the empty pane of a bound home no worker was launched into).
- */
-export function reapOrphanedConfinementResources({
-  tempRoot,
-  maxAgeMs = 3600000,
-  checkLiveness = isRecordedProcessAlive,
-  checkPaneOpen = defaultPaneOpen,
-  closePane = defaultClosePane,
-} = {}) {
-  if (!tempRoot || !fs.existsSync(tempRoot)) {
-    return { reaped: [], skipped: [] };
-  }
-
-  const reaped = [];
-  const skipped = [];
-  const now = Date.now();
-
-  let entries = [];
-  try {
-    entries = fs.readdirSync(tempRoot, { withFileTypes: true });
-  } catch {
-    return { reaped, skipped };
-  }
-
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const dispatchDir = path.join(tempRoot, entry.name);
-
-    // A per-dispatch directory with nothing in it holds no credential copy and no marker to
-    // trust; it is a shell a dispatch left behind. Removing it is safe once it is old enough
-    // that no dispatch can still be about to fill it (rmdir refuses a non-empty directory).
-    try {
-      if (fs.readdirSync(dispatchDir).length === 0 && now - fs.statSync(dispatchDir).mtimeMs > Math.min(maxAgeMs, EMPTY_SHELL_GRACE_MS)) {
-        fs.rmdirSync(dispatchDir);
-        reaped.push({ path: dispatchDir, dispatchId: entry.name, reason: 'empty' });
-        continue;
-      }
-    } catch {
-      // vanished or filled meanwhile: leave it to the marker rules below
-    }
-
-    // Check dispatchDir or subdirectories (e.g. dispatchDir/home)
-    const candidates = [dispatchDir];
-    try {
-      const subEntries = fs.readdirSync(dispatchDir, { withFileTypes: true });
-      for (const sub of subEntries) {
-        if (sub.isDirectory()) {
-          candidates.push(path.join(dispatchDir, sub.name));
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    for (const cand of candidates) {
-      const marker = readOwnershipMarker(cand);
-      if (!marker) {
-        // An attempt home belongs to adopt (finalize-home), whatever its age or whoever is alive.
-        if (readAttemptOwnershipMarker(cand)) skipped.push({ path: cand, reason: 'attempt-home-owned-by-adopt' });
-        // Anything else: not created by us; do not touch
-        continue;
-      }
-
-      const createdTime = marker.createdAt ? new Date(marker.createdAt).getTime() : 0;
-      const isExpired = createdTime > 0 && now - createdTime > maxAgeMs;
-      // A home whose dispatcher is alive and whose run is still inside its own timeout (plus time to
-      // settle) is in use, however old: a run may be given longer than maxAgeMs. The marker's value is
-      // held to the run-timeout ceiling, so no marker keeps a login copy past it.
-      const runTimeoutMs = Number.isSafeInteger(marker.timeoutMs) && marker.timeoutMs > 0 ? Math.min(marker.timeoutMs, RUN_TIMEOUT_MAX_MS) : 0;
-      const isPastRun = createdTime > 0 && now - createdTime > Math.max(maxAgeMs, runTimeoutMs + RUN_SETTLE_GRACE_MS);
-
-      // The pane rule: a home whose pane is open is in use until that pane closes, whatever became of
-      // the process that launched it. Expiry still wins over an unanswerable pane check
-      // (`checkPaneOpen` -> null), so a credential copy cannot outlive maxAgeMs just because herdr is away.
-      const paneKeeps = () => {
-        const open = checkPaneOpen(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null, marker.terminalKey ?? null);
-        return open === true || (open === null && !isExpired);
-      };
-
-      let reason;
-      let closeEmptyPane = false;
-      if (marker.boundAt && !marker.retainedAt && !marker.paneId) {
-        // A binding with no pane is a detached run supervisor's (the pre-adopt cli-spawn way). No new
-        // home is written this way; a leftover is never removed on a pid rule: it is kept and `fgos doctor` names it.
-        skipped.push({ path: cand, reason: 'unpaned-binding-kept-for-doctor' });
-        continue;
-      }
-
-      if (marker.boundAt && !marker.retainedAt) {
-        // An active binding (bindOwnershipMarker): while its binder is alive, the home is kept for a window
-        // anchored at binding, whatever the pane answers (a wrong or other server's socket answers false).
-        // Past that window, or once the binder is dead, the pane decides.
-        const boundTime = Date.parse(marker.boundAt);
-        const binderAlive = checkLiveness(marker.binderPid ?? marker.pid, marker.binderStartTime ?? null);
-        const keepUntil = boundTime + Math.max(maxAgeMs, LAUNCH_GRACE_MS + runTimeoutMs + RUN_SETTLE_GRACE_MS);
-        if (binderAlive && Number.isFinite(boundTime) && now <= keepUntil) {
-          skipped.push({ path: cand, reason: 'binder-alive-in-window' });
-          continue;
-        }
-        if (!binderAlive && !marker.launchedAt) {
-          // The binder died before it launched anything: the pane is empty and the home unused.
-          reason = 'bound-never-launched';
-          closeEmptyPane = true;
-        } else if (paneKeeps()) {
-          skipped.push({ path: cand, reason: 'pane-still-open' });
-          continue;
-        } else {
-          reason = 'pane-closed';
-        }
-      } else if (marker.paneId) {
-        // A retained binding (retainedAt): today's pane rule.
-        if (paneKeeps()) {
-          skipped.push({ path: cand, reason: 'pane-still-open' });
-          continue;
-        }
-        reason = 'pane-closed';
-      } else {
-        const processDead = !checkLiveness(marker.pid, null);
-        if (!(processDead || isPastRun)) {
-          skipped.push({ path: cand, reason: 'process-alive-and-not-expired' });
-          continue;
-        }
-        reason = processDead ? 'process-dead' : 'expired';
-      }
-
-      // The decision above was taken on `marker`; a controller may have bound (or rebound) the home since.
-      // Destroy only what was decided on: a marker that changed meanwhile is left for the next pass.
-      const current = readOwnershipMarker(cand);
-      if (!current || JSON.stringify(current) !== JSON.stringify(marker)) {
-        skipped.push({ path: cand, reason: 'marker-changed' });
-        continue;
-      }
-      if (closeEmptyPane) {
-        try { closePane(marker.paneId, marker.herdrSession ?? null, marker.herdrEndpoint ?? null, marker.terminalKey ?? null); } catch { /* best effort */ }
-      }
-
-      {
-        const res = cleanupConfinementResource(cand, marker.dispatchId);
-        if (res.cleaned) {
-          reaped.push({ path: cand, dispatchId: marker.dispatchId, reason });
-          // If dispatchDir is now empty, clean it up too
-          try {
-            if (fs.existsSync(dispatchDir) && fs.readdirSync(dispatchDir).length === 0) {
-              fs.rmSync(dispatchDir, { recursive: true, force: true });
-            }
-          } catch {
-            // ignore
-          }
-        } else {
-          skipped.push({ path: cand, reason: res.reason });
-        }
-      }
-    }
-  }
-
-  return { reaped, skipped };
 }
 
 /**
