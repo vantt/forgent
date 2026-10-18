@@ -1,0 +1,398 @@
+{
+  "cli": "pi",
+  "source": "screens recorded 2026-10-18 from the real CLI in a herdr pane (herdr 0.9.1-vantt.1) with `herdr pane read --source visible`; *.insp.json is `herdr agent explain` on the same pane; a vector's `source` names anything synthesized",
+  "vectors": [
+    {
+      "name": "ready-after-the-screen-drew-and-held-still",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "launch echo",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": false,
+              "matchedRule": false,
+              "promptText": ""
+            }
+          },
+          {
+            "at": 1000,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready"
+      }
+    },
+    {
+      "name": "a-process-that-never-draws-is-typed-at-after-a-bounded-wait",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "unverified"
+      }
+    },
+    {
+      "name": "working-agent-never-gets-ready-delivery-unknown",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "readiness": "not-ready"
+      },
+      "readyMs": 3000
+    },
+    {
+      "name": "detector-without-verdict-is-typed-at-without-waiting",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": null
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "no-detector"
+      }
+    },
+    {
+      "name": "dead-login-on-a-ready-screen-is-a-block",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "header\nError: No API key found for openai-codex\n❯",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": false,
+              "matchedRule": false,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "login",
+        "readiness": "blocked"
+      },
+      "source": "standard login wording of this CLI on an otherwise idle screen"
+    },
+    {
+      "name": "a-ready-screen-is-not-a-block",
+      "step": "classify-blocked",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      }
+    },
+    {
+      "name": "paste-chip-left-in-composer-gets-enter-not-a-second-paste",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 200,
+            "inspection": {
+              "state": "idle",
+              "promptText": "❯ [paste #1 +42 lines]"
+            }
+          },
+          {
+            "at": 3500,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "minEnters": 2
+      },
+      "message": "# Brief 1\n\n## Your task\nline 0\nline 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nline 9\nline 10\nline 11\nline 12\nline 13\nline 14\nline 15\nline 16\nline 17\nline 18\nline 19\nline 20\nline 21\nline 22\nline 23\nline 24\nline 25\nline 26\nline 27\nline 28\nline 29\nline 30\nline 31\nline 32\nline 33\nline 34\nline 35\nline 36\nline 37\nline 38\nline 39",
+      "source": "chip wording as this CLI folds a long paste"
+    },
+    {
+      "name": "agent-shows-working-after-submit-is-delivered",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "maxEnters": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools."
+    },
+    {
+      "name": "finished-turn-without-result-is-delivery-unknown",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "file": "turn-finished"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "sentTexts": 1,
+        "minEnters": 2,
+        "maxEnters": 7
+      },
+      "message": "Reply with the single word ok. Do not use any tools.",
+      "source": "real screen after a turn that finished before the first look; with no composer rule the short echoed brief sits in the bottom lines and reads as an unsent draft, so Enter is offered a bounded number of times and the outcome stays unknown"
+    },
+    {
+      "name": "screen-unchanged-and-no-chip-is-delivery-unknown-and-never-retyped",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "sentTexts": 1,
+        "maxEnters": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools."
+    },
+    {
+      "name": "refused-typing-on-an-untouched-pane-is-retyped-once",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 2000,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ],
+        "failTextSends": 1
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 2
+      },
+      "message": "Reply with the single word ok. Do not use any tools."
+    },
+    {
+      "name": "refused-typing-is-retyped-at-most-twice",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ],
+        "failTextSends": 5
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "sentTexts": 3
+      },
+      "message": "Reply with the single word ok. Do not use any tools."
+    },
+    {
+      "name": "dialog-after-the-brief-is-needs-human",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "screen": "Allow this tool to run?\n1. Yes\n2. No",
+            "inspection": {
+              "state": "blocked",
+              "visibleBlocker": true,
+              "matchedRule": true
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "needs-human",
+        "sentTexts": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools."
+    },
+    {
+      "name": "outbox-result-completes",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            },
+            "result": "result-1.json"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "completed",
+        "resultFile": "result-1.json"
+      }
+    },
+    {
+      "name": "outbox-beats-quoted-limit-wording",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "ERROR: You've hit your usage limit. try again at 7:18 PM.",
+            "inspection": {
+              "state": "idle"
+            },
+            "result": "result-3.json"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "completed",
+        "resultFile": "result-3.json"
+      }
+    },
+    {
+      "name": "working-without-result-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      }
+    },
+    {
+      "name": "usage-limit-on-an-idle-screen-is-needs-human",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nERROR: You've hit your usage limit. try again at 7:18 PM.",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "needs-human"
+      }
+    },
+    {
+      "name": "exit-command",
+      "step": "exit-command",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": ""
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "exit",
+        "keys": [
+          "C-d"
+        ]
+      }
+    }
+  ]
+}
