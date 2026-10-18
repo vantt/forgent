@@ -451,6 +451,61 @@
       },
       "readyMs": 3000,
       "source": "real spinner screen recorded 2026-10-18 from agy on herdr (state working, rule spinner_working): the sign-in spinner at start-up; a mid-turn agy screen was not captured because the turn was refused by the start-up announcement banner"
+    },
+    {
+      "name": "mid-turn-working-screen-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working-mid-turn",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "esc_cancel_footer_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "real mid-turn screen recorded 2026-10-18 from agy on herdr (state working, rule esc_cancel_footer_working)"
+    },
+    {
+      "name": "mid-turn-working-screen-after-submit-is-delivered",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "file": "working-mid-turn",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "esc_cancel_footer_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "maxEnters": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools.",
+      "source": "real mid-turn screen recorded 2026-10-18 from agy on herdr (state working, rule esc_cancel_footer_working)"
     }
   ]
 }
