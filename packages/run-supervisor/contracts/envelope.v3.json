@@ -48,7 +48,7 @@
     "attemptId": "string, globally unique attempt id minted by the controller (also the slot key in terminal mode)",
     "unitRunId": "string, the unit run this attempt belongs to",
     "runDir": "absolute path of attemptDir",
-    "mode": { "enum": ["direct", "terminal"] },
+    "mode": { "enum": ["direct", "terminal"], "meaning": "terminal requires slot, terminal, a CLI with a terminal adapter and the release-slot builtin step; direct forbids all of them" },
     "protocolId": { "const": 1, "meaning": "internal-route protocol the supervisor, gate and steps must speak (internal-route.run-supervisor.v1.json)" },
     "hostBin": "absolute path of the fgos host binary of the release that wrote the envelope; resolved once by the controller, never through PATH or a shim",
     "payloadRoot": "absolute path of the legacy-node payload root of the same release (components.legacyNode.root of the activated manifest); resolved like apps/fgos/src/legacy_exec.rs",
@@ -68,7 +68,7 @@
     },
     "containment": {
       "preferred": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
-      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`"
+      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`. Terminal mode: the launcher script that terminal-control starts in the pane execs bwrap with --die-with-parent and a --bind of the socket directory, then `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-socket <terminal.socketPath>`"
     },
     "deadlines": {
       "softAt": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds; null when no soft deadline" },
@@ -82,11 +82,21 @@
       "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"], "other": "any other command name selects the generic adapter (exit and outbox only)" },
       "mode": { "enum": ["direct", "terminal"], "meaning": "always equal to the top-level mode" }
     },
-    "slot": "object {key} or absent; terminal mode only (terminal-control key, equal to attemptId)",
+    "slot": "object {key, groupKey}; present exactly when mode is terminal. key: terminal-control key, equal to attemptId. groupKey: the Node client's serialization group for allocate (a string the controller chooses); the supervisor never allocates, it only addresses the slot by key",
+    "terminal": "object {socketPath, exitCommand, orphanSettleMs}; present exactly when mode is terminal. socketPath: absolute AF_UNIX path of the GO socket under the runtime socket dir (mode 0700, owner is the user, name is a hash of attemptId, at most 107 bytes). exitCommand: string typed into the pane after the agent protocol reports completed, or null to use the CLI adapter's own exit command. orphanSettleMs: integer >= 0, the extra wait the gate gives the outbox after it saw a result while the supervisor is gone (orphan branch)",
+    "identity": "object {writerId, parentWriterId}; both modes. writerId: the attempt's writer id, equal to mint_attempt_writer_id(attemptId) (packages/session-identity/contracts/attempt-writer-id.v1.json); the gate exports it as FGOS_SESSION_ID. parentWriterId: writer id of the controller that wrote the envelope, exported as FGOS_PARENT_WRITER_ID, or null when the controller has none",
     "steps": {
-      "type": "array, run in order after the receipt; see step-receipt.v1.json",
+      "type": "array, run in order after the receipt; see step-receipt.v1.json. A terminal envelope ends with the release-slot builtin item; a direct envelope never carries it",
+      "builtinItem": {
+        "stepId": { "const": "release-slot" },
+        "builtin": { "const": true, "meaning": "run by the step runner itself in-process through the terminal-control crate: no hostBin, argv, cwd, env or stepTimeoutMs" },
+        "disposition": {
+          "onSuccess": { "const": "close", "meaning": "terminal-control.release(key, close) when the earlier steps all have receipts" },
+          "onFailure": { "const": "retain", "meaning": "terminal-control.release(key, retain) when an earlier step has no receipt, so the pane stays for a person" }
+        }
+      },
       "item": {
-        "stepId": { "enum": ["settle-attempt", "finalize-home", "release-slot"] },
+        "stepId": { "enum": ["settle-attempt", "finalize-home"], "meaning": "process items; release-slot is a builtinItem" },
         "hostBin": "absolute path, normally equal to the top-level hostBin",
         "payloadRoot": "absolute path, normally equal to the top-level payloadRoot",
         "argv": "string[] after hostBin, normally [\"internal\", \"attempt-step\", <stepId>, \"--protocol\", \"1\", \"--run-dir\", <runDir>]",
@@ -111,6 +121,8 @@
   "invariants": [
     "the envelope is written after the attempt lock (and the cwd lease when mutating) is held and before any agent process exists",
     "nothing in the envelope is a secret",
+    "mode terminal: slot, terminal and the release-slot builtin step are all present and slot.key equals attemptId; mode direct: none of them is present",
+    "identity.writerId equals mint_attempt_writer_id(attemptId) in both modes; a reader that finds another value refuses with envelope-invalid",
     "a reader that finds v != 3 or a digest that does not match treats the run as legacy-run (adopt) or refuses with envelope-invalid (supervise, gate, attempt-step)"
   ]
 }

@@ -1,0 +1,23 @@
+{
+  "contract": { "id": "session-identity-attempt-writer-id", "version": 1 },
+  "description": "Writer id of one attempt (agent run). A pure function of the attempt id, so a resume or a second reader derives the same id and the same envelope digest. The supervisor mints it and the controller computes the same value to publish a delegation before the attempt starts; both call the one function in fgos-session-identity (Rust) or its Node client, never a copy.",
+  "function": {
+    "name": "mint_attempt_writer_id",
+    "input": "attemptId: string",
+    "output": "writerId: string, \"att-\" + attemptId",
+    "errors": { "invalid-attempt-id": "attemptId is empty, longer than maxAttemptIdLength, or has a character outside attemptIdPattern; the function never trims, lowercases, truncates or substitutes characters" }
+  },
+  "constraints": {
+    "attemptIdPattern": "^[A-Za-z0-9._-]+$",
+    "prefix": "att-",
+    "maxWriterIdLength": 200,
+    "maxAttemptIdLength": 196,
+    "why": "the minted id must pass the resolve rule's usable-id test (session-identity.resolve.v1.json: idPattern and maxIdLength 200), otherwise the agent's FGOS_SESSION_ID would be ignored and resolution would fall to the process tree"
+  },
+  "environment": {
+    "FGOS_SESSION_ID": "the minted writer id of the attempt (never empty)",
+    "FGOS_PARENT_WRITER_ID": "writer id of the controller that wrote the envelope; absent when the controller has none",
+    "scrubbed": ["CLAUDE_CODE_SESSION_ID", "CODEX_THREAD_ID"]
+  },
+  "vector": "packages/session-identity/contracts/vectors/attempt-writer-id.v1.json; the Rust and the Node implementation must reproduce every case"
+}
