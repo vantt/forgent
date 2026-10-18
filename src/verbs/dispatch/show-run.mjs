@@ -6,6 +6,9 @@
 // contact anything, and that is a property of the import list rather than of
 // anyone's discipline.
 //
+// The one process it starts is the run supervisor's adopt probe, which only
+// reads (it writes nothing and takes no lock).
+//
 // Observing and contacting are separate capabilities, and V0 hands out only
 // the first. Many people may watch a run; exactly one process drives it.
 
@@ -14,7 +17,9 @@ import path from 'node:path';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
-import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
+import { findRunDir, listAssignmentRuns, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
+import { adoptRun } from '../../run-supervisor/client.mjs';
+import { deriveUnitState, unitDirsOfAssignment } from '../../runner/execution/unit-state.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
@@ -148,6 +153,60 @@ export function readRunSnapshot(runDir) {
   };
 }
 
+/** The run id of the attempt a later `--resume` launched in place of this one (its run.json names this
+ * run in `supersedesRunId`), or null. */
+function supersededBy(fgosDir, runId) {
+  if (!fgosDir || typeof runId !== 'string') return null;
+  for (const { runDir } of listAssignmentRuns(fgosDir)) {
+    const other = readJsonOrNull(path.join(runDir, 'run.json'));
+    if (other?.supersedesRunId === runId) return other.runId ?? null;
+  }
+  return null;
+}
+
+const probeAttempt = (attemptDir) => adoptRun(attemptDir, { probeOnly: true });
+
+/**
+ * What the run supervisor and the unit say about one attempt directory, read-only (the adopt probe writes
+ * nothing and takes no lock). `attemptState` is the probe's word, or the receipt outcome of a closed
+ * attempt that never ran the agent, or `abandoned-legacy` once the doctor settled an attempt from before
+ * the supervisor; `unprobed` (with the reason) when the host cannot judge. `unitState` is set when a
+ * unit run owns this attempt; an `awaiting-resume` unit names the command that goes on.
+ */
+export function readAttemptView(runDir, { fgosDir, probe = probeAttempt } = {}) {
+  const run = readJsonOrNull(path.join(runDir, 'run.json'));
+  let attemptState;
+  let attemptReason;
+  if (run?.settlement === 'abandoned-legacy') {
+    attemptState = 'abandoned-legacy';
+  } else {
+    try {
+      const verdict = probe(runDir);
+      attemptState = verdict.state;
+      if (verdict.reason) attemptReason = verdict.reason;
+      if (attemptState === 'closed') {
+        const outcome = String(readJsonOrNull(path.join(runDir, 'receipt.json'))?.outcome ?? '');
+        if (outcome.startsWith('abandoned')) attemptState = outcome;
+      }
+    } catch (err) {
+      attemptState = 'unprobed';
+      attemptReason = err.message;
+    }
+  }
+  // A closed attempt a resume replaced is neither live nor a failure of its own: it reads as superseded.
+  const replacement = attemptState === 'closed' || String(attemptState).startsWith('abandoned') ? supersededBy(fgosDir, run?.runId) : null;
+  const view = replacement
+    ? { attemptState: 'superseded', supersededBy: replacement, attemptOutcome: attemptState }
+    : { attemptState, ...(attemptReason ? { attemptReason } : {}) };
+  const unitDir = typeof run?.assignmentId === 'string' && fgosDir
+    ? unitDirsOfAssignment(path.join(fgosDir, 'assignments'), run.assignmentId)[0]
+    : undefined;
+  if (unitDir === undefined) return view;
+  let unit;
+  try { unit = deriveUnitState(unitDir, { probe }); } catch { return view; }
+  return { ...view, unitRunId: unit.unitRunId, unitState: unit.unitState, ...(unit.resumeCommand ? { resumeCommand: unit.resumeCommand } : {}) };
+}
+
 export function showRunUseCase(ctx, { runId } = {}) {
   if (typeof runId !== 'string' || !runId.trim()) {
     throw new DispatchObserveError('invalid-run-id', 'dispatch show-run requires a runId');
@@ -164,5 +223,5 @@ export function showRunUseCase(ctx, { runId } = {}) {
   if (!runDir) {
     throw new DispatchObserveError('run-not-found', `no run "${runId}" under ${repoRoot}`, { runId, repoRoot });
   }
-  return { runId, ...readRunSnapshot(runDir) };
+  return { runId, ...readRunSnapshot(runDir), ...readAttemptView(runDir, { fgosDir: fgosDirFromRoot(repoRoot) }) };
 }

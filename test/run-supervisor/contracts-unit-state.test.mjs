@@ -19,7 +19,7 @@ test('unit and attempt states are the named sets with a rule each', () => {
   assert.deepEqual(unitState.unitState.enum, ['running', 'awaiting-resume', 'completed', 'failed']);
   for (const state of unitState.unitState.enum) assert.equal(typeof unitState.unitState.rules[state], 'string', state);
   assert.deepEqual(unitState.attemptState.enum,
-    ['running', 'being-adopted', 'closed', 'legacy-run', 'abandoned-not-started', 'abandoned-before-brief', 'abandoned-legacy']);
+    ['running', 'being-adopted', 'closed', 'legacy-run', 'abandoned-not-started', 'abandoned-before-brief', 'abandoned-legacy', 'superseded']);
   for (const state of unitState.attemptState.enum) assert.equal(typeof unitState.attemptState.rules[state], 'string', state);
 });
 
@@ -67,7 +67,8 @@ test('automatic resume stays deferred with its seam named', () => {
 });
 
 test('recover offers adopt beside the existing actions', () => {
-  assert.deepEqual(Object.keys(recover.actions), ['adopt', 'resume-driver', 'reassign-driver']);
+  assert.deepEqual(Object.keys(recover.actions), ['adopt', 'abandon-legacy', 'resume-driver', 'reassign-driver']);
+  assert.equal(recover.actions['abandon-legacy'].shape.type, 'abandon-legacy');
   assert.equal(recover.actions.adopt.shape.type, 'adopt');
   assert.match(recover.actions.adopt.stillLegal, /running or being-adopted makes it illegal/);
 });
