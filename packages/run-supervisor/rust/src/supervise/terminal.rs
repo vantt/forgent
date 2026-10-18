@@ -390,8 +390,14 @@ impl Sup<'_> {
             self.carrier_check(core, key);
         }
         if self.watch.idle.is_some() && self.last_sample.elapsed() >= SCREEN_SAMPLE_EVERY {
+            let since_sample = self.last_sample.elapsed();
             self.last_sample = Instant::now();
-            self.note_screen(core.read(key, None, Some("visible")).ok());
+            match core.read(key, None, Some("visible")) {
+                Ok(screen) => self.note_screen(Some(screen)),
+                // A screen nobody could read says nothing about the agent: that time is blind
+                // time, never idle time. Only the deadlines still apply to it.
+                Err(_) => self.last_active = (self.last_active + since_sample).min(Instant::now()),
+            }
         }
         if self.stopped.is_none() {
             let cause = if self.watch.cancel_requested() {

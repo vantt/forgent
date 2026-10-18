@@ -8,7 +8,11 @@ files in $FAKE_HERDR_DIR that a test edits while it runs:
 
   explain.json   the screen detector's verdict, answered by `agent explain`
   screen.txt     what `pane read` prints
+  explain.run<N>.json, screen.run<N>.txt
+                 the same for the N-th `pane run` of this fake (1 = the first command started in
+                 a pane), when present: a test script for a chain of attempts
   gone           when present, every pane command says pane_not_found
+  unreadable     when present, `pane read`, `agent get` and `agent explain` fail as an unreachable server does
   no-process     when present, `pane process-info` reports only the pane's shell
   calls.log      every call, arguments joined by a tab (written here)
   sent.jsonl     what was typed at the pane: text, keys, prompt (written here)
@@ -50,6 +54,17 @@ def read(name, default=""):
             return f.read()
     except FileNotFoundError:
         return default
+
+
+def runs_started():
+    """How many commands `pane run` has started so far (the calls log has one line per call)."""
+    return sum(1 for line in read("calls.log").splitlines() if line.startswith("pane\trun\t"))
+
+
+def scoped(stem, ext, default=""):
+    """`<stem>.run<N><ext>` for the command currently in the pane, else `<stem><ext>`."""
+    own = path(f"{stem}.run{runs_started()}{ext}")
+    return read(os.path.basename(own)) if os.path.exists(own) else read(stem + ext, default)
 
 
 args = sys.argv[1:]
@@ -97,6 +112,9 @@ if (group, action) in (("tab", "rename"), ("pane", "rename"), ("pane", "report-a
 if group in ("pane", "agent") and pane_gone():
     fail("pane_not_found", "pane not found")
 
+if os.path.exists(path("unreadable")) and (group, action) in (("pane", "read"), ("agent", "get"), ("agent", "explain")):
+    fail("connection_refused", "herdr server unreachable")
+
 if (group, action) == ("pane", "get"):
     say({"pane": {"pane_id": PANE, "tab_id": TAB, "agent_status": "idle"}, "type": "pane_info"})
 if (group, action) == ("pane", "run"):
@@ -126,7 +144,7 @@ if (group, action) == ("pane", "process-info"):
         live = [{"argv": ["sh"], "cmdline": "sh", "cwd": "/", "name": "sh", "pid": shell}]
     say({"process_info": {"foreground_process_group_id": live[0]["pid"], "foreground_processes": live, "pane_id": PANE, "shell_pid": shell}, "type": "pane_process_info"})
 if (group, action) == ("pane", "read"):
-    sys.stdout.write(read("screen.txt"))
+    sys.stdout.write(scoped("screen", ".txt"))
     sys.exit(0)
 if (group, action) == ("pane", "send-text"):
     log("sent.jsonl", json.dumps({"kind": "text", "text": rest[1]}))
@@ -140,7 +158,7 @@ if (group, action) == ("agent", "prompt"):
 if (group, action) == ("agent", "get"):
     say({"pane": {"pane_id": PANE, "agent": "claude", "agent_status": read("agent-status", "idle").strip() or "idle"}, "type": "pane_info"})
 if (group, action) == ("agent", "explain"):
-    sys.stdout.write(read("explain.json", "{}"))
+    sys.stdout.write(scoped("explain", ".json", "{}"))
     sys.exit(0)
 if (group, action) == ("pane", "close"):
     shell = shell_pid()

@@ -3,9 +3,9 @@
 ```txt
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
-Purpose: Define the one process per attempt that owns a launched agent after the controller handed it over, the launch gate that is the process root of the agent, the receipts, the post-receipt steps and the adopt door
+Purpose: Define the one process per attempt that owns a launched agent (in a headless process or in a terminal pane) after the controller handed it over, the launch gate that is the process root of the agent, the receipts, the post-receipt steps and the adopt door
 Design status: Accepted
-Implementation status: In progress (direct mode: contracts, crate, containment drivers, routes, Node steps and reaper call sites landed; the controller cutover and the doctor checks land in later phases of the plan; terminal mode is plan 6.3)
+Implementation status: Built for `direct` (all platforms) and `terminal` (Linux and macOS; Windows reports `terminal-mode-unsupported`): contracts, crate, containment drivers, routes, Node steps, controller cutover of both modes, doctor checks
 Canonical: Yes
 Owner: Run supervisor component (L4)
 Source: packages/run-supervisor/rust (crate fgos-run-supervisor), src/run-supervisor/ (Node client, steps)
@@ -15,10 +15,13 @@ Related:
 - docs/platform/process/spec.md
 - docs/platform/holder-lock/spec.md
 - docs/platform/agent-protocol/spec.md
+- docs/platform/terminal-control/spec.md
+- docs/platform/session-identity/spec.md
 - docs/platform/component-boundary.md
 - docs/specs/runner.md
 - docs/specs/distribution.md
 - plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md
+- plans/261016-1351-terminal-mode-and-launcher-identity/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
 ```
 
@@ -44,7 +47,7 @@ Adopt (`fgos internal adopt`, section 8) is the third entry point: it settles an
 | Binding, GO, gate-exit, stop and cancel requests, receipt, step receipts, closed marker | Retry, fallback or the next attempt (controller) |
 | The post-receipt step runner (section 7) | What a step does (the Node payload defines `settle-attempt`, `finalize-home`) |
 | The adopt door and its recovery matrix (section 8) | The attempt lock primitive (holder-lock) and the containment port (process control) |
-| Deadlines: soft and idle by the supervisor, hard ceiling by the gate | Panes, tabs, terminals (plan 6.3; the supervisor never knows a pane) |
+| Deadlines: soft and idle by the supervisor, hard ceiling by the gate | Panes, tabs, placement (terminal-control; the supervisor addresses a pane only by the attempt id, as a key) |
 | The four internal routes and their protocol (section 10) | Any verb a person calls |
 
 Layering: the gate and supervisor are L4. They use the containment port and facts of `fgos-process` (L0), the attempt lock and predecessor record of `fgos-holder-lock` (L1) and the adapters of `fgos-agent-protocol` (L3). Nothing below knows an attempt. The component-boundary entries are in [component-boundary.md](../component-boundary.md#4-current-high-level-components).
@@ -77,7 +80,7 @@ The supervisor also writes `agent-binding.json` (the agent's tuple from the gate
 
 **Digest.** `envelope.digest` is `sha256:` plus the hex sha256 of the canonical JSON of the envelope without the `digest` key (keys sorted by UTF-16 order, integers only, no whitespace). Node (`canonicalJson` in `src/runner/dispatch/proof-helpers.mjs`) and Rust (`fgos_run_supervisor::envelope::digest`) reproduce the shared [vector file](../../../packages/run-supervisor/contracts/vectors/envelope-digest.v1.json) byte for byte. A reader finding `v != 3` or a wrong digest treats the run as `legacy-run` (adopt) or refuses with `envelope-invalid` (supervise, gate, attempt-step).
 
-The envelope is immutable and carries no secret. It names: `attemptId`, `unitRunId`, `runDir`, `mode` (`direct`; `terminal` is plan 6.3), `protocolId` 1, `hostBin` and `payloadRoot` of the release that wrote it (resolved once, never through PATH or a shim), `cwd`, `mutation`, `launch` (command, args, non-secret env, `stdinPolicy`, `briefPath`, `outboxDir`, capture paths), `containment.preferred` and `bwrapPrefix`, `deadlines`, `agentProtocol.cli`, and the `steps`. A `createdAt {bootId, boottimeNs}` field lets Windows adopt give an unbound attempt a 60 s start grace on the same boot; file times are never used.
+The envelope is immutable and carries no secret. It names: `attemptId`, `unitRunId`, `runDir`, `mode` (`direct` or `terminal`), `protocolId` 1, `hostBin` and `payloadRoot` of the release that wrote it (resolved once, never through PATH or a shim), `cwd`, `mutation`, `launch` (command, args, non-secret env, `stdinPolicy`, `briefPath`, `outboxDir`, capture paths), `containment.preferred` and `bwrapPrefix`, `deadlines`, `agentProtocol.cli`, and the `steps`. In `terminal` mode it also names `slot {key, groupKey}`, `terminal {socketPath, exitCommand, orphanSettleMs, retainFailedPaneMs, briefPath, outboxDir, groupKey}` and `identity {writerId, parentWriterId}` (section 5.3); `identity` is also written in `direct`. A `createdAt {bootId, boottimeNs}` field lets Windows adopt give an unbound attempt a 60 s start grace on the same boot; file times are never used.
 
 ## 4. Handover: controller to supervisor
 
@@ -116,7 +119,7 @@ Soft deadline and idle are the supervisor's; the hard ceiling is the gate's and 
 
 ### 5.1 The GO channel
 
-[Contract](../../../packages/run-supervisor/contracts/gate-go.v1.json). Frames are a 4-byte big-endian length then one UTF-8 JSON object, at most 65536 bytes; an oversize or invalid frame is treated like EOF. Frames: `HELLO` (gate to supervisor), `GO`, `AGENT {tuple}` (gate to supervisor), `STOP {cause}` (advisory duplicate of `stop-requested.json`), `BRIEF_DELIVERED` (terminal mode only; a direct gate ignores it). Direct mode uses an inherited socketpair end, so there is nothing to authenticate. Terminal mode will use a unix socket and check the peer uid with `SO_PEERCRED`, never the pid (a peer in another PID namespace reads pid 0). On Windows the channel is a named pipe (`--go-socket`).
+[Contract](../../../packages/run-supervisor/contracts/gate-go.v1.json). Frames are a 4-byte big-endian length then one UTF-8 JSON object, at most 65536 bytes; an oversize or invalid frame is treated like EOF. Frames: `HELLO` (gate to supervisor), `GO`, `AGENT {tuple}` (gate to supervisor), `STOP {cause}` (advisory duplicate of `stop-requested.json`), `BRIEF_DELIVERED` (terminal mode only; a direct gate ignores it; sent once, and the connection then stays open until the attempt ends). Direct mode uses an inherited socketpair end, so there is nothing to authenticate. Terminal mode uses a unix socket and checks the peer uid with `SO_PEERCRED` (`getpeereid` off Linux), never the pid (a peer in another PID namespace reads pid 0); the locks travel as `SCM_RIGHTS` on the GO frame (section 5.3). On Windows the channel is a named pipe (`--go-socket`).
 
 ### 5.2 Containment drivers
 
@@ -131,6 +134,31 @@ The supervisor calls the containment port ([process spec, section 9](../process/
 
 The binding records `guarantee.containment` (`kernel` or `best-effort`) and `guarantee.lock` for the attempt.
 
+### 5.3 Terminal mode
+
+One attempt in a terminal pane. The supervisor still knows no pane: it asks terminal-control (crate `fgos-terminal-control`, called in process) by the **attempt id as key**, and the controller has already allocated the slot (`allocate(key = attemptId, groupKey)`, [terminal-control spec](../terminal-control/spec.md)). The sequence:
+
+1. The supervisor listens on `terminal.socketPath` (a hashed name in the runtime socket directory, section 13; the directory is owned by the user and 0700, the file 0600, the path at most 107 bytes) **before** the pane runs anything.
+2. `terminal-control.launch` runs a launcher script in the pane: `exec bwrap ... --unshare-pid --as-pid-1 --die-with-parent --bind <socket dir> ... -- <hostBin> internal gate --go-socket <socketPath>` (or the gate itself when there is no sandbox). `--die-with-parent` exists only here: the parent of bwrap is the pane's shell, so a closed pane or a dead herdr takes the sandbox with it.
+3. The gate connects, the supervisor checks the peer uid (never the pid) and the `HELLO {attemptId}`, learns the gate tuple (the peer pid when it lies in the pane's process subtree, else the namespace init under the pane root; behind a sandbox a tuple it cannot prove fails closed), declares the domain, publishes the binding and sends `GO` with `SCM_RIGHTS` carrying the attempt lock and, for a mutating attempt, the cwd lease (received with `MSG_CMSG_CLOEXEC`; the agent never inherits them).
+4. The gate starts the agent on the pane's own tty with a process group of its own and `tcsetpgrp` to that group (SIGTTOU blocked) before `exec`, sends `AGENT`, and waits. A refused `tcsetpgrp` means the agent does not start (`gate-exit` code 126): the foreground is not best effort.
+5. The agent-protocol terminal adapter ([agent-protocol spec](../agent-protocol/spec.md)) drives the pane through `AgentIo` (`send`, `screen`, `inspect`): wait for the prompt, type the brief, confirm it was taken, then send `BRIEF_DELIVERED` once. After it the supervisor watches: soft deadline, idle, cancel, the carrier, and the completed result; when `outbox/result-<N>.json` is complete it types the exit command and gives the agent a short time to leave, then stops it.
+6. After the receipt the steps run; the last, `release-slot`, decides the pane's fate.
+
+**Idle in a pane.** The idle timer counts a changed screen and a `working` status as activity. A screen or status that cannot be read is **blind time**: it neither counts as activity nor as idle (the idle clock is moved forward by the blind interval), so only the soft deadline and the gate's hard ceiling still apply to a pane that stopped answering.
+
+**The carrier.** Once a second the supervisor asks terminal-control whether the pane is alive. `gone` ends the attempt as `carrier-lost`: nothing is closed, the gate is not asked to stop (its pty is gone) and the domain is swept after the grace. `unknown` is never read as lost.
+
+**Early ends.** The adapter can end a run before a result: `blocked` (login, folder-trust dialog), `needs-human`, `delivery-unknown` (the brief could not be confirmed and is never resent blind), an agent that finished without leaving. The stop cause stays `cancel` (the closed list of causes is unchanged) and the receipt carries `reason: terminal:<outcome>` (for example `terminal:blocked:trust-dialog`); the settle step turns the screen tail and the reason into the failure the run reports, so a provider limit read from the screen still classifies as `provider-limit`.
+
+**Orphan branch (the supervisor dies).** The gate watches its connection after `AGENT`. EOF **before** `BRIEF_DELIVERED`: it ends the domain (`orphan` / `abandoned-before-brief`) and the agent never saw a brief. EOF **after**: the agent keeps running; the gate polls the outbox every 50 ms for a `result-<N>.json` that parses as JSON (temporary names and half-written files do not count), waits `terminal.orphanSettleMs` once it sees one, then stops the domain (`orphan-result`, receipt `exited`). With no result it runs to the hard ceiling. Adopt then settles from `gate-exit.json` and the outbox, and its `release-slot` step releases the pane. A gate that starts after its supervisor died finds the socket closed (exit 64) and runs nothing.
+
+**`release-slot`.** `close` only for a clean end: outcome `exited`, an outbox result, no `reason` and every earlier step done. Every other end (blocked, timeout, cancelled, carrier lost, a step that failed) **retains** the pane, by default for 24 hours (`terminal.retainFailedPaneMs`, which travels in the envelope; `null` keeps it until a person closes it), so its screen stays readable. The step closes only the pane of its own key, never a tab. An answer of `unknown` from terminal-control gives no receipt (the step is retried by adopt); `unsupported` fails the step. A step that asked for a retry leaves the slot undecided.
+
+**Windows and without herdr.** A driver that declares no capability (Windows has no herdr build; herdr missing elsewhere) makes `launch` answer `unsupported`: the supervisor ends before binding with `start-refused.json` code `terminal-mode-unsupported` and the attempt settles as not started. It never switches to `direct` by itself; choosing the launch mode is `bind()`'s job.
+
+**Job control of the shell.** Measured on herdr 0.9.1 (P01 report, [measurements](../../../plans/reports/phase-lead-261018-0912-terminal-mode-p01-pane-tty-env-measurements.md)): the pane's shell is the session leader and the parent of bwrap; `tcsetpgrp(0, group)` works from pid 1 of the PID namespace without `setsid` (`setsid` plus `TIOCSCTTY` fails with `EPERM` in a pane). The gate hands the foreground back to its own group when the domain is empty; inside a PID namespace `getpgrp` reads 0, so the shell reclaims the tty when the sandbox exits. Closing the pane, or killing the herdr server, ends bwrap, gate and agent within the first 500 ms check.
+
 ## 6. Receipt
 
 [Contract](../../../packages/run-supervisor/contracts/receipt.v1.json). The receipt is the physical result, published once. It is not the work result.
@@ -143,7 +171,8 @@ The binding records `guarantee.containment` (`kernel` or `best-effort`) and `gua
 | `output-limit` | `stoppedBy == output-limit`: the two capture files passed `launch.maxOutputBytes` (config `maxBuffer`, default 10 MiB) and the supervisor stopped the agent; the settle step judges it as a failed execution |
 | `gate-lost` | A binding exists but there is no `gate-exit.json` (the lock being free proves the domain empty) |
 | `abandoned-not-started` | No binding; adopt found the lock free |
-| `carrier-lost` | Terminal mode only (plan 6.3) |
+| `carrier-lost` | Terminal mode: the pane (the carrier) is gone while the gate published nothing (section 5.3) |
+| `abandoned-before-brief` | Terminal mode: the supervisor went away before the brief was delivered, so the gate ended the domain with the agent never briefed |
 
 Fields: `outcome`, the `gateExit` object when present, `captureDigests {stdout, stderr}` (`sha256:` of the file bytes or null), `outboxPresent`, `synthesizedBy` (`supervisor` or `adopt`), `publishedAt`. **An outbox result wins:** it is settled whatever the outcome (hard ceiling, orphan branch); the Run Result Evaluator still judges it.
 
@@ -155,7 +184,8 @@ Fields: `outcome`, the `gateExit` object when present, `captureDigests {stdout, 
 |---|---|---|
 | `settle-attempt` | Node payload, Execution Core door | Run Result Evaluator, `exit.json`, `evidence.json`, `result.json`, `settleRunControl` (CAS) through `commitRunSettlement`, using the token in the side file; never a new epoch while that token exists |
 | `finalize-home` | Node payload, confinement door | Write the credential back, then clean the home, for every kind of end (this changes the old contract that kept the home unless the end was `exited` or `spawn-failed`). Returns `retry` (`credential-home-kept`) while the credential cannot be written back |
-| `release-slot` | Plan 6.3 | Terminal-control release; not in a direct envelope |
+| `cleanup-trust` | Node payload | Terminal mode: remove the folder-trust entry the controller wrote for this attempt (only when the controller wrote it) |
+| `release-slot` | Rust builtin (`builtin:release-slot`) | Terminal mode: release the attempt's pane through terminal-control, `close` or `retain` (section 5.3). Absent from a direct envelope; adopt runs the same step |
 
 Each step runs as `<hostBin> internal attempt-step <stepId> --protocol 1 --run-dir <attemptDir>`; the host execs the Node payload of the **same release** (`envelope.payloadRoot`, which may have been deactivated by then) at `src/run-supervisor/attempt-step.mjs`, never through `bin/fgos.mjs`. The step gets stdin `/dev/null`, exactly the env the envelope names (`FGOS_STATE_ROOT`, the project root; no secrets), stderr appended to `supervisor.log`, and **no lock description**: the supervisor keeps holding the lock while it waits, because a step that inherited it would be one more live holder and one more leak surface.
 
@@ -165,7 +195,7 @@ Its stdout is one JSON line: `{result: done, detail}`, `{result: retry, reason}`
 
 ## 8. Adopt
 
-One door for resume, recover, scan and cleanup: `fgos internal adopt --protocol 1 (--run-dir <attemptDir> | --scan) [--probe-only] [--kill-wait-ms N]`. The Node client is `src/run-supervisor/client.mjs`; `sweepAttempts` (`sweep.mjs`) is the single sweep that the four old reaper call sites now use, followed by the reaper for markers it does not own (herdr homes of marker v1, until plan 6.3). The scan reads one attempt directory per stdin line and answers one JSON line per directory in order.
+One door for resume, recover, scan and cleanup: `fgos internal adopt --protocol 1 (--run-dir <attemptDir> | --scan) [--probe-only] [--kill-wait-ms N]`. The Node client is `src/run-supervisor/client.mjs`; `sweepAttempts` (`sweep.mjs`) is the single sweep every former reaper call site now uses; it is adopt and nothing else. The scan reads one attempt directory per stdin line and answers one JSON line per directory in order.
 
 Decision order for one attempt directory:
 
@@ -190,11 +220,11 @@ Decision order for one attempt directory:
 
 Outcomes: `adopted` (this call drove the attempt to `closed`), `open` (a step returned retry or failed; the attempt stays, `pendingStep` names it), `held` (lock free but the declared domain could not be emptied: reason `predecessor-domain-not-empty`, nothing done). Two adopters are serialized by the kernel lock; exactly-once of side effects rests on step receipts, the settlement CAS and credential staging, never on the lock. Never a second agent for the same work.
 
-Home cleanup has one rule: a home belongs to an attempt (marker v2 `{attemptId, runDir, dispatchId, resource, createdAt}`, no pid, no pane); only `finalize-home` run under the attempt lock with an empty domain removes it ([contract](../../../packages/run-supervisor/contracts/home-marker.v2.json)). Marker v1 homes with a `paneId` keep the old reaper until plan 6.3.
+Home cleanup has one rule: a home belongs to an attempt (marker v2 `{attemptId, runDir, dispatchId, resource, createdAt}`, no pid, no pane); only `finalize-home` run under the attempt lock with an empty domain removes it ([contract](../../../packages/run-supervisor/contracts/home-marker.v2.json)). The pane-bound reaper and its marker fields are gone: a herdr attempt's home is a marker v2 home like any other. A marker v1 home (an older dispatch outside the assignment door, a pid marker) is named by the doctor check `confinement-orphaned-resources-reaped`, and only `fgos doctor --fix` removes it, on proof that its pid is gone.
 
 ## 9. Policy: supervisor dies, agent keeps running, adopt settles it
 
-When the supervisor dies the agent runs on until it exits, until the hard ceiling, or (terminal mode) the orphan branch. Exclusion stays correct because the gate still holds the attempt lock and the cwd lease, and the domain stays provable because the gate is pid 1. The alternative (the gate kills the agent when the supervisor dies) would discard work the model already did. Adopt then settles the attempt from `gate-exit.json` and the outbox. The same holds when the controller dies: the supervisor, not the controller, owns the result.
+When the supervisor dies the agent runs on until it exits, until the hard ceiling, or (terminal mode) the orphan branch of section 5.3. Exclusion stays correct because the gate still holds the attempt lock and the cwd lease, and the domain stays provable because the gate is pid 1. The alternative (the gate kills the agent when the supervisor dies) would discard work the model already did. Adopt then settles the attempt from `gate-exit.json` and the outbox. The same holds when the controller dies: the supervisor, not the controller, owns the result.
 
 ## 10. Routes
 
@@ -223,7 +253,7 @@ Who dies, and what each of the others does ([design r6, section 10](../../../pla
 | Gate | Held (supervisor) | Linux: pid 1 died, the kernel kills the namespace; Windows: the job still has the supervisor's handle, the agent lives until the supervisor stops it; macOS: best-effort | none | Supervisor: `gate-lost` | Supervisor finalizes | Supervisor |
 | Agent | Held until the gate exits | none | none | Normal | `finalize-home` | Supervisor |
 | Supervisor and gate (for example `kill -9` of the group) | Released; the domain is already empty when it is | Dies with the namespace | none | Adopt by the matrix (from the outbox if the agent wrote one) | Adopt finalizes | Adopt |
-| herdr server | Held | Lost with the pty | none | Supervisor: `carrier-lost` (terminal mode, plan 6.3) | Finalize | Supervisor |
+| herdr server | Held | Lost with the pty | none | Supervisor: `carrier-lost` (terminal mode) | Finalize | Supervisor |
 | Reboot | Released by the kernel | Dies | none | Adopt on the next `fgos run` | Finalize | Adopt |
 | Clock jump | Unaffected (kernel) | none | Absolute `CLOCK_BOOTTIME` plus boot id | none | none | none |
 | A step dies midway | Held until the supervisor exits | none | none | Missing step receipt: adopt runs that step again | By the matrix | Adopt |
@@ -233,13 +263,13 @@ When the gate is SIGKILLed the kernel closes its fds before it finishes killing 
 ## 12. Boundary
 
 - A process created outside the domain on the agent's request (a daemon reached through a socket of herdr, systemd, docker; a launchd or COM service) is not killed with the attempt. That is outside the guarantee, like raw git outside fgOS. An attempt with a sandbox sees only the host sockets confinement grants explicitly.
-- The supervisor knows no pane and no terminal. Terminal mode (`terminal-control.launch`, `--die-with-parent`, the BRIEF_DELIVERED and orphan branch, `release-slot`, `carrier-lost`) is plan 6.3.
+- The supervisor knows no pane layout and no tab: it addresses terminal-control by key and never closes anything it did not allocate by that key (section 5.3).
 - Every route knows only `--protocol 1`. A release older than the payload that calls it refuses with `host-version-mismatch`.
 - The agent's argv, stdin policy and model come from the executor configuration through the envelope; this component does not choose them.
 
 ## 13. Runtime socket directory
 
-`$XDG_RUNTIME_DIR/fgos` when `XDG_RUNTIME_DIR` is an absolute path, else `/tmp/fgos-<uid>`; mode 0700, owned by the user. `src/run-supervisor/runtime-dir.mjs` resolves and checks it and refuses a directory that is not a real directory, is owned by another uid, allows group or other access, or leaves no room for a hashed socket name within 100 bytes (`sun_path` holds about 107). Direct mode does not need it (the GO channel is an inherited socketpair); terminal mode puts the attempt socket there under a hashed name. Setup creates it and doctor checks it, so the 6.3 path does not arrive with an unchecked directory. The bwrap driver binds it into the sandbox for terminal mode.
+`$XDG_RUNTIME_DIR/fgos` when `XDG_RUNTIME_DIR` is an absolute path, else `/tmp/fgos-<uid>`; mode 0700, owned by the user. `src/run-supervisor/runtime-dir.mjs` resolves and checks it and refuses a directory that is not a real directory, is owned by another uid, allows group or other access, or leaves no room for a hashed socket name within 100 bytes (`sun_path` holds about 107). Direct mode does not need it (the GO channel is an inherited socketpair); terminal mode puts the attempt socket there under a hashed name (`<16 hex of sha256(attemptId)>.sock`). Setup creates it and doctor checks it. The bwrap driver binds it into the sandbox for terminal mode. The supervisor removes its socket on exit; one killed before that leaves a socket file nobody listens on, which doctor reports and `doctor --fix` removes.
 
 ## 14. Setup and doctor
 
@@ -252,12 +282,12 @@ Doctor checks (registered in `src/setup/registrations.mjs`; levels follow the do
 | Check | Does | Result |
 |---|---|---|
 | `process-containment` | Prints the driver the machine would pick, its level (`kernel` or `best-effort`) and the named escapes, from the route's `--probe` answer | `kernel` passes; `best-effort` warns on Linux (no bwrap user namespace, `linux-pgroup` runs) and is informational elsewhere; no driver fails |
-| `runtime-socket-dir` | The directory exists, mode 0700, owned by the uid; fix creates it | Missing warns (setup creates it); not a directory, another owner or a loose mode fails; fix creates or tightens to 0700 and leaves a non-directory alone |
-| `run-attempts-stuck` | Runs with an envelope v3 and no `closed.json` whose lock is free (`adopt --scan --probe-only`; writes nothing) | Fails naming each attempt with its reason (for example `start-refused:lock-held`); a held lock is a running attempt, not a finding; fix runs `sweepAttempts` |
+| `runtime-socket-dir` | The directory exists, mode 0700, owned by the uid, and holds no attempt socket without a supervisor (a `<16 hex>.sock` that is a socket of this user and bound by no process, read from the kernel socket table on Linux; elsewhere the table is absent and nothing is judged) | Missing warns (setup creates it); not a directory, another owner, a loose mode or an orphaned socket fails; fix creates or tightens to 0700, removes orphaned sockets (never a lock, a directory or a plain file) and leaves a non-directory alone |
+| `run-attempts-stuck` | Runs of either mode (`direct` or `terminal`) with an envelope v3 and no `closed.json` whose lock is free (`adopt --scan --probe-only`; writes nothing) | Fails naming each attempt with its reason (for example `start-refused:lock-held`); a held lock is a running attempt, not a finding; fix runs `sweepAttempts` |
 | `run-supervisor-route` | The host binary answers `--protocol 1 --probe` with `result: ok` for `supervise`, `gate`, `adopt`, `attempt-step` | Any route missing or a protocol mismatch fails by name |
 | `gate-kill-grace` | Prints `dispatch.gateKillGraceMs` and its source (`project`, `global`, `default`) | Below 1000 or not an integer fails; absent passes with 10000 |
 
-The check for orphaned confinement resources skips attempt homes (marker version 2: they belong to adopt) and its fix calls `sweepAttempts` instead of the reaper directly; the fix never removes a version 2 home.
+The check for orphaned confinement resources skips attempt homes (marker version 2: they belong to adopt), removes loose-root permissions and empty per-dispatch directories on its own rule, and its fix calls `sweepAttempts`; the fix never removes a version 2 home. The terminal side has its own checks in the [terminal-control spec](../terminal-control/spec.md) (`terminal-control` asks the driver for its capabilities; on Windows it says herdr has no Windows build and that direct mode is unaffected).
 
 **`lock-holders` (N1).** The holder-lock check ([holder-lock spec, section 13](../holder-lock/spec.md#13-setup-doctor-and-activation)) treats a bwrap monitor process whose parent is the supervisor or the gate of an attempt that holds the lock as a member, not a stranger. Without that rule every running attempt would warn, because the monitor sits between the supervisor and the namespace and holds a copy of the lock description.
 
@@ -281,6 +311,9 @@ The check for orphaned confinement resources skips attempt homes (marker version
 - **2026-10-18 — Cutover của `direct` (6.2 P09).** `executeAssignment` giao agent cho supervisor Rust; xoá `detached-run-supervisor.mjs`, kênh IPC, `reconcile-cli-spawn.mjs`, `legacySpawn`, `bindConfinedHomesToSupervisor`. Phát hiện khi chạy bwrap thật: gate nằm trong sandbox root chỉ-đọc nên không tạo được `gate-exit.json` và file capture; controller tạo sẵn file rỗng, driver bind đúng các file đó, gate ghi tại chỗ. Controller đợi `closed.json` sau result; settle step nhận ngữ cảnh controller qua `controller/settle-context.json`.
 - **2026-10-18 — D9: `dispatch.gateKillGraceMs`, mặc định 10000, tối thiểu 1000.** Doctor `gate-kill-grace`; setup không ghi khoá vào config global.
 
+- **2026-10-18 — Cutover của `terminal` (6.3).** Round herdr không còn được canh trong controller: vòng poll, deadline, settle và đóng pane (`herdr-round.mjs`) bị xoá; supervisor canh pane theo attempt id qua terminal-control, gate trong pane nhận khoá qua `SCM_RIGHTS`. Đo trên herdr thật: `tcsetpgrp` làm được từ pid 1 của namespace, không cần `setsid`; không có phương án dự phòng "gate ngoài namespace". Pane chết hoặc supervisor chết đều có đường kết thúc đã đặt tên (`carrier-lost`, nhánh mồ côi). Pane giữ lại khi kết thúc không sạch.
+- **2026-10-18 — Pane không đọc được là thời gian mù, không phải thời gian nhàn rỗi.** Đồng hồ idle của `terminal` chạy tiếp khi màn hình hoặc trạng thái đổi hoặc đọc được `working`; lúc không đọc được cái nào thì bị lùi đúng khoảng mù, chỉ soft deadline và hard ceiling còn áp dụng. Thay thế hành vi cũ của vòng canh trong controller (đọc trạng thái lỗi cộng vào thời gian mù).
+
 ## 17. Related files
 
 | Relationship | File |
@@ -290,5 +323,7 @@ The check for orphaned confinement resources skips attempt homes (marker version
 | adapters | [agent-protocol/spec.md](../agent-protocol/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
 | runner decision | [runner.md](../../specs/runner.md) |
-| plan | [plan.md](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md) |
+| plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |
+| terminal-control | [terminal-control/spec.md](../terminal-control/spec.md) |
+| identity | [session-identity/spec.md](../session-identity/spec.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
