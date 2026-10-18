@@ -507,6 +507,9 @@ fn give_back_foreground() {
     }
 }
 
+/// Variables a terminal multiplexer sets for the program that runs in a pane.
+const PANE_TERMINAL_ENV: [&str; 4] = ["TERM", "COLORTERM", "TERM_PROGRAM", "TERM_PROGRAM_VERSION"];
+
 fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>) -> Result<std::process::Child, String> {
     let mut cmd = Command::new(&config.command);
     // A sandbox hides some directories (a worktree under /tmp behind its private tmpfs): the agent then
@@ -518,6 +521,17 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         cmd.current_dir("/");
     }
     cmd.args(&config.args).env_clear().envs(&config.env).envs(&secrets);
+    if config.terminal {
+        // The gate runs in the pane, so these are the pane's own values: its terminal type and which
+        // pane, tab and server it belongs to. What the controller had (another pane, or none) must never
+        // replace them, and the cleared environment must not lose them: a full-screen agent without a
+        // terminal type draws nothing usable.
+        for (name, value) in std::env::vars() {
+            if PANE_TERMINAL_ENV.contains(&name.as_str()) || name.starts_with("HERDR_") {
+                cmd.env(name, value);
+            }
+        }
+    }
     if let Some((writer, parent)) = &config.identity {
         cmd.env("FGOS_SESSION_ID", writer);
         match parent {

@@ -152,6 +152,27 @@ fn the_agent_sees_the_attempt_identity_and_nothing_of_the_parent_session() {
 }
 
 #[test]
+fn the_agent_keeps_the_terminal_and_pane_variables_of_its_own_pane() {
+    if bwrap_driver("pane-env").is_none() {
+        return;
+    }
+    let out = marker("pane-env-out");
+    let options = Options::new("/bin/sh", &["-c", &format!("env > {}", out.display())]);
+    let (attempt, socket) = terminal_attempt("pane-env", &options, 0, false);
+    let lock = locked_file(&attempt.dir.join("attempt.lock"));
+    let listener = listen(&socket);
+    let mut pane = start_in_pane(&attempt, &socket, true, &[("TERM", "xterm-256color"), ("HERDR_PANE_ID", "w1:p9"), ("HERDR_SOCKET_PATH", "/pane/herdr.sock"), ("HOME", "/pane-home")]);
+    let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
+    assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
+    assert_eq!(pane.wait_exit(LIMIT), 0);
+    let env = fs::read_to_string(&out).unwrap();
+    assert!(env.lines().any(|l| l == "TERM=xterm-256color"), "{env}");
+    assert!(env.lines().any(|l| l == "HERDR_PANE_ID=w1:p9"), "{env}");
+    assert!(env.lines().any(|l| l == "HERDR_SOCKET_PATH=/pane/herdr.sock"), "{env}");
+    assert!(!env.lines().any(|l| l == "HOME=/pane-home"), "only the pane's own variables survive the clear: {env}");
+}
+
+#[test]
 fn neither_the_agent_nor_its_child_holds_a_lock_description() {
     if bwrap_driver("no-fd-leak").is_none() {
         return;

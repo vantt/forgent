@@ -96,7 +96,7 @@
         }
       },
       "item": {
-        "stepId": { "enum": ["settle-attempt", "finalize-home"], "meaning": "process items; release-slot is a builtinItem" },
+        "stepId": { "enum": ["settle-attempt", "finalize-home", "cleanup-trust"], "meaning": "process items; release-slot is a builtinItem. cleanup-trust (terminal mode) removes the folder-trust entry the controller wrote into the agent's trust store (controller/trust-context.json); it is a no-op when the controller wrote none" },
         "hostBin": "absolute path, normally equal to the top-level hostBin",
         "payloadRoot": "absolute path, normally equal to the top-level payloadRoot",
         "argv": "string[] after hostBin, normally [\"internal\", \"attempt-step\", <stepId>, \"--protocol\", \"1\", \"--run-dir\", <runDir>]",

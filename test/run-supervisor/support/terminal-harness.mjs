@@ -1,0 +1,181 @@
+// A project for the terminal-mode tests: a git repository, a fake herdr that keeps one real pane
+// (the python stand-in the Rust supervisor tests use), a herdr "server" socket this process listens on,
+// and a controller started as its own process so a test can kill it. The agent is a real process the
+// gate starts in the pane; what the pane's screen shows and what an agent protocol sees is whatever the
+// test writes into the fake's files.
+import fs from 'node:fs';
+import net from 'node:net';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawn } from 'node:child_process';
+
+export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
+const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
+const CONTROLLER = path.resolve('test/run-supervisor/fixtures/terminal-controller.mjs');
+
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export async function waitUntil(predicate, { timeoutMs = 60_000, intervalMs = 20, what = 'condition' } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const value = predicate();
+    if (value) return value;
+    if (Date.now() > deadline) throw new Error(`timed out after ${timeoutMs} ms waiting for ${what}`);
+    await sleep(intervalMs);
+  }
+}
+
+export const readJson = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
+const readLines = (file) => { try { return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean); } catch { return []; } };
+
+const VERDICTS = {
+  idle: { agent: 'claude', state: 'idle', visible_idle: true, visible_working: false, visible_blocker: false, matched_rule: { id: 'live_prompt_box', priority: 950, region: 'prompt_box_body', state: 'idle' }, evaluated_rules: [{ id: 'live_prompt_box', matched: true, evidence: { region_preview: '' } }] },
+  working: { agent: 'claude', state: 'working', visible_idle: false, visible_working: true, visible_blocker: false },
+  blocked: { agent: 'claude', state: 'blocked', visible_idle: false, visible_working: false, visible_blocker: true },
+};
+
+/** The environment the host, the supervisor and the controller share. */
+function sharedEnv(project) {
+  const env = { ...process.env };
+  for (const name of ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_SESSION_ID', 'HERDR_PANE_ID', 'HERDR_TAB_ID', 'HERDR_WORKSPACE_ID', 'HERDR_SESSION']) delete env[name];
+  return {
+    ...env,
+    FGOS_HERDR_BIN: project.herdrBin,
+    HERDR_SOCKET_PATH: project.herdrSocket,
+    FGOS_STATE_ROOT: project.stateRoot,
+    TERMINAL_AGENT_DIR: project.agentDir,
+  };
+}
+
+export async function createTerminalProject({ name = 'tp' } = {}) {
+  // A unix socket path is limited to about a hundred characters; everything socket-ish lives under /tmp.
+  const scratch = fs.mkdtempSync(path.join('/tmp', `fgos-${name}-`));
+  const repoDir = path.join(scratch, 'repo');
+  const herdrDir = path.join(scratch, 'herdr-files');
+  const agentDir = path.join(scratch, 'agent');
+  const stateRoot = path.join(scratch, 'state');
+  for (const dir of [repoDir, herdrDir, agentDir, stateRoot]) fs.mkdirSync(dir, { recursive: true });
+  const git = (...args) => execFileSync('git', args, { cwd: repoDir, stdio: 'ignore' });
+  git('init', '-b', 'main');
+  git('config', 'user.name', 'Terminal Test');
+  git('config', 'user.email', 'terminal@test.local');
+  fs.writeFileSync(path.join(repoDir, 'README.md'), '# Terminal\n');
+  git('add', 'README.md');
+  git('commit', '-m', 'init');
+
+  // The supervisor reaches herdr through `FGOS_HERDR_BIN` and nothing else of this environment, so the
+  // fake's own directory is baked into a wrapper instead of travelling as a variable.
+  const herdrBin = path.join(scratch, 'herdr');
+  fs.writeFileSync(herdrBin, `#!/bin/sh\nFAKE_HERDR_DIR=${herdrDir} exec ${FAKE_HERDR} "$@"\n`, { mode: 0o755 });
+
+  const herdrSocket = path.join(scratch, 'herdr.sock');
+  const server = net.createServer();
+  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(herdrSocket, resolve); });
+
+  const project = {
+    scratch, repoDir, herdrDir, agentDir, stateRoot, herdrSocket, herdrBin,
+    children: [],
+    env() { return sharedEnv(project); },
+
+    executor({ kind = 'claude' } = {}) {
+      return {
+        kind: 'agent',
+        command: process.execPath,
+        args: [AGENT, '{prompt}'],
+        adapter: 'herdr-spawn',
+        allowCrossProvider: true,
+        env: { TERMINAL_AGENT_DIR: agentDir },
+        interactiveMode: { exitCommand: '/exit', kind },
+      };
+    },
+
+    /** The controller as a process: `fgos run`'s own door (`executeAssignment`) for one herdr-spawn seat. */
+    startController(job = {}) {
+      // The Assignment is built from this checkout's task specs, so the controller starts in it; the work
+      // happens in `repoDir` (the job's cwd).
+      const child = spawn(process.execPath, [CONTROLLER], {
+        cwd: process.cwd(),
+        env: { ...project.env(), TERMINAL_CONTROLLER_JOB: JSON.stringify({ repoDir, workId: job.workId ?? `tsk-${name}`, executor: project.executor(), ...job }) },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (chunk) => { stdout += chunk; });
+      child.stderr.on('data', (chunk) => { stderr += chunk; });
+      const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));
+      const run = {
+        child, exited,
+        output: () => ({ stdout, stderr }),
+        /** The one JSON line the controller prints when it settles. */
+        answer: () => { try { return JSON.parse(stdout.trim().split('\n').filter((l) => l.startsWith('{')).pop()); } catch { return null; } },
+      };
+      project.children.push(child);
+      return run;
+    },
+
+    // --- the fake herdr ---------------------------------------------------------------------------
+    calls() { return readLines(path.join(herdrDir, 'calls.log')).map((l) => l.replace(/\t+$/, '').replaceAll('\t', ' ')); },
+    callsStarting(prefix) { return project.calls().filter((c) => c.startsWith(prefix)); },
+    sent() { return readLines(path.join(herdrDir, 'sent.jsonl')).map((l) => JSON.parse(l)); },
+    setVerdict(kind) { fs.writeFileSync(path.join(herdrDir, 'explain.json'), JSON.stringify(VERDICTS[kind])); },
+    setFlag(flag, on = true) { const file = path.join(herdrDir, flag); if (on) fs.writeFileSync(file, ''); else fs.rmSync(file, { force: true }); },
+    setScreen(text) { fs.writeFileSync(path.join(herdrDir, 'screen.txt'), text); },
+
+    // --- the agent --------------------------------------------------------------------------------
+    agentStarts() { return readLines(path.join(agentDir, 'agent-starts.txt')).map(Number); },
+    agentEnv() { return readJson(path.join(agentDir, 'agent-env.json')); },
+    letAgentExit() { fs.writeFileSync(path.join(agentDir, 'exit-now'), ''); },
+
+    // --- the attempt ------------------------------------------------------------------------------
+    attemptDirs() {
+      const root = path.join(repoDir, '.fgos', 'assignments');
+      const found = [];
+      const walk = (dir) => {
+        let entries;
+        try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+        for (const entry of entries) {
+          if (!entry.isDirectory()) continue;
+          const child = path.join(dir, entry.name);
+          if (path.basename(dir) === 'runs') found.push(child); else walk(child);
+        }
+      };
+      walk(root);
+      return found.sort();
+    },
+    attemptDir() { return project.attemptDirs()[0] ?? null; },
+    /** Wait until the supervisor has typed the brief (the text and the submit key) at the pane. */
+    async waitBriefTyped() {
+      await waitUntil(() => project.sent().length >= 2, { what: 'the brief typed at the pane' });
+      return project.sent()[0].text;
+    },
+    /** The agent shows the brief taken: the protocol reads `working`, so the supervisor confirms delivery. */
+    briefTaken() { project.setVerdict('working'); },
+    /** Play the agent's work: what it wrote and the result claim the brief named. */
+    writeResult(briefText, { status = 'done', summary = 'terminal mode test finished.' } = {}) {
+      const resultPath = /(\S*outbox\/result-1\.json)/.exec(briefText)?.[1];
+      if (!resultPath) throw new Error(`the brief names no result path:\n${briefText}`);
+      fs.writeFileSync(path.join(repoDir, 'terminal-worker-output.txt'), 'terminal worker mutation\n');
+      fs.mkdirSync(path.dirname(resultPath), { recursive: true });
+      fs.writeFileSync(`${resultPath}.tmp`, JSON.stringify({ status, summary }));
+      fs.renameSync(`${resultPath}.tmp`, resultPath);
+      return resultPath;
+    },
+
+    stop() {
+      for (const child of project.children) { try { child.kill('SIGKILL'); } catch { /* gone */ } }
+      try {
+        const pid = Number(fs.readFileSync(path.join(herdrDir, 'script.pid'), 'utf8'));
+        if (pid > 0) process.kill(pid, 'SIGKILL');
+      } catch { /* no pane was ever started */ }
+      for (const pid of project.agentStarts()) { try { process.kill(pid, 'SIGKILL'); } catch { /* gone */ } }
+      server.close();
+      fs.rmSync(scratch, { recursive: true, force: true });
+    },
+  };
+  project.setVerdict('idle');
+  return project;
+}
+
+export const hostBinUsable = () => Boolean(process.env.FGOS_HOST_BIN) && fs.existsSync(process.env.FGOS_HOST_BIN);
+export const noHost = !hostBinUsable() && 'FGOS_HOST_BIN must name a host binary built from this checkout';
+export const tmpRoot = os.tmpdir();

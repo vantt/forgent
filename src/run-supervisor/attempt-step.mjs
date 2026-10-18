@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { EXIT_DONE, EXIT_ENVELOPE_INVALID, EXIT_PAYLOAD_MISSING, EXIT_ERROR, EXIT_RETRY, StepError, readEnvelope } from './step-support.mjs';
 import { settleAttempt } from './steps/settle-attempt.mjs';
 import { finalizeHome } from './steps/finalize-home.mjs';
+import { cleanupTrust } from './steps/cleanup-trust.mjs';
 import { realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 
 export { releasePayloadRoot };
@@ -23,6 +24,7 @@ const PAYLOAD_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 const STEPS = Object.freeze({
   'settle-attempt': settleAttempt,
   'finalize-home': finalizeHome,
+  'cleanup-trust': cleanupTrust,
 });
 
 /** Variables a step needs from `steps[].env`: the runner starts it with nothing else. */

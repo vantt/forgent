@@ -4,7 +4,7 @@
   "fields": {
     "v": { "const": 1 },
     "attemptId": "string",
-    "stepId": { "enum": ["settle-attempt", "finalize-home", "release-slot"] },
+    "stepId": { "enum": ["settle-attempt", "finalize-home", "cleanup-trust", "release-slot"] },
     "status": { "const": "done" },
     "detail": "object or absent; the step's own stdout result minus anything secret",
     "at": "string, ISO-8601 UTC"

@@ -1,9 +1,10 @@
-// The controller half of a `direct` attempt (r6 §9.4): take the attempt lock (and the cwd lease when the
+// The controller half of a supervised attempt, `direct` or `terminal` (r6 §9.4): take the attempt lock (and the cwd lease when the
 // agent writes), let the caller prepare, write the immutable envelope and the secret side file, start
 // `fgos internal supervise` detached with the locks handed over as descriptors, wait for its binding, and
 // then only read: progress from the capture files, the answer from `result.json` that the settle step
 // writes. The controller never settles, never signals the agent and never owns a process of the attempt.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,6 +18,7 @@ import { getBootId } from '../runner/dispatch/process-identity.mjs';
 import { interpretRunResult } from '../runner/dispatch/run-result.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
+import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 
 const PROTOCOL = 1;
@@ -102,9 +104,22 @@ export function prepareAttemptFiles(runDir, attemptId) {
   return binds;
 }
 
-/** The command the sandbox runs: the gate of this attempt, GO channel at descriptor 5 (what the supervisor appends). */
-export function attemptGateCommand(hostBin, runDir) {
-  return [hostBin, 'internal', 'gate', '--protocol', String(PROTOCOL), '--envelope', path.join(path.resolve(runDir), 'envelope.json'), '--go-fd', '5'];
+/**
+ * The command the sandbox runs: the gate of this attempt. `direct`: GO channel at descriptor 5 (what the
+ * supervisor appends). `terminal`: the gate dials the attempt's unix socket `goSocket`.
+ */
+export function attemptGateCommand(hostBin, runDir, { goSocket = null } = {}) {
+  const base = [hostBin, 'internal', 'gate', '--protocol', String(PROTOCOL), '--envelope', path.join(path.resolve(runDir), 'envelope.json')];
+  return goSocket ? [...base, '--go-socket', goSocket] : [...base, '--go-fd', '5'];
+}
+
+/**
+ * Where the gate of a `terminal` attempt reaches its supervisor: the owner-only runtime socket directory,
+ * a name derived from the attempt id so no id can name another attempt's socket.
+ */
+export function terminalSocketPath(attemptId) {
+  const name = crypto.createHash('sha256').update(attemptId).digest('hex').slice(0, 16);
+  return path.join(ensureRuntimeSocketDir(), `${name}.sock`);
 }
 
 /** CLOCK_BOOTTIME now, in the shape the envelope uses. */
@@ -129,6 +144,15 @@ export function attemptStepEnv({ fgosDir, env = process.env } = {}) {
   return out;
 }
 
+/** The two variables an attempt's writer id travels in. */
+export function identityEnv(identity) {
+  if (!identity) return {};
+  return {
+    FGOS_SESSION_ID: identity.writerId,
+    ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}),
+  };
+}
+
 /**
  * Build the envelope v3 body (without digest) and the side file of one attempt.
  *
@@ -138,7 +162,7 @@ export function attemptStepEnv({ fgosDir, env = process.env } = {}) {
  * @param {object} p.attempt          `prepareConfinementForLaunch(...).attempt`
  * @param {string} p.capture          directory that holds the agent's stdout and stderr files
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile }) {
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, identity, terminal = null, extraSteps = [] }) {
   const paths = attemptPaths(runDir, attemptId);
   const sideFile = paths.sideFile;
   const step = (stepId) => ({
@@ -151,12 +175,13 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     stepTimeoutMs: STEP_TIMEOUT_MS,
   });
   const confined = Array.isArray(attempt.bwrapPrefix);
+  const mode = terminal ? 'terminal' : 'direct';
   const body = {
     v: 3,
     attemptId,
     unitRunId,
     runDir,
-    mode: 'direct',
+    mode,
     protocolId: PROTOCOL,
     hostBin: host.hostBin,
     payloadRoot: host.payloadRoot,
@@ -165,10 +190,11 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     launch: {
       command: attempt.command,
       args: attempt.args,
-      env: attempt.env,
+      // The writer id of the attempt and its lineage are not secrets; the gate sets both again last.
+      env: { ...attempt.env, ...identityEnv(identity) },
       stdinPolicy: 'null',
-      briefPath: null,
-      outboxDir: paths.outboxDir,
+      briefPath: terminal ? terminal.briefPath : null,
+      outboxDir: terminal?.outboxDir ?? paths.outboxDir,
       ...(maxOutputBytes ? { maxOutputBytes } : {}),
       capture: { stdout: paths.stdout, stderr: paths.stderr },
     },
@@ -180,10 +206,20 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       gateKillGraceMs,
       killWaitMs,
     },
-    agentProtocol: { cli, mode: 'direct' },
-    steps: [step('settle-attempt'), step('finalize-home')],
+    agentProtocol: { cli, mode },
+    identity,
+    steps: [
+      step('settle-attempt'),
+      step('finalize-home'),
+      ...extraSteps.map(step),
+      ...(terminal ? [{ stepId: 'release-slot', builtin: true, disposition: { onSuccess: 'close', onFailure: 'retain' } }] : []),
+    ],
     sideFile,
     createdAt: boottimeNow(),
+    ...(terminal ? {
+      slot: { key: attemptId, groupKey: terminal.groupKey },
+      terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs },
+    } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile } : {}),
   };
   return body;
@@ -217,21 +253,21 @@ export function readLaunchSettings(projectRoot) {
  * right after the spawn and the supervisor takes both locks itself (it retries while they are still held).
  * @returns {{child: import('node:child_process').ChildProcess}}
  */
-export function startSupervisor({ envelope, locks, stepEnv }) {
+export function startSupervisor({ envelope, locks, stepEnv, extraEnv = {} }) {
   const runDir = envelope.runDir;
   const log = fs.openSync(path.join(runDir, 'supervisor.log'), 'a', 0o600);
   let started = false;
   const argv = ['internal', 'supervise', '--envelope', path.join(runDir, 'envelope.json'), '--protocol', String(PROTOCOL)];
   try {
     if (process.platform === 'win32') {
-      const child = spawn(envelope.hostBin, argv, { cwd: runDir, env: stepEnv, stdio: ['ignore', log, log], detached: true, windowsHide: true });
+      const child = spawn(envelope.hostBin, argv, { cwd: runDir, env: { ...stepEnv, ...extraEnv }, stdio: ['ignore', log, log], detached: true, windowsHide: true });
       child.once('error', (err) => { child.spawnError = err; });
       child.unref();
       started = true;
       return { child, handsOverLocks: false };
     }
     const held = [locks.attempt, ...(locks.cwdLease ? [locks.cwdLease] : [])];
-    const child = spawnWithLocks(held, { command: envelope.hostBin, args: argv, cwd: runDir, env: stepEnv, stdout: log, stderr: log });
+    const child = spawnWithLocks(held, { command: envelope.hostBin, args: argv, cwd: runDir, env: { ...stepEnv, ...extraEnv }, stdout: log, stderr: log });
     started = true;
     return { child, handsOverLocks: true };
   } finally {

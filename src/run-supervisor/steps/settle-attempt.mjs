@@ -12,6 +12,7 @@ import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/
 import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
+import { createTerminalControl } from '../../terminal-control/client.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
@@ -74,6 +75,29 @@ function controlOf(runDir, envelope) {
   throw new StepError('internal', `side file is gone and run control is ${acquired.status}: the settlement cannot be completed`);
 }
 
+/**
+ * What a terminal attempt's pane showed when the attempt ended, for the same evidence the capture files
+ * give a direct attempt. The slot is released by the step after this one, so the pane is still there to
+ * read; a screen that cannot be read is no evidence, never a failure of the settlement.
+ */
+function paneScreenOf(runDir, envelope) {
+  if (envelope.mode !== 'terminal') return '';
+  try {
+    const endpoint = readJson(path.join(runDir, 'terminal-endpoint.json')) ?? {};
+    const env = {};
+    if (endpoint.session) env.HERDR_SESSION = endpoint.session;
+    if (endpoint.socket) env.HERDR_SOCKET_PATH = endpoint.socket;
+    const tc = createTerminalControl({ hostBin: envelope.hostBin, ...(endpoint.bin ? { herdrBin: endpoint.bin } : {}), ...(Object.keys(env).length ? { env } : {}) });
+    const seen = tc.read({ key: envelope.slot.key, source: 'visible' });
+    return seen.result === 'screen' ? String(seen.screen ?? '') : '';
+  } catch { return ''; }
+}
+
+/** The adapter outcome a terminal early end names for the settlement: an agent waiting on a person. */
+function terminalAdapterOutcome(receipt) {
+  return /^terminal:(blocked|needs-human)/.test(receipt.reason ?? '') ? 'blocked' : null;
+}
+
 /** The process facts settleRunOutcome takes, from what the receipt says happened. */
 function rawResultOf(receipt, outboxClaimPresent) {
   const gate = receipt.gateExit ?? null;
@@ -83,7 +107,16 @@ function rawResultOf(receipt, outboxClaimPresent) {
   if (outboxClaimPresent && stopped) {
     return { exitCode: 0, signal: null, isTimeout: false, settledAt, executionError: null };
   }
+  // A terminal attempt the supervisor ended early names why in the receipt reason (the agent waits on a
+  // person, the brief could not be confirmed): that is a failed attempt with a reason, not a cancellation.
+  if (receipt.outcome === 'cancelled' && /^terminal:/.test(receipt.reason ?? '')) {
+    return { exitCode: 1, signal: null, isTimeout: false, settledAt, executionError: new Error(`the agent was stopped: ${receipt.reason}`) };
+  }
   switch (receipt.outcome) {
+    case 'abandoned-before-brief':
+    case 'abandoned-not-started':
+      // Nothing the agent could have done answers the work: the attempt never got its brief.
+      return { exitCode: 1, signal: null, isTimeout: false, settledAt, executionError: new Error(`${receipt.outcome}: the agent never received its brief${receipt.reason ? ` (${receipt.reason})` : ''}`) };
     case 'exited':
       return { exitCode: gate?.exitCode ?? null, signal: gate?.signal ?? null, isTimeout: false, settledAt, executionError: null };
     case 'timeout':
@@ -121,7 +154,8 @@ export async function settleAttempt({ runDir, envelope }) {
     ? strayWriteWarning({ repoRoot: context.strayWatch.repoRoot, strayPaths: watchWritesOutsideWorkspace(context.strayWatch).strayPaths() })
     : null;
   const strayWarnings = strayWarning ? [strayWarning] : [];
-  const stdoutText = readTail(capture.stdout);
+  const screenText = paneScreenOf(runDir, envelope);
+  const stdoutText = readTail(capture.stdout) || screenText;
   const stderrText = readTail(capture.stderr);
 
   try {
@@ -139,6 +173,7 @@ export async function settleAttempt({ runDir, envelope }) {
       stdoutText,
       stderrText,
       executionError: raw.executionError,
+      adapterOutcome: terminalAdapterOutcome(receipt),
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
@@ -160,7 +195,7 @@ export async function settleAttempt({ runDir, envelope }) {
         repoRoot: context.repoRoot ?? envelope.cwd,
         updateRunJson: 'settled',
         ...(context.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: context.providerCapacityRuntimeDir } : {}),
-        ...(envelope.mode === 'direct' ? { adapter: 'cli-spawn' } : {}),
+        adapter: envelope.mode === 'terminal' ? 'herdr-spawn' : 'cli-spawn',
       },
     });
     return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };
