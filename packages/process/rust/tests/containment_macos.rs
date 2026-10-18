@@ -126,3 +126,15 @@ fn containment_macos_tree_names_the_double_fork_escape() {
     // SAFETY: ends the escaped test process this test started.
     unsafe { libc::kill(escape_pid as libc::pid_t, libc::SIGKILL) };
 }
+
+#[test]
+fn a_thousand_fast_exits_are_normal_spawns() {
+    let driver = MacosTree;
+    for i in 0..1000 {
+        let mut domain = driver.create(&format!("fast-{i}")).unwrap();
+        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"])).unwrap();
+        assert!(spawned.child.wait().unwrap().success(), "spawn {i}");
+        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+        assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
+    }
+}

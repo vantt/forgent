@@ -53,12 +53,17 @@ pub struct SpawnSpec {
     pub mode: StartMode,
 }
 
+/// Reserved Linux gate tombstone: bwrap reported a namespace init which was
+/// already reaped. It is never passed to process signalling.
+pub(crate) const EXITED_GATE: &str = "exited-before-identity";
+
 /// The root process of a domain, started by `spawn_in`.
 pub struct Spawned {
     /// The process the supervisor waits on. For `bwrap-pidns` this is the
     /// bwrap monitor; the gate is `root`.
     pub child: Child,
-    /// The gate as the host sees it.
+    /// The gate as the host sees it; a reaped Linux namespace init has
+    /// start_time `exited-before-identity` (an empty-domain tombstone).
     pub root: ProcTuple,
 }
 
@@ -136,7 +141,7 @@ pub struct Guarantee {
 pub enum ContainmentError {
     UnsupportedPlatform,
     DriverUnavailable(String),
-    /// The command could not be started or the gate left before it had an identity.
+    /// The command could not be started or its identity could not be read.
     SpawnFailed(String),
     NamespaceUnavailable(String),
     /// The bwrap argv breaks a rule of the driver; the name says which.
