@@ -54,7 +54,7 @@ pub struct Pane {
 fn open_pty() -> (File, File) {
     let (mut master, mut slave): (RawFd, RawFd) = (-1, -1);
     // SAFETY: openpty fills the two descriptors; the null pointers ask for default settings.
-    let rc = unsafe { libc::openpty(&mut master, &mut slave, std::ptr::null_mut(), std::ptr::null(), std::ptr::null()) };
+    let rc = unsafe { libc::openpty(&mut master, &mut slave, std::ptr::null_mut(), std::ptr::null_mut(), std::ptr::null_mut()) };
     assert_eq!(rc, 0, "openpty");
     // SAFETY: both descriptors are fresh and owned here.
     unsafe { (File::from(OwnedFd::from_raw_fd(master)), File::from(OwnedFd::from_raw_fd(slave))) }
