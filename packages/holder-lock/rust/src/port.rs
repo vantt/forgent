@@ -162,6 +162,12 @@ pub enum Acquire {
 }
 
 /// A held lock. Opaque: callers never see the descriptor.
+///
+/// ```compile_fail
+/// fn description(handle: &fgos_holder_lock::Handle) -> &std::fs::File {
+///     &handle.file
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Handle {
     file: File,
@@ -328,9 +334,43 @@ pub struct BorrowOutcome {
     pub leftovers_killed: u32,
 }
 
+/// Explicit I/O and execution bound for [`run_borrowed_io`].
+#[derive(Debug, Clone)]
+pub struct BorrowIo {
+    /// Binary input; EOF follows the last byte.
+    pub stdin: Vec<u8>,
+    /// Maximum captured stdout bytes.
+    pub stdout_limit: usize,
+    /// Maximum captured stderr bytes.
+    pub stderr_limit: usize,
+    /// Absolute execution deadline (cleanup completes before return).
+    pub deadline: Instant,
+}
+
+/// Completed scoped borrow. No child, pipe or description escapes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BorrowIoOutcome {
+    /// Child status and leftover cleanup.
+    pub outcome: BorrowOutcome,
+    /// Captured binary stdout.
+    pub stdout: Vec<u8>,
+    /// Captured binary stderr.
+    pub stderr: Vec<u8>,
+}
+
 /// Why [`run_borrowed`] failed.
 #[derive(Debug)]
 pub enum BorrowError {
+    /// The acquired description no longer names the current lock resource.
+    ResourceReplaced,
+    /// Explicit bounded I/O is unavailable on this platform.
+    IoUnsupported,
+    /// A captured stream exceeded its byte ceiling; cleanup has completed.
+    OutputLimit(&'static str),
+    /// Execution deadline expired; cleanup has completed.
+    Deadline,
+    /// Reading or writing explicit I/O failed; cleanup has completed.
+    Io(io::Error),
     /// The handle is shared, or the spec has no program.
     InvalidSpec(String),
     /// The child could not be started.
@@ -339,8 +379,13 @@ pub enum BorrowError {
     Wait(io::Error),
     /// The platform cannot borrow.
     Unsupported,
-    /// Processes still held the description after the kill wait
-    /// (`borrow-leftover-not-killed`). The caller still releases its handle.
+    /// A foreign description holder was not killed. The handle stays held;
+    /// no successful drain or release is claimed.
+    ForeignHolder {
+        /// Processes outside the borrowing domain; never signaled.
+        pids: Vec<u32>,
+    },
+    /// Borrowing domain could not be drained.
     LeftoverNotKilled {
         /// What the child itself returned.
         outcome: BorrowOutcome,
@@ -352,6 +397,12 @@ pub enum BorrowError {
 impl std::fmt::Display for BorrowError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            BorrowError::ForeignHolder { pids } => write!(f, "lock-description-foreign-holder: {pids:?}"),
+            BorrowError::ResourceReplaced => write!(f, "lock-resource-replaced"),
+            BorrowError::IoUnsupported => write!(f, "borrow-io-unsupported: explicit I/O requires Unix"),
+            BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
+            BorrowError::Deadline => write!(f, "borrow-deadline"),
+            BorrowError::Io(err) => write!(f, "borrow-io-failed: {err}"),
             BorrowError::InvalidSpec(why) => write!(f, "borrow-spec-invalid: {why}"),
             BorrowError::Spawn(err) => write!(f, "borrow-spawn-failed: {err}"),
             BorrowError::Wait(err) => write!(f, "borrow-wait-failed: {err}"),
@@ -527,6 +578,51 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
     }
 }
 
+/// Validate an acquired opaque exclusive handle without spawning or exposing
+/// its description. This is a point-in-time resource check, not a new acquire
+/// or a proof of continuous custody across a caller's operations.
+pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
+    let drv = driver::current();
+    if !drv.supported() {
+        return Err(BorrowError::Unsupported);
+    }
+    if handle.mode != Mode::Ex {
+        return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
+    }
+    if !drv.same_file(&handle.file, &handle.resource.path) {
+        return Err(BorrowError::ResourceReplaced);
+    }
+    #[cfg(unix)]
+    {
+        let annotation = format!("{}:{BORROW_SLOT}", handle.name());
+        if borrowed_check(&handle.file, handle.path(), Some(&annotation), BORROW_SLOT) != BorrowedCheck::Borrower {
+            return Err(BorrowError::ResourceReplaced);
+        }
+    }
+    // Windows locks cannot be re-taken on the same handle. Handle is private,
+    // acquired only by this port, and close-only, so its exclusive lock lives
+    // until Drop; same_file above verifies the current resource identity.
+    Ok(())
+}
+
+/// Validate exclusive authority and wait for transient fork/exec copies to
+/// close. Never spawns or signals. Linux only; an unprovable foreign holder
+/// refuses admission while the caller retains the opaque handle.
+pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
+    validate(handle)?;
+    #[cfg(target_os = "linux")]
+    {
+        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms))
+            .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
+        // Resource identity can change while transient holders drain.
+        validate(handle)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        Err(BorrowError::Unsupported)
+    }
+}
+
 /// Release a held lock: close the description (see the module note on
 /// unlock).
 pub fn release(handle: Handle) {
@@ -557,8 +653,8 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 ///
 /// POSIX: the description goes to the child at slot 3 with
 /// `FGOS_LOCK_FD=<name>:3`. After the child exits, whatever else still holds
-/// the description (Linux: every other process listed as a holder; macOS: the
-/// child's process group) is killed and waited for, up to the handle's kill
+/// the description within its process group or descendants is killed and
+/// waited for; foreign holders are waited or refused, up to the handle's kill
 /// wait, before this returns.
 ///
 /// Windows: the child runs inside a named kill-on-close job this process
@@ -566,6 +662,7 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 /// holder, and nothing is handed to the child (`borrow_windows`). `helper` is
 /// unused on POSIX.
 pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+    validate(handle)?;
     #[cfg(windows)]
     {
         crate::borrow_windows::run(handle, spec, helper, &crate::borrow_windows::BorrowControl::none())
@@ -579,6 +676,40 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> R
 
 #[cfg(unix)]
 fn run_borrowed_posix(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome, BorrowError> {
+    let drv = driver::current();
+    let mut cmd = borrowed_command(handle, spec)?;
+    drv.prepare_borrow(&mut cmd);
+    let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
+    finish_borrowed(handle, &mut child)
+}
+
+/// One release rule for both Unix borrow forms. Keep the root unreaped while
+/// ending leftovers, so neither its pid nor macOS process group can be reused.
+#[cfg(unix)]
+fn finish_borrowed(handle: &Handle, child: &mut std::process::Child) -> Result<BorrowOutcome, BorrowError> {
+    let pid = child.id();
+    let waited = wait_exited_unreaped(pid).map_err(BorrowError::Wait);
+    let leftovers = driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms));
+    let status = child.wait().map_err(BorrowError::Wait)?;
+    let (exit, signal) = exit_parts(&status);
+    let mut outcome = BorrowOutcome { exit, signal, leftovers_killed: 0 };
+    match leftovers {
+        Ok(killed) => outcome.leftovers_killed = killed,
+        Err(left) => {
+            if left.foreign {
+                return Err(BorrowError::ForeignHolder { pids: left.pids });
+            }
+            outcome.leftovers_killed = left.killed;
+            return Err(BorrowError::LeftoverNotKilled { outcome, pids: left.pids });
+        }
+    }
+    waited?;
+    Ok(outcome)
+}
+
+#[cfg(unix)]
+fn borrowed_command(handle: &Handle, spec: &BorrowSpec) -> Result<Command, BorrowError> {
+    validate(handle)?;
     let drv = driver::current();
     if !drv.supported() {
         return Err(BorrowError::Unsupported);
@@ -607,38 +738,130 @@ fn run_borrowed_posix(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcom
         }
         BorrowStdio::Files { .. } => return Err(BorrowError::InvalidSpec("file stdio is only available on Windows".into())),
     }
+    Ok(cmd)
+}
+
+/// Synchronous bounded-I/O member of `run_borrowed`, with the same fd mapping,
+/// predecessor handling and per-OS leftover domain. Unix only; Windows keeps
+/// its existing borrow path and refuses this form before starting a child.
+/// The spec's stdio is superseded by explicit input and captured output.
+pub fn run_borrowed_io(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+    validate(handle)?;
+    #[cfg(not(unix))]
+    {
+        let _ = (handle, spec, io);
+        Err(BorrowError::IoUnsupported)
+    }
+    #[cfg(unix)]
+    {
+        run_borrowed_io_posix(handle, spec, io)
+    }
+}
+
+#[cfg(unix)]
+fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+    use std::io::Write;
+    let drv = driver::current();
+    let mut explicit = spec.clone();
+    explicit.stdio = BorrowStdio::Null;
+    let mut cmd = borrowed_command(handle, &explicit)?;
+    cmd.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
     drv.prepare_borrow(&mut cmd);
     let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
-    let child_pid = child.id();
-    // The child stays unreaped (a zombie) while its leftovers are ended, so
-    // its pid, and on macOS its process group id, cannot be reused by an
-    // unrelated process in the meantime.
-    wait_exited_unreaped(child_pid).map_err(BorrowError::Wait)?;
-    let leftovers = drv.end_leftovers(&handle.file, child_pid, Duration::from_millis(handle.kill_wait_ms));
-    let status = child.wait().map_err(BorrowError::Wait)?;
-    let (exit, signal) = exit_parts(&status);
-    let mut outcome = BorrowOutcome { exit, signal, leftovers_killed: 0 };
-    match leftovers {
-        Ok(killed) => {
-            outcome.leftovers_killed = killed;
-            Ok(outcome)
+    let pid = child.id();
+    let mut input = child.stdin.take();
+    let mut stdout = child.stdout.take().expect("piped stdout");
+    let mut stderr = child.stderr.take().expect("piped stderr");
+    let mut out = Vec::new();
+    let mut err = Vec::new();
+    // No reader/writer thread can outlive this scope. All three parent pipe
+    // ends are nonblocking, so a child that ignores stdin cannot hide a deadline.
+    let transfer = (|| -> Result<(), BorrowError> {
+        nonblocking(input.as_ref().expect("piped stdin"))?;
+        nonblocking(&stdout)?;
+        nonblocking(&stderr)?;
+        let mut written = 0;
+        loop {
+            if Instant::now() >= io.deadline {
+                return Err(BorrowError::Deadline);
+            }
+            capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")?;
+            capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")?;
+            if written == io.stdin.len() {
+                input.take();
+            }
+            if let Some(pipe) = input.as_mut() {
+                match pipe.write(&io.stdin[written..]) {
+                    Ok(n) => written += n,
+                    Err(e) if e.kind() == std::io::ErrorKind::WouldBlock || e.kind() == std::io::ErrorKind::Interrupted => {}
+                    Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => { input.take(); }
+                    Err(e) => return Err(BorrowError::Io(e)),
+                }
+            }
+            if child_exited_unreaped(pid, true).map_err(BorrowError::Wait)? {
+                return Ok(());
+            }
+            std::thread::sleep(Duration::from_millis(1));
         }
-        Err(left) => {
-            outcome.leftovers_killed = left.killed;
-            Err(BorrowError::LeftoverNotKilled { outcome, pids: left.pids })
+    })();
+    drop(input);
+    if transfer.is_err() {
+        // The root remains our unreaped child, so its identity cannot be reused.
+        let _ = child.kill();
+    }
+    // Every path after spawn uses the original release rule, including I/O
+    // setup/read/write failures. Keep the root unreaped during leftover cleanup.
+    let outcome = finish_borrowed(handle, &mut child)?;
+    transfer?;
+    // Drain bytes already in the pipes after root exit and leftover cleanup.
+    while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? {}
+    while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")? {}
+    Ok(BorrowIoOutcome { outcome, stdout: out, stderr: err })
+}
+
+#[cfg(unix)]
+fn nonblocking(pipe: &impl std::os::fd::AsRawFd) -> Result<(), BorrowError> {
+    let fd = pipe.as_raw_fd();
+    // SAFETY: fcntl only inspects/updates flags on a pipe owned by this call.
+    let flags = unsafe { libc::fcntl(fd, libc::F_GETFL) };
+    if flags < 0 || unsafe { libc::fcntl(fd, libc::F_SETFL, flags | libc::O_NONBLOCK) } < 0 {
+        return Err(BorrowError::Io(io::Error::last_os_error()));
+    }
+    Ok(())
+}
+
+#[cfg(unix)]
+fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<bool, BorrowError> {
+    let mut buf = [0; 8192];
+    match pipe.read(&mut buf) {
+        Ok(n) => {
+            if n > limit.saturating_sub(bytes.len()) {
+                return Err(BorrowError::OutputLimit(stream));
+            }
+            bytes.extend_from_slice(&buf[..n]);
+            Ok(n != 0)
         }
+        Err(e) if e.kind() == io::ErrorKind::WouldBlock => Ok(false),
+        Err(e) if e.kind() == io::ErrorKind::Interrupted => Ok(true),
+        Err(e) => Err(BorrowError::Io(e)),
     }
 }
 
 /// Block until `pid` (a child of this process) has exited, without reaping it.
 #[cfg(unix)]
 fn wait_exited_unreaped(pid: u32) -> io::Result<()> {
+    child_exited_unreaped(pid, false).map(|_| ())
+}
+
+#[cfg(unix)]
+fn child_exited_unreaped(pid: u32, nonblocking: bool) -> io::Result<bool> {
     loop {
-        // SAFETY: waitid fills a zeroed siginfo for our own child; WNOWAIT
-        // leaves it waitable for the reap that follows.
+        // SAFETY: waitid fills a zeroed siginfo for our child; WNOWAIT keeps
+        // the pid reserved through leftover cleanup.
         let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
-        if unsafe { libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, libc::WEXITED | libc::WNOWAIT) } == 0 {
-            return Ok(());
+        let flags = libc::WEXITED | libc::WNOWAIT | if nonblocking { libc::WNOHANG } else { 0 };
+        if unsafe { libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, flags) } == 0 {
+            return Ok(unsafe { info.si_pid() } != 0);
         }
         let err = io::Error::last_os_error();
         if err.raw_os_error() != Some(libc::EINTR) {

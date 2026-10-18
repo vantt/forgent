@@ -18,6 +18,8 @@ members = [
     "packages/run-supervisor/rust",
     "packages/agent-protocol/rust",
     "packages/terminal-control/rust",
+    "packages/git/rust",
+    "packages/durable-file/rust",
 ]
 exclude = [
     "herdr-dashboard",

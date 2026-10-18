@@ -216,3 +216,26 @@ fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
     let none = select(&SelectEnv { bwrap: Some("/nonexistent/bwrap".into()) }).unwrap();
     assert_eq!(none.name(), "linux-pgroup");
 }
+
+#[test]
+fn a_thousand_fast_exits_are_normal_spawns() {
+    let Some(driver) = bwrap_driver("fast-exit") else { return };
+    for i in 0..1000 {
+        let mut domain = driver.create(&format!("fast-{i}")).unwrap();
+        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"], StartMode::Direct)).unwrap();
+        assert!(spawned.child.wait().unwrap().success(), "spawn {i}");
+        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+        assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
+    }
+}
+
+#[test]
+fn fast_exit_preserves_a_nonzero_status() {
+    let Some(driver) = bwrap_driver("fast-status") else { return };
+    for i in 0..100 {
+        let mut domain = driver.create(&format!("status-{i}")).unwrap();
+        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/sh", "-c", "exit 7"], StartMode::Direct)).unwrap();
+        assert_eq!(spawned.child.wait().unwrap().code(), Some(7));
+        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+    }
+}

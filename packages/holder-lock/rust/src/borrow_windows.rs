@@ -172,6 +172,7 @@ fn empty_the_job(job: &fgos_process::platform::windows_job::Job, name: &str, kil
 /// Run `spec` with the holder's authority inside a fresh job. See the module
 /// note; the steps follow `predecessor.v1.json`.
 pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, control: &BorrowControl<'_>) -> Result<BorrowOutcome, BorrowError> {
+    crate::port::validate(handle)?;
     if !driver::current().supported() {
         return Err(BorrowError::Unsupported);
     }

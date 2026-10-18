@@ -145,6 +145,7 @@ impl DomainWatch {
         match &mut self.inner {
             #[cfg(windows)]
             Watch::Job(view) => view.is_empty(),
+            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE => DomainState::Empty,
             Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => match facts::judge_here(&gate.to_record()) {
                 Verdict::Dead => DomainState::Empty,
                 Verdict::Alive => DomainState::NotEmpty,
@@ -163,6 +164,7 @@ impl DomainWatch {
         match &mut self.inner {
             #[cfg(windows)]
             Watch::Job(view) => view.kill_all(),
+            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE => KillOutcome::Ok,
             Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => {
                 if signal_settled(&control::signal_by_identity(gate, control::Signal::Kill)) {
                     KillOutcome::Ok

@@ -41,8 +41,27 @@ impl std::error::Error for InstallError {
 /// Write all bytes, sync the file, install without replacement, remove the
 /// temporary link and sync the parent. Errors preserve the observed effect.
 /// Existing targets (including symlinks) are never opened or overwritten.
+pub trait FileSystem {
+    fn checkpoint(&self, step: &'static str) -> io::Result<()>;
+}
+pub struct OsFileSystem;
+impl FileSystem for OsFileSystem {
+    fn checkpoint(&self, _: &'static str) -> io::Result<()> {
+        Ok(())
+    }
+}
 pub fn install_once(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, &mut |_| Ok(()))
+    install_with(dir, name, bytes, &OsFileSystem)
+}
+/// Inject failures after each real filesystem boundary; never bypass a write
+/// or fsync. Errors retain the same installation evidence as OS failures.
+pub fn install_with(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+    filesystem: &dyn FileSystem,
+) -> Result<Installed, InstallError> {
+    write_durably(dir, name, bytes, false, &mut |step| filesystem.checkpoint(step))
 }
 
 /// Replace a name atomically without opening its old target, then sync its parent.
@@ -65,15 +84,24 @@ pub fn replace_durably_observed(
     bytes: &[u8],
     mut observe: impl FnMut(ReplacePoint) -> io::Result<()>,
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, true, &mut observe)
+    write_durably(dir, name, bytes, true, &mut |step| match step {
+        "bytes-written" => observe(ReplacePoint::Written),
+        "file-fsync" => observe(ReplacePoint::Synced),
+        "name-installed" => observe(ReplacePoint::Renamed),
+        "parent-fsync" => observe(ReplacePoint::DirectorySynced),
+        _ => Ok(()),
+    })
 }
 
+/// One write path for both modes. `replace` renames over the name; otherwise the
+/// name is installed without replacement. `checkpoint` runs after each real
+/// filesystem boundary and its errors carry the effect observed so far.
 fn write_durably(
     dir: &Path,
     name: &str,
     bytes: &[u8],
     replace: bool,
-    observe: &mut dyn FnMut(ReplacePoint) -> io::Result<()>,
+    checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
 ) -> Result<Installed, InstallError> {
     let mut components = Path::new(name).components();
     if name.is_empty()
@@ -117,57 +145,52 @@ fn write_durably(
         installed,
         temporary: Some(temporary.clone()),
     };
+    checkpoint("temp-created").map_err(|e| error(e, None))?;
     // write_all retries short writes and reports WriteZero/EFBIG rather than
     // publishing a truncated record. Keep the temporary on every failure.
     file.write_all(bytes).map_err(|e| error(e, None))?;
-    if replace {
-        observe(ReplacePoint::Written).map_err(|e| error(e, None))?;
-    }
+    checkpoint("bytes-written").map_err(|e| error(e, None))?;
     file.sync_all().map_err(|e| error(e, None))?;
-    if replace {
-        observe(ReplacePoint::Synced).map_err(|e| error(e, None))?;
-    }
+    checkpoint("file-fsync").map_err(|e| error(e, None))?;
     drop(file);
+    let target = dir.join(name);
     let installed = match if replace {
-        fs::rename(&temporary, dir.join(name))
+        fs::rename(&temporary, &target)
     } else {
-        install_name(&temporary, &dir.join(name))
+        install_name(&temporary, &target)
     } {
         Ok(()) => Installed::Created,
         Err(e) if !replace && e.kind() == io::ErrorKind::AlreadyExists => Installed::AlreadyExists,
         Err(e) => return Err(error(e, None)),
     };
-    if replace {
-        observe(ReplacePoint::Renamed).map_err(|e| InstallError {
-            source: e,
-            installed: Some(installed),
-            temporary: None,
-        })?;
-    }
-    // Windows moves the temp; Unix links then unlinks. A surviving Unix temp
-    // is an orphan, not a second record or permission to overwrite a target.
-    #[cfg(not(windows))]
+    // A rename consumed the temporary; only a no-replace install can leave one.
+    let after_install = |source| InstallError {
+        source,
+        installed: Some(installed),
+        temporary: (!replace).then(|| temporary.clone()),
+    };
+    checkpoint("name-installed").map_err(after_install)?;
     if !replace {
-        fs::remove_file(&temporary).map_err(|e| error(e, Some(installed)))?;
-    }
-    #[cfg(windows)]
-    if installed == Installed::AlreadyExists {
-        if !replace {
-            fs::remove_file(&temporary).map_err(|e| error(e, Some(installed)))?;
+        // Windows moves the temp; Unix links then unlinks. A surviving Unix temp
+        // is an orphan, not a second record or permission to overwrite a target.
+        #[cfg(not(windows))]
+        fs::remove_file(&temporary).map_err(after_install)?;
+        #[cfg(windows)]
+        if installed == Installed::AlreadyExists {
+            fs::remove_file(&temporary).map_err(after_install)?;
         }
+        checkpoint("temp-removed").map_err(after_install)?;
     }
     sync_directory(dir).map_err(|source| InstallError {
         source,
         installed: Some(installed),
         temporary: None,
     })?;
-    if replace {
-        observe(ReplacePoint::DirectorySynced).map_err(|source| InstallError {
-            source,
-            installed: Some(installed),
-            temporary: None,
-        })?;
-    }
+    checkpoint("parent-fsync").map_err(|source| InstallError {
+        source,
+        installed: Some(installed),
+        temporary: None,
+    })?;
     Ok(installed)
 }
 

@@ -148,3 +148,23 @@ fn the_guarantee_is_lockfileex_kernel_job_scoped_with_unlistable_holders() {
     drop(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000)));
     assert!(matches!(fgos_holder_lock::holders(&res).unwrap(), fgos_holder_lock::HoldersList::Unlistable(_)));
 }
+
+#[test]
+fn explicit_io_borrow_is_refused_before_spawning_on_windows() {
+    use fgos_holder_lock::{run_borrowed_io, BorrowError, BorrowIo, BorrowSpec};
+    let _serial = serial();
+    let dir = temp_dir("wlfx-io-refused");
+    let handle = acquired(acquire(&resource(&dir, "io"), Mode::Ex, Wait::Try, 2000));
+    let marker = dir.join("must-not-exist");
+    let spec = BorrowSpec {
+        argv: vec!["cmd.exe".into(), "/C".into(), format!("echo started > \"{}\"", marker.display())],
+        ..Default::default()
+    };
+    let bounds = BorrowIo { stdin: vec![], stdout_limit: 32, stderr_limit: 32, deadline: Instant::now() + Duration::from_secs(10) };
+    let error = run_borrowed_io(&handle, &spec, &bounds).unwrap_err();
+    assert!(matches!(error, BorrowError::IoUnsupported));
+    assert!(error.to_string().starts_with("borrow-io-unsupported"));
+    assert!(!marker.exists());
+    release(handle);
+    std::fs::remove_dir_all(dir).unwrap();
+}

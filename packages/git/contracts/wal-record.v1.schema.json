@@ -1,0 +1,686 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "operationId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 15
+    },
+    "previousDigest": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "phase": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "intent"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "oneOf": [
+                    {
+                      "const": "PublicationCas"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "RemoteFetch": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "refspecs": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "refspecs"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "RemoteFetch"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "RemotePush": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "refspecs": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "refspecs"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "RemotePush"
+                      ]
+                    }
+                  ]
+                },
+                "requestDigest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "repoIdentity": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resourceSet": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^refs/fgos/"
+                  }
+                },
+                "authorityBinding": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "writerIdentity": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "objectFormat": {
+                  "enum": [
+                    "sha1",
+                    "sha256"
+                  ]
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "requestDigest",
+                "repoIdentity",
+                "resourceSet",
+                "authorityBinding",
+                "writerIdentity",
+                "objectFormat",
+                "expected",
+                "next"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "prepared"
+            }
+          },
+          "required": [
+            "phase"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "target-attempt"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "prior_target_attempt": {
+                  "type": "null"
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "prior_target_attempt",
+                "expected",
+                "next"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "outcome"
+            },
+            "data": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "success"
+                    },
+                    "observed": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "absent"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "oid"
+                            },
+                            "oid": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "oid"
+                          ]
+                        }
+                      ]
+                    },
+                    "attribution": {
+                      "enum": [
+                        "thisInvocationWonCas",
+                        "effectObservedOnly"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "observed",
+                    "attribution"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "loss"
+                    },
+                    "observed": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "absent"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "oid"
+                            },
+                            "oid": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "oid"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "observed"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "superseded"
+                    },
+                    "later_operation_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "later_receipt_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "attribution": {
+                      "enum": [
+                        "effectObservedOnly",
+                        "uncertain"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "later_operation_id",
+                    "later_receipt_digest",
+                    "attribution"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "transfer"
+                    },
+                    "acknowledged": {
+                      "type": "boolean"
+                    },
+                    "unknown": {
+                      "type": "boolean"
+                    },
+                    "observations": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "string",
+                            "pattern": "^refs/fgos/"
+                          },
+                          {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "const": "absent"
+                                  }
+                                },
+                                "required": [
+                                  "kind"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "const": "oid"
+                                  },
+                                  "oid": {
+                                    "type": "string",
+                                    "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "oid"
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "items": false,
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    },
+                    "details": {
+                      "type": "array",
+                      "maxItems": 1024,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "acknowledged",
+                    "unknown",
+                    "observations",
+                    "details"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "abandonedBeforeAttempt"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "pin-release-attempt"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "prior_target_attempt": {
+                  "type": "null"
+                },
+                "expected": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                },
+                "next": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "absent"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "oid"
+                        },
+                        "oid": {
+                          "type": "string",
+                          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "oid"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "prior_target_attempt",
+                "expected",
+                "next"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "pin-released"
+            }
+          },
+          "required": [
+            "phase"
+          ]
+        }
+      ]
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "version",
+    "operationId",
+    "sequence",
+    "previousDigest",
+    "phase",
+    "digest"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fgos:git:wal-record:v1",
+  "title": "Publication WAL immutable envelope v1",
+  "description": "Concrete PublicationCas graph. Other operation families remain unimplemented and are refused. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Intent at sequence zero has null predecessor; every subsequent record hashes its predecessor. Semantic transitions, object-format validation, resource and live authority checks are Rust obligations. This file is evidence, never effect authority. An Intent/Prepared with no TargetAttempt may close record-only as abandonedBeforeAttempt under the same publication authority. An operation directory without installed record zero is no Intent; temporary files remain evidence but do not block admission."
+}

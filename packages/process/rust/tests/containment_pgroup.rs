@@ -128,3 +128,28 @@ fn containment_pgroup_grace_snapshot_keeps_a_setsid_child_of_a_leader_that_ends_
     assert!(!matches!(facts::observe(ProcId(child)), Observed::Live { .. }));
     let _ = spawned.child.wait();
 }
+
+#[test]
+fn a_thousand_fast_exits_are_normal_spawns() {
+    let driver = LinuxPgroup;
+    for i in 0..1000 {
+        let mut domain = driver.create(&format!("fast-{i}")).unwrap();
+        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"])).unwrap();
+        assert!(spawned.child.wait().unwrap().success(), "spawn {i}");
+        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+        assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
+    }
+}
+
+#[test]
+fn fast_exited_leader_does_not_hide_a_remaining_grandchild() {
+    let driver = LinuxPgroup;
+    let mut domain = driver.create("fast-grandchild").unwrap();
+    let mut spawned = driver.spawn_in(&mut domain, spec(&["sh", "-c", "(sleep 600 &) & exit 0"])).unwrap();
+    assert!(spawned.child.wait().unwrap().success());
+    // Let the intermediate shell finish its fork before checking the group.
+    sleep(Duration::from_millis(100));
+    assert_eq!(driver.is_empty(&mut domain), DomainState::NotEmpty);
+    assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
+    assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+}

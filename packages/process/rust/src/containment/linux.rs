@@ -140,9 +140,26 @@ impl ContainmentDriver for BwrapPidns {
                 return Err(ContainmentError::NamespaceUnavailable(why));
             }
         };
-        let Some(root) = tuple_of(ProcId(gate_pid)) else {
-            end_failed_spawn(&mut child);
-            return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
+        // --unshare-pid plus --as-pid-1 makes child-pid the namespace
+        // init (not the waiting monitor). The monitor can reap it before
+        // this read; a missing init proves the entire namespace has ended.
+        let root = match tuple_of(ProcId(gate_pid)) {
+            Some(root) => root,
+            None if matches!(facts::observe(ProcId(gate_pid)), facts::Observed::Absent) => {
+                let observer = facts::observer();
+                // An explicit tombstone, never a usable process identity.
+                // Its nonnumeric start time cannot match a Linux process,
+                // including a later reuse of the reported pid.
+                ProcTuple {
+                    host: observer.host, boot_id: observer.boot_id,
+                    pid_ns: observer.pid_ns, pid: ProcId(gate_pid),
+                    start_time: super::EXITED_GATE.into(),
+                }
+            }
+            None => {
+                end_failed_spawn(&mut child);
+                return Err(ContainmentError::SpawnFailed("gate identity unreadable".into()));
+            }
         };
         domain.set_domain(Domain::LinuxGate(root.clone()));
         Ok(Spawned { child, root })
@@ -159,6 +176,9 @@ impl ContainmentDriver for BwrapPidns {
         let Some(Domain::LinuxGate(gate)) = domain.domain().cloned() else {
             return KillOutcome::Refused;
         };
+        if gate.start_time == super::EXITED_GATE {
+            return KillOutcome::Ok;
+        }
         if grace_ms > 0 && signal_settled(&control::signal_by_identity(&gate, Signal::Term)) {
             wait_until(Duration::from_millis(grace_ms), || facts::judge_here(&gate.to_record()) == Verdict::Dead);
         }
@@ -504,6 +524,28 @@ fn parse_child_pid(text: &[u8]) -> Option<u32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unreaped_fast_child_keeps_its_identity() {
+        let mut child = Command::new("/bin/true").spawn().unwrap();
+        assert!(wait_until(Duration::from_secs(5), || matches!(facts::observe(ProcId(child.id())), facts::Observed::Zombie)));
+        let tuple = tuple_of(ProcId(child.id())).expect("zombie identity");
+        assert!(tuple.start_time.parse::<u64>().is_ok());
+        assert_eq!(facts::judge_here(&tuple.to_record()), Verdict::Dead);
+        assert!(child.wait().unwrap().success());
+    }
+
+    #[test]
+    fn reaped_gate_tombstone_stays_empty_even_if_pid_is_live_again() {
+        let mut root = tuple_of(ProcId(std::process::id())).unwrap();
+        root.start_time = super::super::EXITED_GATE.into();
+        let mut domain = ContainmentDomain::new("exited");
+        domain.set_domain(Domain::LinuxGate(root));
+        let driver = BwrapPidns::new("/usr/bin/bwrap".into());
+        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
+        assert_eq!(driver.kill_all(&mut domain, 100), KillOutcome::Ok);
+        assert_eq!(crate::domain_kill_all(domain.domain().unwrap()), KillOutcome::Ok);
+    }
 
     #[test]
     fn bwrap_report_names_the_gate_pid() {

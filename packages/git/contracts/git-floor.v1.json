@@ -1,0 +1,7 @@
+{
+  "contract": "git-floor.v1",
+  "minimum": [2, 53, 0],
+  "minimumVersion": "2.53.0",
+  "requiredProbes": ["hook-suppression", "no-lazy-fetch", "update-ref-no-deref", "hook-run"],
+  "evidence": "docs/platform/git/spec.md sections 4 C1, 12, 19 E5; measured Git 2.53.0"
+}
