@@ -1,0 +1,21 @@
+{
+  "request": "step-09-close-rework-01",
+  "entries": 80,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-01.json",
+      "entries": 50,
+      "bytes": 161061,
+      "sha256": "e0df08f564a48ed04f45a0f6cbe4b341df513f6b7f962b923a45d545aa6c5f1b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-02.json",
+      "entries": 30,
+      "bytes": 121779,
+      "sha256": "9b85dc4a214628508b271b78986570c9fcf097d99661574721827a26d5311eb6"
+    }
+  ],
+  "releaseStatus": "held; runner commit and N1 native package prerequisites pending",
+  "requiredNewReport": "review-a38-step-09-close-rework-01.md",
+  "historicalReviewPacksUntouched": true
+}

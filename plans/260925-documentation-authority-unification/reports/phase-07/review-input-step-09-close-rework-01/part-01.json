@@ -1,0 +1,3123 @@
+{
+  "request": "step-09-close-rework-01",
+  "authorSession": "codex-session:fgos-run_unit-run-179233d8d50a57@2026-10-18",
+  "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+  "entries": [
+    {
+      "entry": "contract-S3-01",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-01",
+        "producer": "Team Cognition Engine advisory",
+        "consumers": [
+          "Protocol Package / Definition"
+        ],
+        "contractId": null,
+        "version": null,
+        "payloadTransport": "preserved proposed bounded cognitive action; no current producer",
+        "compatibilityFailure": "historical/deferred intent: the advisory names the retired Agent Coordination Engine; current CollaborationPattern/Workflow implementation has no Team Cognition producer",
+        "implementationEvidence": [
+          "docs/platform/component-boundary.md:116,180-188,260-264,771-783",
+          "docs/platform/agent-coordination/spec.md:24-42",
+          "src/runner/execution/patterns/index.mjs:34-46"
+        ],
+        "owner": "Step 5 visible superseded-label correction",
+        "authorities": {
+          "stateWrite": "none",
+          "decision": "current Workflow/CollaborationPattern, not retired engine",
+          "runtime": "none for this retired seam"
+        },
+        "candidateSource": "docs/platform/component-boundary.md",
+        "status": "historical-deferred-Step-5",
+        "statementFileSha256": "40795a63f2fef1bd72b8f7307ecadbf93040acfe086e418a27fe34351f7aa3b9",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/component-boundary.md:116,180-188,260-264,771-783",
+            "fileSha256": "40795a63f2fef1bd72b8f7307ecadbf93040acfe086e418a27fe34351f7aa3b9",
+            "probes": [
+              {
+                "span": "116",
+                "command": "sed -n '116,116p' docs/platform/component-boundary.md",
+                "probeLine": 116,
+                "probe": "Canonical for: nothing; architectural advisory only",
+                "spanSha256": "0be978bb0f0facf892e260b868c8bc120797161b46a7bb2ea466e52792973666"
+              },
+              {
+                "span": "180-188",
+                "command": "sed -n '180,188p' docs/platform/component-boundary.md",
+                "probeLine": 180,
+                "probe": "#### 3. Recommended Responsibility Chain",
+                "spanSha256": "31df83b609c1900655606c2cbcda4760b10cb45c0fd731abcabca3d67fdbd162"
+              },
+              {
+                "span": "260-264",
+                "command": "sed -n '260,264p' docs/platform/component-boundary.md",
+                "probeLine": 260,
+                "probe": "| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](claude-plugin/spec.md), [Herdr Web Dashboard Spec](herdr-web-dashboard/spec.md), [Visibility And Herdr](agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](work-state/contracts/cli-io-contract.md) |",
+                "spanSha256": "3b6c326a6a7dc7124199f64e4ad9f6571ff00a3ef231a468ee32c700c09b7765"
+              },
+              {
+                "span": "771-783",
+                "command": "sed -n '771,783p' docs/platform/component-boundary.md",
+                "probeLine": 771,
+                "probe": "a time and remains the final egress/policy gate.",
+                "spanSha256": "b3011ea3615f50e46370b4185044b14ea2b4fa6520e1902aa10896795c3cc8d6"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/agent-coordination/spec.md:24-42",
+            "fileSha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+            "probes": [
+              {
+                "span": "24-42",
+                "command": "sed -n '24,42p' docs/platform/agent-coordination/spec.md",
+                "probeLine": 24,
+                "probe": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. This page routes current execution to [the runner spec](../runner/spec.md) and preserves verified boundaries; the [complete former spec](history/retired-engine/spec.md#literal-snapshot) is non-authority history.",
+                "spanSha256": "c53967fff92ed405282b1f73f3335f3b246aec9b9db7dbd59bfe5638317b5275"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/execution/patterns/index.mjs:34-46",
+            "fileSha256": "d327c87fb17efbfcf10fbe0a8af8500495214081d39eef03737fc97014f69414",
+            "probes": [
+              {
+                "span": "34-46",
+                "command": "sed -n '34,46p' src/runner/execution/patterns/index.mjs",
+                "probeLine": 34,
+                "probe": "export async function runPattern(nameOrPreset, unit, cfg, hooks = {}) {",
+                "spanSha256": "aaa3a0a92cb795b01f17e6f775b37a16edf4f85cbc84a23b07a6a3b4a5c9550e"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-02",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-02",
+        "producer": "Workflow/CollaborationPattern policy",
+        "consumers": [
+          "Assignment builder"
+        ],
+        "contractId": "CTR012",
+        "version": null,
+        "payloadTransport": "operation identity, TaskSpec, Skill, Role, policy hints; current payload has no version field",
+        "compatibilityFailure": "invalid/duplicate operation or unresolved TaskSpec is refused; no payload version field exists today",
+        "implementationEvidence": [
+          "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+          "src/workflow/definition.mjs:241-253",
+          "src/workflow/steps.mjs:57-85",
+          "src/runner/execution/run.mjs:555-580",
+          "src/runner/dispatch/assignment.mjs:270-280"
+        ],
+        "owner": "Workflow runner plus Assignment builder boundary",
+        "authorities": {
+          "stateWrite": "Assignment builder only",
+          "decision": "Workflow selects legal declared operation",
+          "runtime": "Execution Core"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+        "status": "compatible",
+        "statementFileSha256": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+            "fileSha256": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+                "probe": "98 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/workflow/definition.mjs:241-253",
+            "fileSha256": "4e597473d5e0bbabc2f342c907b59b8bed0cc407ac4997fc4de2b2294386c865",
+            "probes": [
+              {
+                "span": "241-253",
+                "command": "sed -n '241,253p' src/workflow/definition.mjs",
+                "probeLine": 241,
+                "probe": "    const operations = [];",
+                "spanSha256": "88addac0130647e002b9e1f213c286a8219764ece82496e89db5d45424a59f26"
+              }
+            ]
+          },
+          {
+            "ref": "src/workflow/steps.mjs:57-85",
+            "fileSha256": "8e55ec99437c9a17cbbbad01cd78605f39bc06f45251eacf39340bfce06f36ba",
+            "probes": [
+              {
+                "span": "57-85",
+                "command": "sed -n '57,85p' src/workflow/steps.mjs",
+                "probeLine": 57,
+                "probe": "export function taskSpecForStep(wf, stepOrStatus) {",
+                "spanSha256": "c565209857253f2eaaebc56549739b2e232deb6f1fd12e7ca986c6257a6781be"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/execution/run.mjs:555-580",
+            "fileSha256": "26a4da1545011b427859dcaf05a8203b90fd3749de1fda35f2384ccbecbcd779",
+            "probes": [
+              {
+                "span": "555-580",
+                "command": "sed -n '555,580p' src/runner/execution/run.mjs",
+                "probeLine": 555,
+                "probe": "      resultKind: declaredOp.resultKind,",
+                "spanSha256": "b10b12a2199c40dfa8cc8b3fef1a44678c71ae5d67b6e2244ae09e4c87a3f99e"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment.mjs:270-280",
+            "fileSha256": "c0ba04fb09fd5d80e076fa33062c462c2283a181446872a5c0d320bd650c9fbb",
+            "probes": [
+              {
+                "span": "270-280",
+                "command": "sed -n '270,280p' src/runner/dispatch/assignment.mjs",
+                "probeLine": 270,
+                "probe": "  }",
+                "spanSha256": "da1bc4ee0f3c60672f08fd9b7860b99a27521a60e00b49aef0d5c264d0114568"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-03",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-03",
+        "producer": "validated inline/declared execution contract",
+        "consumers": [
+          "Assignment builder"
+        ],
+        "contractId": "execution-contract-policy",
+        "version": "1",
+        "payloadTransport": "semantic contract object, in process",
+        "compatibilityFailure": "fail closed through validateExecutionContract",
+        "implementationEvidence": [
+          "src/runner/dispatch/execution-contract.mjs:47",
+          "src/runner/dispatch/assignment.mjs:481-629"
+        ],
+        "owner": "Assignment builder",
+        "authorities": {
+          "stateWrite": "Assignment builder materializes immutable Assignment",
+          "decision": "domain harness may enrich/reject but not weaken",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "src/runner/dispatch/execution-contract.mjs:47",
+            "fileSha256": "fcc21d444c42d171838107a577de7487daf8a920c08a779a21fa0d7e2f22e4b6",
+            "probes": [
+              {
+                "span": "47",
+                "command": "sed -n '47,47p' src/runner/dispatch/execution-contract.mjs",
+                "probeLine": 47,
+                "probe": "export const CONTRACT_POLICY_VERSION = '1';",
+                "spanSha256": "bbee567b20f005aabd56b2e48b2e0af7a354582ec0eaaab95f360ad3625237d4"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment.mjs:481-629",
+            "fileSha256": "c0ba04fb09fd5d80e076fa33062c462c2283a181446872a5c0d320bd650c9fbb",
+            "probes": [
+              {
+                "span": "481-629",
+                "command": "sed -n '481,629p' src/runner/dispatch/assignment.mjs",
+                "probeLine": 481,
+                "probe": "  const { contract: rawContract, caller } = provenance ?? {};",
+                "spanSha256": "799110f26d639d599856392ca126bafa4dc7821497b9816c495a1611bd4c0304"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-04",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-04",
+        "producer": "Assignment builder",
+        "consumers": [
+          "Dispatch Control Plane"
+        ],
+        "contractId": "CTR013",
+        "version": null,
+        "payloadTransport": "immutable persisted Assignment; current payload has no contract/schema version field",
+        "compatibilityFailure": "Assignment validation/admission fails closed; policy/normalizer stamps do not claim a payload version",
+        "implementationEvidence": [
+          "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+          "src/runner/dispatch/assignment.mjs:443-444,626-628",
+          "src/runner/dispatch/plan.mjs:56",
+          "src/runner/dispatch/assignment-runner.mjs:1570-1583"
+        ],
+        "owner": "Assignment builder -> Dispatch Control Plane",
+        "authorities": {
+          "stateWrite": "Assignment repository",
+          "decision": "Dispatch alone resolves concrete binding; DispatchPlan remains inside assignment-run.v2",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+            "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+                "probe": "342 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment.mjs:443-444,626-628",
+            "fileSha256": "c0ba04fb09fd5d80e076fa33062c462c2283a181446872a5c0d320bd650c9fbb",
+            "probes": [
+              {
+                "span": "443-444",
+                "command": "sed -n '443,444p' src/runner/dispatch/assignment.mjs",
+                "probeLine": 443,
+                "probe": "      contractPolicyVersion: CONTRACT_POLICY_VERSION,",
+                "spanSha256": "63f9899f067e32b15ed1ccd4fa994c65f3653585e38f3571f55b00a7d6db64b6"
+              },
+              {
+                "span": "626-628",
+                "command": "sed -n '626,628p' src/runner/dispatch/assignment.mjs",
+                "probeLine": 626,
+                "probe": "      contractPolicyVersion: CONTRACT_POLICY_VERSION,",
+                "spanSha256": "3d62b982d57760033ffd98ea0e65bb2ef8a6250a19dbfb973ee841117c102928"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/plan.mjs:56",
+            "fileSha256": "bc57319f904c8856b070a01bdfe76506a17166e4ace244d5f2b917bf5a406598",
+            "probes": [
+              {
+                "span": "56",
+                "command": "sed -n '56,56p' src/runner/dispatch/plan.mjs",
+                "probeLine": 56,
+                "probe": "export function compileDispatchPlan(",
+                "spanSha256": "2c022fe30cbf5b9d4341afe9cfa0819bf5af4021fda614eb50f3b239c4fc4832"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment-runner.mjs:1570-1583",
+            "fileSha256": "86ee108786ac96cb68c0bab7ce2157c7e4a95517e473fbd6953de1c80fddc613",
+            "probes": [
+              {
+                "span": "1570-1583",
+                "command": "sed -n '1570,1583p' src/runner/dispatch/assignment-runner.mjs",
+                "probeLine": 1570,
+                "probe": "      delivery: 'not-sent',",
+                "spanSha256": "4444972f08072b02bdcca526c5ac06cd65f496cea40d6d7582dc8a9c2333ef77"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-05",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-05",
+        "producer": "Dispatch Control Plane",
+        "consumers": [
+          "Run runtime"
+        ],
+        "contractId": "assignment-run",
+        "version": "2",
+        "payloadTransport": "dispatch-plan.json plus atomic run.json",
+        "compatibilityFailure": "unknown/corrupt plan or settlement refuses relaunch",
+        "implementationEvidence": [
+          "src/runner/dispatch/assignment-runner.mjs:638-670",
+          "src/runner/dispatch/assignment-runner.mjs:955-965",
+          "src/runner/dispatch/assignment-runner.mjs:1563-1593"
+        ],
+        "owner": "Dispatch runtime",
+        "authorities": {
+          "stateWrite": "Dispatch owns Run records",
+          "decision": "DispatchPlan binding",
+          "runtime": "Run controller"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "src/runner/dispatch/assignment-runner.mjs:638-670",
+            "fileSha256": "86ee108786ac96cb68c0bab7ce2157c7e4a95517e473fbd6953de1c80fddc613",
+            "probes": [
+              {
+                "span": "638-670",
+                "command": "sed -n '638,670p' src/runner/dispatch/assignment-runner.mjs",
+                "probeLine": 638,
+                "probe": "  assignmentDir,",
+                "spanSha256": "62ad0a7893f2d1894c02a0b1ba42a3e204ef46a24377e3936bef22a48a16e23a"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment-runner.mjs:955-965",
+            "fileSha256": "86ee108786ac96cb68c0bab7ce2157c7e4a95517e473fbd6953de1c80fddc613",
+            "probes": [
+              {
+                "span": "955-965",
+                "command": "sed -n '955,965p' src/runner/dispatch/assignment-runner.mjs",
+                "probeLine": 955,
+                "probe": "      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);",
+                "spanSha256": "7c28065bb267cd50199c79f59ce346e4509bea23d1dcc96160e23a8791a82694"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment-runner.mjs:1563-1593",
+            "fileSha256": "86ee108786ac96cb68c0bab7ce2157c7e4a95517e473fbd6953de1c80fddc613",
+            "probes": [
+              {
+                "span": "1563-1593",
+                "command": "sed -n '1563,1593p' src/runner/dispatch/assignment-runner.mjs",
+                "probeLine": 1563,
+                "probe": "      assignmentId: effectiveAssignment.assignmentId,",
+                "spanSha256": "a2ed7aa16d970dbaea8d07eb1fd4af8d2d2e3d9eb6f244f43135624f777b246b"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-06",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-06",
+        "producer": "Run runtime",
+        "consumers": [
+          "worker"
+        ],
+        "contractId": "effective-execution-contract",
+        "version": "1",
+        "payloadTransport": "brief plus persisted contract and atomic result claim path",
+        "compatibilityFailure": "worker write outside grant or malformed claim fails closed",
+        "implementationEvidence": [
+          "src/runner/dispatch/effective-execution-contract.mjs",
+          "src/runner/dispatch/assignment.mjs:886-915",
+          "src/runner/dispatch/assignment-runner.mjs:955-965"
+        ],
+        "owner": "Dispatch runtime",
+        "authorities": {
+          "stateWrite": "worker only writes declared outputs/result claim",
+          "decision": "none",
+          "runtime": "Dispatch controller"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "src/runner/dispatch/effective-execution-contract.mjs",
+            "fileSha256": "d86e39bc33c8fc70228efb62963e8658dca3ebaf616be8dfe30585598a52298f",
+            "probes": [
+              {
+                "command": "sha256sum src/runner/dispatch/effective-execution-contract.mjs",
+                "probe": "537 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment.mjs:886-915",
+            "fileSha256": "c0ba04fb09fd5d80e076fa33062c462c2283a181446872a5c0d320bd650c9fbb",
+            "probes": [
+              {
+                "span": "886-915",
+                "command": "sed -n '886,915p' src/runner/dispatch/assignment.mjs",
+                "probeLine": 886,
+                "probe": "    // The contract names where this worker may write (a sandboxed worker's",
+                "spanSha256": "e7eee0f356d1c3022da89ae7e901944d8b8759c2b85db2f649539018be1dbb46"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/assignment-runner.mjs:955-965",
+            "fileSha256": "86ee108786ac96cb68c0bab7ce2157c7e4a95517e473fbd6953de1c80fddc613",
+            "probes": [
+              {
+                "span": "955-965",
+                "command": "sed -n '955,965p' src/runner/dispatch/assignment-runner.mjs",
+                "probeLine": 955,
+                "probe": "      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);",
+                "spanSha256": "7c28065bb267cd50199c79f59ce346e4509bea23d1dcc96160e23a8791a82694"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-07",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-07",
+        "producer": "worker",
+        "consumers": [
+          "Run Result Evaluator"
+        ],
+        "contractId": "agent-result-claim",
+        "version": "2",
+        "payloadTransport": "atomic JSON result claim and evidence refs",
+        "compatibilityFailure": "invalid claim is evidence of failure, never success",
+        "implementationEvidence": [
+          "src/runner/dispatch/agent-result-claim-contract.mjs:5",
+          "src/runner/dispatch/run-result.mjs:486-531"
+        ],
+        "owner": "Run Result Evaluator",
+        "authorities": {
+          "stateWrite": "worker writes claim; evaluator writes RunResult",
+          "decision": "worker claim is untrusted",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "src/runner/dispatch/agent-result-claim-contract.mjs:5",
+            "fileSha256": "8deafc9c4f1109801444e6047724818d0db58f6ad9038e1b32e5837bd41bd92a",
+            "probes": [
+              {
+                "span": "5",
+                "command": "sed -n '5,5p' src/runner/dispatch/agent-result-claim-contract.mjs",
+                "probeLine": 5,
+                "probe": "export const AGENT_RESULT_CLAIM_CONTRACT = Object.freeze({ id: 'agent-result-claim', version: 2 });",
+                "spanSha256": "32ee2ac1c6129d7333b525cf48cac6c8d9b67fae509eeab2cbd3dc99a36a2073"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/run-result.mjs:486-531",
+            "fileSha256": "7ccde0c4f7d1fdfb389a57f8a810eded79ddb5b274732ce1ff92455d52666a86",
+            "probes": [
+              {
+                "span": "486-531",
+                "command": "sed -n '486,531p' src/runner/dispatch/run-result.mjs",
+                "probeLine": 486,
+                "probe": "    basis.push('valid-agent-result-claim');",
+                "spanSha256": "b22658aba38cc408b173045fdc3a6e6ca475133fbb654dd252c726ba7dce70ba"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-08",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-08",
+        "producer": "Run Result Evaluator",
+        "consumers": [
+          "Workflow/Work driver"
+        ],
+        "contractId": "run-result",
+        "version": "3|4",
+        "payloadTransport": "normalized RunResult with confidence/evidence",
+        "compatibilityFailure": "contract-corrupt/refused/failed classification cannot advance as success",
+        "implementationEvidence": [
+          "src/runner/dispatch/run-result.mjs:289-351",
+          "src/runner/dispatch/run-result.mjs:557-676",
+          "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:239-333"
+        ],
+        "owner": "Run Result Evaluator",
+        "authorities": {
+          "stateWrite": "RunResult only",
+          "decision": "confidence only; never Work lifecycle",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "status": "compatible",
+        "statementFileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+        "evidencePins": [
+          {
+            "ref": "src/runner/dispatch/run-result.mjs:289-351",
+            "fileSha256": "7ccde0c4f7d1fdfb389a57f8a810eded79ddb5b274732ce1ff92455d52666a86",
+            "probes": [
+              {
+                "span": "289-351",
+                "command": "sed -n '289,351p' src/runner/dispatch/run-result.mjs",
+                "probeLine": 289,
+                "probe": "  if (!result.contract || typeof result.contract !== 'object') {",
+                "spanSha256": "79072a48ba733314dc4341d5eac539af6e58f75ffd85641f608079efc7d461a3"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/run-result.mjs:557-676",
+            "fileSha256": "7ccde0c4f7d1fdfb389a57f8a810eded79ddb5b274732ce1ff92455d52666a86",
+            "probes": [
+              {
+                "span": "557-676",
+                "command": "sed -n '557,676p' src/runner/dispatch/run-result.mjs",
+                "probeLine": 557,
+                "probe": "    policy,",
+                "spanSha256": "de43fbd080cff3966e7b1516a453198e647d3e17ce553b768d9b68eacae38331"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:239-333",
+            "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+            "probes": [
+              {
+                "span": "239-333",
+                "command": "sed -n '239,333p' docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+                "probeLine": 239,
+                "probe": "launch-unknown, result-superseded, version-unsupported and owner-runtime-unavailable.",
+                "spanSha256": "fd197e1ebb627d53174328af091b42090597dd28d24287997ca8030d8220d9dd"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-09",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-09",
+        "producer": "Workflow/Work driver",
+        "consumers": [
+          "Work Lifecycle Engine"
+        ],
+        "contractId": "CTR001+CTR002+run-result(S3-08)",
+        "version": "fgos.v1 / current store schema / run-result 3|4",
+        "payloadTransport": "RunResult is read through runOutcome/runResult; authorized Work verbs cross CLI/store boundaries",
+        "compatibilityFailure": "contract-corrupt or unsatisfied RunResult cannot advance success; lifecycle writes remain Work verbs/store only",
+        "implementationEvidence": [
+          "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:308-333",
+          "src/runner/loop.mjs:103,901-915,1538",
+          "src/workflow/runner.mjs:337,703"
+        ],
+        "owner": "Work Lifecycle Engine",
+        "authorities": {
+          "stateWrite": "Work verbs/store only",
+          "decision": "Work/Workflow driver; confidence/category-to-action mapping queued as P7-DOC-GAP-01",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/component-boundary.md",
+        "status": "compatible-covered-no-new-id",
+        "statementFileSha256": "40795a63f2fef1bd72b8f7307ecadbf93040acfe086e418a27fe34351f7aa3b9",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md:308-333",
+            "fileSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+            "probes": [
+              {
+                "span": "308-333",
+                "command": "sed -n '308,333p' docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+                "probeLine": 308,
+                "probe": "snapshots provide correlation only, not proof of process authorship. Attribution",
+                "spanSha256": "a79f511c533a41b522b769156481db74725beda84fb81815a234d3af4a11811f"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/loop.mjs:103,901-915,1538",
+            "fileSha256": "a309c4ab575eb7f25e621a90d600469387d8f7a46ba7e1b561e0ab1a3ab62d10",
+            "probes": [
+              {
+                "span": "103",
+                "command": "sed -n '103,103p' src/runner/loop.mjs",
+                "probeLine": 103,
+                "probe": "import { runOutcome } from './dispatch/run-result.mjs';",
+                "spanSha256": "e3f6fd3aa05a9df243d0731c5907768a93844f0604df2e442ebb3db51be6523d"
+              },
+              {
+                "span": "901-915",
+                "command": "sed -n '901,915p' src/runner/loop.mjs",
+                "probeLine": 901,
+                "probe": "        const runOutcomeResult = outcome.runResult ? runOutcome(outcome.runResult) : null;",
+                "spanSha256": "7f766d3b16701fba6b1202ccc567d82099739d2f644d62b25a8999816d4f5617"
+              },
+              {
+                "span": "1538",
+                "command": "sed -n '1538,1538p' src/runner/loop.mjs",
+                "probeLine": 1538,
+                "probe": "            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;",
+                "spanSha256": "aa7147c1d58ea5bbfc5929f1cf9820d6511b0dc468c8587156164242d9c276dc"
+              }
+            ]
+          },
+          {
+            "ref": "src/workflow/runner.mjs:337,703",
+            "fileSha256": "89ee9d6fcda52096f87c0397a0e1de34447a6f40a3a71e662b57a092aba3ba65",
+            "probes": [
+              {
+                "span": "337",
+                "command": "sed -n '337,337p' src/workflow/runner.mjs",
+                "probeLine": 337,
+                "probe": "      if (unit.status !== 'completed' || unit.outcome !== 'pass') {",
+                "spanSha256": "68ce7427a6f848d1f502f36bfdc41df3256b6b8f625dc10de507c26caa6905d0"
+              },
+              {
+                "span": "703",
+                "command": "sed -n '703,703p' src/workflow/runner.mjs",
+                "probeLine": 703,
+                "probe": "          if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {",
+                "spanSha256": "b89331931aa534c647bfa3ba8bd857e6e9416a029dbd524aaa880b5b390bd7c6"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-10",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-10",
+        "producer": "CLI/agent surface",
+        "consumers": [
+          "fgOS core/store"
+        ],
+        "contractId": "CTR001",
+        "version": "fgos.v1",
+        "payloadTransport": "stdout JSON envelope, stderr diagnostics, exit taxonomy",
+        "compatibilityFailure": "typed exit and envelope validation",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md:446",
+          "docs/platform/work-state/contracts/cli-io-contract.md"
+        ],
+        "owner": "CLI IO contract",
+        "authorities": {
+          "stateWrite": "none by envelope",
+          "decision": "surface only",
+          "runtime": "CLI"
+        },
+        "candidateSource": "docs/platform/architecture-map.md",
+        "status": "compatible",
+        "statementFileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md:446",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "span": "446",
+                "command": "sed -n '446,446p' docs/platform/architecture-map.md",
+                "probeLine": 446,
+                "probe": "| **CTR001** | người/agent ↔ CLI | `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng (nguồn duy nhất: `store.mjs`'s `EXIT_CODES` + `loop.mjs`'s `EXIT_BUSY`, per D31) + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, `schema_version` hiện `'2.0'` per D34; mỗi verb mang `touchesState`+`externalEffect` — hai trục thay `access` cũ — cộng `paginated` khai verb nào phân trang qua con trỏ đục `--cursor`/`--limit`, cộng `multiValueFormat` trên tham số nhiều-giá-trị, và `deprecated` khi một verb là legacy compatibility, per D34-D36 str46-io-contract + P8 packaging-distribution; xem `docs/io-contract.md` cho hợp đồng đầy đủ) | **live** — envelope `fgos.v1` bọc mọi verb mặc định trên CẢ HAI binary (`fgos.mjs` và, từ STR46 lát 2, `fgos-runner.mjs`'s `printResult()`), với đúng BỐN ngoại lệ có lý do (documented exception): sổ verb máy-đọc của `fgos.mjs` (`--help`/`--help --json`, gồm cả `<verb> --help`), `setup`/`doctor --pretty` của `fgos.mjs`, log worker text trần của `fgos-runner` (`.fgos/logs/<id>.log`), và dòng lifecycle \"watch mode stopped\" trần của chính `fgos-runner`; exit codes + categoryOf ở cả 2 binary; sổ verb công bố toàn mặt verb (STR37). Nhận diện một envelope thật bằng cách parse dòng stdout ra JSON rồi kiểm `contract === 'fgos.v1'` — không bao giờ bằng heuristic văn bản (vd. \"dòng bắt đầu bằng {\"), vì dòng progress-trace verify-tail chưa đụng của `loop.mjs` có thể tự chứa output worker bắt đầu bằng '{'. | deep-dive schema §5; porting-log `agent-output-envelope-contract`; spec work-state §envelope |",
+                "spanSha256": "79c627bf8d96a95cbc42d902bafa8823ab7d2670b546614addff70851c16c6ce"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/work-state/contracts/cli-io-contract.md",
+            "fileSha256": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/work-state/contracts/cli-io-contract.md",
+                "probe": "449 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-11",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-11",
+        "producer": "all mutation callers",
+        "consumers": [
+          "state store"
+        ],
+        "contractId": "CTR002",
+        "version": "event schema v2 / current work schema",
+        "payloadTransport": "in-process store facade and JSONL events",
+        "compatibilityFailure": "unknown versions/cycles fail closed; one writer per mutation door",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md:447",
+          "src/state/store.mjs",
+          "src/state/dep-graph.mjs"
+        ],
+        "owner": "Work state store",
+        "authorities": {
+          "stateWrite": "store only",
+          "decision": "FSM/domain rules",
+          "runtime": "none"
+        },
+        "candidateSource": "docs/platform/architecture-map.md",
+        "status": "compatible",
+        "statementFileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md:447",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "span": "447",
+                "command": "sed -n '447,447p' docs/platform/architecture-map.md",
+                "probeLine": 447,
+                "probe": "| **CTR002** | mọi caller ↔ store | bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) **bất biến phi-chu-trình** (record ADR0012): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. **Nợ có tên:** một-cửa là per-process; multi-process cần lease (chưa có) | **live** | `store.mjs` · `dep-graph.mjs` · spec work-state · luật RUL3 (work-state) |",
+                "spanSha256": "15ab7ada703b29db8d6462ba51ddd5f4d981bd46a478ae9d651d283fe6a78b5a"
+              }
+            ]
+          },
+          {
+            "ref": "src/state/store.mjs",
+            "fileSha256": "f75e0d41308794beb94d5a4513af3bc10aa368699f96b84a056b04a844620ef7",
+            "probes": [
+              {
+                "command": "sha256sum src/state/store.mjs",
+                "probe": "2153 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/state/dep-graph.mjs",
+            "fileSha256": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
+            "probes": [
+              {
+                "command": "sha256sum src/state/dep-graph.mjs",
+                "probe": "238 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-12",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-12",
+        "producer": "runner/orchestrator",
+        "consumers": [
+          "worker"
+        ],
+        "contractId": "CTR003",
+        "version": "uses fgos.v1 surface token",
+        "payloadTransport": "assignment, sandbox/worktree, proof/result",
+        "compatibilityFailure": "worker cannot write .fgos; report-only discovered work",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md:448",
+          "docs/platform/runner/contracts/routing-handoff.md"
+        ],
+        "owner": "runner",
+        "authorities": {
+          "stateWrite": "runner only for lifecycle",
+          "decision": "runner",
+          "runtime": "worker adapter"
+        },
+        "candidateSource": "docs/platform/architecture-map.md",
+        "status": "compatible",
+        "statementFileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md:448",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "span": "448",
+                "command": "sed -n '448,448p' docs/platform/architecture-map.md",
+                "probeLine": 448,
+                "probe": "| **CTR003** | orchestrator ↔ worker | dispatch: việc + verify đòi hỏi + proof khi về; **trust boundary của worker**: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); **kênh báo-cáo-không-ghi (record ADR0013):** worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi, D3); stdout surface of `fgos-runner.mjs` reuses CTR001's `fgos.v1` envelope mechanism (contract field `'fgos.v1'`) as its version token rather than minting a separate CTR003-specific tag, per D6 str46-io-contract | partial | `loop.mjs` · `dispatch.mjs` · `worktree.mjs`; deep-dive schema §3 |",
+                "spanSha256": "2fdfc031c5e73a69a564ca07d46a1b35c36a50f3653c95f57e9ec4849ae78811"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/runner/contracts/routing-handoff.md",
+            "fileSha256": "97b9a2cb6f1bc3acad1ec1a882b32660fda06538e008d66d57a2029cb0ae325d",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/runner/contracts/routing-handoff.md",
+                "probe": "113 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-13",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-13",
+        "producer": "model gateway/dispatch",
+        "consumers": [
+          "provider"
+        ],
+        "contractId": "CTR009",
+        "version": "executor.v1",
+        "payloadTransport": "validated command plus args array",
+        "compatibilityFailure": "RunnerConfigError at load; no shell concatenation",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md",
+          "src/runner/dispatch/config.mjs:394"
+        ],
+        "owner": "Dispatch transport",
+        "authorities": {
+          "stateWrite": "none",
+          "decision": "Dispatch binding",
+          "runtime": "provider adapter"
+        },
+        "candidateSource": "docs/platform/architecture-map.md",
+        "status": "compatible",
+        "statementFileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/architecture-map.md",
+                "probe": "849 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/config.mjs:394",
+            "fileSha256": "622900bf06465cd760e9a8a5a27f126dd10ecd54dd957822f0e8d61d19bf3496",
+            "probes": [
+              {
+                "span": "394",
+                "command": "sed -n '394,394p' src/runner/dispatch/config.mjs",
+                "probeLine": 394,
+                "probe": "    validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);",
+                "spanSha256": "34e01d7b8cf4c137e4bcbff6f665add4650bd5ee432215b2ae6976c78aa5ca21"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-14",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-14",
+        "producer": "Dispatch",
+        "consumers": [
+          "executor adapter"
+        ],
+        "contractId": "CTR011",
+        "version": "confinement-authority.v1 (documentation-only registry label)",
+        "payloadTransport": "policy -> plan -> backend driver -> attestation",
+        "compatibilityFailure": "fail closed when required confinement unavailable",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md",
+          "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+          "src/runner/dispatch/confinement/policies.mjs:29",
+          "src/runner/dispatch/confinement/authority.mjs:772",
+          "src/runner/dispatch/confinement/attestation-store.mjs:21"
+        ],
+        "owner": "Confinement Authority",
+        "authorities": {
+          "stateWrite": "attestation owner",
+          "decision": "Confinement Authority",
+          "runtime": "backend driver"
+        },
+        "candidateSource": "docs/platform/architecture-map.md",
+        "status": "compatible",
+        "statementFileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/architecture-map.md",
+                "probe": "849 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+            "fileSha256": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+                "probe": "780 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/confinement/policies.mjs:29",
+            "fileSha256": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+            "probes": [
+              {
+                "span": "29",
+                "command": "sed -n '29,29p' src/runner/dispatch/confinement/policies.mjs",
+                "probeLine": 29,
+                "probe": "    contract: 'confinement-policy.v1',",
+                "spanSha256": "efcf8ea6fd06720fb8f157d69f9fc684b6680d1d7b8e37e3cebd7a4d6dc333e5"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/confinement/authority.mjs:772",
+            "fileSha256": "3f127d8753c9c7cce876139bcc5f790740af73a40a6532192f48dc1a1b9fa9b7",
+            "probes": [
+              {
+                "span": "772",
+                "command": "sed -n '772,772p' src/runner/dispatch/confinement/authority.mjs",
+                "probeLine": 772,
+                "probe": "      contract: \"confinement-plan.v1\",",
+                "spanSha256": "fe3e14f987bf1ce41231083a534a0339dd68b0192a45f0fd7e7d9d3746a57f1d"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/confinement/attestation-store.mjs:21",
+            "fileSha256": "0167018a138984705ee9b89cbae3c48e3f76179548120f8d7a9fbbafd7c40537",
+            "probes": [
+              {
+                "span": "21",
+                "command": "sed -n '21,21p' src/runner/dispatch/confinement/attestation-store.mjs",
+                "probeLine": 21,
+                "probe": "export const ATTESTATION_CONTRACT = 'confinement-attestation.v1';",
+                "spanSha256": "23b9bf5cb2278653396fb2b063ff98d00b4022091a3442ef7fafe1dcda5d4076"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-15",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-15",
+        "producer": "fgos Gateway REST server",
+        "consumers": [
+          "web/desktop/API clients"
+        ],
+        "contractId": "CTR010",
+        "version": "fgos-gateway.v1 / OpenAPI 1.0.0",
+        "payloadTransport": "HTTP+JSON and /contract YAML",
+        "compatibilityFailure": "HTTP status plus fgos.v1 envelope; shared bearer gate except /contract",
+        "implementationEvidence": [
+          "docs/platform/architecture-map.md",
+          "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:1-65",
+          "apps/fgos-gateway/src/gateway.rs:3"
+        ],
+        "owner": "fgos Gateway REST API",
+        "authorities": {
+          "stateWrite": "gateway delegates through CLI/core; never co-writer",
+          "decision": "no lifecycle authority",
+          "runtime": "gateway process"
+        },
+        "candidateSource": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "status": "compatible",
+        "statementFileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/architecture-map.md",
+            "fileSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/architecture-map.md",
+                "probe": "849 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:1-65",
+            "fileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "probes": [
+              {
+                "span": "1-65",
+                "command": "sed -n '1,65p' docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+                "probeLine": 1,
+                "probe": "openapi: 3.1.0",
+                "spanSha256": "f7761078c8cb3cc880e62ca0cf13746a95b27fc2a6b5b7e8e3e226fdcbc29c1f"
+              }
+            ]
+          },
+          {
+            "ref": "apps/fgos-gateway/src/gateway.rs:3",
+            "fileSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+            "probes": [
+              {
+                "span": "3",
+                "command": "sed -n '3,3p' apps/fgos-gateway/src/gateway.rs",
+                "probeLine": 3,
+                "probe": "//! CTR010). Lives inside the `fgos-gateway` binary (D8) as a new async adapter",
+                "spanSha256": "b1d3bc24019979e3e7190b7af3fc170353a956d72b192674529075c98ef384c8"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-S3-16",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "S3-16",
+        "producer": "fgos Gateway",
+        "consumers": [
+          "CLI/core/store"
+        ],
+        "contractId": "CTR001+CTR002",
+        "version": "fgos.v1 plus one-door-write",
+        "payloadTransport": "thin wrapper over fgos verbs/core use cases",
+        "compatibilityFailure": "gateway may not become a second state writer",
+        "implementationEvidence": [
+          "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:8-47",
+          "docs/platform/component-boundary.md:73"
+        ],
+        "owner": "CLI/core/store",
+        "authorities": {
+          "stateWrite": "store only",
+          "decision": "Work engine",
+          "runtime": "gateway adapter"
+        },
+        "candidateSource": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "status": "compatible",
+        "statementFileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:8-47",
+            "fileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "probes": [
+              {
+                "span": "8-47",
+                "command": "sed -n '8,47p' docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+                "probeLine": 8,
+                "probe": "    \"Kien truc giao tiep nguoi <-> fgOS\", model 3: core-library + thin",
+                "spanSha256": "c7838ff18bbb052d6fad36ec618bd2d3af4a6b07316950ddb5450499254d8206"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/component-boundary.md:73",
+            "fileSha256": "40795a63f2fef1bd72b8f7307ecadbf93040acfe086e418a27fe34351f7aa3b9",
+            "probes": [
+              {
+                "span": "73",
+                "command": "sed -n '73,73p' docs/platform/component-boundary.md",
+                "probeLine": 73,
+                "probe": "| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |",
+                "spanSha256": "95d23e5cd37037fb9ac20d7df2c31e34fb60b1322f505c75b9b4518663b13944"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-01",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-01",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-graph-shape prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-02",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-02",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-round-counting prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-03",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-03",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-context-visibility prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-04",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-04",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-driver-authority prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-05",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-05",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-mutation prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "contract-X-STALE-06",
+      "kind": "refreshed-contract-row",
+      "row": {
+        "id": "X-STALE-06",
+        "producer": "architecture-intent current-fit table",
+        "consumers": [
+          "architecture readers",
+          "implementation-alignment review"
+        ],
+        "contractId": "inventory-only",
+        "version": null,
+        "payloadTransport": "current-fit-declared-operation-dispatch prose",
+        "compatibilityFailure": "not evaluated or edited here",
+        "implementationEvidence": [
+          "docs/platform/system-architecture/architecture/architecture-intent.md"
+        ],
+        "owner": "Step 5 authority-separation",
+        "authorities": {
+          "stateWrite": "n/a",
+          "decision": "n/a",
+          "runtime": "n/a"
+        },
+        "candidateSource": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "status": "inventory-only-Step-5",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "evidencePins": [
+          {
+            "ref": "docs/platform/system-architecture/architecture/architecture-intent.md",
+            "fileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+                "probe": "799 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-DUP-03",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-DUP-03",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "duplicate-group",
+        "authorityKind": "generated projection",
+        "statement": "Preserve canonical/projection distinction for the duplicate pair paths:docs/architecture-manifest.json::docs/platform/contracts/architecture-manifest.json",
+        "statementPath": "docs/platform/contracts/architecture-manifest.json",
+        "anchor": null,
+        "statementFileSha256": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 6 owns equality, generator/manual rule and freshness. No generator run or output repair in Step 5.",
+        "evidence": [
+          {
+            "ref": "docs/architecture-manifest.json",
+            "fileSha256": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/architecture-manifest.json",
+                "probe": "288 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/contracts/architecture-manifest.json",
+            "fileSha256": "d47d61b0eb85cd18e5ee986a3a56db7c1bb1834dfdce50f6084c9181b3465dbc",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/contracts/architecture-manifest.json",
+                "probe": "288 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/contracts/architecture-manifest.json; sha256sum docs/architecture-manifest.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/contracts/architecture-manifest.json",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/contracts/architecture-manifest.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-SEM-05",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-SEM-05",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for agent-confinement:spec-agent-confinement-authority; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/agent-confinement/spec.md",
+        "anchor": null,
+        "statementFileSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+            "fileSha256": "b6d997c55c38b7cfc21cc920a292fecb74135277744a20b28f72bb44219b97a5",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+                "probe": "4468 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/dispatch/confinement/authority.mjs",
+            "fileSha256": "3f127d8753c9c7cce876139bcc5f790740af73a40a6532192f48dc1a1b9fa9b7",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "command": "sha256sum src/runner/dispatch/confinement/authority.mjs",
+                "probe": "1902 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/agent-confinement/spec.md; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json; sha256sum src/runner/dispatch/confinement/authority.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/agent-confinement/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "98f10ba191b729edbe2bfbec7a6ade8047466146ef470345688e6f9f6b9456d6",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/agent-confinement/spec.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-SEM-11",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-SEM-11",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for observe-metrics-and-friction:observe-component-specification; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/observe/spec.md",
+        "anchor": null,
+        "statementFileSha256": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+            "fileSha256": "7931ea72d89fdafc5860e17ab8a108da2c9c20c108b7f3fe32c4483a4ba204ee",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+                "probe": "445 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "packages/observe/rust/src/lib.rs",
+            "fileSha256": "b02ac799e3cdb7418cf2add58861c8663f720f780d4380250f5c12550cec2f07",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "command": "sha256sum packages/observe/rust/src/lib.rs",
+                "probe": "25 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/observe/spec.md; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json; sha256sum packages/observe/rust/src/lib.rs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/observe/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/observe/spec.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-SEM-12",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-SEM-12",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for packaging-distribution:runtime-identity-and-activation; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "statementFileSha256": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+            "fileSha256": "eaa561a13d427e4045dbc9f7ab091d6bf45505a3aef685c244d8fe6a74359ab8",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+                "probe": "7460 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "apps/fgctl/src",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "bindingKind": "directory provenance only; no file hash or whole-directory implementation truth asserted",
+            "treeObjectAtHead": "a1417c009fb4e4a5f7b8503bd7d75f78acc40c63",
+            "probes": [
+              {
+                "command": "git rev-parse HEAD:apps/fgctl/src",
+                "probe": "a1417c009fb4e4a5f7b8503bd7d75f78acc40c63"
+              }
+            ]
+          },
+          {
+            "ref": "packages/distribution",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "bindingKind": "directory provenance only; no file hash or whole-directory implementation truth asserted",
+            "treeObjectAtHead": "91994c2dfecde49a53707884476340eb4d6dab95",
+            "probes": [
+              {
+                "command": "git rev-parse HEAD:packages/distribution",
+                "probe": "91994c2dfecde49a53707884476340eb4d6dab95"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json; git rev-parse HEAD:apps/fgctl/src; git rev-parse HEAD:packages/distribution",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-SEM-13",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-SEM-13",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for platform-documentation-unmapped-candidate:historical-file-prior-navigation-before-whole-file-historical-relocation; live legacy source remains until Phase 9.",
+        "statementPath": "docs/specs/runner.md",
+        "anchor": null,
+        "statementFileSha256": "be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+            "fileSha256": "99fb33393b20d41819b328d6e85275f2f5c22a4124b0b683700269db463327b9",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+                "probe": "14299 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/specs/runner.md; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/specs/runner.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-SEM-14",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-SEM-14",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for runner-dispatch-merge-lifecycle:spec-runner-vòng-tự-hành; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/runner/spec.md",
+        "anchor": null,
+        "statementFileSha256": "e99f04b005e41adab13ff07aa37c124cfc9d916d612f064ecf6d963641d13306",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/execution/run.mjs",
+            "fileSha256": "26a4da1545011b427859dcaf05a8203b90fd3749de1fda35f2384ccbecbcd779",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "command": "sha256sum src/runner/execution/run.mjs",
+                "probe": "1059 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "src/workflow/runner.mjs",
+            "fileSha256": "89ee9d6fcda52096f87c0397a0e1de34447a6f40a3a71e662b57a092aba3ba65",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "command": "sha256sum src/workflow/runner.mjs",
+                "probe": "1373 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/spec.md; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json; sha256sum src/runner/execution/run.mjs; sha256sum src/workflow/runner.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/spec.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-01",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-01",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+            "fileSha256": "92a9a3257c81fdaf6e39c72ceefc94be703e5bda9bd6d0ca60201c961af47a3d",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+                "probe": "846 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+            "fileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+                "probe": "124 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/io-contract.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "bf227cc516b22f8fa4af84bb83429dec615e82bcd5efdb1c54c1656eac7b5616",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-14",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-14",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+            "fileSha256": "eaa561a13d427e4045dbc9f7ab091d6bf45505a3aef685c244d8fe6a74359ab8",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+                "probe": "7460 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+            "fileSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+                "probe": "40 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-15",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-15",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "fileSha256": "f403e6d42c0ed734e19358fc77e10ae0c83152561283a790e23b05bf244ad103",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+                "probe": "582 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+            "fileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+                "probe": "69 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-16",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-16",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "fileSha256": "0ef79138c9d1a74ddb7779c112016b01e2169c5b39044bf543d876ac52c321e5",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+                "probe": "88 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+            "fileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+                "probe": "69 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-17",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-17",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+            "fileSha256": "7931ea72d89fdafc5860e17ab8a108da2c9c20c108b7f3fe32c4483a4ba204ee",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+                "probe": "445 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+            "fileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+                "probe": "124 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/observe.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-18",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-18",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-19",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-19",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-20",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-20",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-21",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-21",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-22",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-22",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-23",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-23",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-24",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-24",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-25",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-25",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-26",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-26",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+                "probe": "105 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-27",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-27",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+            "fileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+                "probe": "87 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-A34-28",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-A34-28",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "e4507fbf144e8d996695e65ddf621e3af154416426b7ec385a1be5116c0cf5b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+                "probe": "12267 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+            "fileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+                "probe": "87 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json; sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-NAV-01",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-NAV-01",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "reader-navigation-gap",
+        "authorityKind": "architecture",
+        "statement": "Candidate architecture route for docs/platform/system-architecture/architecture/roadmap.md",
+        "statementPath": "docs/platform/system-architecture/architecture/roadmap.md",
+        "anchor": null,
+        "statementFileSha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 7 owns the candidate-portal route. No current implementation claim or switchboard rewrite.",
+        "evidence": [
+          {
+            "ref": "docs/platform/README.md",
+            "fileSha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/README.md",
+                "probe": "111 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/system-architecture/architecture/roadmap.md",
+            "fileSha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/roadmap.md",
+                "probe": "292 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-architecture/architecture/roadmap.md; sha256sum docs/platform/README.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "documentation-navigation",
+        "route": "Step 7",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/system-architecture/architecture/roadmap.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-NAV-02",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-NAV-02",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "reader-navigation-gap",
+        "authorityKind": "architecture",
+        "statement": "Candidate architecture route for docs/platform/system-architecture/architecture/workspace-topology.md",
+        "statementPath": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "statementFileSha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 7 owns the candidate-portal route. No current implementation claim or switchboard rewrite.",
+        "evidence": [
+          {
+            "ref": "docs/platform/README.md",
+            "fileSha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/README.md",
+                "probe": "111 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/system-architecture/architecture/workspace-topology.md",
+            "fileSha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/workspace-topology.md",
+                "probe": "371 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-architecture/architecture/workspace-topology.md; sha256sum docs/platform/README.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "documentation-navigation",
+        "route": "Step 7",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/system-architecture/architecture/workspace-topology.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-NAV-03",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-NAV-03",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "reader-navigation-gap",
+        "authorityKind": "architecture",
+        "statement": "Candidate architecture route for docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "statementPath": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "anchor": null,
+        "statementFileSha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 7 owns the candidate-portal route. No current implementation claim or switchboard rewrite.",
+        "evidence": [
+          {
+            "ref": "docs/platform/README.md",
+            "fileSha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/README.md",
+                "probe": "111 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+            "fileSha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+                "probe": "296 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-audit.md; sha256sum docs/platform/README.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "documentation-navigation",
+        "route": "Step 7",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-NAV-04",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-NAV-04",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "reader-navigation-gap",
+        "authorityKind": "architecture",
+        "statement": "Candidate architecture route for docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "statementPath": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "anchor": null,
+        "statementFileSha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 7 owns the candidate-portal route. No current implementation claim or switchboard rewrite.",
+        "evidence": [
+          {
+            "ref": "docs/platform/README.md",
+            "fileSha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/README.md",
+                "probe": "111 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          },
+          {
+            "ref": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+            "fileSha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "command": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+                "probe": "223 lines; whole-file binding, no numeric span asserted"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-roadmap.md; sha256sum docs/platform/README.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "documentation-navigation",
+        "route": "Step 7",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-STALE-03",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-STALE-03",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "stale-coordination-row",
+        "authorityKind": "architecture",
+        "statement": "Checkers see producer results, are read-only and declare independence from producer; panel synthesis waits for every seat. No blanket sibling-isolation claim.",
+        "statementPath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "11-current-system-fit-and-conflicts",
+        "statementFileSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "alignment": "doc-fix",
+        "alignmentMeaning": "Authority-separation subpass corrected this exact row; alignment subpass verifies the final bytes without rewriting. Remaining V1 intent is historical/proposal.",
+        "evidence": [
+          {
+            "ref": "src/runner/execution/patterns/reviewed.mjs:280-315",
+            "fileSha256": "263a1263ccd9462d6b8b1cc32cc268b02d051ac05e8370dc1e70f879caca8ec0",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "span": "280-315",
+                "command": "sed -n '280,315p' src/runner/execution/patterns/reviewed.mjs",
+                "probeLine": 280,
+                "probe": "    for (const checkerRole of checkerList) {",
+                "spanSha256": "b5aff6f4a1e10e4c80530b94b8d201067c647daafdbd260397b73b4f0432a879"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/execution/patterns/panel.mjs:57-109",
+            "fileSha256": "98ada7515c42528809070a1b752927dd05595b33ce4cef064a0433644a1dc85a",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "span": "57-109",
+                "command": "sed -n '57,109p' src/runner/execution/patterns/panel.mjs",
+                "probeLine": 57,
+                "probe": "  // Dispatch all panel members in PARALLEL",
+                "spanSha256": "6c3ffdbefa781893c507b6f9685305ad16f39fe869368b66c848a802b281d652"
+              }
+            ]
+          },
+          {
+            "ref": "src/runner/execution/run.mjs:516-538",
+            "fileSha256": "26a4da1545011b427859dcaf05a8203b90fd3749de1fda35f2384ccbecbcd779",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence",
+            "probes": [
+              {
+                "span": "516-538",
+                "command": "sed -n '516,538p' src/runner/execution/run.mjs",
+                "probeLine": 516,
+                "probe": "  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective }) => {",
+                "spanSha256": "d058003c80ab75e9411b5d30261d2d46148f12863143b1c6090560ac3a6e087f"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md; sed -n '280,315p' src/runner/execution/patterns/reviewed.mjs; sed -n '57,109p' src/runner/execution/patterns/panel.mjs; sed -n '516,538p' src/runner/execution/run.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "route": "Step 5",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/system-architecture/architecture/architecture-intent.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    },
+    {
+      "entry": "alignment-X-DEFECT-06",
+      "kind": "refreshed-alignment-row",
+      "row": {
+        "id": "X-DEFECT-06",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "candidate-citation",
+        "authorityKind": "architecture",
+        "statement": "Disposition of bounded observation TRUTH-15",
+        "statementPath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": null,
+        "statementFileSha256": "c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654",
+        "alignment": "aligned",
+        "alignmentMeaning": "Candidate citation/visible label correction already accepted in Step 4; no new edit or rationale rework.",
+        "evidence": [
+          {
+            "ref": "docs/specs/runner.md:2475,2607,2895",
+            "fileSha256": "be8d799a9946248ae94bda7ee54a351600b2c345c6ee23ab0aab12abb3afa7b9",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence",
+            "probes": [
+              {
+                "span": "2475",
+                "command": "sed -n '2475,2475p' docs/specs/runner.md",
+                "probeLine": 2475,
+                "probe": "lập** của vai trò bên gọi: **arity** (1 đơn vị hay N đơn vị) và",
+                "spanSha256": "9f995e3e96412ae99318523ae474182bd3481d075d2522484efa3114467b90f0"
+              },
+              {
+                "span": "2607",
+                "command": "sed -n '2607,2607p' docs/specs/runner.md",
+                "probeLine": 2607,
+                "probe": "Cửa sổ ấy đã đóng. `0029` điền vào đúng chỗ trống `0028` để lại:",
+                "spanSha256": "720d5e1f4ce31eeaff3ac6c70971e182548b4270044ab781488e9765424968ff"
+              },
+              {
+                "span": "2895",
+                "command": "sed -n '2895,2895p' docs/specs/runner.md",
+                "probeLine": 2895,
+                "probe": "- `docs/history/tsk-1m8/` — item trước, phát hiện gap này khi live-test",
+                "spanSha256": "31fa68a73343dd941f1e597fb4580588ff6a05497e1fdc99b834efcd614993fc"
+              }
+            ]
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md; sed -n '2475,2475p' docs/specs/runner.md; sed -n '2607,2607p' docs/specs/runner.md; sed -n '2895,2895p' docs/specs/runner.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "candidate-content-owner",
+        "route": "Step 4",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof",
+        "pinVerification": {
+          "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+          "workingBytes": true,
+          "statementProbe": "sha256sum docs/platform/runner/architecture/h-7af1f0242611.md",
+          "evidenceProbes": "each evidence.probes; whole-file hashes prove binding only"
+        }
+      }
+    }
+  ]
+}

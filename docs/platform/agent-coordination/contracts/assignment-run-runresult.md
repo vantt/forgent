@@ -66,7 +66,7 @@ Current construction has three provenance kinds:
 
 [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
 distinguishes their shapes. Declared/inline builders stamp policy/normalizer
-versions (`src/runner/dispatch/assignment.mjs:455-460,663-667`; constants in
+versions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in
 `src/runner/dispatch/execution-contract.mjs:47` and
 `src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is
 written by `execution/run.mjs:334-338`.

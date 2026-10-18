@@ -24,6 +24,8 @@ holding hundreds of edits on a long-lived branch.
 
 **Consumers include:**
 
+- `apps/fgos-gateway/src/gateway.rs:1187` serves `/contract` from `docs/contracts/fgos-gateway-api-v1.yaml`; include this runtime consumer when preparing the cutover to the candidate registry contract.
+
 - AGENTS/CLAUDE and instruction sources;
 - reading maps and portals;
 - skills and prompt templates;

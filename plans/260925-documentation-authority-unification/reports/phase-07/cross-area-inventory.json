@@ -2287,23 +2287,25 @@
       "authorityKind": "specification",
       "sourcePath": "docs/platform/holder-lock/spec.md",
       "sourceId": "report-path:docs/platform/holder-lock/spec.md",
-      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "sourceDigest": "e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa",
       "targetPath": "docs/platform/holder-lock/spec.md",
       "targetId": "report-path:docs/platform/holder-lock/spec.md",
-      "targetDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetDigest": "e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa",
       "implementationEvidence": [
-        "packages/holder-lock/rust/src/port.rs",
-        "src/holder-lock/index.mjs",
-        "packages/holder-lock/contracts/lock-registry.v1.json"
+        "packages/holder-lock/rust/src/port.rs:375-480",
+        "src/holder-lock/index.mjs:207-328,398-480",
+        "packages/holder-lock/contracts/lock-registry.v1.json",
+        "src/runner/repo-locks.mjs:54-74"
       ],
       "readerGapId": null,
-      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "disposition": "doc-fix; Deferred main-authored holder-lock status-header refresh to the Phase 9 main-import step. Header is identical on main; cd7ed1207 is ancestor of eab4d617b. No candidate header edit here.",
       "blockedDecision": null,
-      "targetStep": "Step 5; Step 6; Step 9",
-      "scopedStatement": "Holder-lock owns kernel resource exclusion, cold-lock registry and its internal routes; hot state/main-checkout remain next-track work.",
+      "targetStep": "Phase 9 main-import step",
+      "scopedStatement": "Holder-lock owns resource exclusion through one registry; main-checkout is cut over through withMainCheckout in repo-locks.mjs (old main-checkout-lock.mjs deleted); only hot-state implementation remains pending.",
       "importCommit": "0d6da9033",
       "mergeCommit": "21555f026",
-      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here",
+      "closingPinEvidence": "step-09-close-pin-verification.json"
     },
     {
       "rowId": "X-MAIN-02",
@@ -2471,23 +2473,25 @@
       "authorityKind": "contract",
       "sourcePath": "docs/platform/holder-lock/spec.md",
       "sourceId": "report-path:docs/platform/holder-lock/spec.md",
-      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "sourceDigest": "e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa",
       "targetPath": "docs/platform/holder-lock/spec.md",
       "targetId": "report-path:docs/platform/holder-lock/spec.md",
-      "targetDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetDigest": "e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa",
       "implementationEvidence": [
         "packages/holder-lock/contracts/lock-registry.v1.json",
-        "src/holder-lock/registry.mjs",
-        "src/holder-lock/lock-scope.mjs"
+        "src/holder-lock/registry.mjs:14-30",
+        "src/holder-lock/lock-scope.mjs:1-71",
+        "src/runner/repo-locks.mjs:54-74"
       ],
       "readerGapId": null,
-      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "disposition": "doc-fix; Deferred main-authored holder-lock status-header refresh to the Phase 9 main-import step. Header is identical on main; cd7ed1207 is ancestor of eab4d617b. No candidate header edit here.",
       "blockedDecision": null,
-      "targetStep": "Step 5; Step 6; Step 9",
-      "scopedStatement": "Cold-lock names, rank, scope, paths and fences come from one registry; main-checkout/hot-state are not cut over in this track.",
+      "targetStep": "Phase 9 main-import step",
+      "scopedStatement": "Holder-lock owns resource exclusion through one registry; main-checkout is cut over through withMainCheckout in repo-locks.mjs (old main-checkout-lock.mjs deleted); only hot-state implementation remains pending.",
       "importCommit": "0d6da9033",
       "mergeCommit": "21555f026",
-      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here",
+      "closingPinEvidence": "step-09-close-pin-verification.json"
     },
     {
       "rowId": "X-LOCK-05",
@@ -2502,22 +2506,24 @@
       "authorityKind": "specification",
       "sourcePath": "docs/platform/holder-lock/spec.md",
       "sourceId": "report-path:docs/platform/holder-lock/spec.md",
-      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "sourceDigest": "e35f39ecd18672a75addcafe0ddf32d4653e1b152c87f3792fe6bbf28dc428fa",
       "targetPath": "docs/platform/packaging-distribution/spec.md",
       "targetId": "report-path:docs/platform/packaging-distribution/spec.md",
-      "targetDigest": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+      "targetDigest": "802a1c1c2c5459bb7567307b5a0c22df87d64a136ac1b28250877235740db9d1",
       "implementationEvidence": [
-        "src/setup/registrations.mjs",
-        "src/setup/holder-lock-checks.mjs"
+        "src/setup/registrations.mjs:2264-2302",
+        "src/setup/holder-lock-checks.mjs:174-223,445-464,519-557",
+        "docs/platform/packaging-distribution/spec.md:530-533"
       ],
       "readerGapId": null,
-      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "disposition": "aligned; Resolved: candidate packaging-distribution/spec.md:530-533 now includes lock setup/doctor rows 5g/7/7b; no missing candidate conservation remains for P7-DOC-GAP-02.",
       "blockedDecision": null,
-      "targetStep": "Step 5; Step 6; Step 9",
+      "targetStep": "resolved; bounded close re-review",
       "scopedStatement": "Setup/doctor owns discoverability of lock defaults, directories, fences and probes; activation validation gates release readiness.",
       "importCommit": "0d6da9033",
       "mergeCommit": "21555f026",
-      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here",
+      "closingPinEvidence": "step-09-close-pin-verification.json"
     },
     {
       "rowId": "X-LOCK-06",

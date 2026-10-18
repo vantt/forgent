@@ -1,0 +1,125 @@
+✔ ADR<n> form is recognized (1.796746ms)
+✔ bare NNNN form is recognized only when known (0.2501ms)
+✔ a bare id inside an ADR<id> match is not double-counted (0.170736ms)
+✔ multiple distinct ids on one line (0.133639ms)
+✔ a superseded id cited with no acknowledgement reports a dead-framing finding (0.328482ms)
+✔ citing both the superseded id and its superseding id on the same line reports zero (0.163059ms)
+✔ citing a decision that was never superseded reports zero findings (0.131122ms)
+✔ CLI run over a fixture reports the dead-framing finding and exits 1 (40.209293ms)
+✔ CLI run over a fixture with no drift exits 0 (45.205319ms)
+✔ a paren with real prose is a gloss (3.805238ms)
+✔ a paren with only other id tokens is not a gloss (0.353866ms)
+✔ an empty paren is not a gloss (0.18838ms)
+✔ no paren at all is not a gloss (0.155444ms)
+✔ a bare ADR citation with no gloss reports bare-citation (0.828604ms)
+✔ an ADR citation with a real gloss reports nothing (0.205375ms)
+✔ a RUL citation with only the old area-suffix, no real gloss, still reports bare-citation (0.210663ms)
+✔ a D-local id cited outside its own CONTEXT.md reports d-local-outside-home, gloss or not (0.215885ms)
+✔ a D-local id cited inside its OWN CONTEXT.md reports nothing (0.173077ms)
+✔ a comma-list of D-local ids each report their own finding (0.221957ms)
+✔ a slash-separated D-local list reports each id separately (0.177532ms)
+✔ a heading-parenthetical D-local citation still reports (0.138377ms)
+✔ a citation inside a fenced code block is skipped (0.133792ms)
+✔ a baselined finding does not report as new, a genuinely new one does (0.36894ms)
+✔ a shifted line number alone does not make a baselined finding report as new (tsk-3x8 F1: content-keyed, not line-keyed) (0.17987ms)
+✔ two citations of the same id on different lines/text stay distinct (0.16182ms)
+✔ a genuinely new Nth occurrence of an already-duplicated key is not silently absorbed (tsk-6at: count consumption, not membership) (0.222269ms)
+✔ findNewFindings/baselineFromFindings do not throw on a "__proto__" file (tsk-1pf: Object.create(null) hardening) (0.187449ms)
+✔ --write-baseline snapshots current findings, and a bare re-run against the SAME tree exits 0 (78.243266ms)
+✔ a NEW finding appended after --write-baseline still fails (78.006912ms)
+✔ a line inserted BEFORE a baselined finding does not make it report as new (tsk-3x8 F1: the exact hand-verified repro, CLI level) (82.210803ms)
+✔ CLI run against the real repo root, with the checked-in baseline, exits 0 (6895.369399ms)
+✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (3.299358ms)
+✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.220562ms)
+✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.762567ms)
+✔ accounted edit: file modified with valid reviewed exception passes (0.965156ms)
+✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.749563ms)
+✔ unexpected deletion: baselined file missing without exception is refused (0.590642ms)
+✔ malformed baseline: schema validator rejects invalid baseline structures (0.603492ms)
+✔ malformed exception: schema validator rejects invalid exception objects (4.299694ms)
+✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.311729ms)
+✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.870947ms)
+✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (5.477206ms)
+✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.697407ms)
+✔ symlink target: retargeting a symlink to another file of equal bytes is refused (0.695227ms)
+✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.599099ms)
+✔ classification: includes curated generated projections alongside maintained authority (0.110911ms)
+✔ CLI: exits 0 on clean tree and exits 1 on finding (148.2128ms)
+✔ live self-check: repository baseline and ratchet verify cleanly (110.963592ms)
+✔ policy-aware: permits edited and new generated projections without exception (0.649087ms)
+✔ policy-aware: permits new and edited history-evidence payloads without exception (1.527302ms)
+✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.837222ms)
+✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.787093ms)
+✔ safety: detects and refuses class spoofing attempts in baseline (0.622991ms)
+✔ messages: ensure messages do not call non-authority payloads maintained authority (0.477936ms)
+✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.619617ms)
+✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.54592ms)
+✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.540436ms)
+✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.565776ms)
+✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.687673ms)
+✔ reproduction rejects missing or repository output ["consistency"] (38.547337ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (37.595558ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (37.46222ms)
+✔ direct audit rejects a symlink output before reading the corpus (44.308458ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (50.363685ms)
+✔ direct audit rejects a hardlink output before reading the corpus (45.620751ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19190.607051ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (19269.758076ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 65
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38774.795019
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19190.607051ms)
+  AssertionError [ERR_ASSERTION]: checks.mjs
+  {"label":"--output-dir","ok":false,"A":{"historicalOffenders":["plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"],"historicalEqual":false,"newWorkingViolations":["plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"],"accountedPairs":[{"commit":"9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"A46 / Phase 7 authorized plan accounting"},{"commit":"2f0d4a5502f0259da212d840abd49ec6a95f725d","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"19d37a8a17ff598e98bd30770118e60496e67d7a","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"573451ffe22ad45749ec68db82601ad3fc4484e2","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"e8d72c8aa0c02f25c5023921b398fda9dc270186","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"0accd6f6fa1cce873cb126522fc613b9f0c919ae","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"1db62709354f41ea7850b147212d4d942e01a54e","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"1db62709354f41ea7850b147212d4d942e01a54e","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"7d10459005abe1934998e0052e2d952c8afb1900","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"bd217ecf12bc75929d63c2285a838254b1b825cd","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L10-35a"},{"commit":"bd217ecf12bc75929d63c2285a838254b1b825cd","path":"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","authority":"L10-35a"},{"commit":"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd","path":"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","authority":"A21"},{"commit":"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd","path":"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","authority":"A21"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md","authority":"A3"}],"unaccountedPairs":[],"ok":false},"B":true,"H":{"files":612,"byStatus":{"promoted":3,"candidate":214,"legacy-current":0,"non-authority":1,"unrouted":394},"exemptUnrouted":302,"checked":217,"findings":0,"byType":{}},"findings":[],"I":{"equal":false,"links":["docs/platform/**","docs/platform/<area","docs/platform/README.md","docs/platform/holder-lock/spec.md","docs/platform/packaging-distribution/README.md","docs/platform/packaging-distribution/vision.md","docs/platform/process/spec.md","docs/platform/session-identity/spec.md"],"equalToHEAD":true,"frozenBaselineUnchanged":true}}
+  
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (19269.758076ms)
+  AssertionError [ERR_ASSERTION]: checks.mjs
+  {"label":"--output-dir","ok":false,"A":{"historicalOffenders":["plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md","plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"],"historicalEqual":false,"newWorkingViolations":["plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"],"accountedPairs":[{"commit":"9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"A46 / Phase 7 authorized plan accounting"},{"commit":"2f0d4a5502f0259da212d840abd49ec6a95f725d","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"19d37a8a17ff598e98bd30770118e60496e67d7a","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"573451ffe22ad45749ec68db82601ad3fc4484e2","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"e8d72c8aa0c02f25c5023921b398fda9dc270186","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"0accd6f6fa1cce873cb126522fc613b9f0c919ae","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"1db62709354f41ea7850b147212d4d942e01a54e","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"1db62709354f41ea7850b147212d4d942e01a54e","path":"plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"7d10459005abe1934998e0052e2d952c8afb1900","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L11-21 / Phase 7 authorized plan accounting"},{"commit":"bd217ecf12bc75929d63c2285a838254b1b825cd","path":"plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md","authority":"L10-35a"},{"commit":"bd217ecf12bc75929d63c2285a838254b1b825cd","path":"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","authority":"L10-35a"},{"commit":"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd","path":"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md","authority":"A21"},{"commit":"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd","path":"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md","authority":"A21"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md","authority":"A3"},{"commit":"1cc92d7db383b78dafebebf6a057c3d87163afa0","path":"plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md","authority":"A3"}],"unaccountedPairs":[],"ok":false},"B":true,"H":{"files":612,"byStatus":{"promoted":3,"candidate":214,"legacy-current":0,"non-authority":1,"unrouted":394},"exemptUnrouted":302,"checked":217,"findings":0,"byType":{}},"findings":[],"I":{"equal":false,"links":["docs/platform/**","docs/platform/<area","docs/platform/README.md","docs/platform/holder-lock/spec.md","docs/platform/packaging-distribution/README.md","docs/platform/packaging-distribution/vision.md","docs/platform/process/spec.md","docs/platform/session-identity/spec.md"],"equalToHEAD":true,"frozenBaselineUnchanged":true}}
+  
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

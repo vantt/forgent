@@ -1,0 +1,162 @@
+{
+  "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+  "authority": "L11-24",
+  "originalAllowlist": "plans/260925-documentation-authority-unification/reports/phase-07/allowed-paths.json",
+  "originalAllowlistSha256": "9a3771f6c27b50fc8b3217fb2dd52ddcc69ea685cb3ae138caa252b636504330",
+  "unionRule": "exact path equality for extra lanes, original prefix rules preserved",
+  "lanes": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "lane": "retired-unit decisions",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/allowed-paths.json",
+      "lane": "phase-06 allowed-paths widening",
+      "firstParentNonMergeCommits": [
+        "2296413a2193eb4a63e25ad64b83d2a022012544"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-specs-ui.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "lane": "candidate-unverified lists",
+      "firstParentNonMergeCommits": [
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "lane": "reproduction manifests",
+      "firstParentNonMergeCommits": [
+        "681a8600505d09a872effe8e171c21967d407a02",
+        "2296413a2193eb4a63e25ad64b83d2a022012544"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "lane": "reproduction manifests",
+      "firstParentNonMergeCommits": [
+        "681a8600505d09a872effe8e171c21967d407a02",
+        "2296413a2193eb4a63e25ad64b83d2a022012544"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "lane": "native registry persistence",
+      "firstParentNonMergeCommits": [
+        "681a8600505d09a872effe8e171c21967d407a02",
+        "879a4d5fe71ffea6ae7e34a3bd04e2d606b6970d",
+        "dbb86522ac18a4bed317347aa8833d9cd6a3d7aa"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "lane": "citation baseline append",
+      "firstParentNonMergeCommits": [
+        "2296413a2193eb4a63e25ad64b83d2a022012544"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "lane": "ratchet exceptions",
+      "firstParentNonMergeCommits": [
+        "2296413a2193eb4a63e25ad64b83d2a022012544"
+      ],
+      "authority": "L11-24",
+      "scope": "historical plan-owned accounting data only; no present edit authorized outside assignment"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "lane": "closing routing note required by assignment items 3 and 5",
+      "firstParentNonMergeCommits": [],
+      "authority": "L11-24; current assignment",
+      "scope": "one cutover note / consumer inventory addition only"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "lane": "closing routing note required by assignment items 3 and 5",
+      "firstParentNonMergeCommits": [],
+      "authority": "L11-24; current assignment",
+      "scope": "one cutover note / consumer inventory addition only"
+    }
+  ]
+}

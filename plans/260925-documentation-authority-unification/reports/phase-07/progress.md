@@ -2,24 +2,16 @@
 
 ## State
 
-- Owner authorization: A44, 2026-10-17.
-- Standing delegation: A42; ordinary owner-routed choices are Lead decisions.
-- Independent-review rule: A38 extended through Phase 7 by L11-1.
-- Planning: revised after independent red-team; P7-1..P7-19 mapped and addressed.
-- Execution: both independent Step 1 A38 reviews are complete at commit `135230fb3`;
-  the bounded rework and Lead decisions L11-8..L11-11 are authored. Step 2 authoring
-  is complete and no candidate content changed.
-- Completed steps: Steps 1 and 2; the independent bounded review returned 39/39 ok
-  at commit `1d78440f9`, with zero rework and two non-blocking housekeeping notes.
-- Steps 3 and 4: accepted after the bounded independent 15/15 re-review; A45 and L11-12..L11-14 are applied.
-- Bounded re-review (Lead note): 15/15 ok, 0 rework, pins match, at `df3626178`;
-  report `review-a38-step-03-step-04-bounded-rework-01.md`. Steps 3 and 4 accepted.
-- Current action: **STOP / N1 author re-entry required.** Frozen holder-lock header still waits for an Event Store decision already signed. One native carry completed; full inventory was terminated and queued global work cancelled. The changed-row request is withdrawn pending author repair; no closing proof or acceptance is claimed.
-- L11-15: main `0d6da9033` landed through merge `21555f026`. The holder-lock and process specs and component-boundary merge edit join Step 5/6 inventory. All eight main-imported identity-scope changes ride the Step 9 native carry; unsynced identity before that carry is expected.
-- Assignment override: no `fgos` CLI may run this turn. New evidence artifacts use the established `reports/phase-07/` sibling naming pattern; convention resolution cannot be rerun under this explicit restriction. No generated naming policy is changed.
-- Final turn verification: changed JSON parses; matrix/stop and unpark assertions
-  pass; strict candidate-status checks 217 documents with zero findings;
-  `git diff --check` passes; all changed paths remain inside the assignment scope.
+- Steps 1–8 have independent review; Step 9 remains **blocked**, not awaiting-owner-review. Draft close account: `phase-07-scorecard.md`.
+- Lead directions L11-23..27 are recorded. X-MAIN-01/X-LOCK-04 are doc-fix/deferred (main-checkout cut over, only hot state pending); X-LOCK-05 and P7-DOC-GAP-02 are resolved; P7-DOC-GAP-04 is narrowed; PARK-PROTECTED-01 is unparked, branch-correct divergence accepted.
+- H1: L11-22 and `step-09-close-suite-attribution.json` already record the Lead suite decision. H2: owner answer/Lead record is pending on corrected attribution — 35 unknown files equal every docs/platform file changed since B0 `6f0f39ca1`, 6 main-touched and 29 plan-only, 2,436 claims and 233 gaps. No ratification or own-work-accounted claim.
+- Final file pins/probes: `step-09-close-pin-verification.json`; 22 Step 3 rows and 109 Step 5 rows. The source red-team counted 26 stale statement hashes; 51 Step 5 rows needed changed pins/citations.
+- Candidate edit: only Assignment line 69's stamp citations; production extractor changes two units, 57/59 identical. Three existing decision target bindings rebound, pending review. `step-09-close-assignment-unit-delta.json`, `step-09-close-assignment-target-rebindings.json`.
+- **N1 blocker:** native carry resolves committed treeish; this worker cannot write git. Runner must commit corrected candidate bytes before native re-carry, D/E/comparator and exact open-set delta proof. They were not rerun on stale HEAD. ONE bounded request is prepared/held: `review-request-a38-step-09-close-rework-01.md`.
+- Check A passes against allowlist ∪ exact L11-24 lanes, zero outside paths; original allowlist untouched. Check I is **red only for the imported main delta** (Holder-lock, Process, Session Identity spec links), frozen baseline unchanged. `step-09-close-checks.json` records exact paths/commands and head-before-runner scope.
+- Fresh strict H: exit 0, 217 checked, zero findings. Doc-tooling tests: **65/67**, two reproduction checks reject the required working Phase 8/9 plan paths; ownership assertions pass after three target rebindings. Logs and both attempts: `step-09-close-doc-tests.json`. No full suite run or checker/fixture bypass.
+- Checkpoint: existing 6/6, zero false flags; current authored corrections still need independent bounded verdict. Scorecard retains **no fresh seal** wording and Accepted-versus-Candidate/Draft inconsistency.
+- Explicit assignment: no fgOS CLI, git writes, scripts/checker/baseline/protected-reader edits or main import. Existing plan-local naming is reused under that restriction.
 
 Phase 6 is closed. Its A1-A44 answers remain authoritative at
 `../phase-06/owner-answers.md`; this file does not reopen them.
@@ -655,3 +647,9 @@ ONE bounded request: `review-request-a38-step-09-runner-n1-01.md`, **65 mandator
 No package-producer blocker remains. Independent semantic re-review, application of its verdicts and later checkpoint/truth-sample, suite and formal protected-file responsibilities remain with the Lead. This is neither Step 9 acceptance nor Phase 7 closure. No seed, semantic verdict, approval or full-suite result was produced.
 
 Final scope validation: `git diff --check` passes; 44 changed paths, all inside the declared plan scope; no working identity-source, production, checker, baseline or test diff; Phase 7 plan remains unchanged. Request size 11,373 bytes; three part sizes 144,181 / 15,968 / 47,041 bytes. MDView preview was attempted once and failed on its read-only database; no settings or permissions were changed. This preview limitation is not a package blocker. Final evidence: `step-09-runner-n1-final-validation.json`.
+
+## Closing red-team rework handoff
+
+The current State block and `phase-07-scorecard.md` govern this handoff; older step narratives are historical receipts. L11-23..27 record the supplied Lead directions, with no H2 ratification. The accounting union enumerates 15 historical outside paths / 19 path-commit occurrences plus the two presently required Phase 8/9 plan-note paths. No allowed-paths file is widened. The single re-review pack includes refreshed rows, the accepted reading-map disposition, two review-field refreshes and three existing Assignment target rebindings; native proof is a release prerequisite, not a reviewer heavy job.
+
+Remaining work requires the runner-committed candidate tree: native re-carry limited to Assignment, exact D/E/comparator/open-set delta, reproduction manifest-data accounting of that final commit, and independent re-review. No artifact here asserts that 233 gaps or the old comparator errors survive the new positional-unit edit unchanged. H2 owner/Lead answer remains separate and pending.

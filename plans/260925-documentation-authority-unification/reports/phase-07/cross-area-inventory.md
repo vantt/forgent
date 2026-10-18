@@ -56,3 +56,7 @@ Main `0d6da9033` merged at `21555f026`. Ten added rows are a post-B0 supplement,
 | X-LOCK-05 | specification | `docs/platform/holder-lock/spec.md` — Setup/doctor owns discoverability of lock defaults, directories, fences and probes; activation validation gates release readiness. | Step 5; Step 6; Step 9 |
 | X-LOCK-06 | contract | `docs/platform/process/spec.md` — Process judge and Node leaf use shared judge vectors; no PID means unknown, zombie means dead, unseen namespace remains unknown. | Step 5; Step 6; Step 9 |
 | X-LOCK-07 | specification | `docs/platform/process/spec.md` — Only linux-gate domain primitives ship; Windows/macOS domains and full containment/gate primitives remain run-supervisor work. | Step 5; Step 6; Step 9 |
+
+## Closing corrections
+
+L11-23..26 supersede the X-MAIN-01/X-LOCK-04 next-track main-checkout wording: main-checkout is cut over; hot-state alone is pending, and the main-authored header refresh routes to Phase 9 main-import. X-LOCK-05 conservation is resolved at packaging-distribution/spec.md:530-533. Current scoped statements, file digests and evidence spans are in the machine inventory and alignment rows.

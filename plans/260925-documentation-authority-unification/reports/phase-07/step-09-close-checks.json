@@ -1,0 +1,147 @@
+{
+  "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+  "boundary": "working-byte verification plus first-parent history through this HEAD; runner commit itself not yet present",
+  "A": {
+    "posture": "pass with explicitly extended accounting lanes",
+    "commitsChecked": 36,
+    "historicalExtraPathOccurrences": 19,
+    "historicalExtraDistinctPaths": 15,
+    "historyViolations": [],
+    "workingPaths": [
+      "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/cross-area-inventory.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/cross-area-inventory.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/phase-07-scorecard.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-01/part-02.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/review-request-a38-step-09-close-rework-01.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-03-contract-boundary-matrix.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-03-contract-boundary-matrix.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-ratchet-changes.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-accounting-lanes.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-accounting-review-refresh.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-assignment-target-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-assignment-unit-delta.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-checks.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-doc-tests-initial.log",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-doc-tests.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-doc-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-pin-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07/step-09-package-blocker.json"
+    ],
+    "workingViolations": [],
+    "allowedPathsSha256": "9a3771f6c27b50fc8b3217fb2dd52ddcc69ea685cb3ae138caa252b636504330",
+    "lanesSha256": "60b1e453c92d1ca3a78dd1a599acc47042f64a4a457d343a7a47f20141900c4f"
+  },
+  "I": {
+    "posture": "red only for the imported main delta",
+    "equalToFrozenBaseline": false,
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "importedDelta": [
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "removed": [],
+    "frozenBaselineUnchanged": true,
+    "baselineSha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1"
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "result": {
+      "counts": {
+        "files": 612,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 394
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    }
+  },
+  "correctedAttribution": {
+    "changedEqualsUnknown": true,
+    "files": 35,
+    "mainTouched": [
+      "docs/platform/component-boundary.md",
+      "docs/platform/event-store/spec.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "docs/platform/process/spec.md"
+    ],
+    "planOnly": [
+      "docs/platform/README.md",
+      "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "docs/platform/architecture-map.md",
+      "docs/platform/contracts/architecture-manifest.json",
+      "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "docs/platform/observe/decisions/observe-component-architecture.md",
+      "docs/platform/observe/spec.md",
+      "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "docs/platform/packaging-distribution/spec.md",
+      "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "docs/platform/platform-foundations.md",
+      "docs/platform/proposals/README.md",
+      "docs/platform/proposals/component-authority-boundary-map.md",
+      "docs/platform/runner/README.md",
+      "docs/platform/runner/architecture/h-69197b459754.md",
+      "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "docs/platform/runner/spec.md",
+      "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "docs/platform/ui-spec/README.md",
+      "docs/platform/work-state/README.md",
+      "docs/platform/work-state/spec.md"
+    ],
+    "claims": 2436,
+    "gaps": 233,
+    "decision": "H2 pending owner and Lead record"
+  },
+  "N1": {
+    "nativeCarry": "not run; corrected bytes uncommitted and git writes forbidden",
+    "D/E/comparator": "not rerun on authored bytes; historical outputs are not refreshed proof"
+  },
+  "protectedDivergence": {
+    "path": "docs/specs/reading-map.md",
+    "diffNumstat": "10\t2\tdocs/specs/reading-map.md",
+    "disposition": "L11-25 branch correct, divergence accepted; no edit this turn"
+  },
+  "gitDiffCheck": {
+    "exit": 0
+  }
+}

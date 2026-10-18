@@ -302,7 +302,7 @@ the independent findings without authorizing promotion, cutover or retirement.
 - **Reason:** an internal decision arrow is not a new wire contract, but its mapping
   still needs an explicit owner-readable explanation.
 - **Evidence:** `review-a38-step-03-04-architecture-01.md` R4;
-  `src/runner/loop.mjs:1011-1030`; `src/workflow/runner.mjs:83-97,164-166`.
+  `src/runner/loop.mjs:901-915,1538`; `src/workflow/runner.mjs:337,703`.
 - **Affected rows/steps:** S3-09; Step 3; owner queue item
   `P7-DOC-GAP-01` below.
 
@@ -532,20 +532,16 @@ remaining owner-only actions named above.
   Work/Workflow lifecycle action, but the policy is not explained in the runner
   documentation.
 - **Expected owner:** runner specification owner.
-- **Evidence:** S3-09; `src/runner/loop.mjs:1011-1030`;
-  `src/workflow/runner.mjs:83-97,164-166`.
+- **Evidence:** S3-09; `src/runner/loop.mjs:901-915,1538`;
+  `src/workflow/runner.mjs:337,703`.
 - **Boundary:** document the mapping in its owner document; do not mint another
   contract or imply the Run Result Evaluator mutates Work.
 
-### P7-DOC-GAP-02 — Carry main's lock setup/doctor rows into the candidate distribution spec
+### P7-DOC-GAP-02 — Lock setup/doctor candidate conservation resolved
 
-- **Status:** routed to the Step 9 closing carry of main imports.
-- **Gap:** main `0d6da9033` added lock check/fix rows (5g, 7, 7b) to legacy
-  `docs/specs/distribution.md`; candidate `docs/platform/packaging-distribution/spec.md`
-  does not carry them yet.
-- **Evidence:** X-LOCK-05; `src/setup/registrations.mjs:2223-2258`;
-  `src/setup/holder-lock-checks.mjs`.
-- **Boundary:** documentation conservation only; no code change.
+- **Status:** resolved in the candidate; bounded close re-review requested.
+- **Evidence:** `docs/platform/packaging-distribution/spec.md:530-533` contains 5g/7/7b; `src/setup/registrations.mjs:2264-2302` registers checks/fixes; `src/setup/holder-lock-checks.mjs:174-223,445-464,519-557` implements them. Current hashes and probes: `step-09-close-pin-verification.json`, X-LOCK-05.
+- **Boundary:** conservation only, no runtime or authority change.
 
 ### P7-DOC-GAP-03 — Carry main's new laws and instruction changes into candidates
 
@@ -558,17 +554,12 @@ remaining owner-only actions named above.
 - **Boundary:** documentation conservation only; a law change is never edited in place
   by this plan; no code change.
 
-### P7-DOC-GAP-04 — Candidate defects found by the fresh readers
+### P7-DOC-GAP-04 — Reader findings narrowed to promotion work
 
-- **Status:** routed; none changed a score (`fresh-reader-p7-r2-score.md`).
-- **Step 9 (with the main-import carry):** the holder-lock rank table lacks the Event
-  Store ranks 58 and 70 declared by `event-store/spec.md` §4; `component-boundary.md` has
-  no Event Store row; the holder-lock row and holder-lock spec still say state locks wait
-  "until the event store decision" although D-ADR0055 is signed.
-- **Phase 9 (promotion):** `docs/platform/README.md` calls areas Accepted while candidate
-  headers say Candidate/Draft; L10 in `platform-foundations.md` still cites L3 rule 4,
-  which D-ADR0055 superseded (law text carried verbatim; reconcile at promotion).
-- **Boundary:** documentation only; no code change.
+- **Status:** Step 9 conservation resolved; remaining promotion issues deferred to Phase 9. No reader score changed.
+- **Resolved evidence:** `docs/platform/holder-lock/spec.md:126-131` carries planned Event Store ranks 58/70; `docs/platform/component-boundary.md:85` carries the signed-design Event Store row; `holder-lock/spec.md:8,247` waits for implementation of D-ADR0055, not for its decision.
+- **Still deferred:** candidate README Accepted versus Candidate/Draft headers; L10's verbatim L3 rule-4 reference and its D-ADR0055 supersession must be reconciled at promotion. Scorecard explicitly names both candidate inconsistencies.
+- **Boundary:** documentation only; no law rewritten or authority promoted.
 
 ### P7-DOC-GAP-05 — Main's retired-name guard rejects carried source text in component-boundary
 
@@ -603,3 +594,38 @@ remaining owner-only actions named above.
 - **Why:** the plan changes no code; waiting for a green host suite would block on main-owned
   failures that Phase 7 cannot fix (RUL104: no gate edits).
 - **Scope:** Phase 7 close only. Landing on main still requires the dead-vocabulary guard green.
+
+### L11-23 — Correct main-checkout alignment and defer the main-authored header
+
+- **Decision (Lead directions in closing brief, A42):** X-MAIN-01 and X-LOCK-04 become `doc-fix`, deferred to Phase 9 main-import header refresh. Main-checkout is already cut over; only hot-state implementation remains pending.
+- **Reason/evidence:** `cd7ed1207` is an ancestor of `eab4d617b`; `src/runner/repo-locks.mjs:54-74` exposes `withMainCheckout`; `src/runner/main-checkout-lock.mjs` is deleted. The stale holder-lock header clause is identical on main. Refresh its main-door/worktree-admin wording in the Phase 9 import step, preserving the separate signed Event Store pending-implementation fact.
+- **Scope/proof:** no candidate header edit; both rows re-pinned in `step-09-close-pin-verification.json`.
+
+### L11-24 — Account every additional plan-owned data lane explicitly
+
+- **Decision (Lead directions in closing brief, A42):** Check A uses the original Phase 7 allowlist ∪ the exact paths in `step-09-close-accounting-lanes.json`. This is an explicit accounting amendment, not a claim that the original allowlist already covered them. No allowed-paths file is edited.
+- **Lanes and commits:** native registry persistence — `dbb86522a`, `879a4d5fe`, `681a86005`; all eight candidate-unverified lists — `dbb86522a`; citation baseline append — `2296413a2`; both reproduction manifests — `2296413a2`, `681a86005`; ratchet exceptions — `2296413a2`; retired-unit decisions — `dbb86522a`; Phase 6 allowed-paths widening — `2296413a2`. The JSON records every exact path and full commit id, including repeated touches (19 path/commit occurrences, 15 distinct paths).
+- **Reason:** these are plan-owned accounting records written by first-parent non-merge commits. They must be visible in the close account; this does not authorize further edits to scripts/baselines or alter native checks. The Phase 8 consumer and Phase 9 cutover-note paths are also named exact lanes for the present closing brief.
+- **Check I:** red only for the imported main delta: `docs/platform/holder-lock/spec.md`, `docs/platform/process/spec.md`, `docs/platform/session-identity/spec.md`. Frozen baseline remains unchanged; no frozen-I-green claim.
+- **Evidence:** `step-09-close-accounting-lanes.json` and `step-09-close-checks.json`. Any path outside the union stops the close.
+
+### L11-25 — Accept protected reading-map divergence and unpark
+
+- **Decision (Lead directions in closing brief, A42):** PARK-PROTECTED-01 is closed as branch correct, divergence accepted and recorded; unpark it.
+- **Reason/evidence:** `git diff eab4d617b HEAD -- docs/specs/reading-map.md` is +10/-2: the transition banner plus two compounding→knowledge fixes preserve correct branch navigation. Raw equality with main is false and is not asserted.
+- **Scope:** no protected file edit. Phase 9 retains this navigation in its reviewed cutover merge. This is a named provenance exception to raw equality, not a general protected-path waiver.
+
+### L11-26 — Refresh final evidence and repair the bounded Assignment citation
+
+- **Decision (Lead directions in closing brief, A42):** re-pin Step 3/5 final authored bytes; correct S3-09/P7-DOC-GAP-01 and X-LOCK-05 citations. Resolve the latter's candidate-conservation gap. Repair Assignment line 69 to cite `dispatch/assignment.mjs:443-444,626-628`.
+- **Reason/evidence:** these are the declared/inline provenance stamp sites; the old spans no longer show those stamps. `step-09-close-pin-verification.json` provides whole-file SHA and one-line probes per numeric span; `step-09-close-assignment-unit-delta.json` uses the unchanged production extractor and finds two affected units (Assignment heading and block 10), with 57/59 unit objects unchanged.
+- **Target rebinding:** three existing decision targets are rebound to the two current extractor digests (`step-09-close-assignment-target-rebindings.json`), preserving source tuples and pending review. This repairs the three target-digest drifts causing the first 65/67 doc-test run; no native identity is assigned.
+- **N1 boundary:** candidate fix must be runner-committed before native re-carry, D/E/comparator and independent review. They are not claimed here on stale HEAD. One bounded request is prepared and held until committed-byte package evidence exists. No approvals carry.
+
+### L11-27 — Publish a draft scorecard with explicit close blockers
+
+- **Decision (Lead directions in closing brief, A42):** `phase-07-scorecard.md` is a draft close account. Keep separate Lead-fill placeholders for H1 suite decision and H2 A46 ratification; point at existing L11-22 for H1 facts without rewriting its decision.
+- **Reason:** the historical review and checkpoint evidence is useful now, but the candidate N1 repair and H2 answer prevent a passing close claim. Disclose stale key hashes/no fresh seal and the Accepted-versus-Candidate/Draft inconsistency.
+- **Corrected H2 facts (no ratification):** 35 unknown files equal every `docs/platform/**` file changed since B0 `6f0f39ca1`: 6 main-touched, 29 plan-only; 2,436 claims, 233 gaps. Source: closing red-team H2, `step-09-runner-n1-open-sets.json`, and `step-09-package-blocker.json.correctedAttribution`. Owner answer and Lead record are pending; do not call the Phase 7 own work fully accounted.
+
+Closing verification note for L11-26/L11-27: the first 65/67 doc-test run exposed three stale target digests, now rebound. The second run remains 65/67 because both historical reproduction `checks.mjs` reject the required working Phase 8/9 plan paths; ownership assertions pass and historical unaccountedPairs is empty. `step-09-close-doc-tests.json` and its logs retain both results. L11-24 current Check A accounts these exact paths; this does not rewrite the older checker or assert its green status. Next committed-byte package must account the runner commit through the approved reproduction-manifest data process.

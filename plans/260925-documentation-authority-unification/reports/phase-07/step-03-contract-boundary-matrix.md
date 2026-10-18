@@ -22,7 +22,7 @@ coordination rows inventoried for Step 5.
   REST registry row. `confinement-authority.v1` moves to verified-free CTR011;
   that name is a documentation-only registry label, not a code version stamp.
 - The S3-13 implementation citation now points to the shape check at
-  `src/runner/dispatch/config.mjs:395`; S3-09 no longer attributes RunResult
+  `src/runner/dispatch/config.mjs:394`; S3-09 no longer attributes RunResult
   consumption to `fanout-batch.mjs`.
 - X-STALE-01..06 are inventory-only and keep Step 5 as their sole writer.
 
@@ -42,3 +42,7 @@ candidate edits return to independent architecture/contract review.
 - candidate-link/citation checks and protected-boundary check;
 - independent A36 architecture/contract review requested in the combined
   Steps 3-4 request.
+
+## Closing citation refresh
+
+S3-09 now cites `loop.mjs:103,901-915,1538` and `workflow/runner.mjs:337,703`. All 22 rows have current statement and evidence file hashes, spans and probes in the machine matrix and `step-09-close-pin-verification.json`. The prior review verdict is historical; bounded re-review of refreshed rows is pending.

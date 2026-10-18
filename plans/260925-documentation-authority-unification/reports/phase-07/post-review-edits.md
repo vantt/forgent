@@ -107,3 +107,13 @@ The Lead corrected the two runner candidate files in `7f7ae1ed0` and `b919e2b9b`
 |---|---|---|
 | `docs/platform/runner/architecture/h-7af1f0242611.md` | `111f0866f5caacdb4610eaf5f1e82a349a39b0b47804f2fe9e51e39f0a903d4d` | `c3fd068f991f656ac7856ccaee0435693f4efd86a626ffe0a89f1cf5cf8d1654` |
 | `docs/platform/runner/operations/h-51f5cd7279fd.md` | `b8b3d8df8bae3fea6497423d8fb4ed648ef51d49b36046bc5fb18915dc795270` | `e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b` |
+
+### N1 closing Assignment citation correction — authored, package pending
+
+Closing red-team M4 identifies line 69's stale Assignment stamp spans. Corrected only `455-460,663-667` → `443-444,626-628` in `docs/platform/agent-coordination/contracts/assignment-run-runresult.md`; code confirms declared and inline `contractPolicyVersion`/`normalizerVersion` at those sites. No contract semantics or reader route changed. This file is already among the recorded 35 changed files.
+
+Before SHA-256: `2b262872edf78f55c0857cef5d71e8f3eb617e82ed25a6c51ad942375b4516b3`; authored SHA-256: `51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b`.
+
+Unchanged production extractor: 59 units before/after, 57 identical; `assignment` heading and `unheaded-block-10` change. Exact digests/spans are in `step-09-close-assignment-unit-delta.json`. This is not native identity carry; no IDs are invented or transplanted. Native re-carry must run after runner commits this source, then D/E/comparator and exact open-set delta proof. The bounded `review-request-a38-step-09-close-rework-01.md` remains held until that package exists. No fresh reader seal or review approval claimed.
+
+Three existing decision targets (two Assignment-heading references and one historical block successor) are rebound to current extractor digests in `step-09-close-assignment-target-rebindings.json`; source tuples and historical source evidence remain unchanged, review stays pending. This is target accounting only, not native carry.

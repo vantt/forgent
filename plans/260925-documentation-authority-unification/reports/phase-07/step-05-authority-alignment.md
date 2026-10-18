@@ -20,9 +20,9 @@ Status: authored; independent review and reviewer-held A36 draw pending. Steps 3
 
 | Alignment | Rows |
 |---|---:|
-| aligned | 12 |
-| deferred | 90 |
-| doc-fix | 7 |
+| aligned | 11 |
+| deferred | 89 |
+| doc-fix | 9 |
 | implementation-gap | 0 |
 
 `aligned` applies only to the exact stated seam/citation. `doc-fix` means the candidate correction is authored and then read-only verified. `deferred` preserves history/proposals, the accepted ownership bindings awaiting full truth, and work explicitly owned by Steps 6/7/9 or Phase 9. No implementation gap was found against the bounded current claims inspected; this is not a whole-corpus truth verdict.
@@ -33,12 +33,12 @@ Authority-separation is the only writer. It corrects six §11 table rows and lab
 
 | Row | Verified present behavior | Code evidence |
 |---|---|---|
-| X-STALE-01 | Current Workflow dependency graph and three collaboration loops replace retired static protocol topology. | `src/workflow/definition.mjs:396-433`, `src/runner/execution/patterns/index.mjs:34-46` |
-| X-STALE-02 | reviewed has real maxRounds, parameters/config/default 2, preserving round results. | `src/runner/execution/patterns/reviewed.mjs:137-178,222-227,365-397` |
-| X-STALE-03 | Checkers see producer results, are read-only and declare independence from producer; panel synthesis waits for every seat. No blanket sibling-isolation claim. | `src/runner/execution/patterns/reviewed.mjs:280-315`, `src/runner/execution/patterns/panel.mjs:57-120`, `src/runner/execution/run.mjs:516-538` |
-| X-STALE-04 | Workflow sequencing, CollaborationPattern loops and bind selection have separate present owners. No Team Cognition producer. | `src/workflow/runner.mjs:411-428,614-630`, `src/runner/execution/patterns/index.mjs:34-46`, `src/runner/execution/run.mjs:632-651` |
-| X-STALE-05 | Unit producers use scoped writes; runner commits; reviewed checkers stay read-only. Work lifecycle is not granted to a retired CoordinationSession. | `src/runner/execution/patterns/reviewed.mjs:251-261,300-309`, `src/runner/execution/run.mjs:673-687,794-803`, `src/runner/execution/unit.mjs` |
-| X-STALE-06 | Workflow steps project tasks and execute Units; requestRound/authorizeDeclaredOperation remain retired design proposals. | `src/workflow/steps.mjs:43-85`, `src/workflow/runner.mjs:411-428,614-630`, `src/runner/execution/patterns/index.mjs:34-46` |
+| X-STALE-01 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
+| X-STALE-02 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
+| X-STALE-03 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
+| X-STALE-04 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
+| X-STALE-05 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
+| X-STALE-06 | architecture | doc-fix | `docs/platform/system-architecture/architecture/architecture-intent.md` | Step 5 |
 
 S3-01 adds visible historical/deferred labels at `component-boundary.md#3-recommended-responsibility-chain` and `#13-team-cognition-and-protocol-packages`. The advisory text remains intact; there is no current Team Cognition producer, no new id, and no implementation authorization. This also accounts the main-merged component boundary without touching its authority metadata.
 
@@ -50,7 +50,7 @@ S3-01 adds visible historical/deferred labels at `component-boundary.md#3-recomm
 
 - Process domain implementations other than linux-gate, full containment and supervisor gate primitives are explicitly deferred in spec/code; Windows holder-lock remains unsupported. No repair is authorized or attempted.
 - The retired protocol visibility/authorization/event surface and Team Cognition module remain proposal intent. The implemented reviewed loop is not an implementation gap.
-- PARK-PROTECTED-01: the imported reading-map blob retains existing branch material and differs from the main parent. The raw protected proof remains false; no protected working diff or Phase 7-authored protected commit exists. Lead/Step 9 must establish the accepted merge-provenance proof. This parks that proof row only; it is distinct from expected unsynced identity and does not invalidate unrelated Step 5 rows.
+- PARK-PROTECTED-01: unparked under L11-25 as branch correct; divergence accepted and recorded (+10/-2 versus main). Raw equality remains false; Phase 9 preserves the transition banner and two compounding→knowledge fixes. No protected file edit here.
 - L10-37 applies: X-DEFECT-01..05 rationale-only observations stay Phase 9 and never count as Phase 7 rework. Projection/F10 rows remain Step 6 work.
 
 ## Remainder frame and review boundary
@@ -163,14 +163,18 @@ The JSON companion holds exact pins, authority scope, proof commands, risk, owne
 | QF-11 | decision history | deferred | `plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md` | owner at Phase 9 |
 | QF-12 | decision history | deferred | `plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md` | Steps 4-6 named; Phase 9 remaining truth |
 | QF-13 | decision history | deferred | `plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md` | separate main-owned item |
-| X-MAIN-01 | specification | aligned | `docs/platform/holder-lock/spec.md` | Step 5; Step 6; Step 9 |
+| X-MAIN-01 | specification | doc-fix | `docs/platform/holder-lock/spec.md` | Phase 9 main-import step |
 | X-MAIN-02 | specification | aligned | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | X-MAIN-03 | architecture | aligned | `docs/platform/component-boundary.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-01 | architecture | aligned | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-02 | architecture | aligned | `docs/platform/session-identity/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-03 | contract | aligned | `docs/platform/holder-lock/spec.md` | Step 5; Step 6; Step 9 |
-| X-LOCK-04 | contract | aligned | `docs/platform/holder-lock/spec.md` | Step 5; Step 6; Step 9 |
-| X-LOCK-05 | specification | deferred | `docs/platform/packaging-distribution/spec.md` | Step 9 (P7-DOC-GAP-02, L11-17) |
+| X-LOCK-04 | contract | doc-fix | `docs/platform/holder-lock/spec.md` | Phase 9 main-import step |
+| X-LOCK-05 | specification | aligned | `docs/platform/packaging-distribution/spec.md` | resolved; bounded close re-review |
 | X-LOCK-06 | contract | aligned | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-07 | specification | deferred | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | S3-01 | proposal | doc-fix | `docs/platform/component-boundary.md` | Step 5 independent review; Step 9 rebind |
+
+## Closing correction (L11-23..26)
+
+X-MAIN-01/X-LOCK-04 are doc-fix, deferred to Phase 9 main-import header refresh: main-checkout already uses `withMainCheckout`; only hot-state implementation remains pending. X-LOCK-05 is resolved/aligned at packaging-distribution/spec.md:530-533. PARK-PROTECTED-01 is unparked as branch-correct divergence accepted. All 109 rows have refreshed file pins and span probes; 26 statement hashes and additional evidence pins were stale (51 rows changed in total, including the final matrix evidence pin). Current machine rows govern these corrections; historical review observations below are retained as provenance.

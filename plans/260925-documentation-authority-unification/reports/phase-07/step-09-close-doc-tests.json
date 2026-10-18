@@ -1,0 +1,24 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+  "initial": {
+    "exit": 1,
+    "tests": 67,
+    "pass": 65,
+    "fail": 2,
+    "cause": "three stale authored target digests after Assignment citation edit",
+    "log": "step-09-close-doc-tests-initial.log"
+  },
+  "rerun": {
+    "exit": 1,
+    "tests": 67,
+    "pass": 65,
+    "fail": 2,
+    "cause": "ownership assertions now pass; both checks.mjs reject the two required working Phase 8/9 plan-file edits (newWorkingViolations). Historical unaccountedPairs is empty. Phase 7 Check A separately accounts these exact paths under L11-24.",
+    "log": "step-09-close-doc-tests.log"
+  },
+  "failingTests": [
+    "documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json",
+    "documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json"
+  ],
+  "boundary": "No embedded checker, manifest, allowlist, test, baseline or script was changed to force green. Next committed-byte package must re-account its final runner commit/path pairs through the approved manifest-data procedure."
+}

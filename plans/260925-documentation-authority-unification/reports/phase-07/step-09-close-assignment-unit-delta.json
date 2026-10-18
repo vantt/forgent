@@ -1,0 +1,70 @@
+{
+  "method": "unchanged production extractor on HEAD and working bytes; NOT native identity carry",
+  "headBeforeRunner": "102e8c79bc03b2336b7b20be1e4e28760cef02b2",
+  "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+  "beforeSha256": "2b262872edf78f55c0857cef5d71e8f3eb617e82ed25a6c51ad942375b4516b3",
+  "afterSha256": "51e9248b2d7c976c78111e7f86d27487eec28f8c28edb6acd4a479d3a289f91b",
+  "beforeCount": 59,
+  "afterCount": 59,
+  "changes": [
+    {
+      "before": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Assignment",
+        "anchor": "assignment",
+        "githubAnchor": "assignment",
+        "stableAnchor": "h-d4bc457f29dd",
+        "startLine": 42,
+        "endLine": 42,
+        "textDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
+        "sample": "Assignment",
+        "sectionPayloadDigest": "36c626a6e70e98bf4fe036f830dfe9f21f5bcbb501c03cdc45e936df6db7cda5",
+        "followingBlockDigest": "2e23a5faf452888f32dd2c7e15126f432ebfea207e291d31ba547eed60624246",
+        "identityFingerprint": "e22806ffd940586e8e2299579918cdbc7aa1a26e43e2e5fba44e382ac33df7f9"
+      },
+      "after": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Assignment",
+        "anchor": "assignment",
+        "githubAnchor": "assignment",
+        "stableAnchor": "h-d4bc457f29dd",
+        "startLine": 42,
+        "endLine": 42,
+        "textDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605",
+        "sample": "Assignment",
+        "sectionPayloadDigest": "39d25ef30967ca58598951e47004efe86afc227f6b28dedc11746ef09bbd569e",
+        "followingBlockDigest": "2e23a5faf452888f32dd2c7e15126f432ebfea207e291d31ba547eed60624246",
+        "identityFingerprint": "07bf2207578aa1add403bc6e6b90cc73c4332fb3087c9577997d804c315f959b"
+      }
+    },
+    {
+      "before": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 67,
+        "endLine": 74,
+        "textDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+        "sample": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/di",
+        "identityFingerprint": "cdfe89de40570bad8e95a2493e3c74d3ceff3c15d7c152636ce70ea247ea22e9"
+      },
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 67,
+        "endLine": 74,
+        "textDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+        "sample": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/di",
+        "identityFingerprint": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f"
+      }
+    }
+  ],
+  "carryStatus": "pending runner commit; no identity or open-set equivalence claim"
+}
