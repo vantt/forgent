@@ -700,9 +700,11 @@ fn env_pairs(request: &AllocateRequest) -> Vec<(String, String)> {
 }
 
 /// The shell line a launch types into the pane: change directory, set the
-/// environment, `exec` the command so the pane's root process is the command.
+/// environment, run the command. The pane's shell stays as its parent: a pane
+/// whose root process was replaced by the command closes with it, and a pane
+/// kept for a person to read (`retain`) would be gone before they looked.
 fn launch_line(spec: &LaunchSpec) -> Result<String, Refusal> {
-    let mut line = format!("cd {} && exec", shell_quote(&spec.cwd));
+    let mut line = format!("cd {} &&", shell_quote(&spec.cwd));
     if !spec.env.is_empty() {
         line.push_str(" env");
         for (name, value) in &spec.env {

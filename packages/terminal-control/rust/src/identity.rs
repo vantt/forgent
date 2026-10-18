@@ -80,8 +80,8 @@ mod tests {
 
     #[test]
     fn a_shell_that_exec_replaced_itself_is_the_expected_process() {
-        // Real herdr: the launcher line is `cd … && exec launcher`, so the pane's shell pid now runs the
-        // launcher's target and its child is the gate.
+        // A pane whose shell was replaced (`exec`) by a launcher script that `exec`s again: the shell's own
+        // pid now runs the launcher's target and its child is the gate.
         let seen = info(10, &[(10, &["/usr/bin/bwrap", "--die-with-parent", "--", "/opt/fgos", "internal", "gate"]), (11, &["/opt/fgos", "internal", "gate"])]);
         let want = expect("/usr/bin/bwrap", "/usr/bin/bwrap", &["--die-with-parent", "--", "/opt/fgos", "internal", "gate"]);
         assert_eq!(match_expected(&seen, &want).map(|p| p.pid), Some(10));

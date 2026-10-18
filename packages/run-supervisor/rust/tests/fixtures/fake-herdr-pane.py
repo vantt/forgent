@@ -90,6 +90,22 @@ def shell_pid():
     return int(read("script.pid", "0") or 0)
 
 
+def pane_shell():
+    """The pane's shell: the `sh -c <line>` that `script` runs. Like a real pane it stays the parent of
+    whatever the typed line starts; the foreground processes are its descendants."""
+    script = shell_pid()
+    kids = children(script) if script else []
+    return kids[0] if kids else script
+
+
+def descendants(pid):
+    found = []
+    for child in children(pid):
+        found.append(child)
+        found.extend(descendants(child))
+    return found
+
+
 def children(pid):
     try:
         return [int(c) for c in read_proc(f"/proc/{pid}/task/{pid}/children").split()]
@@ -131,10 +147,10 @@ if (group, action) == ("pane", "run"):
         f.write(str(proc.pid))
     say({"type": "ok"})
 if (group, action) == ("pane", "process-info"):
-    shell = shell_pid()
+    shell = pane_shell()
     live = []
     if not os.path.exists(path("no-process")):
-        for child in children(shell):
+        for child in descendants(shell):
             try:
                 argv = read_proc(f"/proc/{child}/cmdline").split("\0")[:-1]
             except OSError:
