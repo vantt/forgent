@@ -45,7 +45,11 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
     let output = std::process::Command::new(std::env::current_exe()?)
         .args(["internal", "quiesce-scan", "--protocol", "1", "--root"])
         .arg(workspace)
-        .args(["--exclude-pid", &std::process::id().to_string()])
+        .args([
+            "--workspace-only",
+            "--exclude-pid",
+            &std::process::id().to_string(),
+        ])
         .output()?;
     validate_predecessor_scan(&output.stdout, output.status.code())
 }

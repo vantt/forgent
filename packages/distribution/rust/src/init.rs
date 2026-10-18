@@ -2131,22 +2131,55 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn holder_lock_gate_refuses_when_a_borrowed_git_leaves_a_background_gc() {
+    fn holder_lock_gate_drains_a_borrowed_git_background_gc() {
         let _serial = GATE_TESTS.lock().unwrap_or_else(|e| e.into_inner());
-        let root = fresh_temp_root("holder_lock_gate_red");
+        let root = fresh_temp_root("holder_lock_gate_gc_drained");
         let bin = root.join("bin");
         std::fs::create_dir_all(&bin).unwrap();
         let git = git_that_ignores_gc_switch(&bin);
-        let err = holder_lock_gate(
+        let helper = fgos_holder_lock::HelperExe::current().unwrap();
+        let HolderLockGate::Passed { .. } = holder_lock_gate(
             &root.join("ws"),
             &root.join("state").join("locks"),
             &git,
-            &fgos_holder_lock::HelperExe::current().unwrap(),
+            &helper,
         )
-        .unwrap_err();
-        let text = err.to_string();
-        assert!(text.starts_with("lock-borrow-vectors-failed: "), "{text}");
-        assert!(text.contains("gc-auto-loose-objects"), "{text}");
+        .unwrap();
+        // Keep a second real GC vector's lock inode for an independent holder
+        // check after the borrowed command and holder have both drained.
+        let report = fgos_holder_lock::borrow_vectors::run(
+            &git,
+            &helper,
+            &["gc-auto-loose-objects".into()],
+            true,
+        )
+        .unwrap();
+        assert!(report.pass(), "{report:?}");
+        let kept = report.kept.unwrap();
+        let resource =
+            fgos_holder_lock::Resource::new("borrow-vectors", kept.join("gc-auto-loose-objects.lock"));
+        assert_eq!(
+            fgos_holder_lock::probe(&resource).unwrap(),
+            fgos_holder_lock::Probe::Free
+        );
+        if cfg!(target_os = "linux") {
+            assert_eq!(
+                fgos_holder_lock::holders(&resource).unwrap(),
+                fgos_holder_lock::HoldersList::List(vec![])
+            );
+            // The auto-GC's cwd is the kept vector repository, including
+            // after daemonisation. No live descendant may remain there.
+            for entry in std::fs::read_dir("/proc").unwrap().flatten() {
+                if let Ok(cwd) = std::fs::read_link(entry.path().join("cwd")) {
+                    assert!(
+                        !cwd.starts_with(&kept),
+                        "GC/vector process remains: {}",
+                        entry.path().display()
+                    );
+                }
+            }
+        }
+        let _ = std::fs::remove_dir_all(kept);
         let _ = std::fs::remove_dir_all(&root);
     }
 }

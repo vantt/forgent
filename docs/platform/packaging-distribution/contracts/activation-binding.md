@@ -125,7 +125,7 @@ without Publication Git-floor/hooks probes; indirect `.git` layouts refuse
 A WAL without a valid controller fence refuses with `git-fence-missing`.
 
 For a WAL-capable activation, the controller's own `internal quiesce-scan`
-identifies live fgOS payloads. A payload whose release manifest cannot prove
+with `--workspace-only` identifies live fgOS payloads belonging to the activated workspace or its linked worktrees, by cwd or resolved execution-root arguments (`--dir`, `--worktree`, `--cwd`, `-C`). Payload names and a machine-wide pinned state root alone do not establish membership. An unknown/unreadable candidate attributed to this workspace still fails closed. The default stop-everything scan remains machine-wide. A payload whose release manifest cannot prove
 `git-wal-v1`, or an unavailable/incomplete process scan, refuses with
 `git-predecessor-writer-live`. No candidate code performs this admission.
 

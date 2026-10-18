@@ -144,7 +144,49 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
         message.contains("git-predecessor-writer-live") && message.contains("fgos.mjs"),
         "{message}"
     );
-    success(controller(&ws, &state, "upgrade", &new));
+    let other = root.join("other-workspace");
+    fs::create_dir(&other).unwrap();
+    let other_script = other.join("fgos.mjs");
+    fs::write(
+        &other_script,
+        "console.log('ready'); setInterval(()=>{},10000);\n",
+    )
+    .unwrap();
+    let mut unrelated = Command::new("node")
+        .arg(&other_script)
+        .args(["run", "--dir"])
+        .arg(&other)
+        .current_dir(&other)
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut ready = String::new();
+    BufReader::new(unrelated.stdout.take().unwrap())
+        .read_line(&mut ready)
+        .unwrap();
+    assert_eq!(ready.trim(), "ready");
+    let mut directed = Command::new("node")
+        .arg(&other_script)
+        .args(["run", "--worktree"])
+        .arg(&ws)
+        .current_dir(&other)
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut ready = String::new();
+    BufReader::new(directed.stdout.take().unwrap())
+        .read_line(&mut ready)
+        .unwrap();
+    assert_eq!(ready.trim(), "ready");
+    let rejected = controller(&ws, &state, "upgrade", &new);
+    directed.kill().unwrap();
+    directed.wait().unwrap();
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("git-predecessor-writer-live"));
+    let activated = controller(&ws, &state, "upgrade", &new);
+    unrelated.kill().unwrap();
+    unrelated.wait().unwrap();
+    success(activated);
     let fence = ws.join(".fgos/locks/activation.lock");
     assert!(fgos_holder_lock::tombstone::is_tombstone(
         &fence,

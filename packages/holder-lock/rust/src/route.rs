@@ -472,7 +472,7 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
 }
 
 fn quiesce_scan(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--root", "--exclude-pid"], &[]) {
+    let flags = match Flags::parse(args, &["--root", "--exclude-pid"], &["--workspace-only"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
@@ -487,7 +487,7 @@ fn quiesce_scan(args: &[String]) -> i32 {
             Err(_) => return usage(&format!("--exclude-pid needs a pid, got {raw}")),
         }
     }
-    quiesce::scan(&roots, &exclude)
+    quiesce::scan(&roots, &exclude, flags.has("--workspace-only"))
 }
 
 mod quiesce {
@@ -535,6 +535,36 @@ mod quiesce {
         })
     }
 
+    /// Explicit execution roots, rather than the installed payload's path,
+    /// establish workspace membership for C5. Resolve relative roots at cwd.
+    fn workspace_argument(argv: &[String], cwd: Option<&Path>, dirs: &[PathBuf]) -> bool {
+        argv.iter().enumerate().any(|(i, arg)| {
+            let value = if let Some((key, value)) = arg.split_once('=') {
+                matches!(key, "--dir" | "--worktree" | "--cwd").then_some(value)
+            } else if i > 0
+                && matches!(
+                    argv[i - 1].as_str(),
+                    "--dir" | "--worktree" | "--cwd" | "-C"
+                )
+            {
+                Some(arg.as_str())
+            } else {
+                None
+            };
+            value.is_some_and(|value| {
+                let p = Path::new(value);
+                let resolved = if p.is_absolute() {
+                    Some(p.to_path_buf())
+                } else {
+                    cwd.map(|cwd| cwd.join(p))
+                };
+                resolved
+                    .map(|p| p.canonicalize().unwrap_or(p))
+                    .is_some_and(|p| dirs.iter().any(|d| p.starts_with(d)))
+            })
+        })
+    }
+
     /// Whether a process whose cwd or environ could not be read may still be
     /// a fgOS process. Its argv stays readable without ptrace access: a
     /// session helper the user's own service manager runs without ptrace
@@ -565,7 +595,7 @@ mod quiesce {
         false
     }
 
-    pub(super) fn scan(roots: &[PathBuf], exclude: &[u32]) -> i32 {
+    pub(super) fn scan(roots: &[PathBuf], exclude: &[u32], workspace_only: bool) -> i32 {
         if !cfg!(target_os = "linux") {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }), EXIT_UNAVAILABLE);
         }
@@ -598,26 +628,33 @@ mod quiesce {
             for (root, dirs) in &per_root {
                 if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
                     hit = Some(("cwd", Some(root.as_path())));
-                } else if names_payload(&argv, dirs, &state_root) {
+                } else if (workspace_only && workspace_argument(&argv, view.cwd.as_deref(), dirs))
+                    || (!workspace_only && names_payload(&argv, dirs, &state_root))
+                {
                     hit = Some(("cmdline", Some(root.as_path())));
                 }
                 if hit.is_some() {
                     break;
                 }
             }
-            if hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
+            if !workspace_only && hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
                 hit = Some(("environ", None));
             }
             match hit {
-                Some((matched, root)) => processes.push(json!({
-                    "pid": view.pid.0,
-                    "startTime": view.tuple.as_ref().map(|t| t.start_time.clone()),
-                    "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
-                    "cmdline": argv.join(" "),
-                    "matched": matched,
-                    "root": root.map(|r| r.to_string_lossy().into_owned()),
-                })),
-                None if !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
+                Some((matched, root)) => {
+                    if workspace_only && view.cmdline.is_none() {
+                        unreadable += 1;
+                    }
+                    processes.push(json!({
+                        "pid": view.pid.0,
+                        "startTime": view.tuple.as_ref().map(|t| t.start_time.clone()),
+                        "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
+                        "cmdline": argv.join(" "),
+                        "matched": matched,
+                        "root": root.map(|r| r.to_string_lossy().into_owned()),
+                    }));
+                }
+                None if !workspace_only && !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
                 None => {}
             }
         }
@@ -632,9 +669,41 @@ mod quiesce {
     #[cfg(test)]
     mod tests {
         use super::could_be_fgos;
+        #[cfg(unix)]
+        use super::workspace_argument;
+        #[cfg(unix)]
+        use std::path::{Path, PathBuf};
 
         fn argv(parts: &[&str]) -> Vec<String> {
             parts.iter().map(|p| p.to_string()).collect()
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn workspace_membership_uses_execution_roots_not_payload_names() {
+            let dirs = vec![PathBuf::from("/workspace")];
+            assert!(!workspace_argument(
+                &argv(&["/workspace/bin/fgos", "run", "--dir", "/other"]),
+                Some(Path::new("/other")),
+                &dirs
+            ));
+            for args in [
+                argv(&["fgos", "--dir=/workspace/child"]),
+                argv(&["fgos", "--worktree", "/workspace/child"]),
+                argv(&["fgos", "--cwd", "child"]),
+                argv(&["git", "-C", "/workspace"]),
+            ] {
+                assert!(workspace_argument(
+                    &args,
+                    Some(Path::new("/workspace")),
+                    &dirs
+                ));
+            }
+            assert!(!workspace_argument(
+                &argv(&["fgos", "--dir", "/workspace-other"]),
+                None,
+                &dirs
+            ));
         }
 
         #[test]
