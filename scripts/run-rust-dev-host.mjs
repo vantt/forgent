@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { computeArtifactDigest, hashFile } from './build-rust-distribution.mjs';
+import { computeArtifactDigest, hashFile, nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -48,7 +48,7 @@ function forwardResult(result, description) {
 }
 
 function main() {
-  const build = spawnSync('cargo', ['build', '--package', 'fgos'], {
+  const build = spawnSync('cargo', ['build', '--locked', '--package', 'fgos', '--package', 'fgos-node-addon'], {
     cwd: checkoutRoot,
     stdio: 'inherit',
     env: process.env,
@@ -75,21 +75,32 @@ function main() {
       fs.chmodSync(temporary, 0o755);
     });
 
+    const addonRelative = `${runtimeBaseRelative}/${path.basename(runtimeDir)}/fgos.node`;
+    const addonFile = path.join(runtimeDir, 'fgos.node');
+    assertLocalPath(addonRelative);
+    atomicWrite(addonFile, (temporary) => {
+      fs.copyFileSync(path.join(targetDir, 'debug', nativeAddonLibraryName()), temporary);
+      fs.chmodSync(temporary, 0o644);
+    });
+    const nativeAddon = nativeAddonComponent(addonFile, addonRelative, checkoutRoot);
     const legacyNodeDigest = hashFile(path.join(checkoutRoot, 'bin/fgos.mjs'));
     const fgosDigest = hashFile(fgosBin);
     const manifestWithoutDigest = {
       schemaVersion: 1,
       entries: { fgos: binaryRelative },
+      capabilities: ["git-wal-v1"],
       components: {
+        nativeAddon,
         legacyNode: { root: '.', entry: 'bin/fgos.mjs', digest: legacyNodeDigest },
       },
       requires: { node: '>=18' },
       target: { os: process.platform, arch: process.arch },
       stateSchemas: { read: ['2'], write: ['2'], migrations: [] },
       files: [
+        { path: addonRelative, kind: "file", digest: `sha256:${nativeAddon.digest}`, mode: "644", class: "immutable-runtime" },
         { path: 'bin/fgos.mjs', kind: 'file', digest: legacyNodeDigest, mode: '755', class: 'legacy-node' },
         { path: binaryRelative, kind: 'file', digest: fgosDigest, mode: '755', class: 'native-host' },
-      ],
+      ].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0),
     };
     const manifest = {
       ...manifestWithoutDigest,

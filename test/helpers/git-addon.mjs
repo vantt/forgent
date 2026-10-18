@@ -6,7 +6,7 @@ import { ensureGitAddon as buildGitAddon, gitAddonSourceDigest, REPO_ROOT } from
 export { REPO_ROOT as root } from '../../scripts/run-tests.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
-  const manifest = path.join(cwd, '.fgos/runtime/phase-target/native-addon.json');
+  const manifest = path.join(cwd, '.fgos/runtime/git-addon/native-addon.json');
   try {
     const value = JSON.parse(fs.readFileSync(manifest, 'utf8'));
     if (value.sourceDigest === gitAddonSourceDigest(cwd)) {

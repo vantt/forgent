@@ -19,6 +19,15 @@ permissions:
   contents: read
 
 jobs:
+  dependency-audit:
+    name: audit locked dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo install cargo-deny --locked --version 0.20.2
+      - run: cargo deny --config .github/cargo-deny.toml check advisories bans sources
+
   build:
     name: assets (${{ matrix.target }})
     strategy:
@@ -63,12 +72,25 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Packaging assets as $VERSION for ${{ matrix.target }}"
 
+      - name: Deterministic Windows linker
+        if: runner.os == 'Windows'
+        run: echo 'RUSTFLAGS=-C link-arg=/Brepro' >> "$GITHUB_ENV"
+
       - name: Build workspace (release)
-        run: cargo build --release --workspace
+        run: cargo build --locked --release --workspace
 
       - name: Check glibc ceiling of the shipped binaries
         if: runner.os == 'Linux'
         run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl
+
+      - name: Record shipped addon digest
+        run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile,nativeAddonLibraryName} from './scripts/build-rust-distribution.mjs'; fs.writeFileSync('addon-digest.txt',hashFile('target/release/'+nativeAddonLibraryName())+'\n');"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shipped-addon-${{ matrix.target }}
+          path: addon-digest.txt
+          if-no-files-found: error
 
       - name: Package release assets
         run: node scripts/package-release-assets.mjs --version "${{ steps.version.outputs.version }}" --out dist
@@ -99,3 +121,53 @@ jobs:
             dist/install.ps1
           if-no-files-found: error
           retention-days: 14
+
+  independent-addon:
+    name: independent addon (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Deterministic Windows linker
+        if: runner.os == 'Windows'
+        run: echo 'RUSTFLAGS=-C link-arg=/Brepro' >> "$GITHUB_ENV"
+      # Same workspace feature graph, independent machine and Cargo outputs; no cache.
+      - run: cargo build --locked --release --workspace
+      - name: Record independent digest
+        run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile,nativeAddonLibraryName} from './scripts/build-rust-distribution.mjs'; fs.writeFileSync('addon-digest.txt',hashFile('target/release/'+nativeAddonLibraryName())+'\n');"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: independent-addon-${{ matrix.target }}
+          path: addon-digest.txt
+          if-no-files-found: error
+
+  compare-addon:
+    name: compare addon digests
+    needs: [build, independent-addon]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*addon-*'
+          path: addon-digests
+      - name: Compare both published targets
+        shell: bash
+        run: |
+          set -eu
+          for triple in x86_64-unknown-linux-gnu x86_64-pc-windows-msvc; do
+            cmp "addon-digests/shipped-addon-$triple/addon-digest.txt" "addon-digests/independent-addon-$triple/addon-digest.txt"
+          done

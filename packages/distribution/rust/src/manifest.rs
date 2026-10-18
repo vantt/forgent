@@ -38,6 +38,8 @@ pub struct ReleaseManifest {
     pub requires: RequiresInfo,
     #[serde(default)]
     pub state_schemas: Option<StateSchemasInfo>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub capabilities: Vec<String>,
     pub files: Vec<ManifestFileEntry>,
 }
 
@@ -74,12 +76,58 @@ impl ReleaseManifest {
         Ok(())
     }
 
+    /// Additive admission: old releases may omit the addon until Git phase 05 (M10).
+    pub fn validate_native_addon_invariant(&self) -> Result<(), &'static str> {
+        let Some(addon) = &self.components.native_addon else {
+            return Ok(());
+        };
+        let expected_target = match (self.target.os.as_str(), self.target.arch.as_str()) {
+            ("linux", "x64" | "x86_64") => "linux-x64",
+            ("windows" | "win32", "x64" | "x86_64") => "win32-x64",
+            _ => return Err("nativeAddon release target unsupported"),
+        };
+        if addon.target != expected_target || addon.napi_version != 8 {
+            return Err("nativeAddon target or Node-API mismatch");
+        }
+        if addon.path.contains('\\')
+            || addon.path.contains(':')
+            || !addon.path.ends_with(".node")
+            || addon
+                .path
+                .split('/')
+                .any(|part| part.is_empty() || part == "." || part == "..")
+        {
+            return Err("nativeAddon path must be a canonical relative .node path");
+        }
+        if addon.digest.len() != 64
+            || !addon
+                .digest
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        {
+            return Err("nativeAddon digest must be lowercase SHA-256 hex");
+        }
+        let checksums = native_addon_crate_checksums();
+        if checksums.len() != 3 || addon.crate_checksums != checksums {
+            return Err("nativeAddon crate checksums differ from Cargo.lock");
+        }
+        if !self.files.iter().any(|file| {
+            file.path == addon.path
+                && file.kind == "file"
+                && file.digest == format!("sha256:{}", addon.digest)
+        }) {
+            return Err("nativeAddon must have a matching files entry");
+        }
+        Ok(())
+    }
+
     /// Validates V1 semantics enforced at every trusted manifest read boundary.
     pub fn validate_v1_invariants(&self) -> Result<(), &'static str> {
         if self.schema_version != RELEASE_MANIFEST_SCHEMA_VERSION_V1 {
             return Err("schemaVersion is unsupported; expected 1");
         }
         self.validate_legacy_node_invariant()?;
+        self.validate_native_addon_invariant()?;
         if self
             .state_schemas
             .as_ref()
@@ -136,6 +184,8 @@ pub struct EntriesInfo {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ComponentsInfo {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_addon: Option<NativeAddonComponent>,
     pub legacy_node: LegacyNodeComponent,
     #[serde(default)]
     pub runner: Option<RunnerComponent>,
@@ -232,4 +282,38 @@ pub fn read_manifest_from_path(manifest_path: &Path) -> Result<ReleaseManifest, 
 
 pub fn read_manifest_from_dir(release_dir: &Path) -> Result<ReleaseManifest, ManifestReadError> {
     read_manifest_from_path(&release_dir.join("manifest.json"))
+}
+
+/// Node-API 8 combined Git/Event Store payload; digests here are raw lowercase hex.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct NativeAddonComponent {
+    pub path: String,
+    pub digest: String,
+    pub target: String,
+    pub napi_version: u32,
+    pub crate_checksums: std::collections::BTreeMap<String, String>,
+}
+
+/// The locked crates.io inputs of the ABI toolchain, embedded in the verifier.
+pub fn native_addon_crate_checksums() -> std::collections::BTreeMap<String, String> {
+    include_str!("../../../../Cargo.lock")
+        .split("[[package]]")
+        .filter_map(|package| {
+            let field = |name: &str| {
+                package.lines().find_map(|line| {
+                    line.strip_prefix(&format!("{name} = \""))
+                        .and_then(|value| value.strip_suffix('"'))
+                })
+            };
+            let name = field("name")?;
+            if !["napi", "napi-derive", "napi-build"].contains(&name) {
+                return None;
+            }
+            Some((
+                format!("{}@{}", name, field("version")?),
+                field("checksum")?.to_string(),
+            ))
+        })
+        .collect()
 }

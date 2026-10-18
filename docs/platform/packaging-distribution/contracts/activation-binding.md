@@ -104,3 +104,12 @@ Resolution code accepts activation only if it can safely resolve the release man
 | Shell/runtime resolver checks activation | `src/setup/bin-discovery.mjs`, `scripts/fgos-shell-integration.sh` |
 | Init, repair, and upgrade tests exercise activation | `test/rust-host/fgctl-init.test.mjs`, `test/rust-host/fgctl-upgrade.test.mjs` |
 | Schema golden tests (full, minimal, forward-compat) | `packages/distribution/rust/tests/schema_golden.rs`, `packages/distribution/rust/tests/goldens/activation-binding-*.json` |
+
+## 8. Native addon admission
+
+Candidate preflight verifies `components.nativeAddon` whenever present using the
+release-manifest contract (confined path, file digest, matching target, Node-API 8
+and pinned Cargo.lock checksums). A missing addon remains compatible today. The
+release carrying Git phase 05 (M10) is the switch point for refusing linux-x64
+payloads without it; no version guess or environment override enables that gate.
+The subsequent Git activation-fence/C5 step owns WAL rollback admission.

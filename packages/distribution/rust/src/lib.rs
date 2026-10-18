@@ -68,6 +68,8 @@ pub struct LegacyNodeComponentRuntime {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ComponentsInfoRuntime {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_addon: Option<manifest::NativeAddonComponent>,
     pub legacy_node: LegacyNodeComponentRuntime,
 }
 
@@ -295,6 +297,7 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
         })
     });
     let components = manifest.as_ref().map(|m| ComponentsInfoRuntime {
+        native_addon: m.components.native_addon.clone(),
         legacy_node: LegacyNodeComponentRuntime {
             root: m.components.legacy_node.root.clone(),
             entry: m.components.legacy_node.entry.clone(),
