@@ -1,0 +1,216 @@
+{
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "mainPin": "eab4d617b",
+  "rows": [
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "e1307d33fb31e4ff1c8cfca44924629de48ac854 fix(dispatch): widen TRUST_STORE_KINDS to recognize agy/agy-json; docs(agent-coordination): migrate to docs/platform/ target structure"
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "e1307d33fb31e4ff1c8cfca44924629de48ac854 fix(dispatch): widen TRUST_STORE_KINDS to recognize agy/agy-json; docs(agent-coordination): migrate to docs/platform/ target structure"
+      ]
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "23fb220e309f82998a62ae4e62727bc405515035 chore: preserve main worktree before packaging merge"
+      ]
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "23fb220e309f82998a62ae4e62727bc405515035 chore: preserve main worktree before packaging merge"
+      ]
+    },
+    {
+      "path": "docs/platform/contracts/architecture-manifest.json",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "existsAtB0": false,
+      "mainCreation": [
+        "6a614a66929e2870be2a1b09bb82fd256e12d2df docs(event-store): draft the event store component spec for council review"
+      ]
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "existsAtB0": false,
+      "mainCreation": [
+        "0e377d7b6dd3094021e1bb2be2c4a359a465a77c docs(holder-lock): add holder-lock and process specs, boundary rows, doctor/setup/activation rules"
+      ]
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "05b6bf861d87d83db2d8939072540e60f6ce1e51 Add native gate-bypass host route"
+      ]
+    },
+    {
+      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "3f673ae9e6ffaa805d5f79ca00edd5e6b807dcfa Document packaging distribution rollout"
+      ]
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "23fb220e309f82998a62ae4e62727bc405515035 chore: preserve main worktree before packaging merge"
+      ]
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "existsAtB0": false,
+      "mainCreation": [
+        "0e377d7b6dd3094021e1bb2be2c4a359a465a77c docs(holder-lock): add holder-lock and process specs, boundary rows, doctor/setup/activation rules"
+      ]
+    },
+    {
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/proposals/README.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/README.md",
+      "existsAtB0": true,
+      "mainCreation": [
+        "23fb220e309f82998a62ae4e62727bc405515035 chore: preserve main worktree before packaging merge"
+      ]
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "existsAtB0": true,
+      "mainCreation": []
+    }
+  ],
+  "previousDiagnosticBaseline": "dbe5c432852837ea01e6025b35868bcb7271495d"
+}

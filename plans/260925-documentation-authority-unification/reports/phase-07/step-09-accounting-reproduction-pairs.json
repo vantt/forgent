@@ -1,0 +1,103 @@
+{
+  "authority": "L11-21",
+  "precedent": "6600925b4 adds closing-step paths; retain prior exact A3/A21/L10-35a exceptions",
+  "allowedPathsAdded": [
+    "plans/260925-documentation-authority-unification/reports/phase-07/",
+    "scripts/check-decision-citation-drift.baseline.json"
+  ],
+  "reason": "Phase 7 reports and documented main-citation baseline accounting are authorized current lanes; six/seven plan-file historical pairs stay explicit, never generally allowlisted",
+  "changes": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "key": "scripts",
+      "addedExactPairs": [
+        {
+          "commit": "2f0d4a5502f0259da212d840abd49ec6a95f725d",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "19d37a8a17ff598e98bd30770118e60496e67d7a",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "573451ffe22ad45749ec68db82601ad3fc4484e2",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "e8d72c8aa0c02f25c5023921b398fda9dc270186",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "0accd6f6fa1cce873cb126522fc613b9f0c919ae",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "1db62709354f41ea7850b147212d4d942e01a54e",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "1db62709354f41ea7850b147212d4d942e01a54e",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "7d10459005abe1934998e0052e2d952c8afb1900",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        }
+      ]
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "key": "readOnlyScripts",
+      "addedExactPairs": [
+        {
+          "commit": "2f0d4a5502f0259da212d840abd49ec6a95f725d",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "19d37a8a17ff598e98bd30770118e60496e67d7a",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "573451ffe22ad45749ec68db82601ad3fc4484e2",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "e8d72c8aa0c02f25c5023921b398fda9dc270186",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "0accd6f6fa1cce873cb126522fc613b9f0c919ae",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "1db62709354f41ea7850b147212d4d942e01a54e",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "1db62709354f41ea7850b147212d4d942e01a54e",
+          "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "7d10459005abe1934998e0052e2d952c8afb1900",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L11-21 / Phase 7 authorized plan accounting"
+        }
+      ]
+    }
+  ]
+}

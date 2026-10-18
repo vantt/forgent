@@ -26,5 +26,7 @@
   "scripts/doc-binding-repair.mjs",
   "scripts/doc-rationale-facts.mjs",
   "test/scripts/",
-  "scripts/compare-doc-global-closure.mjs"
+  "scripts/compare-doc-global-closure.mjs",
+  "plans/260925-documentation-authority-unification/reports/phase-07/",
+  "scripts/check-decision-citation-drift.baseline.json"
 ]

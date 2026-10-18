@@ -1,0 +1,82 @@
+{
+  "LeadReportedRun": {
+    "commit": "879a4d5fe",
+    "tests": 8654,
+    "pass": 8504,
+    "fail": 61,
+    "log": "/tmp/claude-1000/-home-vantt-projects-forgentX/a4954387-fafa-46d2-911f-4ea15b20d08d/scratchpad/p7-npm-test-879a4d5fe.log",
+    "logAccessible": false,
+    "notReproducedByWorker": true
+  },
+  "productionDiffAgainstClosePin": [],
+  "evidence": [
+    {
+      "path": "src/setup/skill-wrappers.mjs",
+      "HEADBlob": "128539f8039584dfe15fa0d19b1b56087be9e49a",
+      "mainPinBlob": "128539f8039584dfe15fa0d19b1b56087be9e49a"
+    },
+    {
+      "path": "scripts/test-select-coverage-map.mjs",
+      "HEADBlob": "4fe78f4eb8106cb412a109abf9b47fb6ebbef426",
+      "mainPinBlob": "4fe78f4eb8106cb412a109abf9b47fb6ebbef426"
+    },
+    {
+      "path": "test/setup/skill-wrappers.test.mjs",
+      "HEADBlob": "e868f0da911a5400516bfae06442431cb07dec67",
+      "mainPinBlob": "e868f0da911a5400516bfae06442431cb07dec67"
+    },
+    {
+      "path": "test/state/store.test.mjs",
+      "HEADBlob": "65b13dc28aad7f55611284cf583ecb950ce653fe",
+      "mainPinBlob": "65b13dc28aad7f55611284cf583ecb950ce653fe"
+    },
+    {
+      "path": "test/scripts/test-select-coverage-map.test.mjs",
+      "HEADBlob": "67668fc9db514f50dcb38af4aa0bedd76f160838",
+      "mainPinBlob": "67668fc9db514f50dcb38af4aa0bedd76f160838"
+    },
+    {
+      "path": "test/rust-host/observe-store-lock.test.mjs",
+      "HEADBlob": "fb7a9f3afc913fc6229c6073064add731c66a80d",
+      "mainPinBlob": "fb7a9f3afc913fc6229c6073064add731c66a80d"
+    },
+    {
+      "path": "test/rust-host/release-tree.test.mjs",
+      "HEADBlob": "dabe4ca279462e2f206e3a7fbfeda160c0967805",
+      "mainPinBlob": "dabe4ca279462e2f206e3a7fbfeda160c0967805"
+    }
+  ],
+  "families": [
+    {
+      "family": "rust-host fgctl / observe-store-lock / release-tree",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "Production Rust/Node code and these existing tests byte-equal to close main pin; install/runtime conditions need original stderr"
+    },
+    {
+      "family": "holder-lock fences",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "Production lock/fence implementation and test fixtures byte-equal to close main pin"
+    },
+    {
+      "family": "runner timing/herdr",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "Production runner and herdr tests byte-equal to close main pin; timing/environment causes require actual failed assertions"
+    },
+    {
+      "family": "setup skill-wrappers",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "src/setup/skill-wrappers.mjs and core/generated skill surfaces byte-equal to close main pin; no wrapper changes in this plan"
+    },
+    {
+      "family": "state store",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "src/state and existing state tests byte-equal to close main pin"
+    },
+    {
+      "family": "test-select-coverage-map",
+      "classification": "not plan-caused by production/test edits; runtime cause unconfirmed without Lead log",
+      "evidence": "Collector and test byte-equal to close main pin; inspected tests create isolated fixture repositories and exercise real process timeouts/concurrency, independent of documentation inventory"
+    }
+  ],
+  "remainingBlocker": "Original Lead suite log is absent in this worker filesystem. Cannot enumerate every failing file or assert each failure cause. Families above are source-diff attribution, not reproduced baseline failures. Lead must attach/export the log or complete per-failure attribution outside worker. No full-suite rerun performed."
+}

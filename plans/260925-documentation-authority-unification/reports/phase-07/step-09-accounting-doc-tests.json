@@ -1,0 +1,13 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/p7-accounting/test-tmp NODE_OPTIONS=--max-old-space-size=3072 node --test --test-concurrency=1 test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/doc-rationale-reproduction.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+  "exit": 0,
+  "tests": 67,
+  "pass": 67,
+  "fail": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "log": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-accounting-doc-tests.log",
+  "logSHA256": "034f29e58ecc4124be11e93d22fed8a2d5f46109963daf51e5c2b7e6025f1dee",
+  "fullSuiteRunByWorker": false,
+  "productionTestsOrCheckersModified": false
+}

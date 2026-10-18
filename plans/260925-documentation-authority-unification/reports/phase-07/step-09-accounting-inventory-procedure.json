@@ -1,0 +1,13 @@
+{
+  "authority": "L11-21",
+  "frozenContentCommit": "e6b7efeece3d28f3bc9b47ecd3b748f54a8d90ed",
+  "priorCompletedNativeCarryCommit": "879a4d5fe",
+  "nativeCarryInvocationsThisTurn": 0,
+  "priorCacheAvailable": false,
+  "missingPriorCache": "/tmp/fgos-work/p7-n1-package/doc-inventory.v8.gz",
+  "reconstruction": "Read-only generateInventory(root,{commit:e6b7efeec,identityRegistryPath:scratch-copy-of-committed-working-registry}); existing step-09-package-n1-inventory-reproduce.mjs V8/chunked-gzip procedure; save original native fields without JSON writer/string limits",
+  "scratch": "/tmp/fgos-work/p7-n1-package",
+  "serial": true,
+  "identitySourceDiff": "git diff e6b7efeec HEAD -- docs AGENTS.md CLAUDE.md plans/260925-documentation-authority-unification/transitional-switchboard.json",
+  "identitySourceDiffPaths": []
+}

@@ -1,0 +1,136 @@
+{
+  "claims": 27,
+  "blocked": [
+    {
+      "row": {
+        "claimId": "claim_55dd0ec63f204a5aaf9ea1815ae352cd",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36"
+      },
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/platform/platform-foundations.md",
+        "docs/platform/vision.md",
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    },
+    {
+      "row": {
+        "claimId": "claim_2a08d5450e84c9e30e67a9ba022641ff",
+        "sourcePath": "docs/specs/observe.md",
+        "sourceAnchor": "unheaded-block-3",
+        "sourceUnitDigest": "737be92fe1b6afd8577530803a8694cfbf9bf71a632bf36043153cb9244a1bde"
+      },
+      "owners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    },
+    {
+      "row": {
+        "claimId": "claim_d5be3d8867878b07ae125ab7c67ce03d",
+        "sourcePath": "docs/specs/reading-map.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "200918ebcc9611499603a27e65695ad1d1c0d9af7e030949a45a87b74949141c"
+      },
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/packaging-distribution/spec.md"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    },
+    {
+      "row": {
+        "claimId": "claim_8c80eeb2eb0ccb02b7244499a5479e63",
+        "sourcePath": "docs/specs/runner.md",
+        "sourceAnchor": "unheaded-block-1",
+        "sourceUnitDigest": "bd64cb8062830cba8ac7e05c9a4b547d363427d227ac7e01298b4115ad825f83"
+      },
+      "owners": [
+        "docs/platform/runner/spec.md",
+        "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "docs/platform/runner/architecture/h-69197b459754.md",
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    },
+    {
+      "row": {
+        "claimId": "claim_1760a69527049577df6e55bcb7536f15",
+        "sourcePath": "docs/specs/runner.md",
+        "sourceAnchor": "unheaded-block-94",
+        "sourceUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640"
+      },
+      "owners": [
+        "docs/platform/runner/spec.md",
+        "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "docs/platform/runner/architecture/h-69197b459754.md",
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    },
+    {
+      "row": {
+        "claimId": "claim_78db12c30ffac4c9dafc9f9fe2644cb4",
+        "sourcePath": "docs/specs/work-state.md",
+        "sourceAnchor": "unheaded-block-106",
+        "sourceUnitDigest": "dd243e80881980e1359eaa75df0c6cac91650f251cd914f7bf1d5c8862675ff4"
+      },
+      "owners": [
+        "docs/platform/work-state/spec.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md",
+        "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+        "docs/platform/work-state/architecture/implementation-pointers.md",
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/packaging-distribution/spec.md"
+      ],
+      "exactTargetMatches": 0,
+      "reason": "No unique complete-unit match in an existing mapped owner; no disposition invented"
+    }
+  ]
+}
