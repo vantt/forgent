@@ -2,10 +2,7 @@
 //! same directory, fsync it, `link(2)` it to its final name. `EEXIST` means
 //! another writer already published; the first copy stays.
 
-use std::fs::{self, File, OpenOptions};
-use std::io::{self, Write};
-#[cfg(unix)]
-use std::os::unix::fs::OpenOptionsExt;
+use std::io;
 use std::path::Path;
 
 /// Who won the link.
@@ -19,36 +16,29 @@ pub enum Published {
 
 /// Publish `bytes` as `<dir>/<name>` exactly once.
 pub fn publish_once(dir: &Path, name: &str, bytes: &[u8]) -> io::Result<Published> {
-    // The pid alone repeats (a gate is always pid 1 in its namespace), so the
-    // name carries the clock too; the file is created exclusively below.
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos();
-    let temp = dir.join(format!(".{name}.tmp.{}.{nanos}", std::process::id()));
-    let result = write_and_link(dir, name, &temp, bytes);
-    let _ = fs::remove_file(&temp);
-    result
+    publication_result(fgos_durable_file::install_once(dir, name, bytes))
 }
 
-fn write_and_link(dir: &Path, name: &str, temp: &Path, bytes: &[u8]) -> io::Result<Published> {
-    // Exclusive and never through a symlink: a pre-planted path must fail, not be written.
-    let mut options = OpenOptions::new();
-    options.write(true).create_new(true);
-    #[cfg(unix)]
-    options.custom_flags(libc::O_NOFOLLOW).mode(0o600);
-    let mut file = options.open(temp)?;
-    file.write_all(bytes)?;
-    file.sync_all()?;
-    drop(file);
-    let outcome = match fs::hard_link(temp, dir.join(name)) {
-        Ok(()) => Published::Created,
-        Err(err) if err.kind() == io::ErrorKind::AlreadyExists => Published::AlreadyPublished,
-        Err(err) => return Err(err),
+fn publication_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<Published> {
+    use fgos_durable_file::Installed;
+    let installed = match result {
+        Ok(installed) => installed,
+        Err(error) => {
+            // Historically cleanup and directory-sync failures after the link
+            // did not turn a completed publication into an error.
+            if let Some(temp) = error.temporary {
+                let _ = std::fs::remove_file(temp);
+            }
+            match error.installed {
+                Some(installed) => installed,
+                None => return Err(error.source),
+            }
+        }
     };
-    // Make the new directory entry durable; the link already happened, so a
-    // failure here must not report the publish as failed.
-    if let Ok(handle) = File::open(dir) {
-        let _ = handle.sync_all();
-    }
-    Ok(outcome)
+    Ok(match installed {
+        Installed::Created => Published::Created,
+        Installed::AlreadyExists => Published::AlreadyPublished,
+    })
 }
 
 /// `YYYY-MM-DDTHH:MM:SS.mmmZ` for the current wall clock.
@@ -82,5 +72,66 @@ mod tests {
         assert_eq!(iso_utc(0, 0), "1970-01-01T00:00:00.000Z");
         assert_eq!(iso_utc(1_791_940_354, 7), "2026-10-14T01:12:34.007Z");
         assert_eq!(iso_utc(951_782_400, 0), "2000-02-29T00:00:00.000Z");
+    }
+}
+
+#[cfg(test)]
+mod install_mapping_tests {
+    use super::*;
+    struct FailAt(&'static str);
+    impl fgos_durable_file::FileSystem for FailAt {
+        fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+            if step == self.0 {
+                Err(io::Error::other("boundary failure"))
+            } else {
+                Ok(())
+            }
+        }
+    }
+    #[test]
+    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-run-supervisor-mapping-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        for step in [
+            "temp-created",
+            "bytes-written",
+            "file-fsync",
+            "name-installed",
+            "temp-removed",
+            "parent-fsync",
+        ] {
+            let name = step;
+            let result = publication_result(fgos_durable_file::install_with(
+                &dir,
+                name,
+                b"original",
+                &FailAt(step),
+            ));
+            if matches!(step, "temp-created" | "bytes-written" | "file-fsync") {
+                assert_eq!(result.unwrap_err().kind(), io::ErrorKind::Other);
+                assert!(!dir.join(name).exists());
+            } else {
+                assert_eq!(result.unwrap(), Published::Created);
+                assert_eq!(std::fs::read(dir.join(name)).unwrap(), b"original");
+                assert_eq!(
+                    publication_result(fgos_durable_file::install_with(
+                        &dir,
+                        name,
+                        b"changed",
+                        &FailAt(step)
+                    ))
+                    .unwrap(),
+                    Published::AlreadyPublished
+                );
+            }
+        }
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

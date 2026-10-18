@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-process = { path = "../../process/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 serde = { workspace = true }

@@ -305,6 +305,8 @@ name = "fgos-run-supervisor"
 version = "0.2.0"
 dependencies = [
  "fgos-agent-protocol",
+ "fgos-canonical-json",
+ "fgos-durable-file",
  "fgos-holder-lock",
  "fgos-process",
  "fgos-terminal-control",
@@ -328,6 +330,7 @@ dependencies = [
 name = "fgos-terminal-control"
 version = "0.2.0"
 dependencies = [
+ "fgos-durable-file",
  "fgos-holder-lock",
  "fgos-process",
  "libc",
