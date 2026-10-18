@@ -9,6 +9,7 @@ files in $FAKE_HERDR_DIR that a test edits while it runs:
   explain.json   the screen detector's verdict, answered by `agent explain`
   screen.txt     what `pane read` prints
   gone           when present, every pane command says pane_not_found
+  unreadable     when present, `pane read`, `agent get` and `agent explain` fail as an unreachable server does
   no-process     when present, `pane process-info` reports only the pane's shell
   calls.log      every call, arguments joined by a tab (written here)
   sent.jsonl     what was typed at the pane: text, keys, prompt (written here)
@@ -96,6 +97,9 @@ if (group, action) in (("tab", "rename"), ("pane", "rename"), ("pane", "report-a
 
 if group in ("pane", "agent") and pane_gone():
     fail("pane_not_found", "pane not found")
+
+if os.path.exists(path("unreadable")) and (group, action) in (("pane", "read"), ("agent", "get"), ("agent", "explain")):
+    fail("connection_refused", "herdr server unreachable")
 
 if (group, action) == ("pane", "get"):
     say({"pane": {"pane_id": PANE, "tab_id": TAB, "agent_status": "idle"}, "type": "pane_info"})

@@ -24,10 +24,16 @@ fn release_slot_item() -> Value {
 
 /// A terminal attempt over `herdr`: the slot already allocated, the brief on disk, an agent that waits.
 fn terminal_run(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms: u64) -> SupRun {
+    terminal_run_with(name, herdr, agent_script, grace_ms, |_| {})
+}
+
+/// `terminal_run` with the deadlines (or anything else of the options) a test sets.
+fn terminal_run_with(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms: u64, tune: impl FnOnce(&mut RunOpts)) -> SupRun {
     let dir = std::env::temp_dir().join(format!("fgos-sup-{name}-{}", std::process::id()));
     let mut opts = RunOpts::agent(0);
     opts.preferred = "linux-pgroup".into();
     opts.grace_ms = grace_ms;
+    tune(&mut opts);
     opts.steps = vec![shell_step(&dir, "settle-attempt", &format!("echo settle >> {}/order", dir.display()), 10_000), release_slot_item()];
     let socket = herdr.go_socket().to_string_lossy().into_owned();
     let script = agent_script.replace("{dir}", &dir.to_string_lossy());
@@ -155,6 +161,52 @@ fn a_pane_that_disappears_is_a_lost_carrier_and_nothing_is_closed() {
     assert!(receipt.get("gateExit").is_none(), "the gate published nothing");
     assert!(pane_closes(&herdr).is_empty(), "a lost carrier closes nothing");
     assert_eq!(run.json("steps/release-slot.json").unwrap()["detail"]["disposition"], "retain");
+}
+
+#[test]
+fn an_agent_reported_working_is_alive_without_asking_the_pane_for_its_processes() {
+    let herdr = FakeHerdr::new("alive");
+    let mut run = terminal_run_with("talive", &herdr, "sleep 600", 500, |opts| opts.idle_ms = Some(6_000));
+    let supervisor = run.start_with_env(&herdr.env());
+
+    brief_taken(&herdr, &run);
+    fs::write(herdr.dir.join("agent-status"), "working").unwrap();
+    // More than two idle periods in which nothing is drawn: the working verdict is the liveness proof.
+    std::thread::sleep(Duration::from_secs(14));
+    assert!(run.json("stop-requested.json").is_none(), "a working agent is not idle: {}", run.log());
+    let calls = herdr.calls();
+    let typed = calls.iter().position(|c| c.starts_with("pane send-keys")).expect("the brief was submitted");
+    assert!(calls[typed..].iter().all(|c| !c.starts_with("pane process-info")), "the watch never reads the pane's processes: {calls:?}");
+
+    kill_agent(&run);
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "exited");
+}
+
+#[test]
+fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle() {
+    let herdr = FakeHerdr::new("blind");
+    let mut run = terminal_run_with("tblind", &herdr, "sleep 600", 500, |opts| {
+        opts.idle_ms = Some(6_000);
+        opts.soft_ms = Some(16_000);
+    });
+    let supervisor = run.start_with_env(&herdr.env());
+
+    brief_taken(&herdr, &run);
+    // Let the adapter confirm the delivery first, with the agent working; only then does the pane stop answering.
+    fs::write(herdr.dir.join("agent-status"), "working").unwrap();
+    std::thread::sleep(Duration::from_secs(4));
+    herdr.set_flag("unreadable", true);
+
+    let (code, line) = finish(supervisor, LIMIT);
+    let agent = agent_pid(&run);
+    // SAFETY: SIGKILL to the agent the gate reported; a pid that is gone is harmless.
+    unsafe { libc::kill(agent, libc::SIGKILL) };
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "timeout");
+    let stop = run.json("stop-requested.json").expect("stop request");
+    assert_eq!(stop["cause"], "soft-deadline", "idle time must not accrue while nothing can be read: {stop}");
 }
 
 #[test]
