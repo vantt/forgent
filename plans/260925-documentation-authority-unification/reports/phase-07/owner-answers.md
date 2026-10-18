@@ -570,3 +570,19 @@ remaining owner-only actions named above.
   which D-ADR0055 superseded (law text carried verbatim; reconcile at promotion).
 - **Boundary:** documentation only; no code change.
 
+### P7-DOC-GAP-05 — Main's retired-name guard rejects carried source text in component-boundary
+
+- **Status:** routed to Phase 9 as a pre-landing blocker (must be resolved before the plan
+  branch lands on main).
+- **Gap:** main's `test/runner/dead-vocabulary-guard.test.mjs` (gateway/plugin retired-name
+  test, added by main `2636ba229`) scans `docs/platform/component-boundary.md` with no
+  history exemption; the Phase 6 verbatim carriage sections "README source carriage" and
+  "repo-layout-vision source carriage" quote retired names (lines 1293–1602), so the test
+  fails on the plan branch only.
+- **Expected fix:** at promotion, move the carriage sections out of the anchor into their own
+  history/provenance file (rebinding their units), or retire them with the legacy sources;
+  never rewrite verbatim carried text or weaken the guard.
+- **Other suite failures at `879a4d5fe`** (fgctl stage contention, runner race timing,
+  store CAS concurrency, missing `.claude/skills/instruction-audit` render) touch no plan
+  path; the plan changes no `src/`, `packages/`, `apps/` or `bin/` byte versus `eab4d617b`.
+
