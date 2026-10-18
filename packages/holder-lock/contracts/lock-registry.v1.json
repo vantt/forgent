@@ -9,7 +9,9 @@
     "40": { "kinds": ["mutex"], "note": "worktree-admin" },
     "50": { "kinds": ["mutex"], "note": "main checkout" },
     "55": { "kinds": [], "note": "git index.lock: outside fgOS, no registry row; the hook tries rank 50 once" },
+    "58": { "kinds": ["mutex"], "note": "event-seal" },
     "60": { "kinds": ["hot-mutex"], "note": "hot state (events + claims)" },
+    "70": { "kinds": ["mutex"], "note": "event-append" },
     "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite" }
   },
   "locks": [
@@ -246,6 +248,28 @@
       "fence": null,
       "owner": "6.2",
       "note": "new lock; the file lives in the run directory and is removed with the run"
+    },
+    {
+      "name": "event-seal",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 58,
+      "v3Path": "<eventOpenRoot>/locks/event-seal.lock",
+      "v1Shape": null,
+      "v1Path": null,
+      "fence": "none",
+      "owner": "event-store"
+    },
+    {
+      "name": "event-append",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 70,
+      "v3Path": "<eventOpenRoot>/locks/event-append.lock",
+      "v1Shape": null,
+      "v1Path": null,
+      "fence": "none",
+      "owner": "event-store"
     }
   ]
 }

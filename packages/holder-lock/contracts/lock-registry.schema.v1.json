@@ -49,7 +49,7 @@
         "v1Path": { "type": ["string", "array", "null"], "items": { "type": "string" } },
         "fence": { "enum": ["tombstone", "blocking-generation", "none", null] },
         "fenceNote": { "type": "string" },
-        "owner": { "enum": ["4.2", "4.3", "4.4", "6.2"] },
+        "owner": { "enum": ["4.2", "4.3", "4.4", "6.2", "event-store"] },
         "note": { "type": "string" }
       },
       "allOf": [
