@@ -57,8 +57,6 @@ fn init(path: &Path, format: &str, backend: &str) {
         "git init {format}/{backend}: {}",
         String::from_utf8_lossy(&out.stderr)
     );
-    use std::os::unix::fs::PermissionsExt;
-    fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
 }
 fn resolve(driver: &GitDriver, path: &Path) -> RepoHandle {
     match driver.resolve_repo(path, path).unwrap() {
@@ -332,6 +330,22 @@ fn remote_mirrors_and_non_fast_forward_are_typed() {
                 &root,
                 &["remote", "add", "origin", remote.to_str().unwrap()],
             );
+            let marker = t.0.join("remote-hook-fired");
+            for hook in [
+                "pre-receive",
+                "update",
+                "post-receive",
+                "reference-transaction",
+            ] {
+                use std::os::unix::fs::PermissionsExt;
+                let path = remote.join("hooks").join(hook);
+                fs::write(
+                    &path,
+                    format!("#!/bin/sh\necho ran >> '{}'\nexit 0\n", marker.display()),
+                )
+                .unwrap();
+                fs::set_permissions(path, fs::Permissions::from_mode(0o755)).unwrap();
+            }
             let driver = GitDriver::new(&t.0).unwrap();
             let repo = resolve(&driver, &root);
             let mut h = handle(&t.0.join("seal.lock"));
@@ -374,10 +388,22 @@ fn remote_mirrors_and_non_fast_forward_are_typed() {
                 "{:?}",
                 pushed.refs
             );
+            assert!(!marker.exists(), "remote receive hooks must be suppressed");
             let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
             port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
             assert!(
                 matches!(port.read_ref(&repo,&RefName::parse("refs/fgos/remotes/origin/events/machine").unwrap()).unwrap(),RefValue::Direct(o) if o==a)
+            );
+            assert!(!marker.exists());
+            assert!(
+                fs::read_dir(root.join("fgos/git/operations"))
+                    .unwrap()
+                    .all(|e| !e
+                        .unwrap()
+                        .file_name()
+                        .to_string_lossy()
+                        .starts_with("remote-")),
+                "terminal transfers must compact"
             );
             assert!(port
                 .fetch_refs(&repo, "origin", &["+refs/*:refs/heads/*".into()])
@@ -454,8 +480,12 @@ fn attempted_operation_is_never_replayed_after_fault_or_aba() {
                 "successor",
             )
             .unwrap();
-            let r = port.supersede(&repo, "fault", "successor").unwrap();
-            assert!(matches!(r.attribution, Attribution::Uncertain));
+            let e = port.recover(&repo, "fault").unwrap_err();
+            assert_eq!(e.code, ResultCode::Superseded);
+            assert!(matches!(
+                e.receipt.unwrap().attribution,
+                Attribution::Uncertain
+            ));
         }
     }
 }
@@ -632,7 +662,7 @@ fn every_acknowledged_filesystem_boundary_preserves_attempt_evidence() {
                 } else {
                     let backlog = wal.scan(100).unwrap();
                     assert!(
-                        backlog.entries.iter().any(|e| e.error.is_some())
+                        backlog.unresolved == 0
                             || !root.join("fgos/git/operations/boundary").exists()
                     );
                 }
@@ -843,13 +873,27 @@ fn remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admiss
         .unwrap()
         .operation_id;
     let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let blocked = port
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Oid(a.clone()),
+            &ExpectedTip::Oid(a.clone()),
+            "blocked-by-transfer",
+        )
+        .unwrap_err();
+    assert_eq!(blocked.operation_id.as_deref(), Some(pending.as_str()));
+    assert!(blocked.cause.contains(&pending));
     // Remove the remote completely: recovery must use only local observations.
     fs::remove_dir_all(&remote).unwrap();
     assert!(matches!(
         port.recover(&repo, &pending).unwrap().remote,
         Remote::Unknown
     ));
-    assert!(wal.inspect(&pending).unwrap().outcome().is_some());
+    assert!(matches!(
+        wal.compacted(&pending).unwrap().unwrap().outcome().unwrap(),
+        wal::Outcome::Transfer { unknown: true, .. }
+    ));
     let bad = root.join("fgos/git/operations/corrupt");
     fs::create_dir(&bad).unwrap();
     fs::write(bad.join("0000.json"), b"bad evidence").unwrap();
@@ -862,7 +906,7 @@ fn remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admiss
             "blocked",
         )
         .unwrap_err();
-    assert_eq!(result.cause, "publication-backlog-unreadable");
+    assert!(result.cause.starts_with("publication-backlog-unreadable"));
     assert!(!root.join("fgos/git/operations/blocked").exists());
 }
 
@@ -887,7 +931,9 @@ fn publication_admission_waits_for_unrelated_pre_exec_copies() {
             unsafe {
                 cmd.pre_exec(move || {
                     let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
-                    if fd < 0 { return Err(std::io::Error::last_os_error()); }
+                    if fd < 0 {
+                        return Err(std::io::Error::last_os_error());
+                    }
                     libc::close(fd);
                     libc::usleep(500_000);
                     Ok(())
@@ -900,11 +946,414 @@ fn publication_admission_waits_for_unrelated_pre_exec_copies() {
             assert!(Instant::now() < deadline);
             std::thread::sleep(Duration::from_millis(1));
         }
-        let receipt = port.compare_and_swap(
-            &repo, &reference(), &ExpectedTip::Absent,
-            &ExpectedTip::Oid(candidate), "pre-exec-admission",
-        ).unwrap();
-        assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
+        let receipt = port
+            .compare_and_swap(
+                &repo,
+                &reference(),
+                &ExpectedTip::Absent,
+                &ExpectedTip::Oid(candidate),
+                "pre-exec-admission",
+            )
+            .unwrap();
+        assert!(matches!(
+            receipt.attribution,
+            Attribution::ThisInvocationWonCas
+        ));
         assert!(unrelated.join().unwrap().success());
     });
+}
+
+#[test]
+fn group_shared_common_dir_is_allowed_but_world_writable_is_refused() {
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
+    use std::os::unix::process::CommandExt;
+    let t = Temp::new();
+    let root = t.0.join("shared");
+    let mut init = Command::new("git");
+    init.args(["init", "--bare", "--shared=group", "-q"])
+        .arg(&root);
+    unsafe {
+        init.pre_exec(|| {
+            libc::umask(0o002);
+            Ok(())
+        });
+    }
+    assert!(init.status().unwrap().success());
+    assert_ne!(fs::metadata(&root).unwrap().mode() & 0o020, 0);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "shared");
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a),
+        "shared",
+    )
+    .unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o777)).unwrap();
+    assert!(wal::Wal::open(&repo).is_err());
+}
+
+#[test]
+fn historical_ledger_over_admission_bound_does_not_block_new_publication() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a.clone()),
+        "seed",
+    )
+    .unwrap();
+    port.release_pin_and_compact(&repo, "seed").unwrap();
+    let wal = wal::Wal::open(&repo).unwrap();
+    let mut receipt = wal.compacted("seed").unwrap().unwrap();
+    use std::os::unix::fs::PermissionsExt;
+    for n in 0..100_001 {
+        receipt.id = format!("history-{n}");
+        receipt.digest = wal::canonical_digest(&(
+            receipt.v,
+            &receipt.id,
+            &receipt.request,
+            &receipt.binding,
+            &receipt.receipt,
+        ))
+        .unwrap();
+        fs::write(
+            root.join("fgos/git/compacted").join(&receipt.id),
+            serde_json::to_vec(&receipt).unwrap(),
+        )
+        .unwrap();
+        fs::set_permissions(
+            root.join("fgos/git/compacted").join(&receipt.id),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+    }
+    assert!(wal.compacted("history-100000").unwrap().is_some());
+    assert!(wal.active(100_000).unwrap().is_empty());
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Oid(a.clone()),
+        &ExpectedTip::Oid(a),
+        "after-history",
+    )
+    .unwrap();
+}
+
+#[test]
+fn pre_attempt_crashes_close_without_blocking_a_new_id() {
+    for step in ["before-pin-cas", "after-pin-cas", "pin-read-back"] {
+        let t = Temp::new();
+        let root = t.0.join("repo");
+        init(&root, "sha1", "files");
+        let driver = GitDriver::new(&t.0).unwrap();
+        let repo = resolve(&driver, &root);
+        let mut h = handle(&t.0.join("seal.lock"));
+        let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+        let a = commit(&port, &repo, vec![], "a");
+        drop(port);
+        let faulty =
+            PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), Fault(step));
+        assert!(faulty
+            .compare_and_swap(
+                &repo,
+                &reference(),
+                &ExpectedTip::Absent,
+                &ExpectedTip::Oid(a.clone()),
+                "old"
+            )
+            .is_err());
+        drop(faulty);
+        let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+        // A crash before record zero also cannot block admission.
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .mode(0o700)
+            .create(root.join("fgos/git/operations/empty"))
+            .unwrap();
+        fs::write(
+            root.join("fgos/git/operations/empty/.durable-file-orphan.tmp"),
+            b"partial",
+        )
+        .unwrap();
+        port.compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a.clone()),
+            "new",
+        )
+        .unwrap();
+        let wal = wal::Wal::open(&repo).unwrap();
+        assert!(wal.active(100).unwrap().is_empty());
+        let terminal = wal
+            .compacted("old")
+            .unwrap()
+            .map(|c| c.outcome().unwrap())
+            .or_else(|| wal.inspect("old").unwrap().outcome().cloned())
+            .unwrap();
+        assert!(matches!(terminal, wal::Outcome::AbandonedBeforeAttempt));
+        assert_eq!(wal.scan(100).unwrap().unresolved, 0);
+    }
+}
+
+#[test]
+fn publication_config_cache_invalidates_and_transport_budget_is_caller_owned() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    let remote = t.0.join("remote");
+    init(&root, "sha1", "files");
+    init(&remote, "sha1", "files");
+    git(
+        &root,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h)).with_remote(RemoteGrant {
+        name: "origin".into(),
+        pinned_url: remote.to_str().unwrap().into(),
+    });
+    port.read_ref(&repo, &reference()).unwrap();
+    git(&root, &["config", "core.sshCommand", "forbidden"]);
+    assert!(port
+        .read_ref(&repo, &reference())
+        .unwrap_err()
+        .cause
+        .contains("repository-config-untrusted: core.sshcommand"));
+    git(&root, &["config", "--unset", "core.sshCommand"]);
+    port.read_ref(&repo, &reference()).unwrap();
+    let port = port.with_transport_timeout(std::time::Duration::ZERO);
+    // The override affects actual transport, while local plumbing still works.
+    port.write_blob(&repo, b"local").unwrap();
+    let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
+    assert!(port
+        .fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
+        .is_err());
+    let port = port.with_transport_timeout(std::time::Duration::from_secs(5));
+    port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
+}
+
+#[test]
+fn post_attempt_read_failure_is_pending_with_operation_id() {
+    struct Tamper(PathBuf);
+    impl FileSystem for Tamper {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "after-target-cas" {
+                git(
+                    &self.0,
+                    &["symbolic-ref", reference().as_str(), "refs/heads/dangling"],
+                );
+            }
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    drop(port);
+    let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), Tamper(root));
+    let error = port
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a),
+            "read-failure",
+        )
+        .unwrap_err();
+    assert_eq!(error.code, ResultCode::RecoveryRequired);
+    assert_eq!(error.operation_id.as_deref(), Some("read-failure"));
+    assert!(matches!(
+        wal::Wal::open(&repo)
+            .unwrap()
+            .inspect("read-failure")
+            .unwrap()
+            .last()
+            .phase,
+        Phase::TargetAttempt { .. }
+    ));
+}
+
+#[test]
+fn linear_history_walk_batches_commit_reads() {
+    use std::io::Write;
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let mut stream = Vec::new();
+    for n in 0..1024 {
+        stream.extend_from_slice(
+            format!(
+                "commit refs/heads/history\ncommitter Test <t@e> {} +0000\ndata 1\nx\n\n",
+                n + 1
+            )
+            .as_bytes(),
+        );
+    }
+    let mut child = Command::new("git")
+        .arg("-C")
+        .arg(&root)
+        .args(["fast-import", "--quiet"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(&stream).unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let head = String::from_utf8(git(&root, &["rev-parse", "refs/heads/history"])).unwrap();
+    let oid = Oid::parse(head.trim(), ObjectFormat::Sha1).unwrap();
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    port.read_ref(&repo, &reference()).unwrap(); // warm the config preflight
+    eprintln!("WALK-BEGIN");
+    let page = port
+        .walk_commits(
+            &repo,
+            &[oid],
+            &[],
+            None,
+            WalkBounds {
+                max_commits: 2048,
+                max_bytes: 1024 * 1024,
+            },
+        )
+        .unwrap();
+    eprintln!("WALK-END");
+    assert!(page.complete);
+    assert_eq!(page.commits.len(), 1024);
+}
+
+#[test]
+fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority() {
+    struct RecordFixture;
+    impl wal::PublicationAuthority for RecordFixture {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a.clone()),
+        "seed",
+    )
+    .unwrap();
+    let wal = wal::Wal::open(&repo).unwrap();
+    let seed = wal.inspect("seed").unwrap().intent().clone();
+    for (n, kind) in [
+        wal::OperationKind::PublicationCas,
+        wal::OperationKind::RemoteFetch {
+            url: "/unused".into(),
+            refspecs: vec!["refs/fgos/events/*".into()],
+        },
+        wal::OperationKind::RemotePush {
+            url: "/unused".into(),
+            refspecs: vec![reference().as_str().into()],
+        },
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        for prepared in [false, true] {
+            let id = format!("pre-attempt-{n}-{prepared}");
+            let mut intent = seed.clone();
+            intent.kind = kind.clone();
+            intent.expected = seed.next.clone();
+            intent.request_digest = wal::canonical_digest(&id).unwrap();
+            let chain = match wal.begin(&id, intent, &RecordFixture).unwrap() {
+                wal::Begin::Created(c) => c,
+                _ => panic!(),
+            };
+            if prepared {
+                wal.append(&chain, Phase::Prepared).unwrap();
+            }
+        }
+    }
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Oid(a.clone()),
+        &ExpectedTip::Oid(a),
+        "after-pre-attempts",
+    )
+    .unwrap();
+    assert!(wal.active(100).unwrap().is_empty());
+    assert_eq!(wal.scan(100).unwrap().unresolved, 0);
+}
+
+#[test]
+fn batched_walk_returns_a_page_before_an_oversized_future_commit() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let parent = commit(&port, &repo, vec![], &"large".repeat(32_000));
+    let child = commit(&port, &repo, vec![parent.clone()], "small");
+    let first = port
+        .walk_commits(
+            &repo,
+            std::slice::from_ref(&child),
+            &[],
+            None,
+            WalkBounds {
+                max_commits: 10,
+                max_bytes: 1024,
+            },
+        )
+        .unwrap();
+    assert_eq!(first.commits.len(), 1);
+    assert!(!first.complete);
+    let second = port
+        .walk_commits(
+            &repo,
+            &[child],
+            &[],
+            first.next_cursor,
+            WalkBounds {
+                max_commits: 10,
+                max_bytes: 256 * 1024,
+            },
+        )
+        .unwrap();
+    assert_eq!(second.commits[0].oid, parent);
+    assert!(second.complete);
 }

@@ -100,6 +100,7 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    AbandonedBeforeAttempt,
     Transfer {
         acknowledged: bool,
         unknown: bool,
@@ -313,6 +314,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     let prev = &records.last().ok_or_else(|| corrupt("empty"))?.phase;
     let valid = match (prev, phase) {
         (Phase::Intent(_), Phase::Prepared) => true,
+        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
+            true
+        }
         (
             Phase::Prepared,
             Phase::Outcome(Outcome::Success {
@@ -329,6 +333,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == &i.expected && next == &i.next,
         (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
+            Outcome::AbandonedBeforeAttempt => false,
             Outcome::Transfer {
                 acknowledged,
                 unknown,
@@ -409,6 +414,9 @@ impl Directory {
         }
     }
     fn open(path: &Path) -> WalResult<Self> {
+        Self::open_trusted(path, false)
+    }
+    fn open_trusted(path: &Path, common: bool) -> WalResult<Self> {
         #[cfg(target_os = "linux")]
         {
             use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
@@ -417,7 +425,9 @@ impl Directory {
                 .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC)
                 .open(path)?;
             let m = file.metadata()?;
-            if m.uid() != unsafe { libc::geteuid() } || m.mode() & 0o022 != 0 {
+            if (m.uid() != unsafe { libc::geteuid() } && !(common && m.uid() == 0))
+                || m.mode() & if common { 0o002 } else { 0o022 } != 0
+            {
                 return Err(WalError::Untrusted);
             }
             Ok(Self { file })
@@ -480,7 +490,7 @@ impl<F: FileSystem> Wal<F> {
         if canonical != common {
             return Err(WalError::Untrusted);
         }
-        let common = Directory::open(common)?;
+        let common = Directory::open_trusted(common, true)?;
         let identity = repository_identity(&common)?;
         let fgos = common.child("fgos", true, &fsys)?;
         let git = fgos.child("git", true, &fsys)?;
@@ -500,7 +510,7 @@ impl<F: FileSystem> Wal<F> {
         if common_path.canonicalize()? != common_path {
             return Err(WalError::Untrusted);
         }
-        let common = Directory::open(common_path)?;
+        let common = Directory::open_trusted(common_path, true)?;
         let identity = repository_identity(&common)?;
         let fgos = common.child("fgos", false, &fsys)?;
         let git = fgos.child("git", false, &fsys)?;
@@ -754,10 +764,14 @@ fn compaction_suffix(dir: &Directory, id: &str) -> WalResult<Vec<Record>> {
             return Err(corrupt("compaction suffix"));
         }
     }
-    if records
-        .last()
-        .is_some_and(|r| !matches!(r.phase, Phase::PinReleased))
-    {
+    if records.last().is_some_and(|r| {
+        !matches!(
+            r.phase,
+            Phase::PinReleased
+                | Phase::Outcome(Outcome::Transfer { .. })
+                | Phase::Outcome(Outcome::AbandonedBeforeAttempt)
+        )
+    }) {
         return Err(corrupt("nonterminal compaction suffix"));
     }
     Ok(records)
@@ -915,9 +929,16 @@ pub struct CompactReceipt {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
-        Outcome::Transfer { .. } => vec![
+        Outcome::AbandonedBeforeAttempt => vec!["a".into()],
+        Outcome::Transfer {
+            acknowledged,
+            unknown,
+            ..
+        } => vec![
             "t".into(),
-            serde_json::to_string(o).expect("serializable outcome"),
+            acknowledged.to_string(),
+            unknown.to_string(),
+            canonical_digest(o).expect("serializable outcome"),
         ],
         Outcome::Success {
             observed,
@@ -963,12 +984,13 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("a") => o.len() == 1,
         Some("t") => {
-            o.len() == 2
-                && matches!(
-                    serde_json::from_str::<Outcome>(&o[1]),
-                    Ok(Outcome::Transfer { .. })
-                )
+            o.len() == 4
+                && matches!(o[1].as_str(), "true" | "false")
+                && matches!(o[2].as_str(), "true" | "false")
+                && !(o[1] == "true" && o[2] == "true")
+                && digest_valid(&o[3])
         }
         Some("s") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "w" | "e"),
         Some("l") => o.len() == 2 && tip(&o[1]),
@@ -997,7 +1019,13 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
-            "t" => serde_json::from_str(&r[1]).map_err(|_| corrupt("transfer compact outcome"))?,
+            "a" => Outcome::AbandonedBeforeAttempt,
+            "t" => Outcome::Transfer {
+                acknowledged: r[1] == "true",
+                unknown: r[2] == "true",
+                observations: vec![],
+                details: vec![format!("compacted transfer digest: {}", r[3])],
+            },
             "s" => Outcome::Success {
                 observed: tip(&r[1]),
                 attribution: if r[2] == "w" {
@@ -1112,7 +1140,9 @@ impl<F: FileSystem> Wal<F> {
         let id = &chain.last().operation_id;
         let actual = self.inspect(id)?;
         if actual.last().digest != chain.last().digest
-            || !matches!(actual.last().phase, Phase::PinReleased)
+            || !(matches!(actual.last().phase, Phase::PinReleased)
+                || (actual.intent().kind != OperationKind::PublicationCas
+                    && actual.outcome().is_some()))
             || reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?
                 != ObservedRef::Direct(Tip::Absent)
         {
@@ -1191,6 +1221,54 @@ pub struct Backlog {
     pub oldest_unresolved: Option<(String, std::time::SystemTime)>,
 }
 impl<F: FileSystem> Wal<F> {
+    pub(crate) fn known_id(&self, id: &str) -> WalResult<bool> {
+        if self.compacted(id)?.is_some() {
+            return Ok(true);
+        }
+        match self.operation(id, false) {
+            Ok(dir) => self.has_intent(&dir),
+            Err(WalError::Io(e)) if e.kind() == io::ErrorKind::NotFound => Ok(false),
+            Err(e) => Err(e),
+        }
+    }
+    fn has_intent(&self, dir: &Directory) -> WalResult<bool> {
+        if dir.path().join(record_name(0)).try_exists()? {
+            return Ok(true);
+        }
+        for (n, entry) in fs::read_dir(dir.path())?.enumerate() {
+            if n >= MAX_RECORDS * 2 {
+                return Err(corrupt("pre-intent scan bound"));
+            }
+            let name = entry?.file_name().to_string_lossy().into_owned();
+            if !(name.starts_with(".durable-file-") && name.ends_with(".tmp")) {
+                return Err(corrupt("unknown pre-intent artifact"));
+            }
+        }
+        Ok(false)
+    }
+    /// Admission never traverses historical ledger entries. A directory without
+    /// record zero is not an Intent and cannot block an unrelated operation.
+    pub fn active(&self, bound: usize) -> WalResult<Vec<Chain>> {
+        let mut chains = Vec::new();
+        for (n, entry) in fs::read_dir(self.root.path())?.enumerate() {
+            if n >= bound {
+                return Err(WalError::RecoveryRequired);
+            }
+            let id = entry?.file_name().to_string_lossy().into_owned();
+            if self.compacted(&id)?.is_some() {
+                continue;
+            }
+            let dir = self.operation(&id, false)?;
+            if !self.has_intent(&dir)? {
+                continue;
+            }
+            let chain = self.inspect(&id)?;
+            if chain.outcome().is_none() {
+                chains.push(chain);
+            }
+        }
+        Ok(chains)
+    }
     /// Bound covers both operation directories and immutable ledger entries;
     /// reaching it always reports incomplete, never clearance for C5.
     pub fn scan(&self, bound: usize) -> WalResult<Backlog> {
@@ -1227,7 +1305,12 @@ impl<F: FileSystem> Wal<F> {
                                 .and_then(|dir| compaction_suffix(&dir, &id))
                                 .map(|_| true)
                         } else {
-                            self.inspect(&id).map(|c| c.outcome().is_some())
+                            self.operation(&id, false).and_then(|dir| {
+                                if !self.has_intent(&dir)? {
+                                    return Ok(true);
+                                }
+                                self.inspect(&id).map(|c| c.outcome().is_some())
+                            })
                         }
                     })
                 };
@@ -1896,7 +1979,7 @@ mod tests {
         assert_eq!(read.fs.count.load(Ordering::SeqCst), 0);
     }
     #[test]
-    fn intent_crash_boundaries_preserve_empty_directory_as_unresolved() {
+    fn intent_crash_boundaries_ignore_uninstalled_intent_but_preserve_evidence() {
         for point in 1..=12 {
             let t = Temp::new();
             let w = Wal::with_filesystem(
@@ -1911,7 +1994,17 @@ mod tests {
             w.fs.fail.store(point, Ordering::SeqCst);
             let _ = w.begin("one", intent(&w), &Authority);
             let reopened = Wal::open_existing(&t.0, OsFileSystem).unwrap();
-            assert_eq!(reopened.scan(100).unwrap().unresolved, 1);
+            let installed = reopened
+                .root
+                .path()
+                .join("one")
+                .join(record_name(0))
+                .exists();
+            assert_eq!(
+                reopened.scan(100).unwrap().unresolved,
+                usize::from(installed)
+            );
+            assert_eq!(reopened.active(100).unwrap().len(), usize::from(installed));
             match reopened.inspect("one") {
                 Ok(c) => assert!(matches!(c.last().phase, Phase::Intent(_))),
                 Err(WalError::Corrupt(_)) => (),

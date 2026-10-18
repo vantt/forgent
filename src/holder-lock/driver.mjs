@@ -365,22 +365,3 @@ export function descriptionHolders(lockPath, { excludePid } = {}) {
   }
   return { kind: 'list', pids };
 }
-
-/** One sweep: SIGKILL every process other than `excludePid` that still holds
- * a description of `lockPath`. Returns the pids signalled and the pids this
- * process could not signal (another user's, or already gone). */
-export function killDescriptionHoldersOnce(lockPath, { excludePid }) {
-  const holders = descriptionHolders(lockPath, { excludePid });
-  if (holders.kind !== 'list') return { listable: false, killed: [], refused: [] };
-  const killed = [];
-  const refused = [];
-  for (const pid of holders.pids) {
-    try {
-      process.kill(pid, 'SIGKILL');
-      killed.push(pid);
-    } catch (err) {
-      if (err.code !== 'ESRCH') refused.push(pid);
-    }
-  }
-  return { listable: true, killed, refused };
-}

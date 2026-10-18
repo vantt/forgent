@@ -287,7 +287,7 @@ fn unrelated_pre_exec_child_survives_borrowed_git() {
 
 #[cfg(target_os = "linux")]
 #[test]
-fn foreign_description_holder_is_refused_and_never_killed() {
+fn admission_refuses_escapee_and_borrow_cleanup_kills_it() {
     use std::os::unix::process::CommandExt;
     let _serial = serial();
     let dir = temp_dir("foreign");
@@ -332,14 +332,10 @@ fn foreign_description_holder_is_refused_and_never_killed() {
     }
     let foreign = ForeignGuard(pid);
     assert!(matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid)));
-    let error = run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap_err();
-    assert!(matches!(&error, BorrowError::ForeignHolder { pids } if pids.contains(&pid)), "{error}");
-    assert!(error.to_string().starts_with("lock-description-foreign-holder:"));
-    assert!(matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Live { .. }));
+    let outcome = run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap();
+    assert!(outcome.outcome.leftovers_killed > 0);
     assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
     release(handle);
-    // Refusal has not killed or unlocked the foreign description.
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
     drop(foreign);
     let deadline = Instant::now() + Duration::from_secs(5);
     while !matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie) {

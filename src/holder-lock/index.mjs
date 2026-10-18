@@ -41,7 +41,6 @@ import {
   leftoverSweep,
   borrowLeadsGroup,
   descriptionHolders,
-  killDescriptionHoldersOnce,
   runProcessObserveRoute,
   ROUTE_CALL_TIMEOUT_MS,
   ROUTE_SLACK_MS,
@@ -56,7 +55,6 @@ export { LockScope, createLockScope, resolveLock, loadLockRegistry, lockEntry, r
  * no longer the inode at the path (the file was replaced under it). */
 const INODE_RETRIES = 3;
 const DEFAULT_POLL_MS = 25;
-const SWEEP_POLL_MS = 5;
 const MAX_OUTPUT_BYTES = 16 * 1024 * 1024;
 
 const descriptions = new WeakMap();
@@ -402,36 +400,28 @@ function leftoverError(handle, remaining, extra) {
   );
 }
 
-/** The holder's release rule, step 0: after the child exited, kill whatever
- * still holds the description and wait for the kernel to show none, at
- * most `killWaitMs`. Linux lists holders through /proc; elsewhere the
- * child's process group is signalled instead (best effort, uncounted). */
+/** Release step 0: Rust applies the refined description-domain rule. */
+function sweepAnswer(handle, answer) {
+  if (!['drained', 'not-drained'].includes(answer.result) || !Array.isArray(answer.remaining) || (answer.result === 'not-drained' && answer.remaining.length === 0)) {
+    throw new HolderLockError('borrow-leftover-not-killed', `${handle.name}: Rust drain did not prove completion`, { lock: handle.name, result: answer.result });
+  }
+  return answer;
+}
+function sweepRequest(handle, childPid) {
+  return {
+    bin: hostBin({ fgosDir: handle.projectRoot && path.join(handle.projectRoot, '.fgos') }),
+    args: ['--drain-child', String(childPid), '--kill-wait-ms', String(handle.killWaitMs)],
+    fd: descriptionOf(handle).fd,
+    timeoutMs: handle.killWaitMs + ROUTE_SLACK_MS,
+  };
+}
 function sweepLeftoversSync(handle, childPid) {
   if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
-  const deadline = Date.now() + handle.killWaitMs;
-  const killed = new Set();
-  for (;;) {
-    const sweep = killDescriptionHoldersOnce(handle.path, { excludePid: process.pid });
-    for (const pid of sweep.killed) killed.add(pid);
-    const remaining = descriptionHolders(handle.path, { excludePid: process.pid });
-    if (remaining.kind !== 'list' || remaining.pids.length === 0) return { leftoversKilled: killed.size, remaining: [] };
-    if (Date.now() >= deadline) return { leftoversKilled: killed.size, remaining: remaining.pids };
-    sleepSync(SWEEP_POLL_MS);
-  }
+  return sweepAnswer(handle, runLockRouteSync(sweepRequest(handle, childPid)));
 }
-
 async function sweepLeftovers(handle, childPid) {
   if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
-  const deadline = Date.now() + handle.killWaitMs;
-  const killed = new Set();
-  for (;;) {
-    const sweep = killDescriptionHoldersOnce(handle.path, { excludePid: process.pid });
-    for (const pid of sweep.killed) killed.add(pid);
-    const remaining = descriptionHolders(handle.path, { excludePid: process.pid });
-    if (remaining.kind !== 'list' || remaining.pids.length === 0) return { leftoversKilled: killed.size, remaining: [] };
-    if (Date.now() >= deadline) return { leftoversKilled: killed.size, remaining: remaining.pids };
-    await sleep(SWEEP_POLL_MS);
-  }
+  return sweepAnswer(handle, await runLockRoute(sweepRequest(handle, childPid)));
 }
 
 function sweepProcessGroup(childPid) {

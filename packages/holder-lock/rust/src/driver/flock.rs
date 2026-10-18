@@ -227,22 +227,31 @@ impl LockDriver for FlockDriver {
 }
 
 /// Linux: only the borrow group and descendants may be killed. Foreign
-/// description holders are waited (transient fork/exec copies) or refused.
+/// direct pre-exec children of the owner are waited; escaped holders are killed.
 fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), kill_wait)
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait)
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
 pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration) -> Result<(), Leftovers> {
-    drain_description(file, None, kill_wait).map(|_| ())
+    drain_description(file, None, std::process::id(), kill_wait).map(|_| ())
 }
 
-fn drain_description(file: &File, child_pid: Option<u32>, kill_wait: Duration) -> Result<u32, Leftovers> {
+pub(crate) fn drain_description(
+    file: &File,
+    child_pid: Option<u32>,
+    owner: u32,
+    kill_wait: Duration,
+) -> Result<u32, Leftovers> {
     use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
     use fgos_process::facts::{file_key, identity_of, lock_holders, Holders};
     let Ok((dev, ino)) = file_key(file) else {
-        return Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false });
+        return Err(Leftovers {
+            killed: 0,
+            pids: Vec::new(),
+            foreign: false,
+        });
     };
     let me = std::process::id();
     let deadline = Instant::now() + kill_wait;
@@ -250,32 +259,45 @@ fn drain_description(file: &File, child_pid: Option<u32>, kill_wait: Duration) -
     let mut killed = 0u32;
     loop {
         let holders = match lock_holders(dev, ino) {
-            Holders::List(list) if list.iter().any(|t| t.pid.0 == me) => list.into_iter().filter(|t| t.pid.0 != me).collect::<Vec<_>>(),
+            Holders::List(list) if list.iter().any(|t| t.pid.0 == me) => list
+                .into_iter()
+                .filter(|t| t.pid.0 != me && t.pid.0 != owner)
+                .collect::<Vec<_>>(),
             // Absence of our known locked description is not proof of an
             // empty holder set (Publication admission also requires self).
-            Holders::List(_) | Holders::Unlistable => return Err(Leftovers { killed, pids: Vec::new(), foreign: false }),
+            Holders::List(_) | Holders::Unlistable => {
+                return Err(Leftovers {
+                    killed,
+                    pids: Vec::new(),
+                    foreign: false,
+                })
+            }
         };
         let had_holders = !holders.is_empty();
         let mut foreign = Vec::new();
-        let mut refused = false;
-        let mut domain = child_pid.map(|pid| group_members(pid as libc::pid_t)).unwrap_or_default();
-        // Include still-reachable descendants that changed process group,
-        // even if they closed the borrowed description.
-        if let (Some(child_pid), Ok(entries)) = (child_pid, std::fs::read_dir("/proc")) {
-            domain.extend(entries.flatten().filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
-                .filter(|pid| in_borrow_domain(*pid, child_pid)));
+        let mut domain = child_pid
+            .map(|pid| group_members(pid as libc::pid_t))
+            .unwrap_or_default();
+        if let (Some(root), Ok(entries)) = (child_pid, std::fs::read_dir("/proc")) {
+            domain.extend(
+                entries
+                    .flatten()
+                    .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
+                    .filter(|pid| in_borrow_domain(*pid, root)),
+            );
         }
         for tuple in holders {
-            if child_pid.is_some_and(|root| in_borrow_domain(tuple.pid.0, root)) {
-                domain.push(tuple.pid.0);
+            let pid = tuple.pid.0;
+            if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+                || (child_pid.is_some()
+                    && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner))
+            {
+                // Each acquire owns a fresh CLOEXEC description. An outside
+                // holder other than an owner's direct pre-exec child can only
+                // be an escaped borrower descendant, even after reparenting.
+                domain.push(pid);
             } else {
-                // An unrelated child can inherit CLOEXEC descriptions until
-                // exec. Re-scan fdinfo, not liveness: it may exec and stay live.
-                // A process can disappear between fdinfo and stat. Do not
-                // turn that normal exit into a permanent foreign refusal;
-                // the next description scan confirms it is gone.
-                refused |= parent_and_group(tuple.pid.0).is_some_and(|(ppid, _)| ppid != me);
-                foreign.push(tuple.pid.0);
+                foreign.push(pid);
             }
         }
         domain.sort_unstable();
@@ -284,22 +306,35 @@ fn drain_description(file: &File, child_pid: Option<u32>, kill_wait: Duration) -
         for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
             if let Some(tuple) = identity_of(fgos_process::ProcId(pid)) {
                 // Re-check membership before signalling a pinned identity.
-                if child_pid.is_some_and(|root| in_borrow_domain(pid, root)) {
+                if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+                    || (child_pid.is_some()
+                        && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner))
+                {
                     live.push(pid);
-                    if signaled.insert((pid, tuple.start_time.clone())) && signal_by_identity(&tuple, Signal::Kill) == SignalOutcome::Sent {
+                    if signaled.insert((pid, tuple.start_time.clone()))
+                        && signal_by_identity(&tuple, Signal::Kill) == SignalOutcome::Sent
+                    {
                         killed += 1;
                     }
                 }
             }
         }
-        if live.is_empty() && (refused || (!foreign.is_empty() && Instant::now() >= deadline)) {
-            return Err(Leftovers { killed, pids: foreign, foreign: true });
+        if live.is_empty() && !foreign.is_empty() && Instant::now() >= deadline {
+            return Err(Leftovers {
+                killed,
+                pids: foreign,
+                foreign: true,
+            });
         }
         if live.is_empty() && foreign.is_empty() && !had_holders {
             return Ok(killed);
         }
         if Instant::now() >= deadline {
-            return Err(Leftovers { killed, pids: live, foreign: false });
+            return Err(Leftovers {
+                killed,
+                pids: live,
+                foreign: false,
+            });
         }
         std::thread::sleep(Duration::from_millis(1));
     }

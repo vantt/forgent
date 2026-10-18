@@ -7,7 +7,7 @@ use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{mpsc, Arc, OnceLock};
+use std::sync::{mpsc, Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 const PATH_LIMIT: usize = 64 * 1024 * 1024;
@@ -20,6 +20,45 @@ static FLOOR: OnceLock<Result<GitFloorVerdict>> = OnceLock::new();
 
 /// Effective config record: origin, normalized key, byte-preserving value.
 type ConfigRecord = (Vec<u8>, String, Vec<u8>);
+type ConfigEnvironment = (Option<std::ffi::OsString>, Option<std::ffi::OsString>);
+#[derive(PartialEq, Eq)]
+struct ConfigStamp {
+    paths: Vec<PathBuf>,
+    // Identity includes inode, length, mtime and ctime; missing inputs are
+    // tracked too, without reading whole config files on the hot path.
+    files: Vec<Option<String>>,
+}
+impl ConfigStamp {
+    fn read(paths: Vec<PathBuf>) -> Result<Self> {
+        let files = paths
+            .iter()
+            .map(|p| match fs::metadata(p) {
+                Ok(m) => {
+                    #[cfg(unix)]
+                    let identity = {
+                        use std::os::unix::fs::MetadataExt;
+                        format!(
+                            "{}:{}:{}:{}:{}:{}:{}",
+                            m.dev(),
+                            m.ino(),
+                            m.len(),
+                            m.mtime(),
+                            m.mtime_nsec(),
+                            m.ctime(),
+                            m.ctime_nsec()
+                        )
+                    };
+                    #[cfg(not(unix))]
+                    let identity = format!("{}:{:?}:{:?}", m.len(), m.modified(), m.created());
+                    Ok(Some(identity))
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+                Err(e) => Err(io(e)),
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Self { paths, files })
+    }
+}
 
 fn refusal(cause: impl Into<String>) -> OperationError {
     OperationError {
@@ -110,6 +149,8 @@ pub struct GitDriver {
     hooks: PathBuf,
     git: PathBuf,
     containment: Box<dyn ContainmentDriver>,
+    publication_config: Mutex<BTreeMap<PathBuf, ConfigStamp>>,
+    config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
     /// state_root is a caller-owned trusted directory, not a repository path.
@@ -145,6 +186,8 @@ impl GitDriver {
             .clone()
             .ok_or_else(|| refusal("git-unavailable"))?;
         Ok(Self {
+            publication_config: Mutex::new(BTreeMap::new()),
+            config_sources: Mutex::new(BTreeMap::new()),
             state_root,
             hooks,
             git,
@@ -264,10 +307,101 @@ impl GitDriver {
         args: &[&str],
         input: &[u8],
         remote: bool,
+        transport_timeout: Duration,
     ) -> Result<Output> {
         self.require_floor()?;
         fgos_holder_lock::validate(handle)
             .map_err(|e| refusal(format!("publication-borrow-unavailable: {e}")))?;
+        self.publication_preflight(repo, handle)?;
+        self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            args,
+            if remote {
+                Policy::Remote
+            } else {
+                Policy::Publication
+            },
+            Some(handle),
+            true,
+            PATH_LIMIT,
+            if remote {
+                transport_timeout
+            } else {
+                Duration::from_secs(30)
+            },
+            input,
+        )
+    }
+
+    fn publication_preflight(
+        &self,
+        repo: &RepoHandle,
+        handle: &fgos_holder_lock::Handle,
+    ) -> Result<()> {
+        let environment = (
+            std::env::var_os("HOME"),
+            std::env::var_os("XDG_CONFIG_HOME"),
+        );
+        let mut sources = self
+            .config_sources
+            .lock()
+            .map_err(|_| refusal("config-cache-poisoned"))?;
+        let globals = if let Some(paths) = sources.get(&environment) {
+            paths.clone()
+        } else {
+            let mut paths = Vec::new();
+            // Ask the selected Git, including absent config inputs. Origin
+            // records alone cannot reveal a missing system/global file that
+            // appears later, and a custom Git prefix must never be guessed.
+            for variable in ["GIT_CONFIG_SYSTEM", "GIT_CONFIG_GLOBAL"] {
+                let out = self.invoke_input(
+                    Some(repo),
+                    &repo.trusted_main_root,
+                    &["var", variable],
+                    Policy::Publication,
+                    Some(handle),
+                    true,
+                    PATH_LIMIT,
+                    Duration::from_secs(30),
+                    &[],
+                )?;
+                if !out.success {
+                    return Err(out.error("git-config-paths-unavailable"));
+                }
+                for path in std::str::from_utf8(&out.stdout)
+                    .map_err(|_| refusal("non-utf8-config-path"))?
+                    .lines()
+                {
+                    let path = PathBuf::from(path);
+                    if !path.is_absolute() {
+                        return Err(refusal("relative-config-path"));
+                    }
+                    paths.push(path);
+                }
+            }
+            sources.insert(environment, paths.clone());
+            paths
+        };
+        drop(sources);
+        let mut paths = globals;
+        paths.extend([
+            repo.common_dir.join("config"),
+            repo.git_dir.join("config.worktree"),
+        ]);
+        let mut cache = self
+            .publication_config
+            .lock()
+            .map_err(|_| refusal("config-cache-poisoned"))?;
+        if let Some(stamp) = cache.get(repo.common_dir()) {
+            // origins outside standard paths are kept as dependencies too.
+            let mut known = paths.clone();
+            known.extend(stamp.paths.iter().filter(|p| !paths.contains(p)).cloned());
+            if ConfigStamp::read(known)? == *stamp {
+                return Ok(());
+            }
+        }
+        let before = ConfigStamp::read(paths.clone())?;
         let config = self.invoke_input(
             Some(repo),
             &repo.trusted_main_root,
@@ -282,26 +416,29 @@ impl GitDriver {
         if !config.success {
             return Err(config.error("git-config-failed"));
         }
-        for (_, key, _) in parse_config(&config.stdout)? {
+        for (origin, key, _) in parse_config(&config.stdout)? {
             if command_config(&key) {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
+            if let Some(path) = origin.strip_prefix(b"file:") {
+                let path = PathBuf::from(
+                    std::str::from_utf8(path).map_err(|_| refusal("non-utf8-config-origin"))?,
+                );
+                let path = if path.is_absolute() {
+                    path
+                } else {
+                    repo.trusted_main_root.join(path)
+                };
+                if !paths.contains(&path) {
+                    paths.push(path);
+                }
+            }
         }
-        self.invoke_input(
-            Some(repo),
-            &repo.trusted_main_root,
-            args,
-            if remote {
-                Policy::Remote
-            } else {
-                Policy::Publication
-            },
-            Some(handle),
-            true,
-            PATH_LIMIT,
-            Duration::from_secs(30),
-            input,
-        )
+        // Do not cache a decision across a config change during the read.
+        if paths == before.paths && before == ConfigStamp::read(before.paths.clone())? {
+            cache.insert(repo.common_dir.clone(), before);
+        }
+        Ok(())
     }
 
     // Deliberately re-read effective config each time. No stale config identity
@@ -435,10 +572,40 @@ impl GitDriver {
                 argv.push("--no-deref".into());
             }
         }
+        if policy == Policy::Remote && args.contains(&"protocol.file.allow=always") {
+            let verb = args
+                .iter()
+                .find(|a| matches!(**a, "push" | "fetch" | "ls-remote"));
+            if let Some(verb) = verb {
+                let service = if *verb == "push" {
+                    "receive-pack"
+                } else {
+                    "upload-pack"
+                };
+                let option = if *verb == "push" {
+                    "--receive-pack"
+                } else {
+                    "--upload-pack"
+                };
+                // Git's local transport scrubs the client's config. Carry the
+                // hook prohibition explicitly to its server-side Git process.
+                let quote = |s: &str| format!("'{}'", s.replace('\'', "'\"'\"'"));
+                let command = format!(
+                    "{} -c {} {}",
+                    quote(&text_path(&self.git)?),
+                    quote(&format!("core.hooksPath={}", text_path(&self.hooks)?)),
+                    service
+                );
+                let at = argv.iter().position(|a| a == "--").unwrap_or(argv.len());
+                argv.insert(at, format!("{option}={command}"));
+            }
+        }
         if args.first() == Some(&"diff") {
             argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
         }
         let mut env = Scrubbed::new();
+        env.0.insert("LC_ALL".into(), "C".into());
+        env.0.insert("LANGUAGE".into(), String::new());
         if policy != Policy::Remote {
             env.0.insert("GIT_NO_LAZY_FETCH".into(), "1".into());
         }
@@ -457,7 +624,9 @@ impl GitDriver {
                     stdin: input.to_vec(),
                     stdout_limit: limit,
                     stderr_limit: STDERR_LIMIT,
-                    deadline: Instant::now() + timeout,
+                    deadline: Instant::now()
+                        .checked_add(timeout)
+                        .ok_or_else(|| refusal("invalid-git-deadline"))?,
                 },
             )?;
             return Ok(Output {
@@ -1456,6 +1625,54 @@ mod tests {
             let driver = GitDriver::new(Path::new(&state)).unwrap();
             assert!(driver.git_floor_verdict().unwrap().supported);
             assert!(Scrubbed::new().0.keys().all(|k| !k.starts_with("GIT_")));
+        }
+    }
+    #[test]
+    fn every_policy_passes_the_c_locale_to_real_git_children() {
+        let state = Temp::new();
+        let repo_dir = Temp::new();
+        git(&repo_dir.0, &["init", "-q"]);
+        let driver = GitDriver::new(&state.0).unwrap();
+        let repo = resolve(&driver, &repo_dir.0);
+        let resource = fgos_holder_lock::Resource::new("locale", state.0.join("locale.lock"));
+        let handle = match fgos_holder_lock::acquire(
+            &resource,
+            fgos_holder_lock::Mode::Ex,
+            fgos_holder_lock::Wait::Try,
+            2000,
+        ) {
+            fgos_holder_lock::Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        for policy in [
+            Policy::Inspect,
+            Policy::Remote,
+            Policy::HookContext,
+            Policy::Publication,
+        ] {
+            let loan = if policy == Policy::Publication {
+                Some(&handle as &dyn BorrowedSpawn)
+            } else {
+                None
+            };
+            let out = driver
+                .invoke(
+                    Some(&repo),
+                    &repo_dir.0,
+                    &[
+                        "-c",
+                        "alias.locale=!printf '%s/%s' \"$LC_ALL\" \"$LANGUAGE\"",
+                        "locale",
+                    ],
+                    policy,
+                    loan,
+                    false,
+                    1024,
+                    Duration::from_secs(5),
+                )
+                .unwrap();
+            assert!(out.success, "{:?}", out.stderr);
+            assert_eq!(out.stdout, b"C/");
         }
     }
     #[test]

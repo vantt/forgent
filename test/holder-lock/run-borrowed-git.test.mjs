@@ -200,3 +200,35 @@ test('runBorrowed prepends the gc guards to git only, refuses a released handle,
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('Rust drain waits for a direct pre-exec child through both Node borrow paths', { skip: SKIP }, async () => {
+  const { createRequire } = await import('node:module');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-pre-exec-'));
+  const addon = path.join(dir, 'pre-exec.node');
+  const build = spawnSync('rustc', ['--crate-type', 'cdylib', '--edition=2021', path.join(root, 'test/holder-lock/pre-exec-fixture.rs'), '-o', addon], { encoding: 'utf8' });
+  assert.equal(build.status, 0, build.stderr);
+  const fixture = createRequire(import.meta.url)(addon);
+  try {
+    for (const async of [false, true]) {
+      const fgosDir = path.join(dir, async ? 'async/.fgos' : 'sync/.fgos');
+      fs.mkdirSync(fgosDir, { recursive: true });
+      const scope = createLockScope();
+      const acquired = acquireSync(scope, LOCK, { fgosDir });
+      assert.equal(acquired.result, 'acquired');
+      const handle = acquired.handle;
+      const pid = fixture.start();
+      assert.ok(pid > 1);
+      try {
+        const inherited = fs.readdirSync(`/proc/${pid}/fd`).some(fd => {
+          try { return fs.readlinkSync(`/proc/${pid}/fd/${fd}`) === handle.path; } catch { return false; }
+        });
+        assert.ok(inherited, 'fixture must expose the real inherited CLOEXEC description');
+        const result = runBorrowed(handle, { command: 'git', args: ['--version'], env: { ...process.env } }, { sync: !async });
+        const outcome = async ? await result.borrowed : result;
+        assert.equal(outcome.exit, 0);
+        assert.equal(outcome.leftoversKilled, 0);
+        assert.equal(fixture.wait(pid), 0, 'pre-exec child must exec and exit normally');
+      } finally { handle.release(); }
+    }
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});

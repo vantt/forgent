@@ -134,6 +134,11 @@ fn file_size_limit_never_installs_truncated_record() {
             Ok(())
         });
     }
-    assert!(cmd.status().unwrap().success());
+    let output = cmd.output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     assert!(!dir.0.join("record").exists());
 }

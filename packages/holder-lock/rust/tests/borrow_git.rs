@@ -14,7 +14,7 @@ use std::time::{Duration, Instant};
 use common::*;
 use fgos_holder_lock::borrow_vectors::{self, add_loose_objects, git_env, init_repo};
 use fgos_holder_lock::port::borrowed_argv;
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, Mode, Probe, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Wait};
 use fgos_process::facts::{lock_holders, observe, Holders, Observed};
 use fgos_process::{FdSlot, ProcId};
 
@@ -130,11 +130,9 @@ fn fd_of_handle(path: &Path) -> i32 {
     panic!("handle fd not found");
 }
 
-/// A reparented setsid escaper has no provable group/ancestry link at
-/// cleanup. The clarified domain rule refuses it rather than killing a
-/// potentially foreign holder; exclusion must survive the refusal.
+/// A reparented setsid holder can only be an escaped borrower descendant.
 #[test]
-fn run_borrowed_refuses_an_unprovable_setsid_holder_without_killing() {
+fn run_borrowed_kills_reparented_setsid_description_holder() {
     let _serial = serial();
     let dir = temp_dir("escaper");
     let repo = dir.join("repo");
@@ -166,12 +164,10 @@ fn run_borrowed_refuses_an_unprovable_setsid_holder_without_killing() {
         fn drop(&mut self) { kill_pids(&[self.0]); }
     }
     let cleanup = Cleanup(escaper);
-    let error = result.expect_err("unprovable ancestry must fail closed");
-    assert!(matches!(error, BorrowError::ForeignHolder { ref pids } if pids.contains(&escaper)), "{error}");
-    assert!(matches!(observe(ProcId(escaper)), Observed::Live { .. }), "foreign holder was killed");
+    let outcome = result.expect("escaped borrowed descendants must drain");
+    assert!(outcome.leftovers_killed > 0);
     assert_eq!(probe(&res).unwrap(), Probe::Held);
     release(handle);
-    assert_eq!(probe(&res).unwrap(), Probe::Held, "refusal must preserve the foreign description");
     drop(cleanup);
     let deadline = Instant::now() + Duration::from_secs(5);
     while !matches!(observe(ProcId(escaper)), Observed::Absent | Observed::Zombie) {
