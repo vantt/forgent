@@ -93,7 +93,15 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
   const project = {
     registryPath, scratch, repoDir, herdrDir, agentDir, stateRoot, herdrSocket, herdrBin,
     children: [],
+    worktreeDir: null,
     env() { return sharedEnv(project); },
+
+    /** A linked worktree of the project's repository, for a unit that declares `writes`. */
+    addWorktree() {
+      project.worktreeDir = path.join(outside, 'worktree');
+      git('worktree', 'add', '-b', 'unit-branch', project.worktreeDir);
+      return project.worktreeDir;
+    },
 
     /** An executor whose agent is the fixture. `commandName` makes the CLI the agent protocol sees (codex, ...). */
     executor({ kind = 'claude', commandName = null, confinement = null } = {}) {
@@ -145,33 +153,31 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
      * `fgos run --unit <file>` as a real process, the door a person uses, in a project whose one executor has
      * a confined headless invocation and a confined herdr-spawn one: with herdr present bind() picks the pane.
      */
-    startFgosRun({ unit = {}, executorId = 'seat', herdrConfinement = { backend: 'bwrap' } } = {}) {
+    startFgosRun({ unit = {}, executorId = 'seat', executorIds = [executorId], worktree = null, herdrConfinement = { backend: 'bwrap' } } = {}) {
       const configDir = path.join(repoDir, '.fgos');
       fs.mkdirSync(configDir, { recursive: true });
       const executor = project.executor({ commandName: 'claude', confinement: herdrConfinement });
       fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
         runner: {
-          defaultExecutor: executorId,
+          defaultExecutor: executorIds[0],
           rigorToTier: { standard: 'standard' },
           timeoutMs: 60_000,
-          executors: {
-            [executorId]: {
-              kind: 'agent',
-              allowCrossProvider: true,
-              providerModel: 'claude',
-              invocations: [
-                { id: `${executorId}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: executor.command, args: ['{prompt}'] },
-                { id: `${executorId}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }] },
-              ],
-            },
-          },
-          modelPolicies: { claude: { standard: 'sonnet' } },
-          capabilities: { 'docs:write': { prefer: [{ executor: executorId, invocation: `${executorId}-cli` }] } },
+          executors: Object.fromEntries(executorIds.map((id) => [id, {
+            kind: 'agent',
+            allowCrossProvider: true,
+            providerModel: id,
+            invocations: [
+              { id: `${id}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: executor.command, args: ['{prompt}'] },
+              { id: `${id}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }] },
+            ],
+          }])),
+          modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),
+          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id, invocation: `${id}-cli` })) } },
         },
       }, null, 2));
       const unitFile = path.join(repoDir, 'unit.json');
       fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-1', objective: 'Inspect the docs', capability: 'docs:write', writes: [], ...unit }));
-      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir], {
+      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : [])], {
         cwd: repoDir,
         env: { ...project.env(), HERDR_ENV: '1' },
         stdio: ['ignore', 'pipe', 'pipe'],
