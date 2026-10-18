@@ -1,7 +1,7 @@
 ---
 title: "6.4 Hoàn tất khi controller chết: settle, --resume nhận kết quả, dọn attempt kẹt"
 description: "Unit có controller chết hiện 'attempt đã settle, unit chờ resume'; chỉ --resume tường minh đi tiếp và dùng kết quả attempt cũ qua cửa adopt, không chạy lại; Ctrl-C gửi cancel cho supervisor; recover qua adopt; dọn attempt running kẹt; chạy lại các kịch bản spike T8 làm nghiệm thu"
-status: pending
+status: completed
 priority: P1
 effort: 34h
 branch: plan/run-supervisor-6-2-6-3-6-4
