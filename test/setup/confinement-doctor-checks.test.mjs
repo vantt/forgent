@@ -21,7 +21,7 @@ import {
   defaultConfinementTempRoots,
   credentialScanRoots,
 } from '../../src/setup/registrations.mjs';
-import { writeOwnershipMarker, writeOwnershipMarkerV2, reapOrphanedConfinementResources } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeOwnershipMarker, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 
 function mkTempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-doctor-'));
@@ -75,20 +75,29 @@ test('confinement-orphaned-resources-reaped passes when no temp root has any mar
   }
 });
 
-test('confinement-orphaned-resources-reaped detects a marker owned by a dead pid, and fix reclaims it', () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-reap-dead-'));
+test('confinement-orphaned-resources-reaped names a home owned by a dead pid, and only fix removes it', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-reap-dead-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
   try {
+    const root = path.join(base, 'fgos-confinement');
     // A pid essentially guaranteed to be dead: spawn a real child and let it exit.
     const dead = cp.spawnSync(process.execPath, ['-e', 'process.exit(0)']);
-    const orphanDir = path.join(tempRoot, 'disp_orphan_1', 'home');
-    fs.mkdirSync(orphanDir, { recursive: true });
+    const orphanDir = path.join(root, 'disp_orphan_1', 'home');
+    fs.mkdirSync(orphanDir, { recursive: true, mode: 0o700 });
+    fs.chmodSync(root, 0o700);
     writeOwnershipMarker(orphanDir, { dispatchId: 'disp_orphan_1', pid: dead.pid });
 
-    const before = reapOrphanedConfinementResources({ tempRoot, checkLiveness: () => false });
-    assert.equal(before.reaped.length, 1);
-    assert.equal(fs.existsSync(orphanDir), false);
+    const before = checkConfinementOrphanedResourcesReaped();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /1 confinement resource dir\(s\) owned by a dead process/);
+    assert.equal(fs.existsSync(orphanDir), true, 'a check never removes');
+    assert.equal(fixConfinementOrphanedResourcesReaped().changed, true);
+    assert.equal(fs.existsSync(orphanDir), false, 'the explicit fix removes a home whose dispatcher is dead');
+    assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
   } finally {
-    fs.rmSync(tempRoot, { recursive: true, force: true });
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
   }
 });
 
@@ -175,26 +184,6 @@ test('doctor does not call an attempt home (version 2 marker) orphaned, and fix 
 
     fixConfinementOrphanedResourcesReaped();
     assert.ok(fs.existsSync(path.join(home, 'kept.txt')), 'only adopt removes an attempt home');
-  } finally {
-    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
-    fs.rmSync(base, { recursive: true, force: true });
-  }
-});
-
-test('doctor does not call a home kept for an open pane orphaned', () => {
-  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-retained-'));
-  const previousTmp = process.env.TMPDIR;
-  process.env.TMPDIR = base;
-  try {
-    const root = path.join(base, 'fgos-confinement');
-    const home = path.join(root, 'disp_kept', 'home');
-    fs.mkdirSync(home, { recursive: true, mode: 0o700 });
-    fs.chmodSync(root, 0o700);
-    writeOwnershipMarker(home, { dispatchId: 'disp_kept', pid: 2 ** 22 + 1 });
-    const markerPath = path.join(home, '.fgos-confinement-owner.json');
-    const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
-    fs.writeFileSync(markerPath, JSON.stringify({ ...marker, paneId: 'p-3' }));
-    assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
   } finally {
     if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
     fs.rmSync(base, { recursive: true, force: true });

@@ -23,7 +23,6 @@ import { interpretRunResult, validateRunResultV2 } from '../../src/runner/dispat
 import { normalizeProviderFamily } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
-import { reconcileHerdrSpawnRun } from '../../src/runner/dispatch/herdr-round.mjs';
 import { reconcilePlanUseCase, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
 import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
@@ -296,13 +295,6 @@ test('F7: result.json with mismatched runId is flagged contract-corrupt and neve
   );
   assert.equal(watchResult.stoppedBecause, 'corrupt-evidence');
   assert.equal(watchResult.settled, false);
-
-  // 4d. reconcileHerdrSpawnRun in herdr-round.mjs returns corrupt, not settled
-  const herdrReconcile = await reconcileHerdrSpawnRun(runDir, { expectedRunId: 'run_expected_123' });
-  assert.equal(herdrReconcile.status, 'corrupt');
-  assert.equal(herdrReconcile.corrupt, true);
-  assert.equal(herdrReconcile.resultCorrupt, true);
-  assert.notEqual(herdrReconcile.status, 'settled');
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });

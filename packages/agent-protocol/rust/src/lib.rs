@@ -7,6 +7,8 @@
 pub mod direct;
 pub mod outcome;
 pub mod port;
+/// Adapters for the `terminal` (interactive pane) launch mode.
+pub mod terminal;
 
 pub use outcome::{Activity, BlockedReason, ExitInfo, Outcome, StdinPolicy};
-pub use port::{AgentIo, IoError, SendInput};
+pub use port::{AgentIo, Inspection, IoError, SendInput};

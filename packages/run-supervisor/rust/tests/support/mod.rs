@@ -5,7 +5,9 @@
 #![allow(dead_code)]
 
 pub mod adopt_fixture;
+pub mod herdr;
 pub mod supervisor;
+pub mod terminal;
 
 use std::collections::BTreeMap;
 use std::fs::{self, File};
@@ -118,6 +120,11 @@ pub fn attempt_dir(name: &str) -> PathBuf {
 
 impl Attempt {
     pub fn new(name: &str, options: &Options) -> Self {
+        Self::new_with(name, options, |_| {})
+    }
+
+    /// Like [`Attempt::new`], with `patch` applied to the envelope before its digest is taken.
+    pub fn new_with(name: &str, options: &Options, patch: impl FnOnce(&mut Value)) -> Self {
         let dir = attempt_dir(name);
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("protected")).unwrap();
@@ -158,6 +165,7 @@ impl Attempt {
             "steps": [],
             "sideFile": side_file,
         });
+        patch(&mut envelope_value);
         let digest = envelope::digest(&envelope_value).unwrap();
         envelope_value["digest"] = Value::String(digest.clone());
         let path = dir.join("envelope.json");

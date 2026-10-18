@@ -1,0 +1,69 @@
+ - Timeout: 240000ms
+
+ - Write scope: none in the workspace (read-only); your result files are still required
+
+ - Permission enforcement: enforced
+
+ When you finish
+
+ Write these two files, in this order, each one .tmp-then-rename:
+
+ 1. /tmp/fgos-p09a-proj/.fgos/assignments/unit-run-1792309533391-f7b3c3c8/producer/1/runs/01/outbox/report-1.md -- what you did, in prose. Anything a reader needs to
+    understand or check your work belongs here.
+
+ 2. /tmp/fgos-p09a-proj/.fgos/assignments/unit-run-1792309533391-f7b3c3c8/producer/1/runs/01/outbox/result-1.json -- a JSON object:
+
+    ```
+      {"contract":{"id":"agent-result-claim","version":2},
+       "status": "done" | "blocked" | "failed" | "no-evidence",
+       "summary": "<one or two sentences>", "evidenceRefs": []}
+    ```
+
+    Claim requirements:
+ - "contract" may be omitted only for legacy claim input; for v2 use {"id":"agent-result-claim","version":2}
+
+ - "status" must be exactly one of: done | blocked | failed | no-evidence
+
+ - "summary" must be a required non-empty string
+
+ - "blocker" must be a non-empty string when status is "blocked"
+
+ - "error" must be a non-empty string or object when status is "failed"
+
+ - "evidenceRefs" must be an array of non-empty strings if provided
+
+ - "needsWrites" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not
+
+ - Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated
+
+    "settled" is not a valid status here -- that word names the run reaching
+    its end, not whether the work succeeded; a worker that writes "settled"
+    in this file fails schema validation and the round is scored failed.
+
+ The second file is what ends this round, so write it last and only once the
+ first one is on disk. Nothing you write is treated as proof on its own; it is
+ your account of the work, and it is read alongside the repository itself.
+
+ Write only inside /tmp/fgos-p09a-proj/.fgos/assignments/unit-run-1792309533391-f7b3c3c8/producer/1/runs/01/outbox. Everything else under
+ /tmp/fgos-p09a-proj/.fgos/assignments/unit-run-1792309533391-f7b3c3c8/producer/1/runs/01 belongs to whoever is watching you.
+
+
+ Let me start by writing the ack file, then run the command, then write the report and result files.
+
+
+ $ date -u +%Y-%m-%dT%H:%M:%SZ (timeout 10000s)
+
+ 2026-10-18T07:45:40Z
+
+ Took 0.0s
+
+
+
+ $ cat > /tmp/fgos-p09a-proj/.
+
+
+── ⠙ Working ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/tmp/fgos-p09a-proj
+↑4.5k ↓53 $0.000 0.4%/1.0M (auto)                                                                                                                                                                                                                                                                                                           z-ai/glm-5.3 • high

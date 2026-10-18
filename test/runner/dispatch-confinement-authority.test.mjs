@@ -731,65 +731,6 @@ test("HIGH-1: required confinement threads requirement through the REAL producti
   }
 });
 
-test("herdr-spawn assignment dispatch through executeThroughConfinement threads runId/assignmentId/preparedInvocationDigest to the adapter", async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-launch-context-test-"));
-  try {
-    const runDir = path.join(tmp, ".fgos", "runs", "run_abc123");
-    fs.mkdirSync(runDir, { recursive: true });
-
-    const req = buildConfinementRequest({
-      capability: "code:implement",
-      executorId: "herdr-agent",
-      invocation: {
-        command: "claude",
-        args: ["-p", "{prompt}"],
-        adapter: "herdr-spawn",
-        interactiveMode: { kind: "claude" },
-        prompt: "do the work",
-      },
-      requirement: { mode: "unconfined" },
-      context: {
-        cwd: tmp,
-        repoRoot: tmp,
-        runDir,
-        timeoutMs: 5000,
-        workId: "w1",
-      },
-      assignmentLaunchContext: {
-        contract: "assignment-herdr-spawn-launch-context.v1",
-        run: {
-          runId: "run_abc123",
-          assignmentId: "asgn_test",
-          attempt: 1,
-          dispatchPlanDigest: `sha256:${"a".repeat(64)}`,
-          evaluatorBaselineDigest: `sha256:${"b".repeat(64)}`,
-        },
-        command: {
-          launchCommandId: "lc-01",
-          controlEpoch: 1,
-          controlTokenDigest: `sha256:${"c".repeat(64)}`,
-        },
-      },
-    });
-
-    let capturedOpts = null;
-    const fakeAdapter = async (invocation, opts) => {
-      capturedOpts = opts;
-      return { status: 0, stdout: "ok" };
-    };
-
-    const res = await executeThroughConfinement(req, fakeAdapter);
-    assert.equal(res.status, "completed");
-    assert.ok(capturedOpts, "adapter must have been invoked through the real Authority door");
-    assert.equal(capturedOpts.runId, "run_abc123", "adapterOpts.runId must be threaded so herdr-spawn's isAssignmentRun evaluates true");
-    assert.equal(capturedOpts.assignmentId, "asgn_test", "adapterOpts.assignmentId must be threaded");
-    assert.equal(capturedOpts.launchCommandId, "lc-01");
-    assert.ok(capturedOpts.preparedInvocationDigest, "adapterOpts.preparedInvocationDigest must be threaded so the receipt cross-check has a digest to compare");
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
 test("the leased account's credential source reaches the herdr-spawn adapter so its private home derives trust from that account", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-trust-account-test-"));
   try {
@@ -816,52 +757,6 @@ test("the leased account's credential source reaches the herdr-spawn adapter so 
     });
     assert.equal(res.status, "completed");
     assert.deepEqual(capturedOpts.trustAccountSource, credentialSource);
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test("recorded herdrName is normalized identically to the launch call's own agent name", async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-name-normalize-test-"));
-  try {
-    const longRunId = `run_${"x".repeat(40)}`;
-    const longLaunchCommandId = `lc-${"y".repeat(40)}`;
-    const runDir = path.join(tmp, ".fgos", "runs", longRunId);
-    fs.mkdirSync(runDir, { recursive: true });
-
-    const req = buildConfinementRequest({
-      capability: "code:implement",
-      executorId: "herdr-agent",
-      invocation: {
-        command: "claude",
-        args: ["-p", "{prompt}"],
-        adapter: "herdr-spawn",
-        interactiveMode: { kind: "claude" },
-        prompt: "do the work",
-      },
-      requirement: { mode: "unconfined" },
-      context: { cwd: tmp, repoRoot: tmp, runDir, timeoutMs: 5000, workId: "w1" },
-      assignmentLaunchContext: {
-        contract: "assignment-herdr-spawn-launch-context.v1",
-        run: {
-          runId: longRunId,
-          assignmentId: "asgn_test",
-          attempt: 1,
-          dispatchPlanDigest: `sha256:${"a".repeat(64)}`,
-          evaluatorBaselineDigest: `sha256:${"b".repeat(64)}`,
-        },
-        command: { launchCommandId: longLaunchCommandId, controlEpoch: 1, controlTokenDigest: `sha256:${"c".repeat(64)}` },
-      },
-    });
-
-    const preparedLaunch = await prepareConfinementForLaunch(req);
-
-    // The exact string herdr-round.mjs's own launch call normalizes to build
-    // the LIVE agent name (`agentName` in `runHerdrRound`'s driveRound).
-    const liveLaunchName = normalizeAgentName(`fgos-${longRunId}-${longLaunchCommandId}`);
-
-    assert.equal(preparedLaunch.launchCommand.herdrName, liveLaunchName, "recorded herdrName must match the live launch's own normalized agent name");
-    assert.ok(preparedLaunch.launchCommand.herdrName.length <= 32, "normalized name must respect herdr's 32-char cap");
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

@@ -1,6 +1,6 @@
 {
   "contract": { "id": "run-supervisor-gate-go", "version": 1 },
-  "description": "Frames on the GO channel between supervisor and gate. direct: an inherited AF_UNIX SOCK_STREAM socketpair end at the fd named by --go-fd (no peer check needed: only the supervisor holds the other end). terminal: an AF_UNIX socket under the runtime socket dir; the gate checks the peer uid with SO_PEERCRED and never compares pids (the peer pid is 0 across pid namespaces).",
+  "description": "Frames on the GO channel between supervisor and gate. direct: an inherited AF_UNIX SOCK_STREAM socketpair end at the fd named by --go-fd (no peer check needed: only the supervisor holds the other end). terminal: an AF_UNIX socket under the runtime socket dir; the gate checks the peer uid with SO_PEERCRED and never compares pids (the peer pid is 0 across pid namespaces). The terminal channel is specified under `terminal`.",
   "framing": {
     "frame": "4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxFrameBytes": 65536,
@@ -8,15 +8,49 @@
   },
   "frames": {
     "HELLO": { "direction": "gate -> supervisor", "fields": { "type": "HELLO", "attemptId": "string, from the gate's own envelope" }, "when": "first frame after the gate starts" },
-    "GO": { "direction": "supervisor -> gate", "fields": { "type": "GO", "attemptId": "string", "envelopeDigest": "string", "gateHostTuple": "processTuple of the gate as seen from the host (linux-gate: from bwrap --info-fd), or null when the driver cannot know it; the gate exports it to the agent as FGOS_PIDNS_ANCHOR (compact JSON)" }, "gateCheck": "attemptId and envelopeDigest must equal the gate's own envelope; mismatch is a refusal (gate exits without running the agent, gate-exit not published, exit code 65)" },
+    "GO": { "direction": "supervisor -> gate", "fields": { "type": "GO", "attemptId": "string", "envelopeDigest": "string", "gateHostTuple": "processTuple of the gate as seen from the host (linux-gate: from bwrap --info-fd), or null when the driver cannot know it; the gate exports it to the agent as FGOS_PIDNS_ANCHOR (compact JSON)", "ancillary": "terminal only: SCM_RIGHTS descriptors, see terminal.fdOrder; direct: none, the locks are inherited" }, "gateCheck": "attemptId and envelopeDigest must equal the gate's own envelope; mismatch is a refusal (gate exits without running the agent, gate-exit not published, exit code 65)" },
     "AGENT": { "direction": "gate -> supervisor", "fields": { "type": "AGENT", "tuple": "processTuple of the agent as seen from the host when knowable, else as seen in the namespace with pidNs of the namespace" }, "when": "right after the agent was spawned" },
-    "BRIEF_DELIVERED": { "direction": "supervisor -> gate", "fields": { "type": "BRIEF_DELIVERED" }, "mode": "terminal only (6.3); a direct gate ignores it" },
+    "BRIEF_DELIVERED": { "direction": "supervisor -> gate", "fields": { "type": "BRIEF_DELIVERED" }, "mode": "terminal only; a direct gate ignores it", "sentWhen": "once, after the agent protocol reports `delivered` (never on `delivery-unknown`)" },
     "STOP": { "direction": "supervisor -> gate", "fields": { "type": "STOP", "cause": { "enum": ["soft-deadline", "idle", "cancel"] } }, "meaning": "advisory duplicate of stop-requested.json; the gate still reads the file when it receives SIGTERM" }
+  },
+  "terminal": {
+    "socket": {
+      "kind": "AF_UNIX SOCK_STREAM, listening socket the supervisor creates before it asks terminal-control to launch the pane",
+      "path": "envelope.terminal.socketPath; passed to the gate as --go-socket <path>",
+      "directory": "runtime socket dir, mode 0700, owner is the user; the sandbox gets it with a --bind; the socket file mode is 0600",
+      "pathLength": "at most 107 bytes (sun_path)",
+      "lifetime": "the supervisor unlinks the path once it accepted the gate's connection or the attempt closed; a second connection after GO is refused"
+    },
+    "peerCheck": {
+      "rule": "the supervisor accepts a connection only when SO_PEERCRED reports its own uid; the gate checks that the socket file is owned by its own uid. Pids are never compared",
+      "refusal": "a wrong uid closes the connection without a frame; the gate sees EOF before GO and exits 64"
+    },
+    "sequence": [
+      "gate connects and sends HELLO{attemptId}",
+      "supervisor checks uid and attemptId, declares the domain from the identity terminal-control returned for the gate, then sends GO with SCM_RIGHTS",
+      "gate receives with MSG_CMSG_CLOEXEC (FD_CLOEXEC on every fd at once), checks attemptId and envelopeDigest against its own envelope, spawns the agent and sends AGENT",
+      "supervisor delivers the brief through the agent protocol, then sends BRIEF_DELIVERED"
+    ],
+    "fdOrder": {
+      "0": "attempt lock description (always)",
+      "1": "dispatch-cwd lease description, only when envelope.mutation is mutating",
+      "rule": "the gate knows from its own envelope whether fd 1 is expected; a different count is a protocol error: the gate exits 65 without running the agent"
+    },
+    "orphan": {
+      "meaning": "the supervisor is gone while the agent runs; the gate ends the domain itself and publishes gate-exit.json with stoppedBy orphan",
+      "reasons": {
+        "abandoned-before-brief": "EOF after GO and before BRIEF_DELIVERED: the gate ends the domain at once, nothing was ever briefed",
+        "orphan-result": "EOF after BRIEF_DELIVERED: the gate watches launch.outboxDir; a result-<N>.json plus envelope.terminal.orphanSettleMs ends the domain; with no result it runs to the hard ceiling (stoppedBy hard-ceiling)"
+      },
+      "record": "gate-exit.json: stoppedBy orphan, cause = the reason. ORPHAN is not a wire frame (the party that would receive it is the one that is gone); it is only this record",
+      "receiptMapping": "receipt.v1.json outcomeRule"
+    },
+    "foreground": "in the pane the gate makes the agent's process group the foreground group of the tty (tcsetpgrp, SIGTTOU ignored while doing so); the exec chain that makes this possible is measured by the phase that owns the gate"
   },
   "gateEnvelope": "the gate reads the envelope named by its own --envelope <path> argv (internal-route.run-supervisor.v1.json), verifies its digest, and compares GO against it",
   "rules": [
     "EOF or a refused connection before GO: the gate exits without running the agent (exit code 64, no gate-exit.json)",
     "after GO the gate never needs the channel: supervisor death (EOF after GO) does not stop the agent in direct mode",
-    "terminal mode only: EOF after GO but before BRIEF_DELIVERED ends the domain (abandoned-before-brief); EOF after BRIEF_DELIVERED makes the gate watch the outbox (orphan branch)"
+    "terminal mode only: EOF after GO but before BRIEF_DELIVERED ends the domain (abandoned-before-brief); EOF after BRIEF_DELIVERED makes the gate watch the outbox (orphan branch, see terminal.orphan)"
   ]
 }

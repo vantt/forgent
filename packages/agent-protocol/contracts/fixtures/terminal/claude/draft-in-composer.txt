@@ -1,0 +1,69 @@
+
+ ▐▛███▛█   Claude Code v2.1.302
+▝▜██████▀  Opus 5.5 · Claude Team
+ ▝▝   ▝▝   /tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/claude
+
+
+● Remote Control is disabled by your organization's policy. Contact your organization admin for access.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                      ctrl+g to edit in Fresh
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ line 11
+  line 12
+  line 13
+  line 14
+  line 15
+  line 16
+  line 17
+  line 18
+  line 19
+  line 20
+  line 21
+  line 22
+  line 23
+  line 24
+  line 25
+  line 26
+  line 27
+  line 28
+  line 29
+  line 30
+  line 31
+  line 32
+  line 33
+  line 34
+  line 35
+  line 36
+  line 37
+  line 38
+  line 39
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  🤖 Opus 5.5  ▱▱▱▱▱▱▱▱▱▱▱▱ 4%  ⌛ 5h 13% (1h36m)  📁 /tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/claude
+  ⏵⏵ bypass permissions on (shift+tab to cycle)

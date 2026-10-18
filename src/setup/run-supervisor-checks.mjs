@@ -20,7 +20,6 @@ import { loadGlobalConfig } from '../config/global-config.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { sweepAttempts } from '../run-supervisor/sweep.mjs';
-import { resolveConfinementTempRoot } from '../runner/dispatch/confinement/cleanup.mjs';
 import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem } from '../run-supervisor/gate-kill-grace.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
@@ -28,6 +27,8 @@ const PROBE_TIMEOUT_MS = 15_000;
 const MAX_LISTED = 5;
 /** `<16 hex chars>.sock`, as the runtime directory module sizes it. */
 const SOCKET_NAME_BYTES = 21;
+const ATTEMPT_SOCKET_NAME = /^[0-9a-f]{16}\.sock$/;
+const PROC_NET_UNIX = '/proc/net/unix';
 
 const warn = (text) => `warning: ${text}`;
 const info = (text) => `info: ${text}`;
@@ -139,8 +140,57 @@ function socketDirState({ uid, env }) {
   return { dir };
 }
 
-/** The runtime socket directory exists, is a real directory of this user and is 0700. */
-export function checkRuntimeSocketDir({ env = process.env, uid = process.getuid?.() } = {}) {
+/**
+ * Paths some process has bound a unix socket to, read from the kernel table (Linux). `null` where
+ * the table does not exist: nothing can then be judged, and nothing is reported or removed. Probing
+ * by connecting is not an option: a live supervisor takes the first connection for its gate.
+ */
+function boundSocketPaths(procFile) {
+  let text;
+  try {
+    text = fs.readFileSync(procFile, 'utf8');
+  } catch {
+    return null;
+  }
+  const bound = new Set();
+  for (const line of text.split('\n').slice(1)) {
+    const fields = line.trim().split(/\s+/);
+    if (fields.length >= 8) bound.add(fields.slice(7).join(' '));
+  }
+  return bound;
+}
+
+/**
+ * Attempt sockets (`<hash>.sock`) in `dir` that no process holds any more: the supervisor that
+ * listened on one was killed before it could remove the path. Sockets only, never other files.
+ */
+function orphanAttemptSockets(dir, { uid, procFile }) {
+  const bound = boundSocketPaths(procFile);
+  if (bound === null) return null;
+  let names;
+  try {
+    names = fs.readdirSync(dir);
+  } catch {
+    return [];
+  }
+  const orphans = [];
+  for (const name of names.filter((entry) => ATTEMPT_SOCKET_NAME.test(entry)).sort()) {
+    const file = path.join(dir, name);
+    try {
+      const st = fs.lstatSync(file);
+      if (st.isSocket() && st.uid === uid && !bound.has(file)) orphans.push(file);
+    } catch {
+      // gone while looking: nothing to report
+    }
+  }
+  return orphans;
+}
+
+/**
+ * The runtime socket directory exists, is a real directory of this user and is 0700, and holds no
+ * attempt socket without a supervisor behind it.
+ */
+export function checkRuntimeSocketDir({ env = process.env, uid = process.getuid?.(), procFile = PROC_NET_UNIX } = {}) {
   if (uid === undefined) return { passed: true, message: info('no runtime socket directory on this platform') };
   const state = socketDirState({ uid, env });
   if (state.problem) {
@@ -148,10 +198,29 @@ export function checkRuntimeSocketDir({ env = process.env, uid = process.getuid?
     return { passed: false, message: fixable ? `${state.problem} -- run "fgos doctor --fix"` : `${state.problem} -- fix it by hand, doctor --fix does not touch it` };
   }
   if (state.missing) return { passed: true, message: warn(`${state.dir} does not exist yet (fgos setup creates it)`) };
-  return { passed: true, message: `${state.dir} is 0700 and owned by uid ${uid}` };
+  const orphans = orphanAttemptSockets(state.dir, { uid, procFile });
+  if (orphans && orphans.length > 0) {
+    return { passed: false, message: `${orphans.length} attempt socket(s) in ${state.dir} have no supervisor: ${listed(orphans.map((file) => path.basename(file)))} -- run "fgos doctor --fix"` };
+  }
+  const judged = orphans === null ? ' (attempt sockets are not judged on this platform)' : '';
+  return { passed: true, message: `${state.dir} is 0700 and owned by uid ${uid}${judged}` };
 }
 
-export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.() } = {}) {
+/** Unlinks the orphans (judged again just now); only socket files, never a lock or a directory. */
+function removeOrphanAttemptSockets(dir, { uid, procFile }) {
+  const removed = [];
+  for (const file of orphanAttemptSockets(dir, { uid, procFile }) ?? []) {
+    try {
+      fs.unlinkSync(file);
+      removed.push(file);
+    } catch {
+      // already removed by its own supervisor, or not ours to remove
+    }
+  }
+  return removed;
+}
+
+export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.(), procFile = PROC_NET_UNIX } = {}) {
   if (uid === undefined) return { changed: false, message: 'no runtime socket directory on this platform' };
   const before = socketDirState({ uid, env });
   if (before.loose) {
@@ -164,6 +233,8 @@ export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.(
   }
   try {
     const dir = ensureRuntimeSocketDir({ env, uid });
+    const removed = removeOrphanAttemptSockets(dir, { uid, procFile });
+    if (removed.length > 0) return { changed: true, message: `removed ${removed.length} attempt socket(s) with no supervisor from ${dir}: ${listed(removed.map((file) => path.basename(file)))}` };
     return { changed: before.missing === true, message: before.missing ? `created ${dir} (0700)` : `${dir} already in order` };
   } catch (err) {
     if (err instanceof RuntimeDirError) return { changed: false, message: err.message };
@@ -205,7 +276,7 @@ export function fixRunAttemptsStuck(repoRoot) {
   const assignmentsRoot = assignmentsRootOf(repoRoot);
   if (listOpenAttemptDirs(assignmentsRoot).length === 0) return { changed: false, message: 'no attempt waits to be closed' };
   const { bin, error } = resolveBin(repoRoot);
-  const result = sweepAttempts({ assignmentsRoot, tempRoot: resolveConfinementTempRoot(), adoptOptions: bin ? { hostBin: bin } : {} });
+  const result = sweepAttempts({ assignmentsRoot, adoptOptions: bin ? { hostBin: bin } : {} });
   if (result.adoptError) return { changed: false, message: `adopt could not run: ${result.adoptError}${error ? ` (${error})` : ''}` };
   const adopted = (result.adopt ?? []).filter((verdict) => verdict.state === 'adopted');
   const left = (result.adopt ?? []).filter((verdict) => STUCK_STATES.has(verdict.state));

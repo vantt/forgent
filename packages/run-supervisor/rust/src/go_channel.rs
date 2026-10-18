@@ -18,6 +18,35 @@ pub enum FrameError {
     Protocol,
 }
 
+/// Bytes read off a nonblocking channel, cut into frames as they complete.
+#[derive(Default)]
+pub struct FrameBuf {
+    buf: Vec<u8>,
+}
+
+impl FrameBuf {
+    pub fn push(&mut self, bytes: &[u8]) {
+        self.buf.extend_from_slice(bytes);
+    }
+
+    /// The next whole frame, `Ok(None)` while one is still partial.
+    pub fn next_frame(&mut self) -> Result<Option<Value>, FrameError> {
+        if self.buf.len() < 4 {
+            return Ok(None);
+        }
+        let len = u32::from_be_bytes([self.buf[0], self.buf[1], self.buf[2], self.buf[3]]) as usize;
+        if len > MAX_FRAME_BYTES {
+            return Err(FrameError::Protocol);
+        }
+        if self.buf.len() < 4 + len {
+            return Ok(None);
+        }
+        let frame = read_frame(&mut self.buf.as_slice())?;
+        self.buf.drain(..4 + len);
+        Ok(Some(frame))
+    }
+}
+
 pub fn write_frame(out: &mut impl Write, frame: &Value) -> io::Result<()> {
     let bytes = serde_json::to_vec(frame).map_err(io::Error::other)?;
     if bytes.len() > MAX_FRAME_BYTES {
@@ -56,6 +85,23 @@ mod tests {
         write_frame(&mut wire, &json!({"type": "HELLO", "attemptId": "a1"})).unwrap();
         let frame = read_frame(&mut wire.as_slice()).unwrap();
         assert_eq!(frame["type"], "HELLO");
+    }
+
+    #[test]
+    fn frame_buffer_yields_frames_as_they_complete() {
+        let mut wire = Vec::new();
+        write_frame(&mut wire, &json!({"type": "GO"})).unwrap();
+        write_frame(&mut wire, &json!({"type": "BRIEF_DELIVERED"})).unwrap();
+        let mut buf = FrameBuf::default();
+        buf.push(&wire[..3]);
+        assert!(buf.next_frame().unwrap().is_none());
+        buf.push(&wire[3..]);
+        assert_eq!(buf.next_frame().unwrap().unwrap()["type"], "GO");
+        assert_eq!(buf.next_frame().unwrap().unwrap()["type"], "BRIEF_DELIVERED");
+        assert!(buf.next_frame().unwrap().is_none());
+        let mut oversize = FrameBuf::default();
+        oversize.push(&((MAX_FRAME_BYTES + 1) as u32).to_be_bytes());
+        assert!(matches!(oversize.next_frame(), Err(FrameError::Protocol)));
     }
 
     #[test]
