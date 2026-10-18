@@ -242,7 +242,7 @@ function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
  * How one dispatch of `attempt` enters the admission ledger. A dispatch the previous controller started
  * and never read the outcome of keeps its retry id, so the dispatch finds that attempt again and takes
  * its settled result instead of running the agent; a dispatch with no such history, or whose attempt
- * was abandoned before it started, gets a new id and names the attempt it follows.
+ * was abandoned before it started or cancelled by the person, gets a new id and names the attempt it follows.
  */
 function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assignmentsDir }) {
   const current = currentAttemptOf(assignmentsDir, assignmentId);
@@ -250,14 +250,20 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
     if (!current || !fs.existsSync(path.join(current.dir, 'envelope.json'))) return false;
     if (adoptRun(current.dir, { probeOnly: true }).state !== 'closed') return false;
     try {
-      return String(JSON.parse(fs.readFileSync(path.join(current.dir, 'receipt.json'), 'utf8')).outcome).startsWith('abandoned');
+      const outcome = String(JSON.parse(fs.readFileSync(path.join(current.dir, 'receipt.json'), 'utf8')).outcome);
+      // Never started, or stopped by the person's Ctrl-C: neither is a result to carry on from.
+      return outcome.startsWith('abandoned') || outcome === 'cancelled';
     } catch { return false; }
   };
-  const continuing = attempt.dispatchRetryId && attempt.outcome === undefined && current && !abandoned();
+  // The ledger, not the directory, says whether the previous dispatch was admitted: a controller that
+  // died between the admission commit and the directory's publication is completed by the same id.
+  const generations = listGenerations(path.join(assignmentsDir, assignmentId, 'admission', 'generations'));
+  const admitted = attempt.dispatchRetryId !== undefined && generations.some((g) => g.record?.retryId === attempt.dispatchRetryId);
+  const continuing = attempt.outcome === undefined && admitted && !abandoned();
   const retryId = continuing ? attempt.dispatchRetryId : `${assignmentId}~${crypto.randomBytes(6).toString('hex')}`;
   return {
     retryId,
-    predecessorRunId: current?.runId ?? null,
+    predecessorRunId: generations.at(-1)?.record?.runId ?? null,
     destination: worktree,
     payloadDigest: crypto.createHash('sha256').update(`${unitRunId}|${assignmentId}`).digest('hex'),
   };
@@ -384,7 +390,7 @@ export async function runUnit(options = {}) {
   try {
     return await runUnitBody(options, scope);
   } finally {
-    scope.control?.release();
+    try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
     uninstall();
   }
 }
@@ -439,19 +445,20 @@ async function runUnitBody(options, scope) {
     if (!fs.existsSync(unitJsonPath)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json not found at "${unitJsonPath}"`);
     }
+    // One controller per unit: a live one (the run itself, or another resume) refuses this resume; one
+    // that died is taken over. Taken before unit.json is read, so a resume that waited behind another
+    // never works from a record that other one has since moved on.
+    const control = acquireUnitControl(unitDir, unitRunId);
+    if (control.status !== 'acquired') {
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another controller drives it${control.holder?.pid ? ` (PID ${control.holder.pid})` : ''}`, { code: 'resume-in-progress' });
+    }
+    scope.control = control;
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     unit = validateUnit(unitRecord.unit);
     if (!Array.isArray(unitRecord.resolvedInputs)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
 
-    // One controller per unit: a live one (the run itself, or another resume) refuses this resume; one
-    // that died is taken over.
-    const control = acquireUnitControl(unitDir, unitRunId);
-    if (control.status !== 'acquired') {
-      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another controller drives it${control.holder?.pid ? ` (PID ${control.holder.pid})` : ''}`, { code: 'resume-in-progress' });
-    }
-    scope.control = control;
     assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir);
 
     // A mutating dispatch holds the worktree's dispatch-cwd lock while its
@@ -569,7 +576,9 @@ async function runUnitBody(options, scope) {
     };
 
     fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
-    scope.control = acquireUnitControl(unitDir, unitRunId);
+    const fresh = acquireUnitControl(unitDir, unitRunId);
+    if (fresh.status !== 'acquired') throw new RunnerConfigError(`unit run "${unitRunId}" is already driven by another controller`, { code: 'resume-in-progress' });
+    scope.control = fresh;
     // Told once, as soon as the run exists and before any seat can start, so a caller can record
     // the id and resume this run if it dies. Not called for a resumed run: its id is already known.
     options.onUnitRunCreated?.(unitRunId);

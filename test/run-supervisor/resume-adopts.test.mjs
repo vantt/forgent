@@ -176,3 +176,19 @@ test('6. a resume of a bound attempt goes through adopt: no second supervisor is
   assert.equal(starts(dir).length, 1);
 });
 
+
+test('7. after Ctrl-C the resume runs the unit again in a new attempt that supersedes the cancelled one', { skip, timeout: 300_000 }, async () => {
+  const project = createProject({ agent: { runMs: 8000 }, dispatch: { gateKillGraceMs: 1000 } });
+  const run = startRun(project, project.unitFile('resume-cancelled'));
+  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'));
+  run.child.kill('SIGINT');
+  assert.equal((await run.exited).code, 130, run.output().stderr);
+  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the cancelled attempt to close' });
+  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
+  const resume = startResume(project, unitRunIdOf(project));
+  assert.equal((await resume.exited).code, 0, resume.output().stderr);
+  const next = project.attemptDirs().filter((d) => d !== dir);
+  assert.equal(next.length, 1, 'one new attempt');
+  assert.equal(readJson(here(next[0], 'run.json')).supersedesRunId, readJson(here(dir, 'run.json')).runId);
+  assert.equal(starts(next[0]).length, 1);
+});
