@@ -3400,14 +3400,14 @@ Superseding this decision needs a new record; do not edit it in place.
 ### Controller chết: attempt settle, unit chờ `--resume` tường minh; tự resume là việc hoãn có tên
 
 - **Trạng thái:** Settled (2026-10-16 quyết định của anh, thiết kế r6 §16; land 2026-10-18). Id decision gán khi ghi vào state bằng `fgos decision` lúc landing.
-- **Bối cảnh:** controller của `fgos run` chết (Ctrl-C, kill, mất điện) thì supervisor vẫn lo attempt (D-ADR0056), nhưng `--resume` chạy lại từ đầu (`runs/02` mới, `supersedesRunId: null`), bỏ kết quả attempt đã xong; `recover` park vì có `result-N.json`; 6 attempt `running` kẹt của spike T8 không ai dọn.
+- **Bối cảnh:** controller của `fgos run` chết (Ctrl-C, kill, mất điện) thì supervisor vẫn lo attempt (D-ADR0056 (run supervisor Rust cách direct)), nhưng `--resume` chạy lại từ đầu (`runs/02` mới, `supersedesRunId: null`), bỏ kết quả attempt đã xong; `recover` park vì có `result-N.json`; 6 attempt `running` kẹt của spike T8 không ai dọn.
 - **Quyết định:**
   1. Chỉ `--resume` tường minh đi tiếp một unit có controller chết; không có gì tự chạy lại.
   2. `--resume` hỏi adopt trước mọi thứ: attempt `closed` có kết quả thì dùng kết quả, không chạy lại agent; `cancelled`/`abandoned-*` thì chạy attempt mới với `supersedesRunId`; còn `running` thì từ chối có tên, không chờ (`--resume --wait` không làm).
   3. Ctrl-C gửi `cancel` cho attempt đã giao, chờ `dispatch.cancelWaitMs`, thoát 130/143; lần hai thoát ngay.
   4. `recover` có hành động `adopt`; `outbox/result-N.json` là bằng chứng có tên.
   5. Run cũ trước supervisor kẹt `running`: doctor `legacy-attempts-stuck` settle `abandoned-legacy` chỉ khi mọi pid đã ghi đều `dead` và không còn home bản 1; không rõ thì giữ và nêu lý do.
-- **Việc hoãn có tên:** (a) **Tự resume** sau khi controller chết. Điều kiện để làm: phát hiện controller chết và đảm bảo một người nhận duy nhất; cả hai đã có primitive, là ledger `unit-control` của unit (holder bị chứng minh là chết; một người acquire thắng); không có code nào cho nó ở đây. (b) **Relaunch trên resume khi gate ghi nhận chưa thả agent** (hiện `gate-lost` không relaunch, fail closed; cần marker phía gate ghi trước GO). (c) **Lease cwd** giữa "attempt xong" và "runner commit `writes`" (kongming N7): chuyển sang plan Git theo D-ADR0057 §6.
+- **Việc hoãn có tên:** (a) **Tự resume** sau khi controller chết. Điều kiện để làm: phát hiện controller chết và đảm bảo một người nhận duy nhất; cả hai đã có primitive, là ledger `unit-control` của unit (holder bị chứng minh là chết; một người acquire thắng); không có code nào cho nó ở đây. (b) **Relaunch trên resume khi gate ghi nhận chưa thả agent** (hiện `gate-lost` không relaunch, fail closed; cần marker phía gate ghi trước GO). (c) **Lease cwd** giữa "attempt xong" và "runner commit `writes`" (kongming N7): chuyển sang plan Git theo D-ADR0057 (Git là một thành phần nền) §6.
 - **Hệ quả:** Người nhìn một unit thấy `awaiting-resume` và biết gõ `fgos run --resume <unit>`; cùng một kết quả agent không bao giờ bị trả tiền hai lần. Rollback là code: revert, attempt đã `closed` vẫn đúng với bản trước.
 - **Ranh giới:** Không đổi component-boundary (chỉ dùng cửa adopt có sẵn). Spec: [run-supervisor](../platform/run-supervisor/spec.md#91-controller-death).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

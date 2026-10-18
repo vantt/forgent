@@ -77,7 +77,7 @@
         "adopted": "this call took the lock and drove the attempt to closed",
         "open": "this call took the lock but a step returned retry or failed; the attempt stays for a later adopt",
         "closed": "closed.json present (skipped without probing the lock)",
-        "legacy-run": "no attempt.lock or no envelope v3: not this door's run (left to 6.4)"
+        "legacy-run": "no attempt.lock or no envelope v3: not this door's run (the legacy sweep, src/run-supervisor/legacy-sweep.mjs, settles it)"
       },
       "rule": "lock free is not enough: adopt proceeds only when containment.is_empty(binding.domain) == empty (unknown counts as not empty)"
     },
