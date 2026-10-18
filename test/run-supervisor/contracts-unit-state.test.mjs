@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (name) => JSON.parse(readFileSync(join(root, 'packages/run-supervisor/contracts', name), 'utf8'));
 
@@ -17,7 +19,7 @@ test('unit and attempt states are the named sets with a rule each', () => {
   assert.deepEqual(unitState.unitState.enum, ['running', 'awaiting-resume', 'completed', 'failed']);
   for (const state of unitState.unitState.enum) assert.equal(typeof unitState.unitState.rules[state], 'string', state);
   assert.deepEqual(unitState.attemptState.enum,
-    ['running', 'being-adopted', 'closed', 'legacy-run', 'abandoned-not-started', 'abandoned-legacy']);
+    ['running', 'being-adopted', 'closed', 'legacy-run', 'abandoned-not-started', 'abandoned-before-brief', 'abandoned-legacy']);
   for (const state of unitState.attemptState.enum) assert.equal(typeof unitState.attemptState.rules[state], 'string', state);
 });
 
@@ -30,7 +32,7 @@ test('awaiting-resume needs a closed last attempt, no unit-summary and no live c
 });
 
 test('abandoned-not-started agrees with the receipt outcome set', () => {
-  assert.ok(receipt.fields.outcome.enum.includes('abandoned-not-started'));
+  for (const o of ['abandoned-not-started', 'abandoned-before-brief', 'cancelled']) assert.ok(receipt.fields.outcome.enum.includes(o), o);
   assert.deepEqual(closed.fields.closedBy.enum, ['supervisor', 'adopt']);
 });
 
@@ -46,11 +48,12 @@ test('the cancel wait key is documented with its default and floor', () => {
   const key = unitState.config['dispatch.cancelWaitMs'];
   assert.match(key.default, /gateKillGraceMs \+ 5000/);
   assert.equal(key.min, 1000);
+  assert.equal(DEFAULT_GATE_KILL_GRACE_MS + 5000, 15000);
 });
 
 test('resume rules cover every attempt state a resume can meet', () => {
   const keys = Object.keys(unitState.resumeRule).join(' ');
-  for (const state of ['closed', 'running', 'being-adopted', 'abandoned-not-started', 'legacy-run']) {
+  for (const state of ['closed', 'running', 'being-adopted', 'abandoned-not-started', 'abandoned-before-brief', 'legacy-run']) {
     assert.ok(keys.includes(state), state);
   }
   assert.match(unitState.resumeRule['running|being-adopted'], /attempt-still-running/);

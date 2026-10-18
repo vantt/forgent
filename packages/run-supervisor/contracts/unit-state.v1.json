@@ -11,25 +11,26 @@
     },
     "liveController": {
       "record": "<unitDir>/controller.json {tuple: processTuple of the controller}, written by the controller when the unit starts; rewritten by a resuming controller",
-      "judge": "packages/process/contracts/process-facts.judge.v1.json over controller.json.tuple; only `dead` counts as no controller. alive and unknown both keep the unit `running` (unknown = keep)"
+      "judge": "packages/process/contracts/process-facts.judge.v1.json over controller.json.tuple; only `dead` counts as no controller. alive and unknown both keep the unit `running` (unknown = keep). A unit with no controller.json (written before it existed) judges `unknown`: it stays `running` until its attempt is closed, and then reads as awaiting-resume only if the attempt dir shows no live holder"
     }
   },
   "attemptState": {
-    "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-legacy"],
-    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>",
+    "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy"],
+    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: the doctor fix writes it, the probe never reports it",
     "rules": {
       "running": "attempt.lock is held and no adopting.json: a supervisor owns it",
       "being-adopted": "attempt.lock is held and adopting.json names the holder: an adopter owns it",
       "closed": "closed.json exists; every step has a step receipt. A scan skips it",
       "legacy-run": "run written before the supervisor (no attempt.lock); adopt cannot judge it",
       "abandoned-not-started": "no binding, receipt outcome abandoned-not-started (receipt.v1.json); a resume launches a new attempt with supersedesRunId",
+      "abandoned-before-brief": "terminal mode; receipt outcome abandoned-before-brief, nothing ran after GO. Counts as closed once closed.json exists; a resume treats it like abandoned-not-started and launches a new attempt with supersedesRunId",
       "abandoned-legacy": "a legacy-run attempt settled by the doctor fix once every recorded pid judged dead and no home marker points at it"
     }
   },
   "resumeRule": {
     "closed": "use result.json as the attempt result and carry on with the unit's remaining steps (commit writes, reviewer, next attempt, unit-summary.json); the agent does not run again",
     "running|being-adopted": "refuse with the named error `attempt-still-running`; print the state and the `fgos dispatch inspect` command; do not wait",
-    "abandoned-not-started": "launch a new attempt with supersedesRunId set to the abandoned one",
+    "abandoned-not-started|abandoned-before-brief": "launch a new attempt with supersedesRunId set to the abandoned one",
     "legacy-run": "refuse with `attempt-legacy-run`; the doctor check legacy-attempts-stuck owns it",
     "neverSecondSupervisor": "a resume goes through adopt and never starts a supervisor for an attempt that already has a binding or receipt (supervise refuses to start there)",
     "concurrentResume": "the next attempt directory is created with an exclusive mkdir; the second resumer gets EEXIST and refuses with `resume-in-progress`"
@@ -44,10 +45,10 @@
       "default": "dispatch.gateKillGraceMs + 5000 (so 15000 with the default grace)",
       "min": 1000,
       "reader": "project-over-global, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs)",
-      "setup": "setup never writes the key into a config file; an absent key is the default. Setup and doctor registration is owned by the doctor/docs phase"
+      "setup": "setup never writes the key into a config file; an absent key is the default. Setup and doctor registration is added together with the doctor check for stuck attempts"
     }
   },
   "deferred": {
-    "automaticResume": "Resuming without an explicit --resume after a controller death is a later item. It needs dead-controller detection (controller.json judge) and a single-taker guarantee. The seam is named here: controller.json is the dead-controller evidence and the exclusive attempt mkdir is the single-taker primitive. Nothing in this release builds it (owner decision, design r6 section 16)."
+    "automaticResume": "Resuming without an explicit --resume after a controller death is a later item. It needs dead-controller detection (controller.json judge) and a single-taker guarantee. The seam is named here: controller.json is the dead-controller evidence and the exclusive attempt mkdir is the single-taker primitive. Nothing in this release builds it (deferred by owner decision)."
   }
 }

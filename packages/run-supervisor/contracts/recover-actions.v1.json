@@ -11,5 +11,5 @@
     "resume-driver": { "shape": { "type": "resume-driver" }, "note": "unchanged" },
     "reassign-driver": { "shape": { "type": "reassign-driver", "toDriverId": "string" }, "note": "unchanged" }
   },
-  "evidence": "outbox result-N.json is recognized evidence for the adopt action (RECOGNIZED_EVIDENCE_TYPES); recover no longer parks because it exists"
+  "evidence": "outbox result-N.json becomes recognized evidence for the adopt action (RECOGNIZED_EVIDENCE_TYPES is extended with it); recover no longer parks because it exists"
 }
