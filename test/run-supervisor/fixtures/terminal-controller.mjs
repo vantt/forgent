@@ -14,7 +14,7 @@ const assignment = buildAssignment({
 });
 const runnerConfig = {
   executor: job.executor,
-  modelPolicies: { claude: { standard: 'sonnet' } },
+  modelPolicies: { claude: { standard: 'sonnet' }, ...(job.modelPolicies ?? {}) },
   rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   timeoutMs: job.timeoutMs ?? 60_000,
   ...(job.idleTimeoutMs ? { idleTimeoutMs: job.idleTimeoutMs } : {}),

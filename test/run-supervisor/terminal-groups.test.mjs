@@ -34,13 +34,13 @@ function fakeWith(scenario = {}) {
 }
 
 /** One seat's controller half: what the controller does before it hands the attempt to a supervisor. */
-function seat({ dir, fake, name, groupKey, anchorPaneId }) {
+function seat({ dir, fake, name, groupKey, anchorPaneId, ...more }) {
   const runDir = path.join(dir, `run-${name}`);
   fs.mkdirSync(runDir, { recursive: true });
   return prepareTerminalAttempt({
     attemptId: `cmd_${name}`, runId: `run_${name}`, runDir, cwd: dir, repoRoot: dir, prompt: `do the work of ${name}`,
     workId: `w-${name}`, tier: 'standard', model: 'sonnet', herdrBin: fake.herdrBin, fullEnv: { ...process.env },
-    agentKind: 'claude', dispatchBatchKey: groupKey, anchorPaneId,
+    agentKind: 'claude', dispatchBatchKey: groupKey, anchorPaneId, ...more,
   });
 }
 
@@ -172,5 +172,79 @@ test('an entry a person vouched for is never named for removal', { skip, timeout
     assert.equal(fs.existsSync(path.join(runDir, 'controller', 'trust-context.json')), false, 'nothing was written, so nothing is recorded');
     assert.equal((await cleanupTrust({ runDir })).detail.trust, 'none-written');
     assert.deepEqual(trusted(storePath), [dir, work].sort());
+  } finally { fake.cleanup(); }
+});
+
+const MULTILINE_PROMPT = 'read the spec\nthen change the file\n\nand report what you did';
+
+test('inline delivery types the whole brief and still writes brief-1.md; file-pointer types one line that names it', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}, {}] });
+  try {
+    const inline = await seat({ dir, fake, name: 'inline', groupKey: 'g-delivery', prompt: MULTILINE_PROMPT });
+    const inlineBrief = fs.readFileSync(path.join(dir, 'run-inline', 'brief-1.md'), 'utf8');
+    assert.ok(inlineBrief.includes(MULTILINE_PROMPT), 'the brief carries the real prompt verbatim, newlines and all');
+    assert.equal(inline.briefPath, path.join(dir, 'run-inline', 'brief-1.md'), 'the supervisor types what the brief file holds');
+
+    const pointer = await seat({ dir, fake, name: 'pointer', groupKey: 'g-delivery', prompt: MULTILINE_PROMPT, delivery: 'file-pointer' });
+    const typed = fs.readFileSync(pointer.briefPath, 'utf8');
+    assert.ok(!typed.includes('\n') || typed.trim().split('\n').length === 1, 'what is typed at a TUI in file-pointer mode is a single line');
+    assert.match(typed.trim(), /^Read .*brief-1\.md and do what it says\.$/);
+    assert.ok(!typed.includes('read the spec'), 'the work itself never goes through the terminal in file-pointer mode');
+    assert.ok(fs.readFileSync(path.join(dir, 'run-pointer', 'brief-1.md'), 'utf8').includes(MULTILINE_PROMPT), 'the pointer names a brief that has the work');
+  } finally { fake.cleanup(); }
+});
+
+test('the brief renders the execution contract and one result path, the outbox claim', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    await seat({ dir, fake, name: 'contract', groupKey: 'g-contract', prompt: 'Implement read-only analysis', effectiveContract: { mutation: 'read-only', limits: { executorTimeoutMs: 45000 } } });
+    const brief = fs.readFileSync(path.join(dir, 'run-contract', 'brief-1.md'), 'utf8');
+    assert.match(brief, /## Execution contract/);
+    assert.match(brief, /Mutation: read-only/);
+    assert.match(brief, /Timeout: 45000ms/);
+    assert.match(brief, /Result claim path: .*outbox[/\\]result-1\.json/);
+    assert.equal(brief.includes('agent-result.json'), false, 'no second, conflicting result path');
+  } finally { fake.cleanup(); }
+});
+
+test('a result already in the run directory refuses the seat before a pane exists: it would settle on somebody else\'s result', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    const runDir = path.join(dir, 'run-stale');
+    fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), '{}');
+    await assert.rejects(() => seat({ dir, fake, name: 'stale', groupKey: 'g-stale' }), (err) => err.reason === 'stale-result-in-run-dir');
+    assert.equal(verbs(fake, 'tab', 'create').length, 0, 'no pane was opened');
+  } finally { fake.cleanup(); }
+});
+
+test('a dead anchor pane opens the seat its own tab instead of failing it', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}], deadAnchorPane: 'w9:gone' });
+  try {
+    const seated = await seat({ dir, fake, name: 'deadanchor', groupKey: 'g-dead', anchorPaneId: 'w9:gone' });
+    assert.equal(seated.slot.key, 'cmd_deadanchor');
+    assert.equal(verbs(fake, 'pane', 'split').length, 0, 'a pane that is not live is no anchor to split from');
+    assert.equal(verbs(fake, 'tab', 'create').length, 1, 'the seat opens its own tab');
+  } finally { fake.cleanup(); }
+});
+
+test('an agy trust entry a seat wrote is removed by the step; one the person already had stays', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}, {}] });
+  try {
+    const work = path.join(dir, 'work');
+    fs.mkdirSync(work);
+    const settingsPath = path.join(dir, 'agy-settings.json');
+    fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [dir] }));
+    const trustedWorkspaces = () => JSON.parse(fs.readFileSync(settingsPath, 'utf8')).trustedWorkspaces.sort();
+
+    await seat({ dir, fake, name: 'agy1', groupKey: 'g-agy', cwd: work, agentKind: 'agy', trustStore: { kind: 'agy', path: settingsPath } });
+    assert.deepEqual(trustedWorkspaces(), [dir, work].sort());
+    await cleanupTrust({ runDir: path.join(dir, 'run-agy1') });
+    assert.deepEqual(trustedWorkspaces(), [dir]);
+
+    fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [dir, work] }));
+    await seat({ dir, fake, name: 'agy2', groupKey: 'g-agy', cwd: work, agentKind: 'agy', trustStore: { kind: 'agy', path: settingsPath } });
+    await cleanupTrust({ runDir: path.join(dir, 'run-agy2') });
+    assert.deepEqual(trustedWorkspaces(), [dir, work].sort(), 'an entry it did not write is not removed');
   } finally { fake.cleanup(); }
 });

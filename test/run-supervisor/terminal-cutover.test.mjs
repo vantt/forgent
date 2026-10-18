@@ -40,6 +40,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   assert.equal(envelope.agentProtocol.cli, 'claude');
   assert.deepEqual(envelope.steps.map((s) => s.stepId), ['settle-attempt', 'finalize-home', 'cleanup-trust', 'release-slot']);
   assert.equal(envelope.identity.writerId, `att-${envelope.attemptId}`);
+  assert.equal(envelope.deadlines.idleMs, 300_000, 'an attempt has an idle limit even when the runner config sets none');
   assert.equal(envelope.launch.briefPath, path.join(attemptDir, 'brief-1.md'));
   assert.equal(fs.readFileSync(envelope.launch.briefPath, 'utf8').trim(), brief.trim());
 
@@ -127,4 +128,26 @@ test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and 
   assert.match(result.runnerNote.summary, /grant trust for this project in the agent's own home/);
   assert.equal(project.callsStarting('pane close').length, 0, 'the pane stays for the person');
   assert.equal(project.callsStarting('tab create').length, 1, 'no second candidate was tried');
+});
+
+test('an executor declared by invocations[] runs the same way as one declared flat', { skip: noHost, timeout: 180_000 }, async () => {
+  const project = await newProject('invocations');
+  const { command, args, env, interactiveMode } = project.executor({ commandName: 'claude' });
+  const run = project.startController({ modelPolicies: { [command]: { standard: 'sonnet' } }, executor: { kind: 'agent', allowCrossProvider: true, invocations: [{ id: 'seat-herdr', via: 'cli', adapter: 'herdr-spawn', command, args, env, interactiveMode }] } });
+  const { exit } = await finishAttempt(project, run);
+  assert.equal(exit.code, 0, JSON.stringify(run.output()));
+  assert.equal(run.answer().result.classification.outcome.reason, 'completed-pass');
+  assert.equal(readJson(path.join(project.attemptDir(), 'envelope.json')).mode, 'terminal');
+});
+
+test('the brief the pane agent reads names the one result path, the outbox claim', { skip: noHost, timeout: 180_000 }, async () => {
+  const project = await newProject('briefcontract');
+  const run = project.startController();
+  const { brief, exit } = await finishAttempt(project, run);
+  assert.equal(exit.code, 0, JSON.stringify(run.output()));
+  assert.match(brief, /## Execution contract/);
+  assert.match(brief, /- Result claim path: [^\n]*outbox[/\\]result-1\.json/);
+  assert.equal(brief.includes('agent-result.json'), false, 'no second, conflicting result path');
+  const contract = readJson(path.join(project.attemptDir(), 'effective-execution-contract.json'));
+  assert.match(contract.resultClaim?.path ?? '', /outbox[/\\]result-1\.json/, 'the persisted contract agrees with the brief');
 });
