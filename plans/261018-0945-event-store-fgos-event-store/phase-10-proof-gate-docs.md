@@ -22,6 +22,7 @@
 6a. **WAL bound (M8):** Git's compaction is present and phase 04's 10,000-seal measurement shows a bounded WAL; otherwise no-go.
 7. **Retired families:** check spec §20's list (G-092, G-093, G-120, part of G-029; G-089, G-121, G-170; G-210, G-211, half of G-184; G-118, G-212, G-213; G-090, G-214) against the catalogue freeze 234 and confirm each mechanism is gone on the candidate.
 8. **Docs** (smallest owning surface each): `docs/platform/event-store/spec.md` (implementation status line; §5 clarifying row for `project:<name>` streams, D9, marked as clarification with no protocol change); `docs/specs/work-state.md` (rebuild section, data-layout pointers, RUL10 note, removed `repair`, `seq` meaning, conflict records); `docs/specs/reading-map.md` (event-store paths); spec §15 and §19 stale citations (`command-registry.mjs:1393` → `:1405`, `registrations.mjs:1965-2031`/`2035-2126` → current rows) as a citation fix; `docs/specs/distillery.md:136-138` (porting storage); `docs/platform/component-boundary.md` (Event Store row: owns envelope, open logs, seal, reader, sharing, verbs; consumers Work, porting, observe, decisions; depends on Git Publication, holder-lock, Session Identity; no consumer imports); any how-to that names event files (found by `rg -l "\.fgos/events" docs`). CHANGELOG stays phase 09's.
+8a. **Spec-text reconciliation with the Git spec (task for the Event Store spec owner, done here, not earlier).** (1) §10 step 2.3: replace the `gix` in process / `update-ref` with `-c core.fsync=objects,reference` wording by a reference to Git's Publication port, since Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec §10 "Directory durability is Git's own job"). (2) §21 `event-store-git-version` floor (2.31 / 2.36): replace the numbers by a pointer to Git's floor, owned by Git (`packages/git/contracts/git-floor.v1.json`, Git phase 01 req 3, read through `gitFloorVerdict`). Recorded as a dated clarification in the spec's history, no protocol change.
 9. **V-EVENT handoff:** send the phase 05 V-EVENT green run id to the Git 08 lead and record it on the board.
 
 ## Files
@@ -29,7 +30,7 @@
 | Action | File |
 |---|---|
 | create | `test/event-store/topologies.test.mjs`, `scripts/event-store/power-loss.sh` |
-| edit | `docs/platform/event-store/spec.md`, `docs/specs/work-state.md`, `docs/specs/reading-map.md`, `docs/platform/component-boundary.md`, how-to pages found by `rg -l "\.fgos/events" docs` |
+| edit | `docs/platform/event-store/spec.md` (requirements 8, 8a), `docs/specs/work-state.md`, `docs/specs/reading-map.md`, `docs/platform/component-boundary.md`, how-to pages found by `rg -l "\.fgos/events" docs` |
 | report | `fgos convention path --kind report --type verification --slug event-store-proof-gate` |
 
 ## Steps

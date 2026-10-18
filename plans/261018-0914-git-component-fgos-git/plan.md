@@ -7,7 +7,7 @@ effort: 254h
 branch: main
 tags: [git, rust, napi, holder-lock, event-store, migration, critical]
 blockedBy: []
-blocks: []
+blocks: [261018-0945-event-store-fgos-event-store]
 created: 2026-10-18
 ---
 
