@@ -121,6 +121,28 @@ test('the door gets a config pinned to the one account, and other providers and 
   assert.equal(pinned.executors, wide.executors);
 });
 
+test('a declared store key, not the command, decides which confined invocations lease the account', () => {
+  const wrapped = (id, credentialStore) => ({
+    id, via: 'cli', adapter: 'cli-spawn', command: '/opt/bin/agent-wrapper', args: [], confinement: { backend: 'bwrap' }, ...(credentialStore ? { credentialStore } : {}),
+  });
+  const wrappedCfg = {
+    providers: cfg.providers,
+    executors: {
+      openai: {
+        kind: 'agent',
+        providerModel: 'openai',
+        invocations: [
+          wrapped('wrapper-codex', { use: 'codex', homeEnv: 'CODEX_HOME' }),
+          wrapped('wrapper-pi', { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' }),
+          wrapped('wrapper-no-store'),
+        ],
+      },
+    },
+  };
+  const found = accountInvocations(wrappedCfg, { provider: 'openai', accountId: 'acct' }).invocations.map((i) => [i.invocationId, i.via]);
+  assert.deepEqual(found, [['wrapper-codex', 'lease']]);
+});
+
 test('every CLI starts before any finishes, each under a read-only posture binding, and left-open panes are closed', async () => {
   const repoRoot = tmp('fgos-account-probe-repo-');
   const runDirOf = (id) => {
