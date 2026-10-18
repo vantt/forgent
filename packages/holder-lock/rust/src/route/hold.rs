@@ -314,8 +314,10 @@ pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool
         }
     });
     // Unlock explicitly, then close: every borrow's domain is empty by now.
-    port::release(handle);
-    EXIT_OK
+    match port::release(handle) {
+        port::Release::Released { .. } => EXIT_OK,
+        outcome => { eprintln!("lock-release-stuck: {outcome:?}"); crate::route::EXIT_INTERNAL }
+    }
 }
 
 #[cfg(windows)]
@@ -496,7 +498,7 @@ mod tests {
         let answer = ready(&args.work);
         assert_eq!(answer["result"], "held");
         assert_eq!(answer["reason"], "kernel-lock-held");
-        port::release(holder);
+        assert!(matches!(port::release(holder), port::Release::Released { .. }));
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -509,7 +511,7 @@ mod tests {
         let answer = ready(&args.work);
         assert_eq!(answer["result"], "timeout");
         assert!(answer["waitedMs"].as_u64().unwrap() >= 30);
-        port::release(holder);
+        assert!(matches!(port::release(holder), port::Release::Released { .. }));
         let _ = fs::remove_dir_all(&dir);
     }
 

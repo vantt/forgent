@@ -42,8 +42,8 @@
     },
     "release": {
       "input": { "handle": "handle returned by acquire" },
-      "rule": "the holder releases only after its own domain is empty (run_borrowed already waited for the child, killed leftovers and waited for empty). Release closes every copy of the description it owns.",
-      "output": { "released": true }
+      "rule": "the holder releases only after its own domain is empty (run_borrowed already waited for the child, killed leftovers and waited for empty). Release closes every copy it owns, then (for exclusive Linux handles) uses positive kernel lock-table evidence and an inode-checked, noncreating shared try-lock probe to prove no copy of its description still holds the lock (a short table read is not EOF); a blocked or uncertain probe enters the full tagged scan, killing escaped holders of it (direct children waited, copies of this process's live handles spared); unresolved within the bounded wait returns lock-release-stuck. Drop uses the same settle; shared handles close directly. The brief shared probe may make a concurrent exclusive Try acquirer report held; no copy of the original description is retained.",
+      "output": { "released": true, "leftoversKilled": "integer >= 0" }
     },
     "run_borrowed": {
       "input": {
@@ -142,13 +142,13 @@
         "detail": "string"
       },
       "errors": {
-        "lock-release-stuck": "release could not end the helper or empty its domain within the bounded wait; the lock may still be held",
+        "lock-release-stuck": "release could not prove the original description released or end its holders/helper within the bounded wait; reports leftoversKilled and remaining pids; the lock may still be held",
         "borrow-busy": "run_borrowed was called while another borrow of the same handle is still running, or release was called during a borrow"
       },
       "invariants": [
         "timeout and held never leave a description open: the lock is released before the result is returned",
         "predecessor-domain-not-empty is returned after the lock was released again",
-        "no result of any operation is ever derived from a pid, a TTL or an mtime"
+        "no result infers ownership or liveness from a pid, a TTL or an mtime; Linux release compares the kernel locker stamp only to this live process"
       ]
     }
   },

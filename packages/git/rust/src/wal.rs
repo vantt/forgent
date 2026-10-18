@@ -758,7 +758,7 @@ impl<F: FileSystem> Wal<F> {
                 .file_name()
                 .into_string()
                 .map_err(|_| corrupt("non UTF-8 record name"))?;
-            if name.starts_with(".durable-file-") && name.ends_with(".tmp") {
+            if is_durable_temporary(&name) {
                 continue;
             }
             if names.len() >= MAX_RECORDS {
@@ -1498,7 +1498,7 @@ impl<F: FileSystem> Wal<F> {
                 return Err(corrupt("pre-intent scan bound"));
             }
             let name = entry?.file_name().to_string_lossy().into_owned();
-            if !(name.starts_with(".durable-file-") && name.ends_with(".tmp")) {
+            if !is_durable_temporary(&name) {
                 return Err(corrupt("unknown pre-intent artifact"));
             }
         }
@@ -1550,13 +1550,14 @@ impl<F: FileSystem> Wal<F> {
         let mut seen = 0;
         for (dir, ledger) in [(&self.root, false), (&self.ledger, true)] {
             for entry in fs::read_dir(dir.path())? {
+                let entry = entry?;
+                let id = entry.file_name().to_string_lossy().into_owned();
+                if is_durable_temporary(&id) { continue; }
                 if seen == bound {
                     result.complete = false;
                     return Ok(result);
                 }
                 seen += 1;
-                let entry = entry?;
-                let id = entry.file_name().to_string_lossy().into_owned();
                 // The ledger is installed durably before any chain deletion.
                 // Re-read it after every failed observation of a root entry.
                 let inspect_entry = || -> WalResult<(bool, u64, Option<std::time::SystemTime>, bool)> {
@@ -1611,6 +1612,11 @@ impl<F: FileSystem> Wal<F> {
         }
         Ok(result)
     }
+}
+
+// Same temporary-name rule for every WAL directory reader.
+fn is_durable_temporary(name: &str) -> bool {
+    name.starts_with(".durable-file-") && name.ends_with(".tmp")
 }
 
 #[cfg(all(test, target_os = "linux"))]
@@ -1934,6 +1940,22 @@ mod tests {
         let mut different = intent(&replay);
         different.request_digest = "f".repeat(64);
         assert!(matches!(replay.begin("replay", different, &Authority), Err(WalError::OperationIdConflict)));
+    }
+
+    #[test]
+    fn scan_ignores_compaction_temporaries_before_counting_the_bound() {
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        fs::write(wal.ledger.path().join(".durable-file-123-0.tmp"), b"partial ledger").unwrap();
+        let scan = wal.scan(0).unwrap();
+        assert!(scan.complete);
+        assert_eq!(scan.unresolved, 0);
+        assert_eq!(scan.ledger_entries, 0);
+        assert!(scan.entries.is_empty());
+        fs::write(wal.ledger.path().join("unexpected"), b"bad").unwrap();
+        let scan = wal.scan(10).unwrap();
+        assert_eq!(scan.unresolved, 1);
+        assert!(scan.entries[0].error.is_some());
     }
 
     #[test]

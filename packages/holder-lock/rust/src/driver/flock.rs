@@ -228,13 +228,13 @@ impl LockDriver for FlockDriver {
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
 fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since))
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?)
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
-pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait, Reach::Everyone).map(|_| ())
+pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
+    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?).map(|_| ())
 }
 
 /// Which processes a drain reads descriptor tables of.
@@ -246,7 +246,7 @@ pub(crate) enum Reach {
     Everyone,
     /// Lagged per-spawn floor, assuming fork inheritance and ordinary PID
     /// allocation. Descriptor transfer to existing processes is covered by
-    /// the mandatory full admission and final drains. Reads processes
+    /// the release-time kernel lock-table settle. Reads processes
     /// found in pid allocation order while the mark is young enough
     /// (`fgos_process::facts::created_since`), otherwise by start time over
     /// every process. The borrowed child, its group and its descendants were
@@ -255,8 +255,10 @@ pub(crate) enum Reach {
 }
 
 impl Reach {
-    fn of(since: Option<CreationMark>) -> Self {
-        since.map_or(Reach::Everyone, Reach::Since)
+    fn of(since: Option<CreationMark>) -> Result<Self, Leftovers> {
+        // Missing reach facts refuse instead of reintroducing a host scan
+        // on admission or every borrow. Release still settles the description.
+        since.map(Reach::Since).ok_or(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
     }
 }
 
@@ -282,6 +284,116 @@ impl Tree {
     }
 }
 
+/// Shared pinned signalling and bounded poll loop for borrow and release.
+#[derive(Default)]
+struct Cleanup {
+    signaled: HashSet<(u32, String)>,
+    killed: u32,
+}
+
+impl Cleanup {
+    fn signal(&mut self, pid: u32) -> bool {
+        let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) else { return false; };
+        self.signal_identity(&tuple);
+        true
+    }
+
+    fn signal_identity(&mut self, tuple: &fgos_process::facts::ProcTuple) {
+        use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
+        if self.signaled.insert((tuple.pid.0, tuple.start_time.clone()))
+            && signal_by_identity(tuple, Signal::Kill) == SignalOutcome::Sent
+        { self.killed += 1; }
+    }
+}
+
+fn cleanup_loop(kill_wait: Duration, mut pass: impl FnMut(&mut Cleanup, Instant) -> Result<bool, Leftovers>) -> Result<u32, Leftovers> {
+    let deadline = Instant::now() + kill_wait;
+    let mut cleanup = Cleanup::default();
+    loop {
+        if pass(&mut cleanup, deadline)? { return Ok(cleanup.killed); }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+}
+
+/// Close first; the kernel's locker stamp distinguishes our escaped copies
+/// from a later acquirer's fresh description, without taking a probe lock.
+#[cfg(target_os = "linux")]
+pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Release {
+    use fgos_process::facts::{file_key, locked_fds, lock_table_entries, own_lock_token, proc_self_pid};
+    use crate::port::Release;
+    let key = file_key(&file);
+    let token = own_lock_token(&file);
+    let me = proc_self_pid().map(|pid| pid.0);
+    // open(/proc/self/fd/N), unlike dup(N), creates an independent description.
+    // Keep it unlocked until after close. This pins even an unlinked inode so
+    // a replaced resource path cannot redirect the shared probe elsewhere.
+    let mut probe = File::open(format!("/proc/self/fd/{}", file.as_raw_fd())).and_then(|probe| {
+        if key.as_ref().is_ok_and(|key| file_key(&probe).is_ok_and(|actual| actual == *key)) {
+            Ok(probe)
+        } else { Err(io::Error::other("release probe inode mismatch")) }
+    }).ok();
+    drop(file);
+    let result = cleanup_loop(kill_wait, |cleanup, deadline| {
+        let stuck = |pids| Leftovers { killed: cleanup.killed, pids, foreign: false };
+        let (Ok((dev, ino)), Ok(me)) = (&key, &me) else { return Err(stuck(Vec::new())); };
+        let tagged = match (&token, lock_table_entries()) {
+            (Ok(token), Ok(entries)) => Some(entries.iter().any(|entry| entry.kind == "FLOCK" && entry.pid == i64::from(*me) && entry.token == *token)),
+            _ => None,
+        };
+        if tagged == Some(false) {
+            // seq_file may return a short prefix, even into a large buffer.
+            // Absence is only a reason to probe, never a release proof.
+            if let Some(file) = &probe {
+                if matches!(FlockDriver.try_lock(file, Mode::Sh), Ok(TryLock::Locked)) {
+                    drop(probe.take());
+                    return Ok(true);
+                }
+            }
+        }
+        let mine = locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).map_err(|_| stuck(Vec::new()))?;
+        // Any live own lock on this inode proves the old EX description gone.
+        // Return before the scan: kcmp need not be available to spare its copies.
+        if mine.iter().any(|fd| fd.lock.kind == "FLOCK") { return Ok(true); }
+        let holders = locked_fds(*dev, *ino, None).map_err(|_| stuck(Vec::new()))?;
+        let mut candidates = HashMap::new();
+        for holder in holders {
+            // Positive proof of a later acquirer, including when its record
+            // fell outside the lock-table prefix: EX exclusivity proves our
+            // old description gone. Never signal that acquirer.
+            if holder.lock.kind == "FLOCK" && holder.lock.pid != i64::from(*me)
+                && token.as_ref().is_ok_and(|token| holder.lock.token == *token)
+            { return Ok(true); }
+            if holder.pid.0 == *me || holder.lock.kind != "FLOCK" || holder.lock.pid != i64::from(*me) { continue; }
+            if let Ok(token) = &token {
+                if holder.lock.token != *token { continue; }
+            }
+            candidates.insert(holder.pid.0, holder.identity);
+        }
+        let mut pids = candidates.keys().copied().collect::<Vec<_>>();
+        pids.sort_unstable();
+        // An empty scan alone cannot prove release across an in-flight fork.
+        // Re-probe/re-scan until the shared probe or a positive later-owner
+        // record proves release, or the bounded wait reports Stuck.
+        for &pid in &pids {
+            // A same-process reacquirer can appear during the full scan.
+            // Its EX lock proves our old description gone; spare its copies.
+            if locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).is_ok_and(|mine| mine.iter().any(|fd| fd.lock.kind == "FLOCK")) {
+                return Ok(true);
+            }
+            // Unknown parent is not authority to kill; re-read each pass.
+            if parent_and_group(pid).is_some_and(|(parent, _)| parent != *me) {
+                cleanup.signal_identity(&candidates[&pid]);
+            }
+        }
+        if Instant::now() >= deadline { return Err(Leftovers { killed: cleanup.killed, pids, foreign: false }); }
+        Ok(false)
+    });
+    match result {
+        Ok(killed) => Release::Released { killed },
+        Err(left) => Release::Stuck { killed: left.killed, pids: left.pids },
+    }
+}
+
 pub(crate) fn drain_description(
     file: &File,
     child_pid: Option<u32>,
@@ -289,8 +401,7 @@ pub(crate) fn drain_description(
     kill_wait: Duration,
     reach: Reach,
 ) -> Result<u32, Leftovers> {
-    use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
-    use fgos_process::facts::{file_key, identity_of, lock_holders, lock_holders_among, Holders};
+    use fgos_process::facts::{file_key, lock_holders, lock_holders_among, Holders};
     use fgos_process::ProcId;
     let Ok((dev, ino)) = file_key(file) else {
         return Err(Leftovers {
@@ -300,10 +411,7 @@ pub(crate) fn drain_description(
         });
     };
     let me = std::process::id();
-    let deadline = Instant::now() + kill_wait;
-    let mut signaled: HashSet<(u32, String)> = HashSet::new();
-    let mut killed = 0u32;
-    loop {
+    cleanup_loop(kill_wait, |cleanup, deadline| {
         // The processes that may hold a copy, with their parent and group:
         // all of them, or only those created since the reach's mark.
         let (tree, candidates) = match reach {
@@ -346,7 +454,7 @@ pub(crate) fn drain_description(
             // empty holder set (Publication admission also requires self).
             Holders::List(_) | Holders::Unlistable => {
                 return Err(Leftovers {
-                    killed,
+                    killed: cleanup.killed,
                     pids: Vec::new(),
                     foreign: false,
                 })
@@ -389,40 +497,32 @@ pub(crate) fn drain_description(
         domain.dedup();
         let mut live = Vec::new();
         for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
-            if let Some(tuple) = identity_of(fgos_process::ProcId(pid)) {
-                // Re-check membership before signalling a pinned identity.
-                if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
-                    || (child_pid.is_some()
-                        && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner))
-                {
-                    live.push(pid);
-                    if signaled.insert((pid, tuple.start_time.clone()))
-                        && signal_by_identity(&tuple, Signal::Kill) == SignalOutcome::Sent
-                    {
-                        killed += 1;
-                    }
-                }
-            }
+            // Re-check membership immediately before pinning and signalling.
+            if (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+                || (child_pid.is_some() && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner)))
+                && cleanup.signal(pid)
+            { live.push(pid); }
         }
+
         if live.is_empty() && !foreign.is_empty() && Instant::now() >= deadline {
             return Err(Leftovers {
-                killed,
+                killed: cleanup.killed,
                 pids: foreign,
                 foreign: true,
             });
         }
         if live.is_empty() && foreign.is_empty() && !had_holders {
-            return Ok(killed);
+            return Ok(true);
         }
         if Instant::now() >= deadline {
             return Err(Leftovers {
-                killed,
+                killed: cleanup.killed,
                 pids: live,
                 foreign: false,
             });
         }
-        std::thread::sleep(Duration::from_millis(1));
-    }
+        Ok(false)
+    })
 }
 
 /// Read-only local Linux domain facts; no process-control policy lives here.

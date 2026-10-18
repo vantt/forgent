@@ -2158,7 +2158,7 @@ mod tests {
             !control.status.success(),
             "the installed hook must reject the control"
         );
-        release(handle);
+        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     }
     #[test]
     fn floor_and_all_repository_backends() {

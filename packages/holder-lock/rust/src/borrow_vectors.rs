@@ -223,12 +223,15 @@ impl Borrowing<'_> {
                     }
                 }
                 Err(err) => {
-                    port::release(handle);
+                    let _ = port::release(handle);
                     return Err(format!("git {}: {err}", args.join(" ")));
                 }
             }
         }
-        port::release(handle);
+        match port::release(handle) {
+            port::Release::Released { killed: count } => killed += count,
+            other => return Err(format!("lock-release-stuck: {other:?}")),
+        }
         let probe = port::probe(&self.resource).map_err(|e| format!("probe: {e}"))?;
         Ok((killed, probe, notes))
     }
@@ -356,7 +359,9 @@ fn sibling(dir: &Path) -> (bool, String) {
         other => return (false, format!("owner could not take the sibling lock: {other:?}")),
     };
     let answer = sibling_answer(&handle, &resource);
-    port::release(handle);
+    if let outcome @ port::Release::Stuck { .. } = port::release(handle) {
+        return (false, format!("lock-release-stuck: {outcome:?}"));
+    }
     match answer {
         Ok(BorrowedCheck::NotBorrower(reason)) => (true, format!("sibling refused ({})", reason.as_str())),
         Ok(BorrowedCheck::Borrower) => (false, "a sibling outside the borrow was accepted as borrower".into()),

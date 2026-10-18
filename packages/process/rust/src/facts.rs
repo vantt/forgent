@@ -503,6 +503,10 @@ pub fn parse_proc_stat(line: &str) -> Option<(char, String)> {
     Some((state, start_time.to_string()))
 }
 
+// Linux kernel lock facts belong to process, not a lock policy adapter.
+#[cfg(target_os = "linux")]
+pub use crate::platform::linux::{kcmp_same_file, lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
+
 #[cfg(test)]
 mod tests {
     use super::*;

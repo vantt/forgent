@@ -79,10 +79,15 @@ impl GitPublication {
         })
     }
     #[napi]
-    pub fn close(&mut self) -> Result<()> {
+    pub fn close(&mut self) -> Result<Value> {
         check()?;
-        self.handle.take();
-        Ok(())
+        match self.handle.take().map(fgos_holder_lock::release) {
+            Some(fgos_holder_lock::Release::Stuck { killed, pids }) =>
+                Err(error(json!({"cause":"lock-release-stuck", "leftoversKilled":killed, "pids":pids}))),
+            Some(fgos_holder_lock::Release::Released { killed }) =>
+                Ok(json!({"released":true, "leftoversKilled":killed})),
+            None => Ok(json!({"released":true, "leftoversKilled":0})),
+        }
     }
     /// One mechanical dispatcher; typed validation and all policy remain in the port.
     #[napi]
