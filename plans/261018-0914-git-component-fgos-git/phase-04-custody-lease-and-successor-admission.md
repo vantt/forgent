@@ -4,7 +4,7 @@
 - **Branch / worktree:** `git/p04-custody`, `.claude/worktrees/git-p04`.
 - **Model / effort:** opus, rigor critical; 20h.
 - **Parallel with:** phase 02. **Collides with:** plan 6.4 (owns `run.mjs`, `assignment-runner.mjs`, `recovery-planner.mjs`); see Q5.
-- **Landing:** stop-everything on all workspaces and both machines (holder-lock §12 quiesce), because an older controller commits with no lease and leaves no predecessor record, which a new successor would read as a handoff (red team FM2).
+- **Landing:** stop-everything on every workspace and machine of the owner's list (Event Store Q2, shared as Event Store M2) (holder-lock §12 quiesce), because an older controller commits with no lease and leaves no predecessor record, which a new successor would read as a handoff (red team FM2).
 
 ## Context
 

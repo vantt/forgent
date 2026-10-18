@@ -92,17 +92,17 @@ Parallel lanes: 01 lane B (bench) runs beside everything; 06's addon skeleton ma
 
 Interface mismatches to settle with the Git leads (not owner questions). ES phases that need a row do not merge until it is settled:
 
-| # | Mismatch | Needed | Git phase | Blocks ES |
-|---|---|---|---|---|
-| M1 | `walk_commits` has no stop set | `stop: [Oid]` (not descended, not interpreted) and each commit with ordered parents and tree id | 01 | 03 |
-| M2 | Git landing fences "both machines" | the machine list of Q2, shared by both plans; `fgctl` and fence on every listed machine | 01 landing | 11 |
-| M3 | a crashed PublicationCas returns `recovery-required` forever (`docs/platform/git/spec.md:287`) | Git resolves an own-ref PublicationCas as superseded once a later receipted CAS of the same ref exists; the ES never waits on it | 01 | 04 |
-| M4 | non-fast-forward push not typed | `push_refs` result `rejected-non-fast-forward` | 01 | 05 |
-| M5 | refspec, floor and config facts not exported | read-only facts for configured fetch refspecs, the Git floor verdict, `fgos.machineId` and the remote URL | 01 | 06, 07 |
-| M7 | interface `write_commit` lacks a date | explicit date argument (Git 01 requirement 9 names it) | 01 | 04 |
-| M8 | no bound on WAL records and pins per seal | compaction of terminal PublicationCas records and pin cleanup within Git §10 rules; ES-04 measures growth over 10,000 seals | 01 or 06 | 11 |
-| M9 | no Git door materializes a reviewed commit's bytes into the main checkout | ScopedCommit `sourceCommit` mode under main 50 with the hook run from HEAD's tree (only if Q5 stays at its default) | 05 | 08, 11 |
-| M10 | `components.nativeAddon` optional until Git 07; spec §23.2 item 9 needs activation to refuse a payload without it | required from the release that carries ES-09, or an ES activation check | 01/07 | 10 |
+| # | Mismatch | Needed | Git phase | Blocks ES | Git answer (2026-10-18) |
+|---|---|---|---|---|---|
+| M1 | `walk_commits` has no stop set | `stop: [Oid]` (not descended, not interpreted) and each commit with ordered parents and tree id | 01 | 03 | Accepted: Git [phase 01](../261018-0914-git-component-fgos-git/phase-01-publication-port.md) req 9 and interface (`stop`, ordered parents, tree id) |
+| M2 | Git landing fences "both machines" | the machine list of Q2, shared by both plans; `fgctl` and fence on every listed machine | 01 landing | 11 | Accepted: Git phase 01 step 14, phases 04 and 08 landing and execution model use the Q2 list; Git 01 landing waits for Q2 |
+| M3 | a crashed PublicationCas returns `recovery-required` forever (`docs/platform/git/spec.md:287`) | Git resolves an own-ref PublicationCas as superseded once a later receipted CAS of the same ref exists; the ES never waits on it | 01 | 04 | **Not accepted as a decision: needs a Git spec amendment**, A1 in the [Git plan](../261018-0914-git-component-fgos-git/plan.md#spec-amendments-needed-before-git-phase-01-freezes-its-interface). Inside the signed text only the equal-`next` case resolves (deterministic retry, `effectObservedOnly`); the owner decides A1 before Git 01's interface freezes and before ES-04 merges |
+| M4 | non-fast-forward push not typed | `push_refs` result `rejected-non-fast-forward` | 01 | 05 | Accepted: Git phase 01 req 9 (typed push results, non-interactive transport) |
+| M5 | refspec, floor and config facts not exported | read-only facts for configured fetch refspecs, the Git floor verdict, `fgos.machineId` and the remote URL | 01 | 06, 07 | Accepted: Git phase 01 req 13a; remote URL pinned through `ensure_fetch_mapping` provenance (req 20) instead of an Event Store git config write |
+| M7 | interface `write_commit` lacks a date | explicit date argument (Git 01 requirement 9 names it) | 01 | 04 | Accepted: Git phase 01 req 9 and interface |
+| M8 | no bound on WAL records and pins per seal | compaction of terminal PublicationCas records and pin cleanup within Git §10 rules; ES-04 measures growth over 10,000 seals | 01 or 06 | 11 | Accepted in Git phase 01 req 12a: terminal chains compacted to one ledger line each, pins released; bounded per seal, not constant (the spec keeps every id non-reusable); crashed records only through A1 |
+| M9 | no Git door materializes a reviewed commit's bytes into the main checkout | ScopedCommit `sourceCommit` mode under main 50 with the hook run from HEAD's tree (only if Q5 stays at its default) | 05 | 08, 11 | **Not planned: needs a Git spec amendment**, A2 in the Git plan; Git recommends Q5 (a), which needs no Git change |
+| M10 | `components.nativeAddon` optional until Git 07; spec §23.2 item 9 needs activation to refuse a payload without it | required from the release that carries ES-09, or an ES activation check | 01/07 | 10 | Accepted: Git phase 05 req 7a, `fgctl` refuses a linux-x64 candidate without the addon from Git 05's release; windows-x64 required at Git 07 |
 
 ## Execution model
 

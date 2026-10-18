@@ -3,7 +3,7 @@ title: "Git component fgos-git: implement the signed G0 spec"
 description: "Build the Rust fgos-git component behind one combined N-API addon, starting with the refs/fgos/* Publication port the Event Store consumes, then every typed port, the custody lease, and the one-release switch that deletes the three parallel Node git cores."
 status: pending
 priority: P1
-effort: 242h
+effort: 254h
 branch: main
 tags: [git, rust, napi, holder-lock, event-store, migration, critical]
 blockedBy: []
@@ -48,11 +48,11 @@ created: 2026-10-18
 
 | Phase | Name | Depends on | Model | Effort |
 |---|---|---|---|---|
-| 01 | [Publication port, foundation and Event Store handover](./phase-01-publication-port.md) | G0 signed | opus | 54h |
+| 01 | [Publication port, foundation and Event Store handover](./phase-01-publication-port.md) | G0 signed; amendment A1 decided before the interface freezes | opus | 64h |
 | 02 | [Rust LockScope bridge, Inspect, Refs, Remote](./phase-02-lockscope-inspect-refs-remote.md) | 01 | sonnet | 24h |
 | 03 | [Worktree port, worktree-admin wrap set, public verb](./phase-03-worktree-port-and-admin-wrap.md) | 02 | sonnet | 20h |
 | 04 | [Custody lease across the runner commit, successor admission](./phase-04-custody-lease-and-successor-admission.md) | 6.3 landed, Q5 | opus | 20h |
-| 05 | [ScopedCommit, Sync, write-scope leaf, hook contract, cutover grant](./phase-05-scoped-commit-sync-hooks.md) | 02, 04 | opus | 30h |
+| 05 | [ScopedCommit, Sync, write-scope leaf, hook contract, cutover grant](./phase-05-scoped-commit-sync-hooks.md) | 02, 04 | opus | 32h |
 | 06 | [Land, SafeRestore, RepositoryConfig, Recovery](./phase-06-land-restore-config-recovery.md) | 02, 03, 05 | opus | 32h |
 | 07 | [Caller migration, three-core deletion, one-door gate](./phase-07-caller-migration-and-one-door.md) | 01-06, Event Store legacy cutover landed | sonnet (opus review) | 44h |
 | 08 | [Implementation-time proofs, docs, landing](./phase-08-proof-gate-docs-landing.md) | 07, Event Store V-EVENT green (E1 and E3 start after 01) | opus | 18h |
@@ -72,11 +72,55 @@ Parallel lanes: 02 ∥ 04; 03 ∥ 05 after 02. File ownership per phase is in ea
 - **After 05:** ScopedCommit in the main checkout under main-checkout 50 with `cutoverGrant`, and hook support for the grant (spec §7), which Event Store §18 step 5 needs.
 - The Event Store legacy cutover lands before the phase 07 release (spec §12 ordering). The Event Store plan removes the event-file allowlist rows with that cutover.
 
+### Event Store interface reconciliation (M1-M10)
+
+Reconciled 2026-10-18 10:45 (Asia/Saigon) against the Event Store plan's mismatch table. (a) = a plan-level addition that fits the signed spec as written; (b) = needs a spec amendment, listed in the next section and not planned as decided. M6 was removed by the Event Store plan itself.
+
+| # | Need | Decision | Where | Spec basis |
+|---|---|---|---|---|
+| M1 | `walk_commits` stop set; ordered parents and tree id per commit | (a) | phase 01 req 9, interface, validation | §4 "walkCommits(tips,cursor,bounds)"; protocol row 3: only the Event Store decides pruning, so the caller passes the stop set and Git does not interpret it |
+| M2 | Fence and `fgctl` on every machine of one shared list | (a) | phase 01 step 14 and risk row, phases 04 and 08 landing, execution model | §12 C5 (fence on every activation); the list itself is Event Store Q2 (owner) |
+| M3 | A crashed PublicationCas never blocks later seals and does not stay unresolved forever | (b) | amendment A1; phase 01 req 12 implements only what the spec allows now | §10 rule 4, recovery rows 2 and 7, line 326, line 328; §12 C5 |
+| M4 | Typed `rejected-non-fast-forward` push result | (a) | phase 01 req 9, interface, validation; non-interactive transport added with it | §2 receipt `remote {… rejected}`; §4 protocol row 5 |
+| M5 | Read-only facts: fetch refspecs, Git floor verdict, `fgos.machineId`, remote URL | (a) | phase 01 req 13a (and req 20 provenance), interface, validation | §3 reads; §12 doctor rows already need the same evidence |
+| M7 | Explicit commit date | (a) | phase 01 req 9, interface, validation | §7 "preserve … author/committer identity/date" |
+| M8 | Bounded WAL records and pins per seal | (a), with a bound per operation | phase 01 req 12a, validation | §10 line 328: compaction keeps the request digest and terminal receipt; pins are reachability only. Crashed records become compactable only through A1 |
+| M9 | ScopedCommit `sourceCommit` mode, hook from HEAD's tree | (b), only if Event Store Q5 stays at (b) | amendment A2; phase 05 context note | §3 ScopedCommit, §7 grant, §8: no door writes another commit's bytes into the main checkout |
+| M10 | Activation refuses a payload without the addon from the Event Store cutover release | (a) | phase 05 req 7a (linux-x64), phase 07 req 5 (windows-x64) | §12 "Missing/wrong addon … fails before mutation"; rollback refusal named as C5 does |
+
+Two further interface gaps found while reconciling, both (a): `compare_and_swap` takes `next = Absent` (exact-old delete of an own `branch-events` ref; Event Store phase 04 abandon; spec §15 V-CAS lists delete) in phase 01 req 9; and `ensure_fetch_mapping` records the remote URL in its provenance (phase 01 req 20, 13a), so the Event Store's D20 pin needs no git config write of its own.
+
+## Spec amendments needed before Git phase 01 freezes its interface
+
+Each item is a problem statement and a proposal for the owner, not a decision. Phase 01 may code the rest of the port meanwhile; its interface and the Event Store phase that depends on the item do not freeze until the owner decides. A signed amendment is recorded as a dated amendment of D-ADR0057 in the spec's own history, like the Event Store amendment of 2026-10-18, and is followed by the re-check named for it.
+
+### A1. A crashed PublicationCas must neither block the next seal nor stay unresolved forever (Event Store M3)
+
+- **What the signed spec says.** §10 rule 4 (`docs/platform/git/spec.md:287`): a chain with a TargetAttempt and no outcome is never re-effected under its id; recovery "returns `recovery-required` (or completes a receipt as `effectObservedOnly` when the state reached next) and preserves WAL, pins and snapshots". Recovery row 2 (`:316`): `ref=expected` with such a chain is `recovery-required`. Row 7 (`:321`): `ref` neither expected nor next means "retain pins; report supersession/uncertainty", with no terminal state. `:326`: "Startup mutation checks pending entries touching its resources; bounded scan returning incomplete knowledge is not clearance to mutate." `:328`: unresolved records and pins never expire. §12 C5 (`:346`): a release without the WAL capability is activated only when the WAL "holds no unresolved record".
+- **Why the Event Store needs more.** A kill after Git installs the TargetAttempt and before the target rename leaves `ref == expected` with an unknown outcome. Event Store §10's crash table says the next seal "publishes again", and its D6 starts that attempt with a new operation id. Read naturally, `:326` makes the pending record of the old id deny clearance to any new mutation of the same ref: every later seal of that stream stops, the record is never compacted (M8), doctor reports it forever and C5 refuses rollback to a pre-WAL release forever. The Event Store red team rated this Critical.
+- **Is there a path inside the current text?** Partly. (1) The spec never says that a pending record of a different id blocks Publication; Publication takes no registry lock, its effect is one exact-old CAS, and its resource authority is the caller's `event-seal` 58 (§5 `:158`, R30 row `:194`). Reading `:326` as "check, do not block" for Publication lets the new id proceed. (2) Event Store seal commits are deterministic (its D6, Git M7): the retry seals the same closed segment on the same tip with the same date, identity and message, so its `next` equals the crashed attempt's `next`. Right after the new receipt, phase 01 req 12 runs recovery of the old record while the ref is still at that `next`, and row 3 completes it as `effectObservedOnly`, which is terminal. Gaps that remain: the reading of `:326` is not settled by the text; when the two `next` values differ (a seal carrying `store.promote` whose branch tip moved between attempts, or any future non-deterministic caller) the old record falls into row 7 and stays unresolved forever, with the permanent C5 and doctor effects above.
+- **Proposed spec text.** Add to §10 after rule 4: "4a. **Publication supersession.** For a PublicationCas only, a chain that ends at a TargetAttempt without outcome does not block a new operation id on the same ref: a caller holding the ref's resource authority (§5: event-seal 58) may start a new operation whose expected value is the tip it reads. The old operation becomes terminal `superseded` when, under that same authority, (1) a later PublicationCas of the same ref has a durable receipt with `thisInvocationWonCas`, (2) that receipt's expected value equals the old operation's expected or next value, and (3) no retained `<ref>.lock` of that ref and no live process of the old performer's containment domain is observed (`containment-unproven` keeps it `recovery-required`). Attribution is `effectObservedOnly` when the later expected value equals the old next value and `uncertain` otherwise. A superseded operation is never re-effected and its id stays bound; its pin may be released and its chain compacted like any terminal chain. Tip equality without the later receipt is never used." Change `:326` to end: "… is not clearance to mutate (C4). A pending entry blocks a new mutation of the same resource, except a pending PublicationCas, which rule 4a resolves." Add `superseded` to the §2 result list and row 7 of the recovery table ("… report supersession/uncertainty; for a PublicationCas, rule 4a").
+- **Proof to re-run.** M1 model check extended to two operations on one ref: crash on both sides of the target rename after the old TargetAttempt, the old operation's orphan git child still able to fire, an ABA control, differing and equal `next`. Required: at most one publication per operation, no attribution beyond WAL evidence, `superseded` only after the later receipt; negative controls (supersede on tip equality alone, supersede with a live old performer) must give counterexamples. P-WAL-ID with a recoverer of the old id racing the supersession record (one transition writer). On the implementation: V-CAS recovery on `files` and `reftable`, and Event Store §23.2 item 1 (kill after object write and around `update-ref`) showing no stalled seal and no unresolved record. Run on `fable` through the architecture capability.
+- **Recommendation.** Amend. The inside-the-text path depends on an unsettled reading of `:326` and leaves one reachable case unresolved forever, which C5 turns into a permanent rollback block. The amendment adds one terminal state and no new effect, so no CAS is ever reissued.
+
+### A2. A door that commits a reviewed commit's bytes on main (Event Store M9), only if Event Store Q5 stays at (b)
+
+- **What the signed spec says.** §3 ScopedCommit (`:114`) and §8 (`:247`) stage literal paths already present in the checkout after a producer ran; §7 (`:241`) defines the cutover grant as a ScopedCommit under main-checkout 50 judged by the checkout's hook (hooks path resolved relative to the trusted main root, `:233`). Land, the only operation that moves another commit's tree into a branch, is not exposed before the Event Store cutover (§12 `:350`). No operation writes a reviewed commit's bytes into the main checkout.
+- **Why the Event Store needs more.** Event Store spec §18 step 5 puts the event-file deletions and the code change in one commit on main. In forgent that commit also edits `.githooks/pre-commit` (its D16), so the hook that judges the commit would be the one the commit brings. The Event Store plan's default for Q5 is (b): one commit through a new `sourceCommit` mode with the hook run from HEAD's tree.
+- **Is there a path inside the current text?** Yes: Event Store Q5 (a). The reviewed code commit lands first through today's landing door (the Node land stays the door until phase 07, §12), inert because the new release refuses Work writes until migrated (Event Store D10); then `migrate` makes the grant commit through phase 05's ScopedCommit; both go in one push inside the stop window. It changes only the Event Store spec's "same commit" wording in §18 step 5, not the Git spec, and the hook that judges the grant commit is already the reviewed one on main.
+- **Proposed spec text (only for Q5 (b)).** §3 ScopedCommit row, add: "A main-checkout ScopedCommit may carry `sourceCommit {oid, parent}`: under main-checkout 50, with HEAD equal to `parent` and a clean own-file set, Git snapshots every path `parent..oid` touches, writes exactly those paths' bytes and modes from `oid` into index and work tree, adds the grant's deletions, and commits; the pre-commit guards run from the hooks of HEAD's tree, never from bytes the commit brings; any failure restores every touched path from the snapshot (SafeRestore rules)." §7: the grant paragraph names `sourceCommit` as the only way the grant commit may carry non-grant paths.
+- **Proof to re-run.** P-CUTOVER with `sourceCommit`, including a negative control in which the brought hook would allow itself and must be judged by the old one; V-CRASH and P-SPACE at every materialization barrier; V-SCOPE (exact path set); V-GATE counting the new door.
+- **Recommendation.** No Git amendment: the owner answers Event Store Q5 with (a), and the Event Store lead amends its own §18 step 5 wording. A2 is drafted only so that the choice is informed; it adds a door and a hook-source rule for one commit in one repository.
+
+### Not an amendment: M8's bound
+
+Spec §10 `:328` keeps the request digest and terminal receipt of every compacted id so the id is never reused. Phase 01 req 12a therefore bounds the WAL per operation (one ledger line, no directory, no pin), not to a constant total. The Event Store plan's acceptance item 8 ("stay bounded over 10,000 seals") is met in that sense; a constant total would need the id-reuse rule weakened, which neither plan asks for.
+
 ## Cross-plan dependencies and collisions
 
 | Plan / lane | Relation | Rule |
 |---|---|---|
-| Event Store (not yet planned) | Blocked by 01; its cutover is blocked by 05; phase 07 is blocked by its cutover. Its cutover edits `merge.mjs` (event parts), `main-fgos-checkpoint.mjs`, the `.githooks/pre-commit` line-count guard and adds a module to `packages/git/node-addon` | Board row ES; Event Store plan names these edges; phase 05 lands the hook grant before the cutover touches the hook; phase 07 rebases on the cutover |
+| Event Store ([plan](../261018-0945-event-store-fgos-event-store/plan.md)) | Its phases 03-05 are blocked by 01 (and 04 by amendment A1); its cutover is blocked by 05 and by an activated release containing 05; phase 07 is blocked by its cutover; phase 08 by its V-EVENT run. Interface rows M1-M10 are reconciled below. Its cutover edits `merge.mjs` (event parts), `main-fgos-checkpoint.mjs`, the `.githooks/pre-commit` line-count guard and adds a module to `packages/git/node-addon` | Board row ES; Event Store plan names these edges; phase 05 lands the hook grant before the cutover touches the hook; phase 07 rebases on the cutover |
 | 6.3 terminal mode (running) | Shares `assignment-runner.mjs`, supervisor crate | Phase 04 starts after 6.3 lands |
 | 6.4 controller death (held) | Owns `run.mjs`, `assignment-runner.mjs`, `recovery-planner.mjs` | Whichever lands second rebases; phase 04 tells the 6.4 lead its lease contract |
 | Board shared files | `src/setup/registrations.mjs`, `CHANGELOG.md`, `lock-registry.v1.json`, `fences.mjs`, `bin/fgos.mjs`, `merge.mjs`, `worktree.mjs`, `Cargo.toml` | Edit only inside the owning phase; land second means rebase |
@@ -88,7 +132,7 @@ Parallel lanes: 02 ∥ 04; 03 ∥ 05 after 02. File ownership per phase is in ea
 - **Branches and worktrees:** `git/pNN-<slug>`, worktree `.claude/worktrees/git-pNN`, from main at phase start. Until phase 03's verb ships, worktrees are created by the existing door the big lead uses today.
 - **Commits:** the runner commits only each unit's declared writes. Big lead `forgentx-95` merges to main, runs the gates, updates the board row.
 - **Model per phase:** table above; reviewers run `opus`; any model re-check of a changed protocol runs on `fable` through the architecture capability.
-- **Landing:** phase 01 installs the new `fgctl` on both machines, then activates the three workspaces one at a time (each first activation places its fence); the Event Store writes no WAL record until every fence is reported. Phase 04 and the phase 07 release land stop-everything (holder-lock §12) on all three workspaces and both machines; the owner picks the hour. Phases 02, 03, 05, 06 merge dormant.
+- **Landing:** phase 01 installs the new `fgctl` on every machine of the owner's list (Event Store Q2, shared as Event Store M2), then activates every listed workspace one at a time (each first activation places its fence); the Event Store writes no WAL record until every fence is reported. Phase 04 and the phase 07 release land stop-everything (holder-lock §12) on every listed workspace and machine; the owner picks the hour. Phases 02, 03, 05, 06 merge dormant.
 - **Impact analysis:** `fgos tool query --capability impact-analysis` reports GitNexus registered with status `unknown` (2026-10-18 09:34), so the posture is **degraded**: each phase reruns the query; with a present, fresh index it runs `impact` on every edited symbol and `detect_changes` before commit; otherwise it cross-checks callers with `rg` (phase 07 lists every caller) and marks blast radius as unconfirmed.
 
 ## Acceptance (implementation done, spec §17)
@@ -210,3 +254,6 @@ Per the delegation brief, no question was put to the owner during planning; Q1-Q
 
 ### Whole-Plan Consistency Sweep
 Re-read after validation edits: the single failure fix touched one path in phase 07; no other file referenced it.
+
+### Event Store reconciliation sweep (2026-10-18 10:45)
+M1, M2, M4, M5, M7, M8, M10 and two further gaps (CAS delete, mapping provenance) applied to phases 01, 04, 05, 07, 08 and the execution model; M3 and M9 written as amendments A1 and A2, not as decisions. Phase efforts now sum to 254h (01: 54h → 64h, 05: 30h → 32h). Searched for "both machines" and "three workspaces": only the Event Store Q2 list remains as the landing set. The Event Store plan's mismatch table marks each row with this decision.
