@@ -51,6 +51,10 @@ fn head_and_literal_tree_pages_all_formats_and_backends() {
                 b"binary name",
             )
             .unwrap();
+            let directory = std::ffi::OsStr::from_bytes(b"sub-\xff[*]");
+            fs::create_dir(repo.join(directory)).unwrap();
+            fs::write(repo.join(directory).join("a\n.jsonl"), "subtree").unwrap();
+            fs::write(repo.join(directory).join("b.jsonl"), "subtree").unwrap();
             git(&repo, &["add", "."]);
             git(
                 &repo,
@@ -70,6 +74,22 @@ fn head_and_literal_tree_pages_all_formats_and_backends() {
                 matches!(driver.resolve_head(&r).unwrap(), HeadFact::Attached {commit,..} if commit.as_str()==first)
             );
             let oid = Oid::parse(&first, r.object_format()).unwrap();
+            // Literal byte directory resolution scopes Git output before pagination.
+            let page = driver
+                .list_tree(&r, &oid, b"sub-\xff[*]/", None, 1)
+                .unwrap();
+            assert!(!page.complete);
+            assert_eq!(page.entries[0].path, b"sub-\xff[*]/a\n.jsonl");
+            let next = driver
+                .list_tree(&r, &oid, b"sub-\xff[*]/", page.next_cursor, 1)
+                .unwrap();
+            assert!(next.complete);
+            assert_eq!(next.entries[0].path, b"sub-\xff[*]/b.jsonl");
+            assert!(driver
+                .list_tree(&r, &oid, b"missing/", None, 1)
+                .unwrap()
+                .entries
+                .is_empty());
             let page = driver.list_tree(&r, &oid, b"a", None, 1).unwrap();
             assert!(!page.complete);
             assert_eq!(page.entries[0].path, b"a\n\t[*]");

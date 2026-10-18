@@ -126,6 +126,12 @@ fn local_seal_restart_and_proven_incremental_fold_equal_full_rebuild() {
     let f = Fixture::new();
     let mut h = f.handle();
     let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    tracked_head(
+        &f,
+        &p,
+        b"events.jsonl",
+        b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1}\n",
+    );
     let e = event('a', 1, 2);
     let own = e.origin.clone();
     let streams = [StreamId::parse("project").unwrap()];
@@ -194,7 +200,8 @@ fn l5_lost_receipt_and_hint_cannot_restart_published_sequence() {
     fs::write(paths.hwm(), b"{\"lastSeq\":1}").unwrap();
     fs::remove_file(paths.sealed()).unwrap();
     fs::remove_file(paths.hwm()).unwrap();
-    fs::write(paths.active(), batch(std::slice::from_ref(&e))).unwrap();
+    let different = event('a', 1, 2);
+    fs::write(paths.active(), batch(&[different])).unwrap();
     let name = fgos_git::RefName::parse("refs/fgos/events/test-aa").unwrap();
     assert_eq!(
         reconcile_durable_history(&p, &f.repo, &f.layout, &e.origin, &stream, &name)
@@ -203,11 +210,8 @@ fn l5_lost_receipt_and_hint_cannot_restart_published_sequence() {
             .as_str(),
         "event-store-seq-recovery-conflict"
     );
-    assert_eq!(
-        serde_json::from_slice::<serde_json::Value>(&fs::read(paths.sealed()).unwrap()).unwrap()
-            ["lastSeq"],
-        1
-    );
+    assert!(!paths.sealed().exists());
+    assert!(!paths.hwm().exists());
     fs::remove_file(paths.active()).unwrap();
     assert_eq!(
         reconcile_durable_history(&p, &f.repo, &f.layout, &e.origin, &stream, &name).unwrap(),
@@ -245,6 +249,22 @@ fn fetched_tip_machine_scope_and_own_origin_are_checked() {
             oid,
             "bad-ref",
         );
+        if case == "own" {
+            use fgos_git::{ExpectedTip, Publication, RefName};
+            let name = RefName::parse("refs/fgos/events/test-aa").unwrap();
+            let old = p.read_ref(&f.repo, &name).unwrap();
+            if let fgos_git::RefValue::Direct(oid) = old {
+                let unrelated = seal(&p, &f.repo, vec![], &[event('b', 1, 1)], "test-aa");
+                p.compare_and_swap(
+                    &f.repo,
+                    &name,
+                    &ExpectedTip::Oid(oid),
+                    &ExpectedTip::Oid(unrelated),
+                    "replace-own",
+                )
+                .unwrap();
+            }
+        }
         let own = if case == "own" {
             "a".repeat(32)
         } else {

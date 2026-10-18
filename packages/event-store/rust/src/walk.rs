@@ -1,4 +1,4 @@
-//! Complete certified-commit walk through Git's typed Publication port.
+//! Complete certified-commit walk through Git's typed Inspect port.
 use crate::{
     append::Positions,
     envelope::{sha256, Envelope, Scope, Seal},
@@ -6,13 +6,13 @@ use crate::{
     layout::StreamId,
     open_read::decode,
 };
-use fgos_git::{Oid, PathValue, Publication, RepoHandle, WalkBounds};
+use fgos_git::{Inspect, Oid, PathValue, RepoHandle, WalkBounds};
 use std::collections::{BTreeMap, BTreeSet};
 pub(crate) fn git_error(e: fgos_git::OperationError) -> Error {
-    Error::new(ErrorCode::EventStoreGap, format!("Git: {}", e.cause))
+    Error::new(ErrorCode::EventStoreIo, format!("Git: {}", e.cause))
 }
 pub fn blob(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     oid: &Oid,
     path: &[u8],
@@ -31,10 +31,13 @@ pub fn blob(
         PathValue::NotABlob(_) => Err(invalid("expected blob")),
     }
 }
-pub fn header(port: &dyn Publication, repo: &RepoHandle, oid: &Oid) -> Result<Seal, Error> {
+pub fn header(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<Seal, Error> {
     let bytes = blob(port, repo, oid, b"seal.json")?
         .ok_or_else(|| Error::new(ErrorCode::EventStoreGap, "seal.json missing"))?;
-    let seal: Seal = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
+    parse_header(&bytes)
+}
+fn parse_header(bytes: &[u8]) -> Result<Seal, Error> {
+    let seal: Seal = serde_json::from_slice(bytes).map_err(|e| invalid(e.to_string()))?;
     if seal.canonical_line()? != bytes {
         return Err(invalid("noncanonical seal"));
     }
@@ -49,12 +52,49 @@ pub struct Walked {
 /// Never mutates supplied coverage/certificates, including on an error after
 /// several successful pages. Git owns traversal, stops and object decoding.
 pub fn walk(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     tips: &[Oid],
     cover: &Positions,
     certified: &BTreeSet<String>,
 ) -> Result<Walked, Error> {
+    walk_inner(port, repo, tips, cover, certified, None)
+}
+pub fn walk_verified(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tip: &Oid,
+    cover: &Positions,
+    certified: &BTreeSet<String>,
+    machine: &str,
+    scope: Scope,
+) -> Result<Walked, Error> {
+    walk_inner(
+        port,
+        repo,
+        std::slice::from_ref(tip),
+        cover,
+        certified,
+        Some((machine, scope)),
+    )
+}
+fn walk_inner(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    tips: &[Oid],
+    cover: &Positions,
+    certified: &BTreeSet<String>,
+    identity: Option<(&str, Scope)>,
+) -> Result<Walked, Error> {
+    let mut scopes: BTreeMap<String, Scope> = tips
+        .iter()
+        .map(|o| {
+            (
+                o.as_str().into(),
+                identity.map(|i| i.1).unwrap_or(Scope::Project),
+            )
+        })
+        .collect();
     let stops = certified
         .iter()
         .map(|s| Oid::parse(s, repo.object_format()).map_err(|e| invalid(e.to_string())))
@@ -78,10 +118,35 @@ pub fn walk(
             if !out.visited.insert(commit.oid.as_str().into()) {
                 continue;
             }
+            if certified.contains(commit.oid.as_str()) && identity.is_none() {
+                continue;
+            }
+            let paths = if certified.contains(commit.oid.as_str()) {
+                vec![b"seal.json".to_vec()]
+            } else {
+                vec![b"seal.json".to_vec(), b"events.jsonl".to_vec()]
+            };
+            let mut observed = port
+                .read_paths_at(repo, &commit.oid, &paths, 32 * 1024 * 1024)
+                .map_err(git_error)?
+                .into_iter();
+            let seal = match observed.next().map(|p| p.value) {
+                Some(PathValue::Blob(bytes)) => parse_header(&bytes)?,
+                Some(PathValue::Error(e)) => return Err(git_error(e)),
+                _ => return Err(Error::new(ErrorCode::EventStoreGap, "seal.json missing")),
+            };
+            let scope = scopes
+                .get(commit.oid.as_str())
+                .copied()
+                .unwrap_or(Scope::Project);
+            if let Some((machine, _)) = identity {
+                verify_tip(&seal, machine, scope)?;
+            }
             if certified.contains(commit.oid.as_str()) {
                 continue;
             }
-            match header(port, repo, &commit.oid)? {
+            let mut promoted = false;
+            match seal {
                 Seal::Seal {
                     origin,
                     stream,
@@ -96,8 +161,11 @@ pub fn walk(
                         .entry(format!("{origin}:{stream}"))
                         .and_modify(|n| *n = (*n).max(last_seq))
                         .or_insert(last_seq);
-                    let bytes = blob(port, repo, &commit.oid, b"events.jsonl")?
-                        .ok_or_else(|| invalid("seal events missing"))?;
+                    let bytes = match observed.next().map(|p| p.value) {
+                        Some(PathValue::Blob(bytes)) => bytes,
+                        Some(PathValue::Error(e)) => return Err(git_error(e)),
+                        _ => return Err(invalid("seal events missing")),
+                    };
                     if sha256(&bytes) != hash {
                         return Err(Error::new(
                             ErrorCode::EventStoreSealMismatch,
@@ -115,6 +183,20 @@ pub fn walk(
                             ErrorCode::EventStoreRefTampered,
                             "seal/event identity, scope or range mismatch",
                         ));
+                    }
+                    if commit.parents.len() > 1 {
+                        promoted = framed.events.iter().any(|e| {
+                            e.event_type == "store.promote"
+                                && e.payload["tip"].as_str() == Some(commit.parents[1].as_str())
+                        });
+                        if identity.is_some()
+                            && (!promoted || scope != Scope::Project || commit.parents.len() != 2)
+                        {
+                            return Err(Error::new(
+                                ErrorCode::EventStoreRefTampered,
+                                "invalid promote ancestry",
+                            ));
+                        }
                     }
                     let high = cover
                         .get(&format!("{origin}:{stream}"))
@@ -136,6 +218,23 @@ pub fn walk(
                 }
                 Seal::Legacy { .. } => return Err(invalid("legacy ref passed to event walk")),
             }
+            for (index, parent) in commit.parents.iter().enumerate() {
+                let expected = if promoted && index == 1 {
+                    Scope::Branch
+                } else {
+                    scope
+                };
+                if scopes
+                    .insert(parent.as_str().into(), expected)
+                    .is_some_and(|old| old != expected)
+                    && identity.is_some()
+                {
+                    return Err(Error::new(
+                        ErrorCode::EventStoreRefTampered,
+                        "ancestor reached through incompatible scopes",
+                    ));
+                }
+            }
         }
         if page.complete {
             break;
@@ -145,7 +244,9 @@ pub fn walk(
                 .ok_or_else(|| invalid("incomplete walk without continuation"))?,
         );
     }
-    check_contiguous(&out.events, cover)?;
+    if identity.is_none() {
+        check_contiguous(&out.events, cover)?;
+    }
     Ok(out)
 }
 pub fn check_contiguous(events: &[Envelope], base: &Positions) -> Result<(), Error> {
@@ -178,8 +279,7 @@ pub fn check_contiguous(events: &[Envelope], base: &Positions) -> Result<(), Err
     }
     Ok(())
 }
-/// A ref's tip is authenticated against its namespace. Ancestors can belong to
-/// other machines/scopes after merge/promote, so they retain their own headers.
+/// Authenticate each commit against its ref and promote-parent traversal context.
 pub fn verify_tip(seal: &Seal, machine: &str, scope: Scope) -> Result<(), Error> {
     let valid = match seal {
         Seal::Seal {

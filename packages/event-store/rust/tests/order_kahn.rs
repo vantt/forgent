@@ -115,7 +115,7 @@ fn c6_delayed_concurrent_event_requires_suffix_replay_at_zero() {
     let x = event('a', 1, 2);
     let y = event('b', 1, 1);
     let old = Cursor {
-        emitted: Positions::from([(stream_key(&x), 1)]),
+        cover: Positions::from([(stream_key(&x), 1)]),
         ..Cursor::default()
     };
     let full = order(&[x.clone(), y.clone()], &Positions::new(), true).unwrap();
@@ -139,7 +139,6 @@ fn proven_own_stream_incremental_fold_matches_full_rebuild() {
     let first = event('a', 1, 2);
     let next = event('a', 2, 0);
     let old = Cursor {
-        emitted: Positions::from([(stream_key(&first), 1)]),
         cover: Positions::from([(stream_key(&first), 1)]),
         ..Cursor::default()
     };
@@ -156,7 +155,12 @@ fn proven_own_stream_incremental_fold_matches_full_rebuild() {
         ),
         Fold::Incremental
     );
-    assert_eq!(Cursor::parse(&old.canonical_bytes().unwrap()).unwrap(), old);
+    let bytes = old.canonical_bytes().unwrap();
+    assert!(serde_json::from_slice::<serde_json::Value>(&bytes)
+        .unwrap()
+        .get("emitted")
+        .is_none());
+    assert_eq!(Cursor::parse(&bytes).unwrap(), old);
 }
 #[test]
 fn promote_is_one_node_with_branch_inputs_and_unpromoted_events_hidden() {

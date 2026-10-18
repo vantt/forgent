@@ -10,13 +10,13 @@ use std::collections::{BTreeMap, BTreeSet};
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Cursor {
-    pub emitted: Positions,
     pub streams: BTreeSet<String>,
     pub project_order: bool,
     pub cover: Positions,
     pub certified: BTreeSet<String>,
     pub mirror_tips: BTreeMap<String, String>,
     pub legacy_tips: BTreeMap<String, String>,
+    pub legacy_digest: Option<String>,
     pub deferred: BTreeSet<String>,
 }
 impl Cursor {
@@ -37,6 +37,9 @@ impl Cursor {
             || c.certified
                 .iter()
                 .any(|s| !crate::validation::valid_object_id(s))
+            || c.legacy_digest
+                .as_ref()
+                .is_some_and(|h| !crate::envelope::is_digest(h))
             || c.deferred.iter().any(|s| !crate::envelope::is_digest(s))
             || c.mirror_tips
                 .iter()
@@ -47,9 +50,6 @@ impl Cursor {
                 })
         {
             return Err(invalid("invalid cursor coverage, query or identifiers"));
-        }
-        if c.emitted != c.cover {
-            return Err(invalid("cursor emitted/cover mismatch"));
         }
         Ok(c)
     }
@@ -72,18 +72,21 @@ pub fn fold_answer(
         .zip(full_order)
         .position(|(a, b)| a != b)
         .unwrap_or(old_order.len().min(full_order.len()));
+    let legacy_changed =
+        old.legacy_tips != new.legacy_tips || old.legacy_digest != new.legacy_digest;
+    let first = if legacy_changed { 0 } else { first };
     let released = old.deferred.iter().any(|h| !new.deferred.contains(h));
     if old.streams == new.streams
         && old.project_order == new.project_order
         && old.mirror_tips == new.mirror_tips
-        && old.legacy_tips == new.legacy_tips
+        && !legacy_changed
         && !released
         && first == old_order.len()
         && delta.iter().all(|e| {
             e.origin == own_origin
                 && e.event_type != "store.promote"
                 && old
-                    .emitted
+                    .cover
                     .iter()
                     .all(|(s, n)| *s == stream_key(e) || e.seen.get(s).copied().unwrap_or(0) >= *n)
         })

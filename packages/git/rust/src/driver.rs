@@ -2,7 +2,7 @@
 use crate::*;
 use fgos_process::containment::{self, ContainmentDriver, SpawnSpec, StartMode};
 use fgos_process::DomainState;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -1172,6 +1172,152 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
 }
 
 impl Inspect for GitDriver {
+    fn walk_commits(
+        &self,
+        repo: &RepoHandle,
+        tips: &[Oid],
+        stop: &[Oid],
+        cursor: Option<WalkCursor>,
+        bounds: WalkBounds,
+    ) -> Result<WalkPage> {
+        if bounds.max_commits == 0
+            || bounds.max_commits > 100_000
+            || bounds.max_bytes == 0
+            || bounds.max_bytes > 64 * 1024 * 1024
+        {
+            return Err(refusal("invalid-walk-bounds"));
+        }
+        for o in tips.iter().chain(stop) {
+            Oid::parse(o.as_str(), repo.object_format())
+                .map_err(|_| refusal("object-format-mismatch"))?;
+        }
+        let binding = wal::canonical_digest(&(
+            tips.iter().map(Oid::as_str).collect::<Vec<_>>(),
+            stop.iter().map(Oid::as_str).collect::<Vec<_>>(),
+            &repo.common_dir(),
+        ))
+        .map_err(|e| refusal(e.to_string()))?;
+        let mut c: CommitCursor = match cursor {
+            Some(c) if c.0.len() <= 64 * 1024 * 1024 => {
+                serde_json::from_slice(&c.0).map_err(|_| refusal("invalid-walk-cursor"))?
+            }
+            Some(_) => return Err(refusal("walk-cursor-overflow")),
+            None => CommitCursor {
+                binding: binding.clone(),
+                pending: tips.iter().map(|o| o.as_str().into()).collect(),
+                visited: BTreeSet::new(),
+            },
+        };
+        if c.binding != binding {
+            return Err(refusal("walk-cursor-request-mismatch"));
+        }
+        let stop: BTreeSet<_> = stop.iter().map(Oid::as_str).collect();
+        let shallow: BTreeSet<String> = if repo.layout.shallow {
+            fs::read_to_string(repo.common_dir().join("shallow"))
+                .map_err(|e| refusal(e.to_string()))?
+                .lines()
+                .map(str::to_owned)
+                .collect()
+        } else {
+            BTreeSet::new()
+        };
+        let mut commits = vec![];
+        let mut cached = BTreeMap::new();
+        let mut total = 0;
+        while let Some(o) = c.pending.pop_front() {
+            if c.visited.contains(&o) {
+                continue;
+            }
+            let oid =
+                Oid::parse(&o, repo.object_format()).map_err(|_| refusal("invalid-cursor-oid"))?;
+            if !cached.contains_key(&o) {
+                let mut seeds = vec![o.clone()];
+                let count = bounds.max_commits - commits.len();
+                seeds.extend(c.pending.iter().take(count.min(256) - 1).cloned());
+                cached = self.commit_batch(repo, &seeds, &stop, count, bounds.max_bytes - total)?;
+            }
+            let Some(bytes) = cached.remove(&o) else {
+                if commits.is_empty() {
+                    return Err(refusal("walk-commit-exceeds-byte-bound"));
+                }
+                c.pending.push_front(o);
+                break;
+            };
+            if total + bytes.len() > bounds.max_bytes {
+                if commits.is_empty() {
+                    return Err(refusal("walk-commit-exceeds-byte-bound"));
+                }
+                c.pending.push_front(o);
+                break;
+            }
+            let header = bytes
+                .windows(2)
+                .position(|w| w == b"\n\n")
+                .ok_or_else(|| refusal("invalid-commit"))?;
+            let mut tree = None;
+            let mut parents = vec![];
+            for l in bytes[..header].split(|b| *b == b'\n') {
+                if let Some(v) = l.strip_prefix(b"tree ") {
+                    if tree.is_some() {
+                        return Err(refusal("invalid-commit-tree"));
+                    }
+                    tree = Some(
+                        Oid::parse(
+                            std::str::from_utf8(v).map_err(|_| refusal("invalid-oid"))?,
+                            repo.object_format(),
+                        )
+                        .map_err(|_| refusal("invalid-oid"))?,
+                    );
+                }
+                if let Some(v) = l.strip_prefix(b"parent ") {
+                    parents.push(
+                        Oid::parse(
+                            std::str::from_utf8(v).map_err(|_| refusal("invalid-oid"))?,
+                            repo.object_format(),
+                        )
+                        .map_err(|_| refusal("invalid-oid"))?,
+                    );
+                }
+            }
+            if !stop.contains(o.as_str()) {
+                if shallow.contains(&o) {
+                    return Err(refusal("shallow-history-incomplete"));
+                }
+                for p in &parents {
+                    if !c.visited.contains(p.as_str()) {
+                        c.pending.push_back(p.as_str().into());
+                    }
+                }
+            }
+            total += bytes.len();
+            c.visited.insert(o);
+            commits.push(WalkCommit {
+                oid,
+                parents,
+                tree: tree.ok_or_else(|| refusal("invalid-commit-tree"))?,
+            });
+            if commits.len() == bounds.max_commits {
+                break;
+            }
+        }
+        // Remove duplicate queued entries before declaring completion.
+        c.pending.retain(|o| !c.visited.contains(o));
+        let complete = c.pending.is_empty();
+        let next_cursor = if complete {
+            None
+        } else {
+            let bytes = serde_json::to_vec(&c).map_err(|_| refusal("invalid-walk-cursor"))?;
+            if bytes.len() > 64 * 1024 * 1024 {
+                return Err(refusal("walk-cursor-overflow"));
+            }
+            Some(WalkCursor(bytes))
+        };
+        Ok(WalkPage {
+            commits,
+            next_cursor,
+            complete,
+        })
+    }
     fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
         self.require_floor()?;
         self.preflight(repo)?;
@@ -1272,7 +1418,44 @@ impl Inspect for GitDriver {
         if kind != b"commit\n" && kind != b"tree\n" {
             return Err(refusal("revision-not-commit-or-tree"));
         }
-        // No pathspec is passed to Git: prefix selection is literal bytes.
+        // Resolve the literal containing directory with NUL-framed byte input.
+        // Git emits only that subtree, rather than the whole project each page.
+        let directory = prefix
+            .iter()
+            .rposition(|b| *b == b'/')
+            .map(|i| &prefix[..i + 1])
+            .unwrap_or(b"");
+        let mut tree_revision = revision.clone();
+        if !directory.is_empty() {
+            let mut input = revision.as_str().as_bytes().to_vec();
+            input.push(b':');
+            input.extend_from_slice(&directory[..directory.len() - 1]);
+            input.push(0);
+            let output = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
+            if output.ends_with(b" missing\0") {
+                if repo.layout.promisor || repo.layout.alternates {
+                    return Err(refusal(if repo.layout.promisor {
+                        "promisor-object-unavailable"
+                    } else {
+                        "alternate-object-unavailable"
+                    }));
+                }
+                return Ok(TreePage {
+                    entries: vec![],
+                    complete: true,
+                    next_cursor: None,
+                });
+            }
+            let fields: Vec<_> = output.split(|b| *b == b' ' || *b == 0).collect();
+            if fields.get(1) != Some(&b"tree".as_slice()) {
+                return Err(refusal("prefix-parent-not-tree"));
+            }
+            tree_revision = Oid::parse(
+                std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-tree-oid"))?,
+                repo.object_format(),
+            )
+            .map_err(|_| refusal("invalid-tree-oid"))?;
+        }
         let bytes = self.checked(
             repo,
             &[
@@ -1281,7 +1464,7 @@ impl Inspect for GitDriver {
                 "-t",
                 "-z",
                 "--full-tree",
-                revision.as_str(),
+                tree_revision.as_str(),
             ],
             Policy::Inspect,
         )?;
@@ -1291,7 +1474,8 @@ impl Inspect for GitDriver {
                 .iter()
                 .position(|b| *b == b'\t')
                 .ok_or_else(|| refusal("invalid-tree-entry"))?;
-            let path = &record[tab + 1..];
+            let full_path = [directory, &record[tab + 1..]].concat();
+            let path = full_path.as_slice();
             if !path.starts_with(prefix)
                 || cursor.as_ref().is_some_and(|c| path <= c.after.as_slice())
             {
@@ -2100,5 +2284,138 @@ mod tests {
             redact(b"fatal: https://user:secret@host/repo?token=secret\n"),
             b"fatal: https://[redacted]@host/repo?[redacted]"
         );
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CommitCursor {
+    binding: String,
+    pending: VecDeque<String>,
+    visited: BTreeSet<String>,
+}
+
+impl GitDriver {
+    fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            args,
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            input,
+        )?;
+        if out.success {
+            Ok(out.stdout)
+        } else {
+            Err(out.error(if repo.layout.promisor {
+                "promisor-object-unavailable"
+            } else if repo.layout.alternates {
+                "alternate-object-unavailable"
+            } else {
+                "git-command-failed"
+            }))
+        }
+    }
+    fn commit_batch(
+        &self,
+        repo: &RepoHandle,
+        seeds: &[String],
+        stop: &BTreeSet<&str>,
+        count: usize,
+        byte_budget: usize,
+    ) -> Result<BTreeMap<String, Vec<u8>>> {
+        let mut revisions = seeds.join("\n");
+        revisions.push('\n');
+        for oid in stop {
+            revisions.push('^');
+            revisions.push_str(oid);
+            revisions.push('\n');
+        }
+        let limit = format!("--max-count={}", count.min(256));
+        let revisions =
+            self.inspect_input(repo, &["rev-list", &limit, "--stdin"], revisions.as_bytes())?;
+        let mut seen = BTreeSet::new();
+        let ids: Vec<String> = seeds
+            .iter()
+            .cloned()
+            .chain(
+                std::str::from_utf8(&revisions)
+                    .map_err(|_| refusal("invalid-utf8"))?
+                    .lines()
+                    .map(str::to_owned),
+            )
+            .filter(|id| seen.insert(id.clone()))
+            .collect();
+        let input = format!("{}\n", ids.join("\n"));
+        let headers = self.inspect_input(repo, &["cat-file", "--batch-check"], input.as_bytes())?;
+        let mut selected = Vec::new();
+        let mut remaining = byte_budget;
+        let lines: Vec<_> = std::str::from_utf8(&headers)
+            .map_err(|_| refusal("invalid-utf8"))?
+            .lines()
+            .collect();
+        if lines.len() != ids.len() {
+            return Err(refusal("invalid-batch-headers"));
+        }
+        for (n, (oid, header)) in ids.iter().zip(lines).enumerate() {
+            let fields: Vec<_> = header.split(' ').collect();
+            if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
+                if n == 0 {
+                    return Err(refusal("commit-missing-or-invalid"));
+                }
+                continue; // Future reads remain subject to their own page.
+            }
+            let size: usize = fields[2]
+                .parse()
+                .map_err(|_| refusal("invalid-object-size"))?;
+            if size <= remaining {
+                selected.push(oid.clone());
+                remaining -= size;
+            } else if n == 0 {
+                return Ok(BTreeMap::new());
+            }
+        }
+        let ids = selected;
+        let input = format!("{}\n", ids.join("\n")).into_bytes();
+        let bytes = self.inspect_input(repo, &["cat-file", "--batch"], &input)?;
+        let mut at = 0;
+        let mut objects = BTreeMap::new();
+        for oid in ids {
+            let end = bytes[at..]
+                .iter()
+                .position(|b| *b == b'\n')
+                .ok_or_else(|| refusal("invalid-object-header"))?
+                + at;
+            let fields: Vec<_> = std::str::from_utf8(&bytes[at..end])
+                .map_err(|_| refusal("invalid-utf8"))?
+                .split(' ')
+                .collect();
+            if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
+                return Err(refusal("commit-missing-or-invalid"));
+            }
+            let size: usize = fields[2]
+                .parse()
+                .map_err(|_| refusal("invalid-object-size"))?;
+            let start = end + 1;
+            let end = start
+                .checked_add(size)
+                .filter(|e| *e < bytes.len())
+                .ok_or_else(|| refusal("invalid-object-size"))?;
+            if bytes[end] != b'\n' {
+                return Err(refusal("invalid-object-size"));
+            }
+            objects.insert(oid, bytes[start..end].to_vec());
+            at = end + 1;
+        }
+        if at != bytes.len() {
+            return Err(refusal("unexpected-batch-output"));
+        }
+        Ok(objects)
     }
 }

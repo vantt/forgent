@@ -10,7 +10,7 @@ use crate::{
     order::{order, stream_key},
     walk::{self, blob, git_error, header},
 };
-use fgos_git::{HeadFact, ObjectType, Oid, Publication, RefPrefix, RefValue, RepoHandle};
+use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
 use serde::Deserialize;
 use std::collections::{BTreeMap, BTreeSet};
 #[derive(Debug)]
@@ -28,6 +28,8 @@ pub struct ReadResult {
 pub struct ReadRequest<'a> {
     pub layout: &'a Layout,
     pub origin: &'a str,
+    /// Include all streams the view observes in `seen`; a predecessor outside
+    /// this query is unavailable to the view and keeps its dependents deferred.
     pub streams: &'a [StreamId],
     pub cursor: &'a Cursor,
     /// The consumer's verified folded event set. Required to locate a differing
@@ -42,9 +44,18 @@ struct Tip {
     scope: Scope,
     mirror: bool,
 }
+fn mirror_suffix(rest: &str) -> Result<&str, Error> {
+    ["/events/", "/branch-events/", "/local-events/", "/legacy"]
+        .iter()
+        .filter_map(|separator| rest.rfind(separator))
+        .max()
+        .map(|index| &rest[index + 1..])
+        .ok_or_else(|| invalid("invalid mirror ref"))
+}
 fn tips(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
+    streams: &[StreamId],
 ) -> Result<(Vec<Tip>, BTreeMap<String, Oid>), Error> {
     let prefixes = [
         "refs/fgos/events/",
@@ -66,12 +77,7 @@ fn tips(
         for e in page.entries {
             let name = e.name.as_str();
             let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
-                (
-                    r.split_once('/')
-                        .ok_or_else(|| invalid("invalid mirror ref"))?
-                        .1,
-                    true,
-                )
+                (mirror_suffix(r)?, true)
             } else {
                 (name.strip_prefix("refs/fgos/").unwrap(), false)
             };
@@ -106,6 +112,9 @@ fn tips(
                 "local-events" => Scope::Local,
                 _ => unreachable!(),
             };
+            if !streams.iter().any(|s| s.scope() == scope) {
+                continue;
+            }
             tips.push(Tip {
                 name: name.into(),
                 oid,
@@ -132,67 +141,89 @@ struct Fence {
     from_commit: String,
 }
 fn legacy_files(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     oid: &Oid,
     streams: &[StreamId],
+    at_head: bool,
 ) -> Result<Vec<LegacyEvent>, Error> {
     let mut cursor = None;
     let mut events = Vec::new();
-    loop {
-        let page = port
-            .list_tree(repo, oid, b"", cursor, 1024)
-            .map_err(git_error)?;
-        let paths: Vec<_> = page
-            .entries
-            .into_iter()
-            .filter(|e| {
-                let work = streams.iter().any(|s| s.as_str() == "project");
-                let porting = streams.iter().any(|s| s.as_str() == "project:porting");
-                e.kind == ObjectType::Blob
-                    && (work
-                        && (e.path == b"events.jsonl"
-                            || e.path == b".fgos/events.jsonl"
-                            || (e.path.starts_with(b"events/")
-                                || e.path.starts_with(b".fgos/events/"))
-                                && e.path.ends_with(b".jsonl"))
-                        || porting
-                            && (e.path == b"porting/events.jsonl"
-                                || e.path == b"docs/distillery/state/porting/events.jsonl"))
-            })
-            .map(|e| e.path)
-            .collect();
-        for path in paths {
-            let bytes = blob(port, repo, oid, &path)?
-                .ok_or_else(|| invalid("listed legacy path missing"))?;
-            let file =
-                std::str::from_utf8(&path).map_err(|_| invalid("non-UTF8 legacy provenance"))?;
-            let raw = std::str::from_utf8(&bytes).map_err(|_| invalid("non-UTF8 legacy events"))?;
-            let tag = if file == "events.jsonl" || file == ".fgos/events.jsonl" {
-                ""
-            } else if file.starts_with("events/") || file.starts_with(".fgos/events/") {
-                file.rsplit('/').next().unwrap()
-            } else {
-                file
-            };
-            let mut parsed = legacy::parse_file(tag, raw)?;
-            for event in &mut parsed {
-                event.provenance.file = file.into();
+    let roots: &[&[u8]] = if at_head {
+        &[b".fgos/", b"docs/distillery/state/porting/"]
+    } else {
+        &[b"events", b"porting/"]
+    };
+    for root in roots {
+        loop {
+            let page = port
+                .list_tree(repo, oid, root, cursor, 1024)
+                .map_err(git_error)?;
+            let paths: Vec<_> = page
+                .entries
+                .into_iter()
+                .filter(|e| {
+                    let work = streams.iter().any(|s| s.as_str() == "project");
+                    let porting = streams.iter().any(|s| s.as_str() == "project:porting");
+                    let baseline: &[u8] = if at_head {
+                        b".fgos/events.jsonl"
+                    } else {
+                        b"events.jsonl"
+                    };
+                    let shards: &[u8] = if at_head {
+                        b".fgos/events/"
+                    } else {
+                        b"events/"
+                    };
+                    let porting_path: &[u8] = if at_head {
+                        b"docs/distillery/state/porting/events.jsonl"
+                    } else {
+                        b"porting/events.jsonl"
+                    };
+                    e.kind == ObjectType::Blob
+                        && (work
+                            && (e.path == baseline
+                                || e.path
+                                    .strip_prefix(shards)
+                                    .is_some_and(|p| !p.contains(&b'/') && p.ends_with(b".jsonl")))
+                            || porting && e.path == porting_path)
+                })
+                .map(|e| e.path)
+                .collect();
+            for path in paths {
+                let bytes = blob(port, repo, oid, &path)?
+                    .ok_or_else(|| invalid("listed legacy path missing"))?;
+                let file = std::str::from_utf8(&path)
+                    .map_err(|_| invalid("non-UTF8 legacy provenance"))?;
+                let raw =
+                    std::str::from_utf8(&bytes).map_err(|_| invalid("non-UTF8 legacy events"))?;
+                let tag = if file == "events.jsonl" || file == ".fgos/events.jsonl" {
+                    ""
+                } else if file.starts_with("events/") || file.starts_with(".fgos/events/") {
+                    file.rsplit('/').next().unwrap()
+                } else {
+                    file
+                };
+                let mut parsed = legacy::parse_file(tag, raw)?;
+                for event in &mut parsed {
+                    event.provenance.file = file.into();
+                }
+                events.extend(parsed);
             }
-            events.extend(parsed);
+            if page.complete {
+                break;
+            }
+            cursor = Some(
+                page.next_cursor
+                    .ok_or_else(|| invalid("tree continuation missing"))?,
+            );
         }
-        if page.complete {
-            break;
-        }
-        cursor = Some(
-            page.next_cursor
-                .ok_or_else(|| invalid("tree continuation missing"))?,
-        );
+        cursor = None;
     }
     Ok(events)
 }
 fn read_legacy(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
@@ -225,7 +256,13 @@ fn read_legacy(
         let fence: Fence = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
         let oid = Oid::parse(&fence.legacy_ref_oid, repo.object_format())
             .map_err(|e| invalid(e.to_string()))?;
-        if refs.is_empty() || refs.values().any(|v| *v != oid) {
+        if refs.is_empty() {
+            return Err(Error::new(
+                ErrorCode::EventStoreRefspecMissing,
+                "tracked legacy fence requires fetching legacy ref",
+            ));
+        }
+        if refs.values().any(|v| *v != oid) {
             return Err(Error::new(
                 ErrorCode::EventStoreRefTampered,
                 "legacy ref does not match tracked fence",
@@ -240,7 +277,7 @@ fn read_legacy(
                 "legacy seal differs from fence",
             ));
         }
-        legacy_files(port, repo, &oid, streams)
+        legacy_files(port, repo, &oid, streams, false)
     } else {
         if !refs.is_empty() {
             return Err(Error::new(
@@ -248,12 +285,12 @@ fn read_legacy(
                 "legacy ref without fence",
             ));
         }
-        legacy_files(port, repo, &head, streams)
+        legacy_files(port, repo, &head, streams, true)
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.
 pub fn read(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     req: ReadRequest<'_>,
 ) -> Result<ReadResult, Error> {
@@ -261,7 +298,7 @@ pub fn read(
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
-    let (tips, legacy_refs) = tips(port, repo)?;
+    let (tips, legacy_refs) = tips(port, repo, req.streams)?;
     for (name, old) in &req.cursor.mirror_tips {
         let tip = tips
             .iter()
@@ -274,9 +311,7 @@ pub fn read(
             ));
         }
     }
-    for tip in &tips {
-        walk::verify_tip(&header(port, repo, &tip.oid)?, &tip.machine, tip.scope)?;
-    }
+
     // A replay source is retained by the consumer, not hidden inside the cursor.
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
     let have_history = (req.cursor.cover.is_empty() || !req.folded.is_empty())
@@ -293,7 +328,29 @@ pub fn read(
         BTreeSet::new()
     };
     let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
-    let walked = walk::walk(port, repo, &oids, &base, &certificates)?;
+    let mut walked = walk::Walked::default();
+    let mut own_published = Positions::new();
+    for tip in &tips {
+        let part = walk::walk_verified(
+            port,
+            repo,
+            &tip.oid,
+            &base,
+            &certificates,
+            &tip.machine,
+            tip.scope,
+        )?;
+        if !tip.mirror {
+            for (key, seq) in &part.published {
+                own_published
+                    .entry(key.clone())
+                    .and_modify(|n| *n = (*n).max(*seq))
+                    .or_insert(*seq);
+            }
+        }
+        walked.events.extend(part.events);
+        walked.visited.extend(part.visited);
+    }
     // Mirror ancestry can include the own stream, but cannot invent own events
     // beyond the locally verified durable receipt.
     for tip in tips.iter().filter(|t| t.mirror) {
@@ -302,12 +359,14 @@ pub fn read(
         } else {
             BTreeSet::new()
         };
-        let mirror = walk::walk(
+        let mirror = walk::walk_verified(
             port,
             repo,
-            std::slice::from_ref(&tip.oid),
+            &tip.oid,
             &base,
             &mirror_stops,
+            &tip.machine,
+            tip.scope,
         )?;
         for (key, seq) in mirror
             .published
@@ -319,7 +378,11 @@ pub fn read(
                 &req.layout.stream(&StreamId::parse(stream)?).sealed(),
             )?
             .unwrap_or(0);
-            if *seq > receipt {
+            if *seq
+                > receipt
+                    .max(own_published.get(key).copied().unwrap_or(0))
+                    .max(base.get(key).copied().unwrap_or(0))
+            {
                 return Err(Error::new(
                     ErrorCode::EventStoreRefTampered,
                     "mirror claims own origin above receipt",
@@ -330,9 +393,28 @@ pub fn read(
     let mut union = req.folded.to_vec();
     union.extend(local);
     union.extend(walked.events.iter().cloned());
+    let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
+    if req.project {
+        for e in &union {
+            if req.streams.iter().any(|s| s.as_str() == e.stream) && e.event_type == "store.promote"
+            {
+                if let (Some(stream), Some(high)) = (
+                    e.payload["stream"].as_str(),
+                    e.payload["throughSeq"].as_u64(),
+                ) {
+                    promoted
+                        .entry(format!("{}:{stream}", e.origin))
+                        .and_modify(|n| *n = (*n).max(high))
+                        .or_insert(high);
+                }
+            }
+        }
+    }
     union.retain(|e| {
         req.streams.iter().any(|s| s.as_str() == e.stream)
-            || req.project && e.scope == Scope::Branch
+            || promoted
+                .get(&stream_key(e))
+                .is_some_and(|high| e.seq <= *high)
     });
     walk::check_contiguous(&union, &Positions::new())?;
     let ordered = order(&union, &Positions::new(), req.project)?;
@@ -349,15 +431,9 @@ pub fn read(
             .and_modify(|n| *n = (*n).max(e.seq))
             .or_insert(e.seq);
     }
-    cursor.emitted = cursor.cover.clone();
     cursor.deferred = ordered.deferred.iter().map(|e| e.h.clone()).collect();
-    if ordered.deferred.is_empty()
-        && walked
-            .events
-            .iter()
-            .all(|e| cursor.cover.get(&stream_key(e)).copied().unwrap_or(0) >= e.seq)
-    {
-        cursor.certified.extend(walked.visited);
+    if ordered.deferred.is_empty() {
+        cursor.certified.clear();
         cursor
             .certified
             .extend(oids.iter().map(|o| o.as_str().into()));
@@ -372,6 +448,13 @@ pub fn read(
         .map(|(n, o)| (n.clone(), o.as_str().into()))
         .collect();
     let legacy = legacy::order(read_legacy(port, repo, &legacy_refs, req.streams)?);
+    cursor.legacy_digest = if legacy.is_empty() {
+        None
+    } else {
+        Some(crate::envelope::sha256(&crate::envelope::line(
+            &legacy.iter().map(LegacyEvent::identity).collect::<Vec<_>>(),
+        )?))
+    };
     let full_order: Vec<_> = legacy
         .iter()
         .map(LegacyEvent::identity)
@@ -381,14 +464,18 @@ pub fn read(
     let delta: Vec<_> = ordered
         .events
         .iter()
-        .filter(|e| e.seq > req.cursor.emitted.get(&stream_key(e)).copied().unwrap_or(0))
+        .filter(|e| e.seq > req.cursor.cover.get(&stream_key(e)).copied().unwrap_or(0))
         .cloned()
         .collect();
     let fold = fold_answer(
         req.cursor,
         &cursor,
         &old_order,
-        &full_order,
+        &ordered
+            .events
+            .iter()
+            .map(|e| e.h.clone())
+            .collect::<Vec<_>>(),
         &delta,
         req.origin,
     );
@@ -410,7 +497,7 @@ pub fn read(
 /// monotonic and fsynced; overlapping active records are refused, never dropped.
 /// Facades call this before allowing an empty-cache stream to append.
 pub fn reconcile_durable_history(
-    port: &dyn Publication,
+    port: &dyn Inspect,
     repo: &RepoHandle,
     layout: &Layout,
     origin: &str,
@@ -428,7 +515,21 @@ pub fn reconcile_durable_history(
         .and_then(|s| s.split('/').next())
         .filter(|s| crate::identity::valid_machine_id(s))
         .ok_or_else(|| invalid("own history ref does not match stream scope"))?;
-    let tip = match port.read_ref(repo, own_ref).map_err(git_error)? {
+    let page = port
+        .list_refs(
+            repo,
+            &[RefPrefix::parse(own_ref.as_str()).map_err(|e| invalid(e.to_string()))?],
+            None,
+            1024,
+        )
+        .map_err(git_error)?;
+    let value = page
+        .entries
+        .into_iter()
+        .find(|e| e.name == *own_ref)
+        .map(|e| e.value)
+        .unwrap_or(RefValue::Absent);
+    let tip = match value {
         RefValue::Absent => {
             if crate::append::read_last_seq(&layout.stream(stream).sealed())?.unwrap_or(0) > 0 {
                 return Err(Error::new(
@@ -446,14 +547,16 @@ pub fn reconcile_durable_history(
             ))
         }
     };
-    walk::verify_tip(&header(port, repo, &tip)?, machine, stream.scope())?;
-    let walked = walk::walk(
+    let walked = walk::walk_verified(
         port,
         repo,
-        std::slice::from_ref(&tip),
+        &tip,
         &Positions::new(),
         &BTreeSet::new(),
+        machine,
+        stream.scope(),
     )?;
+    walk::check_contiguous(&walked.events, &Positions::new())?;
     let ordered = order(&walked.events, &Positions::new(), false)?;
     let mut recovered = Positions::new();
     for e in &ordered.events {
@@ -483,6 +586,16 @@ pub fn reconcile_durable_history(
             "local receipt exceeds own durable history",
         ));
     }
+    let local = read_own(layout, origin, stream)?;
+    if local.events.iter().filter(|e| e.seq <= high).any(|e| {
+        !own.iter()
+            .any(|published| published.seq == e.seq && published.h == e.h)
+    }) {
+        return Err(Error::new(
+            ErrorCode::EventStoreSeqRecoveryConflict,
+            "local records differ from recovered durable history",
+        ));
+    }
     if high > receipt {
         std::fs::create_dir_all(&paths.root).map_err(crate::errors::io)?;
         crate::fsio::sync_dir(&layout.root)?;
@@ -492,24 +605,12 @@ pub fn reconcile_durable_history(
             &serde_json::json!({"lastSeq":high,"ref":own_ref.as_str(),"commit":tip.as_str(),"cover":recovered,"certified":certified}),
         )?;
         fgos_durable_file::replace_durably(&paths.root, "sealed.json", &bytes)
-            .map_err(|e| invalid(e.to_string()))?;
-    }
-    let local = read_own(layout, origin, stream)?;
-    if local.events.iter().any(|e| e.seq <= high) {
-        return Err(Error::new(
-            ErrorCode::EventStoreSeqRecoveryConflict,
-            "local records overlap recovered durable history; reconciliation required",
-        ));
+            .map_err(|e| Error::new(ErrorCode::EventStoreIo, e.to_string()))?;
     }
     crate::fsio::write_hwm(&paths.root, high, &fs)?;
     Ok(high)
 }
-fn descends(
-    port: &dyn Publication,
-    repo: &RepoHandle,
-    tip: &Oid,
-    old: &str,
-) -> Result<bool, Error> {
+fn descends(port: &dyn Inspect, repo: &RepoHandle, tip: &Oid, old: &str) -> Result<bool, Error> {
     let old = Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
     if *tip == old {
         return Ok(true);
@@ -542,5 +643,22 @@ fn descends(
             page.next_cursor
                 .ok_or_else(|| invalid("missing ancestry continuation"))?,
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn mirror_namespace_follows_the_complete_remote_name() {
+        assert_eq!(
+            super::mirror_suffix("a/b/events/test-aa").unwrap(),
+            "events/test-aa"
+        );
+        assert_eq!(
+            super::mirror_suffix("a/events/b/branch-events/test-aa/feature").unwrap(),
+            "branch-events/test-aa/feature"
+        );
+        assert_eq!(super::mirror_suffix("a/b/legacy").unwrap(), "legacy");
+        assert!(super::mirror_suffix("a/b/unknown").is_err());
     }
 }

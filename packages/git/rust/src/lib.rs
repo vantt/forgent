@@ -292,32 +292,7 @@ pub struct PushResult {
 
 /// Typed publication contract. PublicationPort implements it under the caller's
 /// opaque event-seal authority and the signed §4/§10 WAL protocol.
-pub trait Publication {
-    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact>;
-    fn list_tree(
-        &self,
-        repo: &RepoHandle,
-        revision: &Oid,
-        prefix: &[u8],
-        cursor: Option<TreeCursor>,
-        max_entries: usize,
-    ) -> Result<TreePage>;
-
-    fn list_refs(
-        &self,
-        repo: &RepoHandle,
-        prefixes: &[RefPrefix],
-        cursor: Option<RefCursor>,
-        max_entries: usize,
-    ) -> Result<RefPage>;
-    fn read_paths_at(
-        &self,
-        repo: &RepoHandle,
-        revision: &Oid,
-        paths: &[Vec<u8>],
-        max_blob_bytes: usize,
-    ) -> Result<Vec<PathRead>>;
-
+pub trait Publication: Inspect {
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid>;
     fn write_tree(&self, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid>;
     fn write_commit(&self, repo: &RepoHandle, input: &CommitInput) -> Result<Oid>;
@@ -328,14 +303,6 @@ pub trait Publication {
         oid: &Oid,
         expected_type: ObjectType,
     ) -> Result<ReadObject>;
-    fn walk_commits(
-        &self,
-        repo: &RepoHandle,
-        tips: &[Oid],
-        stop: &[Oid],
-        cursor: Option<WalkCursor>,
-        bounds: WalkBounds,
-    ) -> Result<WalkPage>;
     fn compare_and_swap(
         &self,
         repo: &RepoHandle,
@@ -403,6 +370,14 @@ pub trait Inspect {
         max_blob_bytes: usize,
     ) -> Result<Vec<PathRead>>;
 
+    fn walk_commits(
+        &self,
+        repo: &RepoHandle,
+        tips: &[Oid],
+        stop: &[Oid],
+        cursor: Option<WalkCursor>,
+        bounds: WalkBounds,
+    ) -> Result<WalkPage>;
     fn configured_fetch_refspecs(&self, repo: &RepoHandle, remote: &str)
         -> Result<Vec<ConfigFact>>;
     fn push_refspecs(&self, repo: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>>;
