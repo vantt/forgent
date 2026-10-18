@@ -131,6 +131,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `yaml` npm dependency, the hand-written YAML readers in the doctor checks and the persona renderer, and the "not evaluated: yaml package not installed" branches. `fgos doctor` no longer warns about multi-line persona markers because they now render.
 
 ### Fixed
+- The gate of a supervised attempt can read its envelope and run when the run directory or the host binary lives under `/tmp`: the sandbox mounts its own `/tmp`, so both are now bound back in place. Before, such a run ended `gate-lost` with `envelope unreadable`.
+- A `FGOS_HOST_BIN` that names a file that cannot be run is now an error everywhere the host is looked up; it no longer falls back to the activated release.
 - A gemini worker now runs the model its tier asks for. Since gemini moved to omp, the omp invocations passed no `--model`, so every tier ran the profile default (`gemini-3.8-flash`); a frontier task now runs `gemini-4-argon`.
 - `fgos take`, `fgos list` and every other verb that reads active claims no longer spawn one git process per open claim; with 60 open claims a `take` drops from about 270 child processes and 1.7 s to 21 processes and 0.26 s.
 

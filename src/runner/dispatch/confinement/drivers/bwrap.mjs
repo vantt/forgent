@@ -495,6 +495,16 @@ export function prepareBwrapSync(plan, request, backend) {
       bwrapArgs.push('--die-with-parent', '--bind', socketDir, socketDir);
     }
     const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
+    // The private /tmp above hides whatever lives under the host's /tmp. The gate reads its envelope
+    // from the run directory and is itself a host binary, so each is bound back where it sits.
+    if (attemptId) {
+      const gateBin = Array.isArray(request.gateCommand) ? request.gateCommand[0] : null;
+      for (const hostPath of [request.context?.runDir, gateBin]) {
+        if (typeof hostPath === 'string' && isInsideRoot(path.resolve(hostPath), '/tmp')) {
+          bwrapArgs.push('--ro-bind', path.resolve(hostPath), path.resolve(hostPath));
+        }
+      }
+    }
 
     const resources = plan.resources || [];
     const blind = requestIsBlind(request);
