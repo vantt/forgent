@@ -232,7 +232,12 @@ function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
 function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assignmentsDir }) {
   const current = currentAttemptOf(assignmentsDir, assignmentId);
   const abandoned = () => {
-    if (!current || !fs.existsSync(path.join(current.dir, 'envelope.json'))) return false;
+    if (!current) return false;
+    // A run from before the supervisor that the legacy sweep settled has no result to carry on from.
+    try {
+      if (JSON.parse(fs.readFileSync(path.join(current.dir, 'run.json'), 'utf8')).settlement === 'abandoned-legacy') return true;
+    } catch { /* no status record: judged by its envelope below */ }
+    if (!fs.existsSync(path.join(current.dir, 'envelope.json'))) return false;
     if (adoptRun(current.dir, { probeOnly: true }).state !== 'closed') return false;
     try {
       const outcome = String(JSON.parse(fs.readFileSync(path.join(current.dir, 'receipt.json'), 'utf8')).outcome);

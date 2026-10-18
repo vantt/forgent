@@ -8,6 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { bindingPids } from './helpers/envelope-fixture.mjs';
+import { signalPids, waitGone } from './helpers/kill-on-file.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -191,4 +193,46 @@ test('7. after Ctrl-C the resume runs the unit again in a new attempt that super
   assert.equal(next.length, 1, 'one new attempt');
   assert.equal(readJson(here(next[0], 'run.json')).supersedesRunId, readJson(here(dir, 'run.json')).runId);
   assert.equal(starts(next[0]).length, 1);
+});
+
+test('8. controller, supervisor and gate all dead with the lock free: --resume adopts the attempt itself instead of refusing it as running', { skip, timeout: 300_000 }, async () => {
+  const project = createProject({ agent: { runMs: 8000 } });
+  const run = startRun(project, project.unitFile('resume-needs-adopt'));
+  const dir = await attemptWhere(project, (d) => bindingPids(d).length === 2 && exists(d, 'agent-binding.json'));
+  const pids = [run.child.pid, ...bindingPids(dir)];
+  signalPids(pids);
+  await run.exited;
+  await waitGone(pids);
+  assert.equal(exists(dir, 'closed.json'), false, 'nothing settled the attempt yet');
+  const resume = startResume(project, unitRunIdOf(project));
+  await resume.exited;
+  const { stderr } = resume.output();
+  assert.doesNotMatch(stderr, /attempt-still-running|is still needs-adopt/, stderr);
+  assert.ok(exists(dir, 'closed.json'), 'the resume adopted and settled the attempt');
+});
+
+test('9. an attempt the legacy sweep settled is not carried on from: --resume launches a new attempt that supersedes it', { skip, timeout: 300_000 }, async () => {
+  const project = createProject({ agent: { runMs: 1500 } });
+  const first = startRun(project, project.unitFile('resume-legacy'));
+  assert.equal((await first.exited).code, 0, first.output().stderr);
+  const unitDir = unitDirOf(project);
+  const [dir] = project.attemptDirs();
+  // Shape of a run from before the supervisor that the legacy sweep settled: a launch record, no envelope, no
+  // closed marker, and nothing in the unit recording how it ended.
+  for (const name of ['envelope.json', 'closed.json', 'receipt.json', 'result.json', 'exit.json']) fs.rmSync(here(dir, name), { force: true });
+  for (const name of fs.readdirSync(dir).filter((n) => n.startsWith('attempt.lock'))) fs.rmSync(here(dir, name), { recursive: true, force: true });
+  fs.mkdirSync(here(dir, 'controller/commands'), { recursive: true });
+  const status = readJson(here(dir, 'run.json'));
+  fs.writeFileSync(here(dir, 'run.json'), `${JSON.stringify({ ...status, status: 'died', settlement: 'abandoned-legacy', settledAt: new Date().toISOString() })}\n`);
+  const record = readJson(here(unitDir, 'unit.json'));
+  for (const attempts of Object.values(record.bindings)) for (const attempt of attempts) delete attempt.outcome;
+  fs.writeFileSync(here(unitDir, 'unit.json'), `${JSON.stringify(record, null, 2)}\n`);
+  fs.rmSync(here(unitDir, 'unit-summary.json'), { force: true });
+  const resume = startResume(project, unitRunIdOf(project));
+  assert.equal((await resume.exited).code, 0, resume.output().stderr);
+  const next = project.attemptDirs().filter((d) => d !== dir);
+  assert.equal(next.length, 1, 'one new attempt');
+  assert.equal(readJson(here(next[0], 'run.json')).supersedesRunId, status.runId);
+  assert.equal(starts(next[0]).length, 1);
+  assert.ok(fs.existsSync(here(unitDir, 'unit-summary.json')));
 });
