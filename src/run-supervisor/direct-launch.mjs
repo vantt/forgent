@@ -46,9 +46,9 @@ export function resolveAttemptHost() {
  * Take `attempt` (rank 15) and, for an agent that writes, `dispatch-cwd` (rank 30), in one scope so the
  * order is checked. Throws `attempt-in-flight` / `dispatch-in-flight` by name; nothing stays held.
  */
-export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, mutating, custody = null }) {
+export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, mutating, custody = null, executorId = null, capability = null }) {
   if (custody && (custody.released || custody.name !== 'dispatch-cwd' || custody.path !== resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path)) {
-    throw new DispatchError('custody-required', 'attempt custody must be the held lease of this cwd', { cwd });
+    throw new DispatchError('custody-required', 'attempt custody must be the held lease of this cwd', { cwd, executorId, capability });
   }
   const scope = createLockScope('attempt');
   const taken = acquireSync(scope, 'attempt', { fgosDir, runDir: assignmentDir, NN: attemptStr });

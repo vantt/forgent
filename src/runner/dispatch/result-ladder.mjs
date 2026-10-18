@@ -31,14 +31,14 @@ function stripBacktickQuoted(stdout) {
  * from `cliSpawnAdapter`/`herdrSpawn`, etc.) -- its own fields are spread in
  * unchanged and always win the "reported" rung. `headBefore`/`headAfter`
  * are the git HEAD sha captured immediately before/after the adapter call
- * (`captureHeadSha`); `lostUncommittedPaths`, `provider`, and `command` are
+ * (when supplied); `provider` and `command` are
  * additive fields the caller already computed. Herdr's own internal
  * completion sentinel (`__fgos_herdr_exit_*`, `transport.mjs`) is a
  * separate, adapter-level mechanism already resolved by the time `result`
  * reaches here -- it never appears in `result.stdout` and this ladder never
  * needs to know about it.
  */
-export function buildDispatchResult({ mechanism, result, headBefore, headAfter, lostUncommittedPaths, provider, command }) {
+export function buildDispatchResult({ mechanism, result, headBefore, headAfter, provider, command }) {
   const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
   const cleanStdout = stripBacktickQuoted(stdoutStr);
   const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
@@ -67,7 +67,6 @@ export function buildDispatchResult({ mechanism, result, headBefore, headAfter, 
     ...result,
     ...(hasSignal || adapterOutcome ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
     ...(isDone && succeeded && headAfter ? { verifiedSha: headAfter } : {}),
-    ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
     provider,
     command,
   };

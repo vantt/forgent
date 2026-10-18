@@ -8,6 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
@@ -624,4 +625,33 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
     '--account', 'acct-cli',
     '--dir', tmp,
   ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--account cannot change a resumed workflow run/);
+});
+
+
+test('workflow resume preserves an unknown custody predecessor and redispatches in a fresh worktree', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [{ id: 'write', objective: 'WRITE:output.txt', capability: 'docs:write', writes: ['output.txt'] }]);
+  const first = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(first.status, 'completed', JSON.stringify(first.steps));
+  const old = first.steps.write.units.write;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: first.workflowRunId });
+  const complete = events.find((e) => e.type === 'unit.complete');
+  const kept = events.filter((e) => e.seq < complete.seq);
+  fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', first.workflowRunId, 'events.jsonl'), kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+  const lock = resolveLock('dispatch-cwd', { fgosDir: path.join(tmp, '.fgos'), cwd: old.worktreePath }).v3Path;
+  const predecessor = JSON.stringify({ v: 1, domainKind: 'linux-pgroup', domainId: { host: 'other', bootId: 'old', pidNs: 'old', pid: 2147483647, startTime: '0' } });
+  fs.mkdirSync(path.dirname(lock), { recursive: true });
+  fs.writeFileSync(`${lock}.predecessor.json`, predecessor);
+  fs.writeFileSync(path.join(old.worktreePath, 'preserve.txt'), 'uncommitted predecessor work');
+  const resumed = await resumeWorkflow(first.workflowRunId, opts(tmp));
+  assert.equal(resumed.status, 'completed', JSON.stringify(resumed.steps));
+  const next = resumed.steps.write.units.write;
+  assert.notEqual(next.unitRunId, old.unitRunId);
+  assert.notEqual(next.worktreePath, old.worktreePath);
+  assert.notEqual(next.branch, old.branch);
+  assert.equal(fs.readFileSync(`${lock}.predecessor.json`, 'utf8'), predecessor);
+  assert.equal(fs.readFileSync(path.join(old.worktreePath, 'preserve.txt'), 'utf8'), 'uncommitted predecessor work');
+  assert.equal(fs.readFileSync(path.join(next.worktreePath, 'output.txt'), 'utf8'), 'output.txt written\n');
+  const recovery = readWorkflowEvents({ repoRoot: tmp, workflowRunId: first.workflowRunId }).find((e) => e.payload.recovery);
+  assert.equal(recovery.payload.recovery.preservedWorktree, old.worktreePath);
 });

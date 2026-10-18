@@ -10,7 +10,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
 
 class StoreError extends Error {
   constructor(category, message) {
@@ -57,10 +56,7 @@ import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
 // the dispatch root instead.
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
-import { checkoutDirtyPaths } from '../worktree.mjs';
-import { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
-
-export { watchWritesOutsideWorkspace, strayWriteWarning };
+export { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
 
 // Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in
 // the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.
@@ -151,19 +147,6 @@ export function openRunnerRun({ fgosDir, executorId, cwd }) {
   };
 }
 
-
-function captureHeadSha(cwd) {
-  try {
-    const sha = execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: cwd || process.cwd(),
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-    return sha || null;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,
@@ -644,157 +627,127 @@ export async function executeExecutorCli(
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
 
-  // One dispatch at a time per working directory, because two writers in one tree race. A caller that
-  // knows the dispatch cannot write the workspace (a read-only posture) shares the directory instead:
-  // the panelists of one panel run side by side in the same checkout.
-  if (!sharedCwd) throw new DispatchError('custody-domain-required', 'a mutating producer must run through a supervised Assignment with a declared domain', {});
+  // This unsupervised transport serves read-only callers. Writers use Assignment custody.
+  if (!sharedCwd) throw new DispatchError('custody-domain-required', 'a mutating producer must run through a supervised Assignment with a declared domain', { cwd, executorId, capability: capabilityIdentity });
 
+  process.stderr.write(
+    `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+  );
+
+  // A caller may hand us a run directory; when none is given, open one under
+  // `.fgos/` rather than letting the adapter fall back to a private temp
+  // directory. This door used to take that fallback, so a real dispatch
+  // through it left its brief, visibility and outbox somewhere
+  // `fgos dispatch show-run`/`watch` do not look -- observable in principle
+  // and unobservable in practice.
+  const opened = runDir
+    ? { runDir, closeRun: () => {} }
+    : openRunnerRun({ fgosDir, executorId, cwd });
+
+  let confinementRequest;
   try {
-    process.stderr.write(
-      `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
-    );
-    const headBefore = captureHeadSha(cwd);
-    const dirtyBefore = checkoutDirtyPaths(root, cwd);
-
-    // A caller may hand us a run directory; when none is given, open one under
-    // `.fgos/` rather than letting the adapter fall back to a private temp
-    // directory. This door used to take that fallback, so a real dispatch
-    // through it left its brief, visibility and outbox somewhere
-    // `fgos dispatch show-run`/`watch` do not look -- observable in principle
-    // and unobservable in practice.
-    const opened = runDir
-      ? { runDir, closeRun: () => {} }
-      : openRunnerRun({ fgosDir, executorId, cwd });
-    const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
-
-    let confinementRequest;
-    try {
-      confinementRequest = buildConfinementRequest({
+    confinementRequest = buildConfinementRequest({
+      capability: capabilityIdentity,
+      stageSkill: executorIdArg,
+      executorId,
+      fallbackFrom: anchorCapability,
+      anchorCapability,
+      cfg,
+      assignmentLaunchContext,
+      // Same pre-existing `opts`-is-not-defined fix as the in-process
+      // branch above -- see its comment.
+      providerCapacity: providerCapacity ?? options?.providerCapacity,
+      blind,
+      ...(requirement ? { requirement } : {}),
+      invocation: {
+        command,
+        args: withRunDirReadAccess({ adapter, interactiveMode, args, runDir: opened.runDir }),
+        argsTemplate,
+        prompt,
+        env,
+        liveOutput,
+        interactiveMode,
+        promptDelivery,
+        permissionMode,
+        confinement,
+        adapter,
+        method,
+        url,
+        headers,
+        body,
+        resourceBindings,
+      },
+      context: {
+        cwd,
+        repoRoot: workspaceRoot ?? root,
+        runDir: opened.runDir,
+        fgosDir,
+        contextRefs,
+        timeoutMs,
+        idleTimeoutMs,
+        maxBuffer,
+        onChunk,
+        workId: executorId,
+        tier,
+        model,
+        dispatchBatchKey,
+        launchCommandId,
+        controlEpoch,
+        controlToken,
+        effectiveContract,
+      },
+    });
+  } catch (err) {
+    opened.closeRun('settled');
+    const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const refusedAttestation = buildConfinementAttestation({
+      request: {
+        contract: 'confinement-request.v1',
+        dispatchId,
         capability: capabilityIdentity,
         stageSkill: executorIdArg,
         executorId,
-        fallbackFrom: anchorCapability,
-        anchorCapability,
-        cfg,
-        assignmentLaunchContext,
-        // Same pre-existing `opts`-is-not-defined fix as the in-process
-        // branch above -- see its comment.
-        providerCapacity: providerCapacity ?? options?.providerCapacity,
-        blind,
-        ...(requirement ? { requirement } : {}),
-        invocation: {
-          command,
-          args: withRunDirReadAccess({ adapter, interactiveMode, args, runDir: opened.runDir }),
-          argsTemplate,
-          prompt,
-          env,
-          liveOutput,
-          interactiveMode,
-          promptDelivery,
-          permissionMode,
-          confinement,
-          adapter,
-          method,
-          url,
-          headers,
-          body,
-          resourceBindings,
-        },
-        context: {
-          cwd,
-          repoRoot: workspaceRoot ?? root,
-          runDir: opened.runDir,
-          fgosDir,
-          contextRefs,
-          timeoutMs,
-          idleTimeoutMs,
-          maxBuffer,
-          onChunk,
-          workId: executorId,
-          tier,
-          model,
-          dispatchBatchKey,
-          launchCommandId,
-          controlEpoch,
-          controlToken,
-          effectiveContract,
-        },
-      });
-    } catch (err) {
-      opened.closeRun('settled');
-      const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-      const refusedAttestation = buildConfinementAttestation({
-        request: {
-          contract: 'confinement-request.v1',
-          dispatchId,
-          capability: capabilityIdentity,
-          stageSkill: executorIdArg,
-          executorId,
-          requirement: { mode: 'required', error: err.message },
-          context: { cwd, runDir: opened.runDir },
-        },
-        phase: 'refused',
-        outcome: 'refused',
-        error: err,
-      });
-      throw new DispatchError(
-        'confinement-policy-error',
-        err.message,
-        {
-          contract: 'confinement-execution.v1',
-          status: 'refused',
-          dispatchId,
-          capability: capabilityIdentity,
-          stageSkill: executorIdArg,
-          executorId,
-          attestation: refusedAttestation,
-          cause: err,
-        },
-      );
-    }
-
-    let result;
-    try {
-      result = await executeThroughConfinement(confinementRequest);
-    } catch (err) {
-      opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');
-      throw err;
-    }
-    opened.closeRun('settled');
-
-    // Same question as the runner path asks: the round ended, but where?
-    const strayWarning = strayWriteWarning({ repoRoot: root, strayPaths: outsideWatch.strayPaths() });
-
-    const headAfter = captureHeadSha(cwd);
-    const dirtyAfter = checkoutDirtyPaths(root, cwd);
-    let lostUncommittedPaths;
-    if (headBefore === headAfter && dirtyBefore.length > 0) {
-      const dirtyAfterSet = new Set(dirtyAfter);
-      const lost = dirtyBefore.filter((p) => !dirtyAfterSet.has(p));
-      if (lost.length > 0) {
-        lostUncommittedPaths = lost;
-        process.stderr.write(
-          `fgos: warning: uncommitted path(s) lost across out-of-process dispatch: ${lost.join(', ')}\n`,
-        );
-      }
-    }
-    const execResult = result?.result ?? result;
-    const resultToBuild = {
-      ...execResult,
-      attestation: result?.attestation,
-      ...(strayWarning ? { warnings: [...(Array.isArray(execResult?.warnings) ? execResult.warnings : []), strayWarning] } : {}),
-    };
-    const built = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
-    const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});
-    const base = {
-      ...built,
-      ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
-      ...(modelWarnings.length > 0 ? { modelWarnings } : {}),
-    };
-    return resolvedByPurpose ? { ...base, executorId } : base;
-  } finally {
-    // Read-only executor calls have no custody to release.
+        requirement: { mode: 'required', error: err.message },
+        context: { cwd, runDir: opened.runDir },
+      },
+      phase: 'refused',
+      outcome: 'refused',
+      error: err,
+    });
+    throw new DispatchError(
+      'confinement-policy-error',
+      err.message,
+      {
+        contract: 'confinement-execution.v1',
+        status: 'refused',
+        dispatchId,
+        capability: capabilityIdentity,
+        stageSkill: executorIdArg,
+        executorId,
+        attestation: refusedAttestation,
+        cause: err,
+      },
+    );
   }
+
+  let result;
+  try {
+    result = await executeThroughConfinement(confinementRequest);
+  } catch (err) {
+    opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');
+    throw err;
+  }
+  opened.closeRun('settled');
+
+  const execResult = result?.result ?? result;
+  const built = buildDispatchResult({ mechanism, result: { ...execResult, attestation: result?.attestation }, provider, command });
+  const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});
+  const base = {
+    ...built,
+    ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
+    ...(modelWarnings.length > 0 ? { modelWarnings } : {}),
+  };
+  return resolvedByPurpose ? { ...base, executorId } : base;
 
 }
 

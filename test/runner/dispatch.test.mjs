@@ -3133,7 +3133,7 @@ test('executeExecutorCli resolves a cross-provider executor\'s own providerModel
     },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('agy', { prompt: 'classify this', repoRoot: root, tier: 'standard' });
+  const result = await executeExecutorCli('agy', { sharedCwd: true, prompt: 'classify this', repoRoot: root, tier: 'standard' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.provider, 'agy');
   assert.equal(result.model, 'gemini-pro');
@@ -3154,7 +3154,7 @@ test('executeExecutorCli fails closed when the executorId is not in cfg.executor
   // that does not exist in cfg.executors must fail closed with DispatchError('executor-not-found')
   // instead of silently falling through to the global executor.
   await assert.rejects(
-    executeExecutorCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root }),
+    executeExecutorCli('submit-assist-classify', { sharedCwd: true, prompt: 'classify this', repoRoot: root }),
     (err) => err instanceof DispatchError && err.errorClass === 'executor-not-found',
   );
 });
@@ -3169,7 +3169,7 @@ test('executeExecutorCli honors a caller-supplied model override over both the e
     modelPolicies: { claude: { nano: 'flash-3.5', standard: 'sonnet' }, node: { nano: 'flash-3.5', standard: 'sonnet' }, agy: { nano: 'flash-3.5', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root, model: 'opus' });
+  const result = await executeExecutorCli('submit-assist-classify', { sharedCwd: true, prompt: 'classify this', repoRoot: root, model: 'opus' });
   assert.equal(result.model, 'opus');
   const payload = JSON.parse(result.stdout);
   assert.deepEqual(payload.args, ['opus:classify this']);
@@ -3189,7 +3189,7 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   // at all (the pre-existing `executor?.tier ?? DEFAULTS.tier` fallback
   // already lands on 'standard' with no executor match), so it would not
   // actually prove the override path works.
-  const result = await executeExecutorCli('claude', { prompt: 'x', repoRoot: root, tier: 'nano' });
+  const result = await executeExecutorCli('claude', { sharedCwd: true, prompt: 'x', repoRoot: root, tier: 'nano' });
   assert.equal(result.model, 'flash-3.5');
   const payload = JSON.parse(result.stdout);
   assert.deepEqual(payload.args, ['flash-3.5:x']);
@@ -3203,8 +3203,8 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
 // session) -------------------------------------------------------------
 
 test('executeExecutorCli rejects with a usage RunnerConfigError when both executorId and --for are missing', async () => {
-  await assert.rejects(() => executeExecutorCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
-  await assert.rejects(() => executeExecutorCli('', { repoRoot: mkTempDir() }), RunnerConfigError);
+  await assert.rejects(() => executeExecutorCli(undefined, { sharedCwd: true, repoRoot: mkTempDir() }), RunnerConfigError);
+  await assert.rejects(() => executeExecutorCli('', { sharedCwd: true, repoRoot: mkTempDir() }), RunnerConfigError);
 });
 
 test('executeExecutorCli hands back {mechanism:"in-process",agentType,prompt} for a kind:"task" executor when the caller declares live Task access — self-executes nothing, since dispatch has no Task tool of its own to call', async () => {
@@ -3215,7 +3215,7 @@ test('executeExecutorCli hands back {mechanism:"in-process",agentType,prompt} fo
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
+  const result = await executeExecutorCli('my-agent-executor', { sharedCwd: true, repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
   assert.deepEqual(result, { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do the thing', authorityScope: 'external-harness', attestation: null });
 });
 
@@ -3229,7 +3229,7 @@ test('executeExecutorCli falls to out-of-process and self-executes (never hands 
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'hello' });
+  const result = await executeExecutorCli('my-agent-executor', { sharedCwd: true, repoRoot: root, prompt: 'hello' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   const payload = JSON.parse(result.stdout);
@@ -3246,7 +3246,7 @@ test('executeExecutorCli self-executes a kind:"cli" executor via EXECUTOR_ADAPTE
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'classify this' });
+  const result = await executeExecutorCli('submit-assist-classify', { sharedCwd: true, repoRoot: root, prompt: 'classify this' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   assert.equal(result.signal, null);
@@ -3273,7 +3273,7 @@ test('executeExecutorCli prints a "fgos: dispatch ..." chokepoint line to stderr
   let captured = '';
   process.stderr.write = (chunk) => { captured += chunk; return true; };
   try {
-    await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
+    await executeExecutorCli('my-agent-executor', { sharedCwd: true, repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
   } finally {
     process.stderr.write = original;
   }
@@ -3295,7 +3295,7 @@ test('executeExecutorCli prints a "fgos: dispatch ..." chokepoint line to stderr
   let captured = '';
   process.stderr.write = (chunk) => { captured += chunk; return true; };
   try {
-    await executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'classify this' });
+    await executeExecutorCli('submit-assist-classify', { sharedCwd: true, repoRoot: root, prompt: 'classify this' });
   } finally {
     process.stderr.write = original;
   }
@@ -3313,14 +3313,14 @@ test('executeExecutorCli resolves purpose-based (--for) the same way a positiona
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byPurpose = await executeExecutorCli(undefined, { repoRoot: root, for: 'judge', prompt: 'p' });
-  const byName = await executeExecutorCli('judge-decompose', { repoRoot: root, prompt: 'p' });
+  const byPurpose = await executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', prompt: 'p' });
+  const byName = await executeExecutorCli('judge-decompose', { sharedCwd: true, repoRoot: root, prompt: 'p' });
   assert.equal(byPurpose.executorId, 'judge-decompose');
   assert.equal(byPurpose.status, 0);
   assert.equal(byName.executorId, undefined);
 });
 
-test('executeExecutorCli returns outcome:"unsignaled" with headBefore and headAfter when stdout lacks [DONE] or [BLOCKED]', async () => {
+test('executeExecutorCli returns outcome:"unsignaled" without commit evidence when stdout lacks [DONE] or [BLOCKED]', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const root = mkTempDir();
@@ -3330,11 +3330,11 @@ test('executeExecutorCli returns outcome:"unsignaled" with headBefore and headAf
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('test-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'test' });
+  const result = await executeExecutorCli('test-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'test' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.outcome, 'unsignaled');
-  assert.equal(typeof result.headBefore, 'string');
-  assert.equal(typeof result.headAfter, 'string');
+  assert.equal(result.headBefore, undefined);
+  assert.equal(result.headAfter, undefined);
 });
 
 test('executeExecutorCli omits outcome and head shas when stdout contains [DONE] or [BLOCKED]', async () => {
@@ -3355,18 +3355,18 @@ test('executeExecutorCli omits outcome and head shas when stdout contains [DONE]
     timeoutMs: 5000,
   });
 
-  const resDone = await executeExecutorCli('done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resDone = await executeExecutorCli('done-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resDone.outcome, undefined);
   assert.equal(resDone.headBefore, undefined);
   assert.equal(resDone.headAfter, undefined);
 
-  const resBlocked = await executeExecutorCli('blocked-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resBlocked = await executeExecutorCli('blocked-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resBlocked.outcome, undefined);
   assert.equal(resBlocked.headBefore, undefined);
   assert.equal(resBlocked.headAfter, undefined);
 });
 
-test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, and omits verifiedSha on [BLOCKED]', async () => {
+test('read-only executor tokens never certify a commit', async () => {
   const dir = mkTempDir();
   const scriptDonePath = path.join(dir, 'done-executor.mjs');
   fs.writeFileSync(scriptDonePath, 'process.stdout.write("task complete [DONE]\\n"); process.exit(0);');
@@ -3384,10 +3384,10 @@ test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, 
     timeoutMs: 5000,
   });
 
-  const resDone = await executeExecutorCli('done-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
-  assert.equal(resDone.verifiedSha, headCommit);
+  const resDone = await executeExecutorCli('done-executor', { sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resDone.verifiedSha, undefined);
 
-  const resBlocked = await executeExecutorCli('blocked-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  const resBlocked = await executeExecutorCli('blocked-executor', { sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
   assert.equal(resBlocked.verifiedSha, undefined);
 });
 
@@ -3415,12 +3415,12 @@ test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] a
     timeoutMs: 5000,
   });
 
-  const resQuoted = await executeExecutorCli('quoted-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resQuoted = await executeExecutorCli('quoted-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resQuoted.outcome, 'unsignaled');
-  assert.equal(typeof resQuoted.headBefore, 'string');
-  assert.equal(typeof resQuoted.headAfter, 'string');
+  assert.equal(resQuoted.headBefore, undefined);
+  assert.equal(resQuoted.headAfter, undefined);
 
-  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resQuotedAndDone.outcome, undefined);
 });
 
@@ -3511,13 +3511,6 @@ test('buildDispatchResult: a real [DONE] token does NOT get verifiedSha when the
   assert.equal(noStatusField.verifiedSha, undefined);
 });
 
-test('buildDispatchResult: lostUncommittedPaths is included only when given, omitted (never null/empty) otherwise', () => {
-  const withLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', lostUncommittedPaths: ['plan.md'], provider: 'p', command: 'c' });
-  assert.deepEqual(withLost.lostUncommittedPaths, ['plan.md']);
-
-  const withoutLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal('lostUncommittedPaths' in withoutLost, false);
-});
 
 test('buildDispatchResult: a missing or non-string result.stdout is treated as empty, never throws, and resolves the inferred rung', () => {
   const noResult = buildDispatchResult({ mechanism: 'out-of-process', result: undefined, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
@@ -3534,7 +3527,7 @@ test('executeExecutorCli throws when no executor is registered for the given pur
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  await assert.rejects(() => executeExecutorCli(undefined, { repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
+  await assert.rejects(() => executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
 });
 
 test('executeExecutorCli propagates resolveExecutorConfig\'s own RunnerConfigError for a kind:"cli" executor resolving cross-provider with no allowCrossProvider', async () => {
@@ -3547,120 +3540,11 @@ test('executeExecutorCli propagates resolveExecutorConfig\'s own RunnerConfigErr
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  await assert.rejects(() => executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'x' }), RunnerConfigError);
+  await assert.rejects(() => executeExecutorCli('submit-assist-classify', { sharedCwd: true, repoRoot: root, prompt: 'x' }), RunnerConfigError);
 });
 
-test('executeExecutorCli refuses a concurrent dispatch for the same cwd with DispatchError(dispatch-in-flight) (tsk-64hk)', async () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeSlowExecutor(dir, 300);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'slow-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
 
-  const testCwd = repoRoot;
 
-  // Start first dispatch
-  const firstPromise = executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'first' });
-
-  // Give first dispatch a brief moment to acquire the lock
-  await new Promise((r) => setTimeout(r, 50));
-
-  // Second dispatch for the SAME cwd must be refused with dispatch-in-flight
-  let caughtError = null;
-  try {
-    await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'second' });
-  } catch (err) {
-    caughtError = err;
-  }
-
-  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
-  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
-  assert.ok(caughtError.message.includes('already in flight'));
-  assert.equal(caughtError.cwd, testCwd);
-
-  // Wait for first dispatch to finish cleanly
-  const firstResult = await firstPromise;
-  assert.equal(firstResult.status, 0);
-
-  // Subsequent dispatch for the SAME cwd succeeds now that the lock was released
-  const thirdResult = await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'third' });
-  assert.equal(thirdResult.status, 0);
-});
-
-test('executeExecutorCli attaches lostUncommittedPaths and prints stderr warning when out-of-process dispatch reverts uncommitted changes', async () => {
-  const dir = mkTempDir();
-  const scriptWipePath = path.join(dir, 'wipe-executor.mjs');
-  fs.writeFileSync(
-    scriptWipePath,
-    'import fs from "node:fs";\n' +
-    'if (fs.existsSync("plan.md")) fs.unlinkSync("plan.md");\n' +
-    'process.stdout.write("[DONE]\\n");\n' +
-    'process.exit(0);\n',
-  );
-
-  const { repoRoot: gitRepo } = mkTempGitRepo();
-  writeRunnerConfigFixture(gitRepo, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: {
-      'wipe-executor': { kind: 'agent', command: process.execPath, args: [scriptWipePath, '{prompt}'], allowCrossProvider: true },
-    },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-
-  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
-
-  let stderrOutput = '';
-  const origWrite = process.stderr.write;
-  process.stderr.write = (chunk, ...args) => {
-    stderrOutput += chunk.toString();
-    return origWrite.call(process.stderr, chunk, ...args);
-  };
-
-  try {
-    const res = await executeExecutorCli('wipe-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
-    assert.deepEqual(res.lostUncommittedPaths, ['plan.md']);
-    assert.ok(stderrOutput.includes('uncommitted path(s) lost across out-of-process dispatch: plan.md'));
-  } finally {
-    process.stderr.write = origWrite;
-  }
-});
-
-test('executeExecutorCli omits lostUncommittedPaths when dispatch is clean or adapter commits changes', async () => {
-  const dir = mkTempDir();
-  const scriptCommitPath = path.join(dir, 'commit-executor.mjs');
-  fs.writeFileSync(
-    scriptCommitPath,
-    'import { execFileSync } from "node:child_process";\n' +
-    'execFileSync("git", ["add", "plan.md"]);\n' +
-    'execFileSync("git", ["commit", "-q", "-m", "worker commit"]);\n' +
-    'process.stdout.write("[DONE]\\n");\n' +
-    'process.exit(0);\n',
-  );
-
-  const { repoRoot: gitRepo } = mkTempGitRepo();
-  writeRunnerConfigFixture(gitRepo, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: {
-      'commit-executor': { kind: 'agent', command: process.execPath, args: [scriptCommitPath, '{prompt}'], allowCrossProvider: true },
-    },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-
-  // Clean cwd case
-  const resClean = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
-  assert.equal(resClean.lostUncommittedPaths, undefined);
-
-  // Dirty file that is committed by the executor case
-  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
-  const resCommit = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
-  assert.equal(resCommit.lostUncommittedPaths, undefined);
-});
 
 function cliExecutorFixture(repoRoot, scriptPath, timeoutMs = 5000) {
   writeRunnerConfigFixture(repoRoot, {
@@ -3671,31 +3555,14 @@ function cliExecutorFixture(repoRoot, scriptPath, timeoutMs = 5000) {
   });
 }
 
-test('executeExecutorCli refuses while a dispatch in another process holds the cwd, and goes in the moment that holder is SIGKILLed', async () => {
-  if (process.platform === 'win32') return;
-  const { repoRoot, fgosDir } = mkTempGitRepo();
-  cliExecutorFixture(repoRoot, writeEchoExecutor(mkTempDir()));
-  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir, cwd: repoRoot });
-  try {
-    await assert.rejects(
-      () => executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'test' }),
-      (err) => err instanceof DispatchError && err.errorClass === 'dispatch-in-flight' && err.holderPid === child.pid,
-    );
-  } finally {
-    child.kill('SIGKILL');
-    await exited;
-  }
-  const result = await executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'test' });
-  assert.equal(result.status, 0, 'a killed holder released the lock at once; no orphaned lock blocks the next dispatch');
-});
 
-test('executeExecutorCli refuses a cwd that does not exist with a plain DispatchError, before any lock or spawn', async () => {
+test('an unsupervised writer with a missing cwd receives custody refusal context before spawn', async () => {
   const { repoRoot } = mkTempGitRepo();
   cliExecutorFixture(repoRoot, writeEchoExecutor(mkTempDir()));
   const missing = path.join(repoRoot, 'gone-worktree');
   await assert.rejects(
-    () => executeExecutorCli('cli-executor', { repoRoot, cwd: missing, prompt: 'test' }),
-    (err) => err instanceof DispatchError && err.errorClass === 'worker-spawn-fail' && err.message.includes('does not exist'),
+    () => executeExecutorCli('cli-executor', {  repoRoot, cwd: missing, prompt: 'test' }),
+    (err) => err instanceof DispatchError && err.errorClass === 'custody-domain-required' && err.cwd === missing && err.executorId === 'cli-executor' && typeof err.capability === 'string',
   );
 });
 
@@ -3714,33 +3581,6 @@ function writeSleepExecutor(dir, ms) {
   return scriptPath;
 }
 
-test('executeExecutorCli holds the cwd lock while it runs: the same directory through a symlink is refused, a sharedCwd dispatch is not, and the lock is free when the run returns', async () => {
-  if (process.platform === 'win32') return;
-  const { repoRoot, fgosDir } = mkTempGitRepo();
-  cliExecutorFixture(repoRoot, writeSleepExecutor(mkTempDir(), 1500), 4000);
-  const link = path.join(mkTempDir(), 'repo-link');
-  fs.symlinkSync(repoRoot, link);
-
-  const runPromise = executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'x' });
-  const deadline = Date.now() + 5000;
-  while (!dispatchCwdHolder(fgosDir, repoRoot)) {
-    assert.ok(Date.now() < deadline, 'the dispatch never took its cwd lock');
-    await new Promise((r) => setTimeout(r, 15));
-  }
-  await assert.rejects(
-    () => executeExecutorCli('cli-executor', { repoRoot, cwd: link, prompt: 'y' }),
-    (err) => err instanceof DispatchError && err.errorClass === 'dispatch-in-flight' && err.holderPid === process.pid,
-    'one directory reached through a symlink is the same lock',
-  );
-  // Started while the first run still holds the lock, and finishes after it: never refused.
-  const [shared, result] = await Promise.all([
-    executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'z', sharedCwd: true }),
-    runPromise,
-  ]);
-  assert.equal(shared.status, 0, 'a sharedCwd dispatch never takes nor waits for the cwd lock');
-  assert.equal(result.status, 0);
-  assert.equal(dispatchCwdHolder(fgosDir, repoRoot), null, 'the lock is released once the dispatch completes');
-});
 
 
 // --- executors.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
@@ -4298,7 +4138,7 @@ test('executeExecutorCli resolves a purpose-named executorId via capabilities.<n
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'do the thing' });
+  const result = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'do the thing' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   const payload = JSON.parse(result.stdout);
@@ -4315,7 +4155,7 @@ test('executeExecutorCli rejects retired capability overrides before spawning', 
     timeoutMs: 5000,
   });
   await assert.rejects(
-    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' }),
+    executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p' }),
     (err) => err instanceof RunnerConfigError && /overrides was removed/.test(err.message),
   );
 });
@@ -4334,19 +4174,19 @@ test('executeExecutorCli now enforces options.disallowedProviders/disallowedExec
 
   // Blocked by provider family.
   await assert.rejects(
-    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedProviders: ['gemini'] } }),
+    executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['gemini'] } }),
     (err) => err instanceof RunnerConfigError && /governance gate rejected provider "gemini"/.test(err.message),
   );
 
   // Blocked by executor id, independently.
   await assert.rejects(
-    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedExecutors: ['agy'] } }),
+    executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedExecutors: ['agy'] } }),
     (err) => err instanceof RunnerConfigError && /governance gate rejected executor "agy"/.test(err.message),
   );
 
   // A disallow list that names neither this provider nor this executor
   // does not block -- the same dispatch still succeeds.
-  const allowed = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedProviders: ['some-other-provider'] } });
+  const allowed = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['some-other-provider'] } });
   assert.equal(allowed.status, 0);
 });
 
@@ -4361,7 +4201,7 @@ test('executeExecutorCli honors an explicit caller model with a capability rigor
     modelPolicies: { claude: { standard: 'sonnet', flagship: 'opus' }, node: { standard: 'sonnet', flagship: 'opus' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
+  const result = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
   assert.equal(result.model, 'caller-explicit-model');
 });
 
@@ -4642,7 +4482,7 @@ test('decide --work: an item with a malformed legacy rigor still resolves its ex
 test('dispatch doors refuse a Work item instead of ignoring it', async () => {
   assert.throws(() => compileDispatchPlan({}, { work: 'tsk-x', workItem: { id: 'tsk-x' } }), /compileDispatchPlan\(\) takes no Work item/);
   await assert.rejects(() => decideExecutorCli(undefined, { repoRoot: mkTempDir(), work: 'tsk-x' }), /decideExecutorCli\(\) takes no Work item \(work\)/);
-  await assert.rejects(() => executeExecutorCli('agy', { work: { id: 'tsk-x' } }), /executeExecutorCli\(\) takes no Work item/);
+  await assert.rejects(() => executeExecutorCli('agy', { sharedCwd: true, work: { id: 'tsk-x' } }), /executeExecutorCli\(\) takes no Work item/);
   await assert.rejects(() => executeAssignment({ assignmentId: 'a' }, { work: { id: 'tsk-x' } }), /executeAssignment\(\) takes no Work item/);
 });
 
@@ -4821,8 +4661,8 @@ test('executeExecutorCli resolves purpose-based (--for) to the same command a po
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, agy: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byPurpose = await executeExecutorCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
-  const byName = await executeExecutorCli('gather', { repoRoot: root, carries: 'repo-content', prompt: 'p' });
+  const byPurpose = await executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
+  const byName = await executeExecutorCli('gather', { sharedCwd: true, repoRoot: root, carries: 'repo-content', prompt: 'p' });
   assert.equal(byPurpose.executorId, 'gather');
   assert.equal(byPurpose.provider, 'agy');
   assert.equal(byPurpose.model, 'sonnet');
@@ -4840,7 +4680,7 @@ test('executeExecutorCli propagates the carries refusal for a purpose-resolved e
     timeoutMs: 5000,
   });
   await assert.rejects(
-    () => executeExecutorCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' }),
+    () => executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' }),
     RunnerConfigError,
   );
 });

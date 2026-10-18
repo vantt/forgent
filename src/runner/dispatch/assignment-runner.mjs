@@ -1385,9 +1385,6 @@ export async function executeAssignment(assignment, opts = {}) {
       : fallbackMutationForAssignment(effectiveAssignment);
   effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
 
-  if (effectiveMutation === 'mutating' && opts.forceSharedCwd === true) {
-    throw new DispatchError('custody-required', '--force-shared-cwd cannot be used with writes', {});
-  }
   validateAssignmentLegality(effectiveAssignment, opts);
 
   let templateResolution = null;
@@ -1482,6 +1479,11 @@ export async function executeAssignment(assignment, opts = {}) {
   }
 
   let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  if (effectiveMutation === 'mutating' && opts.forceSharedCwd === true) {
+    throw new DispatchError('custody-required', '--force-shared-cwd cannot be used with writes', {
+      cwd: effectiveCwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
+    });
+  }
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
@@ -2055,7 +2057,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const terminalMode = resolvedAdapter === 'herdr-spawn';
   const supervised = resolvedAdapter === 'cli-spawn' || terminalMode;
   if (effectiveMutation === 'mutating' && !supervised) {
-    throw new DispatchError('custody-domain-required', 'a mutating producer requires a supervised declared process domain', { adapter: resolvedAdapter });
+    throw new DispatchError('custody-domain-required', 'a mutating producer requires a supervised declared process domain', { adapter: resolvedAdapter, cwd: effectiveCwd, executorId, capability: compiledPlan.capability });
   }
   // A supervised dispatch is an Assignment-owned recoverable one: a resume finds the same launchCommandId
   // identity a first attempt admitted, and the receipt lands under the same runDir.
@@ -2128,6 +2130,7 @@ export async function executeAssignment(assignment, opts = {}) {
     const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
     if (supervised) {
       attemptLocks = acquireAttemptLocks({
+        executorId, capability: compiledPlan.capability,
         fgosDir,
         assignmentDir,
         attemptStr,

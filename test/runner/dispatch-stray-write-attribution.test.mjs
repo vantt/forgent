@@ -11,7 +11,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
@@ -37,8 +36,15 @@ const [prompt = ''] = process.argv.slice(2);
 fs.writeFileSync('worker-ready', '');
 const deadline = Date.now() + 15000;
 while (!fs.existsSync('worker-go') && Date.now() < deadline) await new Promise((r) => setTimeout(r, 25));
-if (prompt.startsWith('stray:')) {
-  fs.writeFileSync(prompt.slice('stray:'.length), 'export const misplaced = 1;\\n');
+if (fs.existsSync('worker-action')) {
+  const action = fs.readFileSync('worker-action', 'utf8');
+  if (action === 'delete') fs.unlinkSync('plan.md');
+  if (action === 'commit') {
+    execFileSync('git', ['add', 'plan.md']);
+    execFileSync('git', ['commit', '-q', '-m', 'save plan']);
+  }
+} else if (fs.existsSync('stray-target')) {
+  fs.writeFileSync(fs.readFileSync('stray-target', 'utf8'), 'export const misplaced = 1;\\n');
 } else {
   fs.mkdirSync('docs', { recursive: true });
   fs.writeFileSync('docs/note.md', '# written in my workspace\\n');
@@ -56,14 +62,15 @@ function fixture() {
   execFileSync('git', ['init', '-q'], { cwd: root });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
-  fs.writeFileSync(path.join(root, '.gitignore'), ['worker-ready', 'worker-go', '.fgos/', ''].join('\n'));
+  fs.writeFileSync(path.join(root, '.gitignore'), ['worker-ready', 'worker-go', 'worker-action', 'stray-target', '.fgos/', ''].join('\n'));
   execFileSync('git', ['add', '.gitignore'], { cwd: root });
   execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: root });
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'lane', worktree], { cwd: root });
   const script = path.join(base, 'worker.mjs');
   fs.writeFileSync(script, WORKER_SCRIPT);
   const runner = {
-    modelPolicies: { fake: { standard: 'fake-standard' } },
+    executor: { command: process.execPath, args: [script, '{prompt}'], allowCrossProvider: true },
+    modelPolicies: { fake: { standard: 'fake-standard' }, claude: { standard: 'fake-standard' } },
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 20000,
     executors: {
@@ -80,7 +87,7 @@ function fixture() {
   };
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
-  return { base, root, worktree };
+  return { base, root, worktree, runner };
 }
 
 async function waitFor(file) {
@@ -95,17 +102,17 @@ const head = (dir) => execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, enc
 const skip = process.platform === 'win32' && 'git worktree + POSIX paths fixture';
 
 test('a file another session writes into the main checkout during a round is not blamed on the round', { skip }, async () => {
-  const { base, root, worktree } = fixture();
+  const { base, root, worktree, runner } = fixture();
   try {
     const headBefore = head(worktree);
-    const round = executeExecutorCli('fake', { for: 'execute', prompt: 'commit', cwd: worktree, repoRoot: root });
+    const round = executeAssignment(buildAssignment({ workId: 'tsk-stray-own', stage: 'executing', operation: 'implement-item' }), { runnerConfig: runner, prompt: 'commit', cwd: worktree, repoRoot: root });
     await waitFor(path.join(worktree, 'worker-ready'));
     // Another session, not the executor, writes a report into the main checkout.
     fs.mkdirSync(path.join(root, 'plans', 'other', 'reports'), { recursive: true });
     fs.writeFileSync(path.join(root, 'plans', 'other', 'reports', 'code-review.md'), '# someone else\n');
     fs.writeFileSync(path.join(worktree, 'worker-go'), '');
     const result = await round;
-    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.classification.execution.status, 'completed');
     assert.notEqual(head(worktree), headBefore, 'the worker committed its own work');
     assert.deepEqual(result.warnings, [{
       code: 'stray-write-correlated',
@@ -123,14 +130,15 @@ test('a worker that writes into the main checkout instead of its workspace is fl
   // The incident the old refusal was built for (a worker handed a worktree
   // wrote into the main checkout) is still named in the result; with snapshot
   // evidence alone it is a warning, the accepted residual risk.
-  const { base, root, worktree } = fixture();
+  const { base, root, worktree, runner } = fixture();
   try {
     const stray = path.join(root, 'misplaced.mjs');
-    const round = executeExecutorCli('fake', { for: 'execute', prompt: `stray:${stray}`, cwd: worktree, repoRoot: root });
+    fs.writeFileSync(path.join(worktree, 'stray-target'), stray);
+    const round = executeAssignment(buildAssignment({ workId: 'tsk-stray-main', stage: 'executing', operation: 'implement-item' }), { runnerConfig: runner, prompt: `stray:${stray}`, cwd: worktree, repoRoot: root });
     await waitFor(path.join(worktree, 'worker-ready'));
     fs.writeFileSync(path.join(worktree, 'worker-go'), '');
     const result = await round;
-    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.classification.execution.status, 'completed');
     assert.deepEqual(result.warnings?.map((w) => [w.code, w.paths]), [['stray-write-correlated', ['misplaced.mjs']]]);
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
@@ -231,7 +239,7 @@ process.stdout.write('reviewed\\n');
 // reach the settled result. Work does not stop on it alone: the round's own
 // checkout, holding what Work would advance on, is unchanged.
 test('a read-only Assignment round that writes into the main checkout carries the warning in its settled result', { skip }, async () => {
-  const { base, root, worktree } = fixture();
+  const { base, root, worktree, runner } = fixture();
   const harness = path.join(base, 'harness');
   fs.mkdirSync(harness);
   try {
@@ -273,3 +281,23 @@ process.stdout.write('reviewed\\n');
     fs.rmSync(base, { recursive: true, force: true });
   }
 });
+
+
+for (const action of ['delete', 'keep', 'commit']) {
+  test(`supervised Assignment records pre-existing dirty-file evidence when the producer chooses ${action}`, { skip }, async () => {
+    const { base, root, worktree, runner } = fixture();
+    try {
+      fs.writeFileSync(path.join(worktree, 'plan.md'), 'uncommitted plan edit\n');
+      fs.writeFileSync(path.join(worktree, 'worker-action'), action);
+      fs.writeFileSync(path.join(worktree, 'worker-go'), '');
+      const assignment = buildAssignment({ workId: `tsk-dirty-${action}`, stage: 'executing', operation: 'implement-item' });
+      const result = await executeAssignment(assignment, { runnerConfig: runner, cwd: worktree, repoRoot: root });
+      assert.equal(result.classification.execution.status, 'completed');
+      assert.deepEqual((result.warnings ?? []).filter((w) => w.code === 'uncommitted-paths-lost'), action === 'delete' ? [{ code: 'uncommitted-paths-lost', paths: ['plan.md'] }] : []);
+      assert.equal(fs.existsSync(path.join(worktree, 'plan.md')), action !== 'delete');
+      if (action !== 'delete') assert.equal(fs.readFileSync(path.join(worktree, 'plan.md'), 'utf8'), 'uncommitted plan edit\n');
+      const stored = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'result.json'), 'utf8'));
+      assert.deepEqual(stored.warnings, result.warnings);
+    } finally { fs.rmSync(base, { recursive: true, force: true }); }
+  });
+}

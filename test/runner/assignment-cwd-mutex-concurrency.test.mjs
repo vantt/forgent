@@ -157,7 +157,13 @@ test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd i
     // A mutating caller cannot opt out of custody, even while another writer runs.
     await assert.rejects(
       () => executeAssignment(assignmentC, { cwd: tempDir, repoRoot: tempDir, runnerConfig, forceSharedCwd: true }),
-      { code: 'custody-required' },
+      (err) => {
+        assert.equal(err.code, 'custody-required');
+        assert.equal(err.cwd, tempDir);
+        assert.equal(typeof err.executorId, 'string');
+        assert.equal(typeof err.capability, 'string');
+        return true;
+      },
     );
     assert.equal(fs.existsSync(markerC), false, 'refusal starts no producer');
     const raceTimeout = Symbol('pending');

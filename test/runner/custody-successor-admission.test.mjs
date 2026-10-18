@@ -126,6 +126,23 @@ test('an unsupervised mutating executor is refused before its process starts', {
     modelPolicies: { fake: { standard: 'fake-standard' } },
     rigorToTier: { standard: 'standard' }, timeoutMs: 5000,
   };
-  await assert.rejects(() => executeExecutorCli('fake', { cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), { code: 'custody-domain-required' });
+  await assert.rejects(() => executeExecutorCli('fake', { cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
+    assert.equal(err.code, 'custody-domain-required');
+    assert.equal(err.cwd, f.cwd);
+    assert.equal(err.executorId, 'fake');
+    assert.equal(err.capability, 'execute');
+    return true;
+  });
   assert.equal(fs.existsSync(marker), false);
+});
+
+test('an invalid handed custody lease reports the attempted producer context', { skip }, (t) => {
+  const f = fixture(t);
+  assert.throws(() => acquireAttemptLocks({ ...f, assignmentDir: path.join(f.cwd, 'assignment'), attemptStr: '01', mutating: true,
+    custody: { released: true }, executorId: 'fake', capability: 'execute',
+  }), (err) => {
+    assert.equal(err.code, 'custody-required');
+    assert.deepEqual(err.data, { cwd: f.cwd, executorId: 'fake', capability: 'execute' });
+    return true;
+  });
 });

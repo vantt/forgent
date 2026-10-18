@@ -2,6 +2,7 @@
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
 
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -493,7 +494,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           const depStep = workflow.steps.find((s) => s.id === depId);
           if (depStep?.units) {
             for (const u of depStep.units) {
-              const uBranch = `wf/${workflowRunId}/${u.id}`;
+              const uBranch = state.steps[depId]?.units[u.id]?.branch ?? `wf/${workflowRunId}/${u.id}`;
               try {
                 mergeWorkflowBranch({
                   repoRoot: mainRoot,
@@ -552,7 +553,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // continue that run (settled seats are kept) and reuse the worktree it already has.
           // Only when what it needs is still there: after a reboot or a temp-dir cleanup the run's
           // worktree is gone and resuming would fail for good, where a fresh run can still work.
-          const resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
+          let resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
           let startedUnitRunId = null;
 
           // If unit has writes, prepare worktree
@@ -569,6 +570,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             unitWorktree = uState.worktreePath ?? worktreePath;
             uBranch = uState.branch ?? null;
             baseSha = uState.baseSha ?? null;
+            baseRef = uState.baseRef ?? null;
           } else if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
             // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
@@ -611,7 +613,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           let unitRunResult;
           try {
             if (prepError) throw new RunnerConfigError(prepError);
-            unitRunResult = await runUnit({
+            const runOptions = {
               unitData,
               repoRoot: mainRoot,
               cwd: unitWorktree,
@@ -659,7 +661,38 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                   });
                 },
               }),
-            });
+            };
+            try {
+              unitRunResult = await runUnit(runOptions);
+            } catch (err) {
+              if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
+              // Preserve the unknown predecessor's checkout and branch. Start from the trusted
+              // base, never from commits an unproven predecessor may still be changing.
+              const preservedWorktree = unitWorktree;
+              const preservedBranch = uBranch;
+              baseRef ??= base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
+              baseSha ??= baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+              if (!baseSha) throw err;
+              uBranch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
+              unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
+              ownsWorktree = true;
+              resumeUnitRunId = null;
+              startedUnitRunId = null;
+              recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
+                type: 'unit.scheduled', payload: { stepId: step.id, unitId: u.id,
+                  worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha,
+                  recovery: { reason: err.errorClass, preservedWorktree, preservedBranch } },
+              } });
+              unitRunResult = await runUnit({ ...runOptions, cwd: unitWorktree, worktree: unitWorktree,
+                resumeUnitRunId: undefined,
+                onUnitRunCreated: (unitRunId) => {
+                  startedUnitRunId = unitRunId;
+                  recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
+                    type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId },
+                  } });
+                },
+              });
+            }
           } catch (err) {
             unitRunResult = {
               unitRunId: resumeUnitRunId ?? startedUnitRunId,

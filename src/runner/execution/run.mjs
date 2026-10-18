@@ -583,7 +583,7 @@ async function runUnitBody(options, scope) {
   }
 
   if (unit.writes.length > 0 || unitRecord.sync) {
-    if (options.forceSharedCwd === true) throw new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' });
+    if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: unitRecord.worktree, executorId: null, capability: unit.capability });
     scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
   }
 
@@ -850,7 +850,7 @@ async function runUnitBody(options, scope) {
     }
 
     if (bound.mechanism === 'inline') {
-      if (!readOnly) return { outcome: 'policy-refusal', role, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain' } };
+      if (!readOnly) return { outcome: 'policy-refusal', role, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain', cwd: unitRecord.worktree, executorId: bound.executor, capability: unit.capability } };
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
       }
