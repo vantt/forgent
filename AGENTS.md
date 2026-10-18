@@ -148,6 +148,19 @@ hình dễ, không chắp vá.
 
 khong phai no nang ma no tum lum
 
+## RUL104 — tốt hơn, không to hơn (D-ADR0061, docs/specs/platform-foundations.md)
+
+Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang
+có tốt hơn: ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn; API,
+signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển hơn —
+trong phạm vi code đang có. Không làm nó to ra: không thêm tính năng, lớp
+hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ
+trong cùng đợt (L10). Một tính năng chỉ được thêm khi thật sự đáng: gom mọi
+ý tưởng thêm vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật,
+bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn.
+
+tốt hơn, không to hơn
+
 ## Dispatch — routing work to an executor
 
 `fgos run` is the primary door for executing new work in the execution core.
