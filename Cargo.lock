@@ -160,6 +160,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-durable-file"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "windows-sys",
+]
+
+[[package]]
 name = "fgos-event-store"
 version = "0.2.0"
 dependencies = [
