@@ -382,3 +382,36 @@ test('fgos run --sync <ref> without a prompt makes a sync-only unit; with --unit
   assert.equal(record.sync.status, 'up-to-date');
   assert.equal(record.settlement.outcome, 'pass');
 });
+
+test('fgos run "<prompt>" turns --input and --verify into the unit\'s inputs and verify', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Check the readme', '--capability', 'docs:write', '--input', 'README.md', '--verify', 'node -e "process.exit(0)"', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const { unit } = unitRecordOf(tmp, stdout);
+  assert.deepEqual(unit.inputs, ['README.md']);
+  assert.equal(unit.verify, 'node -e "process.exit(0)"');
+});
+
+test('fgos run "<prompt>" without --input or --verify leaves both off the unit', () => {
+  const tmp = setupTestRepo();
+  const { unit } = unitRecordOf(tmp, runCli(['Check the readme', '--capability', 'docs:write', '--dir', tmp], tmp));
+  assert.deepEqual(unit.inputs, []);
+  assert.equal(unit.verify, undefined);
+});
+
+test('fgos run refuses an empty --input or --verify, and either one beside --unit, before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--input', '--dir', tmp], tmp), /--input needs at least one repo-relative path/);
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--verify', '--dir', tmp], tmp), /--verify requires a command/);
+  const unitFile = path.join(tmp, 'my-unit.yaml');
+  fs.writeFileSync(unitFile, 'id: u-flags\nobjective: Test\ncapability: docs:write\nwrites: []\n');
+  assert.match(failCli(['--unit', unitFile, '--verify', 'npm test', '--dir', tmp], tmp), /--verify only applies to fgos run "<prompt>"/);
+  assert.match(failCli(['--unit', unitFile, '--input', 'README.md', '--dir', tmp], tmp), /--input only applies to fgos run "<prompt>"/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run help names --input and --verify', () => {
+  const out = execFileSync(process.execPath, [BIN_FGOS, 'run', '--help'], { encoding: 'utf8' });
+  assert.ok(out.includes('--input'), out);
+  assert.ok(out.includes('--verify'), out);
+});

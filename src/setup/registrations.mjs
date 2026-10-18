@@ -2419,6 +2419,13 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     confinement: { mode: 'unconfined' },
     serves: { outputKind: 'finding', mutates: false },
   },
+  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`
+  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.
+  'docs:write': {
+    description:
+      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a "prefer" pool to choose which executors serve it.',
+    serves: { outputKind: 'change', domain: 'docs', mutates: true },
+  },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',

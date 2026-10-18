@@ -7,7 +7,7 @@ test('PRESETS contains standard named presets with immutable shapes', () => {
   assert.ok(PRESETS['code-change'], 'code-change preset exists');
   assert.equal(PRESETS['code-change'].pattern, 'reviewed');
   assert.deepEqual(PRESETS['code-change'].params.minCheckers, ['reviewer', 'red-team']);
-  assert.equal(PRESETS['code-change'].params.verify, 'npm test');
+  assert.equal('verify' in PRESETS['code-change'].params, false, 'a preset pins no verify command: it comes from the unit');
 
   assert.ok(PRESETS['consult'], 'consult preset exists');
   assert.equal(PRESETS['consult'].pattern, 'solo');
@@ -36,7 +36,7 @@ test('resolvePattern resolves preset names to patternName and params', () => {
   const resolvedCodeChange = resolvePattern('code-change');
   assert.equal(resolvedCodeChange.patternName, 'reviewed');
   assert.deepEqual(resolvedCodeChange.params.minCheckers, ['reviewer', 'red-team']);
-  assert.equal(resolvedCodeChange.params.verify, 'npm test');
+  assert.equal(resolvedCodeChange.params.verify, undefined);
 
   const resolvedConsult = resolvePattern('consult');
   assert.equal(resolvedConsult.patternName, 'solo');

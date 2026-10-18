@@ -294,6 +294,18 @@ test('Phase C: supports.systemPrompt must be a boolean, not a truthy string', ()
   );
 });
 
+test('supports.skills is a non-empty array of skill names, kept as declared', () => {
+  const cfg = loadWith({ command: 'claude', args: ['{prompt}'], supports: { skills: ['docs-seeker', 'mermaid'] } });
+  assert.deepEqual(cfg.executors.sample.supports.skills, ['docs-seeker', 'mermaid']);
+  for (const skills of [[], ['docs-seeker', ''], 'docs-seeker', [3]]) {
+    assert.throws(
+      () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { skills } }),
+      (err) => err instanceof RunnerConfigError && /supports"\) "skills"|"skills"/.test(err.message),
+      `skills=${JSON.stringify(skills)}`,
+    );
+  }
+});
+
 test('Phase C: supports.toolGating must be a non-empty string', () => {
   assert.throws(
     () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { toolGating: '' } }),
