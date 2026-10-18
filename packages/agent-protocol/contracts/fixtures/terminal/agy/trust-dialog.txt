@@ -1,0 +1,13 @@
+Accessing workspace:
+
+/tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/agy
+
+Do you trust the contents of this project?
+
+Antigravity CLI requires permission to read, edit, and execute files here.
+
+> Yes, I trust this folder
+  No, exit
+
+  ↑/↓ Navigate · enter Confirm
+                                                                                                                                                                                                                                                                                                                                      Gemini 3.8 Flash · medium

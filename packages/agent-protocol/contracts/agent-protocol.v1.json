@@ -5,7 +5,10 @@
     "description": "Port the supervisor wires to the adapter: a capture file tail (direct) or terminal-control by key (terminal, 6.3).",
     "send": { "input": { "text": "string or null", "keys": "string[] or null", "submit": "boolean" }, "modes": ["terminal"] },
     "read": { "output": { "lines": "string[], new lines since the previous read (stdout capture in direct mode, screen in terminal mode)" } },
-    "activity": { "output": "monotonic counter or absent; increments on anything the idle timer counts as activity" }
+    "activity": { "output": "monotonic counter or absent; increments on anything the idle timer counts as activity" },
+    "screen": { "output": "string, the whole visible screen right now", "modes": ["terminal"] },
+    "inspect": { "output": { "state": "string or null (idle, working, blocked, done)", "visibleBlocker": "boolean", "visibleIdle": "boolean", "visibleWorking": "boolean", "matchedRule": "boolean, a screen rule vouched for the verdict", "promptText": "string, the composer text the rule saw" }, "modes": ["terminal"], "meaning": "the multiplexer's own agent detection for the pane (terminal-control inspect with detail); never a guess of the supervisor" },
+    "clock": { "output": "now_ms (monotonic) and pause(ms); every wait of an adapter goes through them so a vector can run on a virtual clock" }
   },
   "results": {
     "ready": "terminal: the CLI shows an empty prompt and can take the brief",
@@ -37,5 +40,5 @@
     },
     "unknownCli": "direct: an unknown CLI gets the generic adapter (exit and outbox only, no output patterns); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
   },
-  "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct cells exist; terminal cells arrive with 6.3)"
+  "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct and terminal cells exist; terminal vectors replay recorded screens on a virtual clock)"
 }
