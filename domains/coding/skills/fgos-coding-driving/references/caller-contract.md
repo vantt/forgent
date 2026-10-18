@@ -4,14 +4,14 @@
 
 | Caller | `id` source | `ceiling` |
 |---|---|---|
-| `/fgOS:cook` | freshly submitted item, or a child this loop's own anchor report just surfaced | none (safe: `awaiting-approval`/anchor/no-progress are implicit stops) |
+| `/fgOS:deliver` | freshly submitted item, or a child this loop's own anchor report just surfaced | none (safe: `awaiting-approval`/anchor/no-progress are implicit stops) |
 | `/fgOS:pick` | one explicitly claimed item | none (same implicit stops) |
 | a discovery/exploring-only sweep | the discover pool the discover-next launcher picks from | `stage:planning` |
 | a planning-only sweep | the planning-step frontier (the `planning` stage; the legacy `decompose` alias drains through the same pool) | `stage:executing` |
 | an execution-only sweep | the execute-step frontier (today's existing frontier default, unchanged) | none needed (`awaiting-approval` is now implicit — an explicit `status:awaiting-approval` ceiling still works identically) |
 
 This table is descriptive, not a retrofit checklist this skill performs —
-`cook`/`pick` calling this skill instead of their own inline stage-dispatch
+`deliver`/`pick` calling this skill instead of their own inline stage-dispatch
 prose is a separate, already-completed step; see each launcher's own
 SKILL.md for how it actually calls this skill today.
 
@@ -49,10 +49,10 @@ them run concurrently instead of one at a time, the contract is:
 
 The caller table above lists five readers of this same anchor report.
 `/fgOS:pick` and the three pool sweeps carry the contract's default
-behavior (drive each child sequentially, no fan-out); `/fgOS:cook` also
+behavior (drive each child sequentially, no fan-out); `/fgOS:deliver` also
 inherits it unchanged today — it pushes each open child to the front of
 its own queue rather than fanning out concurrently, a deliberate choice
-recorded when an earlier fan-out wiring for `cook` was reverted. If a
+recorded when an earlier fan-out wiring for `deliver` was reverted. If a
 later session finds one of these "unchanged" rows is a real gap rather
 than legitimate scope, that is new evidence for a follow-up item, not a
 silent omission.

@@ -1483,7 +1483,7 @@ Canonical detailed artifacts:
 
 **Workflow và CollaborationPattern (mô hình gọn per P4).** Một Unit run có thể
 agent-led hoặc declared qua Workflow / CollaborationPattern (`solo`, `reviewed`, `panel` + preset).
-Workflow dùng DAG steps + tích hợp vòng đời Work, CollaborationPattern dùng trong Unit run.
+Workflow là DAG các Unit và không biết Work: Work chỉ là bên dùng (một item mang `workflowRunId` trỏ tới run; Workflow không đọc và không ghi vòng đời Work), CollaborationPattern dùng trong Unit run. Hai cửa vào là `fgos run` và `fgos workflow start`.
 Workflow runner (`src/workflow/runner.mjs`) nạp định nghĩa từ `core/workflows/*.yaml` và `domains/<d>/workflows/*.yaml`.
 
 **Architecture advisory — current boundary.** `core/skills/fgos-architecture-panel/SKILL.md` starts registered Workflows, reads settled reports, and exposes public `workflow status`/`workflow answer` commands for the owner's declared gate; it owns no raw run-state driver or executor roster. `architecture-advisory` has five linear execution steps plus human close, with distinct panel-seat lenses and reviewed/high final synthesis; `architecture-advisory-reopen` revisits parent reports through synthesis → explanation → close without blind seats. Both synthesis templates require reviewer and red-team regardless of configured high-rigor checker defaults. Executor/provider/model/invocation selection remains config + `bind()` owned. Required read-only posture refuses unsafe execution.
