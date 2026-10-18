@@ -99,7 +99,7 @@ export function listController(runDir) {
  * One reading of a run: whether it is still going, where its worker is, and
  * what it has written.
  *
- * `visibility` may legitimately be null -- a `cli-spawn` dispatch never had a
+ * `visibility` may legitimately be null -- a dispatch of the cli adapter never had a
  * pane to record. A corrupt visibility file degrades to a stated error rather
  * than taking the whole reading down, because the point of an observe door is
  * to keep answering while things are going wrong.
