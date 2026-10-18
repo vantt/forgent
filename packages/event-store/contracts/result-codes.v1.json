@@ -24,6 +24,8 @@
     "catch-up-required",
     "lock-order-violation",
     "event-store-machine-id",
-    "event-store-io"
+    "event-store-io",
+    "event-store-lock-dir-invalid",
+    "event-store-lock-timeout"
   ]
 }

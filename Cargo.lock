@@ -173,6 +173,8 @@ version = "0.2.0"
 dependencies = [
  "fgos-canonical-json",
  "fgos-distribution",
+ "fgos-durable-file",
+ "fgos-holder-lock",
  "serde",
  "serde_json",
  "sha2",

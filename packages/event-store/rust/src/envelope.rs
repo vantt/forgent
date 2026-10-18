@@ -108,7 +108,7 @@ impl Envelope {
 fn scope_matches(scope: Scope, stream: &str) -> bool {
     crate::layout::StreamId::parse(stream).is_ok_and(|id| id.scope() == scope)
 }
-fn valid_seen_key(key: &str) -> bool {
+pub(crate) fn valid_seen_key(key: &str) -> bool {
     key.split_once(':').is_some_and(|(origin, stream)| {
         valid_store_id(origin) && crate::layout::StreamId::parse(stream).is_ok()
     })

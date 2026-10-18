@@ -8,8 +8,8 @@ use crate::{
 use crate::{errors::io, validation::valid_store_id};
 use serde::{Deserialize, Serialize};
 use std::{
-    fs::{self, File, OpenOptions},
-    io::{Read, Write},
+    fs::{self, File},
+    io::Read,
     path::Path,
 };
 fn moved(detail: impl Into<String>) -> Error {
@@ -97,7 +97,18 @@ impl StoreIdentity {
         for entry in entries {
             let entry = entry.map_err(io)?;
             let name = entry.file_name();
-            if name
+            if name.to_str().is_some_and(|n| {
+                n.strip_prefix(".durable-file-")
+                    .and_then(|n| n.strip_suffix(".tmp"))
+                    .is_some_and(|n| {
+                        n.split_once('-').is_some_and(|(pid, seq)| {
+                            !pid.is_empty()
+                                && !seq.is_empty()
+                                && pid.bytes().all(|b| b.is_ascii_digit())
+                                && seq.bytes().all(|b| b.is_ascii_digit())
+                        })
+                    })
+            }) || name
                 .to_str()
                 .and_then(|n| n.strip_prefix("store."))
                 .and_then(|n| n.strip_suffix(".tmp"))
@@ -161,32 +172,8 @@ impl StoreIdentity {
         for parent in [layout.root.parent().unwrap(), layout.common_dir.as_path()] {
             File::open(parent).and_then(|f| f.sync_all()).map_err(io)?;
         }
-        let tmp = layout.root.join(format!("store.{}.tmp", identity.store_id));
-        let write = || -> Result<(), Error> {
-            let mut file = OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&tmp)
-                .map_err(io)?;
-            file.write_all(&line(&identity)?)
-                .and_then(|_| file.sync_all())
-                .map_err(io)?;
-            match fs::hard_link(&tmp, layout.store()) {
-                Ok(()) => (),
-                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => (),
-                Err(e) => return Err(io(e)),
-            }
-            fs::remove_file(&tmp).map_err(io)?;
-            File::open(&layout.root)
-                .and_then(|f| f.sync_all())
-                .map_err(io)?;
-            Ok(())
-        };
-        let result = write();
-        if result.is_err() {
-            let _ = fs::remove_file(tmp);
-        }
-        result?;
+        fgos_durable_file::install_once(&layout.root, "store.json", &line(&identity)?)
+            .map_err(|e| io(e.source))?;
         Self::open(layout, machine)
     }
 }

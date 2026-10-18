@@ -6,3 +6,9 @@ pub mod layout;
 pub mod legacy;
 pub mod registry;
 pub mod validation;
+
+pub mod append;
+pub mod fsio;
+pub mod locks;
+pub mod open_read;
+pub mod rotate;
