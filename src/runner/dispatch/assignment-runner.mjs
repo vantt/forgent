@@ -1270,6 +1270,19 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
   });
 }
 
+/**
+ * An extensible copy of a settled result that keeps its accessors (`status`, `confidence`) and
+ * non-enumerable links (`runResult`), which an object spread would drop.
+ */
+function unfrozenCopy(result) {
+  const descriptors = Object.getOwnPropertyDescriptors(result);
+  for (const descriptor of Object.values(descriptors)) {
+    descriptor.configurable = true;
+    if ('value' in descriptor) descriptor.writable = true;
+  }
+  return Object.create(Object.getPrototypeOf(result), descriptors);
+}
+
 export async function executeAssignment(assignment, opts = {}) {
   refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
@@ -2479,7 +2492,7 @@ export async function executeAssignment(assignment, opts = {}) {
           const early = readSettledResult(attemptRunDir, runId);
           if (early) {
             attemptSettled = true;
-            handedOffResult = { ...early };
+            handedOffResult = unfrozenCopy(early);
             return handedOffResult;
           }
         }
@@ -2525,7 +2538,7 @@ export async function executeAssignment(assignment, opts = {}) {
         );
       }
       attemptSettled = true;
-      handedOffResult = { ...settledResult };
+      handedOffResult = unfrozenCopy(settledResult);
       return handedOffResult;
     } else {
       // Legacy/non-supervisor adapters retain the existing pre-spawn write

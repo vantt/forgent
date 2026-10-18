@@ -90,6 +90,6 @@ export function recordCustodyHandoff(custody, result) {
   try { custody?.clearDomain(); }
   catch (error) {
     const warning = { code: 'custody-handoff-not-recorded', detail: error.message };
-    result.warnings = [...(result.warnings ?? []), warning];
+    Object.defineProperty(result, 'warnings', { value: [...(result.warnings ?? []), warning], writable: true, enumerable: true, configurable: true });
   }
 }
