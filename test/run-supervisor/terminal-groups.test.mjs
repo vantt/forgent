@@ -248,3 +248,13 @@ test('an agy trust entry a seat wrote is removed by the step; one the person alr
     assert.deepEqual(trustedWorkspaces(), [dir, work].sort(), 'an entry it did not write is not removed');
   } finally { fake.cleanup(); }
 });
+
+test('the brief a reviewer reads says its claim needs assessment.verdict; the producer\'s does not', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}, {}] });
+  try {
+    await seat({ dir, fake, name: 'producer', groupKey: 'g-roles', effectiveContract: { mutation: 'mutating', assignment: { role: 'producer', operation: 'implement-item' } } });
+    await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
+    assert.match(fs.readFileSync(path.join(dir, 'run-reviewer', 'brief-1.md'), 'utf8'), /"assessment\.verdict" is required for this assessment role/);
+    assert.doesNotMatch(fs.readFileSync(path.join(dir, 'run-producer', 'brief-1.md'), 'utf8'), /assessment\.verdict/);
+  } finally { fake.cleanup(); }
+});

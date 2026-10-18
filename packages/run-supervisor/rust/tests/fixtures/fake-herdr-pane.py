@@ -12,6 +12,7 @@ files in $FAKE_HERDR_DIR that a test edits while it runs:
   no-process     when present, `pane process-info` reports only the pane's shell
   calls.log      every call, arguments joined by a tab (written here)
   sent.jsonl     what was typed at the pane: text, keys, prompt (written here)
+  typescript.log everything the pane's command printed (written by `script`)
 """
 import json
 import os
@@ -101,7 +102,7 @@ if (group, action) == ("pane", "get"):
 if (group, action) == ("pane", "run"):
     line = rest[1]
     proc = subprocess.Popen(
-        ["setsid", "script", "-qefc", line, "/dev/null"],
+        ["setsid", "script", "-qefc", line, path("typescript.log")],
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,

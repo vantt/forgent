@@ -7,7 +7,8 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawn } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
@@ -44,15 +45,26 @@ function sharedEnv(project) {
     HERDR_SOCKET_PATH: project.herdrSocket,
     FGOS_STATE_ROOT: project.stateRoot,
     TERMINAL_AGENT_DIR: project.agentDir,
+    ...(project.registryPath ? { FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH: project.registryPath } : {}),
   };
 }
 
-export async function createTerminalProject({ name = 'tp' } = {}) {
+/** bwrap with a pid namespace works on this machine. */
+export function bwrapUsable() {
+  return spawnSync('/usr/bin/bwrap', ['--unshare-pid', '--as-pid-1', '--ro-bind', '/', '/', '--proc', '/proc', 'true']).status === 0;
+}
+
+/**
+ * `confined`: the repository and the agent's own files live outside /tmp (a confined agent gets a private
+ * tmpfs over /tmp), and the machine's bwrap backend registry is a file of the project's own.
+ */
+export async function createTerminalProject({ name = 'tp', confined = false } = {}) {
   // A unix socket path is limited to about a hundred characters; everything socket-ish lives under /tmp.
   const scratch = fs.mkdtempSync(path.join('/tmp', `fgos-${name}-`));
-  const repoDir = path.join(scratch, 'repo');
+  const outside = confined ? makeFixtureDir(`fgos-${name}-`) : scratch;
+  const repoDir = path.join(outside, 'repo');
   const herdrDir = path.join(scratch, 'herdr-files');
-  const agentDir = path.join(scratch, 'agent');
+  const agentDir = path.join(outside, 'agent');
   const stateRoot = path.join(scratch, 'state');
   for (const dir of [repoDir, herdrDir, agentDir, stateRoot]) fs.mkdirSync(dir, { recursive: true });
   const git = (...args) => execFileSync('git', args, { cwd: repoDir, stdio: 'ignore' });
@@ -72,18 +84,24 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
   const server = net.createServer();
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(herdrSocket, resolve); });
 
+  let registryPath = null;
+  if (confined) {
+    registryPath = path.join(scratch, 'confinement-backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap' } } }));
+  }
+
   const project = {
-    scratch, repoDir, herdrDir, agentDir, stateRoot, herdrSocket, herdrBin,
+    registryPath, scratch, repoDir, herdrDir, agentDir, stateRoot, herdrSocket, herdrBin,
     children: [],
     env() { return sharedEnv(project); },
 
     /** An executor whose agent is the fixture. `commandName` makes the CLI the agent protocol sees (codex, ...). */
-    executor({ kind = 'claude', commandName = null } = {}) {
+    executor({ kind = 'claude', commandName = null, confinement = null } = {}) {
       let command = process.execPath;
       let args = [AGENT, '{prompt}'];
       if (commandName) {
-        fs.mkdirSync(path.join(scratch, 'bin'), { recursive: true });
-        command = path.join(scratch, 'bin', commandName);
+        fs.mkdirSync(path.join(outside, 'bin'), { recursive: true });
+        command = path.join(outside, 'bin', commandName);
         fs.writeFileSync(command, `#!/bin/sh\nexec ${process.execPath} ${AGENT} "$@"\n`, { mode: 0o755 });
         args = ['{prompt}'];
       }
@@ -95,6 +113,7 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
         allowCrossProvider: true,
         env: { TERMINAL_AGENT_DIR: agentDir },
         interactiveMode: { exitCommand: '/exit', kind },
+        ...(confinement ? { confinement } : {}),
       };
     },
 
@@ -122,6 +141,49 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
       return run;
     },
 
+    /**
+     * `fgos run --unit <file>` as a real process, the door a person uses, in a project whose one executor has
+     * a confined headless invocation and a confined herdr-spawn one: with herdr present bind() picks the pane.
+     */
+    startFgosRun({ unit = {}, executorId = 'seat', herdrConfinement = { backend: 'bwrap' } } = {}) {
+      const configDir = path.join(repoDir, '.fgos');
+      fs.mkdirSync(configDir, { recursive: true });
+      const executor = project.executor({ commandName: 'claude', confinement: herdrConfinement });
+      fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
+        runner: {
+          defaultExecutor: executorId,
+          rigorToTier: { standard: 'standard' },
+          timeoutMs: 60_000,
+          executors: {
+            [executorId]: {
+              kind: 'agent',
+              allowCrossProvider: true,
+              providerModel: 'claude',
+              invocations: [
+                { id: `${executorId}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: executor.command, args: ['{prompt}'] },
+                { id: `${executorId}-herdr`, via: 'cli', adapter: 'herdr-spawn', confinement: herdrConfinement, command: executor.command, args: ['{prompt}'], env: executor.env, interactiveMode: executor.interactiveMode, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }] },
+              ],
+            },
+          },
+          modelPolicies: { claude: { standard: 'sonnet' } },
+          capabilities: { 'docs:write': { prefer: [{ executor: executorId, invocation: `${executorId}-cli` }] } },
+        },
+      }, null, 2));
+      const unitFile = path.join(repoDir, 'unit.json');
+      fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-1', objective: 'Inspect the docs', capability: 'docs:write', writes: [], ...unit }));
+      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir], {
+        cwd: repoDir,
+        env: { ...project.env(), HERDR_ENV: '1' },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (chunk) => { stdout += chunk; });
+      child.stderr.on('data', (chunk) => { stderr += chunk; });
+      project.children.push(child);
+      return { child, exited: new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal }))), output: () => ({ stdout, stderr }) };
+    },
+
     // --- the fake herdr ---------------------------------------------------------------------------
     calls() { return readLines(path.join(herdrDir, 'calls.log')).map((l) => l.replace(/\t+$/, '').replaceAll('\t', ' ')); },
     callsStarting(prefix) { return project.calls().filter((c) => c.startsWith(prefix)); },
@@ -131,8 +193,17 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
     setScreen(text) { fs.writeFileSync(path.join(herdrDir, 'screen.txt'), text); },
 
     // --- the agent --------------------------------------------------------------------------------
-    agentStarts() { return readLines(path.join(agentDir, 'agent-starts.txt')).map(Number); },
-    agentEnv() { return readJson(path.join(agentDir, 'agent-env.json')); },
+    /** What the agent wrote: next to the test's own files, or in its private home when it is confined. */
+    agentNote(name) {
+      const own = path.join(agentDir, name);
+      if (fs.existsSync(own)) return own;
+      const root = path.join(os.tmpdir(), 'fgos-confinement');
+      let homes = [];
+      try { homes = fs.readdirSync(root).map((d) => path.join(root, d, 'home', name)).filter((f) => fs.existsSync(f)); } catch { /* none */ }
+      return homes.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] ?? own;
+    },
+    agentStarts() { return readLines(project.agentNote('agent-starts.txt')).map(Number); },
+    agentEnv() { return readJson(project.agentNote('agent-env.json')); },
     letAgentExit() { fs.writeFileSync(path.join(agentDir, 'exit-now'), ''); },
 
     // --- the attempt ------------------------------------------------------------------------------

@@ -5,11 +5,11 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createTerminalProject, noHost, readJson, waitUntil } from './support/terminal-harness.mjs';
+import { bwrapUsable, createTerminalProject, noHost, readJson, waitUntil } from './support/terminal-harness.mjs';
 
 const projects = [];
 after(() => { for (const project of projects) project.stop(); });
-const newProject = async (name) => { const project = await createTerminalProject({ name }); projects.push(project); return project; };
+const newProject = async (name, options = {}) => { const project = await createTerminalProject({ name, ...options }); projects.push(project); return project; };
 
 /** Drive one attempt to its end the way a person-less CLI would: brief typed, taken, result written, agent leaves. */
 async function finishAttempt(project, run) {
@@ -44,6 +44,10 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   assert.equal(envelope.launch.briefPath, path.join(attemptDir, 'brief-1.md'));
   assert.equal(fs.readFileSync(envelope.launch.briefPath, 'utf8').trim(), brief.trim());
 
+  // A claude REPL is given the run directory as a working directory, the one place its brief lives.
+  const argv = project.agentEnv().argv;
+  assert.equal(argv[argv.indexOf('--add-dir') + 1], attemptDir);
+  assert.equal(argv.filter((arg) => arg === '--add-dir').length, 1, 'only the run directory is added');
   assert.equal(project.callsStarting('pane close').length, 1, 'exactly one pane close');
   assert.equal(project.callsStarting('tab close').length, 0, 'no tab is ever closed');
   assert.equal(readJson(path.join(attemptDir, 'steps', 'release-slot.json'))?.detail?.disposition, 'close');
@@ -80,6 +84,7 @@ test('codex gets the attempt writer id as an explicit setting of its argv, the o
   assert.equal(envelope.agentProtocol.cli, 'codex');
   const at = agent.argv.indexOf('-c');
   assert.ok(at >= 0, `argv: ${agent.argv.join(' ')}`);
+  assert.equal(agent.argv.includes('--add-dir'), false, 'only a claude REPL is given the run directory');
   assert.equal(agent.argv[at + 1], `shell_environment_policy.set={FGOS_SESSION_ID="att-${envelope.attemptId}"}`);
   assert.ok(!agent.argv.some((arg) => arg.includes('Brief')), 'the prompt is typed at the agent, never an argument');
   project.letAgentExit();
@@ -150,4 +155,37 @@ test('the brief the pane agent reads names the one result path, the outbox claim
   assert.equal(brief.includes('agent-result.json'), false, 'no second, conflicting result path');
   const contract = readJson(path.join(project.attemptDir(), 'effective-execution-contract.json'));
   assert.match(contract.resultClaim?.path ?? '', /outbox[/\\]result-1\.json/, 'the persisted contract agrees with the brief');
+});
+
+test('fgos run with herdr present runs a confined read-only unit in a pane: the gate is inside the sandbox, the socket is bound in, the agent has a pid namespace of its own', { skip: noHost || (!bwrapUsable() && 'bwrap with a pid namespace is not usable here'), timeout: 240_000 }, async () => {
+  const project = await newProject('confined', { confined: true });
+  const run = project.startFgosRun();
+  const brief = await project.waitBriefTyped();
+  project.briefTaken();
+  // The agent's notes live in its private home, which goes with the attempt: read them while it runs.
+  const agent = await waitUntil(() => project.agentEnv(), { what: 'the confined agent to start' });
+  // A read-only unit's result claim lives in the outbox; the agent plays by writing it from outside.
+  const resultPath = /(\S*outbox\/result-1\.json)/.exec(brief)?.[1];
+  assert.ok(resultPath, brief);
+  // A read-only operation is not done without its report; the claim comes last because it ends the round.
+  fs.writeFileSync(path.join(path.dirname(resultPath), 'report-1.md'), '# Report\nThe assigned work was inspected and completed with a full explanation of what was checked.\n');
+  fs.writeFileSync(`${resultPath}.tmp`, JSON.stringify({ status: 'done', summary: 'inspected', assessment: { verdict: 'pass' } }));
+  fs.renameSync(`${resultPath}.tmp`, resultPath);
+  await waitUntil(() => project.sent().some((s) => s.kind === 'prompt' && s.text === '/exit'), { what: 'the exit command' });
+  project.letAgentExit();
+  const exit = await run.exited;
+  assert.equal(exit.code, 0, run.output().stderr.slice(-1500) + run.output().stdout.slice(-800));
+
+  const envelope = readJson(path.join(project.attemptDir(), 'envelope.json'));
+  assert.equal(envelope.mode, 'terminal');
+  assert.equal(envelope.containment.preferred, 'linux-gate');
+  const prefix = envelope.containment.bwrapPrefix;
+  assert.ok(prefix.includes('--die-with-parent'), 'in a pane the sandbox goes with the pane');
+  assert.equal(prefix[prefix.indexOf('--bind', prefix.indexOf('--die-with-parent')) + 1], path.dirname(envelope.terminal.socketPath), 'the socket directory is bound into the sandbox');
+  assert.ok(agent.pid < 100, `the agent runs in a namespace of its own (pid ${agent.pid})`);
+  assert.equal(agent.env.FGOS_SESSION_ID, envelope.identity.writerId);
+  assert.equal(project.callsStarting('pane close').length, 1);
+  const result = readJson(path.join(project.attemptDir(), 'result.json'));
+  assert.equal(result.adapter, 'herdr-spawn');
+  assert.equal(result.classification.outcome.reason, 'completed-pass', JSON.stringify(result.classification));
 });
