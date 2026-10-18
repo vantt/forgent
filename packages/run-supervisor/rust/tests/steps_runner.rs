@@ -79,8 +79,14 @@ fn a_step_past_its_timeout_is_killed_with_its_descendants_and_leaves_no_receipt(
     assert!(started.elapsed() < Duration::from_secs(20));
     assert!(matches!(outcome, StepsOutcome::Failed { ref reason, .. } if reason.contains("stepTimeoutMs")), "{outcome:?}");
     assert!(!has_receipt(&dir, "settle-attempt"));
+    // SIGKILL reaches the whole group before run_steps returns; the kernel
+    // finishes tearing a process down a moment later, so wait for that, bounded.
     for name in ["step.pid", "child.pid"] {
         let pid: u32 = fs::read_to_string(dir.join(name)).unwrap().trim().parse().unwrap();
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while alive(pid) && Instant::now() < deadline {
+            std::thread::sleep(Duration::from_millis(10));
+        }
         assert!(!alive(pid), "{name} must be dead");
     }
 }
