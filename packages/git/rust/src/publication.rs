@@ -448,7 +448,9 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     ) -> Result<Receipt> {
         let current = tip(&self.ref_tip(repo, &i.resource_set[0])?);
         let (observed, state, attribution) = match outcome {
-            Outcome::AbandonedBeforeAttempt | Outcome::Transfer { .. } => (
+            Outcome::ConfigApproved
+            | Outcome::AbandonedBeforeAttempt
+            | Outcome::Transfer { .. } => (
                 &current,
                 PublicationState::NotPublished,
                 Attribution::Uncertain,
@@ -682,23 +684,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     /// attempts remain pending for a fresh-id successor; no CAS is replayed.
     pub fn recover_publications(&self, repo: &RepoHandle) -> Result<Vec<String>> {
         let wal = self.wal(repo)?;
-        // An interrupted transport is observed and closed, never resent. It
-        // must not wedge later local seals sharing this publication authority.
-        for chain in wal.active(100_000).map_err(werr)? {
-            if matches!(
-                chain.intent().kind,
-                wal::OperationKind::RemoteFetch { .. } | wal::OperationKind::RemotePush { .. }
-            ) && matches!(chain.last().phase, Phase::TargetAttempt { .. })
-                && chain.intent().resource_set.first().map(String::as_str)
-                    == Some(self.authority.reference.as_str())
-            {
-                self.authority
-                    .validate_publication_borrow(chain.intent())
-                    .map_err(werr)?;
-                let id = &chain.last().operation_id;
-                self.recover(repo, id)?;
-            }
-        }
         // No valid operation id is empty. Admission closes only records that
         // have not reached TargetAttempt; it never reissues an old CAS.
         self.admit_pending(repo, &wal, "")?;

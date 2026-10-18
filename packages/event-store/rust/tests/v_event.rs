@@ -2,7 +2,6 @@ mod reader_support;
 mod sync_support;
 use fgos_event_store::{
     envelope::Seal,
-    errors::ErrorCode,
     receipt::Receipt,
     seal::{seal, SealRequest},
     sync::{sync_status, unpublished_summary},
@@ -115,11 +114,21 @@ fn rewound_mirror_keeps_authenticated_baseline_and_forged_own_origin_is_refused(
         &w.remote,
         &["update-ref", "refs/fgos/events/machine-aa", &old],
     );
+    b.append(1);
+    assert!(b
+        .sync(false)
+        .unwrap()
+        .warnings
+        .iter()
+        .any(|w| w.contains("event-store-mirror-rewound")));
     assert_eq!(
-        b.sync(false).unwrap_err().code,
-        ErrorCode::EventStoreMirrorRewound
+        sync_status(&b.layout).unwrap().tips["refs/fgos/remotes/origin/events/machine-aa"],
+        before["refs/fgos/remotes/origin/events/machine-aa"]
     );
-    assert_eq!(sync_status(&b.layout).unwrap().tips, before);
+    assert_eq!(
+        git(&w.remote, &["rev-parse", "refs/fgos/events/machine-bb"]),
+        b.tip()
+    );
     git(
         &w.remote,
         &["update-ref", "refs/fgos/events/machine-aa", &a.tip()],
@@ -128,7 +137,7 @@ fn rewound_mirror_keeps_authenticated_baseline_and_forged_own_origin_is_refused(
     // Attacker copies B's origin but invents its next sequence on A's machine ref.
     let identity = fgos_event_store::identity::StoreIdentity::open(&b.layout, &b.machine).unwrap();
     let forged = a.with_port(|p| {
-        let mut event = reader_support::event('a', 2, 2);
+        let mut event = reader_support::event('a', 4, 2);
         event.origin = identity.store_id;
         reader_support::rehash(&mut event);
         let old = Oid::parse(&a.tip(), a.repo.object_format()).unwrap();
@@ -143,9 +152,16 @@ fn rewound_mirror_keeps_authenticated_baseline_and_forged_own_origin_is_refused(
             &format!("{}:refs/fgos/events/machine-aa", forged.as_str()),
         ],
     );
+    b.append(1);
+    assert!(b
+        .sync(false)
+        .unwrap()
+        .warnings
+        .iter()
+        .any(|w| w.contains("event-store-ref-tampered")));
     assert_eq!(
-        b.sync(false).unwrap_err().code,
-        ErrorCode::EventStoreRefTampered
+        git(&w.remote, &["rev-parse", "refs/fgos/events/machine-bb"]),
+        b.tip()
     );
 }
 #[test]
@@ -181,6 +197,61 @@ fn legacy_is_distributed_only_at_the_tracked_fence_pin() {
         git(&w.remote, &["rev-parse", "refs/fgos/legacy"]),
         legacy.as_str()
     );
+    // A worktree whose HEAD predates the fence sees the same shared store.
+    let pre = a.with_port(|p| {
+        reader_support::commit(
+            p,
+            &a.repo,
+            vec![],
+            vec![(b"old", b"before cutover".to_vec())],
+        )
+    });
+    let linked = w.root.join("linked");
+    git(
+        &a.root,
+        &[
+            "worktree",
+            "add",
+            "--detach",
+            linked.to_str().unwrap(),
+            pre.as_str(),
+        ],
+    );
+    let repo = match a.driver.resolve_repo(&linked, &a.root).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    fgos_event_store::sync::sync(
+        &a.driver,
+        &repo,
+        fgos_event_store::sync::SyncRequest {
+            layout: &a.layout,
+            machine: &a.machine,
+            remote: "origin",
+            no_push: false,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+        },
+    )
+    .unwrap();
+    let origin = fgos_event_store::identity::StoreIdentity::open(&a.layout, &a.machine)
+        .unwrap()
+        .store_id;
+    let read = fgos_event_store::read::read(
+        &a.driver,
+        &repo,
+        fgos_event_store::read::ReadRequest {
+            layout: &a.layout,
+            origin: &origin,
+            streams: &[fgos_event_store::layout::StreamId::parse("project").unwrap()],
+            cursor: &Default::default(),
+            folded: &[],
+            project: true,
+        },
+    )
+    .unwrap();
+    assert_eq!(read.sequence.len(), a.hashes().len());
+    assert_eq!(read.legacy.len(), 1);
     let b = w.clone("b", "machine-bb");
     b.setup();
     b.sync(false).unwrap();
@@ -191,9 +262,16 @@ fn legacy_is_distributed_only_at_the_tracked_fence_pin() {
     );
     // A remote replaces legacy even with a valid event commit: refuse, preserve pin.
     git(&w.remote, &["update-ref", "refs/fgos/legacy", &a.tip()]);
+    a.append(1);
+    assert!(a
+        .sync(false)
+        .unwrap()
+        .warnings
+        .iter()
+        .any(|w| w.contains("event-store-legacy-mismatch")));
     assert_eq!(
-        a.sync(false).unwrap_err().code,
-        ErrorCode::EventStoreLegacyMismatch
+        git(&w.remote, &["rev-parse", "refs/fgos/events/machine-aa"]),
+        a.tip()
     );
 }
 

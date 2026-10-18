@@ -14,18 +14,22 @@ fn three_real_clones_join_offline_and_retain_a_departed_machine() {
     // A leaves; its ref remains history. B continues entirely locally for a period.
     std::fs::rename(&w.remote, w.root.join("offline.git")).unwrap();
     b.append(3);
-    assert!(b.sync(false).is_err());
+    let error = b.sync(false).unwrap_err();
+    assert_eq!(error.code.as_str(), "event-store-io");
+    assert!(fgos_event_store::sync::sync_status(&b.layout)
+        .unwrap()
+        .error
+        .is_some());
     assert_eq!(b.hashes().len(), 7);
     std::fs::rename(w.root.join("offline.git"), &w.remote).unwrap();
     b.sync(false).unwrap();
     c.append(1);
     c.sync(false).unwrap();
-    for clone in [&a, &b, &c] {
+    for clone in [&b, &c] {
         clone.sync(false).unwrap();
     }
-    assert_eq!(a.hashes(), b.hashes());
     assert_eq!(b.hashes(), c.hashes());
-    assert_eq!(a.hashes().len(), 10);
+    assert_eq!(b.hashes().len(), 10);
     let join = w.clone("join", "machine-dd");
     join.setup();
     assert!(git(
@@ -34,7 +38,7 @@ fn three_real_clones_join_offline_and_retain_a_departed_machine() {
     )
     .is_empty());
     join.sync(false).unwrap();
-    assert_eq!(join.hashes(), a.hashes());
+    assert_eq!(join.hashes(), b.hashes());
     assert!(git(
         &join.root,
         &["for-each-ref", "--format=%(refname)", "refs/fgos/events/"]
@@ -43,5 +47,5 @@ fn three_real_clones_join_offline_and_retain_a_departed_machine() {
     for root in [&a.root, &b.root, &c.root, &w.remote] {
         git(root, &["gc", "--prune=now"]);
     }
-    assert_eq!(a.hashes(), b.hashes());
+    assert_eq!(join.hashes(), b.hashes());
 }

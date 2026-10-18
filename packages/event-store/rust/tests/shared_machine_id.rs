@@ -11,13 +11,29 @@ fn shared_machine_diverges_merges_two_parents_and_can_append_after_merge() {
     }
     a.sync(false).unwrap();
     let first = a.tip();
-    // Seal B without transport, then force the real port to encounter a stale remote tip.
+    // Seal B and fetch without pushing, so reconciliation observes the shared remote tip.
     b.sync(true).unwrap();
     let merged = b.tip();
     assert!(!b.sync(true).unwrap().warnings.is_empty());
     let parents = git(&b.root, &["show", "-s", "--format=%P", &merged]);
     assert_eq!(parents.split_whitespace().count(), 2);
     assert!(parents.contains(&first));
+    let max_parent_date = parents
+        .split_whitespace()
+        .map(|parent| {
+            git(&b.root, &["show", "-s", "--format=%ct", parent])
+                .parse::<i64>()
+                .unwrap()
+        })
+        .max()
+        .unwrap();
+    assert_eq!(
+        git(&b.root, &["show", "-s", "--format=%ct", &merged])
+            .parse::<i64>()
+            .unwrap(),
+        max_parent_date
+    );
+
     b.sync(false).unwrap();
     a.sync(false).unwrap();
     assert_eq!(a.hashes(), b.hashes());

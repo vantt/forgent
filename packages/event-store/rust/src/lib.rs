@@ -28,3 +28,5 @@ pub mod promote;
 pub mod reconcile;
 pub mod refspec;
 pub mod sync;
+
+mod fence;

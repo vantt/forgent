@@ -6,7 +6,6 @@ use crate::{
     layout::{Layout, StreamId},
     locks::acquire_seal,
     read::descends,
-    receipt::Receipt,
     reconcile::reconcile,
     refs::own_ref,
     refspec,
@@ -30,16 +29,37 @@ pub struct SyncRequest<'a> {
     pub held_ranks: &'a [u32],
     pub hot_lock_depth: u32,
 }
-#[derive(Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SyncRecord {
+    #[serde(default = "record_version")]
+    pub v: u8,
     pub time: u64,
     pub remote: String,
     /// Last authenticated mirror tips; failures retain this baseline.
     pub tips: BTreeMap<String, String>,
+    #[serde(default)]
+    pub positions: BTreeMap<String, crate::append::Positions>,
     pub error: Option<String>,
     pub warnings: Vec<String>,
     pub unpublished_since: Option<u64>,
+}
+fn record_version() -> u8 {
+    1
+}
+impl Default for SyncRecord {
+    fn default() -> Self {
+        Self {
+            v: 1,
+            time: 0,
+            remote: String::new(),
+            tips: Default::default(),
+            positions: Default::default(),
+            error: None,
+            warnings: Vec::new(),
+            unpublished_since: None,
+        }
+    }
 }
 #[derive(Debug)]
 pub struct Synced {
@@ -54,7 +74,14 @@ fn now() -> Result<u64, Error> {
 }
 pub fn sync_status(layout: &Layout) -> Result<SyncRecord, Error> {
     match fs::read(layout.root.join("sync.json")) {
-        Ok(b) => serde_json::from_slice(&b).map_err(|e| invalid(e.to_string())),
+        Ok(b) => {
+            let record: SyncRecord =
+                serde_json::from_slice(&b).map_err(|e| invalid(e.to_string()))?;
+            if record.v != 1 {
+                return Err(invalid("unsupported sync record version"));
+            }
+            Ok(record)
+        }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(SyncRecord::default()),
         Err(e) => Err(io(e)),
     }
@@ -94,116 +121,90 @@ fn mirrors(
 ) -> Result<BTreeMap<String, String>, Error> {
     let prefix = RefPrefix::parse(&format!("refs/fgos/remotes/{remote}/"))
         .map_err(|e| invalid(e.to_string()))?;
-    let mut cursor = None;
     let mut out = BTreeMap::new();
-    loop {
-        let page = git
-            .list_refs(repo, std::slice::from_ref(&prefix), cursor, 256)
-            .map_err(git_error)?;
-        for r in page.entries {
-            let RefValue::Direct(oid) = r.value else {
-                return Err(invalid("symbolic mirror"));
-            };
-            out.insert(r.name.as_str().into(), oid.as_str().into());
-        }
-        if page.complete {
-            return Ok(out);
-        }
-        cursor = Some(
-            page.next_cursor
-                .ok_or_else(|| invalid("missing ref continuation"))?,
-        );
+    for r in crate::refs::list(git, repo, &[prefix])? {
+        let RefValue::Direct(oid) = r.value else {
+            return Err(invalid("symbolic mirror"));
+        };
+        out.insert(r.name.as_str().into(), oid.as_str().into());
     }
+    Ok(out)
 }
+
 fn verify_mirrors(
     port: &dyn Publication,
     repo: &RepoHandle,
     req: &SyncRequest<'_>,
     identity: Option<&StoreIdentity>,
-    before: &BTreeMap<String, String>,
+    state: &mut SyncRecord,
     after: &BTreeMap<String, String>,
-) -> Result<Vec<String>, Error> {
-    let mut warnings = Vec::new();
+    bounds: &crate::append::Positions,
+) -> Result<(), Error> {
     let prefix = format!("refs/fgos/remotes/{}/events/", req.remote);
     for (name, value) in after {
-        if let Some(machine) = name.strip_prefix(&prefix) {
+        let Some(machine) = name.strip_prefix(&prefix) else {
+            continue;
+        };
+        let result = (|| {
             let oid =
                 Oid::parse(value, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
-            if let Some(old) = before.get(name) {
-                let old =
-                    Oid::parse(old, repo.object_format()).map_err(|e| invalid(e.to_string()))?;
-                if !descends(port, repo, &oid, old.as_str())? {
+            let mut certified = std::collections::BTreeSet::new();
+            let mut cover = crate::append::Positions::new();
+            if let Some(old) = state.tips.get(name) {
+                if !descends(port, repo, &oid, old)? {
                     return Err(Error::new(
                         ErrorCode::EventStoreMirrorRewound,
                         format!("{name}: cache retained"),
                     ));
+                }
+                // Older status files have no positions; verify them in full once.
+                if let Some(positions) = state.positions.get(name) {
+                    certified.insert(old.clone());
+                    cover = positions.clone();
                 }
             }
             let walked = walk::walk_verified(
                 port,
                 repo,
                 &oid,
-                &Default::default(),
-                &Default::default(),
+                &cover,
+                &certified,
                 machine,
                 Scope::Project,
             )?;
-            for e in &walked.events {
-                if let Some(identity) = identity {
-                    if e.origin == identity.store_id
-                        && e.seq
-                            > Receipt::read(
-                                &req.layout.stream(&StreamId::parse(&e.stream)?).sealed(),
-                            )?
-                            .last_seq
-                    {
-                        return Err(Error::new(
-                            ErrorCode::EventStoreRefTampered,
-                            "mirror claims unpublished own origin",
-                        ));
-                    }
-                    if machine == req.machine && e.origin != identity.store_id {
-                        let warning = format!("event-store-machine-ref-shared: git config fgos.machineId <other-id> ({name})");
-                        if !warnings.contains(&warning) {
-                            warnings.push(warning)
-                        }
+            if let Some(identity) = identity {
+                walk::own_origin_bounded(&walked.published, &identity.store_id, bounds)?;
+                if machine == req.machine
+                    && walked.events.iter().any(|e| e.origin != identity.store_id)
+                {
+                    let warning = format!("event-store-machine-ref-shared: git config fgos.machineId <other-id> ({name})");
+                    if !state.warnings.contains(&warning) {
+                        state.warnings.push(warning);
                     }
                 }
             }
-            walk::check_contiguous(&walked.events, &Default::default())?;
+            walk::check_contiguous(&walked.events, &cover)?;
+            for (key, seq) in walked.published {
+                cover
+                    .entry(key)
+                    .and_modify(|n| *n = (*n).max(seq))
+                    .or_insert(seq);
+            }
+            state.positions.insert(name.clone(), cover);
+            state.tips.insert(name.clone(), value.clone());
+            Ok(())
+        })();
+        if let Err(error) = result {
+            if machine == req.machine {
+                return Err(error);
+            }
+            let warning = error.to_string();
+            if !state.warnings.contains(&warning) {
+                state.warnings.push(warning);
+            }
         }
     }
-    Ok(warnings)
-}
-/// Fence is read from HEAD through Git, never from mutable working-tree bytes.
-fn legacy_pin(port: &dyn Inspect, repo: &RepoHandle) -> Result<Option<Oid>, Error> {
-    let head = match port.resolve_head(repo).map_err(git_error)? {
-        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
-        HeadFact::Unborn { .. } => return Ok(None),
-    };
-    let values = port
-        .read_paths_at(repo, &head, &[b".fgos/events".to_vec()], 32 * 1024 * 1024)
-        .map_err(git_error)?;
-    let bytes = match values.into_iter().next().map(|p| p.value) {
-        Some(PathValue::Blob(b)) => b,
-        Some(PathValue::Absent | PathValue::NotABlob(ObjectType::Tree)) => return Ok(None),
-        Some(PathValue::Error(e)) => return Err(git_error(e)),
-        _ => return Err(invalid("invalid fence observation")),
-    };
-    let fence: crate::read::Fence =
-        serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
-    let oid = Oid::parse(&fence.legacy_ref_oid, repo.object_format())
-        .map_err(|e| invalid(e.to_string()))?;
-    let seal = walk::header(port, repo, &oid)?;
-    if fence.seal_digest != seal.digest()?
-        || !matches!(seal,crate::envelope::Seal::Legacy{ref from_commit,..} if fence.from_commit == *from_commit)
-    {
-        return Err(Error::new(
-            ErrorCode::EventStoreLegacyMismatch,
-            "legacy seal differs from tracked fence",
-        ));
-    }
-    Ok(Some(oid))
+    Ok(())
 }
 fn push(
     port: &dyn Publication,
@@ -227,6 +228,15 @@ fn push(
     }
 }
 pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Result<Synced, Error> {
+    sync_with_fs(driver, repo, req, &crate::fsio::OsFileSystem)
+}
+/// Uses the same filesystem boundary port as seal and append.
+pub fn sync_with_fs(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    req: SyncRequest<'_>,
+    filesystem: &dyn crate::fsio::FileSystem,
+) -> Result<Synced, Error> {
     let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?.unwrap();
     if repo.common_dir() != req.layout.common_dir {
         return Err(invalid("repository/layout mismatch"));
@@ -235,7 +245,11 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
     let original = state.tips.clone();
     if !state.remote.is_empty() && state.remote != req.remote {
         state.tips.clear();
+        state.positions.clear();
     }
+    state
+        .warnings
+        .retain(|w| w.starts_with("event-store-machine-ref-shared:"));
     let mut unpublished = false;
     let result = (|| {
         let mut seal_errors = Vec::new();
@@ -282,6 +296,11 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
             name: req.remote.into(),
             pinned_url: url,
         };
+        let bounds = identity
+            .as_ref()
+            .map(|i| crate::receipt::own_bounds(req.layout, &i.store_id))
+            .transpose()?
+            .unwrap_or_default();
         let fetched;
         {
             // Fetch/legacy authority is stable even before this clone's first
@@ -298,14 +317,18 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
             )
             .with_remote(grant.clone());
             port.recover_publications(repo).map_err(git_error)?;
-            let observed = mirrors(&port, repo, req.remote)?;
             port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
                 .map_err(git_error)?;
             fetched = mirrors(&port, repo, req.remote)?;
-            let mut baseline = observed;
-            baseline.extend(state.tips.clone());
-            state.warnings =
-                verify_mirrors(&port, repo, &req, identity.as_ref(), &baseline, &fetched)?;
+            verify_mirrors(
+                &port,
+                repo,
+                &req,
+                identity.as_ref(),
+                &mut state,
+                &fetched,
+                &bounds,
+            )?;
         }
         {
             let port = PublicationPort::new(
@@ -321,58 +344,42 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
             )
             .with_remote(grant.clone());
             port.recover_publications(repo).map_err(git_error)?;
-            let pin = legacy_pin(&port, repo)?;
+            let pin = crate::fence::pinned_legacy(&port, repo)?;
             let remote_legacy = tip(
                 &port,
                 repo,
                 &format!("refs/fgos/remotes/{}/legacy", req.remote),
             )?;
             let local_legacy = tip(&port, repo, "refs/fgos/legacy")?;
-            if remote_legacy
-                .as_ref()
-                .is_some_and(|o| Some(o) != pin.as_ref())
-                || local_legacy
-                    .as_ref()
-                    .is_some_and(|o| Some(o) != pin.as_ref())
-            {
-                return Err(Error::new(
-                    ErrorCode::EventStoreLegacyMismatch,
-                    "legacy ref does not match tracked fence",
-                ));
+            crate::fence::validate_refs(pin.as_ref(), local_legacy.iter())?;
+            if let Err(error) = crate::fence::validate_refs(pin.as_ref(), remote_legacy.iter()) {
+                state.warnings.push(error.to_string());
+            } else if let Some(legacy) = remote_legacy {
+                state.tips.insert(
+                    format!("refs/fgos/remotes/{}/legacy", req.remote),
+                    legacy.as_str().into(),
+                );
             }
-            state.tips = fetched;
             let own = tip(&port, repo, reference.as_str())?;
             if let Some(own) = &own {
-                let checked = walk::walk_verified(
+                if !crate::seal::known_receipt_tip(
                     &port,
                     repo,
-                    own,
-                    &Default::default(),
-                    &Default::default(),
-                    req.machine,
-                    Scope::Project,
-                )?;
-                walk::check_contiguous(&checked.events, &Default::default())?;
-                if let Some(identity) = &identity {
-                    if !crate::seal::known_receipt_tip(
-                        &port,
-                        repo,
-                        req.layout,
-                        &reference,
-                        Some(own),
-                        &identity.store_id,
-                    )? {
-                        return Err(Error::new(
-                            ErrorCode::EventStoreRefMoved,
-                            "own ref lacks authenticated publication evidence",
-                        ));
-                    }
+                    req.layout,
+                    &reference,
+                    Some(own),
+                    identity.as_ref().map(|i| i.store_id.as_str()).unwrap_or(""),
+                )? {
+                    return Err(Error::new(
+                        ErrorCode::EventStoreRefMoved,
+                        "own ref lacks authenticated publication evidence",
+                    ));
                 }
             }
             if let Some(mirror) = tip(
                 &port,
                 repo,
-                &format!("refs/fgos/remotes/{}/events/{}", req.remote, req.machine),
+                &crate::refs::mirror_event(req.remote, req.machine),
             )? {
                 reconcile(
                     &port,
@@ -381,7 +388,9 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
                     tip(&port, repo, reference.as_str())?,
                     &mirror,
                     req.machine,
+                    req.layout,
                 )?;
+                crate::fsio::point(filesystem, crate::fsio::Point::AfterSyncReconcile)?;
             }
             if !req.no_push && identity.is_some() && tip(&port, repo, reference.as_str())?.is_some()
             {
@@ -392,7 +401,7 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
                     unpublished = match tip(
                         &port,
                         repo,
-                        &format!("refs/fgos/remotes/{}/events/{}", req.remote, req.machine),
+                        &crate::refs::mirror_event(req.remote, req.machine),
                     )? {
                         Some(mirror) => !descends(&port, repo, &mirror, own.as_str())?,
                         None => true,
@@ -427,28 +436,48 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
             port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
                 .map_err(git_error)?;
             let fetched = mirrors(&port, repo, req.remote)?;
-            state.warnings =
-                verify_mirrors(&port, repo, &req, identity.as_ref(), &state.tips, &fetched)?;
+            verify_mirrors(
+                &port,
+                repo,
+                &req,
+                identity.as_ref(),
+                &mut state,
+                &fetched,
+                &bounds,
+            )?;
             if let Some(remote_legacy) = tip(
                 &port,
                 repo,
                 &format!("refs/fgos/remotes/{}/legacy", req.remote),
             )? {
-                if Some(remote_legacy) != legacy_pin(&port, repo)? {
-                    return Err(Error::new(
-                        ErrorCode::EventStoreLegacyMismatch,
-                        "legacy ref changed during sync",
-                    ));
+                if let Err(error) = crate::fence::validate_refs(
+                    crate::fence::pinned_legacy(&port, repo)?.as_ref(),
+                    std::iter::once(&remote_legacy),
+                ) {
+                    let warning = error.to_string();
+                    if !state.warnings.contains(&warning) {
+                        state.warnings.push(warning);
+                    }
+                } else {
+                    state.tips.insert(
+                        format!("refs/fgos/remotes/{}/legacy", req.remote),
+                        remote_legacy.as_str().into(),
+                    );
                 }
             }
-            state.tips = fetched;
         }
         Ok(Synced {
             mirrors_changed: original != state.tips,
             warnings: state.warnings.clone(),
         })
     })();
-    state.time = now()?;
+    state.time = match now() {
+        Ok(time) => time,
+        Err(error) => {
+            state.warnings.push(error.to_string());
+            state.time
+        }
+    };
     state.remote = req.remote.into();
     state.error = result.as_ref().err().map(ToString::to_string);
     if state.error.is_some() || unpublished {
@@ -456,8 +485,18 @@ pub fn sync(driver: &GitDriver, repo: &RepoHandle, req: SyncRequest<'_>) -> Resu
     } else {
         state.unpublished_since = None;
     }
-    fgos_durable_file::replace_durably(&req.layout.root, "sync.json", &line(&state)?)
-        .map_err(Error::from_install_error)?;
+    if let Err(error) =
+        fgos_durable_file::replace_durably(&req.layout.root, "sync.json", &line(&state)?)
+    {
+        let error = Error::from_install_error(error);
+        return Err(match result {
+            Err(original) => Error::new(
+                original.code,
+                format!("{original}; status write failed: {error}"),
+            ),
+            Ok(_) => error,
+        });
+    }
     result
 }
 #[derive(Debug)]
@@ -473,11 +512,7 @@ pub fn unpublished_summary(
     machine: &str,
     remote: &str,
 ) -> Result<Vec<Unpublished>, Error> {
-    let mirror = tip(
-        port,
-        repo,
-        &format!("refs/fgos/remotes/{remote}/events/{machine}"),
-    )?;
+    let mirror = tip(port, repo, &crate::refs::mirror_event(remote, machine))?;
     let mut out = Vec::new();
     for stream in streams(layout)? {
         let own = tip(port, repo, own_ref(machine, &stream)?.as_str())?;

@@ -124,6 +124,6 @@ fn legacy_ref_is_authenticated_by_tracked_head_fence_and_seal_digest() {
         .unwrap_err()
         .code
         .as_str(),
-        "event-store-ref-tampered"
+        "event-store-legacy-mismatch"
     );
 }

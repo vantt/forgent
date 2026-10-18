@@ -35,6 +35,7 @@ pub fn reconcile(
     own: Option<Oid>,
     mirror: &Oid,
     machine: &str,
+    layout: &crate::layout::Layout,
 ) -> Result<Oid, Error> {
     let next = match &own {
         Some(own) if descends(port, repo, own, mirror.as_str())? => return Ok(own.clone()),
@@ -57,30 +58,18 @@ pub fn reconcile(
                     }],
                 )
                 .map_err(git_error)?;
-            let when = format!(
-                "{} +0000",
-                date(port, repo, own)?.max(date(port, repo, mirror)?).max(0)
-            );
-            let identity = || Identity {
-                name: "fgOS Event Store".into(),
-                email: "event-store@fgos.invalid".into(),
-            };
-            port.write_commit(
+            crate::publish::event_commit(
+                port,
                 repo,
-                &CommitInput {
-                    tree,
-                    parents,
-                    author: identity(),
-                    committer: identity(),
-                    author_date: when.clone(),
-                    committer_date: when,
-                    message: b"fgos-events merge".to_vec(),
-                },
-            )
-            .map_err(git_error)?
+                tree,
+                parents,
+                date(port, repo, own)?.max(date(port, repo, mirror)?),
+                b"fgos-events merge".to_vec(),
+            )?
         }
         _ => mirror.clone(),
     };
+    crate::receipt::authorize_reconcile(layout, reference, own.as_ref(), &next)?;
     let id = operation_id()?;
     let result = port.compare_and_swap(
         repo,

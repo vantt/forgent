@@ -2,16 +2,15 @@
 use crate::{
     append::Positions,
     cursor::{fold_answer, Cursor, Fold},
-    envelope::{Envelope, Scope, Seal},
+    envelope::{Envelope, Scope},
     errors::{invalid, Error, ErrorCode},
     layout::{Layout, StreamId},
     legacy::{self, LegacyEvent},
     open_read::read_own,
     order::{order, stream_key},
-    walk::{self, blob, git_error, header},
+    walk::{self, blob, git_error},
 };
 use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
-use serde::Deserialize;
 use std::collections::{BTreeMap, BTreeSet};
 #[derive(Debug)]
 pub struct ReadResult {
@@ -67,78 +66,58 @@ fn tips(
     .iter()
     .map(|p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string())))
     .collect::<Result<Vec<_>, _>>()?;
-    let mut cursor = None;
     let mut tips = Vec::new();
     let mut legacy = BTreeMap::new();
-    loop {
-        let page = port
-            .list_refs(repo, &prefixes, cursor, 1024)
-            .map_err(git_error)?;
-        for e in page.entries {
-            let name = e.name.as_str();
-            let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
-                (mirror_suffix(r)?, true)
-            } else {
-                (name.strip_prefix("refs/fgos/").unwrap(), false)
-            };
-            let relevant = rest == "legacy"
-                || ["events/", "branch-events/", "local-events/"]
-                    .iter()
-                    .any(|p| rest.starts_with(p));
-            if !relevant {
-                continue;
-            }
-            let oid = match e.value {
-                RefValue::Direct(o) => o,
-                _ => {
-                    return Err(Error::new(
-                        ErrorCode::EventStoreRefTampered,
-                        "symbolic event ref",
-                    ))
-                }
-            };
-            if rest == "legacy" {
-                legacy.insert(name.into(), oid);
-                continue;
-            }
-            let (kind, suffix) = rest.split_once('/').unwrap();
-            let machine = suffix.split('/').next().unwrap();
-            if !crate::identity::valid_machine_id(machine) {
-                return Err(invalid("invalid machine in ref"));
-            }
-            let scope = match kind {
-                "events" => Scope::Project,
-                "branch-events" => Scope::Branch,
-                "local-events" => Scope::Local,
-                _ => unreachable!(),
-            };
-            if !streams.iter().any(|s| s.scope() == scope) {
-                continue;
-            }
-            tips.push(Tip {
-                name: name.into(),
-                oid,
-                machine: machine.into(),
-                scope,
-                mirror,
-            });
+    for e in crate::refs::list(port, repo, &prefixes)? {
+        let name = e.name.as_str();
+        let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
+            (mirror_suffix(r)?, true)
+        } else {
+            (name.strip_prefix("refs/fgos/").unwrap(), false)
+        };
+        let relevant = rest == "legacy"
+            || ["events/", "branch-events/", "local-events/"]
+                .iter()
+                .any(|p| rest.starts_with(p));
+        if !relevant {
+            continue;
         }
-        if page.complete {
-            break;
+        let oid = match e.value {
+            RefValue::Direct(o) => o,
+            _ => {
+                return Err(Error::new(
+                    ErrorCode::EventStoreRefTampered,
+                    "symbolic event ref",
+                ))
+            }
+        };
+        if rest == "legacy" {
+            legacy.insert(name.into(), oid);
+            continue;
         }
-        cursor = Some(
-            page.next_cursor
-                .ok_or_else(|| invalid("ref continuation missing"))?,
-        );
+        let (kind, suffix) = rest.split_once('/').unwrap();
+        let machine = suffix.split('/').next().unwrap();
+        if !crate::identity::valid_machine_id(machine) {
+            return Err(invalid("invalid machine in ref"));
+        }
+        let scope = match kind {
+            "events" => Scope::Project,
+            "branch-events" => Scope::Branch,
+            "local-events" => Scope::Local,
+            _ => unreachable!(),
+        };
+        if !streams.iter().any(|s| s.scope() == scope) {
+            continue;
+        }
+        tips.push(Tip {
+            name: name.into(),
+            oid,
+            machine: machine.into(),
+            scope,
+            mirror,
+        });
     }
     Ok((tips, legacy))
-}
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub(crate) struct Fence {
-    pub(crate) legacy_ref_oid: String,
-    pub(crate) seal_digest: String,
-    pub(crate) from_commit: String,
 }
 fn legacy_files(
     port: &dyn Inspect,
@@ -228,63 +207,32 @@ fn read_legacy(
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let head = match port.resolve_head(repo).map_err(git_error)? {
-        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
-        HeadFact::Unborn { .. } => {
-            return if refs.is_empty() {
-                Ok(Vec::new())
-            } else {
-                Err(invalid("legacy refs without tracked fence"))
-            }
+    let authority = crate::fence::authority(port, repo)?;
+    let pin = crate::fence::pinned_legacy(port, &authority).map_err(|error| {
+        if refs.is_empty() && error.code == ErrorCode::EventStoreIo {
+            Error::new(
+                ErrorCode::EventStoreRefspecMissing,
+                "tracked legacy fence requires fetching legacy ref",
+            )
+        } else {
+            error
         }
-    };
-    let observed = port
-        .read_paths_at(repo, &head, &[b".fgos/events".to_vec()], 32 * 1024 * 1024)
-        .map_err(git_error)?;
-    let fence = match observed
-        .into_iter()
-        .next()
-        .ok_or_else(|| invalid("fence observation missing"))?
-        .value
-    {
-        fgos_git::PathValue::Blob(b) => Some(b),
-        fgos_git::PathValue::Absent | fgos_git::PathValue::NotABlob(ObjectType::Tree) => None,
-        fgos_git::PathValue::Error(e) => return Err(git_error(e)),
-        _ => return Err(invalid("invalid fence type")),
-    };
-    if let Some(bytes) = fence {
-        let fence: Fence = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
-        let oid = Oid::parse(&fence.legacy_ref_oid, repo.object_format())
-            .map_err(|e| invalid(e.to_string()))?;
+    })?;
+    if let Some(oid) = pin {
         if refs.is_empty() {
             return Err(Error::new(
                 ErrorCode::EventStoreRefspecMissing,
                 "tracked legacy fence requires fetching legacy ref",
             ));
         }
-        if refs.values().any(|v| *v != oid) {
-            return Err(Error::new(
-                ErrorCode::EventStoreRefTampered,
-                "legacy ref does not match tracked fence",
-            ));
-        }
-        let seal = header(port, repo, &oid)?;
-        if seal.digest()? != fence.seal_digest
-            || !matches!(&seal,Seal::Legacy {from_commit,..} if *from_commit==fence.from_commit)
-        {
-            return Err(Error::new(
-                ErrorCode::EventStoreRefTampered,
-                "legacy seal differs from fence",
-            ));
-        }
+        crate::fence::validate_refs(Some(&oid), refs.values())?;
         legacy_files(port, repo, &oid, streams, false)
     } else {
-        if !refs.is_empty() {
-            return Err(Error::new(
-                ErrorCode::EventStoreRefTampered,
-                "legacy ref without fence",
-            ));
-        }
+        crate::fence::validate_refs(None, refs.values())?;
+        let head = match port.resolve_head(&authority).map_err(git_error)? {
+            HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
+            HeadFact::Unborn { .. } => return Ok(Vec::new()),
+        };
         legacy_files(port, repo, &head, streams, true)
     }
 }
@@ -353,6 +301,13 @@ pub fn read(
     }
     // Mirror ancestry can include the own stream, but cannot invent own events
     // beyond the locally verified durable receipt.
+    let mut bounds = crate::receipt::own_bounds(req.layout, req.origin)?;
+    for (key, seq) in own_published.iter().chain(base.iter()) {
+        bounds
+            .entry(key.clone())
+            .and_modify(|n| *n = (*n).max(*seq))
+            .or_insert(*seq);
+    }
     for tip in tips.iter().filter(|t| t.mirror) {
         let mirror_stops = if req.cursor.mirror_tips.contains_key(&tip.name) {
             certificates.clone()
@@ -368,27 +323,7 @@ pub fn read(
             &tip.machine,
             tip.scope,
         )?;
-        for (key, seq) in mirror
-            .published
-            .iter()
-            .filter(|(key, _)| key.starts_with(&format!("{}:", req.origin)))
-        {
-            let stream = key.strip_prefix(&format!("{}:", req.origin)).unwrap();
-            let receipt = crate::append::read_last_seq(
-                &req.layout.stream(&StreamId::parse(stream)?).sealed(),
-            )?
-            .unwrap_or(0);
-            if *seq
-                > receipt
-                    .max(own_published.get(key).copied().unwrap_or(0))
-                    .max(base.get(key).copied().unwrap_or(0))
-            {
-                return Err(Error::new(
-                    ErrorCode::EventStoreRefTampered,
-                    "mirror claims own origin above receipt",
-                ));
-            }
-        }
+        walk::own_origin_bounded(&mirror.published, req.origin, &bounds)?;
     }
     let mut union = req.folded.to_vec();
     union.extend(local);
