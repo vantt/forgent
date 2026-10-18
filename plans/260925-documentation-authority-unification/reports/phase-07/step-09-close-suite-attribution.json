@@ -1,0 +1,63 @@
+{
+  "purpose": "Measured set difference of failing tests: plan HEAD vs main pin, same 21 files (the files failing in the full suite at 879a4d5fe or eab4d617b)",
+  "command": "env -u CLAUDE_CODE_SESSION_ID node --test --test-concurrency=1 <21 files>",
+  "files": [
+    "test/holder-lock/fences-rust-locks.test.mjs",
+    "test/runner/assignment-runresult.test.mjs",
+    "test/runner/dead-vocabulary-guard.test.mjs",
+    "test/runner/execution/run.test.mjs",
+    "test/runner/herdr-reconciliation.test.mjs",
+    "test/runner/herdr-spawn-adapter.test.mjs",
+    "test/runner/loop.test.mjs",
+    "test/rust-host/fgctl-init-activation.test.mjs",
+    "test/rust-host/fgctl-init-download-sources.test.mjs",
+    "test/rust-host/fgctl-init-download.test.mjs",
+    "test/rust-host/fgctl-init-preflight-tail.test.mjs",
+    "test/rust-host/fgctl-init.test.mjs",
+    "test/rust-host/fgctl-upgrade.test.mjs",
+    "test/rust-host/observe-store-lock.test.mjs",
+    "test/rust-host/release-tree.test.mjs",
+    "test/scripts/check-decision-citation-drift.test.mjs",
+    "test/scripts/check-legacy-docs-ratchet.test.mjs",
+    "test/scripts/doc-rationale-reproduction.test.mjs",
+    "test/scripts/test-select-coverage-map.test.mjs",
+    "test/setup/skill-wrappers.test.mjs",
+    "test/state/store.test.mjs"
+  ],
+  "planHead": {
+    "commit": "c2409de08",
+    "tests": 636,
+    "pass": 352,
+    "fail": 280,
+    "failingNames": 281
+  },
+  "mainPin": {
+    "commit": "eab4d617b",
+    "tests": 600,
+    "pass": 308,
+    "fail": 288,
+    "failingNames": 289
+  },
+  "failingOnlyAtPlanHead": [
+    "an agent herdr reports idle whose screen keeps changing is not ended as idle",
+    "dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names"
+  ],
+  "failingOnlyAtMainPin": [
+    "CLI run against the real repo root, with the checked-in baseline, exits 0",
+    "Item 5: Staged release whose manifest.json digest mismatches pin is refused",
+    "Item 5 (widened): a tampered staged release is refused on the pin+matching --from NoOp arm too, not just the pin-only arm",
+    "P7: Candidate preflight failure refuses init before publishing activation and writes no host-visible projections or activation.json",
+    "P7: Local runtime tail failure leaves workspace in diagnosable state with ready-degraded transaction record",
+    "P7: Repair failure when no runtime is active refuses with clear message",
+    "P7: Upgrade failure when no runtime is active refuses with clear message",
+    "R10: version --runtime-json outside activated workspace reports host: \"dev-source\" and null fields",
+    "R1 & R11: Non-git directory refuses init with clear error and no .fgos/installation created",
+    "the staged legacy-node payload carries the vendored YAML parser and any declared production dependencies, and loads them"
+  ],
+  "planHeadOnlyDisposition": {
+    "dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names": "plan-caused; component-boundary.md carriage text; routed to Phase 9 as pre-landing blocker P7-DOC-GAP-05",
+    "an agent herdr reports idle whose screen keeps changing is not ended as idle": "timing flake: test/runner/herdr-spawn-adapter.test.mjs passed 3/3 when rerun alone at HEAD; no src/ or test/ byte differs from eab4d617b",
+    "test/holder-lock/fences-rust-locks.test.mjs": "file-level failure line; fails at both pins (path differs only)"
+  },
+  "environment": "main-pin full suite at eab4d617b: 8,076 tests / 95 fail (scratchpad log); most failures are host/environment (fgctl staging, rust-host, timing) and present on main"
+}

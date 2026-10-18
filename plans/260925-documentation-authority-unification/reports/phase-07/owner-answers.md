@@ -586,3 +586,20 @@ remaining owner-only actions named above.
   store CAS concurrency, missing `.claude/skills/instruction-audit` render) touch no plan
   path; the plan changes no `src/`, `packages/`, `apps/` or `bin/` byte versus `eab4d617b`.
 
+
+### L11-22 — Close Phase 7 with the measured suite residual (closing red-team H1)
+
+- **Decision (Lead, A42):** the `npm test` proof row is met by a measured set difference, not
+  by a green run. Phase 7 closes with exactly one plan-caused failing test, the dead-vocabulary
+  guard (P7-DOC-GAP-05, Phase 9 pre-landing blocker); every other failure is present at the
+  main pin or is a demonstrated timing flake.
+- **Evidence:** `step-09-close-suite-attribution.json`. The 21 test files failing in the full
+  suite at `879a4d5fe` or `eab4d617b` were run serially at plan HEAD `c2409de08` (280 fail)
+  and at main pin `eab4d617b` (288 fail). Failing only at HEAD: the dead-vocabulary guard, and
+  "an agent herdr reports idle whose screen keeps changing is not ended as idle", which passed
+  3/3 rerun alone at HEAD (no `src/` or `test/` byte differs from the main pin). The main pin's
+  full suite (8,076 tests / 95 fail) shows the remaining failures are host/environment and
+  pre-existing on main.
+- **Why:** the plan changes no code; waiting for a green host suite would block on main-owned
+  failures that Phase 7 cannot fix (RUL104: no gate edits).
+- **Scope:** Phase 7 close only. Landing on main still requires the dead-vocabulary guard green.
