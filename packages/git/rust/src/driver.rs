@@ -1,6 +1,6 @@
 //! The sole Git spawn door. Raw argv and borrowed spawn are crate-private.
 use crate::*;
-use fgos_process::containment::{self, ContainmentDriver, SpawnSpec, Spawned, StartMode};
+use fgos_process::containment::{self, ContainmentDriver, SpawnSpec, StartMode};
 use fgos_process::DomainState;
 use std::collections::BTreeMap;
 use std::fs::{self, File};
@@ -46,17 +46,23 @@ pub(crate) enum Policy {
     HookContext,
 }
 
-/// Only a validated same-process holder-lock adapter may implement this port.
-/// It must validate the opaque event-seal handle and lend its description via
-/// spec.fd_map through holder-lock run_borrowed, never a request-supplied fd.
-/// No default implementation: Publication cannot silently spawn without a loan.
+/// Same-process opaque holder authority; operation layers validate the seal
+/// binding before supplying it. Captured bytes return only after borrow cleanup.
 pub(crate) trait BorrowedSpawn {
-    fn spawn_borrowed(
+    fn run_borrowed(
         &self,
-        driver: &dyn ContainmentDriver,
-        domain: &mut containment::ContainmentDomain,
-        spec: SpawnSpec,
-    ) -> Result<Spawned>;
+        spec: &fgos_holder_lock::BorrowSpec,
+        io: &fgos_holder_lock::BorrowIo,
+    ) -> Result<fgos_holder_lock::BorrowIoOutcome>;
+}
+impl BorrowedSpawn for fgos_holder_lock::Handle {
+    fn run_borrowed(
+        &self,
+        spec: &fgos_holder_lock::BorrowSpec,
+        io: &fgos_holder_lock::BorrowIo,
+    ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
+        fgos_holder_lock::run_borrowed_io(self, spec, io).map_err(|e| refusal(e.to_string()))
+    }
 }
 
 struct Scrubbed(BTreeMap<String, String>);
@@ -320,6 +326,22 @@ impl GitDriver {
         limit: usize,
         timeout: Duration,
     ) -> Result<Output> {
+        self.invoke_input(repo, cwd, args, policy, loan, hardened, limit, timeout, &[])
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn invoke_input(
+        &self,
+        repo: Option<&RepoHandle>,
+        cwd: &Path,
+        args: &[&str],
+        policy: Policy,
+        loan: Option<&dyn BorrowedSpawn>,
+        hardened: bool,
+        limit: usize,
+        timeout: Duration,
+        input: &[u8],
+    ) -> Result<Output> {
         check_hooks(&self.hooks)?;
         let mut argv = vec![text_path(&self.git)?];
         argv.extend(
@@ -373,6 +395,33 @@ impl GitDriver {
             env.0.insert("GIT_NO_LAZY_FETCH".into(), "1".into());
         }
         env.0.insert("GIT_TERMINAL_PROMPT".into(), "0".into());
+        if policy == Policy::Publication {
+            let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
+            let result = loan.run_borrowed(
+                &fgos_holder_lock::BorrowSpec {
+                    argv,
+                    cwd: Some(cwd.into()),
+                    env: env.0,
+                    clear_env: true,
+                    stdio: fgos_holder_lock::BorrowStdio::Null,
+                },
+                &fgos_holder_lock::BorrowIo {
+                    stdin: input.to_vec(),
+                    stdout_limit: limit,
+                    stderr_limit: STDERR_LIMIT,
+                    deadline: Instant::now() + timeout,
+                },
+            )?;
+            return Ok(Output {
+                stdout: result.stdout,
+                stderr: redact(&result.stderr),
+                success: result.outcome.exit == Some(0),
+                code: result.outcome.exit,
+            });
+        }
+        if !input.is_empty() {
+            return Err(refusal("git-input-requires-borrow"));
+        }
         let (stdout_r, stdout_w) = std::io::pipe().map_err(io)?;
         let (stderr_r, stderr_w) = std::io::pipe().map_err(io)?;
         let spec = SpawnSpec {
@@ -395,14 +444,10 @@ impl GitDriver {
             .containment
             .create(&id)
             .map_err(|e| refusal(e.to_string()))?;
-        let mut spawned = if policy == Policy::Publication {
-            loan.ok_or_else(|| refusal("publication-borrow-required"))?
-                .spawn_borrowed(self.containment.as_ref(), &mut domain, spec)?
-        } else {
-            self.containment
-                .spawn_in(&mut domain, spec)
-                .map_err(|e| refusal(e.to_string()))?
-        };
+        let mut spawned = self
+            .containment
+            .spawn_in(&mut domain, spec)
+            .map_err(|e| refusal(e.to_string()))?;
         let overflow = Arc::new(AtomicBool::new(false));
         let out = capture(stdout_r, limit, overflow.clone());
         let err = capture(stderr_r, STDERR_LIMIT, overflow.clone());
@@ -937,6 +982,94 @@ mod tests {
             ResolveRepo::Repository(r) => r,
             _ => panic!("not repo"),
         }
+    }
+    #[test]
+    #[cfg(unix)]
+    fn publication_borrow_hash_object_binary_round_trip() {
+        use fgos_holder_lock::{acquire, release, Acquire, Mode, Resource, Wait};
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        // A real executable hook would fail the operation if hooks were enabled.
+        let hook = dir.0.join(".git/hooks/reference-transaction");
+        fs::write(&hook, b"#!/bin/sh\nexit 91\n").unwrap();
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o700)).unwrap();
+        let driver = GitDriver::new(&state.0).unwrap();
+        let repo = resolve(&driver, &dir.0);
+        let resource = Resource::new("event-seal", state.0.join("seal.lock"));
+        let handle = match acquire(&resource, Mode::Ex, Wait::Try, 2000) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        let input: Vec<u8> = (0..=255).cycle().take(256 * 1024).collect();
+        let out = driver
+            .invoke_input(
+                Some(&repo),
+                &dir.0,
+                &["hash-object", "--stdin", "-w"],
+                Policy::Publication,
+                Some(&handle),
+                true,
+                PATH_LIMIT,
+                Duration::from_secs(10),
+                &input,
+            )
+            .unwrap();
+        assert!(out.success);
+        assert!(out.stderr.is_empty());
+        let oid = line(&out.stdout).unwrap();
+        let read = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &["cat-file", "blob", oid],
+                Policy::Publication,
+                Some(&handle),
+                true,
+                PATH_LIMIT,
+                Duration::from_secs(10),
+            )
+            .unwrap();
+        assert!(read.success);
+        assert_eq!(read.stdout, input);
+        // Also exercise a hook-capable borrowed command through the same policy.
+        let commit = git(
+            &dir.0,
+            &[
+                "-c",
+                "user.name=Test",
+                "-c",
+                "user.email=t@e",
+                "commit-tree",
+                "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                "-m",
+                "test",
+            ],
+        );
+        let updated = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &["update-ref", "refs/test/borrow", line(&commit).unwrap()],
+                Policy::Publication,
+                Some(&handle),
+                true,
+                PATH_LIMIT,
+                Duration::from_secs(10),
+            )
+            .unwrap();
+        assert!(updated.success, "{:?}", updated.stderr);
+        let control = Command::new("git")
+            .current_dir(&dir.0)
+            .args(["update-ref", "refs/test/control", line(&commit).unwrap()])
+            .output()
+            .unwrap();
+        assert!(
+            !control.status.success(),
+            "the installed hook must reject the control"
+        );
+        release(handle);
     }
     #[test]
     fn floor_and_all_repository_backends() {

@@ -163,6 +163,7 @@ name = "fgos-git"
 version = "0.2.0"
 dependencies = [
  "fgos-durable-file",
+ "fgos-holder-lock",
  "fgos-process",
  "libc",
  "serde",
