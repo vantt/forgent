@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fgos.invalid/event-store/batch-commit.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "kind",
+    "origin",
+    "stream",
+    "firstSeq",
+    "lastSeq",
+    "count",
+    "sha256"
+  ],
+  "properties": {
+    "v": {
+      "const": 4
+    },
+    "kind": {
+      "const": "batch-commit"
+    },
+    "origin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stream": {
+      "type": "string",
+      "minLength": 1
+    },
+    "firstSeq": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "lastSeq": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

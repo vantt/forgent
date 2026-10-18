@@ -1,0 +1,138 @@
+{
+  "files": [
+    {
+      "file": "",
+      "lines": [
+        "{\"seq\":1,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"baseline\"}}"
+      ]
+    },
+    {
+      "file": "a.jsonl",
+      "lines": [
+        "{\"seq\":3,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"a-three\"}}",
+        "{\"seq\":2,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"hashed\"},\"v\":3,\"src\":\"fixture-writer\",\"h\":\"35cc4aeb2eedf28c\"}",
+        "{\"seq\":0,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"a-zero\"}}"
+      ]
+    },
+    {
+      "file": "b.jsonl",
+      "lines": [
+        "{\"seq\":2,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"hashed\"},\"v\":3,\"src\":\"fixture-writer\",\"h\":\"35cc4aeb2eedf28c\"}",
+        "{\"seq\":1,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"baseline\"}}",
+        "{\"seq\":1,\"ts\":\"2026-10-17T23:59:59.999Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"earlier\"}}",
+        "{\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"no-seq\"}}",
+        "{\"seq\":2,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"no-src\"},\"v\":3}",
+        " {\"seq\":1,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"baseline\"}}"
+      ]
+    }
+  ],
+  "expected": [
+    {
+      "file": "b.jsonl",
+      "line": 3,
+      "raw": "{\"seq\":1,\"ts\":\"2026-10-17T23:59:59.999Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"earlier\"}}",
+      "event": {
+        "seq": 1,
+        "ts": "2026-10-17T23:59:59.999Z",
+        "type": "fixture",
+        "payload": {
+          "id": "earlier"
+        }
+      }
+    },
+    {
+      "file": "",
+      "line": 1,
+      "raw": "{\"seq\":1,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"baseline\"}}",
+      "event": {
+        "seq": 1,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "baseline"
+        }
+      }
+    },
+    {
+      "file": "a.jsonl",
+      "line": 3,
+      "raw": "{\"seq\":0,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"a-zero\"}}",
+      "event": {
+        "seq": 0,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "a-zero"
+        }
+      }
+    },
+    {
+      "file": "a.jsonl",
+      "line": 2,
+      "raw": "{\"seq\":2,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"hashed\"},\"v\":3,\"src\":\"fixture-writer\",\"h\":\"35cc4aeb2eedf28c\"}",
+      "event": {
+        "seq": 2,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "hashed"
+        },
+        "v": 3,
+        "src": "fixture-writer",
+        "h": "35cc4aeb2eedf28c"
+      }
+    },
+    {
+      "file": "a.jsonl",
+      "line": 1,
+      "raw": "{\"seq\":3,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"a-three\"}}",
+      "event": {
+        "seq": 3,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "a-three"
+        }
+      }
+    },
+    {
+      "file": "b.jsonl",
+      "line": 4,
+      "raw": "{\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"no-seq\"}}",
+      "event": {
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "no-seq"
+        }
+      }
+    },
+    {
+      "file": "b.jsonl",
+      "line": 6,
+      "raw": " {\"seq\":1,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"baseline\"}}",
+      "event": {
+        "seq": 1,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "baseline"
+        }
+      }
+    },
+    {
+      "file": "b.jsonl",
+      "line": 5,
+      "raw": "{\"seq\":2,\"ts\":\"2026-10-18T00:00:00.000Z\",\"type\":\"fixture\",\"payload\":{\"id\":\"no-src\"},\"v\":3}",
+      "event": {
+        "seq": 2,
+        "ts": "2026-10-18T00:00:00.000Z",
+        "type": "fixture",
+        "payload": {
+          "id": "no-src"
+        },
+        "v": 3
+      }
+    }
+  ]
+}

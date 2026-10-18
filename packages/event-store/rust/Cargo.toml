@@ -1,0 +1,18 @@
+[package]
+name = "fgos-event-store"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+fgos-canonical-json = { path = "../../canonical-json/rust" }
+sha2.workspace = true
+thiserror.workspace = true
+
+[build-dependencies]
+serde_json.workspace = true
+
+[dev-dependencies]
+# Audit only: the Event Store production dependency graph has no consumer.
+fgos-distribution = { path = "../../distribution/rust" }
