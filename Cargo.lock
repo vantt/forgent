@@ -214,6 +214,7 @@ dependencies = [
  "fgos-agent-protocol",
  "fgos-holder-lock",
  "fgos-process",
+ "fgos-terminal-control",
  "libc",
  "serde_json",
  "sha2",

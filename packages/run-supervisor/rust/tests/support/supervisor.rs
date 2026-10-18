@@ -94,6 +94,11 @@ pub fn lock_is_free_ex(path: &Path) -> bool {
 
 impl SupRun {
     pub fn new(name: &str, opts: &RunOpts) -> Self {
+        Self::new_with(name, opts, |_| {})
+    }
+
+    /// Like [`SupRun::new`], with `patch` applied to the envelope before its digest is taken.
+    pub fn new_with(name: &str, opts: &RunOpts, patch: impl FnOnce(&mut Value)) -> Self {
         let dir = std::env::temp_dir().join(format!("fgos-sup-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("protected")).unwrap();
@@ -139,6 +144,7 @@ impl SupRun {
             "steps": opts.steps,
             "sideFile": side_file,
         });
+        patch(&mut value);
         let digest = envelope::digest(&value).unwrap();
         value["digest"] = Value::String(digest);
         let path = dir.join("envelope.json");
@@ -157,9 +163,14 @@ impl SupRun {
     /// Start the supervisor with the descriptions at slots 3 and 4, then let go
     /// of the controller's copies: the supervisor (and its gate) now carry them.
     pub fn start(&mut self) -> Child {
+        self.start_with_env(&[])
+    }
+
+    /// [`SupRun::start`] with environment variables the supervisor needs (it starts with nothing else).
+    pub fn start_with_env(&mut self, env: &[(String, String)]) -> Child {
         let mut cmd = Command::new(internal_harness());
         let log = OpenOptions::new().create(true).append(true).open(self.dir.join("supervisor.log")).unwrap();
-        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"]).arg(&self.envelope).env_clear().stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
+        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"]).arg(&self.envelope).env_clear().envs(env.iter().map(|(k, v)| (k, v))).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
         // SAFETY: setsid is async-signal-safe; the supervisor leads its own session like a detached one.
         unsafe {
             cmd.pre_exec(|| if libc::setsid() < 0 { Err(std::io::Error::last_os_error()) } else { Ok(()) });

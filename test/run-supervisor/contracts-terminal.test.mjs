@@ -96,7 +96,7 @@ test('a minted writer id always passes the resolve rule and the length bound is 
     const id = mintAttemptWriterId(c.expand ? c.expand.char.repeat(c.expand.count) : c.attemptId);
     assert.ok(pattern.test(id) && id.length <= max, c.name);
   }
-  assert.deepEqual(writerIdContract.environment.scrubbed, ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID']);
+  assert.deepEqual(writerIdContract.environment.scrubbed, ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_PARENT_WRITER_ID']);
 });
 
 test('gate-go terminal section defines the socket, peer check, fd order and orphan reasons', () => {

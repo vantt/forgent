@@ -37,10 +37,10 @@ pub const OPS: [&str; 10] = [
 
 /// Layout defaults from the herdr measurements: the size the five supported
 /// agent CLIs are designed for, and the panes a 352x69 tab holds at it.
-const DEFAULT_LIMITS: Limits = Limits { min_cols: 80, min_rows: 20, max_panes_per_tab: 8 };
+pub const DEFAULT_LIMITS: Limits = Limits { min_cols: 80, min_rows: 20, max_panes_per_tab: 8 };
 /// Ready timeout of a round plus 30 s.
-const DEFAULT_ALLOCATION_GRACE_MS: u64 = 60_000;
-const DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS: u64 = 5_000;
+pub const DEFAULT_ALLOCATION_GRACE_MS: u64 = 60_000;
+pub const DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS: u64 = 5_000;
 
 fn line(result: &str, fields: Value) -> String {
     let mut map = Map::new();

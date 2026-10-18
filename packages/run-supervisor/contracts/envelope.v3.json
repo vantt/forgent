@@ -59,7 +59,7 @@
       "args": "string[]",
       "env": "object string -> string; the non-secret environment of the agent. Secret values are absent here and present in sideFile.env; the gate merges sideFile.env over this map",
       "stdinPolicy": { "enum": ["brief-file", "null"], "meaning": "brief-file: the gate opens briefPath read-only as stdin; null: stdin is /dev/null (NUL on Windows)" },
-      "briefPath": "absolute path of the brief file, or null when the brief travels in argv",
+      "briefPath": "absolute path of the brief file, or null when the brief travels in argv; terminal mode requires a file: the supervisor types its content at the agent",
       "outboxDir": "absolute path where the agent writes result-<N>.json",
       "capture": {
         "stdout": "absolute path; the gate opens it O_WRONLY|O_CREAT|O_APPEND and dup2s it to fd 1",

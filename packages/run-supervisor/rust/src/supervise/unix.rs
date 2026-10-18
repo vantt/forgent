@@ -55,6 +55,12 @@ impl Locks {
         Ok(())
     }
 
+    /// The lock descriptions a terminal gate receives over `SCM_RIGHTS`, in contract order:
+    /// the attempt lock, then the cwd lease of a mutating attempt.
+    pub(super) fn raw_fds(&self) -> Vec<std::os::fd::RawFd> {
+        self.attempt.iter().chain(self.cwd_lease.iter()).map(AsRawFd::as_raw_fd).collect()
+    }
+
     pub(super) fn release_cwd(&mut self) {
         drop(self.cwd_lease.take());
     }
@@ -88,6 +94,10 @@ impl GoLink {
 pub(super) struct Go(UnixStream);
 
 impl Go {
+    pub(super) fn from_stream(stream: UnixStream) -> Go {
+        Go(stream)
+    }
+
     pub(super) fn readable(&self, timeout: Duration) -> bool {
         let mut p = [libc::pollfd { fd: self.0.as_raw_fd(), events: libc::POLLIN, revents: 0 }];
         // SAFETY: poll over one valid pollfd.
