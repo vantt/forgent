@@ -496,7 +496,7 @@ test('provider capacity: prepareBwrap copies selected account auth.json into pri
     const req = {
       dispatchId: 'disp_selected_home',
       executorId: 'codex-bwrap',
-      invocation: { command: 'agent-cli', args: [], env: {} },
+      invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
       providerCapacity: {
         provider: 'openai-codex',
         accountId: 'tetnu',
@@ -554,6 +554,7 @@ test('provider capacity: old FGOS_CODEX_CREDENTIAL_HOMES hash rotation is ignore
         env: {
           FGOS_CODEX_CREDENTIAL_HOMES: poolHome,
         },
+        credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' },
       },
       providerCapacity: {
         provider: 'openai-codex',
@@ -600,7 +601,7 @@ test('provider capacity: selected missing credential fails closed before spawn',
       () => prepareBwrap(plan, {
         dispatchId: 'disp_missing_home',
         executorId: 'codex-bwrap',
-        invocation: { command: 'agent-cli', args: [], env: {} },
+        invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
         providerCapacity: {
           provider: 'openai-codex',
           accountId: 'missing',
@@ -677,8 +678,10 @@ test('provider capacity: a home-files credential that is missing, escapes its ho
   const f = homeFilesFixture();
   try {
     fs.symlinkSync('/etc/hostname', path.join(f.source, 'link-out'));
+    fs.symlinkSync('no-such-target', path.join(f.source, 'dangling'));
     const cases = [
-      [['auth.json', 'gone.json'], /selected credential file "gone\.json" is missing/],
+      [['gone.json'], /credential-store-empty: account "a" has none of \[gone\.json\] of store "agent-cli"/],
+      [['dangling'], /selected credential file "dangling" is missing/],
       [['../outside'], /must be a relative path without "\.\."/],
       [['/etc/hostname'], /must be a relative path without "\.\."/],
       [['link-out'], /not a regular file inside the credential home/],
@@ -702,6 +705,82 @@ test('provider capacity: a home-files credential that is missing, escapes its ho
     );
   } finally {
     fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: the files present are copied, a listed file that is absent is left out', async () => {
+  const f = homeFilesFixture();
+  try {
+    const prepared = await prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'gone.json', 'bin/absent'] }), { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['auth.json']);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: the files the invocation declares replace the account list', async () => {
+  const f = homeFilesFixture();
+  try {
+    const request = f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'nested/settings.json'] });
+    request.invocation.credentialStore = { use: 'agent-cli', homeEnv: 'AGENT_HOME', files: ['bin/helper'] };
+    const prepared = await prepareBwrap(f.plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['bin/helper']);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: an invocation that declares no store gets no login and no home variable, whatever account was leased', async () => {
+  const f = homeFilesFixture();
+  try {
+    const request = f.request({ kind: 'home-files', home: f.source, files: ['auth.json'] });
+    delete request.invocation.credentialStore;
+    const prepared = await prepareBwrap(f.plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement'));
+      assert.deepEqual(listed, []);
+      assert.equal(prepared.providerCapacity, undefined);
+      assert.equal(prepared.invocation.env.AGENT_HOME, undefined);
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('assessBwrap: a store read through a private home needs a policy that grants one', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-grant-'));
+  try {
+    const request = (grants) => ({
+      dispatchId: 'disp_store_grant',
+      invocation: { command: 'codex', args: [], env: {}, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants,
+        },
+      },
+    });
+    fs.mkdirSync(path.join(tmp, 'run'), { recursive: true });
+    const backend = { id: 'bwrap', config: { type: 'bwrap' } };
+    const without = assessBwrap(request([{ resource: 'run-output', access: 'write', scope: 'dispatch' }]), backend);
+    assert.ok(without.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /login store "codex".*grants no "private-home"/.test(m.detail)));
+    const granted = assessBwrap(request([{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'private-home', access: 'read-write', scope: 'dispatch' }]), backend);
+    assert.ok(!granted.mismatches.some((m) => /private-home/.test(m.detail)));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
