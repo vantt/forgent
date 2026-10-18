@@ -61,7 +61,10 @@ export function deriveUnitState(unitDir, { probe }) {
   for (const attempt of record ? lastAttempts(record) : []) {
     if (typeof attempt.assignmentId !== 'string') continue;
     const current = currentAttemptOf(assignmentsDir, attempt.assignmentId);
-    if (current !== null && probe(current.dir).state !== 'closed') return { unitRunId, unitState: 'running' };
+    if (current === null) continue;
+    // The legacy sweep settles a run from before the supervisor; the probe still answers `legacy-run` for it.
+    if (readJson(path.join(current.dir, 'run.json'))?.settlement === 'abandoned-legacy') continue;
+    if (probe(current.dir).state !== 'closed') return { unitRunId, unitState: 'running' };
   }
   return { unitRunId, unitState: 'awaiting-resume', resumeCommand: `fgos run --resume ${unitRunId}` };
 }

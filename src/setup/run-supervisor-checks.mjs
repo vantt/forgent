@@ -4,7 +4,9 @@
 //
 // Checks only read (the stuck-attempt probe asks adopt for `--probe-only`, which writes
 // nothing). The fixes write: `runtime-socket-dir` creates or tightens the socket directory,
-// `run-attempts-stuck` sends the unclosed attempts through the adopt door.
+// `run-attempts-stuck` sends the unclosed attempts through the adopt door, `legacy-attempts-stuck`
+// settles runs from before the supervisor through the legacy sweep (the recover door is passed in by
+// the registration: it is a use case above this layer).
 //
 // Levels follow the doctor convention: `passed: false` fails, a message that starts with
 // `warning:` warns, `info:` is informational, anything else passes.
@@ -18,9 +20,12 @@ import { PROTOCOL } from '../holder-lock/protocol.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
-import { adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
+import { adoptRun, adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { sweepAttempts } from '../run-supervisor/sweep.mjs';
-import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem } from '../run-supervisor/gate-kill-grace.mjs';
+import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
+import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
+import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { deriveUnitState, unitDirOfAssignment } from '../runner/execution/unit-state.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
 const PROBE_TIMEOUT_MS = 15_000;
@@ -302,4 +307,104 @@ export function checkGateKillGrace(repoRoot, { globalConfigPath } = {}) {
   const problem = gateKillGraceProblem(value);
   if (problem) return { passed: false, message: `${problem} (${source})` };
   return { passed: true, message: `${GATE_KILL_GRACE_KEY} = ${value} (${source})` };
+}
+
+// ---------------------------------------------------------------------
+// legacy-attempts-stuck
+// ---------------------------------------------------------------------
+
+/**
+ * Runs from before the run supervisor still `running` with no attempt lock. Each is judged on its own
+ * records (every recorded pid dead, no version-1 home left): the ones that can be settled fail the check
+ * (the fix settles them), the ones kept warn with the reason that keeps them. Nothing is written.
+ * `judgeOptions` (`judgeRecord`, `confinementRoot`) reach `judgeLegacyHolders`.
+ */
+export function checkLegacyAttemptsStuck(repoRoot, judgeOptions = {}) {
+  const stuck = findLegacyStuck({ assignmentsRoot: assignmentsRootOf(repoRoot) });
+  if (stuck.length === 0) return { passed: true, message: 'no run from before the run supervisor is left running' };
+  const settleable = [];
+  const kept = [];
+  for (const { runDir, runId } of stuck) {
+    const verdict = judgeLegacyHolders(runDir, judgeOptions);
+    if (verdict.allDead) settleable.push(`${runDir} (${runId})`);
+    else kept.push(`${runDir} (${runId}): ${verdict.reason}`);
+  }
+  if (settleable.length > 0) {
+    const tail = kept.length > 0 ? `; kept: ${listed(kept)}` : '';
+    return { passed: false, message: `${settleable.length} run(s) from before the run supervisor are left running and every process they recorded is dead: ${listed(settleable)} -- run "fgos doctor --fix"${tail}` };
+  }
+  return { passed: true, message: warn(`${kept.length} run(s) from before the run supervisor are left running and stay open: ${listed(kept)}`) };
+}
+
+/**
+ * Settle the provably dead ones as `abandoned-legacy` through the recover door and name each run kept.
+ * @param {string} repoRoot
+ * @param {{door: {observe: Function, apply: Function}}} options the recover door, passed in by the caller
+ */
+export function fixLegacyAttemptsStuck(repoRoot, { door, ...judgeOptions }) {
+  const assignmentsRoot = assignmentsRootOf(repoRoot);
+  if (findLegacyStuck({ assignmentsRoot }).length === 0) return { changed: false, message: 'no run from before the run supervisor is left running' };
+  const { settled, kept } = sweepLegacy({ assignmentsRoot, door, repoRoot: path.resolve(repoRoot), ...judgeOptions });
+  const left = kept.length > 0 ? `; kept: ${listed(kept.map((entry) => `${entry.runDir}: ${entry.reason}`))}` : '';
+  return { changed: settled.length > 0, message: `settled ${settled.length} run(s) as abandoned-legacy${left}` };
+}
+
+// ---------------------------------------------------------------------
+// units-awaiting-resume
+// ---------------------------------------------------------------------
+
+/**
+ * Unit runs whose controller is gone and whose last attempt is closed, with no summary: information, not
+ * a failure (nothing continues on its own; a person types `fgos run --resume <unit>`). Read-only; each
+ * unit is judged by `deriveUnitState` over the adopt probe.
+ */
+export function checkUnitsAwaitingResume(repoRoot, { bin: binOverride } = {}) {
+  const fgosDir = fgosDirOf(repoRoot);
+  const unitDirs = new Set();
+  for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
+    const unitDir = unitDirOfAssignment(fgosDir, assignmentId);
+    if (unitDir) unitDirs.add(unitDir);
+  }
+  if (unitDirs.size === 0) return { passed: true, message: 'no unit run to resume' };
+  const { bin, error } = resolveBin(repoRoot, binOverride);
+  if (error) return { passed: true, message: warn(`unit runs exist but the host cannot judge their attempts: ${error}`) };
+  const probe = (attemptDir) => adoptRun(attemptDir, { probeOnly: true, hostBin: bin });
+  const waiting = [];
+  try {
+    for (const unitDir of [...unitDirs].sort()) {
+      const unit = deriveUnitState(unitDir, { probe });
+      if (unit.unitState === 'awaiting-resume') waiting.push(unit.resumeCommand);
+    }
+  } catch (err) {
+    return { passed: true, message: warn(`unit runs exist but adopt could not judge them: ${err.message}`) };
+  }
+  if (waiting.length === 0) return { passed: true, message: `${unitDirs.size} unit run(s), none awaiting resume` };
+  return { passed: true, message: warn(`${waiting.length} unit run(s) await resume: ${listed(waiting.map((command) => `"${command}"`))}`) };
+}
+
+// ---------------------------------------------------------------------
+// cancel-wait
+// ---------------------------------------------------------------------
+
+/**
+ * `dispatch.cancelWaitMs` after the config merge (project over global): value and source. It fails
+ * when unusable or shorter than `dispatch.gateKillGraceMs`: the controller would leave before the gate
+ * could finish stopping the agent.
+ */
+export function checkCancelWait(repoRoot, { globalConfigPath } = {}) {
+  let project;
+  let global;
+  try {
+    project = readSharedConfig(path.resolve(repoRoot));
+    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();
+  } catch (err) {
+    return { passed: false, message: `${CANCEL_WAIT_KEY} unreadable: ${err.message}` };
+  }
+  const { value, source, grace } = resolveCancelWait({ project, global });
+  const problem = cancelWaitProblem(value);
+  if (problem) return { passed: false, message: `${problem} (${source})` };
+  if (Number.isInteger(grace) && value < grace) {
+    return { passed: false, message: `${CANCEL_WAIT_KEY} = ${value} (${source}) is shorter than ${GATE_KILL_GRACE_KEY} = ${grace}: a stopped controller would leave before the gate can finish stopping the agent` };
+  }
+  return { passed: true, message: `${CANCEL_WAIT_KEY} = ${value} (${source})` };
 }

@@ -137,7 +137,8 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
-import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace } from './run-supervisor-checks.mjs';
+import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
+import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
@@ -2311,7 +2312,7 @@ registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
 // Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
 // host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.
-// `dispatch.gateKillGraceMs` is read with a default and never written by setup.
+// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.
 registerCheck({
   id: 'process-containment',
   description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',
@@ -2337,8 +2338,24 @@ registerCheck({
   description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',
   check: (cwd) => checkGateKillGrace(cwd),
 });
+registerCheck({
+  id: 'legacy-attempts-stuck',
+  description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',
+  check: (cwd) => checkLegacyAttemptsStuck(cwd),
+});
+registerCheck({
+  id: 'units-awaiting-resume',
+  description: 'lists unit runs whose controller is gone and whose last attempt is closed, with the fgos run --resume command (information, never a failure)',
+  check: (cwd) => checkUnitsAwaitingResume(cwd),
+});
+registerCheck({
+  id: 'cancel-wait',
+  description: 'dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than dispatch.gateKillGraceMs (default gateKillGraceMs + 5000)',
+  check: (cwd) => checkCancelWait(cwd),
+});
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
+registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
 registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/

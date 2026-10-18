@@ -200,7 +200,7 @@ One door for resume, recover, scan and cleanup: `fgos internal adopt --protocol 
 Decision order for one attempt directory:
 
 1. `closed.json` present: `closed`, no lock opened.
-2. No `attempt.lock`, or no envelope with `v == 3`: `legacy-run` (left to plan 6.4).
+2. No `attempt.lock`, or no envelope with `v == 3`: `legacy-run` (settled only by the doctor check `legacy-attempts-stuck`, section 14).
 3. Probe the lock with a shared, non-blocking try (two scans never block each other). Held: `being-adopted` when `adopting.json` exists, else `running`.
 4. Lock free but unbound with an envelope younger than the Windows start grace: `running` (reason `starting`). A `start-refused.json` of this attempt ends the grace: the supervisor said it will never bind (on Windows a supervisor that cannot take the attempt lock exits 70 `lock-held`), so the attempt is judged at once and carries the reason `start-refused:<code>` in the adopt answer, in `receipt.json` (`reason`) and in the doctor message, not only in `supervisor.log`.
 5. Lock free is not enough: ask the containment domain recorded in the binding (or, with no binding, the declared predecessor record) whether it is empty; `unknown` counts as not empty. `--probe-only` stops here (`needs-adopt` or `running` with reason `domain-not-empty`) and writes nothing. A scan adopts only what is already empty; `--run-dir` may wait out a domain for up to `--kill-wait-ms` (default `lock.predecessorKillWaitMs`, 2000).
@@ -225,6 +225,34 @@ Home cleanup has one rule: a home belongs to an attempt (marker v2 `{attemptId, 
 ## 9. Policy: supervisor dies, agent keeps running, adopt settles it
 
 When the supervisor dies the agent runs on until it exits, until the hard ceiling, or (terminal mode) the orphan branch of section 5.3. Exclusion stays correct because the gate still holds the attempt lock and the cwd lease, and the domain stays provable because the gate is pid 1. The alternative (the gate kills the agent when the supervisor dies) would discard work the model already did. Adopt then settles the attempt from `gate-exit.json` and the outbox. The same holds when the controller dies: the supervisor, not the controller, owns the result.
+
+### 9.1 Controller death
+
+What happens when the controller of `fgos run` goes away, by cause. The contract of the names is [unit-state.v1.json](../../../packages/run-supervisor/contracts/unit-state.v1.json); the actions of recover are [recover-actions.v1.json](../../../packages/run-supervisor/contracts/recover-actions.v1.json).
+
+| Cause | What the controller does | What the attempt does | What the unit reads |
+|---|---|---|---|
+| Ctrl-C (SIGINT) or SIGTERM, first time | Publishes `cancel-requested.json` for every attempt it handed over, waits for their receipts for at most `dispatch.cancelWaitMs`, prints `unit <id> chờ resume: fgos run --resume <id>` and exits 130 (SIGINT) or 143 (SIGTERM) | The supervisor reads the request and stops the agent; receipt outcome `cancelled`, then the post-receipt steps and `closed.json` | `awaiting-resume` |
+| The same signal a second time | Exits at once with the same code | Unchanged: the request is already on disk, the supervisor still stops the attempt | `awaiting-resume` once `closed.json` exists, `running` until then |
+| Abnormal death (SIGKILL, crash, power loss) | Nothing | Settles as in section 9: the supervisor, or adopt from the recovery matrix, owns the result; the attempt ends `closed` with the result the agent produced, or `abandoned-not-started` | `awaiting-resume` |
+| An attempt with no binding yet | Holds the attempt lock and dies with it | Adopt judges it `abandoned-not-started` | `awaiting-resume` |
+
+A unit whose controller died never continues on its own. Only an explicit `fgos run --resume <unit>` goes on (owner decision 2026-10-16). `dispatch inspect`, `dispatch show-run` and `fgos run --json` name the state (`unitState`, `attemptState`, `resumeCommand`); `fgos doctor` lists the waiting units in `units-awaiting-resume`.
+
+`--resume` goes through adopt for the last attempt of every seat and round, before anything else, and never starts a second supervisor for an attempt that already has a binding or a receipt (`supervise` refuses to start there):
+
+| Attempt state | Resume |
+|---|---|
+| `closed` with a result | Uses `result.json` as the attempt result and carries on with the unit's remaining steps (commit `writes`, reviewer, next attempt, `unit-summary.json`); the agent never runs twice |
+| `closed`, receipt `cancelled`, `abandoned-not-started` or `abandoned-before-brief` | Launches a new attempt that names the replaced one in `supersedesRunId`; the old attempt reads `superseded` |
+| `running`, `being-adopted` | Refused `attempt-still-running` with the state and the `fgos dispatch inspect` command; resume does not wait |
+| `closed` with receipt `gate-lost` (binding present, gate dead, no `gate-exit`) | Not relaunched: adopt cannot prove the agent never ran, so it fails closed (design r6 §9.7); a wrong guess would run the agent twice. The person starts a new `fgos run` |
+| `legacy-run` | Refused `attempt-legacy-run`; the doctor check `legacy-attempts-stuck` owns it. Once settled as `abandoned-legacy` the attempt is closed for the unit |
+| A second `--resume` of the same unit at the same time | One controller drives a unit: the resumer takes the controller seat (the `unit-control` ledger under the unit directory) before it reads `unit.json`; the loser finds a live holder and is refused `resume-in-progress`. A holder proven dead is taken over |
+
+`fgos dispatch recover <run>` over an attempt of the supervisor recommends `adopt` (CAS: snapshot hash and control epoch); an `outbox/result-N.json` is evidence for it, never a reason to park. Applying it is `adoptRun`: it settles the attempt and changes nothing for an attempt a supervisor or adopter holds.
+
+**Named deferral: automatic resume.** Resuming without an explicit `--resume` after a controller death is a later item. It needs dead-controller detection and a single-taker guarantee; the seam is named in the contract: the `unit-control` ledger (`src/runner/execution/unit-control.mjs`) is both the evidence (holder proven dead) and the single-taker primitive (one acquirer wins). Nothing here builds it. Also deferred: relaunch on resume when the gate recorded that it never released the agent (it would turn the `gate-lost` limit above into a relaunch; it needs a gate-side marker written before GO). Also deferred: a cwd lease between "attempt finished" and "runner committed `writes`"; it moved to the Git component's custody lease.
 
 ## 10. Routes
 
@@ -275,6 +303,8 @@ When the gate is SIGKILLed the kernel closes its fds before it finishes killing 
 
 Config key `dispatch.gateKillGraceMs` (milliseconds, default 10000): the SIGTERM to SIGKILL grace used by the gate, by the hard ceiling and by `kill_all`; the controller copies it into `envelope.deadlines.gateKillGraceMs`. Project overrides global. The key is read through the project-over-global merge (`src/run-supervisor/gate-kill-grace.mjs`) with the default when absent; setup registers no config default for it, because a registered default would be written into the global `~/.fgos/config.json` before every workspace on the machine has activated a release that knows it (the lesson of 2026-10-13). Doctor refuses a value below 1000.
 
+Config key `dispatch.cancelWaitMs` (milliseconds, minimum 1000, default `dispatch.gateKillGraceMs` + 5000): how long a controller stopped by Ctrl-C or SIGTERM waits for the receipts of its attempts before it exits. It is read by the same reader, in the same file (`src/run-supervisor/gate-kill-grace.mjs`), and setup registers no config default for it for the same reason; doctor `cancel-wait` is its registration.
+
 `fgos setup` creates the runtime socket directory (0700) when missing; it runs the registered fixes, so the `runtime-socket-dir` fix is the setup step.
 
 Doctor checks (registered in `src/setup/registrations.mjs`; levels follow the doctor convention: `passed: false` fails, a `warning:` prefix warns):
@@ -286,6 +316,9 @@ Doctor checks (registered in `src/setup/registrations.mjs`; levels follow the do
 | `run-attempts-stuck` | Runs of either mode (`direct` or `terminal`) with an envelope v3 and no `closed.json` whose lock is free (`adopt --scan --probe-only`; writes nothing) | Fails naming each attempt with its reason (for example `start-refused:lock-held`); a held lock is a running attempt, not a finding; fix runs `sweepAttempts` |
 | `run-supervisor-route` | The host binary answers `--protocol 1 --probe` with `result: ok` for `supervise`, `gate`, `adopt`, `attempt-step` | Any route missing or a protocol mismatch fails by name |
 | `gate-kill-grace` | Prints `dispatch.gateKillGraceMs` and its source (`project`, `global`, `default`) | Below 1000 or not an integer fails; absent passes with 10000 |
+| `cancel-wait` | Prints `dispatch.cancelWaitMs` and its source (same reader and merge as the grace; the default is the effective grace plus 5000) | Below 1000, not an integer, or shorter than `dispatch.gateKillGraceMs` fails (a stopped controller would leave before the gate could finish stopping the agent); absent passes |
+| `legacy-attempts-stuck` | Runs from before the supervisor (no `attempt.lock`, or an envelope that is not version 3) still `running`; each is judged on its own records: every recorded pid `dead` (controller, old Node supervisor and its worker, pane worker) and no version-1 home left. Writes nothing | Fails while a run can be settled, naming it; runs that cannot be proven dead (`pid-alive`, `pid-unknown`, `home-present`, `no-recorded-holders`) are listed with that reason and only warn; fix runs `sweepLegacy`, which settles the provable ones as `abandoned-legacy` through the recover door and prints the reason for each run it keeps |
+| `units-awaiting-resume` | Unit runs whose last attempt is `closed`, with no `unit-summary.json` and no live controller (`deriveUnitState` over the adopt probe; writes nothing) | Always passes; warns with `fgos run --resume <unit>` for each; no fix (a person decides) |
 
 The check for orphaned confinement resources skips attempt homes (marker version 2: they belong to adopt), removes loose-root permissions and empty per-dispatch directories on its own rule, and its fix calls `sweepAttempts`; the fix never removes a version 2 home. The terminal side has its own checks in the [terminal-control spec](../terminal-control/spec.md) (`terminal-control` asks the driver for its capabilities; on Windows it says herdr has no Windows build and that direct mode is unaffected).
 
@@ -313,6 +346,7 @@ The check for orphaned confinement resources skips attempt homes (marker version
 
 - **2026-10-18 — Cutover của `terminal` (6.3).** Round herdr không còn được canh trong controller: vòng poll, deadline, settle và đóng pane (`herdr-round.mjs`) bị xoá; supervisor canh pane theo attempt id qua terminal-control, gate trong pane nhận khoá qua `SCM_RIGHTS`. Đo trên herdr thật: `tcsetpgrp` làm được từ pid 1 của namespace, không cần `setsid`; không có phương án dự phòng "gate ngoài namespace". Pane chết hoặc supervisor chết đều có đường kết thúc đã đặt tên (`carrier-lost`, nhánh mồ côi). Pane giữ lại khi kết thúc không sạch.
 - **2026-10-18 — Pane không đọc được là thời gian mù, không phải thời gian nhàn rỗi.** Đồng hồ idle của `terminal` chạy tiếp khi màn hình hoặc trạng thái đổi hoặc đọc được `working`; lúc không đọc được cái nào thì bị lùi đúng khoảng mù, chỉ soft deadline và hard ceiling còn áp dụng. Thay thế hành vi cũ của vòng canh trong controller (đọc trạng thái lỗi cộng vào thời gian mù).
+- **2026-10-18 — Controller chết: attempt settle, unit chờ `--resume` (6.4).** Ctrl-C/SIGTERM gửi `cancel` cho attempt controller đã giao (chờ `dispatch.cancelWaitMs`, thoát 130/143, lần hai thoát ngay); chết bất thường thì supervisor hoặc adopt settle; unit đọc là `awaiting-resume` và chỉ `--resume` tường minh đi tiếp, dùng kết quả attempt đã settle qua adopt, không chạy lại agent. `recover` đề xuất `adopt`; `outbox/result-N.json` là bằng chứng, không còn là lý do park. Run cũ trước supervisor: doctor `legacy-attempts-stuck` settle `abandoned-legacy` chỉ khi mọi pid đã ghi đều chết và không còn home bản 1. Quyết định của anh 2026-10-16: không tự resume; tự resume là việc hoãn có tên (section 9.1). Chi tiết: [runner.md](../../specs/runner.md).
 
 ## 17. Related files
 

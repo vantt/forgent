@@ -8,7 +8,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { installCancelOnSignal, readCancelWaitMs, register, registeredRuns, requestCancel, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
+import { installCancelOnSignal, register, registeredRuns, requestCancel, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
+import { readCancelWaitMs } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { bwrapUsable, createProject, readJson, sleep, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();
