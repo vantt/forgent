@@ -69,7 +69,7 @@ export function effectiveWriteScope(unitRecord) {
  * merge needed no worker. A conflicted merge widens the effective scope by the conflicted paths it does
  * not already cover.
  */
-export function runPendingSync(unitRecord, mainRoot, persist) {
+export function runPendingSync(unitRecord, mainRoot, persist, custody) {
   const sync = unitRecord.sync;
   if (!sync || !['pending', 'failed'].includes(sync.status)) {
     const done = sync?.status === 'merged' || sync?.status === 'up-to-date';
@@ -80,7 +80,7 @@ export function runPendingSync(unitRecord, mainRoot, persist) {
   const adoptOpenMerge = sync.status === 'pending' && sync.started === true;
   sync.started = true;
   persist();
-  const result = startSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, ref: sync.ref, sha: sync.sha, adoptOpenMerge });
+  const result = startSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, ref: sync.ref, sha: sync.sha, adoptOpenMerge, custody });
   unitRecord.sync = result;
   persist();
   if (result.status === 'failed') {
@@ -125,10 +125,10 @@ export function syncBrief(sync) {
  * left open for the worker, then commit the rest of the round as usual (`commitWork`). The result
  * is the round's commit record with the merge's own under `sync`.
  */
-export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePaths) {
+export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePaths, custody) {
   const sync = unitRecord.sync;
   if (sync?.status !== 'conflicted') return commitWork();
-  const merge = finishSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync });
+  const merge = finishSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync, custody });
   if (merge.status === 'failed') {
     const { status, reason, error, ...detail } = merge;
     return { status, reason, error, ...detail, outOfScope: [], preExistingInScope: [...excludePaths], sync: merge };

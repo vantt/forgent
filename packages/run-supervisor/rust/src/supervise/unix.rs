@@ -30,18 +30,20 @@ const GO_SLOT: u32 = 5;
 pub(super) struct Locks {
     attempt: Option<File>,
     cwd_lease: Option<File>,
+    lease_path: Option<PathBuf>,
 }
 
 impl Locks {
     /// The attempt lock, close-on-exec first: nothing this process spawns may inherit it.
     pub(super) fn early() -> Result<Locks, Refusal> {
         let attempt = take_inherited(FdSlot(ATTEMPT_LOCK_SLOT)).map_err(|_| Refusal { exit: EXIT_INTERNAL, code: "fd-invalid", why: "descriptor 3 (the attempt lock) was not handed over".into() })?;
-        Ok(Locks { attempt: Some(attempt), cwd_lease: None })
+        Ok(Locks { attempt: Some(attempt), cwd_lease: None, lease_path: None })
     }
 
     /// Slot 4 is a lease only for a mutating attempt; anything else there is not ours.
     pub(super) fn complete(&mut self, envelope: &Value, _run_dir: &Path) -> Result<(), Refusal> {
         if envelope["mutation"] == "mutating" {
+            self.lease_path = Some(envelope["cwdLeaseFile"].as_str().ok_or_else(|| Refusal { exit: EXIT_INTERNAL, code: "envelope-invalid", why: "a mutating attempt needs cwdLeaseFile".into() })?.into());
             self.cwd_lease = take_inherited(FdSlot(CWD_LEASE_SLOT)).ok();
             if self.cwd_lease.is_none() {
                 return Err(Refusal { exit: EXIT_INTERNAL, code: "fd-invalid", why: "a mutating attempt needs descriptor 4 (the cwd lease)".into() });
@@ -51,8 +53,11 @@ impl Locks {
     }
 
     /// The gate carries the lease description, so a dead supervisor leaves the lease held until the gate is gone.
-    pub(super) fn declare_on_lease(&self, _record: &Domain) -> io::Result<()> {
-        Ok(())
+    pub(super) fn declare_on_lease(&self, record: &Domain) -> io::Result<()> {
+        match &self.lease_path {
+            Some(path) => fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record),
+            None => Ok(()),
+        }
     }
 
     /// The lock descriptions a terminal gate receives over `SCM_RIGHTS`, in contract order:

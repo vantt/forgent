@@ -83,12 +83,14 @@ pub struct Resource {
     /// Lock file path; created on first acquire, never removed while the
     /// resource lives.
     pub path: PathBuf,
+    /// Optional admission policy, checked under the kernel lock before cleanup.
+    pub predecessor_kinds: Vec<String>,
 }
 
 impl Resource {
     /// A resource named `name` locked through the file at `path`.
     pub fn new(name: impl Into<String>, path: impl Into<PathBuf>) -> Self {
-        Resource { name: name.into(), path: path.into() }
+        Resource { name: name.into(), path: path.into(), predecessor_kinds: Vec::new() }
     }
 }
 
@@ -191,6 +193,15 @@ impl Handle {
     /// Lock file path.
     pub fn path(&self) -> &Path {
         &self.resource.path
+    }
+
+    /// Clear this holder's predecessor after its domain is observed empty.
+    pub fn clear_domain(&self) -> io::Result<()> {
+        if self.mode != Mode::Ex {
+            return Err(io::Error::other("only an exclusive holder clears a domain"));
+        }
+        validate(self).map_err(io::Error::other)?;
+        predecessor::clear(&predecessor::record_path(&self.resource.path), Duration::from_millis(self.kill_wait_ms))
     }
 
     /// Record the process domain this holder is about to create, before it
@@ -565,6 +576,9 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
                 return Acquire::Timeout { waited_ms: started.elapsed().as_millis() as u64 };
             }
             continue;
+        }
+        if let Some(domain) = predecessor::disallowed_kind(&predecessor::record_path(&resource.path), &resource.predecessor_kinds) {
+            return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
         }
         let (admitted, seen) = predecessor::admit_with_trace(&predecessor::record_path(&resource.path), Duration::from_millis(kill_wait_ms));
         *trace = seen;

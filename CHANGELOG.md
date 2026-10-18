@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Writing Unit runs retain cwd custody through runner commits and lend it to git/hooks; successor admission preserves unprovable predecessor worktrees. Mutating producers require a supervised domain, and `--force-shared-cwd` with writes is refused. Workflow automatic fresh-worktree redispatch is pending.
+
 - Releases ship a combined Git/Event Store Node addon through optional `components.nativeAddon`; its manifest attests build inputs without binding future upgrades to the verifier's Cargo.lock. Only Linux advertises `git-wal-v1` while C5 scan/fence support is Linux-only; Windows activation remains available and lock-taking Git ports refuse with `git-lockscope-unavailable-windows`.
 - Config mapping failures resolve their WAL chain and remove only their own native staging lock. Re-running activation installs a missing Git fence; WAL writers refuse an unfenced workspace. Older `fgctl` stops with `EISDIR` at the fenced legacy activation lock. Channels without the optional addon report informational Git checks until M10.
 

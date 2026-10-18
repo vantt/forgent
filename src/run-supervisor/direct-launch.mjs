@@ -11,7 +11,7 @@ import path from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
 import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot, readPredecessorKillWaitMs, HolderLockError } from '../holder-lock/index.mjs';
-import { acquireDispatchCwdLockIn } from '../runner/dispatch/cwd-lock.mjs';
+import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
 import { computeSha256Digest, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
 import { getBootId } from '../runner/dispatch/process-identity.mjs';
@@ -46,16 +46,19 @@ export function resolveAttemptHost() {
  * Take `attempt` (rank 15) and, for an agent that writes, `dispatch-cwd` (rank 30), in one scope so the
  * order is checked. Throws `attempt-in-flight` / `dispatch-in-flight` by name; nothing stays held.
  */
-export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, mutating }) {
+export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, mutating, custody = null }) {
+  if (custody && (custody.released || custody.name !== 'dispatch-cwd' || custody.path !== resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path)) {
+    throw new DispatchError('custody-required', 'attempt custody must be the held lease of this cwd', { cwd });
+  }
   const scope = createLockScope('attempt');
   const taken = acquireSync(scope, 'attempt', { fgosDir, runDir: assignmentDir, NN: attemptStr });
   if (taken.result !== 'acquired') {
     throw new DispatchError('attempt-in-flight', `attempt ${attemptStr} of ${assignmentDir} is already held by another process`, { assignmentDir, attemptStr });
   }
-  let cwdLease = null;
-  if (mutating) {
+  let cwdLease = custody;
+  if (mutating && !custody) {
     try {
-      cwdLease = acquireDispatchCwdLockIn(scope, fgosDir, cwd);
+      cwdLease = admitSuccessor(scope, fgosDir, cwd);
     } catch (err) {
       taken.handle.release();
       throw err;
@@ -64,9 +67,10 @@ export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, m
   return {
     attempt: taken.handle,
     cwdLease,
+    releaseAttempt() { taken.handle.release(); },
     /** Close this process's copies; the supervisor keeps its own. Safe to call twice. */
     release() {
-      for (const handle of [cwdLease, taken.handle]) {
+      for (const handle of [custody ? null : cwdLease, taken.handle]) {
         if (!handle) continue;
         try { handle.release(); } catch { /* already closed */ }
       }
@@ -162,7 +166,7 @@ export function identityEnv(identity) {
  * @param {object} p.attempt          `prepareConfinementForLaunch(...).attempt`
  * @param {string} p.capture          directory that holds the agent's stdout and stderr files
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, identity, terminal = null, extraSteps = [] }) {
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [] }) {
   const paths = attemptPaths(runDir, attemptId);
   const sideFile = paths.sideFile;
   const step = (stepId) => ({
@@ -220,7 +224,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       slot: { key: attemptId, groupKey: terminal.groupKey },
       terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs, ...(terminal.retainFailedPaneMs !== undefined ? { retainFailedPaneMs: terminal.retainFailedPaneMs } : {}) },
     } : {}),
-    ...(cwdLeaseFile ? { cwdLeaseFile } : {}),
+    ...(cwdLeaseFile ? { cwdLeaseFile, ...(cwdLeaseOwner ? { cwdLeaseOwner } : {}) } : {}),
   };
   return body;
 }
@@ -249,8 +253,9 @@ export function readLaunchSettings(projectRoot) {
 
 /**
  * Start the supervisor for `envelope`. Unix: the locks go over as descriptors 3 (and 4); the controller
- * keeps its copies until it sees the binding. Windows: a lock cannot be inherited, so the controller lets go
- * right after the spawn and the supervisor takes both locks itself (it retries while they are still held).
+ * keeps cwd custody through commit, closing only the attempt copy at binding. Windows: the controller
+ * releases the attempt copy after spawn; its existing helper keeps the cwd lease and the supervisor
+ * declares its job on that same lease without reacquiring.
  * @returns {{child: import('node:child_process').ChildProcess}}
  */
 export function startSupervisor({ envelope, locks, stepEnv, extraEnv = {} }) {

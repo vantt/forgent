@@ -1622,6 +1622,12 @@ chưa forward `step.mutation` vào engine — mutation-unlock chưa có đườn
 CLI thật nào chạm tới hôm nay (`tsk-371`), một khoảng trống cần đóng
 trước khi domain coding có thể thử nghiệm mutation-gắn-Work qua CLI.
 
+## Custody lease extension (2026-10-18, Git phase 04)
+
+[Git §6](../platform/git/spec.md#6-n7-and-rul84) owns the custody contract. Execution holds one existing dispatch-cwd lease across the whole writing Unit, including provider-limit failover, runner commits, persisted receipts and handoff. Direct and terminal Assignments receive the same acquired handle; their supervisor declares its domain on the lease on every platform. Commit and sync children borrow the handle; only the attempt copy closes at binding. A completed holder clears its own unchanged predecessor under exclusion after observing the domain empty. Throw paths preserve that record.
+
+Successor admission refuses best-effort or unprovable predecessor domains with `custody-predecessor-unknown` and recovery details naming `git-worktree-recovery`/preserve/new-worktree. Writing inline and unsupervised producers refuse with `custody-domain-required`; `--force-shared-cwd` with mutation refuses with `custody-required`. Read-only sharing remains supported. Workflow's automatic fresh-worktree redispatch is still pending outside this phase's allowed write scope; this implementation preserves the old worktree and reports the refusal. Evidence and exact reproduction commands: [phase report](../../plans/reports/phase-lead-261018-2305-git-p04-custody-lease.md). No new record type or lock row.
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.

@@ -24,7 +24,7 @@ import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktr
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
-import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder, admitSuccessor } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -36,6 +36,7 @@ import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
+import { createLockScope } from '../../holder-lock/index.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -375,13 +376,20 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
-  const scope = { control: null };
+  const scope = { control: null, custody: null, handedOff: false };
   const uninstall = holdCancelOnSignal(options);
   try {
-    return await runUnitBody(options, scope);
+    const result = await runUnitBody(options, scope);
+    scope.handedOff = true;
+    return result;
   } finally {
-    try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
-    uninstall();
+    try {
+      try { if (scope.handedOff) scope.custody?.clearDomain(); }
+      finally { scope.custody?.release(); }
+    } finally {
+      try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
+      uninstall();
+    }
   }
 }
 
@@ -574,6 +582,11 @@ async function runUnitBody(options, scope) {
     options.onUnitRunCreated?.(unitRunId);
   }
 
+  if (unit.writes.length > 0 || unitRecord.sync) {
+    if (options.forceSharedCwd === true) throw new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' });
+    scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
+  }
+
   const unitDir = path.join(assignmentsDir, unitRunId);
   if (options.resumeUnitRunId) {
     const summaryFile = path.join(unitDir, 'unit-summary.json');
@@ -714,6 +727,7 @@ async function runUnitBody(options, scope) {
     const runResult = await executeAssignment(assignment, {
       cwd: unitRecord.worktree,
       repoRoot: mainRoot,
+      custody: readOnly ? null : scope.custody,
       runnerConfig,
       // The admission identity of this dispatch: a resume of an attempt whose outcome was never read
       // finds that attempt again (and its settled result) instead of admitting a new one.
@@ -796,6 +810,7 @@ async function runUnitBody(options, scope) {
         worktree: unitRecord.worktree,
         // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
         repoRoot: mainRoot,
+        custody: scope.custody,
         unitId: summarySource.id,
         summary: runResult?.agentClaim?.summary,
         objective: summarySource.objective,
@@ -803,7 +818,7 @@ async function runUnitBody(options, scope) {
         changedFiles: runResult?.evidence?.changedFiles ?? null,
         excludePaths,
         needsWrites: runResult?.agentClaim?.needsWrites,
-      }), excludePaths);
+      }), excludePaths, scope.custody);
       persistUnitRecord();
       return commit;
     };
@@ -835,6 +850,7 @@ async function runUnitBody(options, scope) {
     }
 
     if (bound.mechanism === 'inline') {
+      if (!readOnly) return { outcome: 'policy-refusal', role, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain' } };
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
       }
@@ -1045,7 +1061,7 @@ async function runUnitBody(options, scope) {
   // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose
   // merge needed no worker, ends the run here; a conflicted merge stays open for the producer.
   if (unitRecord.sync) {
-    const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord);
+    const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord, scope.custody);
     if (early) {
       executionSettled = true;
       settle(early.outcome);

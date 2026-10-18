@@ -35,12 +35,13 @@ pub(super) struct Locks {
     attempt: Option<Handle>,
     cwd_lease: Option<Handle>,
     lease_path: Option<PathBuf>,
+    lease_owner: Option<PathBuf>,
 }
 
 impl Locks {
     /// Nothing is inherited on Windows: the locks are taken once the envelope names them.
     pub(super) fn early() -> Result<Locks, Refusal> {
-        Ok(Locks { attempt: None, cwd_lease: None, lease_path: None })
+        Ok(Locks { attempt: None, cwd_lease: None, lease_path: None, lease_owner: None })
     }
 
     pub(super) fn complete(&mut self, envelope: &Value, run_dir: &Path) -> Result<(), Refusal> {
@@ -49,7 +50,11 @@ impl Locks {
             let Some(lease) = envelope["cwdLeaseFile"].as_str() else {
                 return Err(Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why: "a mutating attempt needs cwdLeaseFile on Windows".into() });
             };
-            self.cwd_lease = Some(take("dispatch-cwd", Path::new(lease))?);
+            if let Some(owner) = envelope["cwdLeaseOwner"].as_str() {
+                self.lease_owner = Some(PathBuf::from(owner));
+            } else {
+                self.cwd_lease = Some(take("dispatch-cwd", Path::new(lease))?);
+            }
             self.lease_path = Some(PathBuf::from(lease));
         }
         Ok(())
@@ -59,6 +64,9 @@ impl Locks {
     /// so the lease records the same domain: a later holder of the lease waits for
     /// it to be empty exactly as a later holder of the attempt lock does.
     pub(super) fn declare_on_lease(&self, record: &Domain) -> io::Result<()> {
+        if let Some(owner) = &self.lease_owner {
+            return declare_via_holder(owner, record);
+        }
         match &self.lease_path {
             Some(path) => fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record),
             None => Ok(()),
@@ -67,6 +75,34 @@ impl Locks {
 
     pub(super) fn release_cwd(&mut self) {
         drop(self.cwd_lease.take());
+    }
+}
+
+/// Reuse the lock-hold helper's request/answer channel. Only a helper still
+/// holding the lease can answer; parent death before this point refuses GO.
+fn declare_via_holder(owner: &Path, domain: &Domain) -> io::Result<()> {
+    let n = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_err(io::Error::other)?.as_nanos();
+    let n = u64::try_from(n).map_err(io::Error::other)?;
+    let mut record = fgos_holder_lock::predecessor::domain_json(domain);
+    record["v"] = serde_json::json!(1);
+    let target = owner.join(format!("req-{n}.json"));
+    let temporary = owner.join(format!("req-{n}.json.tmp"));
+    std::fs::write(&temporary, serde_json::json!({ "op": "declare-domain", "domain": record }).to_string())?;
+    std::fs::rename(&temporary, &target)?;
+    let result = owner.join(format!("result-{n}.json"));
+    let until = Instant::now() + Duration::from_secs(5);
+    let answer = loop {
+        match std::fs::read(&result) {
+            Ok(bytes) => break serde_json::from_slice::<Value>(&bytes).map_err(io::Error::other),
+            Err(err) if err.kind() == io::ErrorKind::NotFound && Instant::now() < until => std::thread::sleep(Duration::from_millis(5)),
+            Err(err) => break Err(err),
+        }
+    };
+    let _ = std::fs::remove_file(target);
+    let _ = std::fs::remove_file(result);
+    match answer? {
+        value if value["result"] == "declared" => Ok(()),
+        value => Err(io::Error::other(format!("custody-domain-required: lease holder refused declaration: {value}"))),
     }
 }
 

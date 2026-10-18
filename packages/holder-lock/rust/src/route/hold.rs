@@ -30,6 +30,7 @@ const TICK: Duration = Duration::from_millis(5);
 /// The arguments of one `lock-hold` call, already validated.
 pub(super) struct HoldArgs {
     pub path: PathBuf,
+    pub predecessor_kinds: Vec<String>,
     pub mode: Mode,
     pub wait: Wait,
     pub kill_wait_ms: u64,
@@ -218,6 +219,31 @@ mod borrow {
                 }
             };
             match request.get("op").and_then(Value::as_str) {
+                Some("declare-domain") => {
+                    // The supervisor cannot inherit LockFileEx. Its declaration
+                    // must be acknowledged by this still-holding helper before
+                    // GO; a dead helper therefore cannot authorize a late start.
+                    let result = if flight.busy() {
+                        json!({ "error": "borrow-busy" })
+                    } else if let Some(domain) = crate::predecessor::parse_record(&request["domain"]) {
+                        match port::validate(handle).map_err(std::io::Error::other).and_then(|()| handle.declare_domain(&domain)) {
+                            Ok(()) => json!({ "result": "declared" }),
+                            Err(err) => json!({ "error": "lock-domain-declaration-failed", "message": err.to_string() }),
+                        }
+                    } else { json!({ "error": "domain-invalid" }) };
+                    answer(work, n, result);
+                }
+                Some("clear-domain") => {
+                    let result = if flight.busy() {
+                        json!({ "error": "borrow-busy" })
+                    } else {
+                        match handle.clear_domain() {
+                            Ok(()) => json!({ "result": "cleared" }),
+                            Err(err) => json!({ "error": "lock-domain-not-empty", "message": err.to_string() }),
+                        }
+                    };
+                    answer(work, n, result);
+                }
                 Some("borrow") => {
                     if flight.busy() {
                         answer(work, n, json!({ "error": "borrow-busy" }));
@@ -278,7 +304,8 @@ mod borrow {
 /// that). Returns the process exit code.
 pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool) -> i32 {
     let name = args.path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
-    let resource = Resource::new(name, &args.path);
+    let mut resource = Resource::new(name, &args.path);
+    resource.predecessor_kinds = args.predecessor_kinds.clone();
     let handle = match port::acquire(&resource, args.mode, args.wait, args.kill_wait_ms) {
         Acquire::Acquired(handle) => handle,
         Acquire::Held { reason, domain } => {
@@ -437,7 +464,7 @@ mod tests {
     fn args(dir: &Path, wait: Wait) -> HoldArgs {
         let work = dir.join("work");
         fs::create_dir_all(&work).unwrap();
-        HoldArgs { path: dir.join("hold.lock"), mode: Mode::Ex, wait, kill_wait_ms: 100, work }
+        HoldArgs { predecessor_kinds: Vec::new(), path: dir.join("hold.lock"), mode: Mode::Ex, wait, kill_wait_ms: 100, work }
     }
 
     fn ready(work: &Path) -> Value {

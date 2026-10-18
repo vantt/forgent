@@ -15,6 +15,7 @@
 // fsmonitor runs, and no GIT_* variable of the caller's environment applies.
 
 import { execFileSync } from 'node:child_process';
+import { runBorrowed } from '../../holder-lock/index.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -40,7 +41,8 @@ function cleanEnv(extra = {}) {
   return { ...env, ...extra };
 }
 
-function rawGit(cwd, args) {
+function rawGit(cwd, args, custody) {
+  if (custody) return borrowed(custody, 'git', args, { cwd, env: cleanEnv() });
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: cleanEnv() });
 }
 
@@ -52,13 +54,13 @@ class UntrustedWorktreeError extends Error {}
  * cannot write: the gitdir is looked up from that repository's own worktree list, never read from
  * the worktree's `.git` file.
  */
-export function gitContext({ worktree, repoRoot }) {
+export function gitContext({ worktree, repoRoot, custody }) {
   if (!repoRoot) throw new TypeError('the runner commit requires repoRoot (the main checkout): the gitdir is never read from the worktree');
   const workTree = fs.realpathSync(worktree);
   const prefix = ['-c', 'core.fsmonitor=false'];
 
   const mainRoot = fs.realpathSync(repoRoot);
-  const commonDir = path.resolve(mainRoot, rawGit(mainRoot, ['rev-parse', '--git-common-dir']).trim());
+  const commonDir = path.resolve(mainRoot, rawGit(mainRoot, ['rev-parse', '--git-common-dir'], custody).trim());
   // A linked worktree named as the root would hand its own (worker-writable) pointer the trust.
   if (fs.realpathSync(path.dirname(commonDir)) !== mainRoot) {
     throw new UntrustedWorktreeError(`${mainRoot} is not the main checkout of its repository; pass the main checkout as repoRoot`);
@@ -80,14 +82,26 @@ export function gitContext({ worktree, repoRoot }) {
 
   // A relative hooks path is read against the main checkout, whose hooks the worker cannot edit.
   let hooksPath = '';
-  try { hooksPath = rawGit(mainRoot, ['config', '--get', 'core.hooksPath']).trim(); } catch { /* unset */ }
+  try { hooksPath = rawGit(mainRoot, ['config', '--get', 'core.hooksPath'], custody).trim(); } catch { /* unset */ }
   if (hooksPath && !path.isAbsolute(hooksPath) && !hooksPath.startsWith('~')) {
     prefix.push('-c', `core.hooksPath=${path.resolve(mainRoot, hooksPath)}`);
   }
-  return { cwd: workTree, gitDir, prefix: ['--git-dir', gitDir, '--work-tree', workTree, ...prefix] };
+  return { custody, cwd: workTree, gitDir, prefix: ['--git-dir', gitDir, '--work-tree', workTree, ...prefix] };
+}
+
+/** Every child of a custody-backed commit borrows the same acquired handle. */
+function borrowed(custody, command, args, { cwd, env, input } = {}) {
+  const result = runBorrowed(custody, { command, args, cwd, env, detached: true, stdin: input === undefined ? 'ignore' : 'pipe', input });
+  if (result.exit !== 0 || result.signal) {
+    const error = new Error(`Command failed: ${command} ${args.join(' ')}\n${result.stderr ?? ''}`);
+    Object.assign(error, { status: result.exit, signal: result.signal, stdout: result.stdout, stderr: result.stderr });
+    throw error;
+  }
+  return result.stdout ?? '';
 }
 
 function git(ctx, args, { env, input } = {}) {
+  if (ctx.custody) return borrowed(ctx.custody, 'git', [...ctx.prefix, ...args], { cwd: ctx.cwd, env: cleanEnv(env), input });
   return execFileSync('git', [...ctx.prefix, ...args], {
     cwd: ctx.cwd,
     encoding: 'utf8',
@@ -192,6 +206,13 @@ const sameSet = (a, b) => a.length === b.length && new Set([...a, ...b]).size ==
 
 /** Literal pathspecs on stdin: no argument limit, and no `*`, `[` or `:(magic)` reading. */
 function withPaths(ctx, args, paths) {
+  if (ctx.custody && process.platform === 'win32') {
+    let output = '';
+    for (let at = 0; at < paths.length; at += 32) {
+      output += git(ctx, [...args, '--', ...paths.slice(at, at + 32)], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+    }
+    return output;
+  }
   return git(ctx, [...args, '--pathspec-from-file=-', '--pathspec-file-nul'], {
     env: { GIT_LITERAL_PATHSPECS: '1' },
     input: `${paths.join('\0')}\0`,
@@ -220,7 +241,7 @@ function withPaths(ctx, args, paths) {
  * @returns {{ status: 'committed'|'no-changes'|'failed', sha?: string, subject?: string, files?: string[],
  *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], reason?: string, error?: string }}
  */
-export function commitUnitWork({ worktree, repoRoot, unitId, summary, objective, scope, changedFiles = null, excludePaths = [], needsWrites }) {
+export function commitUnitWork({ worktree, repoRoot, custody, unitId, summary, objective, scope, changedFiles = null, excludePaths = [], needsWrites }) {
   if (!Array.isArray(scope)) throw new TypeError('commitUnitWork requires a write scope (use ["**"] for the whole worktree)');
   if (!repoRoot) throw new TypeError('commitUnitWork requires repoRoot (the main checkout): the gitdir is never read from the worktree');
   const base = {
@@ -232,7 +253,7 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, objective,
   try {
     let ctx;
     try {
-      ctx = gitContext({ worktree, repoRoot });
+      ctx = gitContext({ worktree, repoRoot, custody });
     } catch (err) {
       if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
       throw err;
@@ -427,7 +448,7 @@ function preCommitRefusal(ctx) {
     return null;
   }
   try {
-    execFileSync(hook, [], {
+    (ctx.custody ? (command, args, options) => borrowed(ctx.custody, command, args, options) : execFileSync)(hook, [], {
       cwd: ctx.cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -458,11 +479,11 @@ function abortMerge(ctx) {
  *   `error` carries its words), `committed-set-mismatch` (the commit landed holding more than the
  *   merge) or `git-error`.
  */
-export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = false }) {
+export function startSyncMerge({ worktree, repoRoot, custody, ref, sha, adoptOpenMerge = false }) {
   const failed = (reason, error, extra = {}) => ({ status: 'failed', reason, error, ref, sha, ...extra });
   let ctx;
   try {
-    ctx = gitContext({ worktree, repoRoot });
+    ctx = gitContext({ worktree, repoRoot, custody });
   } catch (err) {
     if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
     throw err;
@@ -569,11 +590,11 @@ export function pathsWithConflictMarkers(worktree, paths) {
  * MERGE_HEAD as second parent. `merged-outside` when the sha is already in the branch (someone
  * concluded it by hand); `sync-merge-lost` when the merge is gone or HEAD moved.
  */
-export function finishSyncMerge({ worktree, repoRoot, sync }) {
+export function finishSyncMerge({ worktree, repoRoot, custody, sync }) {
   const failed = (reason, error, extra = {}) => ({ status: 'failed', reason, error, ...extra });
   let ctx;
   try {
-    ctx = gitContext({ worktree, repoRoot });
+    ctx = gitContext({ worktree, repoRoot, custody });
   } catch (err) {
     if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
     throw err;

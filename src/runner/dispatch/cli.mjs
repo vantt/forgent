@@ -57,7 +57,6 @@ import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
 // the dispatch root instead.
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
-import { acquireDispatchCwdLock } from './cwd-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
 import { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
 
@@ -648,7 +647,7 @@ export async function executeExecutorCli(
   // One dispatch at a time per working directory, because two writers in one tree race. A caller that
   // knows the dispatch cannot write the workspace (a read-only posture) shares the directory instead:
   // the panelists of one panel run side by side in the same checkout.
-  const cwdLock = sharedCwd ? null : acquireDispatchCwdLock(fgosDir, cwd);
+  if (!sharedCwd) throw new DispatchError('custody-domain-required', 'a mutating producer must run through a supervised Assignment with a declared domain', {});
 
   try {
     process.stderr.write(
@@ -794,7 +793,7 @@ export async function executeExecutorCli(
     };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
-    cwdLock?.release();
+    // Read-only executor calls have no custody to release.
   }
 
 }

@@ -85,9 +85,9 @@ export function sweepStaleWorkDirs({ tmpdir = os.tmpdir(), now = Date.now() } = 
   return removed;
 }
 
-function holdArgv({ lockPath, mode = 'ex', wait, killWaitMs, work }) {
+function holdArgv({ lockPath, mode = 'ex', wait, killWaitMs, predecessorKinds, work }) {
   const waitArgs = wait.kind === 'ms' ? ['--wait-ms', String(wait.ms)] : ['--try'];
-  return ['internal', 'lock-hold', '--protocol', String(PROTOCOL), '--path', path.resolve(lockPath), '--mode', mode, ...waitArgs, '--kill-wait-ms', String(killWaitMs), '--work', work];
+  return ['internal', 'lock-hold', '--protocol', String(PROTOCOL), '--path', path.resolve(lockPath), '--mode', mode, ...waitArgs, '--kill-wait-ms', String(killWaitMs), ...(predecessorKinds ? ['--predecessor-kinds', predecessorKinds.join(',')] : []), '--work', work];
 }
 
 /** Remove a work directory; a failure leaves it for the next sweep. */
@@ -101,13 +101,13 @@ export function removeWorkDir(work) {
 
 /** Start one helper with a fresh work directory. `{ child, pid, work }`; the
  * work directory is removed again when the helper cannot start. */
-export function startHold({ bin, lockPath, wait, killWaitMs, env }) {
+export function startHold({ bin, lockPath, wait, killWaitMs, predecessorKinds, env }) {
   sweepStaleWorkDirs();
   sequence += 1;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), `${WORK_PREFIX}${process.pid}-${sequence}-`));
   let child;
   try {
-    child = spawn(bin, holdArgv({ lockPath, wait, killWaitMs, work }), { env, stdio: 'ignore', windowsHide: true });
+    child = spawn(bin, holdArgv({ lockPath, wait, killWaitMs, predecessorKinds, work }), { env, stdio: 'ignore', windowsHide: true });
   } catch (err) {
     removeWorkDir(work);
     throw new HolderLockError('lock-driver-unavailable', `cannot run ${bin}: ${err.message}`, { reason: 'no-host-binary', tried: [bin] });
@@ -487,4 +487,19 @@ export function borrowAsync(hold, spec, { killWaitMs, onResult }) {
   }, TAIL_POLL_MS);
   process.nextTick(() => child.emit('spawn'));
   return child;
+}
+
+/** Clear under the helper's acquired handle, using its existing request channel. */
+export function clearDomainHold(hold, timeoutMs) {
+  const n = writeRequest(hold, { op: 'clear-domain' });
+  const deadline = Date.now() + timeoutMs;
+  try {
+    while (Date.now() < deadline) {
+      const answer = resultOf(hold, n);
+      if (answer) return answer;
+      if (!helperAlive(hold)) break;
+      sleepSync(RESULT_POLL_MS);
+    }
+    throw new HolderLockError('lock-route-error', 'clear-domain helper did not answer', {});
+  } finally { forget(hold, n, ['req-<n>.json', 'result-<n>.json']); }
 }
