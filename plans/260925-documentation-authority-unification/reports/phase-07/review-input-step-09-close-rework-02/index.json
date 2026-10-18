@@ -1,0 +1,69 @@
+{
+  "request": "step-09-close-rework-02",
+  "supersedes": "review-request-a38-step-09-close-rework-01.md",
+  "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "entries": 110,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-02/part-01.json",
+      "entries": 50,
+      "bytes": 161058,
+      "sha256": "d0a51c1845d3c8b768a70339b99cb43a7b412a644745c1da30710dbe3a282648"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-02/part-02.json",
+      "entries": 50,
+      "bytes": 187518,
+      "sha256": "9e414a7d5da9b7afd0026588aea2cf5875671b436856499e2cdebe0cf1514d5d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-09-close-rework-02/part-03.json",
+      "entries": 10,
+      "bytes": 18652,
+      "sha256": "d823bc7f13f79e4c8d32ed2829fd00ae20becd79bd555c54feefc42eba773063"
+    }
+  ],
+  "releaseStatus": "ready for independent bounded review; H1/H2 remain Lead-owned",
+  "requiredNewReport": "review-a38-step-09-close-rework-02.md",
+  "sampling": {
+    "population": 131,
+    "minimum": 20,
+    "included": 81,
+    "allHighRisk": [
+      "X-A34-01",
+      "X-A34-17",
+      "X-A34-18",
+      "X-A34-19",
+      "X-A34-20",
+      "X-A34-21",
+      "X-A34-22",
+      "X-A34-23",
+      "X-A34-24",
+      "X-A34-25",
+      "X-A34-26",
+      "X-A34-27",
+      "X-A34-28",
+      "X-STALE-01",
+      "X-STALE-02",
+      "X-STALE-03",
+      "X-STALE-04",
+      "X-STALE-05",
+      "X-STALE-06",
+      "X-CTR010-01",
+      "X-MAIN-01",
+      "X-MAIN-02",
+      "X-MAIN-03",
+      "X-LOCK-01",
+      "X-LOCK-02",
+      "X-LOCK-03",
+      "X-LOCK-04",
+      "X-LOCK-05",
+      "X-LOCK-06",
+      "X-LOCK-07",
+      "S3-01"
+    ],
+    "allHighRiskIncluded": true,
+    "method": "All 22 changed/refreshed contract rows, all 51 changed alignment pins/citations, plus every other high-risk/deepReadRequired alignment row. Independent semantics pending."
+  },
+  "historicalRequestsAndReviewsUntouched": true
+}

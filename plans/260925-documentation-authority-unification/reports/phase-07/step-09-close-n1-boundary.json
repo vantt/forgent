@@ -1,0 +1,56 @@
+{
+  "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "manifestChanges": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "onlyExactExceptionArrayChanged": true,
+      "currentSHA256": "502562f0aba27229878d3f5ad3a2165b23a66a15ff576b4dca0bf393507fae08"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "onlyExactExceptionArrayChanged": true,
+      "currentSHA256": "7bd8e281d2efbbfbbc8b40b349f2c8ddb5e9aa4d9de5a90cae286292bedfa413"
+    }
+  ],
+  "productionInputs": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "sha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "scripts/compare-doc-global-closure.mjs",
+      "sha256": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "sha256": "ad4be75733d5684afd50e72439255ccc575a51a848b092dcea21f5677dcd9278",
+      "byteEqualToHEAD": true
+    },
+    {
+      "path": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "sha256": "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646",
+      "byteEqualToHEAD": true
+    }
+  ],
+  "candidateDiff": "",
+  "phase07PlanDiff": "",
+  "nativeCarryInvocations": 1,
+  "heavyJobsSerialized": true
+}

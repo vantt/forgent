@@ -55,6 +55,16 @@
           "commit": "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f",
           "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
           "authority": "A46 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+          "authority": "L11-24 / L11-26 / N1 PACKAGE approved manifest-data accounting"
+        },
+        {
+          "commit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "L11-24 / L11-26 / N1 PACKAGE approved manifest-data accounting"
         }
       ]
     },
@@ -106,19 +116,26 @@
           "commit": "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f",
           "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
           "authority": "A46 / Phase 7 authorized plan accounting"
+        },
+        {
+          "commit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+          "authority": "L11-24 / L11-26 / N1 PACKAGE approved manifest-data accounting"
+        },
+        {
+          "commit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "L11-24 / L11-26 / N1 PACKAGE approved manifest-data accounting"
         }
       ]
     }
   ],
-  "latestAuthority": "A46 / N1 package at b919e2b9b",
-  "addedExactPairCount": 18,
+  "latestAuthority": "L11-24 / L11-26 / N1 PACKAGE at 6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "addedExactPairCount": 22,
   "laterTrackedPlanCommitScan": {
-    "fromExclusive": "2296413a2",
-    "through": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
-    "method": "first-parent non-merge commits, compare each touched path to the existing exact-pair paths in each manifest",
-    "newCommits": [
-      "9ac0f42fb4322880d3a6c4c3f57b8535fe25f25f"
-    ],
+    "fromExclusive": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+    "through": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+    "method": "first-parent non-merge commits; touched paths intersect exact-pair tracked path universe in each manifest",
     "phase07PlanEditedByPackage": false
   }
 }

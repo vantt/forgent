@@ -1,0 +1,70 @@
+{
+  "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "candidateBytesEdited": false,
+  "phase07PlanEdited": false,
+  "nativeCarryInvocations": 1,
+  "identitySourceChanges": [
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md"
+  ],
+  "registryCollections": {
+    "documents": {
+      "unaffectedRows": 4488,
+      "allOtherRowsEqual": true
+    },
+    "units": {
+      "unaffectedRows": 91675,
+      "allOtherRowsEqual": true
+    },
+    "identityGaps": {
+      "unaffectedRows": 5979,
+      "allOtherRowsEqual": true
+    },
+    "retiredUnits": {
+      "unaffectedRows": 2300,
+      "allOtherRowsEqual": true
+    },
+    "retiredDocuments": {
+      "unaffectedRows": 27,
+      "allOtherRowsEqual": true
+    }
+  },
+  "queueRowsChanged": [
+    236,
+    237,
+    238,
+    242,
+    243,
+    244
+  ],
+  "historicalB0TuplesPreserved": true,
+  "priorCarryMetadataPreserved": true,
+  "LeadPlaceholderLinesBytePreserved": true,
+  "productionToolsAndBaselinesByteEqualToHEAD": true,
+  "scopeViolations": [],
+  "gateD": {
+    "allThreeExit": 0,
+    "fatal": 0
+  },
+  "ratchetExit": 0,
+  "strictE": {
+    "allThreeExit": 1,
+    "fatalCategories": 8,
+    "exactRecordedSetsAfterTwoNativeCorrespondences": true
+  },
+  "comparator": {
+    "reproduced": true,
+    "comparatorExit": 1,
+    "errors": 24
+  },
+  "docTests": {
+    "exit": 0,
+    "pass": 67,
+    "fail": 0
+  },
+  "preview": {
+    "attempted": true,
+    "available": false,
+    "reason": "MDView database read-only; no scope expansion"
+  },
+  "remaining": "Independent closing re-review and Lead H1/H2 placeholders/owner H2 ratification; no new candidate-content defect found."
+}

@@ -1,0 +1,459 @@
+{
+  "request": "step-09-close-rework-02",
+  "authorSession": "codex-session:fgos-run_unit-run-1792346bcf6848@2026-10-18",
+  "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+  "entries": [
+    {
+      "entry": "doc-tooling-tests",
+      "kind": "closing-recheck",
+      "row": {
+        "exit": 0,
+        "tests": 67,
+        "pass": 67,
+        "fail": 0,
+        "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+        "log": "step-09-close-n1-doc-tests.log",
+        "boundary": "Approved exact manifest exception data only; tests and checker logic unchanged.",
+        "finalRerun": true,
+        "initialPass": 67,
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "durationMs": 44796.989555
+      }
+    },
+    {
+      "entry": "displaced-228",
+      "kind": "historical-source-current-target-binding",
+      "row": {
+        "queueIndex": 228,
+        "tuple": [
+          9,
+          "heading",
+          "assignment",
+          42,
+          42,
+          "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+          1,
+          "5a0f4218a0a00b08442feb8fe9b1fcdf4d415dfa00d035450d5da7451a1ce171"
+        ],
+        "currentNative": {
+          "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+          "unitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+          "identityFingerprint": "07bf2207578aa1add403bc6e6b90cc73c4332fb3087c9577997d804c315f959b",
+          "claimId": "claim_f50eba28f12680323837c93d7c23ac1c",
+          "sourceAnchor": "assignment",
+          "unitKind": "heading",
+          "sourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605",
+          "claimKind": "contract",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+            "fromUnitDigest": "b7b789e9947e9fb14b5dda3031b62fb0e605e87b07d79a5df09e9095d7ca730f",
+            "toUnitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+            "fromSourceUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
+            "toSourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605"
+          }
+        },
+        "boundary": "Historical B0 source tuple unchanged; current target binding only."
+      }
+    },
+    {
+      "entry": "displaced-234",
+      "kind": "historical-source-current-target-binding",
+      "row": {
+        "queueIndex": 234,
+        "tuple": [
+          9,
+          "unheaded-block",
+          "unheaded-block-10",
+          71,
+          72,
+          "565c53c7942aaa01ecfb4d4ab3ef3aa47fdf996bee4bb8e3eb6aa71722ec0eee",
+          1,
+          "93dce06786b71dc92b40c7551269037a90ec55f855908a43225adb968f92bc51"
+        ],
+        "currentNative": {
+          "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+          "unitDigest": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+          "identityFingerprint": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+          "claimId": "claim_1e367448a5e9807953df6f9b2ef44e43",
+          "sourceAnchor": "unheaded-block-10",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+          "claimKind": "contract",
+          "status": "future",
+          "origin": "added-since-b919e2b9b53b2425cafef51d16f1327c81ecc68f"
+        },
+        "boundary": "Historical B0 source tuple unchanged; current target binding only."
+      }
+    },
+    {
+      "entry": "closure-open-set-comparison",
+      "kind": "closing-recheck",
+      "row": {
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "priorContentCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+        "baseline": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-open-sets.json",
+        "current": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-open-sets.json",
+        "nativeCorrespondences": [
+          {
+            "before": {
+              "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "unitDigest": "b7b789e9947e9fb14b5dda3031b62fb0e605e87b07d79a5df09e9095d7ca730f",
+              "identityFingerprint": "e22806ffd940586e8e2299579918cdbc7aa1a26e43e2e5fba44e382ac33df7f9",
+              "claimId": "claim_f50eba28f12680323837c93d7c23ac1c",
+              "sourceAnchor": "assignment",
+              "unitKind": "heading",
+              "sourceUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
+              "claimKind": "contract",
+              "status": "future",
+              "reviewStatus": "needs-review",
+              "lineage": {
+                "fromCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+                "fromUnitDigest": "27810401f329c6ed630f5cb9b4de43c2fa2de9b5c6071e69a0a12eda0fd665f0",
+                "toUnitDigest": "b7b789e9947e9fb14b5dda3031b62fb0e605e87b07d79a5df09e9095d7ca730f",
+                "fromSourceUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+                "toSourceUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4"
+              }
+            },
+            "after": {
+              "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "unitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+              "identityFingerprint": "07bf2207578aa1add403bc6e6b90cc73c4332fb3087c9577997d804c315f959b",
+              "claimId": "claim_f50eba28f12680323837c93d7c23ac1c",
+              "sourceAnchor": "assignment",
+              "unitKind": "heading",
+              "sourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605",
+              "claimKind": "contract",
+              "status": "future",
+              "reviewStatus": "needs-review",
+              "lineage": {
+                "fromCommit": "b919e2b9b53b2425cafef51d16f1327c81ecc68f",
+                "fromUnitDigest": "b7b789e9947e9fb14b5dda3031b62fb0e605e87b07d79a5df09e9095d7ca730f",
+                "toUnitDigest": "ba9b040703a63c770e80e6e2338bf7953d753e5bb670cdc531bae6ce0a40be96",
+                "fromSourceUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
+                "toSourceUnitDigest": "8f9c8e2058426e830124acaaaf2c3a4c750eb2a48d4256c3a06824738bb56605"
+              }
+            }
+          },
+          {
+            "before": {
+              "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "unitDigest": "cdfe89de40570bad8e95a2493e3c74d3ceff3c15d7c152636ce70ea247ea22e9",
+              "identityFingerprint": "cdfe89de40570bad8e95a2493e3c74d3ceff3c15d7c152636ce70ea247ea22e9",
+              "claimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
+              "sourceAnchor": "unheaded-block-10",
+              "unitKind": "unheaded-block",
+              "sourceUnitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+              "claimKind": "contract",
+              "status": "future"
+            },
+            "after": {
+              "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "unitDigest": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+              "identityFingerprint": "66aa216562bfa004e27488562b10431c371f2b55cc87df7d12818c4fb23b218f",
+              "claimId": "claim_1e367448a5e9807953df6f9b2ef44e43",
+              "sourceAnchor": "unheaded-block-10",
+              "unitKind": "unheaded-block",
+              "sourceUnitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+              "claimKind": "contract",
+              "status": "future",
+              "origin": "added-since-b919e2b9b53b2425cafef51d16f1327c81ecc68f"
+            }
+          }
+        ],
+        "rule": "Only the two committed Assignment unit occurrences follow native successors/digests; every other tuple and every comparator error must equal the recorded set. Gap supersession is authored pending review; H2 ratification is separate.",
+        "comparisons": {
+          "filesUnknownBlocking": {
+            "expectedCount": 35,
+            "actualCount": 35,
+            "unexpected": [],
+            "missing": []
+          },
+          "claimsUnknownBlocking": {
+            "expectedCount": 2436,
+            "actualCount": 2436,
+            "unexpected": [],
+            "missing": []
+          },
+          "claimsWithoutOwnRationale": {
+            "expectedCount": 2436,
+            "actualCount": 2436,
+            "unexpected": [],
+            "missing": []
+          },
+          "registryGapsWithoutDisposition": {
+            "expectedCount": 233,
+            "actualCount": 233,
+            "unexpected": [],
+            "missing": []
+          },
+          "pendingHolds": {
+            "expectedCount": 4504,
+            "actualCount": 4504,
+            "unexpected": [],
+            "missing": []
+          },
+          "partialCarries": {
+            "expectedCount": 28,
+            "actualCount": 28,
+            "unexpected": [],
+            "missing": []
+          },
+          "identicalUnits": {
+            "expectedCount": 362,
+            "actualCount": 362,
+            "unexpected": [],
+            "missing": []
+          },
+          "candidateUnits": {
+            "expectedCount": 2716,
+            "actualCount": 2716,
+            "unexpected": [],
+            "missing": []
+          },
+          "comparatorErrors": {
+            "expectedCount": 24,
+            "actualCount": 24,
+            "unexpected": [],
+            "missing": []
+          }
+        },
+        "allThreeStrictEOutputsEqual": true,
+        "D": [
+          {
+            "priors": "both",
+            "exit": 0,
+            "fatal": 0
+          },
+          {
+            "priors": "identity",
+            "exit": 0,
+            "fatal": 0
+          },
+          {
+            "priors": "phase02",
+            "exit": 0,
+            "fatal": 0
+          }
+        ],
+        "ratchet": {
+          "clean": true,
+          "findings": [],
+          "stats": {
+            "baselineFilesCount": 994,
+            "onDiskFilesCount": 995,
+            "accountedEditsCount": 26,
+            "accountedNewFilesCount": 1,
+            "findingsCount": 0
+          }
+        },
+        "H2": "pending owner/Lead; equality is continuity proof, never attribution or approval",
+        "passed": true
+      }
+    },
+    {
+      "entry": "portable-comparator-replay",
+      "kind": "closing-recheck",
+      "row": {
+        "reproduced": true,
+        "comparatorExit": 1,
+        "errors": 24
+      }
+    },
+    {
+      "entry": "production-and-manifest-boundary",
+      "kind": "closing-recheck",
+      "row": {
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "manifestChanges": [
+          {
+            "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+            "onlyExactExceptionArrayChanged": true,
+            "currentSHA256": "502562f0aba27229878d3f5ad3a2165b23a66a15ff576b4dca0bf393507fae08"
+          },
+          {
+            "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+            "onlyExactExceptionArrayChanged": true,
+            "currentSHA256": "7bd8e281d2efbbfbbc8b40b349f2c8ddb5e9aa4d9de5a90cae286292bedfa413"
+          }
+        ],
+        "productionInputs": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "scripts/check-doc-inventory-gates.mjs",
+            "sha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "scripts/compare-doc-global-closure.mjs",
+            "sha256": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+            "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+            "sha256": "ad4be75733d5684afd50e72439255ccc575a51a848b092dcea21f5677dcd9278",
+            "byteEqualToHEAD": true
+          },
+          {
+            "path": "test/scripts/doc-rationale-reproduction.test.mjs",
+            "sha256": "bc1ef9d3a9eb2326567710dd37d30b765964fce0bfce71f6fdcd67c7ac785646",
+            "byteEqualToHEAD": true
+          }
+        ],
+        "candidateDiff": "",
+        "phase07PlanDiff": "",
+        "nativeCarryInvocations": 1,
+        "heavyJobsSerialized": true
+      }
+    },
+    {
+      "entry": "ratchet-command",
+      "kind": "closing-recheck",
+      "row": {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+        "exit": 0,
+        "output": "check-legacy-docs-ratchet: clean (995 legacy files checked; 26 accounted edit(s), 1 accounted new file(s)).",
+        "stderr": ""
+      }
+    },
+    {
+      "entry": "closure-inputs",
+      "kind": "closing-recheck",
+      "row": {
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "scopeFiles": 1084,
+        "actualSHA256": "34e37da38302a8431f5162bda7640927232836a27bd9d69443c861a3d06245de",
+        "expectedSHA256": "c26edb25b40bd63ba981f06440350dfe0fd42ebe8dcb23ca1df1adbf92b54acf",
+        "strictEGateSHA256": "d6ae3cbf9a7b061ca9f6d3078d6be1c8591304db0760b4644150ed5274757bd1",
+        "inventoryManifestSHA256": "2dcad8b666c15f9b57793a5b9597ea5b23d98caecbc5010933a0c2c8fa72324d",
+        "registrySHA256": "33ff5d4a4e7fec769203b89ebde307abf2d0e8c59fcfcda0ca6d976bc91c648f",
+        "noGateDerivedExpectations": true,
+        "expectedProjectionFinalized": true,
+        "candidateProjectionFinalized": true
+      }
+    },
+    {
+      "entry": "candidate-declaration-correspondence",
+      "kind": "closing-recheck",
+      "row": {
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "source": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "prior": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-expected.json",
+        "changes": [
+          {
+            "listIndex": 8,
+            "rowIndex": 23,
+            "before": {
+              "claimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
+              "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "anchor": "unheaded-block-10",
+              "unitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+              "status": "candidate-unverified",
+              "reviewStatus": "pending",
+              "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+            },
+            "after": {
+              "claimId": "claim_1e367448a5e9807953df6f9b2ef44e43",
+              "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+              "anchor": "unheaded-block-10",
+              "unitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+              "status": "candidate-unverified",
+              "reviewStatus": "pending",
+              "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+            }
+          }
+        ],
+        "allOtherCandidateRowsPreserved": true
+      }
+    },
+    {
+      "entry": "final-boundary-validation",
+      "kind": "closing-recheck",
+      "row": {
+        "contentCommit": "6f88f5d8e6a0a85c3e9f4d7bf9eb1aef13223fa6",
+        "candidateBytesEdited": false,
+        "phase07PlanEdited": false,
+        "nativeCarryInvocations": 1,
+        "identitySourceChanges": [
+          "docs/platform/agent-coordination/contracts/assignment-run-runresult.md"
+        ],
+        "registryCollections": {
+          "documents": {
+            "unaffectedRows": 4488,
+            "allOtherRowsEqual": true
+          },
+          "units": {
+            "unaffectedRows": 91675,
+            "allOtherRowsEqual": true
+          },
+          "identityGaps": {
+            "unaffectedRows": 5979,
+            "allOtherRowsEqual": true
+          },
+          "retiredUnits": {
+            "unaffectedRows": 2300,
+            "allOtherRowsEqual": true
+          },
+          "retiredDocuments": {
+            "unaffectedRows": 27,
+            "allOtherRowsEqual": true
+          }
+        },
+        "queueRowsChanged": [
+          236,
+          237,
+          238,
+          242,
+          243,
+          244
+        ],
+        "historicalB0TuplesPreserved": true,
+        "priorCarryMetadataPreserved": true,
+        "LeadPlaceholderLinesBytePreserved": true,
+        "productionToolsAndBaselinesByteEqualToHEAD": true,
+        "scopeViolations": [],
+        "gateD": {
+          "allThreeExit": 0,
+          "fatal": 0
+        },
+        "ratchetExit": 0,
+        "strictE": {
+          "allThreeExit": 1,
+          "fatalCategories": 8,
+          "exactRecordedSetsAfterTwoNativeCorrespondences": true
+        },
+        "comparator": {
+          "reproduced": true,
+          "comparatorExit": 1,
+          "errors": 24
+        },
+        "docTests": {
+          "exit": 0,
+          "pass": 67,
+          "fail": 0
+        },
+        "preview": {
+          "attempted": true,
+          "available": false,
+          "reason": "MDView database read-only; no scope expansion"
+        },
+        "remaining": "Independent closing re-review and Lead H1/H2 placeholders/owner H2 ratification; no new candidate-content defect found."
+      }
+    }
+  ]
+}
