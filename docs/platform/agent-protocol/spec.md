@@ -58,7 +58,7 @@ In direct mode the supervisor does not need `send`: the gate gave the brief to t
 | `needs-human` | The agent asked a question only a person can answer | both |
 | `exited(code)` | The process exited without a result file | direct |
 | `ready` | The CLI shows an empty prompt and can take the brief | terminal |
-| `delivered` | The brief is confirmed submitted: the CLI shows it working, or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen is not proof | terminal |
+| `delivered` | The brief is confirmed submitted: the CLI shows it working **and** its composer no longer holds the brief (or it keeps working for 8 s, longer than a paste takes to be ingested), or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen, or one look at `working` while the TUI takes in the paste, is not proof | terminal |
 | `delivery-unknown` | Delivery could not be confirmed, or the prompt never became ready. Nothing is resent blind | terminal |
 
 Rules for direct mode, as implemented:
@@ -75,7 +75,7 @@ Rules for direct mode, as implemented:
 | CLI | `direct` | `terminal` |
 |---|---|---|
 | claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |
-| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog; Enter gap 600 ms (text then Enter back to back reads as a paste); launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID="<id>"}` |
+| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog (v0.163 words it "Trust this folder?" and opens it about a second after the first prompt screen); Enter gap 600 ms (text then Enter back to back reads as a paste, and a 4 KB paste can swallow Enter for several seconds, so a draft gets Enter again every 2.5 s, six times at most); launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID="<id>"}` |
 | agy | landed | landed: exit `/exit` + Enter; trust dialog; Enter gap 300 ms |
 | pi | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; Enter gap 300 ms |
 | omp | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; attachment chip that Enter submits; Enter gap 300 ms |
@@ -88,13 +88,13 @@ Contract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts
 
 | Step | Rule |
 |---|---|
-| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |
-| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key. A draft left in the composer (paste chip, history above the composer) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`) |
+| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). After the settle wait the detector is asked once more, so a dialog that opened over a prompt that already looked ready still blocks. A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |
+| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key. A draft left in the composer (paste chip, history above the composer, or a composer that grew to show a window of a long paste: two or more of the brief's own lines in the last six) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`). The detector's prompt text is not trusted alone: codex reports its window title there, so the screen is always looked at |
 | Delivered | Section 4. Typing is repeated only when the typing call itself failed **and**, after one render interval, the pane equals its screen from before the send, is idle and shows no draft; at most 2 resends. A typing call that succeeded is never repeated |
 | Completed | A result counts only when `outbox/result-<N>.json` parses as a JSON object and keeps its size over 20 ms; temporary names (`*.tmp.*`) are ignored. Measured: claude renames a full file into place, codex, agy and omp write in place, pi shows the name empty first |
 | Exit | The CLI's exit command (the envelope's `terminal.exitCommand` overrides it) |
 
-Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). Known limits: the working screens of codex, agy, pi and omp were not recorded (turns ended in under 3 s), so their working detection rests on the detector verdict plus the wording tests; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction).
+Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). The working screens of codex, omp, pi and agy (a start-up spinner and a mid-turn screen) were recorded on herdr in the integration round, with the long-paste window and the late folder dialog of codex. Known limits: omp's detector never says `working` (its `⎋ Working…` footer is read from the screen), so an omp that is already working when its brief arrives cannot be told from an idle one; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction).
 
 ## 6. Design decision: argv stays in the executor configuration
 
