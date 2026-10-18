@@ -507,7 +507,7 @@ function runBorrowedHold(handle, entry, spec, sync) {
 
 /**
  * runBorrowed(handle, spec, { sync }) -- the one way a child command runs
- * with the holder's authority. `spec = { command, args, cwd, env, stdin, input, detached }`.
+ * with the holder's authority. `spec = { command, args, cwd, env, stdin, input, detached, maxOutputBytes }`.
  * `input` supplies synchronous fd-transport stdin when `stdin: pipe`; the
  * hold transport retains its null-stdin contract.
  * The description goes to the child at slot 3 and `FGOS_LOCK_FD=<name>:3`
@@ -527,6 +527,7 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   if (!spec || typeof spec.command !== 'string' || !spec.command) {
     throw new HolderLockError('borrow-spec-invalid', 'runBorrowed needs spec.command', {});
   }
+  if (spec.maxOutputBytes !== undefined && (!Number.isSafeInteger(spec.maxOutputBytes) || spec.maxOutputBytes < 1)) throw new HolderLockError('borrow-spec-invalid', 'maxOutputBytes must be a positive safe integer', {});
   if (entry.fd !== null && !sameInode(entry.fd, handle.path)) throw new HolderLockError('lock-resource-replaced', `${handle.name}: the held lock resource was replaced`, {});
   if (entry.hold) return runBorrowedHold(handle, entry, spec, sync);
   const argv = borrowedArgv(spec.command, spec.args);
@@ -540,22 +541,21 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
     entry.borrows += 1;
     let res;
     try {
-      res = spawnSync(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, encoding: 'utf8', maxBuffer: MAX_OUTPUT_BYTES, ...(spec.input === undefined ? {} : { input: spec.input }), windowsHide: true });
+      res = spawnSync(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, encoding: 'utf8', maxBuffer: spec.maxOutputBytes ?? MAX_OUTPUT_BYTES, ...(spec.input === undefined ? {} : { input: spec.input }), windowsHide: true });
     } catch (err) {
       entry.borrows -= 1;
       throw err;
     }
-    if (res.error) {
-      entry.borrows -= 1;
-      throw new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${res.error.message}`, { lock: handle.name, cause: res.error.code ?? null });
-    }
     let sweep;
     try {
-      sweep = sweepLeftoversSync(handle, res.pid);
+      sweep = res.pid ? sweepLeftoversSync(handle, res.pid) : { remaining: [], leftoversKilled: 0 };
     } finally {
       entry.borrows -= 1;
     }
     if (sweep.remaining.length > 0) throw leftoverError(handle, sweep.remaining, { exit: res.status, signal: res.signal });
+    if (res.error) {
+      throw new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${res.error.message}`, { lock: handle.name, cause: res.error.code ?? null });
+    }
     return { exit: res.status, signal: res.signal, stdout: res.stdout, stderr: res.stderr, leftoversKilled: sweep.leftoversKilled };
   }
 

@@ -88,3 +88,19 @@ for (const killController of [false, true]) {
     assert.equal(fs.existsSync(`${f.lockPath}.predecessor.json`), false);
   });
 }
+
+test('custody-backed runner commit accepts hook output above 16 MiB within its 64 MiB limit', { skip }, async (t) => {
+  const { admitSuccessor } = await import('../../src/runner/dispatch/cwd-lock.mjs');
+  const { createLockScope } = await import('../../src/holder-lock/index.mjs');
+  const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
+  const f = fixture(t);
+  const hook = path.join(f.root, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, `#!/bin/sh\n${JSON.stringify(process.execPath)} -e "process.stdout.write('x'.repeat(17 * 1024 * 1024))"\n`);
+  const custody = admitSuccessor(createLockScope('large-commit-output'), f.fgosDir, f.worktree);
+  try {
+    const result = commitUnitWork({ worktree: f.worktree, repoRoot: f.root, custody, unitId: 'capture', summary: 'fix(test): large hook output', scope: ['result.txt'] });
+    assert.equal(result.status, 'committed');
+    assert.deepEqual(result.files, ['result.txt']);
+    custody.clearDomain();
+  } finally { custody.release(); }
+});

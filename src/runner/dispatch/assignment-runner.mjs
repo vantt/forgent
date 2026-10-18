@@ -13,6 +13,7 @@
 // - Step 04: malformed agent-result.json produces failed/failed, not no-evidence.
 // - Step 04: prompt includes concrete runDir paths for worker result artifacts.
 
+import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
@@ -2072,6 +2073,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // predecessor record for successor admission.
   let attemptLocks = null;
   let attemptSettled = false;
+  let handedOffResult;
   // Set once the supervisor owns the attempt: from then on the run control token belongs to its settle
   // step (side file) and this controller no longer releases it unless it saw the result.
   let attemptHandedOver = false;
@@ -2477,7 +2479,8 @@ export async function executeAssignment(assignment, opts = {}) {
           const early = readSettledResult(attemptRunDir, runId);
           if (early) {
             attemptSettled = true;
-            return early;
+            handedOffResult = { ...early };
+            return handedOffResult;
           }
         }
         throw new RunnerConfigError(
@@ -2522,7 +2525,8 @@ export async function executeAssignment(assignment, opts = {}) {
         );
       }
       attemptSettled = true;
-      return settledResult;
+      handedOffResult = { ...settledResult };
+      return handedOffResult;
     } else {
       // Legacy/non-supervisor adapters retain the existing pre-spawn write
       // guarantee. cli-spawn writes later, immediately after Authority
@@ -2647,7 +2651,8 @@ export async function executeAssignment(assignment, opts = {}) {
     // the adopt door's): its run control token stays, the settle step uses it.
     if (attemptLocks) {
       try {
-        if (!opts.custody && attemptSettled) attemptLocks.cwdLease?.clearDomain();
+        if (!opts.custody && attemptSettled) recordCustodyHandoff(attemptLocks.cwdLease, handedOffResult);
+        if (handedOffResult) Object.freeze(handedOffResult);
       } finally { attemptLocks.release(); }
     }
     if (terminalPrep && !attemptHandedOver) await terminalPrep.abandon();

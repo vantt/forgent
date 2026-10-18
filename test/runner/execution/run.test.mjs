@@ -1766,3 +1766,44 @@ test('a unit persona whose file cannot be parsed or has the wrong shape refuses 
   const assignments = path.join(repoRoot, '.fgos', 'assignments');
   assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
 });
+
+test('custody admission refusal creates and announces no Unit run', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
+  let announced = false;
+  try {
+    await assert.rejects(() => runUnit({
+      unitData: { id: 'busy-admission', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+      onUnitRunCreated: () => { announced = true; },
+    }), { code: 'dispatch-in-flight' });
+    assert.equal(announced, false);
+    const assignments = path.join(repoRoot, '.fgos', 'assignments');
+    assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], []);
+  } finally { child.kill('SIGKILL'); await exited; }
+});
+
+test('a committed Unit result survives a failed custody handoff with a warning', async (t) => {
+  const { resolveLock } = await import('../../../src/holder-lock/index.mjs');
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(repoRoot, 'docs'));
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'in.md'), 'completed\n');
+  gitIn(repoRoot, 'add', 'docs/in.md');
+  gitIn(repoRoot, 'commit', '-qm', 'feat(docs): upstream change');
+  const record = `${resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path}.predecessor.json`;
+  const hook = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, `#!/bin/sh\nprintf 'broken record' > '${record.replaceAll("'", "'\\''")}'\n`, { mode: 0o755 });
+  const result = await runUnit({
+    unitData: { id: 'handoff-warning', capability: 'docs:write', writes: ['docs'], syncBase: 'main' },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results[0].commit.status, 'committed');
+  assert.equal(result.results[0].commit.sha, headOf(worktreeDir));
+  assert.equal(result.warnings[0].code, 'custody-handoff-not-recorded');
+  assert.equal(fs.readFileSync(record, 'utf8'), 'broken record');
+});

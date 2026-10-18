@@ -267,16 +267,18 @@ function forget(hold, n, names) {
 
 const BORROW_FILES = ['req-<n>.json', 'started-<n>.json', 'out-<n>.log', 'err-<n>.log', 'result-<n>.json'];
 
-/** A log as text, at most `MAX_LOG_BYTES` of it, like the POSIX output cap. */
-function readLog(hold, name) {
+/** Capture a completed log, refusing overflow instead of returning a partial path list. */
+function readLog(hold, name, maxOutputBytes = MAX_LOG_BYTES) {
   let fd;
   try {
     fd = fs.openSync(path.join(hold.work, name), 'r');
-    const size = Math.min(fs.fstatSync(fd).size, MAX_LOG_BYTES);
+    const size = fs.fstatSync(fd).size;
+    if (size > maxOutputBytes) throw new HolderLockError('borrow-output-limit', `borrowed output exceeds ${maxOutputBytes} bytes`, { name, size, maxOutputBytes });
     const buffer = Buffer.alloc(size);
     fs.readSync(fd, buffer, 0, size, 0);
     return buffer.toString('utf8');
-  } catch {
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
     return '';
   } finally {
     if (fd !== undefined) fs.closeSync(fd);
@@ -310,9 +312,9 @@ export function borrowSync(hold, spec, { killWaitMs }) {
   for (;;) {
     const result = resultOf(hold, n);
     if (result) {
-      const answer = { result, stdout: readLog(hold, `out-${n}.log`), stderr: readLog(hold, `err-${n}.log`) };
-      forget(hold, n, BORROW_FILES);
-      return answer;
+      try {
+        return { result, stdout: readLog(hold, `out-${n}.log`, spec.maxOutputBytes), stderr: readLog(hold, `err-${n}.log`, spec.maxOutputBytes) };
+      } finally { forget(hold, n, BORROW_FILES); }
     }
     if (!helperAlive(hold)) {
       // It may have answered and ended between the two looks.

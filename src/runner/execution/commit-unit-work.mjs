@@ -91,7 +91,7 @@ export function gitContext({ worktree, repoRoot, custody }) {
 
 /** Every child of a custody-backed commit borrows the same acquired handle. */
 function borrowed(custody, command, args, { cwd, env, input } = {}) {
-  const result = runBorrowed(custody, { command, args, cwd, env, detached: true, stdin: input === undefined ? 'ignore' : 'pipe', input });
+  const result = runBorrowed(custody, { command, args, cwd, env, maxOutputBytes: GIT_LIST_MAX_BUFFER, detached: true, stdin: input === undefined ? 'ignore' : 'pipe', input });
   if (result.exit !== 0 || result.signal) {
     const error = new Error(`Command failed: ${command} ${args.join(' ')}\n${result.stderr ?? ''}`);
     Object.assign(error, { status: result.exit, signal: result.signal, stdout: result.stdout, stderr: result.stderr });
@@ -142,8 +142,8 @@ const outsideStore = (p) => !p.startsWith(STORE_PREFIX) && p !== '.fgos';
  * them, it stages only what it chose) and paths already dirty inside the scope (never committed
  * by the run; they stay for whoever left them).
  */
-export function preflightUnitWorktree({ worktree, repoRoot, scope, sync = null }) {
-  const ctx = gitContext({ worktree, repoRoot });
+export function preflightUnitWorktree({ worktree, repoRoot, custody, scope, sync = null }) {
+  const ctx = gitContext({ worktree, repoRoot, custody });
   // The merge a sync of this run left open is the run's own: its staged and conflicted paths are
   // neither foreign nor dirt to keep out of the commit. Any other open merge is someone else's.
   const mergeHead = mergeHeadOf(ctx);
@@ -318,8 +318,8 @@ export function commitUnitWork({ worktree, repoRoot, custody, unitId, summary, o
 }
 
 /** Whether `sha` is still in the history of the worktree's HEAD. A worktree it cannot trust throws. */
-export function commitOnBranch(worktree, sha, repoRoot) {
-  const ctx = gitContext({ worktree, repoRoot });
+export function commitOnBranch(worktree, sha, repoRoot, custody) {
+  const ctx = gitContext({ worktree, repoRoot, custody });
   try {
     git(ctx, ['merge-base', '--is-ancestor', sha, 'HEAD']);
     return true;

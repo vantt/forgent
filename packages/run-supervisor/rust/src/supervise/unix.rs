@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
 use std::os::fd::{AsRawFd, OwnedFd};
-use std::os::unix::fs::OpenOptionsExt;
+use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::process::Child;
@@ -55,7 +55,14 @@ impl Locks {
     /// The gate carries the lease description, so a dead supervisor leaves the lease held until the gate is gone.
     pub(super) fn declare_on_lease(&self, record: &Domain) -> io::Result<()> {
         match &self.lease_path {
-            Some(path) => fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record),
+            Some(path) => {
+                let held = self.cwd_lease.as_ref().ok_or_else(|| io::Error::other("cwd lease missing"))?.metadata()?;
+                let named = std::fs::metadata(path)?;
+                if held.dev() != named.dev() || held.ino() != named.ino() {
+                    return Err(io::Error::other("cwd lease path does not match descriptor 4"));
+                }
+                fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record)
+            },
             None => Ok(()),
         }
     }

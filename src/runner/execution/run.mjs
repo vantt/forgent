@@ -24,7 +24,7 @@ import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktr
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
-import { dispatchCwdHolder, admitSuccessor } from '../dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder, admitSuccessor, recordCustodyHandoff } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -174,10 +174,10 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
  * paths outside the scope; a person has to take that commit off first.
  */
-function commitPending(attempt, worktree, mainRoot) {
+function commitPending(attempt, worktree, mainRoot, custody) {
   const commit = attempt?.commit;
   if (commit?.status !== 'failed') return false;
-  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot));
+  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot, custody));
 }
 
 /** A resume cannot go past a commit that landed holding paths outside the unit's write scope. */
@@ -378,13 +378,14 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
 export async function runUnit(options = {}) {
   const scope = { control: null, custody: null, handedOff: false };
   const uninstall = holdCancelOnSignal(options);
+  let result;
   try {
-    const result = await runUnitBody(options, scope);
+    result = await runUnitBody(options, scope);
     scope.handedOff = true;
     return result;
   } finally {
     try {
-      try { if (scope.handedOff) scope.custody?.clearDomain(); }
+      try { if (scope.handedOff) recordCustodyHandoff(scope.custody, result); }
       finally { scope.custody?.release(); }
     } finally {
       try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
@@ -518,6 +519,10 @@ async function runUnitBody(options, scope) {
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
+    if (unit.writes.length > 0 || sync) {
+      if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: worktreePath, executorId: null, capability: unit.capability });
+      scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
+    }
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -582,7 +587,7 @@ async function runUnitBody(options, scope) {
     options.onUnitRunCreated?.(unitRunId);
   }
 
-  if (unit.writes.length > 0 || unitRecord.sync) {
+  if (!scope.custody && (unit.writes.length > 0 || unitRecord.sync)) {
     if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: unitRecord.worktree, executorId: null, capability: unit.capability });
     scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
   }
@@ -618,7 +623,7 @@ async function runUnitBody(options, scope) {
   const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
     .filter(([, attempts]) => {
       const last = attempts[attempts.length - 1];
-      return commitPending(last, unitRecord.worktree, mainRoot) || leftByDeadController(last, assignmentsDir);
+      return commitPending(last, unitRecord.worktree, mainRoot, scope.custody) || leftByDeadController(last, assignmentsDir);
     })
     .map(([key]) => key));
   const history = () => {
@@ -826,8 +831,8 @@ async function runUnitBody(options, scope) {
     // The agent already did this round's work and only the runner commit failed: commit again,
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
-    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot)) {
-      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync }));
+    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot, scope.custody)) {
+      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
       if (refusal) return refusal;
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
       const excludePaths = lastRecorded.preExistingInScope ?? [];
@@ -877,7 +882,7 @@ async function runUnitBody(options, scope) {
     // runner never commits them. A resumed attempt keeps what its first launch saw.
     let preExistingInScope = [];
     if (!readOnly) {
-      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync });
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync });
       const refusal = preflightRefusal(role, round, preflight);
       if (refusal) return refusal;
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;

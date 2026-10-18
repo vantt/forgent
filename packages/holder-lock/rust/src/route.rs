@@ -250,7 +250,7 @@ fn lock_fd(args: &[String]) -> i32 {
     };
     if mode == "--clear-domain" {
         let path = Path::new(flags.values("--clear-domain")[0]);
-        if port::borrowed_check(&file, path, Some("dispatch-cwd:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
+        if port::borrowed_check(&file, path, Some("lease:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
             return error("lock-handle-invalid", "clear requires the held exclusive description", EXIT_NEGATIVE);
         }
         return match crate::predecessor::clear(&crate::predecessor::record_path(path), std::time::Duration::from_millis(kill_wait_ms)) {

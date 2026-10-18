@@ -2,12 +2,12 @@
 //
 // One writing dispatch at a time per working directory, because two writers in
 // one tree race. The lock is a kernel lease at
-// `<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`, keyed by the directory's
+// `<fgosDir>/locks/dispatch-cwd--<dev>-<ino>-<birthtimeNs>.lock`, keyed by the directory's
 // identity after realpath, so a worktree reached through a symlink is the same
 // lock. It has no TTL and no heartbeat: a holder that dies releases it at once.
 
 import fs from 'node:fs';
-import { acquireSync, createLockScope, lockHolders, probe, resolveLock, predecessorState } from '../../holder-lock/index.mjs';
+import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../../holder-lock/index.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 
 const LOCK_NAME = 'dispatch-cwd';
@@ -36,11 +36,6 @@ export function acquireDispatchCwdLock(fgosDir, cwd) {
 export function admitSuccessor(scope, fgosDir, cwd) {
   if (!fs.existsSync(cwd)) throw new DispatchError('worker-spawn-fail', `dispatch cwd "${cwd}" does not exist.`, { cwd });
   const lockPath = resolveLock(LOCK_NAME, lockParams(fgosDir, cwd)).v3Path;
-  const previous = predecessorState(lockPath, { fgosDir });
-  const kind = previous.domain?.domainKind;
-  if (previous.state !== 'absent' && !['linux-gate', 'windows-job'].includes(kind)) {
-    throw new DispatchError('custody-predecessor-unknown', `preserve cwd "${cwd}": the predecessor domain cannot prove custody handoff`, { cwd, lockPath, predecessor: previous, recovery: { check: 'git-worktree-recovery', disposition: 'preserve', next: 'new-worktree' } });
-  }
   try { return acquireDispatchCwdLockIn(scope, fgosDir, cwd, { predecessorKinds: ['linux-gate', 'windows-job'] }); }
   catch (error) {
     if (error.code === 'lock-predecessor-domain-not-empty') {
@@ -88,4 +83,13 @@ export function dispatchCwdHolder(fgosDir, cwd) {
   const holders = lockHolders(LOCK_NAME, params);
   if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0], lockPath } : null;
   return probe(LOCK_NAME, params).result === 'free' ? null : { pid: null, lockPath };
+}
+
+/** A failed handoff leaves predecessor evidence intact and preserves the settled result. */
+export function recordCustodyHandoff(custody, result) {
+  try { custody?.clearDomain(); }
+  catch (error) {
+    const warning = { code: 'custody-handoff-not-recorded', detail: error.message };
+    result.warnings = [...(result.warnings ?? []), warning];
+  }
 }

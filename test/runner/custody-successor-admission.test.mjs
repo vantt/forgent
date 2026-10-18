@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { acquireSync, createLockScope, predecessorState, probe, resolveLock } from '../../src/holder-lock/index.mjs';
-import { admitSuccessor } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { admitSuccessor, recordCustodyHandoff } from '../../src/runner/dispatch/cwd-lock.mjs';
 import { acquireAttemptLocks } from '../../src/run-supervisor/direct-launch.mjs';
 
 const skip = process.platform !== 'linux' ? 'real Linux flock/process identity vectors' : false;
@@ -76,6 +76,11 @@ test('clearDomain cannot erase a live domain, then records handoff after it exit
   const tuple = JSON.parse(String(data));
   fs.writeFileSync(f.record, JSON.stringify({ v: 1, domainKind: 'linux-pgroup', domainId: tuple }));
   assert.throws(() => handle.clearDomain());
+  const committed = { outcome: 'pass', commit: { status: 'committed', sha: 'already-recorded' } };
+  recordCustodyHandoff(handle, committed);
+  assert.equal(committed.outcome, 'pass');
+  assert.equal(committed.commit.status, 'committed');
+  assert.equal(committed.warnings[0].code, 'custody-handoff-not-recorded');
   assert.ok(fs.existsSync(f.record));
   child.stdin.end();
   await once(child, 'exit');
@@ -91,7 +96,7 @@ test('controller death with a setsid escapee keeps an unconfined worktree inadmi
     import fs from 'node:fs';
     import { spawn } from 'node:child_process';
     import { localObserver, getProcessStartTime } from ${JSON.stringify(identity)};
-    import { admitSuccessor } from ${JSON.stringify(new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href)};
+    import { admitSuccessor, recordCustodyHandoff } from ${JSON.stringify(new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href)};
     import { createLockScope } from ${JSON.stringify(new URL('../../src/holder-lock/index.mjs', import.meta.url).href)};
     const custody = admitSuccessor(createLockScope('controller'), ${JSON.stringify(f.fgosDir)}, ${JSON.stringify(f.cwd)});
     const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });
@@ -145,4 +150,82 @@ test('an invalid handed custody lease reports the attempted producer context', {
     assert.deepEqual(err.data, { cwd: f.cwd, executorId: 'fake', capability: 'execute' });
     return true;
   });
+});
+
+test('cwd identity includes birth time and cannot inherit a record keyed only by a recycled inode', { skip }, (t) => {
+  const f = fixture(t);
+  const stat = fs.statSync(f.cwd, { bigint: true });
+  const inodeOnly = path.join(path.dirname(f.lockPath), `dispatch-cwd--${stat.dev}-${stat.ino}.lock`);
+  fs.writeFileSync(`${inodeOnly}.predecessor.json`, 'stranded old generation');
+  assert.notEqual(f.lockPath, inodeOnly);
+  assert.ok(f.lockPath.includes(`${stat.dev}-${stat.ino}-${stat.birthtimeNs}`));
+  const held = admitSuccessor(createLockScope('new-directory'), f.fgosDir, f.cwd);
+  held.release();
+  assert.equal(fs.readFileSync(`${inodeOnly}.predecessor.json`, 'utf8'), 'stranded old generation');
+  const alias = path.join(f.cwd, 'alias');
+  fs.symlinkSync(f.cwd, alias);
+  assert.equal(resolveLock('dispatch-cwd', { ...f.params, cwd: alias }).v3Path, f.lockPath);
+});
+
+test('fd borrow capture honors a 64 MiB per-call limit and refuses overflow', { skip }, async (t) => {
+  const { runBorrowed } = await import('../../src/holder-lock/index.mjs');
+  const f = fixture(t);
+  const held = admitSuccessor(createLockScope('capture'), f.fgosDir, f.cwd);
+  try {
+    const spec = { command: process.execPath, args: ['-e', "process.stdout.write('a'.repeat(17 * 1024 * 1024) + '\\0')"] };
+    const answer = runBorrowed(held, { ...spec, maxOutputBytes: 64 * 1024 * 1024 });
+    assert.equal(answer.exit, 0);
+    assert.equal(answer.stdout.length, 17 * 1024 * 1024 + 1);
+    assert.equal(answer.stdout.at(-1), '\0');
+    assert.throws(() => runBorrowed(held, { ...spec, maxOutputBytes: 1024 }), { code: 'borrow-spawn-failed' });
+  } finally { held.release(); }
+});
+
+test('best-effort handoff limitation: live controller clears a linux-pgroup record after a successful producer leaves a setsid escapee', { skip }, async (t) => {
+  const f = fixture(t);
+  const custody = admitSuccessor(createLockScope('live-controller'), f.fgosDir, f.cwd);
+  const producer = spawn(process.execPath, ['--input-type=module', '-e', `
+    import { spawn } from 'node:child_process';
+    import { localObserver, getProcessStartTime } from ${JSON.stringify(identity)};
+    const escapee = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });
+    escapee.unref();
+    process.stdout.write(JSON.stringify({ escapedPid: escapee.pid, tuple: { ...localObserver(), pid: process.pid, startTime: getProcessStartTime(process.pid) } }) + '\\n');
+    process.stdin.resume();
+  `], { detached: true, stdio: ['pipe', 'pipe', 'inherit'] });
+  const [data] = await once(producer.stdout, 'data');
+  const { escapedPid, tuple } = JSON.parse(String(data));
+  t.after(() => { producer.kill('SIGKILL'); try { process.kill(escapedPid, 'SIGKILL'); } catch {} if (!custody.released) custody.release(); });
+  fs.writeFileSync(f.record, JSON.stringify({ v: 1, domainKind: 'linux-pgroup', domainId: tuple }));
+  const exit = once(producer, 'exit');
+  producer.stdin.end();
+  assert.deepEqual(await exit, [0, null]);
+  process.kill(escapedPid, 0);
+  const result = { outcome: 'pass' };
+  recordCustodyHandoff(custody, result);
+  assert.equal(result.warnings, undefined);
+  assert.equal(predecessorState(f.lockPath, { fgosDir: f.fgosDir }).state, 'absent');
+  process.kill(escapedPid, 0);
+  custody.release();
+  const successor = admitSuccessor(createLockScope('successor'), f.fgosDir, f.cwd);
+  successor.release();
+});
+
+test('recreating a directory with a reused inode gets a new custody record key', { skip }, (t) => {
+  const f = fixture(t);
+  const directory = path.join(f.cwd, 'recreated');
+  const seen = new Map();
+  for (let generation = 0; generation < 1024; generation += 1) {
+    fs.mkdirSync(directory);
+    const stat = fs.statSync(directory, { bigint: true });
+    const key = `${stat.dev}-${stat.ino}`;
+    const lockPath = resolveLock('dispatch-cwd', { fgosDir: f.fgosDir, cwd: directory }).v3Path;
+    const previous = seen.get(key);
+    if (previous) {
+      assert.notEqual(lockPath, previous, 'birth time separates real inode reuse');
+      return;
+    }
+    seen.set(key, lockPath);
+    fs.rmdirSync(directory);
+  }
+  t.diagnostic('filesystem did not reuse a directory inode in 1024 creations; deterministic birth-time and legacy-record checks cover the key');
 });
