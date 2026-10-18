@@ -1,0 +1,22 @@
+{
+  "contract": { "id": "run-supervisor-recover-actions", "version": 1 },
+  "description": "Actions a `fgos dispatch recover` recommendation can carry (src/runner/dispatch/recovery-planner.mjs). `adopt` is new; the others keep their meaning. The door stays CAS-guarded: a recommendation carries snapshotHash + controlEpoch and an actionKey, and applying re-derives legality from the action.",
+  "actions": {
+    "adopt": {
+      "shape": { "type": "adopt", "attemptId": "string" },
+      "when": "an attempt exists whose attemptState (unit-state.v1.json) is not closed and not legacy-run, or is closed but unsettled; outbox result-N.json is named evidence for it, never a reason to park",
+      "apply": "adoptRun(attempt): settles the attempt through the adopt door (probe, take attempt.lock EX, synthesize the receipt, run the post-receipt steps, publish closed.json)",
+      "stillLegal": "re-probed at apply time; running or being-adopted makes it illegal (park with the probe state); closed changes the snapshot hash, so the apply is refused plan-stale and nothing runs twice",
+      "outcomes": "applied (adopt answered adopted or closed); held (a supervisor or adopter owns the attempt); adopt-incomplete (a step is left, the attempt stays open for a later adopt)"
+    },
+    "abandon-legacy": {
+      "shape": { "type": "abandon-legacy" },
+      "intent": "abandon-legacy",
+      "when": "attemptState is legacy-run and legacy-holders evidence says allDead. The caller of the door supplies the proof through ctx.judgeLegacyHolders(runDir) -> {allDead, reason}; without it the door answers needs-input, never a guess",
+      "apply": "run.json is patched to status died, settlement abandoned-legacy; the attempt then reads abandoned-legacy. A second apply parks: already abandoned"
+    },
+    "resume-driver": { "shape": { "type": "resume-driver" }, "note": "unchanged" },
+    "reassign-driver": { "shape": { "type": "reassign-driver", "toDriverId": "string" }, "note": "unchanged" }
+  },
+  "evidence": "outbox result-N.json becomes recognized evidence for the adopt action (RECOGNIZED_EVIDENCE_TYPES is extended with it); recover no longer parks because it exists"
+}

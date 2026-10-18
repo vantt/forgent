@@ -56,16 +56,34 @@ test('1. a controller killed with SIGKILL after the binding leaves an agent that
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
 });
 
-test('2. a controller that gets SIGTERM does not stop the attempt either: the controller catches no signal here', { skip, timeout: 240_000 }, async () => {
-  const project = createProject({ agent: { runMs: 2500 } });
-  const run = startRun(project, project.unitFile('crash-sigterm'));
-  const dir = await attemptWhere(project, (d) => exists(d, 'supervisor-binding.json'), { what: 'the supervisor binding' });
-  run.child.kill('SIGTERM');
-  assert.equal((await run.exited).signal, 'SIGTERM');
-  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the attempt to close without its controller' });
+test('2. a controller that gets SIGINT asks the supervisor to cancel, waits for the receipt, prints the resume line and exits 130', { skip, timeout: 240_000 }, async () => {
+  const project = createProject({ agent: { runMs: 60_000 }, dispatch: { gateKillGraceMs: 1000 } });
+  const run = startRun(project, project.unitFile('crash-sigint'));
+  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'), { what: 'the agent to start' });
+  run.child.kill('SIGINT');
+  const { code } = await run.exited;
+  assert.equal(code, 130, run.output().stderr);
+  assert.ok(exists(dir, 'cancel-requested.json'), 'the controller published its cancel request');
+  assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGINT');
+  assert.ok(exists(dir, 'receipt.json'), 'the controller waited for the receipt');
+  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
+  assert.match(run.output().stderr, /fgos run --resume unit-run-/);
+  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the cancelled attempt to close' });
   await assertSettledAttempt(project, dir);
   assert.equal(starts(dir).length, 1);
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
+});
+
+test('2b. SIGTERM does the same and exits 143', { skip, timeout: 240_000 }, async () => {
+  const project = createProject({ agent: { runMs: 60_000 }, dispatch: { gateKillGraceMs: 1000 } });
+  const run = startRun(project, project.unitFile('crash-sigterm'));
+  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'), { what: 'the agent to start' });
+  run.child.kill('SIGTERM');
+  const { code } = await run.exited;
+  assert.equal(code, 143, run.output().stderr);
+  assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGTERM');
+  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the cancelled attempt to close' });
+  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
+  await assertSettledAttempt(project, dir);
 });
 
 /** Kill the controller, then the supervisor, once the agent runs; returns the attempt directory. */

@@ -1,0 +1,56 @@
+{
+  "contract": { "id": "run-supervisor-unit-state", "version": 1 },
+  "description": "How a unit and its attempts are named when the controller of `fgos run` is gone. A unit whose controller died never continues on its own: only an explicit `fgos run --resume <unit>` goes on, and it takes the settled result of the last attempt through the adopt door instead of running the agent again. States are derived from files on disk plus the adopt probe; none is stored as its own field.",
+  "unitState": {
+    "enum": ["running", "awaiting-resume", "completed", "failed"],
+    "rules": {
+      "running": "no unit-summary.json and either a live controller or an attempt that is not closed",
+      "awaiting-resume": "the last attempt is closed AND <unitDir>/unit-summary.json does not exist AND no live controller. Display state shown by inspect, show-run and `fgos run --json`; the next command is `fgos run --resume <unit>`",
+      "completed": "unit-summary.json exists with a passing outcome",
+      "failed": "unit-summary.json exists with a failing outcome"
+    },
+    "liveController": {
+      "record": "<unitDir>/unit-control/: the run-control ledger (src/runner/execution/unit-control.mjs over src/runner/dispatch/run-lock.mjs) whose holder is the controller driving the unit; taken when the unit starts and by a resuming controller",
+      "judge": "inspectRunControl over that ledger: the holder is judged with the same dead-holder proof every run control uses (packages/process/contracts/process-facts.judge.v1.json); only a holder proven dead counts as no controller. alive and unknown both keep the unit `running` (unknown = keep). A unit with no ledger has no controller"
+    }
+  },
+  "attemptState": {
+    "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy", "superseded"],
+    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: the doctor fix writes it, the probe never reports it",
+    "rules": {
+      "running": "attempt.lock is held and no adopting.json: a supervisor owns it",
+      "being-adopted": "attempt.lock is held and adopting.json names the holder: an adopter owns it",
+      "closed": "closed.json exists; every step has a step receipt. A scan skips it",
+      "legacy-run": "run written before the supervisor (no attempt.lock); adopt cannot judge it",
+      "abandoned-not-started": "no binding, receipt outcome abandoned-not-started (receipt.v1.json); a resume launches a new attempt with supersedesRunId",
+      "abandoned-before-brief": "terminal mode; receipt outcome abandoned-before-brief, nothing ran after GO. Counts as closed once closed.json exists; a resume treats it like abandoned-not-started and launches a new attempt with supersedesRunId",
+      "superseded": "inspect and show-run only: a closed (or abandoned) attempt that a later `--resume` replaced with a new attempt whose run.json names it in supersedesRunId. Reported with supersededBy (the new run id) and attemptOutcome (what the attempt itself was)",
+      "abandoned-legacy": "a legacy-run attempt settled by the doctor fix once every recorded pid judged dead and no home marker points at it"
+    }
+  },
+  "resumeRule": {
+    "closed": "use result.json as the attempt result and carry on with the unit's remaining steps (commit writes, reviewer, next attempt, unit-summary.json); the agent does not run again",
+    "running|being-adopted": "refuse with the named error `attempt-still-running`; print the state and the `fgos dispatch inspect` command; do not wait",
+    "gate-lost": "binding present, gate dead, no gate-exit: adopt cannot prove the agent never ran, so the attempt settles gate-lost and a resume does not relaunch it (fail closed; the person starts a new run). Relaunching it is deferred: it needs a gate-side marker written before GO",
+    "abandoned-not-started|abandoned-before-brief": "launch a new attempt with supersedesRunId set to the abandoned one",
+    "legacy-run": "refuse with `attempt-legacy-run`; the doctor check legacy-attempts-stuck owns it",
+    "neverSecondSupervisor": "a resume goes through adopt and never starts a supervisor for an attempt that already has a binding or receipt (supervise refuses to start there)",
+    "concurrentResume": "the controller seat of the unit (unit-control ledger) is taken before unit.json is read; a second resumer finds a live holder and refuses with `resume-in-progress`; a holder proven dead is taken over"
+  },
+  "signalExit": {
+    "firstSignal": "write cancel-requested.json for every attempt the controller delivered, wait for the receipts up to config dispatch.cancelWaitMs, print `unit awaiting resume`, exit 130 (SIGINT) or 143 (SIGTERM)",
+    "secondSignal": "exit at once with the same code; the cancel files are already written and the supervisor still stops the attempt"
+  },
+  "config": {
+    "dispatch.cancelWaitMs": {
+      "type": "integer, milliseconds",
+      "default": "dispatch.gateKillGraceMs + 5000 (so 15000 with the default grace)",
+      "min": 1000,
+      "reader": "project-over-global, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs)",
+      "setup": "setup never writes the key into a config file; an absent key is the default. Setup and doctor registration is added together with the doctor check for stuck attempts"
+    }
+  },
+  "deferred": {
+    "automaticResume": "Resuming without an explicit --resume after a controller death is a later item. It needs dead-controller detection and a single-taker guarantee. The seam is named here: the unit-control ledger is both the dead-controller evidence (inspectRunControl: holder proven dead) and the single-taker primitive (acquireRunControl: one acquirer wins). Nothing in this release builds it (deferred by owner decision)."
+  }
+}

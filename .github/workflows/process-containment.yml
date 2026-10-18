@@ -1,10 +1,10 @@
 name: process-containment
 
-# Runs on pushes to run-supervisor and terminal-mode branches and on demand: runs the process-containment driver tests on real Windows,
+# Runs on pushes to run-supervisor, terminal-mode and controller-death branches and on demand: runs the process-containment driver tests on real Windows,
 # macOS and Linux runners (Job Objects, process groups, pid namespaces).
 on:
   push:
-    branches: ['run-supervisor/**', 'terminal-mode/**']
+    branches: ['run-supervisor/**', 'terminal-mode/**', 'controller-death/**']
     paths:
       - 'packages/process/**'
       - 'packages/run-supervisor/**'

@@ -1236,7 +1236,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             'run-id': { type: 'string', description: 'The runId to recover (positional, --run-id or --run).' },
             run: { type: 'string', description: 'Same as --run-id.' },
-            intent: { type: 'string', description: 'Without --action only: "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
+            intent: { type: 'string', description: 'Without --action only: "resume" (default; for an attempt of the run supervisor the recommendation is `adopt`), "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input") or "abandon-legacy" (a run from before the run supervisor, settled only on proof that every process it recorded is dead).' },
             action: { type: 'string', description: 'JSON-encoded action object to apply, exactly as returned by a prior recover call\'s own `action` field. Its presence selects the apply path.' },
             'expected-snapshot': { type: 'string', description: 'Apply only: the `snapshotHash` from the recommendation being applied.' },
             'expected-control-epoch': { type: 'string', description: 'Apply only: the `expectedControlEpoch` from the recommendation being applied.' },
