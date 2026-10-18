@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Codex terminal runs deliver the brief through the terminal-control prompt door instead of typing it and pressing Enter, so a long brief is no longer left unsubmitted in the composer; the paste-chip matcher also recognizes codex's `[Pasted Content N chars]`.
 - Releases ship a combined Git/Event Store Node addon through optional `components.nativeAddon`; its manifest attests build inputs without binding future upgrades to the verifier's Cargo.lock. Only Linux advertises `git-wal-v1` while C5 scan/fence support is Linux-only; Windows activation remains available and lock-taking Git ports refuse with `git-lockscope-unavailable-windows`.
 - Config mapping failures resolve their WAL chain and remove only their own native staging lock. Re-running activation installs a missing Git fence; WAL writers refuse an unfenced workspace. Older `fgctl` stops with `EISDIR` at the fenced legacy activation lock. Channels without the optional addon report informational Git checks until M10.
 
