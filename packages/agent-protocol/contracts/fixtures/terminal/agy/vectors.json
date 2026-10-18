@@ -401,6 +401,56 @@
         "outcome": "exit",
         "text": "/exit"
       }
+    },
+    {
+      "name": "working-spinner-screen-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "spinner_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "real spinner screen recorded 2026-10-18 from agy on herdr (state working, rule spinner_working): the sign-in spinner at start-up; a mid-turn agy screen was not captured because the turn was refused by the start-up announcement banner"
+    },
+    {
+      "name": "working-spinner-screen-is-never-ready",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "spinner_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "readiness": "not-ready"
+      },
+      "readyMs": 3000,
+      "source": "real spinner screen recorded 2026-10-18 from agy on herdr (state working, rule spinner_working): the sign-in spinner at start-up; a mid-turn agy screen was not captured because the turn was refused by the start-up announcement banner"
     }
   ]
 }

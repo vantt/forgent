@@ -529,6 +529,87 @@
         "readiness": "blocked"
       },
       "source": "real screen recorded 2026-10-18 from codex v0.163 on herdr: the folder dialog opens about a second after the first prompt screen"
+    },
+    {
+      "name": "working-spinner-screen-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "osc_title_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "real working screen recorded 2026-10-18 from codex v0.163 on herdr (state working, rule osc_title_working)"
+    },
+    {
+      "name": "working-spinner-screen-is-never-ready",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "osc_title_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "readiness": "not-ready"
+      },
+      "readyMs": 3000,
+      "source": "real working screen recorded 2026-10-18 from codex v0.163 on herdr (state working, rule osc_title_working)"
+    },
+    {
+      "name": "working-spinner-screen-after-submit-is-delivered",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "file": "working",
+            "inspection": {
+              "state": "working",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": true,
+              "matchedRule": "osc_title_working",
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "maxEnters": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools.",
+      "source": "real working screen recorded 2026-10-18 from codex v0.163 on herdr (state working, rule osc_title_working)"
     }
   ]
 }

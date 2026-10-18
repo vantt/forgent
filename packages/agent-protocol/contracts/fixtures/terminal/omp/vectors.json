@@ -385,6 +385,59 @@
           "C-d"
         ]
       }
+    },
+    {
+      "name": "working-spinner-screen-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working",
+            "inspection": {
+              "state": "idle",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": false,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "real working screen recorded 2026-10-18 from omp on herdr; herdr's detector has no rule for omp and says idle, the `⎋ Working…` footer is what shows work"
+    },
+    {
+      "name": "working-spinner-screen-after-submit-is-delivered",
+      "step": "deliver-brief",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          },
+          {
+            "at": 100,
+            "file": "working",
+            "inspection": {
+              "state": "idle",
+              "visibleBlocker": false,
+              "visibleIdle": false,
+              "visibleWorking": false,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "sentTexts": 1,
+        "maxEnters": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools.",
+      "source": "real working screen recorded 2026-10-18 from omp on herdr; herdr's detector has no rule for omp and says idle, the `⎋ Working…` footer is what shows work"
     }
   ]
 }
