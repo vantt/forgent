@@ -135,10 +135,10 @@ fn tips(
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct Fence {
-    legacy_ref_oid: String,
-    seal_digest: String,
-    from_commit: String,
+pub(crate) struct Fence {
+    pub(crate) legacy_ref_oid: String,
+    pub(crate) seal_digest: String,
+    pub(crate) from_commit: String,
 }
 fn legacy_files(
     port: &dyn Inspect,

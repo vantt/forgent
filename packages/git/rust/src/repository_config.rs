@@ -232,8 +232,29 @@ impl GitDriver {
             }
         };
         if missing.is_empty() {
+            // Even a no-op setup approves the current URL. Record the normal
+            // acknowledged transfer shape so Inspect can recover its provenance.
+            chain = wal.append(&chain, Phase::Prepared).map_err(error)?;
             chain = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                .append(
+                    &chain,
+                    Phase::TargetAttempt {
+                        prior_target_attempt: None,
+                        expected: Tip::Absent,
+                        next: Tip::Absent,
+                    },
+                )
+                .map_err(error)?;
+            chain = wal
+                .append(
+                    &chain,
+                    Phase::Outcome(Outcome::Transfer {
+                        acknowledged: true,
+                        unknown: false,
+                        observations: vec![],
+                        details: vec!["local fetch mapping already installed; URL approved".into()],
+                    }),
+                )
                 .map_err(error)?;
             return Ok(receipt(id, &chain.intent().request_digest));
         }
