@@ -170,6 +170,26 @@ test('abandon-legacy settles a legacy run only on proof that every recorded proc
   assert.equal(recoverObserveUseCase(dead, { runId: 'run-1', intent: 'abandon-legacy' }).kind, 'park');
 });
 
+test('abandon-legacy settles a legacy run whose worker result nobody read, and the other intents still treat it as settled', { skip }, () => {
+  const p = project({ supervised: false });
+  write(path.join(p.dir, 'outbox', 'result-1.json'), { claim: 'done' });
+  const dead = { ...p.ctx, judgeLegacyHolders: () => ({ allDead: true }) };
+  const rec = recoverObserveUseCase(dead, { runId: 'run-1', intent: 'abandon-legacy' });
+  assert.equal(rec.kind, 'recommendation', rec.reason);
+  assert.deepEqual(rec.action, { type: 'abandon-legacy' });
+  const applied = recoverApplyUseCase(dead, {
+    runId: 'run-1', action: rec.action, expectedSnapshot: rec.snapshotHash, expectedControlEpoch: rec.expectedControlEpoch,
+    expectedExpiresAt: rec.expiresAt, actionKey: rec.actionKey,
+  });
+  assert.equal(applied.outcome, 'applied', applied.reason);
+  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).attemptState, 'abandoned-legacy');
+  const other = project({ supervised: false, runId: 'run-2', assignmentId: 'unit-run-2/producer/1' });
+  write(path.join(other.dir, 'outbox', 'result-1.json'), { claim: 'done' });
+  const resume = recoverObserveUseCase(other.ctx, { runId: 'run-2' });
+  assert.equal(resume.kind, 'park');
+  assert.match(resume.reason, /already settled/);
+});
+
 test('a unit whose only attempt the legacy sweep settled is terminal for the unit and awaits resume', { skip }, () => {
   const p = project({ supervised: false, extraRun: { status: 'died', settlement: 'abandoned-legacy', settledAt: '2026-10-18T00:00:00.000Z' } });
   unitOf(p);

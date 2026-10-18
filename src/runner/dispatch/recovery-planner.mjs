@@ -93,7 +93,7 @@ function evidenceIdsOf(evidence) {
  * write path's re-check can never drift into two different notions of
  * "what is legal right now" (Acceptance: "Read and write paths ... must
  * derive from and return identical authorization and legal-next facts"). */
-function checkPreconditions(snapshot, evidence) {
+function checkPreconditions(snapshot, evidence, { legacySweep = false } = {}) {
   const unknown = evidence.filter((e) => !RECOGNIZED_EVIDENCE_TYPES.includes(e.type));
   if (unknown.length > 0) {
     return {
@@ -115,7 +115,10 @@ function checkPreconditions(snapshot, evidence) {
   // "nothing to recover" even before run.json.status has been reconciled to
   // 'settled'. Read-door defense-in-depth alongside recover.mjs's own F5
   // write-door re-check, not a substitute for it.
-  if (!isAdoptable(snapshot) && (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled')) {
+  // The one exception: the legacy sweep settles a run from before the supervisor whose worker result nobody
+  // read (its status still says running), which is the run the sweep exists for.
+  const unreadLegacyResult = legacySweep && attemptStateOf(snapshot) === 'legacy-run' && snapshot.run?.status !== 'settled';
+  if (!isAdoptable(snapshot) && !unreadLegacyResult && (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled')) {
     return { status: 'park', reason: 'run already settled -- there is nothing to recover' };
   }
   return null;
@@ -159,7 +162,7 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
       `requestedIntent must be one of ${RECOGNIZED_INTENTS.join('/')}, got: ${JSON.stringify(requestedIntent)}`,
     );
   }
-  const blocked = checkPreconditions(snapshot, evidence);
+  const blocked = checkPreconditions(snapshot, evidence, { legacySweep: requestedIntent === 'abandon-legacy' });
   if (blocked) return blocked;
 
   if (requestedIntent === 'abandon-legacy') return abandonLegacyFacts(snapshot, evidence);
@@ -232,7 +235,7 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
  * `checkPreconditions` gate `deriveRecoveryFacts` uses, so "legal right now"
  * can never diverge between the two paths. */
 export function isActionLegal(snapshot, evidence, action) {
-  const blocked = checkPreconditions(snapshot, evidence);
+  const blocked = checkPreconditions(snapshot, evidence, { legacySweep: action?.type === 'abandon-legacy' });
   if (blocked) return blocked;
 
   if (!action || typeof action !== 'object' || typeof action.type !== 'string') {
