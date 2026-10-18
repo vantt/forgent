@@ -5,7 +5,9 @@ Status: **blocked; not awaiting-owner-review**. This is the established `reports
 
 ## Close decisions and limits
 
-**H1 suite decision:** [Lead fills final close statement here; L11-22 already records the measured residual, with `step-09-close-suite-attribution.json`.]
+**H1 suite decision (Lead, L11-22):** the `npm test` row is met by a measured set difference. The 21 failing test files were run at plan HEAD `c2409de08` and main pin `eab4d617b`; only two tests fail on the plan branch alone: the dead-vocabulary guard (plan-caused, P7-DOC-GAP-05, Phase 9 pre-landing blocker) and a herdr idle timing test that passed 3/3 rerun alone. Every other failure is present on main. Evidence: `step-09-close-suite-attribution.json`.
+
+**Closing re-review (Lead, L11-28):** -02 108 ok / 2 rework (fixed), -03 50/50 ok; two untouched stale code citations routed to Phase 9 as P7-DOC-GAP-06.
 
 **H2 A46 ratification:** [Lead fills the owner's answer on the corrected attribution here; pending, no ratification inferred.]
 
