@@ -195,8 +195,8 @@ const attemptAnswers = new Map();
  * `bin` overrides the host binary lookup (tests, doctor).
  */
 export function mintAttemptWriterId(attemptId, { bin, fgosDir } = {}) {
-  if (typeof attemptId !== 'string') {
-    throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string');
+  if (typeof attemptId !== 'string' || attemptId.includes('\0')) {
+    throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string without NUL');
   }
   const cached = attemptAnswers.get(attemptId);
   if (cached) return cached;
