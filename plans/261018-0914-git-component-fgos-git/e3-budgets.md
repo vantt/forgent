@@ -1,6 +1,6 @@
 # E3 budgets for the combined addon (owner input)
 
-Status: **PROPOSED, not yet the owner's.** Spec §15 E3 requires the owner to write these budgets before any combined-addon measurement. Edit the numbers, change the status line to "Owner-set on <date>", and commit this file before phase 01 step 13 runs. No E3 verdict counts if this commit does not precede the run.
+Status: **Owner-set on 2026-10-18** (owner: "đồng ý", 11:20 Asia/Saigon), numbers unchanged from the proposal. Spec §15 E3 requires the owner to write these budgets before any combined-addon measurement. Edit the numbers, change the status line to "Owner-set on <date>", and commit this file before phase 01 step 13 runs. No E3 verdict counts if this commit does not precede the run.
 
 Starting points (proposals only): the DC baseline in Git spec §19 E3 row (warm tmpfs, one caller: one plumbing spawn p50 5.4-6.4 ms, p95 6.9-7.7 ms; `worktree add` p50 13.1 ms; one `update-ref --stdin` of 100 refs p50 12.0 ms; WAL record 4,096 allocated bytes; 10,000 records parsed in about 46 ms) and Event Store spec §17. All runs on ext4, not tmpfs.
 
