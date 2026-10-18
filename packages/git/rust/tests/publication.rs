@@ -391,6 +391,23 @@ fn remote_mirrors_and_non_fast_forward_are_typed() {
             assert!(!marker.exists(), "remote receive hooks must be suppressed");
             let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
             port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
+            let discovered = port
+                .list_refs(&repo, &[RefPrefix::parse("refs/fgos/").unwrap()], None, 100)
+                .unwrap();
+            assert!(discovered.complete);
+            assert!(discovered
+                .entries
+                .iter()
+                .any(|e| e.name.as_str() == "refs/fgos/events/machine"));
+            assert!(discovered
+                .entries
+                .iter()
+                .any(|e| e.name.as_str() == "refs/fgos/remotes/origin/events/machine"));
+            assert!(!discovered
+                .entries
+                .iter()
+                .any(|e| e.name.as_str().starts_with("refs/fgos/git-operations/")));
+
             assert!(
                 matches!(port.read_ref(&repo,&RefName::parse("refs/fgos/remotes/origin/events/machine").unwrap()).unwrap(),RefValue::Direct(o) if o==a)
             );
@@ -1356,4 +1373,135 @@ fn batched_walk_returns_a_page_before_an_oversized_future_commit() {
         .unwrap();
     assert_eq!(second.commits[0].oid, parent);
     assert!(second.complete);
+}
+
+#[test]
+fn literal_ref_pages_and_batched_tree_paths() {
+    for format in ["sha1", "sha256"] {
+        for backend in ["files", "reftable"] {
+            let t = Temp::new();
+            let root = t.0.join("repo");
+            init(&root, format, backend);
+            let driver = GitDriver::new(&t.0).unwrap();
+            let repo = resolve(&driver, &root);
+            let mut h = handle(&t.0.join("seal.lock"));
+            let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+            let blob = port.write_blob(&repo, b"{seal}\0\n").unwrap();
+            let child = port.write_tree(&repo, &[]).unwrap();
+            let tree = port
+                .write_tree(
+                    &repo,
+                    &[
+                        TreeEntry {
+                            name: b"seal.json".to_vec(),
+                            mode: 0o100644,
+                            oid: blob.clone(),
+                        },
+                        TreeEntry {
+                            name: b"events.jsonl".to_vec(),
+                            mode: 0o100644,
+                            oid: blob.clone(),
+                        },
+                        TreeEntry {
+                            name: b"odd\nname".to_vec(),
+                            mode: 0o100644,
+                            oid: blob.clone(),
+                        },
+                        TreeEntry {
+                            name: b"dir".to_vec(),
+                            mode: 0o040000,
+                            oid: child,
+                        },
+                    ],
+                )
+                .unwrap();
+            let commit = port
+                .write_commit(
+                    &repo,
+                    &CommitInput {
+                        tree: tree.clone(),
+                        parents: vec![],
+                        author: Identity {
+                            name: "a".into(),
+                            email: "a@b".into(),
+                        },
+                        committer: Identity {
+                            name: "a".into(),
+                            email: "a@b".into(),
+                        },
+                        author_date: "1700000000 +0000".into(),
+                        committer_date: "1700000000 +0000".into(),
+                        message: b"test".to_vec(),
+                    },
+                )
+                .unwrap();
+            git(
+                &root,
+                &["update-ref", "refs/fgos/events/one", commit.as_str()],
+            );
+            git(
+                &root,
+                &[
+                    "update-ref",
+                    "refs/fgos/git-operations/test/candidate",
+                    commit.as_str(),
+                ],
+            );
+            git(
+                &root,
+                &[
+                    "symbolic-ref",
+                    "refs/fgos/events/two",
+                    "refs/fgos/events/one",
+                ],
+            );
+            let prefixes = [RefPrefix::parse("refs/fgos/").unwrap()];
+            let first = Inspect::list_refs(&driver, &repo, &prefixes, None, 1).unwrap();
+            assert!(!first.complete);
+            assert_eq!(first.entries.len(), 1);
+            let second = port
+                .list_refs(&repo, &prefixes, first.next_cursor, 1)
+                .unwrap();
+            assert!(second.complete);
+            assert!(
+                matches!(&second.entries[0].value, RefValue::Symbolic(r) if r.as_str() == "refs/fgos/events/one")
+            );
+            assert_eq!(
+                port.list_refs(
+                    &repo,
+                    &[RefPrefix::parse("refs/fgos/git-operations/").unwrap()],
+                    None,
+                    10
+                )
+                .unwrap()
+                .entries
+                .len(),
+                1
+            );
+            for revision in [&tree, &commit] {
+                let paths = [
+                    b"seal.json".to_vec(),
+                    b"events.jsonl".to_vec(),
+                    b"missing".to_vec(),
+                    b"dir".to_vec(),
+                    b"odd\nname".to_vec(),
+                ];
+                let result = port.read_paths_at(&repo, revision, &paths, 1024).unwrap();
+                assert!(matches!(&result[0].value, PathValue::Blob(b) if b == b"{seal}\0\n"));
+                assert!(matches!(&result[1].value, PathValue::Blob(_)));
+                assert!(matches!(&result[2].value, PathValue::Absent));
+                assert!(matches!(
+                    &result[3].value,
+                    PathValue::NotABlob(ObjectType::Tree)
+                ));
+                assert!(matches!(&result[4].value, PathValue::Blob(_)));
+                assert!(
+                    matches!(&Inspect::read_paths_at(&driver, &repo, revision, &paths[..1], 1).unwrap()[0].value, PathValue::Error(e) if e.cause == "blob-too-large")
+                );
+            }
+            assert!(port
+                .read_paths_at(&repo, &blob, &[b"x".to_vec()], 10)
+                .is_err());
+        }
+    }
 }

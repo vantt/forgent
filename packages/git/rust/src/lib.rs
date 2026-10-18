@@ -293,6 +293,21 @@ pub struct PushResult {
 /// Typed publication contract. PublicationPort implements it under the caller's
 /// opaque event-seal authority and the signed §4/§10 WAL protocol.
 pub trait Publication {
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage>;
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>>;
+
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid>;
     fn write_tree(&self, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid>;
     fn write_commit(&self, repo: &RepoHandle, input: &CommitInput) -> Result<Oid>;
@@ -353,6 +368,21 @@ pub struct FetchMappingProvenance {
 }
 
 pub trait Inspect {
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage>;
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>>;
+
     fn configured_fetch_refspecs(&self, repo: &RepoHandle, remote: &str)
         -> Result<Vec<ConfigFact>>;
     fn push_refspecs(&self, repo: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>>;
@@ -389,4 +419,45 @@ pub struct RepoLayout {
 pub enum RefStorage {
     Files,
     Reftable,
+}
+
+/// Literal byte prefix, never a Git glob. A trailing slash selects a namespace.
+#[derive(Debug, Clone)]
+pub struct RefPrefix(String);
+impl RefPrefix {
+    pub fn parse(value: &str) -> std::result::Result<Self, InvalidInput> {
+        RefName::parse(value.trim_end_matches('/'))?;
+        Ok(Self(value.into()))
+    }
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+#[derive(Debug, Clone)]
+pub struct RefCursor {
+    pub(crate) binding: Vec<String>,
+    pub(crate) after: String,
+}
+#[derive(Debug)]
+pub struct RefEntry {
+    pub name: RefName,
+    pub value: RefValue,
+}
+#[derive(Debug)]
+pub struct RefPage {
+    pub entries: Vec<RefEntry>,
+    pub complete: bool,
+    pub next_cursor: Option<RefCursor>,
+}
+#[derive(Debug)]
+pub enum PathValue {
+    Blob(Vec<u8>),
+    Absent,
+    NotABlob(ObjectType),
+    Error(OperationError),
+}
+#[derive(Debug)]
+pub struct PathRead {
+    pub path: Vec<u8>,
+    pub value: PathValue,
 }

@@ -13,7 +13,9 @@
       "pathsAtRevision",
       "listWorktrees",
       "compareContent",
-      "snapshotWrites"
+      "snapshotWrites",
+      "listRefs",
+      "readPathsAt"
     ],
     "Refs": [
       "ensureBranch",
@@ -76,7 +78,9 @@
       "walkCommits",
       "compareAndSwap",
       "fetchRefs",
-      "pushRefs"
+      "pushRefs",
+      "listRefs",
+      "readPathsAt"
     ]
   },
   "publicationExtensions": {

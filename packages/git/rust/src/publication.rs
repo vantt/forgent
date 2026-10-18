@@ -970,6 +970,25 @@ struct Cursor {
 }
 
 impl<F: FileSystem> Publication for PublicationPort<'_, F> {
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage> {
+        Inspect::list_refs(self.driver, repo, prefixes, cursor, max_entries)
+    }
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>> {
+        Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)
+    }
+
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
         self.object_write(repo, "blob", bytes)
     }

@@ -636,9 +636,11 @@ impl GitDriver {
                 code: result.outcome.exit,
             });
         }
-        if !input.is_empty() {
+        // Read-only batch plumbing needs stdin without holder authority.
+        if !input.is_empty() && policy != Policy::Inspect {
             return Err(refusal("git-input-requires-borrow"));
         }
+        let (stdin_r, mut stdin_w) = std::io::pipe().map_err(io)?;
         let (stdout_r, stdout_w) = std::io::pipe().map_err(io)?;
         let (stderr_r, stderr_w) = std::io::pipe().map_err(io)?;
         let spec = SpawnSpec {
@@ -647,7 +649,7 @@ impl GitDriver {
             fd_map: Vec::new(),
             env: env.0,
             cwd: cwd.into(),
-            stdin: None,
+            stdin: Some(reader_file(stdin_r)),
             stdout: Some(pipe_file(stdout_w)),
             stderr: Some(pipe_file(stderr_w)),
             mode: StartMode::Direct,
@@ -665,6 +667,11 @@ impl GitDriver {
             .containment
             .spawn_in(&mut domain, spec)
             .map_err(|e| refusal(e.to_string()))?;
+        let input = input.to_vec();
+        std::thread::spawn(move || {
+            use std::io::Write;
+            let _ = stdin_w.write_all(&input);
+        });
         let overflow = Arc::new(AtomicBool::new(false));
         let out = capture(stdout_r, limit, overflow.clone());
         let err = capture(stderr_r, STDERR_LIMIT, overflow.clone());
@@ -963,6 +970,16 @@ fn pipe_file(pipe: std::io::PipeWriter) -> File {
     use std::os::windows::io::OwnedHandle;
     File::from(OwnedHandle::from(pipe))
 }
+#[cfg(unix)]
+fn reader_file(pipe: std::io::PipeReader) -> File {
+    use std::os::fd::OwnedFd;
+    File::from(OwnedFd::from(pipe))
+}
+#[cfg(windows)]
+fn reader_file(pipe: std::io::PipeReader) -> File {
+    use std::os::windows::io::OwnedHandle;
+    File::from(OwnedHandle::from(pipe))
+}
 fn capture(
     mut input: impl Read + Send + 'static,
     limit: usize,
@@ -1155,6 +1172,214 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
 }
 
 impl Inspect for GitDriver {
+    fn list_refs(
+        &self,
+        repo: &RepoHandle,
+        prefixes: &[RefPrefix],
+        cursor: Option<RefCursor>,
+        max_entries: usize,
+    ) -> Result<RefPage> {
+        if prefixes.is_empty() || prefixes.len() > 256 || max_entries == 0 || max_entries > 100_000
+        {
+            return Err(refusal("invalid-ref-bounds"));
+        }
+        let binding: Vec<String> = prefixes.iter().map(|p| p.as_str().to_owned()).collect();
+        if cursor.as_ref().is_some_and(|c| c.binding != binding) {
+            return Err(refusal("ref-cursor-query-mismatch"));
+        }
+        let bytes = self.checked(
+            repo,
+            &[
+                "for-each-ref",
+                "--sort=refname",
+                "--format=%(refname)%00%(objectname)%00%(symref)",
+            ],
+            Policy::Inspect,
+        )?;
+        let mut entries = Vec::new();
+        let mut more = false;
+        for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
+            let fields: Vec<_> = line.split(|b| *b == 0).collect();
+            if fields.len() != 3 {
+                return Err(refusal("invalid-ref-observation"));
+            }
+            let name = std::str::from_utf8(fields[0]).map_err(|_| refusal("non-utf8-ref-name"))?;
+            if !binding.iter().any(|p| name.starts_with(p))
+                || cursor.as_ref().is_some_and(|c| name <= c.after.as_str())
+            {
+                continue;
+            }
+            if name.starts_with("refs/fgos/git-operations/")
+                && !binding
+                    .iter()
+                    .any(|p| p.starts_with("refs/fgos/git-operations"))
+            {
+                continue;
+            }
+            if entries.len() == max_entries {
+                more = true;
+                break;
+            }
+            let value = if fields[2].is_empty() {
+                RefValue::Direct(
+                    Oid::parse(
+                        std::str::from_utf8(fields[1]).map_err(|_| refusal("invalid-ref-oid"))?,
+                        repo.object_format(),
+                    )
+                    .map_err(|_| refusal("invalid-ref-oid"))?,
+                )
+            } else {
+                RefValue::Symbolic(
+                    RefName::parse(
+                        std::str::from_utf8(fields[2])
+                            .map_err(|_| refusal("invalid-symbolic-target"))?,
+                    )
+                    .map_err(|_| refusal("invalid-symbolic-target"))?,
+                )
+            };
+            entries.push(RefEntry {
+                name: RefName::parse(name).map_err(|_| refusal("invalid-ref-name"))?,
+                value,
+            });
+        }
+        let next_cursor = if more {
+            Some(RefCursor {
+                binding,
+                after: entries.last().unwrap().name.as_str().into(),
+            })
+        } else {
+            None
+        };
+        Ok(RefPage {
+            entries,
+            complete: !more,
+            next_cursor,
+        })
+    }
+    fn read_paths_at(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        paths: &[Vec<u8>],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<PathRead>> {
+        Oid::parse(revision.as_str(), repo.object_format())
+            .map_err(|_| refusal("object-format-mismatch"))?;
+        if paths.len() > 4096 || max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
+            return Err(refusal("invalid-path-read-bounds"));
+        }
+        // Validate the root separately so a missing root never becomes absent paths.
+        let kind = self.checked(
+            repo,
+            &["cat-file", "-t", revision.as_str()],
+            Policy::Inspect,
+        )?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(refusal("revision-not-commit-or-tree"));
+        }
+        let mut input = Vec::new();
+        for path in paths {
+            if path.is_empty()
+                || path.len() > 4096
+                || path.contains(&0)
+                || path.starts_with(b"/")
+                || path
+                    .split(|b| *b == b'/')
+                    .any(|p| p == b".." || p == b"." || p.is_empty())
+            {
+                return Err(refusal("invalid-literal-path"));
+            }
+            input.extend_from_slice(revision.as_str().as_bytes());
+            input.push(b':');
+            input.extend_from_slice(path);
+            input.push(0);
+        }
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["cat-file", "--batch", "-Z"],
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            &input,
+        )?;
+        if !out.success {
+            return Err(out.error(if repo.layout.promisor {
+                "promisor-object-unavailable"
+            } else if repo.layout.alternates {
+                "alternate-object-unavailable"
+            } else if repo.layout.shallow {
+                "shallow-history-incomplete"
+            } else {
+                "path-read-failed"
+            }));
+        }
+        let mut rest = out.stdout.as_slice();
+        let mut result = Vec::new();
+        for path in paths {
+            let end = rest
+                .iter()
+                .position(|b| *b == 0)
+                .ok_or_else(|| refusal("invalid-path-header"))?;
+            let header = &rest[..end];
+            rest = &rest[end + 1..];
+            let value = if header.ends_with(b" missing") {
+                if repo.layout.promisor {
+                    PathValue::Error(refusal("promisor-object-unavailable"))
+                } else if repo.layout.alternates {
+                    PathValue::Error(refusal("alternate-object-unavailable"))
+                } else {
+                    PathValue::Absent
+                }
+            } else {
+                let fields: Vec<_> = header.split(|b| *b == b' ').collect();
+                if fields.len() != 3 {
+                    return Err(refusal("invalid-path-header"));
+                }
+                Oid::parse(
+                    std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-object-oid"))?,
+                    repo.object_format(),
+                )
+                .map_err(|_| refusal("invalid-object-oid"))?;
+                let kind = match fields[1] {
+                    b"blob" => ObjectType::Blob,
+                    b"tree" => ObjectType::Tree,
+                    b"commit" => ObjectType::Commit,
+                    b"tag" => ObjectType::Tag,
+                    _ => return Err(refusal("invalid-object-type")),
+                };
+                let size = std::str::from_utf8(fields[2])
+                    .ok()
+                    .and_then(|s| s.parse::<usize>().ok())
+                    .ok_or_else(|| refusal("invalid-object-size"))?;
+                if size >= rest.len() || rest[size] != 0 {
+                    return Err(refusal("invalid-object-size"));
+                }
+                let value = if kind != ObjectType::Blob {
+                    PathValue::NotABlob(kind)
+                } else if size > max_blob_bytes {
+                    PathValue::Error(refusal("blob-too-large"))
+                } else {
+                    PathValue::Blob(rest[..size].to_vec())
+                };
+                rest = &rest[size + 1..];
+                value
+            };
+            result.push(PathRead {
+                path: path.clone(),
+                value,
+            });
+        }
+        if !rest.is_empty() {
+            return Err(refusal("unexpected-path-output"));
+        }
+        Ok(result)
+    }
+
     fn configured_fetch_refspecs(
         &self,
         repo: &RepoHandle,
