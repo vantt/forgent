@@ -89,7 +89,7 @@ pub fn install_ordered(
             before_install()
         }
         _ => filesystem.checkpoint(step),
-    }, also_sync, alongside)
+    }, Ordered { also_sync, alongside })
 }
 
 /// Sync several directories, each with its own fsync, issued concurrently
@@ -116,7 +116,7 @@ pub fn sync_directories(dirs: &[&Path]) -> io::Result<()> {
 /// Install with the caller's historical Unix creation mode (still filtered by
 /// umask). Other platforms use their normal creation permissions.
 pub fn install_once_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, mode, &mut |_| Ok(()), &[], None)
+    write_durably(dir, name, bytes, false, mode, &mut |_| Ok(()), Ordered::NONE)
 }
 
 /// Replace a name atomically without opening its old target, then sync its parent.
@@ -126,7 +126,7 @@ pub fn replace_durably(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed
 
 /// Replace with a caller-selected Unix creation mode, filtered by umask.
 pub fn replace_durably_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, true, mode, &mut |_| Ok(()), &[], None)
+    write_durably(dir, name, bytes, true, mode, &mut |_| Ok(()), Ordered::NONE)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -150,7 +150,17 @@ pub fn replace_durably_observed(
         "name-installed" => observe(ReplacePoint::Renamed),
         "parent-fsync" => observe(ReplacePoint::DirectorySynced),
         _ => Ok(()),
-    }, &[], None)
+    }, Ordered::NONE)
+}
+
+/// Effects an ordered install adds around one record (see [`install_ordered`]).
+struct Ordered<'a> {
+    also_sync: &'a [&'a Path],
+    alongside: Option<&'a (dyn Fn() -> io::Result<()> + Sync)>,
+}
+
+impl Ordered<'_> {
+    const NONE: Ordered<'static> = Ordered { also_sync: &[], alongside: None };
 }
 
 /// One write path for both modes. `replace` renames over the name; otherwise the
@@ -163,9 +173,9 @@ fn write_durably(
     replace: bool,
     mode: u32,
     checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
-    also_sync: &[&Path],
-    alongside: Option<&(dyn Fn() -> io::Result<()> + Sync)>,
+    ordered: Ordered<'_>,
 ) -> Result<Installed, InstallError> {
+    let Ordered { also_sync, alongside } = ordered;
     let mut components = Path::new(name).components();
     if name.is_empty()
         || !matches!(components.next(), Some(Component::Normal(_)))
