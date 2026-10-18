@@ -205,9 +205,14 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       // An unconfined agent writes next to the test; the confinement homes on this machine belong to whatever else runs at the same time.
       if (fs.existsSync(own) || !confined) return own;
       const root = path.join(os.tmpdir(), 'fgos-confinement');
+      // Only a home whose agent ran in this project's repository is this test's: another confined test can run at the same time.
+      const ours = (home) => {
+        try { return path.resolve(readJson(path.join(home, 'agent-env.json')).cwd).startsWith(repoDir); } catch { return false; }
+      };
       let homes = [];
-      try { homes = fs.readdirSync(root).map((d) => path.join(root, d, 'home', name)).filter((f) => fs.existsSync(f)); } catch { /* none */ }
-      return homes.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] ?? own;
+      try { homes = fs.readdirSync(root).map((d) => path.join(root, d, 'home')).filter(ours); } catch { /* none */ }
+      const files = homes.map((home) => path.join(home, name)).filter((f) => fs.existsSync(f));
+      return files.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] ?? own;
     },
     agentStarts() { return readLines(project.agentNote('agent-starts.txt')).map(Number); },
     agentEnv() { return readJson(project.agentNote('agent-env.json')); },
