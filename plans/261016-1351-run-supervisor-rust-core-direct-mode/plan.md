@@ -1,7 +1,7 @@
 ---
 title: "6.2 Run supervisor: lõi Rust, cách khởi động direct, cổng chứa process, cửa adopt"
 description: "Mỗi attempt một process supervisor Rust và một gate là gốc process của agent trong miền chứa chứng minh được rỗng; lock attempt và lease cwd giữ trước prepare; receipt từng bước; cửa adopt thay reaper; driver chứa process Linux, Windows Job Object, macOS best-effort; agent-protocol direct cho 5 CLI; xoá supervisor Node và kênh IPC"
-status: pending
+status: completed
 priority: P1
 effort: 83h
 branch: plan/run-supervisor-6-2-6-3-6-4

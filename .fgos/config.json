@@ -1548,5 +1548,18 @@
     "commands": [
       "cargo build --release --workspace"
     ]
+  },
+  "lock": {
+    "predecessorKillWaitMs": 2000
+  },
+  "terminal": {
+    "allocationGraceMs": 60000,
+    "retainFailedPaneMs": null,
+    "layout": {
+      "policy": "measured-split",
+      "minCols": 80,
+      "minRows": 20,
+      "maxPanesPerTab": 8
+    }
   }
 }
