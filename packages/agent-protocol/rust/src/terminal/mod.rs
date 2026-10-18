@@ -393,7 +393,7 @@ impl Terminal {
         let mut enters = 0;
         let mut last_enter: Option<u64> = None;
         let mut no_draft = 0;
-        let mut working_looks = 0;
+        let mut working_since: Option<u64> = None;
         while io.now_ms() < deadline {
             if outbox.newest_complete().is_some() {
                 return TerminalOutcome::Delivered;
@@ -408,17 +408,22 @@ impl Terminal {
             if seen.visible_blocker || state == "blocked" {
                 return self.blocked_outcome(io);
             }
-            // The TUI flashes `working` while it takes in a long paste, before the Enter has submitted
-            // anything; a brief that was taken keeps the agent working for longer than one look.
+            // The TUI shows `working` while it takes in a long paste, before the Enter has submitted
+            // anything. A working agent counts as having the brief when the composer no longer holds
+            // it, or when it keeps working for longer than a paste takes to be ingested.
             if seen.visible_working || state == "working" {
-                working_looks += 1;
-                if working_looks >= SUBMIT_WORKING_LOOKS {
+                let screen = io.screen().unwrap_or_default();
+                if !draft_still_in_composer(message, &seen.prompt_text, &screen) {
+                    return TerminalOutcome::Delivered;
+                }
+                let since = *working_since.get_or_insert(io.now_ms());
+                if io.now_ms().saturating_sub(since) >= SUBMIT_WORKING_MS {
                     return TerminalOutcome::Delivered;
                 }
                 io.pause(POLL_MS);
                 continue;
             }
-            working_looks = 0;
+            working_since = None;
             let idle = state == "idle";
             let mut screen = String::new();
             if idle {

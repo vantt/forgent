@@ -20,8 +20,9 @@ pub const SUBMIT_ENTER_EVERY_MS: u64 = 2500;
 pub const SUBMIT_MAX_ENTERS: u32 = 6;
 /// Consecutive looks with no unsent draft after which the submit check is over.
 pub const SUBMIT_NO_DRAFT_POLLS: u32 = 4;
-/// Consecutive looks at a working agent that count as the brief being taken.
-pub const SUBMIT_WORKING_LOOKS: u32 = 2;
+/// How long an agent that still shows the brief in its composer must keep working before that counts
+/// as the brief being taken (a codex paste keeps it working for seconds before Enter is honoured).
+pub const SUBMIT_WORKING_MS: u64 = 8000;
 /// How long after typing the adapter keeps checking that the brief was taken.
 pub const SUBMIT_CONFIRM_MS: u64 = 60_000;
 

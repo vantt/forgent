@@ -445,22 +445,28 @@
           },
           {
             "at": 100,
+            "file": "draft-expanded-composer",
             "inspection": {
               "state": "working",
               "visibleWorking": true,
-              "promptText": ""
+              "promptText": "codex"
             }
           },
           {
             "at": 900,
-            "file": "draft-expanded-composer"
+            "file": "draft-expanded-composer",
+            "inspection": {
+              "state": "idle",
+              "visibleWorking": false,
+              "promptText": "codex"
+            }
           },
           {
             "at": 4500,
             "inspection": {
               "state": "working",
               "visibleWorking": true,
-              "promptText": ""
+              "promptText": "codex"
             }
           }
         ]
