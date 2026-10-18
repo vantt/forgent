@@ -444,6 +444,34 @@ the independent findings without authorizing promotion, cutover or retirement.
   reviewer re-validates and seals.
 - **Affected rows/steps:** Steps 7, 8; P7-DOC-GAP-03.
 
+### L11-21 — Account main imports at the close instead of stopping on them
+
+- **Date:** 2026-10-18
+- **Status:** decided (Lead under A42; owner: "em cứ điều phối để tiếp tục")
+- **What is happening:** the N1 re-entry package (`879a4d5fe`) finished the native carry,
+  rebind and a 7,250-entry request, but closing checks are red only on main imports:
+  D has seven legacy-ratchet findings (six main-side edits to legacy specs whose
+  exception digests predate the imports, one now-unused exception); strict E has 15
+  findings (unknown-blocking files, registry gaps and rationale-less claims, largely from
+  sources main authored after B0, such as the Event Store, Holder-lock and Process specs);
+  the comparator has 347 mismatches; `npm test` could not start inside the sandboxed worker
+  (EROFS on the user-level full-suite lock).
+- **Decision:**
+  1. Re-account `scripts/check-legacy-docs-ratchet.exceptions.json` for the main-side legacy
+     edits exactly as the earlier main-import accounting commits did (`1c626c8aa`,
+     `37f6f7499`, `c3f22d6a6`): digest, main commit list, rationale; remove or re-scope the
+     unused exception. This is reviewed accounting data, not a gate or baseline edit.
+  2. Account every other E/comparator finding with existing vocabulary where the
+     precedent is mechanical. Units whose source was authored on main after B0 directly in
+     `docs/platform/**` (Event Store, Holder-lock, Process and any other such files) and that
+     have no Phase 6 transformation lineage become ONE declared Phase 9 carry category,
+     "post-B0 main-authored platform sources", with their exact open sets listed; main keeps
+     editing them until cutover, so Phase 9 accounts them against the final main bytes.
+     Strict E may stay nonzero only for that declared set and the existing Phase 8/9 carries.
+  3. The Lead runs `npm test` outside the sandboxed worker and records it.
+  4. The 7,250-entry review runs after the checks are green or declared, sized per A36.
+- **Affected rows/steps:** Step 9.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
