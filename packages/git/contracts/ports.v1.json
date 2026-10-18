@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "docs/platform/git/spec.md \u00a73\u20134",
-  "implementationStatus": "dormant-contract-skeleton",
+  "implementationStatus": "publication-linux-backend; remaining ports are contracts",
   "ports": {
     "Inspect": [
       "resolveRepo",
@@ -88,7 +88,8 @@
       "rejected-non-fast-forward",
       "rejected-other",
       "remote-outcome-unknown"
-    ]
+    ],
+    "remote": "explicit RemoteGrant with pinned effective URL; bounded borrowed transport; mirror refs installed by no-dereference exact-old CAS"
   },
   "inspectFacts": [
     "configuredFetchRefspecs",
@@ -97,5 +98,11 @@
     "configValue(fgos.machineId)",
     "gitFloorVerdict",
     "fetchMappingProvenance"
+  ],
+  "publicationAuthority": "HolderAuthority takes an exclusive mutable borrow of an acquired opaque event-seal Handle; !Sync; validate before Intent and every child; no fd input",
+  "publicationRecovery": [
+    "recover",
+    "supersede",
+    "release_pin_and_compact"
   ]
 }

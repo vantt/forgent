@@ -39,7 +39,71 @@
               "additionalProperties": false,
               "properties": {
                 "kind": {
-                  "const": "PublicationCas"
+                  "oneOf": [
+                    {
+                      "const": "PublicationCas"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "RemoteFetch": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "refspecs": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "refspecs"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "RemoteFetch"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "RemotePush": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "refspecs": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "refspecs"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "RemotePush"
+                      ]
+                    }
+                  ]
                 },
                 "requestDigest": {
                   "type": "string",
@@ -52,7 +116,6 @@
                 "resourceSet": {
                   "type": "array",
                   "minItems": 1,
-                  "maxItems": 1,
                   "items": {
                     "type": "string",
                     "pattern": "^refs/fgos/"
@@ -397,6 +460,83 @@
                     "later_operation_id",
                     "later_receipt_digest",
                     "attribution"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "transfer"
+                    },
+                    "acknowledged": {
+                      "type": "boolean"
+                    },
+                    "unknown": {
+                      "type": "boolean"
+                    },
+                    "observations": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "string",
+                            "pattern": "^refs/fgos/"
+                          },
+                          {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "const": "absent"
+                                  }
+                                },
+                                "required": [
+                                  "kind"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "const": "oid"
+                                  },
+                                  "oid": {
+                                    "type": "string",
+                                    "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "oid"
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "items": false,
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    },
+                    "details": {
+                      "type": "array",
+                      "maxItems": 1024,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "acknowledged",
+                    "unknown",
+                    "observations",
+                    "details"
                   ]
                 }
               ]

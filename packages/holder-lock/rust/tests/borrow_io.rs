@@ -222,3 +222,144 @@ fn successful_root_exit_drains_leftovers_and_captures_tail() {
     release(handle);
     fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn replaced_lock_inode_refuses_old_handle_before_any_child() {
+    let _serial = serial();
+    let dir = temp_dir("io-replaced");
+    let res = resource(&dir, "event-seal");
+    let old = held(&res);
+    validate(&old).unwrap();
+    fs::rename(&res.path, dir.join("original.lock")).unwrap();
+    let successor = held(&res);
+    validate(&successor).unwrap();
+    assert_eq!(validate(&old).unwrap_err().to_string(), "lock-resource-replaced");
+    let spec = shell("touch spawned", &dir);
+    assert_eq!(run_borrowed_io(&old, &spec, &bounds(vec![])).unwrap_err().to_string(), "lock-resource-replaced");
+    let helper = HelperExe::current().unwrap();
+    assert_eq!(run_borrowed(&old, &spec, &helper).unwrap_err().to_string(), "lock-resource-replaced");
+    assert!(!dir.join("spawned").exists());
+    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
+    release(old);
+    validate(&successor).unwrap();
+    release(successor);
+    fs::remove_dir_all(dir).unwrap();
+}
+
+/// Deterministically exposes the real fork-to-exec inheritance window.
+#[cfg(target_os = "linux")]
+#[test]
+fn unrelated_pre_exec_child_survives_borrowed_git() {
+    use std::os::unix::process::CommandExt;
+    let _serial = serial();
+    let dir = temp_dir("pre-exec");
+    let handle = held(&resource(&dir, "io"));
+    let marker = std::ffi::CString::new(dir.join("ready").to_str().unwrap()).unwrap();
+    std::thread::scope(|scope| {
+        let unrelated = scope.spawn(|| {
+            let mut cmd = Command::new("/bin/true");
+            // SAFETY: only async-signal-safe syscalls between fork and exec.
+            unsafe {
+                cmd.pre_exec(move || {
+                    let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
+                    if fd < 0 { return Err(std::io::Error::last_os_error()); }
+                    libc::close(fd);
+                    libc::usleep(500_000);
+                    Ok(())
+                });
+            }
+            cmd.status().unwrap()
+        });
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !dir.join("ready").exists() {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(1));
+        }
+        let spec = BorrowSpec { argv: vec!["git".into(), "--version".into()], ..Default::default() };
+        let out = run_borrowed_io(&handle, &spec, &bounds(vec![])).unwrap();
+        assert_eq!(out.outcome.exit, Some(0));
+        assert_eq!(out.outcome.leftovers_killed, 0);
+        assert!(unrelated.join().unwrap().success());
+    });
+    release(handle);
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn foreign_description_holder_is_refused_and_never_killed() {
+    use std::os::unix::process::CommandExt;
+    let _serial = serial();
+    let dir = temp_dir("foreign");
+    let res = resource(&dir, "io");
+    let handle = held(&res);
+    let marker = std::ffi::CString::new(dir.join("foreign").to_str().unwrap()).unwrap();
+    let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|entry| {
+        (fs::read_link(entry.path()).ok()? == res.path).then(|| entry.file_name().to_str().unwrap().parse().unwrap())
+    }).unwrap();
+    let mut cmd = Command::new("/bin/true");
+    // Fork an unrelated grandchild before exec, keeping its inherited copy.
+    // SAFETY: the child uses only async-signal-safe syscalls, never Rust locks.
+    unsafe {
+        cmd.pre_exec(move || {
+            let pid = libc::fork();
+            if pid < 0 { return Err(std::io::Error::last_os_error()); }
+            if pid == 0 {
+                libc::setsid();
+                // Close Command's exec-error pipe too; retain only the lock
+                // copy so the parent's spawn can finish independently.
+                for fd in 3..65536 {
+                    if fd != lock_fd { libc::close(fd); }
+                }
+                loop { libc::pause(); }
+            }
+            let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
+            if fd < 0 { libc::kill(pid, libc::SIGKILL); return Err(std::io::Error::last_os_error()); }
+            libc::write(fd, (&pid as *const libc::pid_t).cast(), std::mem::size_of_val(&pid));
+            libc::close(fd);
+            Ok(())
+        });
+    }
+    assert!(cmd.status().unwrap().success());
+    let bytes = fs::read(dir.join("foreign")).unwrap();
+    let pid = i32::from_ne_bytes(bytes.try_into().unwrap()) as u32;
+    struct ForeignGuard(u32);
+    impl Drop for ForeignGuard {
+        fn drop(&mut self) {
+            // SAFETY: test owns this deliberately created process.
+            unsafe { libc::kill(self.0 as i32, libc::SIGKILL); }
+        }
+    }
+    let foreign = ForeignGuard(pid);
+    assert!(matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid)));
+    let error = run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap_err();
+    assert!(matches!(&error, BorrowError::ForeignHolder { pids } if pids.contains(&pid)), "{error}");
+    assert!(error.to_string().starts_with("lock-description-foreign-holder:"));
+    assert!(matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Live { .. }));
+    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
+    release(handle);
+    // Refusal has not killed or unlocked the foreign description.
+    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
+    drop(foreign);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie) {
+        assert!(Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    release(held(&res));
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn borrowed_grandchild_keeps_fd_and_is_drained() {
+    let _serial = serial();
+    let dir = temp_dir("grandchild");
+    let handle = held(&resource(&dir, "io"));
+    let out = run_borrowed_io(&handle, &shell("sh -c 'sleep 30 & echo $! > grandchild'", &dir), &bounds(vec![])).unwrap();
+    assert_eq!(out.outcome.exit, Some(0));
+    assert!(out.outcome.leftovers_killed > 0);
+    gone(fs::read_to_string(dir.join("grandchild")).unwrap().trim().parse().unwrap());
+    release(handle);
+    fs::remove_dir_all(dir).unwrap();
+}

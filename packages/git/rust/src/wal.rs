@@ -44,6 +44,12 @@ fn corrupt(s: &str) -> WalError {
 pub trait FileSystem: Send + Sync {
     fn checkpoint(&self, step: &'static str) -> io::Result<()>;
 }
+// A shared injected filesystem controls both WAL and operation boundaries.
+impl<T: FileSystem + ?Sized> FileSystem for &T {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        (**self).checkpoint(step)
+    }
+}
 struct FaultAdapter<'a>(&'a dyn FileSystem);
 impl fgos_durable_file::FileSystem for FaultAdapter<'_> {
     fn checkpoint(&self, step: &'static str) -> io::Result<()> {
@@ -57,9 +63,11 @@ impl FileSystem for OsFileSystem {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
+    RemoteFetch { url: String, refspecs: Vec<String> },
+    RemotePush { url: String, refspecs: Vec<String> },
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
@@ -92,6 +100,12 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Transfer {
+        acknowledged: bool,
+        unknown: bool,
+        observations: Vec<(String, Tip)>,
+        details: Vec<String>,
+    },
     Success {
         observed: Tip,
         attribution: Attribution,
@@ -211,15 +225,29 @@ impl Intent {
             || self.repo_identity.is_empty()
             || self.authority_binding.is_empty()
             || self.writer_identity.is_empty()
-            || self.resource_set.len() != 1
+            || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
         }
-        RefName::parse(&self.resource_set[0]).map_err(|_| corrupt("resource ref"))?;
-        if !self.resource_set[0].starts_with("refs/fgos/")
-            || self.resource_set[0].starts_with("refs/fgos/git-operations/")
-        {
-            return Err(corrupt("publication resource"));
+        for resource in &self.resource_set {
+            RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
+            if !resource.starts_with("refs/fgos/")
+                || resource.starts_with("refs/fgos/git-operations/")
+            {
+                return Err(corrupt("publication resource"));
+            }
+        }
+        match &self.kind {
+            OperationKind::PublicationCas if self.resource_set.len() != 1 => {
+                return Err(corrupt("CAS resource set"))
+            }
+            OperationKind::RemoteFetch { url, refspecs }
+            | OperationKind::RemotePush { url, refspecs }
+                if url.is_empty() || refspecs.is_empty() =>
+            {
+                return Err(corrupt("remote binding"))
+            }
+            _ => (),
         }
         validate_tip(&self.expected, self.object_format)?;
         validate_tip(&self.next, self.object_format)
@@ -287,6 +315,13 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
         (Phase::Intent(_), Phase::Prepared) => true,
         (
             Phase::Prepared,
+            Phase::Outcome(Outcome::Success {
+                observed,
+                attribution: Attribution::EffectObservedOnly,
+            }),
+        ) => i.kind == OperationKind::PublicationCas && observed == &i.next,
+        (
+            Phase::Prepared,
             Phase::TargetAttempt {
                 prior_target_attempt: None,
                 expected,
@@ -294,23 +329,46 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == &i.expected && next == &i.next,
         (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
+            Outcome::Transfer {
+                acknowledged,
+                unknown,
+                observations,
+                details,
+            } => {
+                if i.kind == OperationKind::PublicationCas
+                    || details.len() > 1024
+                    || (*acknowledged && *unknown)
+                {
+                    return Err(corrupt("transfer outcome"));
+                }
+                for (reference, observed) in observations {
+                    if !i.resource_set.contains(reference) {
+                        return Err(corrupt("transfer observation resource"));
+                    }
+                    validate_tip(observed, i.object_format)?;
+                }
+                true
+            }
             Outcome::Success {
                 observed,
                 attribution,
             } => {
                 validate_tip(observed, i.object_format)?;
-                observed == &i.next && *attribution != Attribution::Uncertain
+                i.kind == OperationKind::PublicationCas
+                    && observed == &i.next
+                    && *attribution != Attribution::Uncertain
             }
             Outcome::Loss { observed } => {
                 validate_tip(observed, i.object_format)?;
-                observed != &i.next
+                i.kind == OperationKind::PublicationCas
             }
             Outcome::Superseded {
                 later_operation_id,
                 later_receipt_digest,
                 attribution,
             } => {
-                valid_id(later_operation_id)
+                i.kind == OperationKind::PublicationCas
+                    && valid_id(later_operation_id)
                     && digest_valid(later_receipt_digest)
                     && *attribution != Attribution::ThisInvocationWonCas
             }
@@ -520,6 +578,9 @@ impl<F: FileSystem> Wal<F> {
         value: &T,
     ) -> WalResult<Installed> {
         let bytes = serde_json::to_vec(value).map_err(|_| corrupt("serialize"))?;
+        if bytes.len() as u64 > MAX_RECORD {
+            return Err(corrupt("record byte bound"));
+        }
         let result = install_with(&dir.path(), name, &bytes, &FaultAdapter(&self.fs))
             .map_err(|e| WalError::Io(e.source))?;
         self.fs.checkpoint("record-install")?;
@@ -614,7 +675,9 @@ impl<F: FileSystem> Wal<F> {
         let later = self.inspect(later_id)?;
         let a = old.intent();
         let b = later.intent();
-        if a.repo_identity != b.repo_identity
+        if a.kind != OperationKind::PublicationCas
+            || b.kind != OperationKind::PublicationCas
+            || a.repo_identity != b.repo_identity
             || a.resource_set != b.resource_set
             || a.authority_binding != b.authority_binding
             || (b.expected != a.expected && b.expected != a.next)
@@ -649,7 +712,7 @@ impl<F: FileSystem> Wal<F> {
             }),
         )
     }
-    fn native_lock_present(&self, intent: &Intent) -> WalResult<bool> {
+    pub(crate) fn native_lock_present(&self, intent: &Intent) -> WalResult<bool> {
         // Never unlink any native lock. Probe files and reftable: an unknown
         // backend artifact conservatively blocks every attempted supersession.
         for p in [
@@ -805,6 +868,9 @@ impl<F: FileSystem> Wal<F> {
             return Ok(Recovery::Terminal(o.clone()));
         }
         let i = c.intent();
+        if i.kind != OperationKind::PublicationCas {
+            return Ok(Recovery::RecoveryRequired);
+        }
         let target = reader.read_ref(&i.resource_set[0])?;
         let pin = reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?;
         if matches!(c.last().phase, Phase::Intent(_)) {
@@ -849,6 +915,10 @@ pub struct CompactReceipt {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Transfer { .. } => vec![
+            "t".into(),
+            serde_json::to_string(o).expect("serializable outcome"),
+        ],
         Outcome::Success {
             observed,
             attribution,
@@ -893,6 +963,13 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("t") => {
+            o.len() == 2
+                && matches!(
+                    serde_json::from_str::<Outcome>(&o[1]),
+                    Ok(Outcome::Transfer { .. })
+                )
+        }
         Some("s") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "w" | "e"),
         Some("l") => o.len() == 2 && tip(&o[1]),
         Some("x") => {
@@ -920,6 +997,7 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "t" => serde_json::from_str(&r[1]).map_err(|_| corrupt("transfer compact outcome"))?,
             "s" => Outcome::Success {
                 observed: tip(&r[1]),
                 attribution: if r[2] == "w" {

@@ -361,6 +361,8 @@ pub struct BorrowIoOutcome {
 /// Why [`run_borrowed`] failed.
 #[derive(Debug)]
 pub enum BorrowError {
+    /// The acquired description no longer names the current lock resource.
+    ResourceReplaced,
     /// Explicit bounded I/O is unavailable on this platform.
     IoUnsupported,
     /// A captured stream exceeded its byte ceiling; cleanup has completed.
@@ -377,8 +379,13 @@ pub enum BorrowError {
     Wait(io::Error),
     /// The platform cannot borrow.
     Unsupported,
-    /// Processes still held the description after the kill wait
-    /// (`borrow-leftover-not-killed`). The caller still releases its handle.
+    /// A foreign description holder was not killed. The handle stays held;
+    /// no successful drain or release is claimed.
+    ForeignHolder {
+        /// Processes outside the borrowing domain; never signaled.
+        pids: Vec<u32>,
+    },
+    /// Borrowing domain could not be drained.
     LeftoverNotKilled {
         /// What the child itself returned.
         outcome: BorrowOutcome,
@@ -390,6 +397,8 @@ pub enum BorrowError {
 impl std::fmt::Display for BorrowError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            BorrowError::ForeignHolder { pids } => write!(f, "lock-description-foreign-holder: {pids:?}"),
+            BorrowError::ResourceReplaced => write!(f, "lock-resource-replaced"),
             BorrowError::IoUnsupported => write!(f, "borrow-io-unsupported: explicit I/O requires Unix"),
             BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
             BorrowError::Deadline => write!(f, "borrow-deadline"),
@@ -569,6 +578,51 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
     }
 }
 
+/// Validate an acquired opaque exclusive handle without spawning or exposing
+/// its description. This is a point-in-time resource check, not a new acquire
+/// or a proof of continuous custody across a caller's operations.
+pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
+    let drv = driver::current();
+    if !drv.supported() {
+        return Err(BorrowError::Unsupported);
+    }
+    if handle.mode != Mode::Ex {
+        return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
+    }
+    if !drv.same_file(&handle.file, &handle.resource.path) {
+        return Err(BorrowError::ResourceReplaced);
+    }
+    #[cfg(unix)]
+    {
+        let annotation = format!("{}:{BORROW_SLOT}", handle.name());
+        if borrowed_check(&handle.file, handle.path(), Some(&annotation), BORROW_SLOT) != BorrowedCheck::Borrower {
+            return Err(BorrowError::ResourceReplaced);
+        }
+    }
+    // Windows locks cannot be re-taken on the same handle. Handle is private,
+    // acquired only by this port, and close-only, so its exclusive lock lives
+    // until Drop; same_file above verifies the current resource identity.
+    Ok(())
+}
+
+/// Validate exclusive authority and wait for transient fork/exec copies to
+/// close. Never spawns or signals. Linux only; an unprovable foreign holder
+/// refuses admission while the caller retains the opaque handle.
+pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
+    validate(handle)?;
+    #[cfg(target_os = "linux")]
+    {
+        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms))
+            .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
+        // Resource identity can change while transient holders drain.
+        validate(handle)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        Err(BorrowError::Unsupported)
+    }
+}
+
 /// Release a held lock: close the description (see the module note on
 /// unlock).
 pub fn release(handle: Handle) {
@@ -599,8 +653,8 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 ///
 /// POSIX: the description goes to the child at slot 3 with
 /// `FGOS_LOCK_FD=<name>:3`. After the child exits, whatever else still holds
-/// the description (Linux: every other process listed as a holder; macOS: the
-/// child's process group) is killed and waited for, up to the handle's kill
+/// the description within its process group or descendants is killed and
+/// waited for; foreign holders are waited or refused, up to the handle's kill
 /// wait, before this returns.
 ///
 /// Windows: the child runs inside a named kill-on-close job this process
@@ -608,6 +662,7 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 /// holder, and nothing is handed to the child (`borrow_windows`). `helper` is
 /// unused on POSIX.
 pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+    validate(handle)?;
     #[cfg(windows)]
     {
         crate::borrow_windows::run(handle, spec, helper, &crate::borrow_windows::BorrowControl::none())
@@ -641,6 +696,9 @@ fn finish_borrowed(handle: &Handle, child: &mut std::process::Child) -> Result<B
     match leftovers {
         Ok(killed) => outcome.leftovers_killed = killed,
         Err(left) => {
+            if left.foreign {
+                return Err(BorrowError::ForeignHolder { pids: left.pids });
+            }
             outcome.leftovers_killed = left.killed;
             return Err(BorrowError::LeftoverNotKilled { outcome, pids: left.pids });
         }
@@ -651,6 +709,7 @@ fn finish_borrowed(handle: &Handle, child: &mut std::process::Child) -> Result<B
 
 #[cfg(unix)]
 fn borrowed_command(handle: &Handle, spec: &BorrowSpec) -> Result<Command, BorrowError> {
+    validate(handle)?;
     let drv = driver::current();
     if !drv.supported() {
         return Err(BorrowError::Unsupported);
@@ -687,6 +746,7 @@ fn borrowed_command(handle: &Handle, spec: &BorrowSpec) -> Result<Command, Borro
 /// its existing borrow path and refuses this form before starting a child.
 /// The spec's stdio is superseded by explicit input and captured output.
 pub fn run_borrowed_io(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+    validate(handle)?;
     #[cfg(not(unix))]
     {
         let _ = (handle, spec, io);

@@ -256,6 +256,54 @@ impl GitDriver {
         Ok(ResolveRepo::Repository(repo))
     }
 
+    /// Operation-layer door: even config reads borrow the caller's seal.
+    pub(crate) fn publication_call(
+        &self,
+        repo: &RepoHandle,
+        handle: &fgos_holder_lock::Handle,
+        args: &[&str],
+        input: &[u8],
+        remote: bool,
+    ) -> Result<Output> {
+        self.require_floor()?;
+        fgos_holder_lock::validate(handle)
+            .map_err(|e| refusal(format!("publication-borrow-unavailable: {e}")))?;
+        let config = self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["config", "--null", "--show-origin", "--list"],
+            Policy::Publication,
+            Some(handle),
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            &[],
+        )?;
+        if !config.success {
+            return Err(config.error("git-config-failed"));
+        }
+        for (_, key, _) in parse_config(&config.stdout)? {
+            if command_config(&key) {
+                return Err(refusal(format!("repository-config-untrusted: {key}")));
+            }
+        }
+        self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            args,
+            if remote {
+                Policy::Remote
+            } else {
+                Policy::Publication
+            },
+            Some(handle),
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            input,
+        )
+    }
+
     // Deliberately re-read effective config each time. No stale config identity
     // cache, including includeIf/global/system changes, can authorize a call.
     fn config(&self, repo: &RepoHandle) -> Result<Vec<ConfigRecord>> {
@@ -395,7 +443,7 @@ impl GitDriver {
             env.0.insert("GIT_NO_LAZY_FETCH".into(), "1".into());
         }
         env.0.insert("GIT_TERMINAL_PROMPT".into(), "0".into());
-        if policy == Policy::Publication {
+        if policy == Policy::Publication || (policy == Policy::Remote && loan.is_some()) {
             let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
             let result = loan.run_borrowed(
                 &fgos_holder_lock::BorrowSpec {
@@ -679,14 +727,14 @@ impl GitDriver {
     }
 }
 
-struct Output {
-    stdout: Vec<u8>,
-    stderr: Vec<u8>,
-    success: bool,
-    code: Option<i32>,
+pub(crate) struct Output {
+    pub(crate) stdout: Vec<u8>,
+    pub(crate) stderr: Vec<u8>,
+    pub(crate) success: bool,
+    pub(crate) code: Option<i32>,
 }
 impl Output {
-    fn error(self, cause: &str) -> OperationError {
+    pub(crate) fn error(self, cause: &str) -> OperationError {
         let mut e = refusal(cause);
         e.exit_code = self.code;
         e.stderr = self.stderr;
@@ -935,6 +983,71 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
         }
         Ok(true)
     }
+}
+
+impl Inspect for GitDriver {
+    fn configured_fetch_refspecs(
+        &self,
+        repo: &RepoHandle,
+        remote: &str,
+    ) -> Result<Vec<ConfigFact>> {
+        config_facts(self, repo, &format!("remote.{remote}.fetch"))
+    }
+    fn push_refspecs(&self, repo: &RepoHandle, remote: &str) -> Result<Vec<ConfigFact>> {
+        config_facts(self, repo, &format!("remote.{remote}.push"))
+    }
+    fn remote_url(&self, repo: &RepoHandle, remote: &str) -> Result<String> {
+        let out = self.checked(repo, &["remote", "get-url", "--", remote], Policy::Inspect)?;
+        Ok(line(&redact(&out))?.into())
+    }
+    fn machine_id(&self, repo: &RepoHandle) -> Result<Option<ConfigFact>> {
+        Ok(config_facts(self, repo, "fgos.machineid")?.pop())
+    }
+    fn git_floor_verdict(&self) -> Result<GitFloorVerdict> {
+        let v = GitDriver::git_floor_verdict(self)?;
+        Ok(GitFloorVerdict {
+            version: v.version.clone(),
+            minimum: v.minimum.clone(),
+            supported: v.supported,
+            probes: v
+                .probes
+                .iter()
+                .map(|p| FloorProbe {
+                    name: p.name.clone(),
+                    passed: p.passed,
+                    evidence: p.evidence.clone(),
+                })
+                .collect(),
+        })
+    }
+    fn fetch_mapping_provenance(
+        &self,
+        _repo: &RepoHandle,
+        _remote: &str,
+    ) -> Result<Option<FetchMappingProvenance>> {
+        // No RepositoryConfig writer has recorded provenance in this lane.
+        Ok(None)
+    }
+    fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {
+        GitDriver::resolve_repo(self, path, path)
+    }
+}
+fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> Result<Vec<ConfigFact>> {
+    driver
+        .config(repo)?
+        .into_iter()
+        .filter(|(_, k, _)| k == &key.to_ascii_lowercase())
+        .map(|(origin, _, value)| {
+            Ok(ConfigFact {
+                value,
+                origin: PathBuf::from(
+                    line(&origin)?
+                        .strip_prefix("file:")
+                        .unwrap_or(line(&origin)?),
+                ),
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]

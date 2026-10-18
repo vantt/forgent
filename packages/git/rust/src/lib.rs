@@ -1,9 +1,10 @@
 //! Git component contracts and hardened repository inspection.
 //!
-//! Publication is an implementor port, not a working backend. Authority,
-//! hardened driver, WAL and recovery must land before an implementation can
-//! issue effects. There is intentionally no public raw-argv escape hatch.
+//! Publication uses caller-held opaque holder-lock authority, hardened borrowed
+//! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
+mod publication;
+pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub mod wal;
 pub use driver::{GitDriver, WalReader};
 use serde::{Deserialize, Serialize};
@@ -75,7 +76,7 @@ impl std::fmt::Display for InvalidInput {
 }
 impl std::error::Error for InvalidInput {}
 
-/// Only a future validated driver may construct a repository handle.
+/// Only the validated driver may construct a repository handle.
 #[derive(Debug)]
 pub struct RepoHandle {
     common_dir: PathBuf,
@@ -223,7 +224,7 @@ pub struct OperationError {
 }
 pub type Result<T> = std::result::Result<T, OperationError>;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectType {
     Blob,
     Tree,
@@ -289,8 +290,8 @@ pub struct PushResult {
     pub refs: Vec<(RefName, PushOutcome)>,
 }
 
-/// Stub interface only: implementing this port requires the signed §4/§10
-/// authority and WAL protocol. No default methods may pretend effects occurred.
+/// Typed publication contract. PublicationPort implements it under the caller's
+/// opaque event-seal authority and the signed §4/§10 WAL protocol.
 pub trait Publication {
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid>;
     fn write_tree(&self, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid>;
