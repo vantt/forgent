@@ -1937,6 +1937,11 @@ fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
     // The first id is compacted: same request returns its receipt.
     let (id, old, next) = &done[0];
     assert!(!operations.join(id).exists());
+    // Compacting it again returns its ledger entry; recover names it compacted.
+    assert_eq!(&port.release_pin_and_compact(&repo, id).unwrap().id, id);
+    let compacted = port.recover(&repo, id).unwrap_err();
+    assert_eq!(compacted.code, ResultCode::Refused);
+    assert!(compacted.cause.starts_with("operation-compacted"));
     let receipt = port
         .compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), id)
         .unwrap();

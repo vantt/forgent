@@ -871,7 +871,21 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     /// Observe/recover this id; an attempted CAS is never reissued.
     pub fn recover(&self, repo: &RepoHandle, id: &str) -> Result<Receipt> {
         let wal = self.wal(repo)?;
-        let chain = wal.inspect(id).map_err(werr)?;
+        let chain = match wal.inspect(id) {
+            Ok(chain) => chain,
+            // A compacted id is settled: the ledger keeps its binding and
+            // terminal outcome, not its request. Its receipt is returned to
+            // a replay of the same request (compareAndSwap).
+            Err(WalError::Io(e))
+                if e.kind() == std::io::ErrorKind::NotFound
+                    && wal.compacted(id).map_err(werr)?.is_some() =>
+            {
+                let mut e = err("operation-compacted: replay the same request to read its receipt");
+                e.operation_id = Some(id.into());
+                return Err(e);
+            }
+            Err(e) => return Err(werr(e)),
+        };
         self.authority
             .validate_publication_borrow(chain.intent())
             .map_err(werr)?;
@@ -1019,19 +1033,23 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
                 // commit (a tag peels to another oid, a tree or blob fails),
                 // and the walk fails on any missing object. Anything else is
                 // decided by the separate type read and walk below, so every
-                // refusal keeps its own answer.
+                // refusal keeps its own answer. History already published at
+                // the expected tip passed this check when it was published and
+                // is held by that ref: the walk stops at it (as Git's own
+                // connectivity check does), so its cost follows the new
+                // objects, not the length of the stream.
                 let peeled = format!("{o}^{{commit}}");
-                if let Ok(out) = self.port.call(
-                    self.repo,
-                    &[
-                        "rev-list",
-                        "--objects",
-                        "--missing=error",
-                        "--end-of-options",
-                        &peeled,
-                    ],
-                    &[],
-                ) {
+                let mut args = vec![
+                    "rev-list",
+                    "--objects",
+                    "--missing=error",
+                    "--end-of-options",
+                    &peeled,
+                ];
+                if let Tip::Oid(expected) = &i.expected {
+                    args.extend(["--not", expected.as_str()]);
+                }
+                if let Ok(out) = self.port.call(self.repo, &args, &[]) {
                     if out.split(|b| *b == b'\n').next() == Some(o.as_bytes()) {
                         return Ok(true);
                     }
@@ -1810,7 +1828,15 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         id: &str,
     ) -> Result<wal::CompactReceipt> {
         let wal = self.wal(repo)?;
-        let mut chain = wal.inspect(id).map_err(werr)?;
+        let mut chain = match wal.inspect(id) {
+            Ok(chain) => chain,
+            // Already compacted (for example by a later publication's
+            // admission): the ledger entry is the result.
+            Err(WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
+                return wal.compacted(id).map_err(werr)?.ok_or_else(|| werr(WalError::Io(e)));
+            }
+            Err(e) => return Err(werr(e)),
+        };
         self.authority
             .validate_publication_borrow(chain.intent())
             .map_err(werr)?;
