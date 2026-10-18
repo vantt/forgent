@@ -1,12 +1,11 @@
 // One round's view of its terminal slot.
 //
-// Every herdr call of the dispatch path goes through terminal-control, which
-// addresses a pane by a key. This module binds one key to a client and gives
-// the round the handful of questions it asks about its pane: what is on the
-// screen, what state the agent is in, what the detector sees, whether the
-// agent's process is still there, how to type at it. It decides nothing:
-// a refusal from the port becomes a thrown `TerminalSlotError` whose `code`
-// is the driver's own error code when the driver named one.
+// Every herdr call of the controller goes through terminal-control, which
+// addresses a pane by a key: this module makes the client (one per route
+// configuration), names keys and display data, and turns a refusal from the
+// port into a thrown `TerminalSlotError` whose `code` is the driver's own
+// error code when the driver named one. What happens in the pane after the
+// handover belongs to the run supervisor.
 
 import path from 'node:path';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
@@ -46,12 +45,6 @@ export function refusalError(refusal, what) {
   return new TerminalSlotError(code, `${what}: ${detail}`);
 }
 
-function must(result, expected, what) {
-  if (result.result === expected) return result;
-  if (result.result === 'unsupported' || result.result === 'unknown') throw refusalError(result, what);
-  throw new TerminalSlotError('terminal_bad_answer', `${what}: the port answered ${result.result}`);
-}
-
 // One client per route configuration for the life of the process: the client's promise queue per
 // group key is what keeps two rounds of one batch from both opening the batch's tab, so rounds that
 // run side by side in this process must share it.
@@ -85,101 +78,6 @@ export function createRoundTerminalControl({ herdrBin, herdrEnv, config, hostBin
 /** Tab label for a group: short and readable, never read back. */
 export function groupLabel(groupKey) {
   return String(groupKey).slice(0, 40);
-}
-
-/**
- * Bind `key` on `tc`. The returned object is the only thing the wait, brief
- * and settle logic of a round sees of the terminal.
- */
-export function createSlotIo({ tc, key, groupKey }) {
-  const call = (op, request = {}) => tc[op]({ key, ...request });
-
-  // `want` leaves parts out so a poll costs only the driver calls it needs.
-  const inspect = (want = {}) => {
-    const seen = call('inspect', want);
-    must(seen, 'inspection', `inspect ${key}`);
-    return seen;
-  };
-
-  /** The pane must exist for an operation on its agent to mean anything. */
-  const livePane = (seen) => {
-    if (seen.pane === 'gone') throw new TerminalSlotError('pane_not_found', `pane of ${key} is gone`);
-    if (seen.pane !== 'live') throw new TerminalSlotError('terminal_unknown', `pane of ${key} could not be inspected`);
-    return seen;
-  };
-
-  return {
-    key,
-
-    /** Screen text; `source` is `visible`, `recent`, ... */
-    read({ lines, source } = {}) {
-      const answer = call('read', { ...(lines ? { lines } : {}), ...(source ? { source } : {}) });
-      return must(answer, 'screen', `read ${key}`).screen;
-    },
-
-    /** The agent's status as the driver reports it (`unknown` when it looked and saw no agent);
-     * throws when the status could not be read. `recognised` says the driver knows an agent runs in the pane. */
-    state() {
-      const seen = livePane(inspect({ foreground: false }));
-      const activity = seen.activity ?? null;
-      // No activity at all means the driver could not read one: that is a failure to look, which a
-      // caller counts as blind time. A driver that looked and recognised no agent answers `unknown`.
-      if (!activity) throw new TerminalSlotError('terminal_unknown', `agent state of ${key} could not be read`);
-      return {
-        agentStatus: activity.state || 'unknown',
-        agentSession: activity.session ?? null,
-        agent: activity.agent ?? null,
-        recognised: typeof activity.agent === 'string' && activity.agent !== '',
-      };
-    },
-
-    /** The driver's screen detector: a verdict, or `{ state: null }` when it gave none. */
-    explain() {
-      const seen = livePane(inspect({ foreground: false, detail: true }));
-      const detail = seen.activity?.detail;
-      if (!detail) return { state: null, visibleBlocker: false, visibleIdle: false, visibleWorking: false, matchedRule: null, promptText: '', raw: null };
-      return {
-        state: typeof detail.state === 'string' ? detail.state : null,
-        visibleBlocker: detail.visibleBlocker === true,
-        visibleIdle: detail.visibleIdle === true,
-        visibleWorking: detail.visibleWorking === true,
-        matchedRule: detail.matchedRule ?? null,
-        promptText: typeof detail.promptText === 'string' ? detail.promptText : '',
-        raw: detail,
-      };
-    },
-
-    /** `{ pane: 'live'|'gone'|'unknown', foreground: identity|null }`. */
-    foreground() {
-      const seen = inspect({ activity: false });
-      return { pane: seen.pane, foreground: seen.foreground ?? null };
-    },
-
-    /** Type `text` and submit it. */
-    prompt(text) {
-      must(call('send', { text, submit: true }), 'ok', `send to ${key}`);
-    },
-
-    /** Type `text` without submitting it. */
-    type(text) {
-      must(call('send', { text }), 'ok', `send to ${key}`);
-    },
-
-    sendKeys(keys) {
-      must(call('send', { keys }), 'ok', `send keys to ${key}`);
-    },
-
-    /** Tell the driver which agent runs here, for a process it does not recognise by itself. */
-    reportAgent({ agent, label, state = 'working' }) {
-      must(call('label', { display: { label, agent }, reportState: state }), 'ok', `report agent of ${key}`);
-    },
-
-    /** Close the pane (or retain it) behind the earlier calls of its group, so a close never runs while
-     * a seat of the same group is still choosing a pane next to it. */
-    release(disposition, { until = null } = {}) {
-      return tc.releaseAsync({ key, ...(groupKey ? { groupKey } : {}), ...(disposition === 'retain' ? { disposition, until } : { disposition }) });
-    },
-  };
 }
 
 /** Display data for a slot: structured, written to the terminal only. */

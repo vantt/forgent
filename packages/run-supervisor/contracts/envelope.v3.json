@@ -40,6 +40,7 @@
   "optionalFields": {
     "launch.maxOutputBytes": "integer >= 1: the supervisor stops the agent (stop cause output-limit, receipt outcome output-limit) once the two capture files hold more than this together (config maxBuffer, default 10485760); absent means no limit",
     "cwdLeaseFile": "string, Windows only: the dispatch-cwd lease file the supervisor takes itself (a LockFileEx lock is never inherited). A mutating Windows envelope without it is refused with exit 65; absent on Unix, where the lease arrives at fd 4",
+    "terminal.retainFailedPaneMs": "terminal mode only: integer >= 1 or null. How long a pane kept for a person (any end but a clean exit) stays before terminal-control may close it; null keeps it until a person closes it; absent means 24 hours. Source: config terminal.retainFailedPaneMs",
     "createdAt": "object {bootId, boottimeNs}: the controller's boot id and monotonic boot time (CLOCK_BOOTTIME ns; Windows GetTickCount64 ms * 1e6) when it wrote the envelope. Windows adopt gives an unbound attempt with a free lock a 60 s start grace measured from it, on the same boot only; absent or another boot means no grace. File times are never used"
   },
   "fields": {
@@ -96,7 +97,7 @@
         }
       },
       "item": {
-        "stepId": { "enum": ["settle-attempt", "finalize-home"], "meaning": "process items; release-slot is a builtinItem" },
+        "stepId": { "enum": ["settle-attempt", "finalize-home", "cleanup-trust"], "meaning": "process items; release-slot is a builtinItem. cleanup-trust (terminal mode) removes the folder-trust entry the controller wrote into the agent's trust store (controller/trust-context.json); it is a no-op when the controller wrote none" },
         "hostBin": "absolute path, normally equal to the top-level hostBin",
         "payloadRoot": "absolute path, normally equal to the top-level payloadRoot",
         "argv": "string[] after hostBin, normally [\"internal\", \"attempt-step\", <stepId>, \"--protocol\", \"1\", \"--run-dir\", <runDir>]",

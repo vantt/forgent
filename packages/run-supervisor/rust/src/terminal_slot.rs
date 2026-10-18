@@ -19,9 +19,19 @@ use fgos_terminal_control::route::{DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_I
 use fgos_terminal_control::store::default_state_root;
 use serde_json::Value;
 
-/// How long a pane kept for a person stays before terminal-control's reconcile
-/// may close it.
+/// How long a pane kept for a person stays before terminal-control's reconcile may close it, when the
+/// envelope names no setting.
 pub const RETAIN_FAILED_PANE_MS: u64 = 24 * 60 * 60 * 1000;
+
+/// The retain window an envelope asks for (`terminal.retainFailedPaneMs`): a number of milliseconds, `null`
+/// for "until a person closes it" (`None`), absent for the default.
+pub fn retain_window(envelope: &Value) -> Option<u64> {
+    match envelope["terminal"].get("retainFailedPaneMs") {
+        None => Some(RETAIN_FAILED_PANE_MS),
+        Some(Value::Null) => None,
+        Some(window) => Some(window.as_u64().unwrap_or(RETAIN_FAILED_PANE_MS)),
+    }
+}
 
 /// The driver, policy and config a [`Core`] borrows.
 pub struct Backend {
@@ -95,9 +105,10 @@ pub enum ReleaseFailure {
 }
 
 /// `release(key, disposition)`; `Ok` carries the detail the step receipt records.
-pub fn release(backend: &Backend, key: &str, disposition: Disposition) -> Result<Value, ReleaseFailure> {
+pub fn release(backend: &Backend, key: &str, disposition: Disposition, retain_window: Option<u64>) -> Result<Value, ReleaseFailure> {
     use fgos_terminal_control::port::Refusal;
-    let until = (disposition == Disposition::Retain).then(|| now_ms() + RETAIN_FAILED_PANE_MS);
+    // A retained pane with no window stays until a person closes it.
+    let until = if disposition == Disposition::Retain { retain_window.map(|window| now_ms() + window) } else { None };
     match backend.core().release(key, disposition, until) {
         Ok(ReleaseOutcome::Released { disposition }) => Ok(serde_json::json!({"disposition": disposition, "key": key})),
         Ok(ReleaseOutcome::KeptUnknown { reason }) => Err(ReleaseFailure::Retry(reason)),
@@ -110,6 +121,13 @@ pub fn release(backend: &Backend, key: &str, disposition: Disposition) -> Result
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn the_envelope_sets_how_long_a_retained_pane_stays() {
+        assert_eq!(retain_window(&json!({"terminal": {}})), Some(RETAIN_FAILED_PANE_MS), "absent means the default");
+        assert_eq!(retain_window(&json!({"terminal": {"retainFailedPaneMs": null}})), None, "null keeps it until a person closes it");
+        assert_eq!(retain_window(&json!({"terminal": {"retainFailedPaneMs": 90000}})), Some(90000));
+    }
 
     #[test]
     fn only_a_clean_exit_with_every_step_done_closes_the_pane() {

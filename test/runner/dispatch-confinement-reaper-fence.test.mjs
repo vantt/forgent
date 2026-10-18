@@ -50,7 +50,6 @@ import { finalizeConfinementResources, bindingForPrepared } from '../../src/runn
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { RUN_TIMEOUT_MAX_MS } from '../../src/runner/dispatch/run-timeout.mjs';
 import { herdrEndpointForEnv, socketPathForSession } from '../../src/runner/dispatch/worker-session.mjs';
-import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import { createSessionFake } from '../helpers/fake-herdr-session.mjs';
 import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
@@ -550,116 +549,8 @@ test('S2(7) a marker that names no slot key is never asked about and never has i
 test.todo('S2(7) live, not mocked: the reaper against the endpoint recorded for a real default-session pane returns true while it is open and false after it closes [needs a live herdr; out of scope for a deterministic suite]');
 
 // ---------------------------------------------------------------------------------------------
-// (8) Plumbing authority -> transport -> herdr-round. A confined herdr-spawn round driven through the
-// real adapter door with a fake herdr and the real terminal-control route; the binding is a spy
-// standing in for Confinement Authority's bind/markLaunched (the adapter only ever sees those two functions).
-
-const POSIX_ONLY = process.platform === 'win32' && 'the mock herdr is a POSIX shell wrapper';
-
-async function withRoundHerdr(tmp, fn) {
-  const harness = await startTerminalHarness();
-  const fake = createFakeHerdr(path.join(tmp, 'fake'), { socketPath: harness.socketPath });
-  try {
-    return await fn({ fake, socket: harness.socketPath });
-  } finally {
-    fake.cleanup();
-    harness.stop();
-  }
-}
-
-async function confinedRound(tmp, fake, { confinementBinding, runIds = {} } = {}) {
-  const runDir = path.join(tmp, 'run');
-  fs.mkdirSync(runDir, { recursive: true });
-  return EXECUTOR_ADAPTERS['herdr-spawn'](
-    {
-      command: 'agy',
-      args: [],
-      prompt: 'p',
-      env: {},
-      interactiveMode: { exitCommand: '/exit', kind: 'agy' },
-      requirement: { mode: 'required' },
-      workerInvocation: { command: '/bin/true', args: [], env: {}, cwd: tmp },
-    },
-    {
-      cwd: tmp, timeoutMs: 5000, workId: 'w-s2-8', tier: 'standard', model: 'sonnet',
-      herdrBin: fake.herdrBin, runDir, transportDeadlines: { readyTimeoutMs: 200, resendAfterMs: 200 },
-      confinementBinding,
-      ...runIds,
-    },
-  );
-}
-
-function withHerdrEnv(vars, fn) {
-  const keys = ['HERDR_SOCKET_PATH', 'HERDR_SESSION'];
-  const saved = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
-  for (const k of keys) { if (vars[k] === undefined) delete process.env[k]; else process.env[k] = vars[k]; }
-  const restore = () => { for (const k of keys) { if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k]; } };
-  return Promise.resolve().then(fn).finally(restore);
-}
-
-function spyBinding(fake, { failBind = false } = {}) {
-  const events = [];
-  return {
-    events,
-    binding: {
-      bind: (b) => { events.push({ kind: 'bind', binding: b, herdrCallsBefore: fake.calls().length }); if (failBind) throw new Error('bind refused for the test'); },
-      markLaunched: () => { events.push({ kind: 'launched', herdrCallsBefore: fake.calls().length }); },
-    },
-  };
-}
-
-const isPaneRun = (c) => c[0] === 'pane' && c[1] === 'run';
-
-test('S2(8) a NON-assignment confined dispatch binds pane, endpoint and its own pid before the launch, then records the launch, outside the isAssignmentRun guard', { skip: POSIX_ONLY }, async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
-  try {
-    await withRoundHerdr(tmp, async ({ fake, socket }) => {
-      const spy = spyBinding(fake);
-      await withHerdrEnv({ HERDR_SOCKET_PATH: socket }, () => assert.rejects(() => confinedRound(tmp, fake, { confinementBinding: spy.binding })));
-      const calls = fake.calls();
-      const runIdx = calls.findIndex(isPaneRun);
-      assert.ok(runIdx >= 0, 'the round reached the launch');
-      assert.deepEqual(spy.events.map((e) => e.kind), ['bind', 'launched']);
-      const [bind, launched] = spy.events;
-      const { terminalKey, ...rest } = bind.binding;
-      assert.deepEqual(rest, { paneId: 'mock-pane-1', herdrEndpoint: socket, herdrSession: null, binderPid: process.pid });
-      assert.match(terminalKey, /^fgos-w-s2-8-/, 'the binding records the slot key the reaper asks about');
-      assert.ok(bind.herdrCallsBefore <= runIdx && launched.herdrCallsBefore <= runIdx, 'bind and the launch record both precede the launch');
-      assert.equal(fake.envs()[runIdx].socket, socket, 'the recorded endpoint is the one the round\'s route used');
-    });
-  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
-});
-
-test('S2(8) a default-session confined round (no HERDR_SOCKET_PATH, no HERDR_SESSION) records the socket herdr falls back to, never a session name', { skip: POSIX_ONLY }, async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
-  try {
-    await withRoundHerdr(tmp, async ({ fake }) => {
-      const spy = spyBinding(fake);
-      await withHerdrEnv({}, () => assert.rejects(() => confinedRound(tmp, fake, { confinementBinding: spy.binding })));
-      assert.ok(spy.events.length > 0, 'the round bound its home before launching');
-      const { terminalKey, ...rest } = spy.events[0].binding;
-      assert.ok(terminalKey);
-      assert.deepEqual(rest, { paneId: 'mock-pane-1', herdrEndpoint: socketPathForSession('default', { home: process.env.HOME }), herdrSession: null, binderPid: process.pid });
-    });
-  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
-});
-
-test('S2(8) a bind failure closes the pane and fails the round before the launch; no worker starts', { skip: POSIX_ONLY }, async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-round-'));
-  try {
-    await withRoundHerdr(tmp, async ({ fake, socket }) => {
-      const spy = spyBinding(fake, { failBind: true });
-      await withHerdrEnv({ HERDR_SOCKET_PATH: socket }, () => assert.rejects(
-        () => confinedRound(tmp, fake, { confinementBinding: spy.binding }),
-        (err) => { assert.match(`${err.code ?? ''} ${err.errorClass ?? ''} ${err.message}`, /confinement-bind-failed|could not bind/); return true; },
-      ));
-      const calls = fake.calls();
-      assert.equal(calls.some(isPaneRun), false, 'no launch after a failed bind');
-      assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'close' && c.includes('mock-pane-1')), 'the pane was closed');
-      assert.deepEqual(spy.events.map((e) => e.kind), ['bind']);
-    });
-  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
-});
+// (8) Plumbing authority -> binding. A terminal attempt binds nothing in the home from the controller:
+// the attempt lock decides, and the herdr rounds that used to bind a pane before the launch are gone.
 
 test('S2(8) Confinement Authority hands one binding over every prepared home and none when nothing can bind', () => {
   assert.equal(bindingForPrepared([null, { cleanup() {} }]), null, 'an unconfined round has no home and is handed no bind function');

@@ -60,7 +60,7 @@ test('direct and terminal envelopes follow the mode rules', () => {
   for (const step of terminalEnvelope.steps.slice(0, -1)) {
     for (const field of Object.keys(envelopeContract.fields.steps.item).filter((f) => f !== 'note')) assert.ok(field in step, `process step ${step.stepId}.${field}`);
   }
-  assert.deepEqual(envelopeContract.fields.steps.item.stepId.enum, ['settle-attempt', 'finalize-home']);
+  assert.deepEqual(envelopeContract.fields.steps.item.stepId.enum, ['settle-attempt', 'finalize-home', 'cleanup-trust']);
 });
 
 test('both envelopes carry identity equal to the minted attempt writer id', () => {
