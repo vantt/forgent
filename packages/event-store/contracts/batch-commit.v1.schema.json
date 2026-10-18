@@ -26,7 +26,8 @@
     },
     "stream": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^(project(?::[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)?|local|branch:[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)$"
     },
     "firstSeq": {
       "type": "integer",

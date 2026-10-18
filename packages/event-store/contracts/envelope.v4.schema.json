@@ -38,7 +38,8 @@
     },
     "stream": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^(project(?::[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)?|local|branch:[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)$"
     },
     "seq": {
       "type": "integer",
@@ -48,7 +49,7 @@
     "seen": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^[^:]+:(project(:.+)?|local|branch:.+)$"
+        "pattern": "^[^:]+:(project(?::[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)?|local|branch:[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?)$"
       },
       "additionalProperties": {
         "type": "integer",

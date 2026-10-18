@@ -99,30 +99,11 @@ impl Envelope {
     }
 }
 fn scope_matches(scope: Scope, stream: &str) -> bool {
-    match scope {
-        Scope::Project => {
-            stream == "project"
-                || stream
-                    .strip_prefix("project:")
-                    .is_some_and(|s| !s.is_empty())
-        }
-        Scope::Local => stream == "local",
-        Scope::Branch => stream
-            .strip_prefix("branch:")
-            .is_some_and(|s| !s.is_empty()),
-    }
+    crate::layout::StreamId::parse(stream).is_ok_and(|id| id.scope() == scope)
 }
 fn valid_seen_key(key: &str) -> bool {
     key.split_once(':').is_some_and(|(origin, stream)| {
-        !origin.is_empty()
-            && (stream == "project"
-                || stream == "local"
-                || stream
-                    .strip_prefix("project:")
-                    .is_some_and(|s| !s.is_empty())
-                || stream
-                    .strip_prefix("branch:")
-                    .is_some_and(|s| !s.is_empty()))
+        !origin.is_empty() && crate::layout::StreamId::parse(stream).is_ok()
     })
 }
 pub fn is_digest(s: &str) -> bool {
@@ -188,7 +169,7 @@ impl BatchCommit {
         if self.v != 4
             || self.kind != "batch-commit"
             || self.origin.is_empty()
-            || self.stream.is_empty()
+            || crate::layout::StreamId::parse(&self.stream).is_err()
             || !positive_counter(self.first_seq)
             || !positive_counter(self.last_seq)
             || self.last_seq < self.first_seq
