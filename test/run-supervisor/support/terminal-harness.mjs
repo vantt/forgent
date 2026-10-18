@@ -77,11 +77,20 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
     children: [],
     env() { return sharedEnv(project); },
 
-    executor({ kind = 'claude' } = {}) {
+    /** An executor whose agent is the fixture. `commandName` makes the CLI the agent protocol sees (codex, ...). */
+    executor({ kind = 'claude', commandName = null } = {}) {
+      let command = process.execPath;
+      let args = [AGENT, '{prompt}'];
+      if (commandName) {
+        fs.mkdirSync(path.join(scratch, 'bin'), { recursive: true });
+        command = path.join(scratch, 'bin', commandName);
+        fs.writeFileSync(command, `#!/bin/sh\nexec ${process.execPath} ${AGENT} "$@"\n`, { mode: 0o755 });
+        args = ['{prompt}'];
+      }
       return {
         kind: 'agent',
-        command: process.execPath,
-        args: [AGENT, '{prompt}'],
+        command,
+        args,
         adapter: 'herdr-spawn',
         allowCrossProvider: true,
         env: { TERMINAL_AGENT_DIR: agentDir },
@@ -90,12 +99,12 @@ export async function createTerminalProject({ name = 'tp' } = {}) {
     },
 
     /** The controller as a process: `fgos run`'s own door (`executeAssignment`) for one herdr-spawn seat. */
-    startController(job = {}) {
+    startController({ env: extraEnv = {}, ...job } = {}) {
       // The Assignment is built from this checkout's task specs, so the controller starts in it; the work
       // happens in `repoDir` (the job's cwd).
       const child = spawn(process.execPath, [CONTROLLER], {
         cwd: process.cwd(),
-        env: { ...project.env(), TERMINAL_CONTROLLER_JOB: JSON.stringify({ repoDir, workId: job.workId ?? `tsk-${name}`, executor: project.executor(), ...job }) },
+        env: { ...project.env(), ...extraEnv, TERMINAL_CONTROLLER_JOB: JSON.stringify({ repoDir, workId: job.workId ?? `tsk-${name}`, executor: project.executor(), ...job }) },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stdout = '';

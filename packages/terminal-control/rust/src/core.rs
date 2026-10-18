@@ -295,7 +295,15 @@ impl<'a> Core<'a> {
         let mut tabs: Vec<TabGeometry> = Vec::new();
         let mut group_panes = Vec::new();
         for live in group {
-            let geometry = self.driver.layout_geometry(&live.record.pane_id)?;
+            let geometry = match self.driver.layout_geometry(&live.record.pane_id) {
+                Ok(geometry) => geometry,
+                // A pane another process released between the liveness check and this look is no longer
+                // part of the group; anything else that stops the look is the caller's to hear.
+                Err(refusal) => match self.driver.pane_liveness(&live.record.pane_id) {
+                    Ok(PaneLiveness::Gone) => continue,
+                    _ => return Err(refusal),
+                },
+            };
             if !tabs.iter().any(|t| t.tab_id == geometry.tab_id) {
                 tabs.push(geometry.clone());
             }
@@ -308,6 +316,10 @@ impl<'a> Core<'a> {
                     role_hint: None,
                 });
             }
+        }
+        // Every pane of the group went away while it was being measured: it continues in a new tab.
+        if group_panes.is_empty() {
+            return self.new_tab(request);
         }
         let input = PlaceInput {
             group_key: request.group_key.clone(),
