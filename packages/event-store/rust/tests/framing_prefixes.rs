@@ -70,10 +70,6 @@ fn wrong_checksum_marker_and_complete_unmarked_lines_never_fold() {
     m.sha256 = "0".repeat(64);
     let mut bad = bytes[..start].to_vec();
     bad.extend(m.canonical_line().unwrap());
-    assert!(decode(&bad, &origin, &repo.stream, false)
-        .unwrap()
-        .events
-        .is_empty());
     assert_eq!(
         decode(&bad, &origin, &repo.stream, true)
             .unwrap_err()
@@ -86,6 +82,7 @@ fn wrong_checksum_marker_and_complete_unmarked_lines_never_fold() {
         .events
         .is_empty());
     let paths = repo.layout.stream(&repo.stream);
-    fs::write(paths.active(), bad).unwrap();
-    assert_eq!(repo.append(1).ack.first_seq, 1);
+    fs::write(paths.active(), &bad).unwrap();
+    assert!(repo.append_cursor(1, &Default::default()).is_err());
+    assert_eq!(fs::read(paths.active()).unwrap(), bad);
 }

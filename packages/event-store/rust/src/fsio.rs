@@ -5,7 +5,7 @@ use crate::{
     errors::{io as io_error, Error},
 };
 use std::{
-    fs::{self, File, OpenOptions},
+    fs::File,
     io::{self, Write},
     path::Path,
 };
@@ -39,6 +39,12 @@ pub trait FileSystem {
     fn write_batch(&self, file: &mut File, bytes: &[u8]) -> io::Result<usize> {
         file.write(bytes)
     }
+    fn sync_file(&self, file: &File) -> io::Result<()> {
+        file.sync_all()
+    }
+    fn sync_directory(&self, path: &Path) -> io::Result<()> {
+        fgos_durable_file::sync_directory(path)
+    }
     fn guarantee(&self, path: &Path) -> fgos_holder_lock::Guarantee {
         fgos_holder_lock::guarantee(path)
     }
@@ -52,33 +58,23 @@ pub(crate) fn point(fs: &dyn FileSystem, p: Point) -> Result<(), Error> {
 pub(crate) fn sync_dir(path: &Path) -> Result<(), Error> {
     fgos_durable_file::sync_directory(path).map_err(io_error)
 }
-/// The append lock serializes this replaceable hint. A fixed temporary is safe
-/// only under that lock; a crash's temporary is replaced on the next recovery.
+/// The shared durable-file leaf owns temporary creation and atomic replacement.
 pub(crate) fn write_hwm(root: &Path, seq: u64, fs: &dyn FileSystem) -> Result<(), Error> {
+    use fgos_durable_file::ReplacePoint;
     point(fs, Point::BeforeHwm)?;
-    let tmp = root.join("hwm.json.tmp");
-    let mut options = OpenOptions::new();
-    options.write(true).create(true).truncate(true);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        // The root is a trusted store directory. Refuse symlinked temporaries.
-        options.mode(0o600);
-    }
-    // Remove the previous crash's temporary without following its target.
-    match fs::remove_file(&tmp) {
-        Ok(()) => (),
-        Err(e) if e.kind() == io::ErrorKind::NotFound => (),
-        Err(e) => return Err(io_error(e)),
-    }
-    let mut file = options.create_new(true).open(&tmp).map_err(io_error)?;
-    file.write_all(&line(&serde_json::json!({"lastSeq":seq}))?)
-        .map_err(io_error)?;
-    point(fs, Point::AfterHwmWrite)?;
-    file.sync_all().map_err(io_error)?;
-    point(fs, Point::AfterHwmFsync)?;
-    fs::rename(tmp, root.join("hwm.json")).map_err(io_error)?;
-    point(fs, Point::AfterHwmRename)?;
-    sync_dir(root)?;
-    point(fs, Point::AfterHwmDirFsync)
+    fgos_durable_file::replace_durably_observed(
+        root,
+        "hwm.json",
+        &line(&serde_json::json!({"lastSeq":seq}))?,
+        |p| {
+            fs.checkpoint(match p {
+                ReplacePoint::Written => Point::AfterHwmWrite,
+                ReplacePoint::Synced => Point::AfterHwmFsync,
+                ReplacePoint::Renamed => Point::AfterHwmRename,
+                ReplacePoint::DirectorySynced => Point::AfterHwmDirFsync,
+            })
+        },
+    )
+    .map_err(|e| io_error(io::Error::other(e)))?;
+    Ok(())
 }

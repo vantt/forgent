@@ -17,8 +17,8 @@ pub struct Framed {
     pub events: Vec<Envelope>,
     pub committed_len: usize,
 }
-/// An active suffix is speculative, including complete event lines and an
-/// invalid marker. Stop at the first bad batch: never salvage later bytes.
+/// An active suffix is speculative, including complete event lines and
+/// an incomplete line. A complete marker after a failure proves corruption.
 /// Immutable segments instead require complete, valid framing through EOF.
 pub fn decode(
     bytes: &[u8],
@@ -86,7 +86,23 @@ pub fn decode(
             }
         })();
         if let Err(e) = parsed {
-            if strict || e.code == ErrorCode::EventStoreSeqRecoveryConflict {
+            if e.code == ErrorCode::EventStoreSeqRecoveryConflict {
+                return Err(e);
+            }
+            if bytes[batch_start..]
+                .split_inclusive(|b| *b == b'\n')
+                .any(|line| {
+                    line.ends_with(b"\n")
+                        && serde_json::from_slice::<BatchCommit>(line)
+                            .is_ok_and(|marker| marker.kind == "batch-commit")
+                })
+            {
+                return Err(Error::new(
+                    ErrorCode::EventStoreIntegrity,
+                    "damaged batch before a complete commit marker",
+                ));
+            }
+            if strict {
                 return Err(e);
             }
             break;
@@ -119,17 +135,29 @@ pub(crate) fn segments(layout: &StreamLayout) -> Result<Vec<(u64, u64, PathBuf)>
     for entry in entries {
         let entry = entry.map_err(io)?;
         let name = entry.file_name();
-        let name = name.to_str().ok_or_else(|| invalid("non-UTF8 segment"))?;
+        let name = name
+            .to_str()
+            .ok_or_else(|| invalid(format!("non-UTF8 segment: {}", entry.path().display())))?;
         let (first, last) = name
             .strip_suffix(".jsonl")
             .and_then(|n| n.split_once('-'))
-            .ok_or_else(|| invalid("invalid closed segment name"))?;
+            .ok_or_else(|| {
+                invalid(format!(
+                    "invalid closed segment name: {}",
+                    entry.path().display()
+                ))
+            })?;
         let first: u64 = first
             .parse()
-            .map_err(|_| invalid("invalid segment first"))?;
-        let last: u64 = last.parse().map_err(|_| invalid("invalid segment last"))?;
+            .map_err(|_| invalid(format!("invalid segment first: {}", entry.path().display())))?;
+        let last: u64 = last
+            .parse()
+            .map_err(|_| invalid(format!("invalid segment last: {}", entry.path().display())))?;
         if first == 0 || last < first || name != format!("{first}-{last}.jsonl") {
-            return Err(invalid("invalid closed segment range"));
+            return Err(invalid(format!(
+                "invalid closed segment range: {}",
+                entry.path().display()
+            )));
         }
         out.push((first, last, entry.path()));
     }
@@ -154,7 +182,7 @@ pub(crate) fn closed(
 #[derive(Debug, Default)]
 pub struct OpenRead {
     pub events: Vec<Envelope>,
-    pub vanished: Vec<PathBuf>,
+    pub vanished: Vec<(u64, u64, PathBuf)>,
 }
 /// Steps 1-2 only; phase 03 fills gaps through the publication reader. A vanished
 /// segment is evidence for that reader, never permission to skip a sequence.
@@ -186,7 +214,7 @@ pub fn read_own_with_fs(
     for (first, last, path) in listed {
         match read_optional(&path)? {
             Some(bytes) => events.extend(closed(&bytes, origin, stream, first, last)?.events),
-            None => vanished.push(path),
+            None => vanished.push((first, last, path)),
         }
     }
     let mut hashes = BTreeSet::new();
@@ -215,7 +243,17 @@ pub fn read_in_gate(
     stream: &StreamId,
     cursor_seq: u64,
 ) -> Result<OpenRead, Error> {
-    let mut result = read_own(layout, origin, stream)?;
+    read_in_gate_with_fs(layout, origin, stream, cursor_seq, &OsFileSystem)
+}
+/// Bounded reader with the same real-file boundary observer as the own reader.
+pub fn read_in_gate_with_fs(
+    layout: &Layout,
+    origin: &str,
+    stream: &StreamId,
+    cursor_seq: u64,
+    fs: &dyn FileSystem,
+) -> Result<OpenRead, Error> {
+    let mut result = read_own_with_fs(layout, origin, stream, fs)?;
     let receipt = crate::append::read_last_seq(&layout.stream(stream).sealed())?.unwrap_or(0);
     result.events.retain(|e| e.seq > cursor_seq);
     let mut expected = cursor_seq;
@@ -228,7 +266,12 @@ pub fn read_in_gate(
         }
         expected = event.seq;
     }
-    if expected < receipt || !result.vanished.is_empty() {
+    if expected < receipt
+        || result
+            .vanished
+            .iter()
+            .any(|(_, last, _)| *last > cursor_seq)
+    {
         return Err(Error::new(
             ErrorCode::CatchUpRequired,
             "own-stream segments moved to ref; catch up outside gate",

@@ -2,7 +2,7 @@
 use crate::{
     envelope::{line, sha256, valid_timestamp, BatchCommit, Envelope},
     errors::{invalid, io, Error, ErrorCode},
-    fsio::{point, sync_dir, write_hwm, FileSystem, OsFileSystem, Point},
+    fsio::{point, write_hwm, FileSystem, OsFileSystem, Point},
     identity::{valid_machine_id, StoreIdentity},
     layout::{Layout, StreamId, StreamLayout},
     locks::{acquire_append, AppendGuard},
@@ -66,6 +66,15 @@ pub(crate) fn read_last_seq(path: &Path) -> Result<Option<u64>, Error> {
         .ok_or_else(|| conflict("invalid lastSeq"))?;
     Ok(Some(seq))
 }
+pub(crate) fn read_hint(path: &Path) -> Result<Option<u64>, Error> {
+    let Some(bytes) = read_optional(path)? else {
+        return Ok(None);
+    };
+    Ok(serde_json::from_slice::<Value>(&bytes)
+        .ok()
+        .and_then(|v| v.get("lastSeq").and_then(Value::as_u64))
+        .filter(|s| *s < (1u64 << 53)))
+}
 /// The private guard parameter prevents recovery from being called unlocked.
 pub(crate) fn recover(
     paths: &StreamLayout,
@@ -76,21 +85,17 @@ pub(crate) fn recover(
 ) -> Result<crate::open_read::Framed, Error> {
     let bytes = read_optional(&paths.active())?.unwrap_or_default();
     let active = decode(&bytes, origin, stream, false)?;
-    if active.committed_len != bytes.len() {
-        let file = OpenOptions::new()
-            .write(true)
-            .open(paths.active())
-            .map_err(io)?;
-        file.set_len(active.committed_len as u64).map_err(io)?;
-        point(fs, Point::AfterTruncate)?;
-        file.sync_all().map_err(io)?;
-        point(fs, Point::AfterTruncateFsync)?;
-    }
     let receipt = read_last_seq(&paths.sealed())?.unwrap_or(0);
     let mut high = receipt;
-    for (first, last, path) in segments(paths)? {
-        let bytes = std::fs::read(path).map_err(io)?;
-        closed(&bytes, origin, stream, first, last)?;
+    let listed = segments(paths)?;
+    for (index, (first, last, path)) in listed.iter().enumerate() {
+        let (first, last) = (*first, *last);
+        // Immutable ranges supply sequence recovery; seal verifies every segment.
+        // Strictly verify the newest segment before trusting its range.
+        if index + 1 == listed.len() {
+            let bytes = std::fs::read(path).map_err(io)?;
+            closed(&bytes, origin, stream, first, last)?;
+        }
         if last <= receipt {
             continue;
         }
@@ -99,28 +104,47 @@ pub(crate) fn recover(
         }
         high = last;
     }
+    let durable_high = high;
     if let Some(first) = active.events.first() {
         if high.checked_add(1) != Some(first.seq) {
             return Err(conflict("active gap or overlap above receipt"));
         }
         high = active.events.last().unwrap().seq;
     }
-    let hint = read_last_seq(&paths.hwm())?;
+    let hint = read_hint(&paths.hwm())?;
     if hint.is_some_and(|s| s > high) {
         return Err(conflict("hwm exceeds every durable event location"));
     }
-    if hint.is_none_or(|s| s < high) {
-        write_hwm(&paths.root, high, fs)?;
+    if active.committed_len != bytes.len() {
+        let file = OpenOptions::new()
+            .write(true)
+            .open(paths.active())
+            .map_err(io)?;
+        file.set_len(active.committed_len as u64).map_err(io)?;
+        point(fs, Point::AfterTruncate)?;
+        fs.sync_file(&file).map_err(io)?;
+        point(fs, Point::AfterTruncateFsync)?;
+    }
+    if hint.is_none_or(|s| s < durable_high) {
+        write_hwm(&paths.root, durable_high, fs)?;
     }
     Ok(active)
 }
 /// Persist stream directory entries before ever acknowledging a file below them.
-pub(crate) fn prepare_stream(layout: &Layout, stream: &StreamId) -> Result<StreamLayout, Error> {
+pub(crate) fn prepare_stream(
+    layout: &Layout,
+    stream: &StreamId,
+    fs: &dyn FileSystem,
+) -> Result<StreamLayout, Error> {
     let paths = layout.stream(stream);
+    let created = !paths.closed().try_exists().map_err(io)?;
     fs::create_dir_all(paths.closed()).map_err(io)?;
-    sync_dir(&paths.closed())?;
-    sync_dir(&paths.root)?;
-    sync_dir(&layout.root)?;
+    if created {
+        fs.sync_directory(&paths.closed()).map_err(io)?;
+        fs.sync_directory(&layout.root).map_err(io)?;
+    }
+    // Also covers a predecessor killed after creating active but before dir sync.
+    fs.sync_directory(&paths.root).map_err(io)?;
     Ok(paths)
 }
 pub fn append(
@@ -166,10 +190,13 @@ pub fn append_with_fs(
         request.machine,
         &request.events[0].ts,
     )?;
-    let paths = prepare_stream(layout, request.stream)?;
-    recover(&paths, &identity.store_id, request.stream, &guard, fs)?;
-    // Recovery has reconciled and durably rewritten the hint, under this lock.
-    let high = read_last_seq(&paths.hwm())?.unwrap_or(0);
+    let paths = prepare_stream(layout, request.stream, fs)?;
+    let active = recover(&paths, &identity.store_id, request.stream, &guard, fs)?;
+    let high = active
+        .events
+        .last()
+        .map(|e| e.seq)
+        .unwrap_or(read_hint(&paths.hwm())?.unwrap_or(0));
     let own_key = format!("{}:{}", identity.store_id, request.stream.as_str());
     if request.cursor.get(&own_key).is_some_and(|seq| *seq != high) {
         return Err(Error::new(
@@ -240,10 +267,10 @@ pub fn append_with_fs(
             "short batch write; no ack",
         )));
     }
-    file.sync_all().map_err(io)?;
+    fs.sync_file(&file).map_err(io)?;
     point(fs, Point::AfterAppendFsync)?;
     if created {
-        sync_dir(&paths.root)?;
+        fs.sync_directory(&paths.root).map_err(io)?;
     }
     point(fs, Point::AfterAppendDirFsync)?;
     drop(file);

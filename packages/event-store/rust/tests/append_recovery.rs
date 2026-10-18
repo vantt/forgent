@@ -54,7 +54,7 @@ fn high_water_recovers_receipt_closed_active_and_stale_hint() {
     assert_eq!(
         serde_json::from_slice::<serde_json::Value>(&fs::read(p.hwm()).unwrap()).unwrap()
             ["lastSeq"],
-        5
+        4
     );
     // Already receipted closed segments can remain until publication cleans up.
     fs::write(p.segment(1, 2).unwrap(), batch(&a.ack.origin, 1, 2)).unwrap();
@@ -420,7 +420,7 @@ fn vanished_closed_segment_is_recorded_and_gate_requires_catch_up() {
     assert!(got.events.is_empty());
     assert_eq!(
         got.vanished,
-        vec![r.layout.stream(&r.stream).segment(1, 3).unwrap()]
+        vec![(1, 3, r.layout.stream(&r.stream).segment(1, 3).unwrap())]
     );
     code(
         read_in_gate(&r.layout, &a.ack.origin, &r.stream, 0).unwrap_err(),

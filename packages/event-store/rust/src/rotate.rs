@@ -1,6 +1,6 @@
 //! The short append-locked rotation stage; publication belongs to phase 04.
 use crate::{
-    append::{prepare_stream, read_last_seq, recover},
+    append::{prepare_stream, read_hint, recover},
     errors::{io, Error},
     fsio::{point, sync_dir, write_hwm, FileSystem, OsFileSystem, Point},
     identity::StoreIdentity,
@@ -35,9 +35,13 @@ pub fn rotate_with_fs(
     let guard = acquire_append(layout, held_ranks, fs)?;
     StoreIdentity::sweep_temps_under_append_lock(layout)?;
     let identity = StoreIdentity::open(layout, machine)?;
-    let paths = prepare_stream(layout, stream)?;
+    let paths = prepare_stream(layout, stream, fs)?;
     let active = recover(&paths, &identity.store_id, stream, &guard, fs)?;
-    let high = read_last_seq(&paths.hwm())?.unwrap_or(0);
+    let high = active
+        .events
+        .last()
+        .map(|e| e.seq)
+        .unwrap_or(read_hint(&paths.hwm())?.unwrap_or(0));
     let mut segment = None;
     if let Some(first) = active.events.first() {
         File::open(paths.active())
@@ -59,7 +63,9 @@ pub fn rotate_with_fs(
         point(fs, Point::AfterClosedDirFsync)?;
         sync_dir(&paths.root)?;
         point(fs, Point::AfterStreamDirFsync)?;
-        write_hwm(&paths.root, high, fs)?;
+        if read_hint(&paths.hwm())? != Some(high) {
+            write_hwm(&paths.root, high, fs)?;
+        }
         segment = Some(target);
     }
     Ok(Rotation {

@@ -137,3 +137,50 @@ fn file_size_limit_never_installs_truncated_record() {
     assert!(cmd.status().unwrap().success());
     assert!(!dir.0.join("record").exists());
 }
+
+#[test]
+fn replacement_is_complete_and_does_not_follow_destination_symlink() {
+    use fgos_durable_file::replace_durably;
+    let dir = Dir::new();
+    replace_durably(&dir.0, "hint", b"first").unwrap();
+    replace_durably(&dir.0, "hint", b"second").unwrap();
+    assert_eq!(fs::read(dir.0.join("hint")).unwrap(), b"second");
+    #[cfg(unix)]
+    {
+        fs::write(dir.0.join("outside"), b"untouched").unwrap();
+        fs::remove_file(dir.0.join("hint")).unwrap();
+        std::os::unix::fs::symlink(dir.0.join("outside"), dir.0.join("hint")).unwrap();
+        replace_durably(&dir.0, "hint", b"new").unwrap();
+        assert_eq!(fs::read(dir.0.join("outside")).unwrap(), b"untouched");
+        assert_eq!(fs::read(dir.0.join("hint")).unwrap(), b"new");
+    }
+    assert!(replace_durably(&dir.0, "../escape", b"x")
+        .unwrap_err()
+        .installed
+        .is_none());
+}
+#[test]
+fn replacement_errors_report_effect_at_real_boundaries() {
+    use fgos_durable_file::{replace_durably_observed, ReplacePoint};
+    for after_rename in [false, true] {
+        let dir = Dir::new();
+        fs::write(dir.0.join("hint"), b"old").unwrap();
+        let err = replace_durably_observed(&dir.0, "hint", b"new", |p| {
+            if matches!(
+                (after_rename, p),
+                (false, ReplacePoint::Synced) | (true, ReplacePoint::Renamed)
+            ) {
+                Err(std::io::Error::other("observer failure"))
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap_err();
+        assert_eq!(err.installed.is_some(), after_rename);
+        assert_eq!(
+            fs::read(dir.0.join("hint")).unwrap(),
+            if after_rename { b"new" } else { b"old" }
+        );
+        assert_eq!(err.temporary.is_some(), !after_rename);
+    }
+}

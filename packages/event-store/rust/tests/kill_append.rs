@@ -65,7 +65,7 @@ fn sigkill_at_every_append_and_ack_boundary_preserves_acknowledged_prefix() {
 }
 #[test]
 fn sigkill_during_real_write_never_exposes_a_partial_batch() {
-    for prefix in [1, 20, 200, 450, 900] {
+    for prefix in (1..1000).step_by(17) {
         let r = Repo::new();
         let a = r.append(2);
         kill_at(&r, "append", "", Some(prefix));
@@ -110,8 +110,8 @@ fn sigkill_at_every_rotation_boundary_never_reuses_sequence() {
         let r = Repo::new();
         let a = r.append(3);
         let p = r.layout.stream(&r.stream);
-        // Already reconciled hint makes all HWM faults occur after rename.
-        fs::write(p.hwm(), b"{\"lastSeq\":3}\n").unwrap();
+        // Active data is self-describing; rotation persists the new high.
+        fs::write(p.hwm(), b"{\"lastSeq\":0}\n").unwrap();
         kill_at(&r, "rotate", point, None);
         recover_and_check(&r, &a.ack.origin, 3, 3);
         rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
@@ -129,6 +129,7 @@ fn sigkill_during_hint_repair_and_rotation_crash_with_stale_hint() {
     ] {
         let r = Repo::new();
         let a = r.append(3);
+        fs::remove_file(r.layout.stream(&r.stream).hwm()).unwrap();
         kill_at(&r, "append", point, None);
         recover_and_check(&r, &a.ack.origin, 3, 3);
     }

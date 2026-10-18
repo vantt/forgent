@@ -26,6 +26,11 @@
 9. **Recovery (§10 crash table).** Every row handled by the next seal or sync with no doctor step; seven named crash points injected.
 10. **API for triggers.** `sealIfDue(intervalSec)` (oldest unsealed age), `sealAll()`, and `oldestUnsealedAgeSec()` for status and doctor.
 
+
+- **P02 review L5 — lost local receipt and hint.** Cross-check the own ref tip outside the Work gate when locally recovered high is zero and active starts at seq 1 on a stream with an existing ref. Rebuild coverage/receipt through the shared ref walk before allowing sequence reuse; test simultaneous loss of `sealed.json` and `hwm.json` after closed-segment deletion. A local zero must never silently restart a published stream.
+- **P02 review L1 — enforce seal ownership.** Add `acquire_seal` refusing caller-held ranks ≥58 and the facade error `event-store-seal-under-state`. Require a typed `&SealGuard` for rotation so it is reachable only while event-seal is held; test rank refusal and guard lifetime.
+- **P02 review L2/L3 — durable receipt and staging.** Use `fgos-durable-file::replace_durably` for `sealed.json`, preserving effect-aware errors. Never stage temporaries in `closed/`; it contains only validated immutable segment names.
+
 ## Files
 
 | Action | File |
