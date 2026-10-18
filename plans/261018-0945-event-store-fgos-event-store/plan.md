@@ -154,6 +154,10 @@ Interface mismatches to settle with the Git leads (not owner questions). ES phas
 
 ## Open questions for the owner
 
+**Owner answers, 2026-10-18 10:35 (Asia/Saigon): every recommendation accepted.** Q1 yes, one canonical-JSON leaf crate (the release-distribution serializer moves only if its digests stay unchanged). Q2 the writer list is the three owner machines with workspaces forgent (forgentX on the owner machine), mdview and mcp-skill-hub, as recorded in the earlier landing reports; phase 11 re-scans each machine for `.fgos/installation/activation.json` before the cutover and stops if it finds a workspace not on this list. Q3 probe `refs/fgos/*` on a scratch repository on the same forge first. Q4 the power-loss test runs in the same session as Git E1; the cutover does not wait for it. Q5 (a): two commits in one push; Git amendment A2 is therefore not needed. Q6 reads keep working from the old files, writes are refused with the migrate command. Git amendment A1: the owner chose option 1 (add the supersession rule), so ES-04 merges after the amended Git spec and its re-checks pass.
+
+The questions below are kept as asked.
+
 Each follows `core/skills/_shared/decision-question.md`. Until answered, the plan follows the default.
 
 **Q1. Extract one canonical-JSON leaf crate?**

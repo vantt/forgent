@@ -92,6 +92,8 @@ Two further interface gaps found while reconciling, both (a): `compare_and_swap`
 
 ## Spec amendments needed before Git phase 01 freezes its interface
 
+**Owner answers, 2026-10-18 10:35:** A1 accepted (add §10 rule 4a "Publication supersession" and the `superseded` outcome; re-run M1 two-operations-one-ref with negative controls, P-WAL-ID, V-CAS on files and reftable before Git 01 freezes its interface). A2 not needed: the Event Store chose two commits in one push (ES Q5 (a)).
+
 Each item is a problem statement and a proposal for the owner, not a decision. Phase 01 may code the rest of the port meanwhile; its interface and the Event Store phase that depends on the item do not freeze until the owner decides. A signed amendment is recorded as a dated amendment of D-ADR0057 in the spec's own history, like the Event Store amendment of 2026-10-18, and is followed by the re-check named for it.
 
 ### A1. A crashed PublicationCas must neither block the next seal nor stay unresolved forever (Event Store M3)
