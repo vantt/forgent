@@ -202,7 +202,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
     /** What the agent wrote: next to the test's own files, or in its private home when it is confined. */
     agentNote(name) {
       const own = path.join(agentDir, name);
-      if (fs.existsSync(own)) return own;
+      // An unconfined agent writes next to the test; the confinement homes on this machine belong to whatever else runs at the same time.
+      if (fs.existsSync(own) || !confined) return own;
       const root = path.join(os.tmpdir(), 'fgos-confinement');
       let homes = [];
       try { homes = fs.readdirSync(root).map((d) => path.join(root, d, 'home', name)).filter((f) => fs.existsSync(f)); } catch { /* none */ }
