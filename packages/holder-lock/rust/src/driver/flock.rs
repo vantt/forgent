@@ -2,14 +2,15 @@
 //! description, is released when the last copy of it is closed, and is
 //! never touched with `LOCK_UN`.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 use std::fs::File;
 use std::io;
 use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::time::{Duration, Instant};
+
+use fgos_process::facts::CreationMark;
 
 use super::{Leftovers, LockDriver, TryLock};
 use crate::port::{Guarantee, HoldersList, Level, Mode};
@@ -210,16 +211,14 @@ impl LockDriver for FlockDriver {
         }
     }
 
-    fn prepare_borrow(&self, cmd: &mut Command) {
-        use std::os::unix::process::CommandExt;
-        // Command applies setpgid in the child before exec, alongside the
-        // explicit fd mapping. The unreaped leader pins this group id.
-        cmd.process_group(0);
+    fn prepare_borrow(&self, request: &mut fgos_process::mapped::MappedSpawn) {
+        // The child leads its own group; the unreaped leader pins this group id.
+        request.process_group = true;
     }
 
-    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
+    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
         if cfg!(target_os = "linux") {
-            end_listed_holders(file, child_pid, kill_wait)
+            end_listed_holders(file, child_pid, kill_wait, since)
         } else {
             end_process_group(child_pid, kill_wait)
         }
@@ -228,14 +227,71 @@ impl LockDriver for FlockDriver {
 
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
-fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait)
+fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since))
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
-pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait).map(|_| ())
+pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
+    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)).map(|_| ())
+}
+
+/// Which processes a drain reads descriptor tables of.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Reach {
+    /// Every process on the host: nothing is known about when the
+    /// description could first have been copied (a helper handed someone
+    /// else's description).
+    Everyone,
+    /// No process but this one held the description at this mark (it was
+    /// opened after it, or a drain that began there proved it). A copy of a
+    /// description is only ever inherited across fork, so every other holder
+    /// now was created after the mark: the drain reads those processes only,
+    /// found in pid allocation order while the mark is young enough
+    /// (`fgos_process::facts::created_since`), otherwise by start time over
+    /// every process. The borrowed child, its group and its descendants were
+    /// all created after the mark too.
+    Since(CreationMark),
+}
+
+impl Reach {
+    fn of(since: Option<CreationMark>) -> Self {
+        since.map_or(Reach::Everyone, Reach::Since)
+    }
+}
+
+/// One pass over the process table: parent, group and start of each pid.
+struct Tree(HashMap<u32, (u32, u32, u64)>);
+
+impl Tree {
+    fn read() -> Option<Self> {
+        fgos_process::facts::relations().map(Self::of)
+    }
+    fn of(relations: Vec<fgos_process::facts::Relation>) -> Self {
+        Self(relations.into_iter().map(|r| (r.pid.0, (r.parent, r.group, r.start_ticks))).collect())
+    }
+    /// Parent and group, from the pass or (for a pid it did not see) read now.
+    fn parent_and_group(&self, pid: u32) -> Option<(u32, u32)> {
+        match self.0.get(&pid) {
+            Some((parent, group, _)) => Some((*parent, *group)),
+            None => parent_and_group(pid),
+        }
+    }
+    fn in_borrow_domain(&self, mut pid: u32, root: u32) -> bool {
+        let mut seen = HashSet::new();
+        while pid > 1 && seen.insert(pid) {
+            if pid == root {
+                return true;
+            }
+            let Some((parent, group)) = self.parent_and_group(pid) else { return false };
+            if group == root {
+                return true;
+            }
+            pid = parent;
+        }
+        false
+    }
 }
 
 pub(crate) fn drain_description(
@@ -243,9 +299,11 @@ pub(crate) fn drain_description(
     child_pid: Option<u32>,
     owner: u32,
     kill_wait: Duration,
+    reach: Reach,
 ) -> Result<u32, Leftovers> {
     use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
-    use fgos_process::facts::{file_key, identity_of, lock_holders, Holders};
+    use fgos_process::facts::{file_key, identity_of, lock_holders, lock_holders_among, Holders};
+    use fgos_process::ProcId;
     let Ok((dev, ino)) = file_key(file) else {
         return Err(Leftovers {
             killed: 0,
@@ -258,7 +316,40 @@ pub(crate) fn drain_description(
     let mut signaled: HashSet<(u32, String)> = HashSet::new();
     let mut killed = 0u32;
     loop {
-        let holders = match lock_holders(dev, ino) {
+        // The processes that may hold a copy, with their parent and group:
+        // all of them, or only those created since the reach's mark.
+        let (tree, candidates) = match reach {
+            Reach::Everyone => (Tree::read(), None),
+            Reach::Since(mark) => match fgos_process::facts::created_since(&mark) {
+                Some(created) => {
+                    let tree = Tree::of(created);
+                    let mut pids: Vec<ProcId> = tree.0.keys().map(|pid| ProcId(*pid)).collect();
+                    pids.push(ProcId(me));
+                    (Some(tree), Some(pids))
+                }
+                None => {
+                    let tree = Tree::read();
+                    let pids = tree.as_ref().map(|tree| {
+                        let mut pids: Vec<ProcId> = tree
+                            .0
+                            .iter()
+                            .filter(|(pid, (parent, _, start))| **pid == me || *parent == owner || *start >= mark.ticks)
+                            .map(|(pid, _)| ProcId(*pid))
+                            .collect();
+                        if !pids.contains(&ProcId(me)) {
+                            pids.push(ProcId(me));
+                        }
+                        pids
+                    });
+                    (tree, pids)
+                }
+            },
+        };
+        let listed = match candidates {
+            Some(pids) => lock_holders_among(dev, ino, &pids),
+            None => lock_holders(dev, ino),
+        };
+        let holders = match listed {
             Holders::List(list) if list.iter().any(|t| t.pid.0 == me) => list
                 .into_iter()
                 .filter(|t| t.pid.0 != me && t.pid.0 != owner)
@@ -275,16 +366,22 @@ pub(crate) fn drain_description(
         };
         let had_holders = !holders.is_empty();
         let mut foreign = Vec::new();
-        let mut domain = child_pid
-            .map(|pid| group_members(pid as libc::pid_t))
-            .unwrap_or_default();
-        if let (Some(root), Ok(entries)) = (child_pid, std::fs::read_dir("/proc")) {
-            domain.extend(
-                entries
-                    .flatten()
-                    .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
-                    .filter(|pid| in_borrow_domain(*pid, root)),
-            );
+        let mut domain = Vec::new();
+        if let Some(root) = child_pid {
+            match &tree {
+                Some(tree) => domain.extend(tree.0.keys().copied().filter(|pid| tree.in_borrow_domain(*pid, root))),
+                None => {
+                    domain.extend(group_members(root as libc::pid_t));
+                    if let Ok(entries) = std::fs::read_dir("/proc") {
+                        domain.extend(
+                            entries
+                                .flatten()
+                                .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
+                                .filter(|pid| in_borrow_domain(*pid, root)),
+                        );
+                    }
+                }
+            }
         }
         for tuple in holders {
             let pid = tuple.pid.0;

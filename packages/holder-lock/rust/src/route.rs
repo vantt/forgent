@@ -253,6 +253,8 @@ fn lock_fd(args: &[String]) -> i32 {
             Some(child),
             owner,
             std::time::Duration::from_millis(kill_wait_ms),
+            // Nothing is known about the inherited description's history.
+            driver::flock::Reach::Everyone,
         ) {
             Ok(killed) => emit(
                 Some("drained"),

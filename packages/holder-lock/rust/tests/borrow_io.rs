@@ -359,3 +359,93 @@ fn borrowed_grandchild_keeps_fd_and_is_drained() {
     release(handle);
     fs::remove_dir_all(dir).unwrap();
 }
+
+/// Drains read only processes started since the last proven drain. An
+/// escapee of a later borrow (new session and group, reparented away from
+/// the borrowed child, still holding the description) starts after that
+/// point, so it is still found and killed.
+#[cfg(target_os = "linux")]
+#[test]
+fn setsid_escapee_after_an_earlier_proven_drain_is_still_killed() {
+    let _serial = serial();
+    let dir = temp_dir("escapee-after-drain");
+    let res = resource(&dir, "io");
+    let handle = held(&res);
+    // A proven drain moves the read floor forward.
+    assert_eq!(run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap().outcome.exit, Some(0));
+    std::thread::sleep(Duration::from_millis(30));
+    let out = run_borrowed_io(
+        &handle,
+        &shell("setsid sh -c 'echo $$ > escapee; exec sleep 30' & while [ ! -s escapee ]; do sleep 0.01; done", &dir),
+        &bounds(vec![]),
+    )
+    .unwrap();
+    assert_eq!(out.outcome.exit, Some(0));
+    assert!(out.outcome.leftovers_killed > 0);
+    gone(fs::read_to_string(dir.join("escapee")).unwrap().trim().parse().unwrap());
+    release(handle);
+    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Acquired(_)));
+    fs::remove_dir_all(dir).unwrap();
+}
+
+/// A check that could not prove the description held by this process alone
+/// leaves the read floor where it was: the same leaked holder is found again
+/// by a later check, however much later it runs.
+#[cfg(target_os = "linux")]
+#[test]
+fn refused_admission_keeps_finding_the_same_leaked_holder() {
+    use std::os::unix::process::CommandExt;
+    let _serial = serial();
+    let dir = temp_dir("leak-floor");
+    let res = resource(&dir, "io");
+    let handle = held(&res);
+    // Prove the description alone once, so the floor is past acquire.
+    validate_quiescent(&handle).unwrap();
+    std::thread::sleep(Duration::from_millis(30));
+    let marker = std::ffi::CString::new(dir.join("leaked").to_str().unwrap()).unwrap();
+    let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|entry| {
+        (fs::read_link(entry.path()).ok()? == res.path).then(|| entry.file_name().to_str().unwrap().parse().unwrap())
+    }).unwrap();
+    let mut cmd = Command::new("/bin/true");
+    // SAFETY: the child uses only async-signal-safe syscalls, never Rust locks.
+    unsafe {
+        cmd.pre_exec(move || {
+            let pid = libc::fork();
+            if pid < 0 { return Err(std::io::Error::last_os_error()); }
+            if pid == 0 {
+                libc::setsid();
+                for fd in 3..65536 {
+                    if fd != lock_fd { libc::close(fd); }
+                }
+                loop { libc::pause(); }
+            }
+            let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
+            if fd < 0 { libc::kill(pid, libc::SIGKILL); return Err(std::io::Error::last_os_error()); }
+            libc::write(fd, (&pid as *const libc::pid_t).cast(), std::mem::size_of_val(&pid));
+            libc::close(fd);
+            Ok(())
+        });
+    }
+    assert!(cmd.status().unwrap().success());
+    let pid = i32::from_ne_bytes(fs::read(dir.join("leaked")).unwrap().try_into().unwrap()) as u32;
+    struct Leaked(u32);
+    impl Drop for Leaked {
+        fn drop(&mut self) {
+            // SAFETY: the test owns this deliberately created process.
+            unsafe { libc::kill(self.0 as i32, libc::SIGKILL); }
+        }
+    }
+    let leaked = Leaked(pid);
+    for _ in 0..2 {
+        assert!(matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid)));
+        std::thread::sleep(Duration::from_millis(30));
+    }
+    drop(leaked);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie) {
+        assert!(Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    release(handle);
+    fs::remove_dir_all(dir).unwrap();
+}

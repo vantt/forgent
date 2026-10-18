@@ -15,12 +15,13 @@ use std::fs::{File, OpenOptions};
 use std::io;
 use std::path::{Path, PathBuf};
 #[cfg(unix)]
-use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
 #[cfg(unix)]
 use fgos_process::FdSlot;
+#[cfg(unix)]
+use fgos_process::mapped::{spawn_mapped, MappedChild, MappedSpawn, MappedStdio};
 use fgos_process::{Domain, WatchTrace};
 use serde_json::{json, Value};
 
@@ -174,6 +175,14 @@ pub struct Handle {
     resource: Resource,
     pub(crate) mode: Mode,
     pub(crate) kill_wait_ms: u64,
+    /// A creation mark at which no process but this one held the
+    /// description: taken before it was opened, and moved to the start of
+    /// each drain or quiescence check that proved no other process held it.
+    /// A copy is only inherited across fork, so drains read only processes
+    /// created since this mark, never every process. `None`: unknown; drains
+    /// read every process.
+    #[cfg_attr(not(unix), allow(dead_code))]
+    since: std::sync::Mutex<Option<fgos_process::facts::CreationMark>>,
 }
 
 impl Drop for Handle {
@@ -198,6 +207,26 @@ impl Handle {
     /// later holder that finds this domain not empty ends it first.
     /// Only an exclusive holder may declare one: a second shared holder
     /// would find it populated and kill it.
+    /// The mark since which only this process held the description, when known.
+    #[cfg_attr(not(unix), allow(dead_code))]
+    fn since(&self) -> Option<fgos_process::facts::CreationMark> {
+        self.since.lock().ok().and_then(|since| *since)
+    }
+
+    /// A drain or quiescence check that began at `started` proved that no
+    /// other process held the description. Processes created before then can
+    /// no longer get a copy, so later drains need not read them.
+    #[cfg_attr(not(unix), allow(dead_code))]
+    fn proven_alone_at(&self, started: Option<fgos_process::facts::CreationMark>) {
+        if let Ok(mut since) = self.since.lock() {
+            match (started, *since) {
+                // Never move back (a concurrent check may have finished later).
+                (Some(new), Some(old)) if new.at <= old.at => {}
+                (new, _) => *since = new,
+            }
+        }
+    }
+
     pub fn declare_domain(&self, domain: &Domain) -> io::Result<()> {
         if self.mode != Mode::Ex {
             return Err(io::Error::new(io::ErrorKind::InvalidInput, "only an exclusive holder declares a domain"));
@@ -533,6 +562,8 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
     // a bounded number of times for a single try.
     let mut replaced = 0u32;
     loop {
+        // Taken before the open: nothing created earlier can inherit it.
+        let opened_after = fgos_process::facts::creation_mark();
         let file = match open_lock_file(&resource.path) {
             Ok(file) => file,
             Err(err) => return Acquire::Unavailable { reason: UnavailableReason::IoError, detail: format!("open {}: {err}", resource.path.display()) },
@@ -574,7 +605,7 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
             return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
         }
         locked.keep();
-        return Acquire::Acquired(Handle { file, resource: resource.clone(), mode, kill_wait_ms });
+        return Acquire::Acquired(Handle { file, resource: resource.clone(), mode, kill_wait_ms, since: std::sync::Mutex::new(opened_after) });
     }
 }
 
@@ -612,8 +643,10 @@ pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
     validate(handle)?;
     #[cfg(target_os = "linux")]
     {
-        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms))
+        let started = fgos_process::facts::creation_mark();
+        driver::flock::wait_unborrowed(&handle.file, Duration::from_millis(handle.kill_wait_ms), handle.since())
             .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
+        handle.proven_alone_at(started);
         // Resource identity can change while transient holders drain.
         validate(handle)
     }
@@ -677,19 +710,23 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> R
 #[cfg(unix)]
 fn run_borrowed_posix(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome, BorrowError> {
     let drv = driver::current();
-    let mut cmd = borrowed_command(handle, spec)?;
-    drv.prepare_borrow(&mut cmd);
-    let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
+    let mut request = borrowed_request(handle, spec)?;
+    drv.prepare_borrow(&mut request);
+    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
     finish_borrowed(handle, &mut child)
 }
 
 /// One release rule for both Unix borrow forms. Keep the root unreaped while
 /// ending leftovers, so neither its pid nor macOS process group can be reused.
 #[cfg(unix)]
-fn finish_borrowed(handle: &Handle, child: &mut std::process::Child) -> Result<BorrowOutcome, BorrowError> {
+fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOutcome, BorrowError> {
     let pid = child.id();
     let waited = wait_exited_unreaped(pid).map_err(BorrowError::Wait);
-    let leftovers = driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms));
+    let started = fgos_process::facts::creation_mark();
+    let leftovers = driver::current().end_leftovers(&handle.file, pid, Duration::from_millis(handle.kill_wait_ms), handle.since());
+    if leftovers.is_ok() {
+        handle.proven_alone_at(started);
+    }
     let status = child.wait().map_err(BorrowError::Wait)?;
     let (exit, signal) = exit_parts(&status);
     let mut outcome = BorrowOutcome { exit, signal, leftovers_killed: 0 };
@@ -707,8 +744,10 @@ fn finish_borrowed(handle: &Handle, child: &mut std::process::Child) -> Result<B
     Ok(outcome)
 }
 
+/// The borrowing child's request: the argv `borrowed_argv` shapes, the
+/// spec's environment plus the slot annotation, its stdio.
 #[cfg(unix)]
-fn borrowed_command(handle: &Handle, spec: &BorrowSpec) -> Result<Command, BorrowError> {
+fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn, BorrowError> {
     validate(handle)?;
     let drv = driver::current();
     if !drv.supported() {
@@ -718,27 +757,24 @@ fn borrowed_command(handle: &Handle, spec: &BorrowSpec) -> Result<Command, Borro
         return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
     }
     let argv = borrowed_argv(&spec.argv);
-    let Some((program, args)) = argv.split_first() else {
+    if argv.is_empty() {
         return Err(BorrowError::InvalidSpec("argv is empty".into()));
-    };
-    let mut cmd = Command::new(program);
-    cmd.args(args);
-    if let Some(cwd) = &spec.cwd {
-        cmd.current_dir(cwd);
     }
-    if spec.clear_env {
-        cmd.env_clear();
-    }
-    cmd.envs(&spec.env);
-    cmd.env(LOCK_FD_ENV, format!("{}:{BORROW_SLOT}", handle.resource.name));
-    match &spec.stdio {
-        BorrowStdio::Inherit => {}
-        BorrowStdio::Null => {
-            cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
-        }
+    let mut env: Vec<(std::ffi::OsString, std::ffi::OsString)> = spec.env.iter().map(|(k, v)| (k.into(), v.into())).collect();
+    env.push((LOCK_FD_ENV.into(), format!("{}:{BORROW_SLOT}", handle.resource.name).into()));
+    let stdio = match &spec.stdio {
+        BorrowStdio::Inherit => [MappedStdio::Inherit; 3],
+        BorrowStdio::Null => [MappedStdio::Null; 3],
         BorrowStdio::Files { .. } => return Err(BorrowError::InvalidSpec("file stdio is only available on Windows".into())),
-    }
-    Ok(cmd)
+    };
+    Ok(MappedSpawn {
+        argv: argv.into_iter().map(Into::into).collect(),
+        env,
+        clear_env: spec.clear_env,
+        cwd: spec.cwd.clone(),
+        process_group: false,
+        stdio,
+    })
 }
 
 /// Synchronous bounded-I/O member of `run_borrowed`, with the same fd mapping,
@@ -764,10 +800,10 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
-    let mut cmd = borrowed_command(handle, &explicit)?;
-    cmd.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    drv.prepare_borrow(&mut cmd);
-    let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
+    let mut request = borrowed_request(handle, &explicit)?;
+    request.stdio = [MappedStdio::Piped; 3];
+    drv.prepare_borrow(&mut request);
+    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
     let pid = child.id();
     let mut input = child.stdin.take();
     let mut stdout = child.stdout.take().expect("piped stdout");
@@ -781,12 +817,20 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
         nonblocking(&stdout)?;
         nonblocking(&stderr)?;
         let mut written = 0;
+        let (mut out_open, mut err_open) = (true, true);
+        // Wake on pipe activity or on the root's exit instead of sleeping in
+        // fixed steps; without a process descriptor, wake at least every 1 ms.
+        let exit_fd = exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
                 return Err(BorrowError::Deadline);
             }
-            capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")?;
-            capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")?;
+            if out_open {
+                out_open = capture_available(&mut stdout, &mut out, io.stdout_limit, "stdout")?;
+            }
+            if err_open {
+                err_open = capture_available(&mut stderr, &mut err, io.stderr_limit, "stderr")?;
+            }
             if written == io.stdin.len() {
                 input.take();
             }
@@ -797,11 +841,37 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
                     Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => { input.take(); }
                     Err(e) => return Err(BorrowError::Io(e)),
                 }
+                if written == io.stdin.len() {
+                    input.take();
+                }
             }
             if child_exited_unreaped(pid, true).map_err(BorrowError::Wait)? {
                 return Ok(());
             }
-            std::thread::sleep(Duration::from_millis(1));
+            use std::os::fd::AsRawFd;
+            let mut fds = Vec::with_capacity(4);
+            if out_open {
+                fds.push(libc::pollfd { fd: stdout.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+            }
+            if err_open {
+                fds.push(libc::pollfd { fd: stderr.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+            }
+            if let Some(pipe) = input.as_ref() {
+                fds.push(libc::pollfd { fd: pipe.as_raw_fd(), events: libc::POLLOUT, revents: 0 });
+            }
+            if let Some(fd) = exit_fd.as_ref() {
+                fds.push(libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+            }
+            let left = io.deadline.saturating_duration_since(Instant::now());
+            let step = if exit_fd.is_some() { left } else { left.min(Duration::from_millis(1)) };
+            let timeout = step.as_millis().clamp(1, i32::MAX as u128) as libc::c_int;
+            // SAFETY: poll reads and writes only the pollfd array it is given.
+            if unsafe { libc::poll(fds.as_mut_ptr(), fds.len() as libc::nfds_t, timeout) } < 0 {
+                let e = io::Error::last_os_error();
+                if e.kind() != std::io::ErrorKind::Interrupted {
+                    return Err(BorrowError::Io(e));
+                }
+            }
         }
     })();
     drop(input);
@@ -828,6 +898,45 @@ fn nonblocking(pipe: &impl std::os::fd::AsRawFd) -> Result<(), BorrowError> {
         return Err(BorrowError::Io(io::Error::last_os_error()));
     }
     Ok(())
+}
+
+/// Read everything the pipe has now. `Ok(false)` once the writer side closed.
+#[cfg(unix)]
+fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<bool, BorrowError> {
+    let mut buf = [0; 65536];
+    loop {
+        match pipe.read(&mut buf) {
+            Ok(0) => return Ok(false),
+            Ok(n) => {
+                if n > limit.saturating_sub(bytes.len()) {
+                    return Err(BorrowError::OutputLimit(stream));
+                }
+                bytes.extend_from_slice(&buf[..n]);
+            }
+            Err(e) if e.kind() == io::ErrorKind::WouldBlock => return Ok(true),
+            Err(e) if e.kind() == io::ErrorKind::Interrupted => {}
+            Err(e) => return Err(BorrowError::Io(e)),
+        }
+    }
+}
+
+/// A descriptor that becomes readable when child `pid` exits (Linux pidfd).
+/// `None` where the kernel has none; callers then poll in short steps.
+#[cfg(unix)]
+fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::os::fd::FromRawFd;
+        // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
+        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
+        // SAFETY: a non-negative result is a new descriptor owned by nobody else.
+        (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = pid;
+        None
+    }
 }
 
 #[cfg(unix)]
