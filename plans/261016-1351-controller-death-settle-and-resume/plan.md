@@ -108,3 +108,39 @@ Chỉ code (không state mới ngoài field hiển thị). Revert merge, activat
 1. **Đổi 2026-10-18 (owner):** phần lease `dispatch-cwd` qua runner commit (N7) **chuyển sang plan Git** ([phase 04](../261018-0914-git-component-fgos-git/phase-04-custody-lease-and-successor-admission.md)), theo spec Git đã ký D-ADR0057 §6 (Q2). 6.4 **không** thêm phase ~3 h này nữa; lead 6.4 đừng tạo phase file cho nó. Kiểm ngày 18/10: chưa ai làm; `direct-launch.mjs` của run supervisor chỉ giữ lease trong lúc attempt chạy. Ghi chép cũ: ~~Đã chốt 2026-10-16: gom vào 6.4 theo RUL11~~ (khe hở thật, nằm trong phạm vi): thêm phase ~3 h giữ `dispatch-cwd` quanh `commitUnitWork`, cả đường resume; Lead thêm phase file khi mở track. (D5, kongming N7) Khe "attempt xong → runner commit `writes`" không có lease cwd (hôm nay đã vậy). **Mặc định:** để ngoài 6.4 và giữ trong "Việc hoãn có tên" của r6. Nếu anh muốn gom vào đây (RUL11): thêm một phase ~3 h, `runUnit` giữ `dispatch-cwd` quanh `commitUnitWork` ([`run.mjs:687`](../../src/runner/execution/run.mjs)), cả đường resume.
 2. **Đã chốt 2026-10-16:** giữ mặc định (từ chối ngay). (D2) `--resume` gặp attempt còn `running` thì từ chối ngay. **Mặc định:** từ chối và in lệnh `fgos dispatch inspect` để xem. Phương án khác: chờ tới khi attempt `closed` rồi đi tiếp (`--resume --wait`), thêm ~2 h.
 3. Tự resume vẫn hoãn (r6 §16). Ghi chú giữ trong spec runner và intent-preservation ledger; không có code nào cho nó ở 6.4.
+
+## CẮT LẠI 2026-10-18
+
+Ghi bởi P00r. Đọc main `dfe7f9212` (6.2 đã land) và 6.3 **theo `terminal-mode/integration` @6f2e922bf** (chưa land; big lead kiểm lại các dòng 6.3 sau khi land). Khối này **ghi đè** các dòng cũ ở trên khi mâu thuẫn. Phase P00r không có code sản phẩm.
+
+### Tiền đề
+- 6.2 đã land: cửa adopt (`fgos internal adopt`, `src/run-supervisor/client.mjs` `adoptRun`/`adoptScan`, `probeOnly`), `sweepAttempts`, receipt, marker v2, check `run-attempts-stuck`, `closed.json`. Trạng thái adopt có thật: `closed`, `running`, `being-adopted`, `held`, `legacy-run`, outcome `adopted`/`open`/`held` (spec §8).
+- 6.3 (per terminal-mode/integration @6f2e922bf): supervisor `terminal`, `release-slot`, launcher writer id; `herdr-reconcile.mjs`, `liveness.mjs`, `worker-session.mjs` đã bị xoá, `herdr-round.mjs` rút gọn. Chưa land thì P00 không mở.
+- Quyết định chủ (10-18 10:05): **lease cwd qua bước runner commit (N7) chuyển sang plan Git phase 04** (`plans/261018-0914-git-component-fgos-git/plan.md`). 6.4 bỏ phần đó.
+- Không dùng số D-ADR0057 (Git G0 giữ; 6.3 P08 cũng đã viết một "D-ADR0057" trùng). Docs 6.4 ghi quyết định bằng tên, không số.
+
+### Phần đã moot / đổi nghĩa
+| Chỗ | Trạng thái |
+|---|---|
+| D5 + câu hỏi mở 1 ("gom lease cwd vào 6.4, phase ~3h") | **Moot**: sang Git phase 04. P02 giữ test "commit `writes` thất bại sau settle" (đường `commitPending`), bỏ mọi việc giữ `dispatch-cwd` quanh `commitUnitWork`. P06 sửa dòng ledger: lease cwd = Git phase 04, không "hoãn theo D5" |
+| P03 mục 2 "outbox `result-N.json` là `unknown` → park" | 6.3 đã sửa `collectEvidence`: `result-*.json` là `worker-result`, không còn park vì `unknown`. Còn lại: recommendation mới `adopt` (planner hiện chỉ có `resume-driver`, cần liveness heartbeat cũ) và evidence `attempt-receipt`. Sửa test kỳ vọng park nếu có |
+| P02 mục 1 "adopt `closed` + `result.json` → dùng kết quả" | `executeAssignment` đã có nhánh `admitted.resumed` (adopt, `readSettledResult`, từ chối `run-in-flight`/`run-unreconciled`/`result-corrupt`, từ chối run trước 6.2 bằng `legacy-run`). Việc thật của P02 còn lại nằm ở `runUnit`: `run.mjs` không truyền `retryId`/attempt cũ, nên resume sẽ admit `runs/02` mới. P02 phải nối resume vào nhánh `resumed` có sẵn (tìm attempt cuối ở `<unitDir>/<role>/<round>/runs/NN`), không viết cơ chế adopt thứ hai |
+| `legacy-run` ở P02 ("chạy lại + cảnh báo") | Mâu thuẫn với hành vi đã land (từ chối `run-unreconciled`/`legacy-run`). Giữ hành vi đã land: từ chối có tên, người dọn bằng P04 rồi `--resume` |
+| P00 `controller.json {tuple}` | Đã có `inspectRunControl(runDir)` (holder run control, dùng cho admission). P00 quyết dùng nó để biết controller chết; chỉ thêm `controller.json` nếu nó không phân biệt được |
+| Cơ chế `unit.json` | `attempts[n].runId` chỉ ghi **sau** khi `executeAssignment` trả về (`run.mjs` ~813): controller chết giữa chừng thì attempt không có `runId`. P02/P03 tìm run dir theo `assignmentDir`, không theo `runId` trong `unit.json` |
+
+### Delta theo phase
+- **P00** (contract): `cancel-requested.v1.json` hiện `{v, attemptId, requestedBy (free text), at}` và supervisor (`supervise.rs`) so `attemptId`; chỉ bổ sung giá trị `requestedBy` (`signal:SIGINT|signal:SIGTERM|recover`) và requester tuple nếu cần, giữ `attemptId`. Không sửa `.rs`. `unit-state.v1.json` trỏ tới `adopt` state có thật (thêm `held`). `recover-actions.v1.json`: `adopt`, `abandon-legacy`.
+- **P01**: `installCancelOnSignal` ghi `cancel-requested.json` **kèm `attemptId`** (đọc từ envelope/binding), không thì supervisor bỏ qua. Chờ receipt, thoát 130/143; lần hai thoát ngay. Không sửa `.rs`.
+- **P02**: như bảng trên. **Guard 6.2**: `supervise` từ chối khởi động khi run dir đã có binding/receipt → `--resume` luôn đi qua adopt, **không bao giờ spawn supervisor thứ hai** cho attempt đã bind; có test riêng (resume trên attempt bound không gọi `supervise`). D6 (`mkdir` độc quyền `runs/NN`): admission hiện có (`admitRunAttempt`, CAS) đã cấp số attempt; P02 kiểm xem còn cần `mkdir` thêm không, không thì bỏ.
+- **P03**: `inspectDispatchRuntime`/`show-run` thêm `attemptState` qua `adoptRun(probeOnly)` + `unitState`; `isSupervisedAttemptStillWorking` (assignment-runner) là probe sẵn có, tái dùng. Planner: thêm `adopt`; `recover.mjs` dùng `classifyRunOutcome(liveness:'unknown')`, giữ CAS.
+- **P04**: `legacy-sweep.mjs` mới. ~2100 attempt mở của run cũ trên forgentX (doctor `run-attempts-stuck`) là tải thật: `settleLegacy` quét theo lô, đo thời gian, không chạy tuần tự từng lần `internal` route. Run cũ thiếu `attempt.lock` → `legacy-run`.
+- **P05**: ma trận crash dùng supervisor `direct` thật và `terminal` (fake herdr) per terminal-mode/integration @6f2e922bf (đã có `test/run-supervisor/direct-crash-matrix.test.mjs` và `terminal-crash-matrix.test.mjs` + `test/run-supervisor/support/`: tái dùng helper, không viết lại).
+- **P06**: thêm `legacy-attempts-stuck`, `units-awaiting-resume`, `dispatch.cancelWaitMs` vào `registrations.mjs` (file này 6.3 và Git lane B cũng sửa: merge main trước, giữ cả hai phía). Docs không dùng số D-ADR; ghi "tự resume hoãn có tên" ở deferred của spec, kèm seam: cần phát hiện controller chết + một người nhận duy nhất.
+- **P07 A**: gồm `controller-death/**` trong push trigger CI (đã thêm ở P00r).
+
+### File bị lane khác chuyển
+Git/ES sau khi 6.3 land sẽ chuyển `packages/run-supervisor/rust/src/publish.rs`, `packages/terminal-control/rust/src/store.rs`, `packages/run-supervisor/rust/src/envelope.rs` sang `fgos-durable-file` / `fgos-canonical-json`. **Không phase 6.4 nào sửa ba file này** (P00 chỉ sửa contract JSON). Nếu có phase đổi ý, phải báo big lead để xếp thứ tự. Holder-lock borrow cleanup đã đổi trên main: P05 kiểm kỳ vọng "mọi holder bị giết" trong test mới.
+
+### Thứ tự chạy
+P00 → P01 → P02 → P03 → P04 → P05 → P06 → P07 phần A, một lead một lần. Thứ tự merge: P00 → P03 → P04 → P01 → P02 → P06 docs → P05 → P06 check. Big lead bắt đầu P00 sau khi 6.3 land và kiểm lại các dòng "per terminal-mode/integration".
