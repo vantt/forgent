@@ -1172,6 +1172,176 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
 }
 
 impl Inspect for GitDriver {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let symbolic = || -> Result<Option<RefName>> {
+            let out = self.invoke(
+                Some(repo),
+                &repo.trusted_main_root,
+                &["symbolic-ref", "--quiet", "HEAD"],
+                Policy::Inspect,
+                None,
+                true,
+                4096,
+                Duration::from_secs(30),
+            )?;
+            if out.success {
+                let name = std::str::from_utf8(&out.stdout)
+                    .map_err(|_| refusal("invalid-head-target"))?
+                    .trim_end_matches('\n');
+                Ok(Some(
+                    RefName::parse(name).map_err(|_| refusal("invalid-head-target"))?,
+                ))
+            } else if out.code == Some(1) {
+                Ok(None)
+            } else {
+                Err(out.error("head-observation-failed"))
+            }
+        };
+        let target = symbolic()?;
+        let out = self.invoke(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
+            Policy::Inspect,
+            None,
+            true,
+            4096,
+            Duration::from_secs(30),
+        )?;
+        if target != symbolic()? {
+            return Err(refusal("head-changed-during-read"));
+        }
+        if out.success {
+            let value = std::str::from_utf8(&out.stdout)
+                .map_err(|_| refusal("invalid-head-oid"))?
+                .trim_end_matches('\n');
+            let commit =
+                Oid::parse(value, repo.object_format()).map_err(|_| refusal("invalid-head-oid"))?;
+            return Ok(match target {
+                Some(target) => HeadFact::Attached { target, commit },
+                None => HeadFact::Detached { commit },
+            });
+        }
+        if let Some(target) = target {
+            let page =
+                self.list_refs(
+                    repo,
+                    &[RefPrefix::parse(target.as_str())
+                        .map_err(|_| refusal("invalid-head-target"))?],
+                    None,
+                    100_000,
+                )?;
+            if !page.entries.iter().any(|e| e.name == target) && page.complete {
+                return Ok(HeadFact::Unborn { target });
+            }
+        }
+        Err(out.error(if repo.layout.promisor {
+            "promisor-object-unavailable"
+        } else if repo.layout.shallow {
+            "shallow-history-incomplete"
+        } else {
+            "head-object-unavailable"
+        }))
+    }
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage> {
+        Oid::parse(revision.as_str(), repo.object_format())
+            .map_err(|_| refusal("object-format-mismatch"))?;
+        if prefix.contains(&0) || prefix.len() > 4096 || max_entries == 0 || max_entries > 100_000 {
+            return Err(refusal("invalid-tree-bounds"));
+        }
+        if cursor
+            .as_ref()
+            .is_some_and(|c| c.revision != *revision || c.prefix != prefix)
+        {
+            return Err(refusal("tree-cursor-query-mismatch"));
+        }
+        let kind = self.checked(
+            repo,
+            &["cat-file", "-t", revision.as_str()],
+            Policy::Inspect,
+        )?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(refusal("revision-not-commit-or-tree"));
+        }
+        // No pathspec is passed to Git: prefix selection is literal bytes.
+        let bytes = self.checked(
+            repo,
+            &[
+                "ls-tree",
+                "-r",
+                "-t",
+                "-z",
+                "--full-tree",
+                revision.as_str(),
+            ],
+            Policy::Inspect,
+        )?;
+        let mut entries = Vec::new();
+        for record in bytes.split(|b| *b == 0).filter(|r| !r.is_empty()) {
+            let tab = record
+                .iter()
+                .position(|b| *b == b'\t')
+                .ok_or_else(|| refusal("invalid-tree-entry"))?;
+            let path = &record[tab + 1..];
+            if !path.starts_with(prefix)
+                || cursor.as_ref().is_some_and(|c| path <= c.after.as_slice())
+            {
+                continue;
+            }
+            let fields: Vec<_> = record[..tab].split(|b| *b == b' ').collect();
+            if fields.len() != 3 {
+                return Err(refusal("invalid-tree-entry"));
+            }
+            let mode = std::str::from_utf8(fields[0])
+                .ok()
+                .and_then(|m| u32::from_str_radix(m, 8).ok())
+                .ok_or_else(|| refusal("invalid-tree-mode"))?;
+            let kind = match fields[1] {
+                b"blob" => ObjectType::Blob,
+                b"tree" => ObjectType::Tree,
+                b"commit" => ObjectType::Commit,
+                _ => return Err(refusal("invalid-tree-type")),
+            };
+            let oid = Oid::parse(
+                std::str::from_utf8(fields[2]).map_err(|_| refusal("invalid-tree-oid"))?,
+                repo.object_format(),
+            )
+            .map_err(|_| refusal("invalid-tree-oid"))?;
+            entries.push(ListedTreeEntry {
+                path: path.to_vec(),
+                mode,
+                kind,
+                oid,
+            });
+        }
+        entries.sort_by(|a, b| a.path.cmp(&b.path));
+        let complete = entries.len() <= max_entries;
+        entries.truncate(max_entries);
+        let next_cursor = if complete {
+            None
+        } else {
+            Some(TreeCursor {
+                revision: revision.clone(),
+                prefix: prefix.to_vec(),
+                after: entries.last().unwrap().path.clone(),
+            })
+        };
+        Ok(TreePage {
+            entries,
+            complete,
+            next_cursor,
+        })
+    }
+
     fn list_refs(
         &self,
         repo: &RepoHandle,

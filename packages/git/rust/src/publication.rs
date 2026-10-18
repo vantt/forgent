@@ -970,6 +970,19 @@ struct Cursor {
 }
 
 impl<F: FileSystem> Publication for PublicationPort<'_, F> {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
+        Inspect::resolve_head(self.driver, repo)
+    }
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage> {
+        Inspect::list_tree(self.driver, repo, revision, prefix, cursor, max_entries)
+    }
     fn list_refs(
         &self,
         repo: &RepoHandle,

@@ -15,7 +15,9 @@
       "compareContent",
       "snapshotWrites",
       "listRefs",
-      "readPathsAt"
+      "readPathsAt",
+      "resolveHead",
+      "listTree"
     ],
     "Refs": [
       "ensureBranch",
@@ -80,7 +82,9 @@
       "fetchRefs",
       "pushRefs",
       "listRefs",
-      "readPathsAt"
+      "readPathsAt",
+      "resolveHead",
+      "listTree"
     ]
   },
   "publicationExtensions": {
@@ -93,7 +97,9 @@
       "rejected-other",
       "remote-outcome-unknown"
     ],
-    "remote": "explicit RemoteGrant with pinned effective URL; bounded borrowed transport; mirror refs installed by no-dereference exact-old CAS"
+    "remote": "explicit RemoteGrant with pinned effective URL; bounded borrowed transport; mirror refs installed by no-dereference exact-old CAS",
+    "resolveHead": "Inspect policy without borrowing holder authority; worktree-specific attached/detached/unborn facts",
+    "listTree": "Inspect policy without borrowing holder authority; recursive typed byte paths, literal prefix, revision/query-bound bounded pages; 64 MiB capture refusal"
   },
   "inspectFacts": [
     "configuredFetchRefspecs",

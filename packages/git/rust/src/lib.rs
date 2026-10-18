@@ -293,6 +293,16 @@ pub struct PushResult {
 /// Typed publication contract. PublicationPort implements it under the caller's
 /// opaque event-seal authority and the signed §4/§10 WAL protocol.
 pub trait Publication {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact>;
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage>;
+
     fn list_refs(
         &self,
         repo: &RepoHandle,
@@ -368,6 +378,16 @@ pub struct FetchMappingProvenance {
 }
 
 pub trait Inspect {
+    fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact>;
+    fn list_tree(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        prefix: &[u8],
+        cursor: Option<TreeCursor>,
+        max_entries: usize,
+    ) -> Result<TreePage>;
+
     fn list_refs(
         &self,
         repo: &RepoHandle,
@@ -460,4 +480,31 @@ pub enum PathValue {
 pub struct PathRead {
     pub path: Vec<u8>,
     pub value: PathValue,
+}
+
+/// Checked-out commit and symbolic target belong to this handle's worktree.
+#[derive(Debug)]
+pub enum HeadFact {
+    Attached { target: RefName, commit: Oid },
+    Detached { commit: Oid },
+    Unborn { target: RefName },
+}
+#[derive(Debug, Clone)]
+pub struct TreeCursor {
+    pub(crate) revision: Oid,
+    pub(crate) prefix: Vec<u8>,
+    pub(crate) after: Vec<u8>,
+}
+#[derive(Debug)]
+pub struct ListedTreeEntry {
+    pub path: Vec<u8>,
+    pub mode: u32,
+    pub kind: ObjectType,
+    pub oid: Oid,
+}
+#[derive(Debug)]
+pub struct TreePage {
+    pub entries: Vec<ListedTreeEntry>,
+    pub complete: bool,
+    pub next_cursor: Option<TreeCursor>,
 }
