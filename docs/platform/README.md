@@ -44,7 +44,7 @@ Target area docs live at `docs/platform/<area>/`.
 | [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |
 | [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |
 | [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |
-| [agent-mailbox](agent-mailbox/spec.md) | [agent-mailbox/spec.md](agent-mailbox/spec.md) — draft proposal, not signed: how a message reaches an agent session in time, hexagonal ports and adapters; blocked on the V-011 decision |
+| [agent-mailbox](agent-mailbox/spec.md) | [agent-mailbox/spec.md](agent-mailbox/spec.md) — draft proposal, not signed: first slice is delivery of a message into a live agent session (Claude Code, Codex, agy, one machine); acknowledgement, expiry and cross-machine are recorded as later parts; needs the V-011 narrowing |
 | [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |
 | `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |
 | `ui-spec` | [../ui-spec/](../ui-spec/) |
