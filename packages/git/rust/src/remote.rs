@@ -194,7 +194,7 @@ impl GitDriver {
         push: bool,
         filesystem: &F,
     ) -> Result<Receipt> {
-        let scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        let scope = self.remote_scope(held)?;
         if writer.is_empty() || mappings.is_empty() || mappings.len() > 256 {
             return Err(failure("invalid-remote-mappings"));
         }

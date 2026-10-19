@@ -228,11 +228,13 @@ impl GitDriver {
             // A case-only alias is tracked only when it names the same index
             // entry on disk. Case folding alone would admit a distinct file on
             // case-sensitive filesystems (or an untracked hard link).
-            let tracked_alias = tracked.iter().any(|indexed| {
+            let collision_metadata = fs::symlink_metadata(root.join(p));
+            let folded = p.to_lowercase();
+            let tracked_alias = tracked.iter().filter(|indexed| indexed.to_lowercase() == folded).any(|indexed| {
                 #[cfg(unix)]
                 {
                     use std::os::unix::fs::MetadataExt;
-                    match (fs::symlink_metadata(root.join(indexed)), fs::symlink_metadata(root.join(p))) {
+                    match (fs::symlink_metadata(root.join(indexed)), collision_metadata.as_ref()) {
                         (Ok(a), Ok(b)) => a.dev() == b.dev() && a.ino() == b.ino()
                             && fs::read_dir(root.join(Path::new(p).parent().unwrap_or(Path::new(""))))
                                 .is_ok_and(|mut entries| !entries.any(|e| e.is_ok_and(|e| e.file_name() == Path::new(p).file_name().unwrap_or_default()))),
@@ -735,7 +737,12 @@ impl GitDriver {
             let page = self.list_worktrees(&repo, cursor, 4096)?;
             for row in page.entries {
                 let registered = Path::new(std::str::from_utf8(&row.path).map_err(failure)?);
-                if destination.starts_with(registered.canonicalize().map_err(failure)?) {
+                let registered = match registered.canonicalize() {
+                    Ok(path) => path,
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                    Err(e) => return Err(failure(e)),
+                };
+                if destination.starts_with(registered) {
                     return Err(failure("restore-extract-outside-repository-required"));
                 }
             }

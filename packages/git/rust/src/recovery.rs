@@ -49,9 +49,17 @@ impl GitDriver {
     pub fn inspect_operation(&self, repo: &RepoHandle, id: &str) -> Result<Value> {
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         if let Some(c) = wal.compacted(id).map_err(failure)? {
-            return Ok(
-                json!({"operationId":id,"requestDigest":c.request,"terminal":true,"compacted":true,"outcome":c.outcome().map_err(failure)?}),
-            );
+            let outcome = c.outcome().map_err(failure)?;
+            let compact_kind = match &outcome {
+                wal::Outcome::Restore { .. } => Some("Restore"),
+                wal::Outcome::Land { .. } => Some("Land"),
+                wal::Outcome::Transfer { .. } => Some("RemoteTransfer"),
+                wal::Outcome::ConfigApproved => Some("ConfigChange"),
+                // Generic terminal outcomes do not retain the original kind.
+                _ => None,
+            };
+            return Ok(json!({"operationId":id,"kind":compact_kind,"requestDigest":c.request,
+                "terminal":true,"compacted":true,"outcome":outcome}));
         }
         let c = wal.inspect(id).map_err(failure)?;
         Ok(
@@ -104,6 +112,7 @@ impl GitDriver {
                 self.inspect_operation(repo, id)
             }
             OperationKind::ConfigChange(change) => {
+                if !held.is_empty() { return Err(failure("config-recovery-caller-loans-refused")); }
                 // repo-config is already rank 80 and is the resource authority
                 // for both writers and recoverers. Do not acquire a peer leaf.
                 match self.recover_config_change(repo, id, change) {

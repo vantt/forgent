@@ -150,7 +150,7 @@ Worktree WAL kinds bind canonical paths and registration names; move/remove addi
 
 `fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]` is available now under the owner's plan Q2 answer of 2026-10-18. Without a branch it creates a detached checkout. Base accepts a full OID, HEAD or a literal branch/tag/remote ref. Other production Worktree callers migrate together in phase 07. `git-worktree-recovery` reads raw admin entries (including partial entries omitted by Git listing), dirty/stale checkouts and pending Worktree WAL records without repairing; phase 04 adds its producing-custody row to this same diagnostic.
 
-### Dormant Recovery and GitHub adapter contract (phase 06 unit 9)
+### Dormant Recovery and GitHub adapter contract (phase 06 units 9–13)
 
 `createGitRecovery(options)` exposes `inspectOperation({operationId})`,
 `listPending({bound?})`, and `reconcile({operationId}, held?)`. Inspection
@@ -168,16 +168,31 @@ released before returning to consumer settlement; no consumer state is written.
 ConfigChange reconciliation delegates to the existing config recovery under
 repo-config 80, without acquiring the peer-rank recovery leaf. This resource
 authority excludes fgOS config writers and recoverers; native config.lock
-excludes ordinary Git writers. The full interrupted-operation matrix remains
-required acceptance evidence. Production callers remain for phase 07.
+excludes ordinary Git writers. Caller loans are refused on ConfigChange rather
+than silently dropped. The interrupted-operation matrix covers all twelve
+payload kinds at durable Intent in both recovery orders; additional ref/transfer
+rows cover pin installation, TargetAttempt and observed CAS. Production caller
+moves remain for phase 07.
+
+Publication recovery retains its existing event-seal resource authority without
+taking the recovery leaf, including live Event Store publish/recover paths.
+Other recovery paths take recovery 80 last; it never substitutes for resource
+authority. Git reuses the registered recovery lock with
+`runDir=<common>/fgos/git`, hence `<common>/fgos/git/locks/recovery.lock`.
+Non-event transfers retain their lock-free scope (caller ranks below 60);
+worktree-admin belongs only to their observe-only recovery, not transfer admission.
 
 GitHub API merge stays in the GitHub adapter under **consumer authorization**;
 Git ports do not grant approval or perform API merges. A merge timeout is
 **outcome-unknown until queried**, including the adapter's existing
 `blocked` transport result: it does not prove the server declined the merge.
-The consumer queries PR state/merge commit before considering another request.
+The production adapter queries PR state/merge commit after an unreachable merge
+result, returns the observed merged receipt when available, otherwise retains
+`blocked` with `reason: outcome-unknown`. A repeated merge call first queries
+state and returns an existing MERGED result without sending another request.
+The contract test invokes the production merge adapter twice.
 Any local mutation the adapter needs must go through the typed Git ports.
-Phase 06 adds the contract and test only; it does not move adapter code.
+Phase 06 adds the timeout-query and MERGED guard to the existing adapter; the phase 07 caller move remains separate.
 
 ## 4. Publication port: refs/fgos/*
 
@@ -254,8 +269,8 @@ The common order remains 20→40→50→60. Operations take only needed locks. V
 | Refs ensureBranch/advanceRef/deleteRef/fastForwardCheckedOut on `refs/heads/*` (changed by the 2026-10-18 re-check fold; was "none") | 40, held from the checkout revalidation through the exact-old CAS and read-back | 10, 15, 20, 30 (fastForwardCheckedOut requires the verified 30 on the one worktree that holds the branch) | Holding 40, 50, 60 or 70 is refused with `lock-order-violation` before any effect, so 40 is never taken under main 50 (order 20→40→50). Exact-old CAS serializes the ref value; 40 serializes checkout membership, which the CAS does not see. A branch checked out in any worktree is refused (§3) except under fastForwardCheckedOut. Post-land branch cleanup runs after land, outside the dispatch scope. Refs on `refs/fgos/*` are Publication (row below), never checked out, and take no lock. |
 | Publication (Event Store seal/sync, `refs/fgos/*`) | none (Event Store holds event-seal 58) | anything below 58 | Never 20/40/50 under 58; never under 60 or 70. |
 | Remote fetch/push of non-event refs | none | anything below 60 | No Git under 60. |
-| RepositoryConfig (fetch mapping and hooks) | repo-config 80 | anything below 60; recovery 80 | The resource authority serializes fgOS writers and ConfigChange recoverers; native config.lock excludes ordinary Git config writers. ConfigChange recovery takes no peer-rank recovery leaf. |
-| Recovery of an interrupted operation | the same locks as the interrupted operation, then `recovery` 80 last (ConfigChange uses only repo-config 80) | as for that operation | Recovery 80 never replaces 20/40/50 and is released before any later state 60 settlement. |
+| RepositoryConfig (fetch mapping and hooks) | repo-config 80 | anything below 60; recovery refuses caller loans | The resource authority serializes fgOS writers and ConfigChange recoverers; native config.lock excludes ordinary Git config writers. ConfigChange recovery takes no peer-rank recovery leaf. |
+| Recovery of an interrupted operation | owning resource authority, then `recovery` 80 last; non-event transfer recovery uses 40 then 80; Publication uses only caller event-seal 58; ConfigChange uses only repo-config 80 | as for that operation; non-event transfer recovery below 40; ConfigChange no caller loans | Recovery 80 never replaces resource authority and is released before any later state 60 settlement. |
 
 The table is the structure the owner chose (Q1 option (a), Q2 lease extension). M2 (unit-run-1792254306261-e7f3b8ba) enumerated every subset of the 11 ranks against 26 operation and recovery profiles and 5 descriptor states (266,240 cases) and found no two-scope wait cycle, including the refusal of a land request that carries 30. That is a check of the abstraction, not of fairness, bounded waiting, cancellation, alias identity or descendant drain, and the hook was encoded as a single probe; V-ORDER still has to exercise the real Node→addon→Rust→hook ladder. M2 ran with the Refs row taking no lock; its new rank-40 profile is legal by the rank rule (40 above every rank it may be held with) and is re-checked in §19.
 
@@ -473,6 +488,23 @@ The shared exact-owned quarantine path remains production for ConfigChange stagi
 Frozen fd-table attribution at fgOS's own kill door is deferred. Its explicit trigger is an observed **`killed-after-grace` with retained `index.lock` residue**. Only then consider freeze → observe exact writable descriptor inode → kill → post-death state verification. Spawn-time pid/start-time/absence evidence is not inode ownership and is not planned.
 
 `createGitRepositoryConfig(...)` provides `inspectHooks({ownedPath})`, `ensureHooks({ownedPath, operationId})`, `removeOwnedHooksConfig({ownedPath, operationId})` and `recover({operationId})`. Hooks paths must be absolute. A hooks slot is empty only when no file-backed config scope supplies core.hooksPath. Global/system/included values are preserved and reported as `skippedExisting` with missing fgOS enforcement. Ownership and exact-old removal checks use only the common local config file; removal reveals any inherited value. Custom/pre-existing unproven values return `skippedExisting`; inspection reports the configured path, successful WAL provenance and missing executable pre-commit enforcement. Ensure fills an empty slot; removal requires both successful owned provenance and the exact current owned value. Both use the **same config writer as ensureFetchMapping**, now admitted through LockScope repo-config 80: native `config.lock`, a private draft, full old-file plus stamp-validated exact-old-value checks immediately before replacement, WAL `ConfigChange`/Prepared/TargetAttempt/Outcome and read-back. The driver's command-line safety hooks override is excluded from stored hooks facts. Effect-free owned re-approval may use `configApproved` under §10 rule 4c. Optional hooks/staging evidence preserves historical ConfigChange digests. The writer records its exclusively-created staging inode and process tuple; after writer death the shared quarantine code preserves that exact staging artifact under repo-config 80. Recovery abandons pre-attempt changes or observes post-attempt values without replaying an effect. ConfigChange is available through the general Recovery port under repo-config 80 without the recovery leaf; production setup/doctor caller migration remains phase 07. Impact-analysis: inactive (no provider registered).
+
+
+Phase 06 unit 13 review facts: SafeRestore extraction skips non-existent/prunable
+worktree registrations, while every existing canonical registered path remains
+excluded. Terminal ref recovery releases the candidate pin before compaction.
+Compacted inspection reports a kind only when the receipt unambiguously retains
+it (Restore, Land, RemoteTransfer, ConfigChange); generic receipts cannot recover
+the original payload kind from a request digest.
+
+Native-lock quarantine on Linux uses `renameat2(RENAME_EXCHANGE)` with a private
+directory guard. A substituted inode is exchanged back while that guard still
+excludes ordinary Git lock creation. If the kernel/filesystem does not support
+exchange, quarantine retains the non-overwriting hard-link fallback: a foreign
+lock created during restoration is preserved and the substituted inode remains
+in quarantine, explicitly reported. If a crash leaves a directory guard at the
+native path, preserve it and the operation's quarantine evidence for inspection;
+never delete it by age. A replaced guard is also preserved and reported.
 
 ## 12. Distribution, setup and doctor
 
@@ -717,6 +749,11 @@ Every G-001..G-234 appears once. Frozen obligation text lives in `plans/reports/
 | `G-234` | Consumer Iron Law; Git binds | V-LAND/V-VERIFY |
 
 Rows G-135–G-165, G-167–G-169, G-171–G-180, G-182, G-185–G-201 are **not dropped**. Their frozen obligation text and A's per-row port mapping remain in force except where the precedence rule or the override table replaces a retired lock/event mechanism. Appendix A below carries A's per-row matrix with these overrides applied; omitting a G-id is a defect. Structural count 234 (G-001..G-234; freeze line v2.1 adds G-234). Older catalogue header “233” is stale.
+
+
+E3 typed ScopedCommit (1.5× p95) and Land (1.2× p95) budgets remain **unproven**:
+unit 13 does not execute E3. Paired samples alternate legacy/port order to reduce
+warm-cache bias; no passing performance claim follows from the script alone.
 
 ## 17. Acceptance, remaining uncertainty, prohibited claims
 

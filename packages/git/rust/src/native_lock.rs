@@ -365,12 +365,53 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         return Ok(report);
     }
     filesystem.checkpoint("native-lock-rechecked").map_err(failure)?;
-    // Original WAL ownership remains the provenance after a crash at this rename.
-    fs::rename(path, &quarantined).map_err(failure)?;
+    // As with holder-lock's activation tombstone, exchange with a directory
+    // guard: ordinary Git cannot create a foreign index.lock in the gap.
+    #[cfg(target_os = "linux")]
+    let guard = {
+        use std::os::unix::ffi::OsStrExt;
+        fs::create_dir(&quarantined).map_err(failure)?;
+        let guard = File::open(&quarantined).map_err(failure)?;
+        let old = std::ffi::CString::new(path.as_os_str().as_bytes()).map_err(failure)?;
+        let new = std::ffi::CString::new(quarantined.as_os_str().as_bytes()).map_err(failure)?;
+        let result = unsafe { libc::renameat2(libc::AT_FDCWD, old.as_ptr(), libc::AT_FDCWD, new.as_ptr(), libc::RENAME_EXCHANGE) };
+        if result == 0 { Some(guard) } else {
+            let e = std::io::Error::last_os_error();
+            fs::remove_dir(&quarantined).map_err(failure)?;
+            if !matches!(e.raw_os_error(), Some(libc::ENOSYS | libc::EINVAL | libc::EOPNOTSUPP)) { return Err(failure(e)); }
+            fs::rename(path, &quarantined).map_err(failure)?;
+            None
+        }
+    };
+    #[cfg(not(target_os = "linux"))]
+    let guard: Option<File> = { fs::rename(path, &quarantined).map_err(failure)?; None };
+    File::open(path.parent().ok_or_else(|| failure("native-lock-parent-missing"))?)
+        .and_then(|f| f.sync_all()).map_err(failure)?;
+    File::open(&destination).and_then(|f| f.sync_all()).map_err(failure)?;
+    File::open(&directory).and_then(|f| f.sync_all()).map_err(failure)?;
+    filesystem.checkpoint("native-lock-after-move").map_err(failure)?;
     // The pathname may have been replaced after the final observation. Never
     // report a substituted inode as repaired, and restore it without overwrite.
     let moved = File::open(&quarantined).map_err(failure)?;
     if facts::file_key(&moved).map_err(failure)? != (owned.device, owned.inode) {
+        #[cfg(target_os = "linux")]
+        if let Some(guard) = &guard {
+            use std::os::unix::ffi::OsStrExt;
+            if File::open(path).and_then(|f| facts::file_key(&f)).ok() == Some(facts::file_key(guard).map_err(failure)?) {
+                let old = std::ffi::CString::new(path.as_os_str().as_bytes()).map_err(failure)?;
+                let new = std::ffi::CString::new(quarantined.as_os_str().as_bytes()).map_err(failure)?;
+                if unsafe { libc::renameat2(libc::AT_FDCWD, old.as_ptr(), libc::AT_FDCWD, new.as_ptr(), libc::RENAME_EXCHANGE) } == 0 {
+                    fs::remove_dir(&quarantined).map_err(failure)?;
+                    File::open(path.parent().unwrap()).and_then(|f| f.sync_all()).map_err(failure)?;
+                    File::open(&destination).and_then(|f| f.sync_all()).map_err(failure)?;
+                    report.inspection = "substituted inode restored without overwrite by atomic exchange; inspect again".into();
+                    return Ok(report);
+                }
+            }
+            report.quarantine_path = Some(quarantined.to_string_lossy().into());
+            report.inspection = "substituted inode retained in quarantine; guard changed or exchange failed".into();
+            return Ok(report);
+        }
         match fs::hard_link(&quarantined, path) {
             Ok(()) => {
                 fs::remove_file(&quarantined).map_err(failure)?;
@@ -385,6 +426,14 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
             .and_then(|f| f.sync_all()).map_err(failure)?;
         File::open(&destination).and_then(|f| f.sync_all()).map_err(failure)?;
         return Ok(report);
+    }
+    if let Some(guard) = &guard {
+        if File::open(path).and_then(|f| facts::file_key(&f)).ok() != Some(facts::file_key(guard).map_err(failure)?) {
+            report.quarantine_path = Some(quarantined.to_string_lossy().into());
+            report.inspection = "owned artifact quarantined; native path guard changed, preserved".into();
+            return Ok(report);
+        }
+        fs::remove_dir(path).map_err(failure)?;
     }
     File::open(&quarantined)
         .and_then(|f| f.sync_all())
@@ -711,6 +760,11 @@ mod tests {
             if step == "native-lock-rechecked" {
                 fs::rename(&self.0, self.0.with_extension("original"))?;
                 fs::write(&self.0, b"foreign replacement")?;
+            }
+            #[cfg(target_os = "linux")]
+            if step == "native-lock-after-move" {
+                assert!(self.0.is_dir(), "exchange must retain a native-path guard");
+                assert!(fs::OpenOptions::new().write(true).create_new(true).open(&self.0).is_err());
             }
             Ok(())
         }

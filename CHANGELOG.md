@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git recovery preserves live Publication and non-event transfer lock contracts, releases terminal ref pins, tolerates prunable extraction registrations, and atomically guards Linux native-lock quarantine; GitHub merge timeouts query server state before a later request.
+
 - Git deadline cleanup now gives children three seconds to terminate cooperatively; unowned native index locks refuse with `native-index-lock-unowned` and a read-only holder report plus the retained-lock runbook.
 
 - Git Recovery reconciles ConfigChange under repo-config authority; hooks configuration preserves inherited values and removes only owned local settings. Native quarantine detects inode substitution after rename.

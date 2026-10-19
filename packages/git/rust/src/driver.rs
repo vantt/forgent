@@ -1630,7 +1630,7 @@ fn repository_transport_config(key: &str) -> bool {
                     .any(|s| key.ends_with(s))))
 }
 /// Config --null with --show-origin or --show-scope emits metadata NUL key LF value NUL.
-fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
+pub(crate) fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
     let fields = nul_records(bytes)?;
     if fields.len() % 2 != 0 {
         return Err(refusal("git-config-protocol"));

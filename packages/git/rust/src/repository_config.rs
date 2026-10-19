@@ -610,14 +610,18 @@ impl GitDriver {
             .map(|v| String::from_utf8(v.value).map_err(error)).transpose()
     }
     fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
-        let config = repo.common_dir().join("config");
-        let values: Vec<_> = crate::driver::config_facts(self, repo, "core.hookspath")?
-            .into_iter().filter(|v| v.origin == config).collect();
+        let out = self.invoke(None, repo.trusted_main_root(),
+            &["config", "--null", "--show-scope", "--list"],
+            crate::driver::Policy::Inspect, None, false, 1024 * 1024,
+            Duration::from_secs(30))?;
+        if !out.success { return Err(error("hooks-config-read-failed")); }
+        let values: Vec<_> = crate::driver::parse_config(&out.stdout)?
+            .into_iter().filter(|(scope, key, _)| scope == b"local" && key == "core.hookspath").collect();
         if values.len() > 1 {
             return Err(error("hooks-config-ambiguous"));
         }
         values.into_iter().next()
-            .map(|v| String::from_utf8(v.value).map_err(error)).transpose()
+            .map(|(_, _, value)| String::from_utf8(value).map_err(error)).transpose()
     }
     fn config_change_installed(
         &self,
@@ -799,18 +803,7 @@ impl GitDriver {
             .hooks
             .as_ref()
             .ok_or_else(|| error("invalid-hooks-operation"))?;
-        match self.change_config(
-            repo,
-            "",
-            &[],
-            id,
-            Some((&h.owner_path, h.next.is_none())),
-            &wal::OsFileSystem,
-        ) {
-            Ok(_) => (),
-            Err(e) if e.cause == "config-change-resolved-without-success" => (),
-            Err(e) => return Err(e),
-        }
+        self.recover_config_change(repo, id, change)?;
         self.inspect_hooks(repo, std::path::Path::new(&h.owner_path))
     }
 }

@@ -220,7 +220,7 @@ async function typedOperationRows(root, state, index, loader, samples) {
     return repo;
   };
   const scoped = { legacy: [], port: [] }, land = { legacy: [], port: [] };
-  for (let i = 0; i < samples; i++) for (const mode of ['legacy', 'port']) {
+  for (let i = 0; i < samples; i++) for (const mode of (i % 2 ? ['port', 'legacy'] : ['legacy', 'port'])) {
     const repo = make(`typed-commit-${mode}-${i}`), linked = `${repo}-linked`;
     git(['-C', repo, 'worktree', 'add', '-qb', 'producer', linked]);
     const claim = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir:path.join(repo,'.fgos'), cwd:linked });

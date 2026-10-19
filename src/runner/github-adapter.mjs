@@ -25,7 +25,8 @@
 // conflicting PR, so which mergeable/mergeStateStatus value signals a conflict
 // is unproven, and guessing one would silently fork D3 on an assumption. Any
 // merge-time failure (including a real conflict) folds into `blocked`+reason
-// like any other gh failure; a distinct outcome for it waits on real evidence.
+// like any other gh failure. An unreachable merge is queried immediately and
+// retains reason outcome-unknown unless the server confirms MERGED.
 //
 // RETURN SHAPE: every exported call resolves `{outcome, step, ...}` where step
 // is exactly 'create' | 'status' | 'merge' naming which wrapped gh call it came
@@ -184,6 +185,8 @@ export async function viewGitHubPRStatus(repoRoot, prNumber, opts = {}) {
  * elsewhere, never silently retried past. Any gh failure resolves
  * `{outcome:'blocked', step, prNumber, reason, detail}` — step is 'status'
  * when a status read failed, 'merge' when the merge call itself failed.
+ * An unreachable/timeout merge is queried immediately; observed MERGED returns
+ * success, otherwise reason outcome-unknown preserves the uncertain effect.
  */
 export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
   if (prNumber == null || prNumber === '') {
@@ -193,10 +196,19 @@ export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
   if (status.outcome === 'blocked') {
     return status;
   }
+  if (status.state === 'MERGED') {
+    return { outcome: 'merged', step: 'merge', prNumber, mergeCommit: status.mergeCommit };
+  }
   try {
     gh(repoRoot, ['pr', 'merge', String(prNumber), '--merge'], opts);
   } catch (err) {
-    return blockedFrom('merge', prNumber, err);
+    const uncertain = blockedFrom('merge', prNumber, err);
+    if (uncertain.reason === 'unreachable' || err.code === 'ETIMEDOUT') {
+      const observed = await viewGitHubPRStatus(repoRoot, prNumber, opts);
+      if (observed.state === 'MERGED') return { outcome: 'merged', step: 'merge', prNumber, mergeCommit: observed.mergeCommit };
+      return { ...uncertain, reason: 'outcome-unknown', observed };
+    }
+    return uncertain;
   }
   const postMerge = await viewGitHubPRStatus(repoRoot, prNumber, opts);
   return { outcome: 'merged', step: 'merge', prNumber, mergeCommit: postMerge.mergeCommit };

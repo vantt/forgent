@@ -405,3 +405,10 @@ Until Git phase 03 owns removal/recovery, preserve the refused checkout and use 
 | dispatch cwd lock, resume guard, reconcile | [runner.md](../../specs/runner.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
+
+Git recovery reuses the existing `recovery` registry entry (rank 80, run scope)
+with `runDir=<common>/fgos/git`, resolving to
+`<common>/fgos/git/locks/recovery.lock`. This is one registry entry shared with
+dispatch recovery, not a new lock kind. Git takes it after its resource authority;
+Publication retains event-seal authority without acquiring this leaf, and
+ConfigChange retains repo-config 80 without a peer-rank leaf.

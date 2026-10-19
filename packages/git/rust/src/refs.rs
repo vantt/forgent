@@ -1021,7 +1021,10 @@ impl GitDriver {
             || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root())).map_err(failure)? {
             return Err(failure("ref-authority-mismatch"));
         }
-        if let Some(o) = chain.outcome() { return Ok(o.clone()); }
+        if let Some(o) = chain.outcome() {
+            release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &chain)?;
+            return Ok(o.clone());
+        }
         let attempted = chain.records().iter().any(|r| matches!(r.phase, Phase::TargetAttempt {..}));
         let outcome = if !attempted { Outcome::AbandonedBeforeAttempt } else {
             if let OperationKind::RefUpdate { worktree: Some(path) } = &i.kind {
@@ -1042,7 +1045,8 @@ impl GitDriver {
             if observed == i.next { Outcome::Success { observed, attribution: wal::Attribution::EffectObservedOnly } }
             else { return Err(recovery("ref-effect-unknown")); }
         };
-        wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &terminal)?;
         Ok(outcome)
     }
 }
