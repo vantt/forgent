@@ -1,3 +1,46 @@
+# Step 02i author checkpoint — consolidated parser repair and regenerated A50 packet
+
+State: **L12-25 author regeneration complete; independent A50 review pending;
+class 3 / Step 2 OPEN.** Input committed tree `c5efdf003417b6f68441d9297c1d0519b12f68b1`.
+
+**Supersession:** the entire **105-part step-02h packet is SUPERSEDED** by the
+[step-02i request](step-02i-mapping-review-request.md), **121 logical parts**.
+All previous scripts, tables, partial reviews and the narrative below remain evidence.
+
+- Class 3: **5,434 → 5,436 edges**, **1,036 committed files**,
+  **1,322 → 1,351 mappings**; two newly captured complete wrapped units.
+  Actions: **1,507 cutover proposals / 3,119 preserve / 469 pending target /
+  194 pending behavioral proof / 147 row flips**. These are future specifications,
+  with zero actual consumer patches. All 197 overlay controls remain checked downstream.
+- [Per-defect before/after](step-02i-defect-diff.md): every L12-25 witness fails
+  step-02h and passes step-02i; all inherited L12-21..24 after-counts remain zero.
+  The complete unsampled ledger holds **679 changed source rows** and **75 review
+  finding joins**. The 61 candidate-switchboard edges now have row semantics.
+  Hex decision ids require actual reachable commit/blob proof before preservation;
+  wrapped tokens/labels retain complete physical spans; source columns, source-carriage
+  headings, operative lists, bounded line locators, generated/checker precedence,
+  planning lists, retired checkpoint writes and literal-snapshot successor notes are covered.
+- Mechanical replay **PASS**: **192 differential probes (79 added)**,
+  **9 syntax cases**, **8 negative mutations rejected**. [Receipt](step-02i-verification.json).
+  A second replay from `/tmp` also PASSes with byte-identical output; [final checks](step-02i-final-checks.json). No full-suite, runtime, installed-coordinate,
+  authority-flip or independent semantic acceptance claim.
+- **391 action-changed rows** are mandatory in **parts 115–121**. Former pilot
+  **03 → 99–101**, **26 → 102**; former second-pilot **30/47/65 → 103/104/105**.
+  All **1,351 mappings**, every exception and the **816-edge** seeded sample require review.
+  Lead owns reviewer launch (waves at most six); no reviewer is started here.
+- Class 4 **STARTED: initial static census only**, using the same parser/tree rules:
+  **53 files / 1,207 edges / 59 unresolved expression cues**. Code/projection rows
+  remain behavioral, no executable rewrite. Class 4 and Step 2 remain OPEN; no class 5.
+  [Initial census](step-02i-class4-initial-census.json). Class-3's embedded class-4 status
+  is its earlier snapshot, not the status of this later separate scan.
+- No author execution blocker. Independent A50 semantics, Step 3 exact decisions,
+  Step 5 adoption/parity/native proof, and Lead accounting at the actual runner commit
+  remain gates. Both Phase 6 reproduction manifests and all out-of-scope consumers stay unchanged.
+
+The prior checkpoint below is superseded history, preserved verbatim.
+
+---
+
 # Step 2h author checkpoint — final parser fixes and full A50 review packet
 
 State: **L12-24 author regeneration complete; full A50 independent review pending;
