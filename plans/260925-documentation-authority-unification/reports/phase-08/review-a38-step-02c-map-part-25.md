@@ -1,0 +1,94 @@
+# A38 step-02c mapping review, part 25
+
+- Reviewer: `reviewer:sonnet-session:ab2071717b4503d17@2026-10-19`
+- Worktree HEAD: `2854c92ff` (detached, read-only); author `e064f8bd5`, accounting `2854c92ff`
+- Part id: 25 (population preserve-pending-target, 60 entries, sourceTable `step-02c-census-maps-portals-prose.json`)
+- Overlay precedence applied: none of the 60 IDs appears in slice1, slice2 or wrapped-rescan correction/rebinding rows, so the original rows are effective.
+- Method: resolved every ID with python; for each row verified the physical line, column span and context lines against `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`, the full backticked path containing the span against `normalizedReference`, `fileDigest` against the file sha256 (`6b314f37...0284bf`), target existence in the worktree, and read the surrounding table row, the evidence-payload relocation policy and the L12 owner answers.
+
+## Findings common to the part
+
+- All 60 rows are one consumer file, a Draft Phase 0 migration inventory under `docs/platform/agent-coordination/history/`. Consumer is not under `docs/specs/**` or `docs/architect/**` (L12-7 not engaged; `cutoverPatchOnlyConsumerEdges` = 0). No writer, read or default-root behavior: the cell is a prose "target disposition" column of a bookkeeping table.
+- Each row cites the docs/platform form of an evidence-payload path (5th table cell). Per `evidence-payload-relocation-policy.md` section 4, the docs/platform copy is the stay-put destination, so there is no legacy-to-new rewrite to specify; `desiredOwner` null, no `cutoverPatch`, `preserve bytes` is correct and matches the earlier accepted treatment of this file (merged-census part 07, row evidence-154). Sibling edges of the same lines that cite the docs/architect form carry the draft-alias patches and are outside this part.
+- L12-20: no parked row carries an executable `new`; no alias is activated or used as destination.
+
+## Per-entry verdicts
+
+| Entry | Consumer line | Cited target | Verdict | Rationale |
+|---|---|---|---|---|
+| maps-02594 | source-inventory.md:253 | `.../verification/step-09-mvp6-to-mvp9/P07.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02598 | source-inventory.md:254 | `.../verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02602 | source-inventory.md:255 | `.../verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02606 | source-inventory.md:256 | `.../verification/step-09-mvp6-to-mvp9/P07.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02610 | source-inventory.md:257 | `.../verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02614 | source-inventory.md:258 | `.../verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02618 | source-inventory.md:259 | `.../verification/step-09-mvp6-to-mvp9/P07.4.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02622 | source-inventory.md:260 | `.../verification/step-09-mvp6-to-mvp9/P08.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02626 | source-inventory.md:261 | `.../verification/step-09-mvp6-to-mvp9/P08.2-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02630 | source-inventory.md:262 | `.../verification/step-09-mvp6-to-mvp9/P08.2-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02634 | source-inventory.md:263 | `.../verification/step-09-mvp6-to-mvp9/P08.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02638 | source-inventory.md:264 | `.../verification/step-09-mvp6-to-mvp9/P08.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02642 | source-inventory.md:265 | `.../verification/step-09-mvp6-to-mvp9/P09.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02646 | source-inventory.md:266 | `.../verification/step-09-mvp6-to-mvp9/P09.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02650 | source-inventory.md:267 | `.../verification/step-09-mvp6-to-mvp9/P09.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02654 | source-inventory.md:268 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02658 | source-inventory.md:269 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02662 | source-inventory.md:270 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02666 | source-inventory.md:271 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02670 | source-inventory.md:272 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck2-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02674 | source-inventory.md:273 | `.../verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02678 | source-inventory.md:274 | `.../verification/step-09-mvp6-to-mvp9/P10.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02682 | source-inventory.md:275 | `.../verification/step-09-mvp6-to-mvp9/P10.10-final-recheck-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02686 | source-inventory.md:276 | `.../verification/step-09-mvp6-to-mvp9/P10.10-redteam-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02690 | source-inventory.md:277 | `.../verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02694 | source-inventory.md:278 | `.../verification/step-09-mvp6-to-mvp9/P10.10.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02698 | source-inventory.md:279 | `.../verification/step-09-mvp6-to-mvp9/P10.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02702 | source-inventory.md:280 | `.../verification/step-09-mvp6-to-mvp9/P10.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02706 | source-inventory.md:281 | `.../verification/step-09-mvp6-to-mvp9/P10.4.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02710 | source-inventory.md:282 | `.../verification/step-09-mvp6-to-mvp9/P10.5.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02714 | source-inventory.md:283 | `.../verification/step-09-mvp6-to-mvp9/P10.6.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02718 | source-inventory.md:284 | `.../verification/step-09-mvp6-to-mvp9/P10.7.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02722 | source-inventory.md:285 | `.../verification/step-09-mvp6-to-mvp9/P10.8.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02726 | source-inventory.md:286 | `.../verification/step-09-mvp6-to-mvp9/P10.9.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02730 | source-inventory.md:287 | `.../verification/step-09-mvp6-to-mvp9/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02734 | source-inventory.md:288 | `.../verification/step-09-mvp6-to-mvp9/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02738 | source-inventory.md:289 | `.../verification/team-dispatch-v1/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02742 | source-inventory.md:290 | `.../verification/team-dispatch-v1/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02746 | source-inventory.md:291 | `.../verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02750 | source-inventory.md:292 | `.../verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02754 | source-inventory.md:293 | `.../verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02758 | source-inventory.md:294 | `.../verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02762 | source-inventory.md:295 | `.../verification/team-dispatch-v1/step-06-cell-4-review-item.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02766 | source-inventory.md:296 | `.../verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02770 | source-inventory.md:297 | `.../verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02774 | source-inventory.md:298 | `.../verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02778 | source-inventory.md:299 | `.../verification/team-dispatch-v1/step-06-final-consolidation.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02782 | source-inventory.md:300 | `.../verification/visibility-herdr/v0-live-proof-2026-09-07.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02792 | source-inventory.md:476 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02793 | source-inventory.md:477 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02794 | source-inventory.md:478 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02795 | source-inventory.md:479 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02796 | source-inventory.md:480 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02797 | source-inventory.md:481 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02798 | source-inventory.md:482 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02799 | source-inventory.md:483 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02800 | source-inventory.md:484 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02801 | source-inventory.md:485 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02802 | source-inventory.md:486 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+| maps-02803 | source-inventory.md:487 | `.../verification/implementation-alignment.md` | needs-Lead-judgment | Target file no longer exists at HEAD (deleted by 9134ff4e5, content moved verbatim). Successor exists, see note A. |
+
+## Totals
+
+- ok: 48
+- rework: 0
+- needs-Lead-judgment: 12 (maps-02792, maps-02793, maps-02794, maps-02795, maps-02796, maps-02797, maps-02798, maps-02799, maps-02800, maps-02801, maps-02802, maps-02803)
+- Rework rate for this part: 0%
+
+## Note A (the 12 implementation-alignment rows)
+
+These rows (source-inventory.md lines 476-487, code files `src/runner/coordination/*` and `src/verbs/dispatch/*` mapped to `docs/platform/agent-coordination/verification/implementation-alignment.md`) are parked as "no unique exact draft owner". Facts at `2854c92ff`:
+
+- `docs/platform/agent-coordination/verification/implementation-alignment.md` does not exist; `git log --diff-filter=D` shows commit `9134ff4e5` deleted it. The deleted file's own text says the content "moved verbatim to the retired-engine snapshot".
+- A unique successor exists: `docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md` (anchor `## Literal Snapshot`, line 24), plus a second copy at `.../retired-engine/files/verification/implementation-alignment.md`. So the parked reason is factually off: a canonical successor is findable.
+- Preserve bytes is still the right action (point-in-time Phase 0 history inventory; rewriting would falsify the record), and no executable `new` may be added (L12-20). The row is not in the mechanical target-failure set, which covers patch rows only, so the dangling target is not flagged anywhere else.
+- Judgment for the Lead, not a disposition change: either (a) keep as is and accept the imprecise "no draft owner" text, or (b) amend metadata only to record "target deleted; successor candidate (non-executable, blocked suggestion) retired-engine/verification/implementation-alignment.md#literal-snapshot" so Phase 9 link-check does not treat it as an unexplained dangling citation. Recommendation: (b), metadata only, no byte or action change. Same applies to the same-shaped rows outside this part if any.

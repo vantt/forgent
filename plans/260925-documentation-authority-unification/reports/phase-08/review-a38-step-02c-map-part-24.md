@@ -1,0 +1,85 @@
+# A38 step-02c mapping review, part 24
+
+- Reviewer: `reviewer:sonnet-session:ab2071717b4503d17@2026-10-19`
+- Worktree HEAD: `2854c92ff` (detached, read-only); author `e064f8bd5`, accounting `2854c92ff`
+- Part id: 24 (population preserve-pending-target, 60 entries, sourceTable `step-02c-census-maps-portals-prose.json`)
+- Overlay precedence applied: none of the 60 IDs appears in slice1, slice2 or wrapped-rescan correction/rebinding rows, so the original rows are effective.
+- Method: resolved every ID with python; for each row verified the physical line, column span and context lines against `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`, the full backticked path containing the span against `normalizedReference`, `fileDigest` against the file sha256 (`6b314f37...0284bf`), target existence in the worktree, and read the surrounding table row, the evidence-payload relocation policy and the L12 owner answers.
+
+## Findings common to the part
+
+- All 60 rows are one consumer file, a Draft Phase 0 migration inventory under `docs/platform/agent-coordination/history/`. Consumer is not under `docs/specs/**` or `docs/architect/**` (L12-7 not engaged; `cutoverPatchOnlyConsumerEdges` = 0). No writer, read or default-root behavior: the cell is a prose "target disposition" column of a bookkeeping table.
+- Each row cites the docs/platform form of an evidence-payload path (5th table cell). Per `evidence-payload-relocation-policy.md` section 4, the docs/platform copy is the stay-put destination, so there is no legacy-to-new rewrite to specify; `desiredOwner` null, no `cutoverPatch`, `preserve bytes` is correct and matches the earlier accepted treatment of this file (merged-census part 07, row evidence-154). Sibling edges of the same lines that cite the docs/architect form carry the draft-alias patches and are outside this part.
+- L12-20: no parked row carries an executable `new`; no alias is activated or used as destination.
+
+## Per-entry verdicts
+
+| Entry | Consumer line | Cited target | Verdict | Rationale |
+|---|---|---|---|---|
+| maps-02354 | source-inventory.md:193 | `.../verification/step-07-mvp/P02.4.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02358 | source-inventory.md:194 | `.../verification/step-07-mvp/P02.5.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02362 | source-inventory.md:195 | `.../verification/step-07-mvp/P03.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02366 | source-inventory.md:196 | `.../verification/step-07-mvp/P03.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02370 | source-inventory.md:197 | `.../verification/step-07-mvp/P03.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02374 | source-inventory.md:198 | `.../verification/step-07-mvp/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02378 | source-inventory.md:199 | `.../verification/step-07-mvp/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02382 | source-inventory.md:200 | `.../verification/step-07-mvp/proof-1-standalone-inline-read-only.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02386 | source-inventory.md:201 | `.../verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02390 | source-inventory.md:202 | `.../verification/step-08-standalone-coordination/P00.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02394 | source-inventory.md:203 | `.../verification/step-08-standalone-coordination/P00.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02398 | source-inventory.md:204 | `.../verification/step-08-standalone-coordination/P00.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02402 | source-inventory.md:205 | `.../verification/step-08-standalone-coordination/P00.4.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02406 | source-inventory.md:206 | `.../verification/step-08-standalone-coordination/P01.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02410 | source-inventory.md:207 | `.../verification/step-08-standalone-coordination/P01.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02414 | source-inventory.md:208 | `.../verification/step-08-standalone-coordination/P02.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02418 | source-inventory.md:209 | `.../verification/step-08-standalone-coordination/P02.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02422 | source-inventory.md:210 | `.../verification/step-08-standalone-coordination/P03.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02426 | source-inventory.md:211 | `.../verification/step-08-standalone-coordination/P03.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02430 | source-inventory.md:212 | `.../verification/step-08-standalone-coordination/P04.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02434 | source-inventory.md:213 | `.../verification/step-08-standalone-coordination/P04.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02438 | source-inventory.md:214 | `.../verification/step-08-standalone-coordination/P05.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02442 | source-inventory.md:215 | `.../verification/step-08-standalone-coordination/P05.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02446 | source-inventory.md:216 | `.../verification/step-08-standalone-coordination/P06.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02450 | source-inventory.md:217 | `.../verification/step-08-standalone-coordination/P06.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02454 | source-inventory.md:218 | `.../verification/step-08-standalone-coordination/P07.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02458 | source-inventory.md:219 | `.../verification/step-08-standalone-coordination/P07.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02462 | source-inventory.md:220 | `.../verification/step-08-standalone-coordination/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02466 | source-inventory.md:221 | `.../verification/step-08-standalone-coordination/deferral-audit.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02470 | source-inventory.md:222 | `.../verification/step-08-standalone-coordination/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02474 | source-inventory.md:223 | `.../verification/step-09-group-thinking-mvp1-mvp2/P00.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02478 | source-inventory.md:224 | `.../verification/step-09-group-thinking-mvp1-mvp2/P01.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02482 | source-inventory.md:225 | `.../verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02486 | source-inventory.md:226 | `.../verification/step-09-group-thinking-mvp1-mvp2/P02.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02490 | source-inventory.md:227 | `.../verification/step-09-group-thinking-mvp1-mvp2/P03.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02494 | source-inventory.md:228 | `.../verification/step-09-group-thinking-mvp1-mvp2/P03.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02498 | source-inventory.md:229 | `.../verification/step-09-group-thinking-mvp1-mvp2/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02502 | source-inventory.md:230 | `.../verification/step-09-group-thinking-mvp1-mvp2/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02506 | source-inventory.md:231 | `.../verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02510 | source-inventory.md:232 | `.../verification/step-09-mvp3-to-mvp5/P00.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02514 | source-inventory.md:233 | `.../verification/step-09-mvp3-to-mvp5/P01.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02518 | source-inventory.md:234 | `.../verification/step-09-mvp3-to-mvp5/P02.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02522 | source-inventory.md:235 | `.../verification/step-09-mvp3-to-mvp5/P02.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02526 | source-inventory.md:236 | `.../verification/step-09-mvp3-to-mvp5/P03.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02530 | source-inventory.md:237 | `.../verification/step-09-mvp3-to-mvp5/P04.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02534 | source-inventory.md:238 | `.../verification/step-09-mvp3-to-mvp5/P04.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02538 | source-inventory.md:239 | `.../verification/step-09-mvp3-to-mvp5/current-cell.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02542 | source-inventory.md:240 | `.../verification/step-09-mvp3-to-mvp5/index.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02546 | source-inventory.md:241 | `.../verification/step-09-mvp6-to-mvp9/P00.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02550 | source-inventory.md:242 | `.../verification/step-09-mvp6-to-mvp9/P00.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02554 | source-inventory.md:243 | `.../verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02558 | source-inventory.md:244 | `.../verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02562 | source-inventory.md:245 | `.../verification/step-09-mvp6-to-mvp9/P06.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02566 | source-inventory.md:246 | `.../verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02570 | source-inventory.md:247 | `.../verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02574 | source-inventory.md:248 | `.../verification/step-09-mvp6-to-mvp9/P06.2.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02578 | source-inventory.md:249 | `.../verification/step-09-mvp6-to-mvp9/P06.3-red-team.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02582 | source-inventory.md:250 | `.../verification/step-09-mvp6-to-mvp9/P06.3-review.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02586 | source-inventory.md:251 | `.../verification/step-09-mvp6-to-mvp9/P06.3.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+| maps-02590 | source-inventory.md:252 | `.../verification/step-09-mvp6-to-mvp9/P07.1.md` | ok | Target exists (byte-identical mirror of legacy payload, final destination); span/digest/context verified; preserve bytes, no patch is right. |
+
+## Totals
+
+- ok: 60
+- rework: 0
+- needs-Lead-judgment: 0
+- Rework rate for this part: 0%
