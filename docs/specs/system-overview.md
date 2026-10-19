@@ -16,6 +16,7 @@ coverage: partial
 - enduser-docs-authoring — soạn & nuôi tài liệu người-dùng-cuối ở khâu tổng-hợp, tức khi việc mang status `retrospective`: biến capture thật thành tài liệu theo ngăn Diataxis, một tài liệu sống trên mỗi đường dẫn, tích luỹ không mất (write-side); spec: enduser-docs-authoring.md
 - enduser-docs-index — chỉ mục đọc-theo-tag máy-đọc-được của tài liệu người-dùng-cuối, sinh từ cây tài liệu + capture (`fgos docs-index`), giữ móc truy ngược tài liệu↔việc, và verb `fgos doc-sources` gom mọi capture của một đường dẫn (read-side); spec: enduser-docs-index.md
 - runner — vòng tự hành: lấy việc từ frontier, giao trợ lý nền trong nhánh cô lập, tự chấm, ghi đề xuất chờ duyệt; spec: runner.md
+- workflow — Workflow là guide (hướng dẫn tác nghiệp + ràng buộc MUST/SHOULD/MAY instead) và case (ledger admit activity do agent đề xuất, ghi tiến độ); agent chọn thứ tự, harness kiểm; D-ADR0070 (workflow guide + admission ledger); spec: workflow.md
 - fgos-plugin — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper one-door-write bọc quanh CLI `fgos`; spec: fgos-plugin.md
 - distribution — cài `fgos` từ ngoài source repo (npm install qua GitHub); spec: distribution.md
 - decision-citation-drift — quét backlog/spec tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế (chỉ phát hiện, không tự sửa); spec: decision-citation-drift.md

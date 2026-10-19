@@ -1,7 +1,7 @@
 ---
 area: workflow
 updated: 2026-10-19
-status: draft — đề xuất, chờ owner duyệt; chưa có hiệu lực
+status: settled — owner duyệt 2026-10-19 12:32 (quyết định ở mục 17)
 sources: [agent-workflow-model-owner-direction, workflow-design-intent-and-current-state, agent-workflow-model-council-settled, agent-workflow-model-council-reopen, agent-workflow-model-focused-round, agent-workflow-model-independent-review]
 decisions: []
 coverage: partial
@@ -9,7 +9,7 @@ coverage: partial
 
 # Spec: Workflow (guide, case, admission)
 
-> **Trạng thái: bản nháp đề xuất (lane AGENT-WF), chưa được owner duyệt toàn bộ.** Luật mang id tạm `RUL-WF-n`; id thật gán khi spec land. Các quyết định owner đã trả lời riêng lẻ được đánh dấu **owner 2026-10-19** (mục 17). Khi spec này mâu thuẫn với [runner.md](runner.md) (quyết định 0048 §2, 0049 §4), runner.md vẫn là luật đang chạy cho tới khi owner duyệt spec và quyết định thay thế được ghi.
+> **Trạng thái: Settled — owner duyệt spec 2026-10-19 12:32 ("duyệt spec"), quyết định D-ADR0070 (workflow guide + admission ledger; lane AGENT-WF).** Luật mang id `RUL-WF-n` của khu vực này. Các quyết định owner đã trả lời riêng lẻ trước đó được đánh dấu **owner 2026-10-19** (mục 17). D-ADR0070 (workflow guide + admission ledger) supersede một phần 0048 §2 và 0049 §4 của [runner.md](runner.md); 0048 §3 và 0049 §1–3 giữ nguyên. Spec khoá hành vi; việc cài đặt đi theo plan, và cho tới khi plan land, code hôm nay vẫn chạy như mục 5.1 mô tả. Owner đã chọn ý tưởng tính năng 2026-10-19 12:35 ("đồng ý, chọn theo đề xuất"): F1–F7, F9, F11, F12 là lõi của cutover; F13 sau khi lõi land; F8, F14, F15, F16 hoãn; F10 không thuộc cutover này (mục 15).
 
 Nguồn: hướng owner ([brief-261018-2235](../../plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md)); nghiên cứu bước 1 ([research-261018-2239](../../plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md)); gói hội đồng đã settle (`unit-run-1792368757620-6e4020ea`); gói reopen trả lời Q1–Q6 (`unit-run-1792374387809-85a2ae93`); review độc lập ([review-261019-0930](../../plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md)); vòng hội đồng tập trung vào phần Rust, đặt tên và cách mang ngữ cảnh case (`unit-run-1792383001628-8dbde4b4`, producer/2 cùng reviewer và red-team của nó); các câu trả lời của owner ngày 2026-10-19 lúc 08:46 và 12:20.
 
@@ -584,29 +584,29 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | N12/N16 — Work tuỳ chọn; `feature.yaml` giữ phần lifecycle tới cutover | hội đồng (mặc định) | cutover coding land | xoá phần lifecycle trong cùng thay đổi (L10) |
 | Không pilot trước engine | hội đồng (mặc định) | owner muốn giao hàng bắt đầu bằng các đối tượng nhỏ trước khi nối admission (bất đồng P2-pilot-first) | đổi trình tự giao hàng, không đổi mô hình |
 | Bác CMMN đầy đủ | hội đồng (mặc định) | nhu cầu trao đổi hay công cụ với bên ngoài được chứng minh | engine CMMN |
-| Supersede một phần 0048 §2, 0049 §4 | chờ owner duyệt spec | — | một decision ID mới; không sửa tại chỗ |
+| D-ADR0070 (workflow guide + admission ledger) — supersede một phần 0048 §2, 0049 §4 | owner 2026-10-19 (duyệt spec 12:32) | bằng chứng mới cho thấy agent chọn thứ tự làm mất authority mà 0049 đã đóng (ví dụ hai bên cùng quyết thứ tự cho một case) | một record mới supersede D-ADR0070 (workflow guide + admission ledger); không sửa tại chỗ |
 | R10 — theo dõi `visibility.json` | làn Execution Core | `visibility.json` khớp launcher cho cả hai loại ghế | đóng mục |
 
-## 15. Ý tưởng tính năng (RUL104 (tốt hơn, không to hơn) — owner chọn)
+## 15. Ý tưởng tính năng (RUL104 (tốt hơn, không to hơn) — owner đã chọn 2026-10-19 12:35)
 
-| # | Ý tưởng | Vấn đề thật (bằng chứng) | Lợi ích |
-|---|---|---|---|
-| F1 | Projection milestone gắn subject (digest; gate và receipt gắn hash) | `dependsOn` chỉ thấy step xong; duyệt A không phải duyệt B; bộ digest bỏ qua gate answer | route thích nghi không dùng bằng chứng cũ; một fold trong store sẵn có |
-| F2 | Khung với hạn mức cộng dồn, trần seat launch giao cho Unit | hạn mức mỗi Unit reset khi conductor mở thêm Unit | tự chủ có giới hạn qua retry, fallback, wave lồng |
-| F3 | AdmissionPort + giao thức ngữ cảnh authority + binding (N1, luật owner đã chấp nhận) | run id tuỳ chọn là đúng kiểu hỏng của chuỗi 6.4 | authority kế thừa thành thật; vẫn hai cửa |
-| F4 | Event route/deviation; SHOULD/MAY có cấu trúc | không bản ghi nào nối mặc định, lý do, kết quả | audit và học không cần dịch vụ chấm điểm |
-| F5 | "Không guard, không MUST" với mục unenforced | MUST văn xuôi đã trượt ba lần | khoảng trống lộ lúc viết |
-| F6 | `status` như projection, verb `close` | case thích nghi không có "mọi step xong" | một chỗ đọc điều gì hợp lệ bây giờ |
-| F7 | Reserve-then-release cho conductor case | giữ `advance` suốt thi hành cấm song song | song song-khi-eligible không cần CAS |
-| F8 | Primitive quan sát adapter cho hiệu ứng ngoài | sáu guard không thấy ngoài repo | publish/release thành milestone thật; **hoãn** |
-| F9 | Thu hồi `--plan`, trường runner chết, "một Unit hỏng → hỏng case" | hai mô hình một từ; dịch `writes` rỗng không an toàn | ít trường, một mô hình |
-| F10 | Lịch sử bền của case vào Event Store (hình dạng owner đã định ở mục 5.5) | JSONL không fsync, không chia sẻ máy | bền và lịch sử liên máy không dời lease; **không thuộc cutover này** |
-| F11 | Làm cứng JSONL tại chỗ (fsync, bộ đọc fail closed) | bộ đọc bỏ qua mọi dòng hỏng, `seq` trùng | đúng bằng chứng, không substrate mới — owner đã chọn cho cutover này |
-| F12 | Tách `src/workflow/runner.mjs` theo vai trong commit viết lại | một file năm vai | đọc và review dễ; không tốn thêm |
-| F13 | Đổi tên vật lý `fgos-runner` / `src/runner/**` | "runner" chỉ ba thứ | dễ tìm; một bước L10 sau |
-| F14 | Proposer như attempt có giám sát (Shape B) | không adopt/probe được proposer | đổi lại một loại launch không phải agent và giam lồng |
-| F15 | Hook trước công cụ (Edit/Write) đọc binding | ghi trong phiên nằm ngoài ledger (mục 1.3) | đóng lớp sự cố 6.4 cho Claude Code; codex/pi/omp/agy không có hook |
-| F16 | Relay phía host cho dispatch lồng từ worker bị giam | gốc chỉ-đọc và mặt nạ tmpfs làm admission trong worker bất khả | worker playbook có writer con không qua conductor |
+| # | Ý tưởng | Vấn đề thật (bằng chứng) | Lợi ích | Owner chọn (2026-10-19) |
+|---|---|---|---|---|
+| F1 | Projection milestone gắn subject (digest; gate và receipt gắn hash) | `dependsOn` chỉ thấy step xong; duyệt A không phải duyệt B; bộ digest bỏ qua gate answer | route thích nghi không dùng bằng chứng cũ; một fold trong store sẵn có | **chọn** — lõi của cutover này |
+| F2 | Khung với hạn mức cộng dồn, trần seat launch giao cho Unit | hạn mức mỗi Unit reset khi conductor mở thêm Unit | tự chủ có giới hạn qua retry, fallback, wave lồng | **chọn** — lõi của cutover này |
+| F3 | AdmissionPort + giao thức ngữ cảnh authority + binding (N1, luật owner đã chấp nhận) | run id tuỳ chọn là đúng kiểu hỏng của chuỗi 6.4 | authority kế thừa thành thật; vẫn hai cửa | **chọn** — lõi của cutover này |
+| F4 | Event route/deviation; SHOULD/MAY có cấu trúc | không bản ghi nào nối mặc định, lý do, kết quả | audit và học không cần dịch vụ chấm điểm | **chọn** — lõi của cutover này |
+| F5 | "Không guard, không MUST" với mục unenforced | MUST văn xuôi đã trượt ba lần | khoảng trống lộ lúc viết | **chọn** — lõi của cutover này |
+| F6 | `status` như projection, verb `close` | case thích nghi không có "mọi step xong" | một chỗ đọc điều gì hợp lệ bây giờ | **chọn** — lõi của cutover này |
+| F7 | Reserve-then-release cho conductor case | giữ `advance` suốt thi hành cấm song song | song song-khi-eligible không cần CAS | **chọn** — lõi của cutover này |
+| F8 | Primitive quan sát adapter cho hiệu ứng ngoài | sáu guard không thấy ngoài repo | publish/release thành milestone thật; **hoãn** | **hoãn** — mở lại theo điều kiện ở mục 14 |
+| F9 | Thu hồi `--plan`, trường runner chết, "một Unit hỏng → hỏng case" | hai mô hình một từ; dịch `writes` rỗng không an toàn | ít trường, một mô hình | **chọn** — lõi của cutover này |
+| F10 | Lịch sử bền của case vào Event Store (hình dạng owner đã định ở mục 5.5) | JSONL không fsync, không chia sẻ máy | bền và lịch sử liên máy không dời lease; **không thuộc cutover này** | **không thuộc cutover này** (owner 2026-10-19 12:20) |
+| F11 | Làm cứng JSONL tại chỗ (fsync, bộ đọc fail closed) | bộ đọc bỏ qua mọi dòng hỏng, `seq` trùng | đúng bằng chứng, không substrate mới — owner đã chọn cho cutover này | **chọn** — lõi của cutover này |
+| F12 | Tách `src/workflow/runner.mjs` theo vai trong commit viết lại | một file năm vai | đọc và review dễ; không tốn thêm | **chọn** — lõi của cutover này |
+| F13 | Đổi tên vật lý `fgos-runner` / `src/runner/**` | "runner" chỉ ba thứ | dễ tìm; một bước L10 sau | **sau khi lõi land** — một bước L10 riêng |
+| F14 | Proposer như attempt có giám sát (Shape B) | không adopt/probe được proposer | đổi lại một loại launch không phải agent và giam lồng | **hoãn** — mở lại theo điều kiện ở mục 14 |
+| F15 | Hook trước công cụ (Edit/Write) đọc binding | ghi trong phiên nằm ngoài ledger (mục 1.3) | đóng lớp sự cố 6.4 cho Claude Code; codex/pi/omp/agy không có hook | **hoãn** — mở lại theo điều kiện ở mục 14 |
+| F16 | Relay phía host cho dispatch lồng từ worker bị giam | gốc chỉ-đọc và mặt nạ tmpfs làm admission trong worker bất khả | worker playbook có writer con không qua conductor | **hoãn** — mở lại theo điều kiện ở mục 14 |
 
 ## 16. Bất đồng được giữ nguyên (không lấy trung bình)
 
@@ -627,40 +627,41 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 
 ## 17. Lịch sử quyết định
 
-### (đề xuất) — Workflow là guide + ledger admission; agent chọn thứ tự; supersede một phần 0048 §2 và 0049 §4
+### D-ADR0070 (workflow guide + admission ledger) — Workflow là guide + ledger admission; agent chọn thứ tự; supersede một phần 0048 §2 và 0049 §4
 
-- **Trạng thái:** **proposed — decision ID được gán khi owner duyệt.** 0048 và 0049 vẫn là luật đang chạy.
+- **Trạng thái:** **Settled (owner 2026-10-19 12:32, "duyệt spec").** Record chính thức ở "Lịch sử quyết định" của [runner.md](runner.md); mục này là bản tóm tắt trong spec khu vực.
 - **Bối cảnh:** 0049 đóng authority sprawl bằng cách để Workflow runner vừa giữ bản ghi vừa *quyết thứ tự*. Phần thứ hai lấy phán đoán về thứ tự khỏi agent, trái với tầm nhìn "trong mềm, ngoài cứng" (2026-09-05) và hướng owner 2026-10-18. Bằng chứng: `coding/feature` chưa từng chạy trên runner; mọi run đã lưu là playbook; chuỗi lead 6.4 cho thấy luật chỉ-văn-xuôi bị bỏ qua ba lần, còn luật máy giữ được.
-- **Quyết định đề xuất:**
+- **Quyết định:**
   1. **0048 §2** ("driver không tự lập lịch, giao trọn cho Workflow runner") **thành:** agent đề xuất, Workflow case admit và ghi. Driver vẫn không tự merge, không tự cưỡng chế; nó chọn route.
   2. **0049 §4** ("Workflow runner là sequencer duy nhất") **thành:** Workflow là authority duy nhất cho **admission và bản ghi tiến độ**, không phải bên chọn thứ tự. Chữ "sequencer" bị thu hồi.
   3. **Giữ nguyên:** 0048 §3 (consent cần `--approve`); 0049 §1–3 (Work không có stage, Workflow không cần Work, A4).
   4. Mô hình RUL-WF-1 … RUL-WF-28 và các mặc định N1–N17 dưới đây.
-- **Hình thức:** một decision ID mới trong "Lịch sử quyết định" của spec chủ; không sửa 0048/0049 tại chỗ.
+- **Hình thức:** record D-ADR0070 (workflow guide + admission ledger) trong "Lịch sử quyết định" của runner.md; 0048/0049 không bị sửa tại chỗ, chỉ mang một dòng trỏ tới D-ADR0070 (workflow guide + admission ledger).
 
 ### Các mặc định có tên
 
 | Id | Mặc định | Trạng thái |
 |---|---|---|
 | N1 | ràng buộc authority fail-closed trên dispatch ghi file trong constrained case (RUL-WF-11) | **owner 2026-10-19** (08:46) |
-| N2 | subject = tập artifact được khai | hội đồng, đề xuất |
-| N3 | playbook = guide listed-routes-only + tự đề xuất SHOULD duy nhất; không scheduler thứ hai | hội đồng, đề xuất |
-| N4 | độc lập trên ledger; đóng gói bắt buộc khi là cách mã hoá duy nhất | hội đồng, đề xuất |
-| N5 | hiệu ứng ngoài: unenforced hoặc người đánh giá | hội đồng, đề xuất |
-| N6 | reserve-then-release dưới `advance` cho conductor case; không CAS | hội đồng, đề xuất; thu hẹp cho playbook case bởi N17 |
-| N7 | `rigorFloor`, không `rigorCeiling` | hội đồng, đề xuất |
-| N8 | case không có Work là một Workflow run, dùng `advance`; không khoá thứ ba | hội đồng, đề xuất |
-| N9 | `listedRoutesOnly` là cờ có authority trên decision point | hội đồng, đề xuất |
-| N10 | catalog đóng sáu primitive khởi đầu; guard nền tảng tham chiếu | hội đồng, đề xuất |
-| N11 | projection không loại đường đề xuất unlisted | hội đồng, đề xuất |
-| N12 | Work tuỳ chọn; FSM coding giữ tới cutover | hội đồng, đề xuất |
-| N13 | từ vựng mục 2.1; "runner" đứng một mình không gọi tên gì; **"Playbook proposer"** | tên proposer: **owner 2026-10-19** (12:20); phần còn lại: hội đồng, đề xuất |
-| N14 | predicate admission, projection và phần cài port ở Node, tầng infra hoặc thấp hơn; Playbook proposer và cửa ở use-case; AdmissionPort do Execution Core sở hữu; nền Rust bên dưới. (Sửa câu tóm tắt N14 của gói reopen, vốn xếp proposer vào infra hoặc thấp hơn; vị trí của §5.3 bản nháp trước vốn đã đúng.) | hội đồng, đề xuất |
+| N2 | subject = tập artifact được khai | hội đồng; settled cùng quyết định mục 17 |
+| N3 | playbook = guide listed-routes-only + tự đề xuất SHOULD duy nhất; không scheduler thứ hai | hội đồng; settled cùng quyết định mục 17 |
+| N4 | độc lập trên ledger; đóng gói bắt buộc khi là cách mã hoá duy nhất | hội đồng; settled cùng quyết định mục 17 |
+| N5 | hiệu ứng ngoài: unenforced hoặc người đánh giá | hội đồng; settled cùng quyết định mục 17 |
+| N6 | reserve-then-release dưới `advance` cho conductor case; không CAS | hội đồng; settled cùng quyết định mục 17; thu hẹp cho playbook case bởi N17 |
+| N7 | `rigorFloor`, không `rigorCeiling` | hội đồng; settled cùng quyết định mục 17 |
+| N8 | case không có Work là một Workflow run, dùng `advance`; không khoá thứ ba | hội đồng; settled cùng quyết định mục 17 |
+| N9 | `listedRoutesOnly` là cờ có authority trên decision point | hội đồng; settled cùng quyết định mục 17 |
+| N10 | catalog đóng sáu primitive khởi đầu; guard nền tảng tham chiếu | hội đồng; settled cùng quyết định mục 17 |
+| N11 | projection không loại đường đề xuất unlisted | hội đồng; settled cùng quyết định mục 17 |
+| N12 | Work tuỳ chọn; FSM coding giữ tới cutover | hội đồng; settled cùng quyết định mục 17 |
+| N13 | từ vựng mục 2.1; "runner" đứng một mình không gọi tên gì; **"Playbook proposer"** | tên proposer: **owner 2026-10-19** (12:20); phần còn lại: hội đồng; settled cùng quyết định mục 17 |
+| N14 | predicate admission, projection và phần cài port ở Node, tầng infra hoặc thấp hơn; Playbook proposer và cửa ở use-case; AdmissionPort do Execution Core sở hữu; nền Rust bên dưới. (Sửa câu tóm tắt N14 của gói reopen, vốn xếp proposer vào infra hoặc thấp hơn; vị trí của §5.3 bản nháp trước vốn đã đúng.) | hội đồng; settled cùng quyết định mục 17 |
 | N15 / F10 | ledger giữ JSONL làm cứng tại chỗ; Event Store không thuộc cutover này; nếu F10 mở: append sau đoạn, không re-rank, reservation/binding không thành event | **owner 2026-10-19** (12:20) |
-| N16 | `feature.yaml` giữ phần lifecycle tới cutover, thêm phần guide, chỉ xoá trường runner chết | hội đồng, đề xuất |
+| N16 | `feature.yaml` giữ phần lifecycle tới cutover, thêm phần guide, chỉ xoá trường runner chết | hội đồng; settled cùng quyết định mục 17 |
 | N17 | Shape C: proposer giữ `advance` suốt đời cho playbook case; conductor case giữ theo từng admission; thu hẹp N6/§5.4/§7.4 công khai | **owner 2026-10-19** (12:20) |
-| R1 | giao thức ngữ cảnh RUL-WF-11; ghi lồng từ worker bị giam bị từ chối theo tên, không relay | từ chối: **owner 2026-10-19** (12:20); phần còn lại: hội đồng, đề xuất |
+| R1 | giao thức ngữ cảnh RUL-WF-11; ghi lồng từ worker bị giam bị từ chối theo tên, không relay | từ chối: **owner 2026-10-19** (12:20); phần còn lại: hội đồng; settled cùng quyết định mục 17 |
 | S1 | N1 chỉ ràng hai cửa; ghi trong phiên ngoài ledger; hook là F15 | **owner 2026-10-19** (12:20) |
+| Ý tưởng tính năng | F1–F7, F9, F11, F12 chọn (lõi của cutover); F13 sau khi lõi land; F8, F14, F15, F16 hoãn với điều kiện mở ở mục 14; F10 không thuộc cutover này | **owner 2026-10-19** (12:35, "đồng ý, chọn theo đề xuất") |
 
 ## 18. Pointers
 

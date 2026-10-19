@@ -1495,7 +1495,7 @@ agent-led hoặc declared qua Workflow / CollaborationPattern (`solo`, `reviewed
 Workflow là DAG các Unit và không biết Work: Work chỉ là bên dùng (một item mang `workflowRunId` trỏ tới run; Workflow không đọc và không ghi vòng đời Work), CollaborationPattern dùng trong Unit run. Hai cửa vào là `fgos run` và `fgos workflow start`.
 Workflow runner (`src/workflow/runner.mjs`) nạp định nghĩa từ `core/workflows/*.yaml` và `domains/<d>/workflows/*.yaml`.
 
-> **Pointer (bản nháp, chờ owner duyệt):** mô hình Workflow mới (workflow là guide + ràng buộc, agent chọn thứ tự, Workflow case là ledger admit và ghi tiến độ) được đặc tả ở [workflow.md](workflow.md). Spec đó đề xuất supersede một phần 0048 §2 và 0049 §4; cho tới khi owner duyệt và một decision ID mới được ghi, 0048 và 0049 ở đây vẫn có hiệu lực.
+> **Pointer:** mô hình Workflow (workflow là guide + ràng buộc, agent chọn thứ tự, Workflow case là ledger admit và ghi tiến độ) được đặc tả ở [workflow.md](workflow.md), owner duyệt 2026-10-19 (D-ADR0070 (workflow guide + admission ledger), supersede một phần 0048 §2 và 0049 §4). Spec đó là nguồn cho hành vi Workflow; đoạn trên mô tả code hôm nay, đúng cho tới khi plan của D-ADR0070 (workflow guide + admission ledger) land.
 
 **Architecture advisory — current boundary.** `core/skills/fgos-architecture-panel/SKILL.md` starts registered Workflows, reads settled reports, and exposes public `workflow status`/`workflow answer` commands for the owner's declared gate; it owns no raw run-state driver or executor roster. `architecture-advisory` has five linear execution steps plus human close, with distinct panel-seat lenses and reviewed/high final synthesis; `architecture-advisory-reopen` revisits parent reports through synthesis → explanation → close without blind seats. Both synthesis templates require reviewer and red-team regardless of configured high-rigor checker defaults. Executor/provider/model/invocation selection remains config + `bind()` owned. Required read-only posture refuses unsafe execution.
 `council-lite` is a one-panel discussion Workflow: `params.roleTasks` gives each seat one task posture from `core/agents/council-*.yaml`, supplied through template `contextRefs`. Each description contains method, blind spot, and an explicit evidence-led ending rule; posture is not actor identity, registry membership, or provider policy. `bind()` spreads seats across provider families as a preference (decision 0055), never refusing a seat for sharing one. No runtime or renderer seam is added. Each seat first writes a short "Restatement" of the question and what it treats as out of scope before analysing, and the synthesizer lists mismatched restatements as unresolved evidence.
@@ -3148,6 +3148,8 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
 
 ### 0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher
 
+> Superseded một phần bởi D-ADR0070 (workflow guide + admission ledger, 2026-10-19): §2 thành "agent đề xuất, Workflow case admit và ghi". §1, §3, §4 giữ nguyên. Phát biểu gốc dưới đây giữ nguyên.
+
 - **Trạng thái:** Settled (Request-to-Run P2 Runnable Plans hoàn tất, 2026-10-01)
 - **Bối cảnh:** Trước P2, việc phân rã và chọn capability/cơ chế bị phân mảnh bởi lớp prose L2 DemandFacts (8 fields) -> matcher -> `form` (`inline|protocol|facade`). Các facade `fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop` tự lập lịch, tự chạy vòng lặp bằng prose, tạo ra nhiều sequencer chồng chéo và gắn chặt vào domain coding.
 - **Quyết định:**
@@ -3158,6 +3160,8 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### 0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4
+
+> Superseded một phần bởi D-ADR0070 (workflow guide + admission ledger, 2026-10-19): §4 thành "Workflow là authority duy nhất cho admission và bản ghi tiến độ, không phải bên chọn thứ tự". §1–3 giữ nguyên. Phát biểu gốc dưới đây giữ nguyên.
 
 - **Trạng thái:** Settled (Request-to-Run P3b hoàn tất, 2026-10-02)
 - **Bối cảnh:** Trước P3, Work mang trường `stage`, và dispatch đọc thẳng stage/workflow của Work (vi phạm A4). Điều này khiến logic tuần tự bước bị phân tán giữa `loop.mjs`, FSM stage, và prose của skill, đồng thời kéo dispatch phụ thuộc vào state.
@@ -3427,4 +3431,21 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Việc hoãn có tên:** (a) **Tự resume** sau khi controller chết. Điều kiện để làm: phát hiện controller chết và đảm bảo một người nhận duy nhất; cả hai đã có primitive, là ledger `unit-control` của unit (holder bị chứng minh là chết; một người acquire thắng); không có code nào cho nó ở đây. (b) **Relaunch trên resume khi gate ghi nhận chưa thả agent** (hiện `gate-lost` không relaunch, fail closed; cần marker phía gate ghi trước GO). (c) **Lease cwd** giữa "attempt xong" và "runner commit `writes`" (kongming N7): chuyển sang plan Git theo D-ADR0057 (Git là một thành phần nền) §6.
 - **Hệ quả:** Người nhìn một unit thấy `awaiting-resume` và biết gõ `fgos run --resume <unit>`; cùng một kết quả agent không bao giờ bị trả tiền hai lần. Rollback là code: revert, attempt đã `closed` vẫn đúng với bản trước.
 - **Ranh giới:** Không đổi component-boundary (chỉ dùng cửa adopt có sẵn). Spec: [run-supervisor](../platform/run-supervisor/spec.md#91-controller-death).
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### D-ADR0070 (workflow guide + admission ledger) — Workflow là guide + ledger admission, agent chọn thứ tự (supersede một phần 0048 §2 và 0049 §4)
+
+- **Trạng thái:** Settled (owner duyệt spec 2026-10-19 12:32, nguyên văn "duyệt spec"; lane AGENT-WF). Các phần owner đã trả lời riêng trước đó cùng ngày: N1 (08:46); Shape C, tên "Playbook proposer", từ chối ghi lồng từ worker bị giam, N1 chỉ ràng hai cửa, Event Store ngoài cutover (12:20). Spec: [workflow.md](workflow.md).
+- **Bối cảnh:** 0049 đóng authority sprawl (ba sequencer chồng nhau) bằng cách để Workflow runner vừa giữ bản ghi vừa *quyết thứ tự*. Phần thứ hai lấy phán đoán về thứ tự khỏi agent, trái với tầm nhìn "trong mềm, ngoài cứng" (2026-09-05) và hướng owner 2026-10-18 (workflow là "hướng dẫn tác nghiệp cho một mảng business", không phải kịch bản). Thứ tự mà vòng DAG ép phần lớn là thói quen viết, không phải ràng buộc thật; ràng buộc thật gần như toàn là độc lập (blind trước reveal) và consent (duyệt trước hành động).
+- **Quyết định:**
+  1. **0048 §2 thành:** agent điều phối đề xuất activity và route kế tiếp; Workflow case admit theo trạng thái đã ghi và ghi tiến độ. Driver vẫn không tự merge, không tự cưỡng chế.
+  2. **0049 §4 thành:** Workflow là authority duy nhất cho **admission và bản ghi tiến độ** của một case, không phải bên chọn thứ tự. Chữ "sequencer" bị thu hồi.
+  3. **Giữ nguyên:** 0048 §1, §3 (consent cần `--approve`), §4; 0049 §1–3 (Work không có stage, Workflow không cần Work, A4).
+  4. Workflow guide mang hướng dẫn và ràng buộc theo milestone (MUST / SHOULD có lý do / MAY instead, route unlisted được phép có biện minh trừ điểm `listedRoutesOnly`); MUST chỉ từ catalog đóng sáu kiểm tra máy, nghĩa vụ không có guard thì ghi là unenforced.
+  5. N1: dispatch ghi file vào worktree đã ràng với một constrained case bị từ chối trừ khi mang authority của case đó; mỏ neo là bản ghi binding worktree, không phải biến môi trường.
+  6. Execution Core sở hữu giao diện AdmissionPort, Workflow cài; mọi caller `runUnit` có `writes` tiêm port; Unit ghi file thiếu port bị từ chối.
+  7. `advance` theo Shape C: conductor case giữ theo từng admission, Playbook proposer giữ suốt đời; ledger giữ JSONL làm cứng tại chỗ.
+- **Không đóng:** ghi trong phiên (Edit/Write/Agent) nằm ngoài ledger (hook là ý tưởng tính năng); không ai ngoài proposer admit vào playbook case đang sống; relay cho ghi lồng từ worker bị giam; cutover Event Store; cutover coding từ Work step FSM sang ledger (chưa đo kích thước); các ý tưởng tính năng owner đã hoãn (F8, F14, F15, F16) và F13 (đổi tên vật lý, sau khi lõi land). Owner chọn ý tưởng tính năng 2026-10-19 12:35: F1–F7, F9, F11, F12 là lõi của cutover này. Điều kiện mở lại từng mục: [workflow.md §14](workflow.md#14-điều-kiện-đảo-quyết-định).
+- **Bằng chứng:** 0 trên 89 run đã lưu là `coding/feature` (runner chưa từng chạy coding); chuỗi lead 6.4 bỏ qua luật văn xuôi ba lần trong khi guard máy giữ được; nghiên cứu bước 1, gói hội đồng settled, gói reopen, vòng tập trung (ba panelist, synthesizer, critique) và hai lượt review/red-team độc lập, liệt kê ở mục Nguồn của spec.
+- **Ranh giới:** Đổi component-boundary: hàng Workflow (guide + case, admission, binding, ledger; không chọn thứ tự), Work Lifecycle (không sở hữu sequencing), Execution Core (sở hữu giao diện AdmissionPort, không sở hữu quyết định), Holder-lock (`advance` theo Shape C, không hàng khoá mới). Không component mới.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
