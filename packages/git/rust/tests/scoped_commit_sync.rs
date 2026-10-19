@@ -371,7 +371,11 @@ fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
         }))
     };
     let intent = Intent {
-        request_digest: canonical_digest(&(&kind, "fixture")).unwrap(),
+        request_digest: if sync {
+            canonical_digest(&(&kind, "fixture")).unwrap()
+        } else {
+            canonical_digest(&(&baseline, &request, "fixture")).unwrap()
+        },
         kind,
         repo_identity: wal.repository_identity().into(),
         resource_set: vec![format!("worktree:{}", baseline.worktree)],
@@ -568,7 +572,11 @@ fn sync_inspection_closes_interruption_before_merge_and_allows_fresh_commit() {
                 .inspect_sync(&f.repo, f.held(), "fixture", "interrupted")
                 .unwrap()
                 .state,
-            "not-started"
+            if phase == 2 {
+                "merge-effect-unknown"
+            } else {
+                "not-started"
+            }
         );
         fresh_commit(&f, "fresh");
         assert!(wal::Wal::open(&f.repo)
@@ -576,5 +584,204 @@ fn sync_inspection_closes_interruption_before_merge_and_allows_fresh_commit() {
             .active(100)
             .unwrap()
             .is_empty());
+    }
+}
+
+#[test]
+fn recovery_observes_hook_modified_overtaken_and_aba_commits() {
+    for (modified, moved) in [(true, 0), (true, 1), (false, 1), (false, 2)] {
+        let f = Fixture::new();
+        let chain = interrupted(&f, "observe", 2, false);
+        let wal::OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
+            panic!()
+        };
+        let baseline: CommitBaseline = serde_json::from_str(&payload.baseline).unwrap();
+        if modified {
+            fs::write(f.tree.join("a"), "hook formatter bytes").unwrap();
+            git(&f.tree, &["add", "a"]);
+        }
+        git(&f.tree, &["commit", "-qm", "interrupted"]);
+        let landed = git(&f.tree, &["rev-parse", "HEAD"]);
+        if moved == 1 {
+            fs::write(f.tree.join("later"), "later").unwrap();
+            git(&f.tree, &["add", "later"]);
+            git(&f.tree, &["commit", "-qm", "later"]);
+        } else if moved == 2 {
+            git(&f.tree, &["reset", "--hard", &baseline.head]);
+        }
+        let result = f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "observe")
+            .unwrap();
+        assert!(
+            matches!(result, wal::Outcome::Commit { observed, contract_violation } if observed == landed && contract_violation == modified)
+        );
+    }
+}
+
+#[test]
+fn unknown_replay_keeps_cause_and_recovery_preserves_foreign_staging() {
+    let f = Fixture::new();
+    let chain = interrupted(&f, "unknown", 2, false);
+    let wal::OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
+        panic!()
+    };
+    let baseline: CommitBaseline = serde_json::from_str(&payload.baseline).unwrap();
+    let request: CommitRequest = serde_json::from_str(&payload.request).unwrap();
+    fs::write(f.tree.join("human"), "keep staged").unwrap();
+    git(&f.tree, &["add", "human"]);
+    let outcome = f
+        .driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "unknown")
+        .unwrap();
+    assert!(
+        matches!(outcome, wal::Outcome::CommitRejected { cause } if cause == "commit-effect-unknown")
+    );
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "human");
+    let error = f
+        .driver
+        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "unknown")
+        .unwrap_err();
+    assert!(format!("{error:?}").contains("commit-effect-unknown"));
+    assert_eq!(error.code, ResultCode::RecoveryRequired);
+}
+
+#[test]
+fn pre_attempt_recovery_does_not_unstage_a_changed_index() {
+    let f = Fixture::new();
+    interrupted(&f, "prepared", 1, false);
+    fs::write(f.tree.join("human"), "keep staged").unwrap();
+    git(&f.tree, &["add", "human"]);
+    f.driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "prepared")
+        .unwrap();
+    assert_eq!(
+        git(&f.tree, &["diff", "--cached", "--name-only"]),
+        "a\nhuman"
+    );
+}
+
+#[test]
+fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
+    use std::os::unix::fs::MetadataExt;
+    for phase in [0, 2] {
+        let mut f = Fixture::new();
+        interrupted(&f, "dead", phase, false);
+        drop(f.lease.take());
+        git(
+            &f.main,
+            &["worktree", "remove", "--force", f.tree.to_str().unwrap()],
+        );
+        git(
+            &f.main,
+            &["worktree", "add", f.tree.to_str().unwrap(), "producer"],
+        );
+        let m = fs::metadata(&f.tree).unwrap();
+        let birth = m
+            .created()
+            .unwrap()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = f.main.join(format!(
+            ".fgos/locks/dispatch-cwd--{}-{}-{birth}.lock",
+            m.dev(),
+            m.ino()
+        ));
+        f.lease = Some(
+            match acquire(
+                &Resource::new("dispatch-cwd", path),
+                Mode::Ex,
+                Wait::Ms(100),
+                5000,
+            ) {
+                Acquire::Acquired(h) => h,
+                other => panic!("{other:?}"),
+            },
+        );
+        fresh_commit(&f, "new-checkout");
+        let old = wal::Wal::open(&f.repo)
+            .unwrap()
+            .compacted("dead")
+            .unwrap()
+            .unwrap();
+        assert!(
+            matches!(old.outcome().unwrap(), wal::Outcome::CommitRejected { cause } if cause == "foreign-checkout-abandoned")
+        );
+        assert!(f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "dead")
+            .is_err());
+    }
+}
+
+#[test]
+fn sync_recovery_observes_modified_overtaken_and_reset_merge_commits() {
+    for moved in [0, 1, 2] {
+        let f = Fixture::new();
+        let baseline = git(&f.tree, &["rev-parse", "HEAD"]);
+        fs::write(f.main.join("incoming"), "target").unwrap();
+        git(&f.main, &["add", "incoming"]);
+        git(&f.main, &["commit", "-qm", "target"]);
+        fs::write(f.tree.join("a"), "producer").unwrap();
+        git(&f.tree, &["commit", "-qam", "producer"]);
+        // Force a resolver barrier, then perform the already-recorded commit
+        // manually as a crashed process would, without installing its outcome.
+        fs::write(f.main.join("a"), "target a").unwrap();
+        git(&f.main, &["commit", "-qam", "conflict target"]);
+        let target = Oid::parse(
+            &git(&f.main, &["rev-parse", "HEAD"]),
+            f.repo.object_format(),
+        )
+        .unwrap();
+        assert_ne!(target.as_str(), baseline);
+        assert_ne!(target.as_str(), git(&f.tree, &["rev-parse", "HEAD"]));
+        let result = f
+            .driver
+            .start_sync(
+                &f.repo,
+                f.held(),
+                &target,
+                "recover merge",
+                "fixture",
+                "merge-observe",
+            )
+            .unwrap();
+        assert_eq!(result.state, "conflicted-open");
+        fs::write(f.tree.join("a"), "resolved").unwrap();
+        git(&f.tree, &["add", "a"]);
+        let wal = wal::Wal::open(&f.repo).unwrap();
+        let chain = wal.inspect("merge-observe").unwrap();
+        let chain = wal
+            .append(
+                &chain,
+                wal::Phase::SyncCommitAttempt {
+                    tree: git(&f.tree, &["write-tree"]),
+                },
+            )
+            .unwrap();
+        let wal::OperationKind::Sync(payload) = &chain.intent().kind else {
+            panic!()
+        };
+        fs::write(f.tree.join("a"), "formatter changed resolution").unwrap();
+        git(&f.tree, &["add", "a"]);
+        git(&f.tree, &["commit", "-qm", "recover merge"]);
+        let observed = git(&f.tree, &["rev-parse", "HEAD"]);
+        if moved == 1 {
+            fs::write(f.tree.join("later"), "later").unwrap();
+            git(&f.tree, &["add", "later"]);
+            git(&f.tree, &["commit", "-qm", "later"]);
+        }
+        if moved == 2 {
+            git(&f.tree, &["reset", "--hard", &payload.head]);
+        }
+        let receipt = f
+            .driver
+            .inspect_sync(&f.repo, f.held(), "fixture", "merge-observe")
+            .unwrap();
+        assert_eq!(receipt.state, "done");
+        let commit = receipt.commit.unwrap();
+        assert_eq!(commit.status, ResultCode::CommittedButContractViolation);
+        assert_eq!(commit.oid.unwrap().as_str(), observed);
     }
 }

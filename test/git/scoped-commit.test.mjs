@@ -186,3 +186,47 @@ for(const name of ['literal*star','control\tname','control\nname']) test(`unsupp
   assert.equal(fs.readFileSync(path.join(f.linked,name),'utf8'),'producer');
  }finally{f.close();}
 });
+
+test('post-commit compaction failure returns the landed receipt with a warning',()=>{
+ const f=fixture();try {
+  const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+  fs.writeFileSync(path.join(hooks,'post-commit'),'#!/bin/sh\nprintf evidence > "$(git rev-parse --git-common-dir)/fgos/git/operations/compaction-warning/.durable-file-orphan.tmp"\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
+  const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'landed');
+  const args={operationId:'compaction-warning',baseline,request:{writes:['a'],message:'landed',cutoverGrant:null}};
+  const receipt=f.port.commit(args,f.held);
+  assert.equal(receipt.status,'committed');assert.equal(receipt.oid,execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  assert.match(receipt.warnings[0],/compaction-deferred/);
+  assert.equal(f.port.commit(args,f.held).oid,receipt.oid);
+  fs.unlinkSync(path.join(f.repo,'.git/fgos/git/operations/compaction-warning/.durable-file-orphan.tmp'));
+  f.git('config','core.hooksPath','/dev/null');
+  const next=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'next');
+  assert.equal(f.port.commit({operationId:'after-warning',baseline:next,request:args.request},f.held).status,'committed');
+  assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
+ }finally{f.close();}
+});
+
+test('rejected hooks restore clean permission bits and leave skip-worktree paths alone',()=>{
+ const f=fixture();try {
+  for(const name of ['clean','skipped'])fs.writeFileSync(path.join(f.linked,name),name);
+  execFileSync('git',['-C',f.linked,'add','clean','skipped']);execFileSync('git',['-C',f.linked,'commit','-qm','snapshot fixture']);
+  execFileSync('git',['-C',f.linked,'update-index','--skip-worktree','skipped']);fs.unlinkSync(path.join(f.linked,'skipped'));
+  fs.chmodSync(path.join(f.linked,'clean'),0o600);
+  const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf changed > clean\nchmod 644 clean\nprintf hook > a\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
+  const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
+  assert.throws(()=>f.port.commit({operationId:'clean-modes',baseline,request:{writes:['*'],message:'reject',cutoverGrant:null}},f.held),/commit-rejected/);
+  assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer');assert.equal(fs.readFileSync(path.join(f.linked,'clean'),'utf8'),'clean');
+  assert.equal(fs.statSync(path.join(f.linked,'clean')).mode&0o777,0o600);assert.equal(fs.existsSync(path.join(f.linked,'skipped')),false);
+ }finally{f.close();}
+});
+
+test('a clean-path restore failure still restores producer bytes on independent paths',()=>{
+ const f=fixture();const dir=path.join(f.linked,'blocked');try {
+  fs.mkdirSync(dir);fs.writeFileSync(path.join(dir,'clean'),'base');
+  execFileSync('git',['-C',f.linked,'add','blocked/clean']);execFileSync('git',['-C',f.linked,'commit','-qm','restore fixture']);
+  const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf hook > a\nchmod 000 blocked\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
+  const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer bytes');
+  assert.throws(()=>f.port.commit({operationId:'restore-failure',baseline,request:{writes:['a','blocked/clean'],message:'reject',cutoverGrant:null}},f.held),/commit-worktree-restore-required/);
+  assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer bytes');
+  assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
+ }finally{if(fs.existsSync(dir))fs.chmodSync(dir,0o700);f.close();}
+});

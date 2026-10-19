@@ -235,15 +235,26 @@ async function run(args) {
     if (claim.result !== 'acquired') throw new Error(`Node loan custody: ${claim.result}`);
     try {
       const port = index.createGitScopedCommit({stateRoot:state,repoPath:linked,trustedMain:main,writer:WRITER},loader);
-      const changing=[], preflight=[];
-      for (let n=0;n<samples+20;n++) {
-        const [beforeMs, baseline]=time(()=>port.preflight({},[claim.handle]));
-        fs.writeFileSync(path.join(linked,'payload'),`producer ${n}`);
-        const [commitMs,result]=time(()=>port.commit({operationId:`node-loan-${n}`,baseline,request:{writes:['payload'],message:'E3 Node loan',cutoverGrant:null}},[claim.handle]));
-        if(result.status!=='committed') throw new Error(`Node loan commit: ${JSON.stringify(result)}`);
-        if(n>=20){changing.push(commitMs);preflight.push(beforeMs);}
+      for (const aged of [false, true]) {
+        // Keep the acquired Node handle and its original reach floor alive.
+        // Advance PID allocation after acquisition as a long-lived runner does.
+        const ageStarted = performance.now();
+        const shortProcesses = aged ? 1500 : 0;
+        for (let n = 0; n < shortProcesses; n++) execFileSync('true');
+        const agedForMs = performance.now() - ageStarted;
+        const changing=[], preflight=[];
+        for (let n=0;n<samples+20;n++) {
+          const [beforeMs, baseline]=time(()=>port.preflight({},[claim.handle]));
+          fs.writeFileSync(path.join(linked,'payload'),`producer ${aged} ${n}`);
+          const [commitMs,result]=time(()=>port.commit({operationId:`node-loan-${aged}-${n}`,baseline,request:{writes:['payload'],message:'E3 Node loan',cutoverGrant:null}},[claim.handle]));
+          if(result.status!=='committed') throw new Error(`Node loan commit: ${JSON.stringify(result)}`);
+          if(n>=20){changing.push(commitMs);preflight.push(beforeMs);}
+        }
+        say(aged ? 'nodeLoanScopedCommitAgedFloor' : 'nodeLoanScopedCommit',{
+          authority:'Node dispatch-cwd -> opaque addon loan', shortProcesses, agedForMs,
+          changing:stats(changing),preflight:stats(preflight),
+        });
       }
-      say('nodeLoanScopedCommit',{authority:'Node dispatch-cwd -> opaque addon loan',changing:stats(changing),preflight:stats(preflight)});
     } finally { claim.handle.release(); }
   }
 

@@ -1230,6 +1230,13 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                  "clean_modes": {
+                    "type": "array",
+                    "items": {
+                      "type": "array", "minItems": 2, "maxItems": 2,
+                      "prefixItems": [{"type": "string"}, {"type": "integer", "minimum": 0, "maximum": 65535}]
+                    }
+                  },
                 "conflicts": {
                   "type": "array",
                   "items": {

@@ -216,9 +216,9 @@ impl LockDriver for FlockDriver {
         request.process_group = true;
     }
 
-    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
+    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
         if cfg!(target_os = "linux") {
-            end_listed_holders(file, child_pid, kill_wait, since)
+            end_listed_holders(file, child_pid, kill_wait, since, protected_roots)
         } else {
             end_process_group(child_pid, kill_wait)
         }
@@ -227,8 +227,8 @@ impl LockDriver for FlockDriver {
 
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
-fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, &[])
+fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, protected_roots)
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.

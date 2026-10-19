@@ -1,7 +1,7 @@
 //! Operation-owned sync of a pinned commit into a producer under continuous custody.
 use crate::{
     refs::{failure, recovery, Authority},
-    scoped_commit::{binding, handle, paths, root, scope},
+    scoped_commit::{binding, checkout_resources, compact_matches, handle, paths, root, scope},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -11,6 +11,7 @@ use std::fs;
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SyncResult {
+    pub warnings: Vec<String>,
     pub state: String,
     pub operation_id: String,
     pub head: String,
@@ -27,6 +28,7 @@ fn info(
     commit: Option<CommitResult>,
 ) -> SyncResult {
     SyncResult {
+        warnings: vec![],
         operation_id: id.into(),
         head: head.into(),
         target: target.into(),
@@ -98,7 +100,7 @@ impl GitDriver {
         if self.ancestry(repo, target, &head_oid)? {
             return Ok(info(id, &head, target.as_str(), "up-to-date", vec![], None));
         }
-        let resources = vec![format!("worktree:{}", root(repo)?.display())];
+        let resources = checkout_resources(repo)?;
         crate::refs::admission(&wal, id, &resources)?;
         let binding = binding(handle(&scope, repo)?)?;
         let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
@@ -153,6 +155,27 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
+        // Metadata only: preserve permission bits Git does not represent for
+        // clean paths that a later hook may touch before abort.
+        let mut clean_modes = std::collections::BTreeMap::new();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            for entry in paths(&self.checkout_bytes(repo, &scope, &["ls-files", "-v", "-z"])?)? {
+                if entry.starts_with("S ") || entry.starts_with("s ") {
+                    continue;
+                }
+                let path = entry[2..].to_owned();
+                match fs::symlink_metadata(root(repo)?.join(&path)) {
+                    Ok(m) if m.is_file() && !m.file_type().is_symlink() => {
+                        clean_modes.insert(path, m.permissions().mode());
+                    }
+                    Ok(_) => (),
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    Err(e) => return Err(failure(e)),
+                }
+            }
+        }
         let out = self.checkout_call(
             repo,
             &scope,
@@ -218,6 +241,10 @@ impl GitDriver {
                 Phase::SyncState {
                     conflicts: conflicts.clone(),
                     index_digest: self.sync_index_digest(repo, &scope, &conflicts)?,
+                    clean_modes: clean_modes
+                        .into_iter()
+                        .filter(|(p, _)| staged.contains(p) && !conflicts.contains(p))
+                        .collect(),
                     staged,
                 },
             )
@@ -309,21 +336,30 @@ impl GitDriver {
                 })),
                 request_digest: compact.request.clone(),
                 repo_identity: wal.repository_identity().into(),
-                resource_set: vec![format!("worktree:{}", root(repo)?.display())],
+                resource_set: checkout_resources(repo)?,
                 authority_binding: binding(handle(scope, repo)?)?,
                 writer_identity: writer.into(),
                 object_format: repo.object_format(),
                 expected: Tip::Oid(compact.expected.clone()),
                 next: Tip::Oid(compact.next.clone()),
             };
-            if !compact.matches(&intent).map_err(failure)? {
+            if !compact_matches(&compact, &intent, repo)? {
                 return Err(failure("sync-authority-mismatch"));
             }
-            let commit = match compact.outcome().map_err(failure)? {
+            let outcome = compact.outcome().map_err(failure)?;
+            let state = match &outcome {
+                Outcome::Commit { .. } => "done",
+                Outcome::CommitRejected { cause } => cause.as_str(),
+                Outcome::AbandonedBeforeAttempt => "not-started",
+                _ => "lost",
+            }
+            .to_owned();
+            let commit = match outcome {
                 Outcome::Commit {
                     observed,
                     contract_violation,
                 } => Some(CommitResult {
+                    warnings: vec![],
                     status: if contract_violation {
                         ResultCode::CommittedButContractViolation
                     } else {
@@ -351,11 +387,7 @@ impl GitDriver {
                 id,
                 &compact.expected,
                 &compact.next,
-                if commit.is_some() {
-                    "done"
-                } else {
-                    "not-started"
-                },
+                &state,
                 vec![],
                 commit,
             ));
@@ -370,7 +402,9 @@ impl GitDriver {
             target,
             ..
         } = payload.as_ref();
-        if *worktree != root(repo)?.to_string_lossy()
+        if (chain.intent().resource_set != checkout_resources(repo)?
+            && chain.intent().resource_set != vec![format!("worktree:{}", root(repo)?.display())])
+            || *worktree != root(repo)?.to_string_lossy()
             || chain.intent().writer_identity != writer
             || chain.intent().authority_binding != binding(handle(scope, repo)?)?
         {
@@ -390,6 +424,7 @@ impl GitDriver {
                 "done",
                 vec![],
                 Some(CommitResult {
+                    warnings: vec![],
                     status: if *contract_violation {
                         ResultCode::CommittedButContractViolation
                     } else {
@@ -428,47 +463,48 @@ impl GitDriver {
                 }
                 return Err(recovery("sync-rejected-merge-recovery-required"));
             }
-            return Ok(info(id, head, target, "not-started", vec![], None));
+            let state = match chain.outcome() {
+                Some(Outcome::CommitRejected { cause }) => cause.as_str(),
+                Some(Outcome::AbandonedBeforeAttempt) => "not-started",
+                _ => "lost",
+            };
+            return Ok(info(id, head, target, state, vec![], None));
         }
         // A commit may have moved HEAD and then died before its receipt.
         // Never infer a safe retry from HEAD equality (including ABA).
-        if let Phase::SyncCommitAttempt { tree } = &chain.last().phase {
+        if let Phase::SyncCommitAttempt { .. } = &chain.last().phase {
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 _ => return Err(recovery("sync-index-lock-present")),
             }
-            let outcome = if &now == head {
+            let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+            let outcome = if let Some((observed, contract_violation)) =
+                self.observe_checkout_commit(repo, scope, wal, &chain)?
+            {
+                crate::refs::sync_refs(repo, &RefName::parse(&reference).map_err(failure)?)?;
+                Outcome::Commit {
+                    observed,
+                    contract_violation,
+                }
+            } else if &now == head {
                 Outcome::CommitRejected {
                     cause: "sync-commit-effect-unknown".into(),
                 }
             } else {
-                let parents =
-                    self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", &now])?;
-                if parents.split_whitespace().skip(1).collect::<Vec<_>>()
-                    != vec![head.as_str(), target.as_str()]
-                    || self.checkout_text(
-                        repo,
-                        scope,
-                        &["rev-parse", &format!("{now}^{{tree}}")],
-                    )? != *tree
-                {
-                    return Err(recovery("sync-commit-attempt-recovery-required"));
-                }
-                let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
-                crate::refs::sync_refs(repo, &RefName::parse(&reference).map_err(failure)?)?;
-                Outcome::Commit {
-                    observed: now.clone(),
-                    contract_violation: false,
-                }
+                return Err(recovery("sync-commit-attempt-recovery-required"));
             };
             let terminal = wal
                 .append(&chain, Phase::Outcome(outcome))
                 .map_err(failure)?;
-            if merge.is_none() {
-                self.compact_checkout(repo, scope, wal, &terminal)?;
-            }
-            return self.continue_sync_scoped(repo, scope, wal, writer, id, false);
+            let warnings = if merge.is_none() {
+                self.compact_checkout_warning(repo, scope, wal, &terminal)
+            } else {
+                vec![]
+            };
+            let mut receipt = self.continue_sync_scoped(repo, scope, wal, writer, id, false)?;
+            receipt.warnings.extend(warnings);
+            return Ok(receipt);
         }
         if merge.is_none() {
             fgos_holder_lock::validate_quiescent(handle(scope, repo)?).map_err(failure)?;
@@ -489,15 +525,17 @@ impl GitDriver {
                         }),
                     )
                     .map_err(failure)?;
-                self.compact_checkout(repo, scope, wal, &terminal)?;
-                return Ok(info(id, head, target, "not-started", vec![], None));
+                let mut receipt = info(id, head, target, "merge-effect-unknown", vec![], None);
+                receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
+                return Ok(receipt);
             }
             if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                     .map_err(failure)?;
-                self.compact_checkout(repo, scope, wal, &terminal)?;
-                return Ok(info(id, head, target, "not-started", vec![], None));
+                let mut receipt = info(id, head, target, "not-started", vec![], None);
+                receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
+                return Ok(receipt);
             }
             if self.ancestry(
                 repo,
@@ -558,6 +596,7 @@ impl GitDriver {
             conflicts,
             staged,
             index_digest,
+            ..
         } = &chain.last().phase
         else {
             return Err(recovery("sync-state-recovery-required"));
@@ -654,14 +693,15 @@ impl GitDriver {
                 }),
             )
             .map_err(failure)?;
-        self.compact_checkout(repo, scope, wal, &terminal)?;
-        Ok(info(
+        let warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
+        let mut receipt = info(
             &chain.last().operation_id,
             head,
             target,
             "done",
             vec![],
             Some(CommitResult {
+                warnings: vec![],
                 status: if violation {
                     ResultCode::CommittedButContractViolation
                 } else {
@@ -672,7 +712,9 @@ impl GitDriver {
                 operation_id: chain.last().operation_id.clone(),
                 pre_existing_in_scope: vec![],
             }),
-        ))
+        );
+        receipt.warnings = warnings;
+        Ok(receipt)
     }
     pub fn abort_sync(
         &self,
@@ -684,22 +726,27 @@ impl GitDriver {
         let scope = scope(repo, held)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
         let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
-        if state.state == "done" || state.state == "not-started" {
+        if state.state == "done"
+            || state.state == "not-started"
+            || state.state == "conflict-aborted"
+        {
             return Ok(state);
         }
         if state.state != "in-progress" && state.state != "rejected-open" {
             return Err(failure("sync-merge-lost"));
         }
         let chain = wal.inspect(id).map_err(failure)?;
-        self.abort_sync_scoped(repo, &scope, &wal, &chain)?;
-        Ok(info(
+        let warnings = self.abort_sync_scoped(repo, &scope, &wal, &chain)?;
+        let mut receipt = info(
             id,
             &state.head,
             &state.target,
             "conflict-aborted",
             vec![],
             None,
-        ))
+        );
+        receipt.warnings = warnings;
+        Ok(receipt)
     }
     fn abort_sync_scoped(
         &self,
@@ -707,7 +754,7 @@ impl GitDriver {
         scope: &LockScope<'_>,
         wal: &Wal,
         chain: &wal::Chain,
-    ) -> Result<()> {
+    ) -> Result<Vec<String>> {
         let OperationKind::Sync(payload) = &chain.intent().kind else {
             return Err(failure("not-sync-operation"));
         };
@@ -743,13 +790,43 @@ impl GitDriver {
             .filter(|p| !conflicts.contains(p))
             .cloned()
             .collect();
-        self.stage_paths(
-            repo,
-            scope,
-            &["restore", "--source=HEAD", "--staged", "--worktree"],
-            &clean,
-        )?;
-        self.stage_paths(repo, scope, &["reset", "-q", "HEAD"], &conflicts)?;
+        let modes = chain.records().iter().find_map(|r| match &r.phase {
+            Phase::SyncState { clean_modes, .. } => Some(clean_modes),
+            _ => None,
+        });
+        let mut failed = false;
+        for p in &clean {
+            failed |= self
+                .stage_paths(
+                    repo,
+                    scope,
+                    &["restore", "--source=HEAD", "--staged", "--worktree"],
+                    std::slice::from_ref(p),
+                )
+                .is_err();
+        }
+        #[cfg(unix)]
+        if let Some(modes) = modes {
+            use std::os::unix::fs::PermissionsExt;
+            for (p, mode) in modes {
+                let path = root(repo)?.join(p);
+                if fs::symlink_metadata(&path)
+                    .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+                {
+                    failed |= fs::set_permissions(path, fs::Permissions::from_mode(*mode)).is_err();
+                } else {
+                    failed = true;
+                }
+            }
+        }
+        #[cfg(not(unix))]
+        let _ = modes;
+        failed |= self
+            .stage_paths(repo, scope, &["reset", "-q", "HEAD"], &conflicts)
+            .is_err();
+        if failed {
+            return Err(recovery("commit-worktree-restore-required"));
+        }
         self.checkout_bytes(repo, scope, &["merge", "--quit"])?;
         let terminal = if chain.outcome().is_some() {
             chain.clone()
@@ -762,7 +839,7 @@ impl GitDriver {
             )
             .map_err(failure)?
         };
-        self.compact_checkout(repo, scope, wal, &terminal)
+        Ok(self.compact_checkout_warning(repo, scope, wal, &terminal))
     }
 }
 pub fn has_conflict_markers(bytes: &[u8]) -> bool {

@@ -542,7 +542,7 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   // The group sweep needs the child to lead a process group; a caller that
   // signals the child's group itself asks for one everywhere.
   // A drain's protected-root snapshot must not miss a newly spawned sibling.
-  if (entry.sweeps > 0) throw new HolderLockError('borrow-leftover-not-killed', `${handle.name}: borrow drain in progress`, { lock: handle.name });
+  if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
   const detached = borrowLeadsGroup(spec);
 
   if (sync) {
@@ -618,6 +618,7 @@ export function spawnWithLocks(handles, spec) {
   const fds = handles.map((handle) => {
     const entry = descriptionOf(handle);
     if (entry.released) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot hand over a released lock`, { lock: handle.name });
+    if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
     if (entry.fd === null) throw new HolderLockError('lock-transport-hold', `${handle.name}: this platform keeps the lock in a helper; the child must take it itself`, { lock: handle.name });
     return entry.fd;
   });
@@ -695,6 +696,7 @@ export function registerNativeHandover(mint, dispose) {
     const entries = handles.map(handle => {
       const entry = descriptionOf(handle);
       if (entry.released) throw new HolderLockError('lock-handle-released', 'cannot hand over a released lock', {});
+      if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
       if (entry.fd === null) throw new HolderLockError('git-lock-handover-unsupported', 'description unavailable', {});
       return entry;
     });
@@ -703,7 +705,7 @@ export function registerNativeHandover(mint, dispose) {
     try {
       for (let i = 0; i < handles.length; i += 1) {
         const handle = handles[i];
-        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs, entries[i].reachFloorTicks));
+        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs, entries[i].reachFloorTicks, [...entries[i].borrowRoots]));
       }
       // Native calls are synchronous; Externals are consumed once and closed
       // before this guard ends, including marshaling/validation failures.

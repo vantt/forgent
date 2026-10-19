@@ -41,6 +41,7 @@ pub struct CommitBaseline {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CommitResult {
+    pub warnings: Vec<String>,
     pub status: ResultCode,
     pub oid: Option<Oid>,
     pub files: Vec<String>,
@@ -135,6 +136,31 @@ pub(crate) fn binding(handle: &Handle) -> Result<String> {
         Err(failure("git-lockscope-unavailable-windows"))
     }
 }
+/// New chains bind the directory identity used by custody; legacy chains keep
+/// their path-only resource and are accepted only under their original lease.
+pub(crate) fn checkout_resources(repo: &RepoHandle) -> Result<Vec<String>> {
+    #[cfg(unix)]
+    let custody = crate::refs::custody_lock_path(repo, root(repo)?)?;
+    #[cfg(not(unix))]
+    let custody = std::path::PathBuf::new();
+    Ok(vec![format!(
+        "worktree:{}:custody:{}",
+        root(repo)?.display(),
+        custody.display()
+    )])
+}
+pub(crate) fn compact_matches(
+    compact: &wal::CompactReceipt,
+    intent: &Intent,
+    repo: &RepoHandle,
+) -> Result<bool> {
+    if compact.matches(intent).map_err(failure)? {
+        return Ok(true);
+    }
+    let mut legacy = intent.clone();
+    legacy.resource_set = vec![format!("worktree:{}", root(repo)?.display())];
+    compact.matches(&legacy).map_err(failure)
+}
 impl GitDriver {
     /// Admission uses Publication's terminal ledger and never scans compacted
     /// history. Interrupted pre-attempt work has no ref effect to replay.
@@ -145,21 +171,56 @@ impl GitDriver {
         wal: &Wal,
         id: &str,
     ) -> Result<()> {
-        let resources = vec![format!("worktree:{}", root(repo)?.display())];
+        let resources = checkout_resources(repo)?;
+        let legacy = format!("worktree:{}", root(repo)?.display());
+        let current_binding = binding(handle(scope, repo)?)?;
         for mut chain in wal.retained(100_000).map_err(failure)? {
-            if chain.last().operation_id == id
-                || !chain
-                    .intent()
-                    .resource_set
-                    .iter()
-                    .any(|r| resources.contains(r))
-            {
+            let worktree = match &chain.intent().kind {
+                OperationKind::ScopedCommit(p) => &p.worktree,
+                OperationKind::Sync(p) => &p.worktree,
+                _ => continue,
+            };
+            if worktree != &root(repo)?.to_string_lossy() {
                 continue;
             }
-            if !matches!(
-                chain.intent().kind,
-                OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
-            ) {
+            let foreign = if chain.intent().resource_set == vec![legacy.clone()] {
+                chain.intent().authority_binding != current_binding
+            } else {
+                chain.intent().resource_set != resources
+            };
+            if foreign {
+                // Current custody proves that this directory is a different
+                // checkout. Close only its old WAL, never touch its index or
+                // replay an effect. Existing terminal causes stay unchanged.
+                let _ = (|| -> Result<()> {
+                    if chain.outcome().is_none() {
+                        chain = wal
+                            .append(
+                                &chain,
+                                Phase::Outcome(Outcome::CommitRejected {
+                                    cause: "foreign-checkout-abandoned".into(),
+                                }),
+                            )
+                            .map_err(failure)?;
+                    }
+                    if matches!(chain.intent().kind, OperationKind::Sync(_)) {
+                        crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &chain)?;
+                        chain = wal.inspect(&chain.last().operation_id).map_err(failure)?;
+                    }
+                    wal.compact(
+                        &chain,
+                        &WalReader { driver: self, repo },
+                        &Authority {
+                            scope,
+                            binding: chain.intent().authority_binding.clone(),
+                        },
+                    )
+                    .map_err(failure)?;
+                    Ok(())
+                })();
+                continue;
+            }
+            if chain.last().operation_id == id {
                 continue;
             }
             wal::PublicationAuthority::validate_publication_borrow(
@@ -189,6 +250,8 @@ impl GitDriver {
             }
             if chain.outcome().is_some() {
                 self.compact_checkout(repo, scope, wal, &chain)?;
+            } else {
+                return Err(recovery("resource-recovery-required"));
             }
         }
         crate::refs::admission(wal, id, &resources)
@@ -228,6 +291,135 @@ impl GitDriver {
             .map_err(failure)?;
         Ok(())
     }
+    pub(crate) fn compact_checkout_warning(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        wal: &Wal,
+        chain: &wal::Chain,
+    ) -> Vec<String> {
+        self.compact_checkout(repo, scope, wal, chain)
+            .err()
+            .map(|e| vec![format!("checkout-compaction-deferred: {e:?}")])
+            .unwrap_or_default()
+    }
+    /// Observe immutable commits at HEAD and in the branch reflog. Never issue
+    /// another commit, and never infer rejection from HEAD equality (ABA).
+    pub(crate) fn observe_checkout_commit(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        wal: &Wal,
+        chain: &wal::Chain,
+    ) -> Result<Option<(String, bool)>> {
+        let (reference, parents, tree, message) = match &chain.intent().kind {
+            OperationKind::ScopedCommit(payload) => {
+                let baseline: CommitBaseline =
+                    serde_json::from_str(&payload.baseline).map_err(failure)?;
+                let request: CommitRequest =
+                    serde_json::from_str(&payload.request).map_err(failure)?;
+                (
+                    baseline.reference,
+                    vec![baseline.head],
+                    payload.tree.clone(),
+                    request.message,
+                )
+            }
+            OperationKind::Sync(payload) => {
+                let Phase::SyncCommitAttempt { tree } = &chain.last().phase else {
+                    return Err(recovery("sync-state-recovery-required"));
+                };
+                (
+                    self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?,
+                    vec![payload.head.clone(), payload.target.clone()],
+                    tree.clone(),
+                    payload.message.clone(),
+                )
+            }
+            _ => return Err(failure("not-checkout-commit-operation")),
+        };
+        let now = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
+        // Admission forbids a later checkout chain while an attempt is open.
+        // Cross-check retained peers as well, without trusting record age or
+        // directory timestamps. A peer at this baseline makes message-only
+        // attribution ambiguous; a strictly older baseline does not.
+        let mut newest = true;
+        for peer in wal.retained(100_000).map_err(failure)? {
+            let worktree = match &peer.intent().kind {
+                OperationKind::ScopedCommit(p) => &p.worktree,
+                OperationKind::Sync(p) => &p.worktree,
+                _ => continue,
+            };
+            if peer.last().operation_id == chain.last().operation_id
+                || worktree != &root(repo)?.to_string_lossy()
+            {
+                continue;
+            }
+            if peer.intent().authority_binding != chain.intent().authority_binding
+                || (peer.intent().resource_set != checkout_resources(repo)?
+                    && peer.intent().resource_set
+                        != vec![format!("worktree:{}", root(repo)?.display())])
+            {
+                continue;
+            }
+            let Tip::Oid(prior) = &peer.intent().expected else {
+                newest = false;
+                break;
+            };
+            if *prior == parents[0]
+                || !self.ancestry(
+                    repo,
+                    &Oid::parse(prior, repo.object_format()).map_err(failure)?,
+                    &Oid::parse(&parents[0], repo.object_format()).map_err(failure)?,
+                )?
+            {
+                newest = false;
+                break;
+            }
+        }
+        let reflog =
+            self.checkout_bytes(repo, scope, &["reflog", "show", "--format=%H", &reference])?;
+        let mut candidates = vec![now];
+        candidates.extend(
+            std::str::from_utf8(&reflog)
+                .map_err(failure)?
+                .lines()
+                .map(str::to_owned),
+        );
+        let mut seen = BTreeSet::new();
+        for oid in candidates {
+            if !seen.insert(oid.clone()) {
+                continue;
+            }
+            let raw = self.checkout_bytes(repo, scope, &["cat-file", "commit", &oid])?;
+            let Some(split) = raw.windows(2).position(|w| w == b"\n\n") else {
+                return Err(recovery("commit-object-invalid"));
+            };
+            let headers = std::str::from_utf8(&raw[..split]).map_err(failure)?;
+            let actual_parents: Vec<_> = headers
+                .lines()
+                .filter_map(|l| l.strip_prefix("parent "))
+                .map(str::to_owned)
+                .collect();
+            if actual_parents != parents {
+                continue;
+            }
+            let actual_tree = headers
+                .lines()
+                .find_map(|l| l.strip_prefix("tree "))
+                .ok_or_else(|| recovery("commit-object-invalid"))?;
+            // Git terminates a nonempty verbatim message with one LF.
+            let expected_message = if message.ends_with('\n') {
+                message.to_owned()
+            } else {
+                format!("{message}\n")
+            };
+            if actual_tree == tree || newest && raw[split + 2..] == *expected_message.as_bytes() {
+                return Ok(Some((oid, actual_tree != tree)));
+            }
+        }
+        Ok(None)
+    }
     /// Explicit observe-only recovery. Custody excludes a live cooperative
     /// performer; native index residue or ambiguous HEAD preserves the attempt.
     pub fn recover_scoped_commit(
@@ -251,14 +443,14 @@ impl GitDriver {
                 })),
                 request_digest: compact.request.clone(),
                 repo_identity: wal.repository_identity().into(),
-                resource_set: vec![format!("worktree:{}", root(repo)?.display())],
+                resource_set: checkout_resources(repo)?,
                 authority_binding: binding(handle(&scope, repo)?)?,
                 writer_identity: writer.into(),
                 object_format: repo.object_format(),
                 expected: Tip::Oid(compact.expected.clone()),
                 next: Tip::Oid(compact.next.clone()),
             };
-            if !compact.matches(&intent).map_err(failure)? {
+            if !compact_matches(&compact, &intent, repo)? {
                 return Err(failure("commit-authority-mismatch"));
             }
             return compact.outcome().map_err(failure);
@@ -267,7 +459,9 @@ impl GitDriver {
         let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
             return Err(failure("not-scoped-commit-operation"));
         };
-        if payload.worktree != root(repo)?.to_string_lossy()
+        if (chain.intent().resource_set != checkout_resources(repo)?
+            && chain.intent().resource_set != vec![format!("worktree:{}", root(repo)?.display())])
+            || payload.worktree != root(repo)?.to_string_lossy()
             || chain.intent().writer_identity != writer
             || chain.intent().authority_binding != binding(handle(&scope, repo)?)?
         {
@@ -278,7 +472,13 @@ impl GitDriver {
         }
         fgos_holder_lock::validate_quiescent(handle(&scope, repo)?).map_err(failure)?;
         let outcome = if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
-            self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+            let baseline: CommitBaseline =
+                serde_json::from_str(&payload.baseline).map_err(failure)?;
+            if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head
+                && self.staged(repo, &scope)? == payload.paths
+            {
+                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+            }
             Outcome::AbandonedBeforeAttempt
         } else {
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
@@ -287,23 +487,9 @@ impl GitDriver {
             }
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;
-            let now = self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?;
-            if now == baseline.head {
-                self.checkout_bytes(repo, &scope, &["reset", "-q", "HEAD"])?;
-                Outcome::CommitRejected {
-                    cause: "commit-effect-unknown".into(),
-                }
-            } else {
-                let parents =
-                    self.checkout_text(repo, &scope, &["rev-list", "--parents", "-n", "1", &now])?;
-                let tree =
-                    self.checkout_text(repo, &scope, &["rev-parse", &format!("{now}^{{tree}}")])?;
-                if parents.split_whitespace().skip(1).collect::<Vec<_>>()
-                    != vec![baseline.head.as_str()]
-                    || tree != payload.tree
-                {
-                    return Err(recovery("commit-effect-unknown"));
-                }
+            if let Some((observed, tree_changed)) =
+                self.observe_checkout_commit(repo, &scope, &wal, &chain)?
+            {
                 let files = paths(&self.checkout_bytes(
                     repo,
                     &scope,
@@ -313,7 +499,7 @@ impl GitDriver {
                         "--no-renames",
                         "-z",
                         &baseline.head,
-                        &now,
+                        &observed,
                     ],
                 )?)?;
                 crate::refs::sync_refs(
@@ -321,15 +507,22 @@ impl GitDriver {
                     &RefName::parse(&baseline.reference).map_err(failure)?,
                 )?;
                 Outcome::Commit {
-                    observed: now,
-                    contract_violation: files != payload.paths,
+                    observed,
+                    contract_violation: tree_changed || files != payload.paths,
                 }
+            } else if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
+                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &payload.paths)?;
+                Outcome::CommitRejected {
+                    cause: "commit-effect-unknown".into(),
+                }
+            } else {
+                return Err(recovery("commit-effect-unknown"));
             }
         };
         let terminal = wal
             .append(&chain, Phase::Outcome(outcome.clone()))
             .map_err(failure)?;
-        self.compact_checkout(repo, &scope, &wal, &terminal)?;
+        let _ = self.compact_checkout_warning(repo, &scope, &wal, &terminal);
         Ok(outcome)
     }
     pub(crate) fn checkout_call(
@@ -572,17 +765,17 @@ impl GitDriver {
                 request_digest: wal::canonical_digest(&(baseline, request, writer))
                     .map_err(failure)?,
                 repo_identity: wal.repository_identity().into(),
-                resource_set: vec![format!("worktree:{}", baseline.worktree)],
+                resource_set: checkout_resources(repo)?,
                 authority_binding: binding(handle(scope, repo)?)?,
                 writer_identity: writer.into(),
                 object_format: repo.object_format(),
                 expected: Tip::Oid(baseline.head.clone()),
                 next: Tip::Oid(baseline.head.clone()),
             };
-            let ordinary = compact.matches(&intent).map_err(failure)?;
+            let ordinary = compact_matches(&compact, &intent, repo)?;
             intent.request_digest =
                 wal::canonical_digest(&(baseline, request, writer, "no-op")).map_err(failure)?;
-            let noop = compact.matches(&intent).map_err(failure)?;
+            let noop = compact_matches(&compact, &intent, repo)?;
             if !ordinary && !noop {
                 return Err(failure("operation-id-reused"));
             }
@@ -591,6 +784,7 @@ impl GitDriver {
                     observed,
                     contract_violation,
                 } => Ok(CommitResult {
+                    warnings: vec![],
                     status: if contract_violation {
                         ResultCode::CommittedButContractViolation
                     } else {
@@ -613,78 +807,87 @@ impl GitDriver {
                     pre_existing_in_scope: pre_existing,
                 }),
                 Outcome::AbandonedBeforeAttempt if noop => Ok(CommitResult {
+                    warnings: vec![],
                     status: ResultCode::Unchanged,
                     files: vec![],
                     oid: None,
                     operation_id: id.into(),
                     pre_existing_in_scope: pre_existing,
                 }),
+                Outcome::CommitRejected { cause } => Err(if cause.ends_with("effect-unknown") {
+                    recovery(cause)
+                } else {
+                    failure(cause)
+                }),
                 _ => Err(failure("commit-rejected")),
             };
         }
         if wal.known_id(id).map_err(failure)? {
             let old = wal.inspect(id).map_err(failure)?;
-            if matches!(old.outcome(), Some(Outcome::AbandonedBeforeAttempt)) {
-                if let OperationKind::ScopedCommit(payload) = &old.intent().kind {
-                    if payload.paths.is_empty()
-                        && payload.baseline == serde_json::to_string(baseline).map_err(failure)?
-                        && payload.request == serde_json::to_string(request).map_err(failure)?
-                        && old.intent().writer_identity == writer
-                    {
-                        return Ok(CommitResult {
-                            status: ResultCode::Unchanged,
-                            oid: None,
-                            files: vec![],
-                            operation_id: id.into(),
-                            pre_existing_in_scope: pre_existing.clone(),
-                        });
-                    }
-                }
+            if old.intent().authority_binding != binding(handle(scope, repo)?)?
+                || (old.intent().resource_set != checkout_resources(repo)?
+                    && old.intent().resource_set
+                        != vec![format!("worktree:{}", root(repo)?.display())])
+            {
+                return Err(failure("commit-authority-mismatch"));
+            }
+            let OperationKind::ScopedCommit(payload) = &old.intent().kind else {
+                return Err(failure("operation-id-reused"));
+            };
+            if payload.baseline != serde_json::to_string(baseline).map_err(failure)?
+                || payload.request != serde_json::to_string(request).map_err(failure)?
+                || old.intent().writer_identity != writer
+            {
                 return Err(failure("operation-id-reused"));
             }
             // A ref-moving attempt is never issued twice, even after ABA.
-            if let Some(Outcome::Commit {
-                observed,
-                contract_violation,
-            }) = old.outcome()
-            {
-                if let OperationKind::ScopedCommit(payload) = &old.intent().kind {
-                    let wal::ScopedCommitIntent {
-                        baseline: b,
-                        request: r,
-                        ..
-                    } = payload.as_ref();
-                    if b != &serde_json::to_string(baseline).map_err(failure)?
-                        || r != &serde_json::to_string(request).map_err(failure)?
-                        || old.intent().writer_identity != writer
-                    {
-                        return Err(failure("operation-id-reused"));
-                    }
-                    return Ok(CommitResult {
-                        status: if *contract_violation {
-                            ResultCode::CommittedButContractViolation
-                        } else {
-                            ResultCode::Committed
-                        },
-                        oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
-                        files: paths(&self.checkout_bytes(
-                            repo,
-                            scope,
-                            &[
-                                "diff",
-                                "--name-only",
-                                "--no-renames",
-                                "-z",
-                                &baseline.head,
-                                observed,
-                            ],
-                        )?)?,
+            return match old.outcome() {
+                Some(Outcome::AbandonedBeforeAttempt) if payload.paths.is_empty() => {
+                    Ok(CommitResult {
+                        warnings: vec![],
+                        status: ResultCode::Unchanged,
+                        oid: None,
+                        files: vec![],
                         operation_id: id.into(),
                         pre_existing_in_scope: pre_existing.clone(),
-                    });
+                    })
                 }
-            }
-            return Err(recovery("commit-attempt-recovery-required"));
+                Some(Outcome::Commit {
+                    observed,
+                    contract_violation,
+                }) => Ok(CommitResult {
+                    warnings: vec![],
+                    status: if *contract_violation {
+                        ResultCode::CommittedButContractViolation
+                    } else {
+                        ResultCode::Committed
+                    },
+                    oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
+                    files: paths(&self.checkout_bytes(
+                        repo,
+                        scope,
+                        &[
+                            "diff",
+                            "--name-only",
+                            "--no-renames",
+                            "-z",
+                            &baseline.head,
+                            observed,
+                        ],
+                    )?)?,
+                    operation_id: id.into(),
+                    pre_existing_in_scope: pre_existing.clone(),
+                }),
+                Some(Outcome::CommitRejected { cause }) => {
+                    Err(if cause.ends_with("effect-unknown") {
+                        recovery(cause)
+                    } else {
+                        failure(cause)
+                    })
+                }
+                Some(Outcome::AbandonedBeforeAttempt) => Err(failure("operation-id-reused")),
+                _ => Err(recovery("commit-attempt-recovery-required")),
+            };
         }
         self.admit_checkout(repo, scope, &wal, id)?;
         if self.merge_head(repo, scope)?.is_some() {
@@ -749,7 +952,7 @@ impl GitDriver {
                 tree: self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?,
                 cutover_grant: None,
             }));
-            let resources = vec![format!("worktree:{}", baseline.worktree)];
+            let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;
             let binding = binding(handle(scope, repo)?)?;
             let intent = Intent {
@@ -772,8 +975,9 @@ impl GitDriver {
             wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                 .map_err(failure)?;
             let terminal = wal.inspect(id).map_err(failure)?;
-            self.compact_checkout(repo, scope, &wal, &terminal)?;
+            let warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
             return Ok(CommitResult {
+                warnings,
                 status: ResultCode::Unchanged,
                 oid: None,
                 files: vec![],
@@ -785,10 +989,17 @@ impl GitDriver {
         // only a HEAD marker; dirty, ignored and absent paths retain their state.
         let checkout = root(repo)?;
         let dirty: BTreeSet<_> = self.dirty_paths(repo, scope)?.into_iter().collect();
-        let tracked: BTreeSet<_> =
-            paths(&self.checkout_bytes(repo, scope, &["ls-files", "-z"])?)?
-                .into_iter()
-                .collect();
+        let inventory = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-v", "-z"])?)?;
+        let skipped: BTreeSet<_> = inventory
+            .iter()
+            .filter(|p| p.starts_with("S ") || p.starts_with("s "))
+            .map(|p| p[2..].to_owned())
+            .collect();
+        let tracked: BTreeSet<_> = inventory
+            .iter()
+            .filter(|p| !p.starts_with("S ") && !p.starts_with("s "))
+            .map(|p| p[2..].to_owned())
+            .collect();
         let mut saved_paths = BTreeSet::new();
         for p in dirty
             .iter()
@@ -819,16 +1030,19 @@ impl GitDriver {
         );
         let snapshot = saved_paths
             .into_iter()
+            .filter(|p| !skipped.contains(p))
             .map(|p| {
                 let saved = if tracked.contains(&p) && !dirty.contains(&p) {
-                    SavedPath::Head
+                    let metadata = fs::symlink_metadata(root(repo)?.join(&p)).map_err(failure)?;
+                    SavedPath::Head(metadata.is_file().then(|| metadata.permissions()))
                 } else {
                     SavedPath::capture(&root(repo)?.join(&p))?
                 };
                 Ok((p, saved))
             })
             .collect::<Result<BTreeMap<_, _>>>()?;
-        let prepared = (|| {
+        let mut recorded_terminal = None;
+        let mut prepared = (|| {
             self.stage_paths(repo, scope, &["add", "-A"], &selected)?;
             if self.staged(repo, scope)? != selected {
                 return Err(failure("staged-set-mismatch"));
@@ -842,7 +1056,7 @@ impl GitDriver {
                 tree: tree.clone(),
                 cutover_grant: request.cutover_grant.clone(),
             }));
-            let resources = vec![format!("worktree:{}", baseline.worktree)];
+            let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;
             let authority_binding = binding(handle(scope, repo)?)?;
             let intent = Intent {
@@ -939,15 +1153,18 @@ impl GitDriver {
                     != vec![baseline.head.as_str()];
             let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
             crate::refs::sync_refs(repo, &RefName::parse(&baseline.reference).map_err(failure)?)?;
-            wal.append(
-                &attempted,
-                Phase::Outcome(Outcome::Commit {
-                    observed,
-                    contract_violation: violation,
-                }),
-            )
-            .map_err(failure)?;
+            recorded_terminal = Some(
+                wal.append(
+                    &attempted,
+                    Phase::Outcome(Outcome::Commit {
+                        observed,
+                        contract_violation: violation,
+                    }),
+                )
+                .map_err(failure)?,
+            );
             Ok(CommitResult {
+                warnings: vec![],
                 status: if violation {
                     ResultCode::CommittedButContractViolation
                 } else {
@@ -959,6 +1176,10 @@ impl GitDriver {
                 pre_existing_in_scope: pre_existing.clone(),
             })
         })();
+        if let (Ok(receipt), Some(terminal)) = (&mut prepared, recorded_terminal) {
+            receipt.warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
+            return prepared;
+        }
         if prepared.is_err()
             && self
                 .checkout_text(repo, scope, &["rev-parse", "HEAD"])
@@ -988,23 +1209,38 @@ impl GitDriver {
                     restore.entry(p).or_insert(SavedPath::Absent);
                 }
             }
-            let clean: Vec<_> = restore
-                .iter()
-                .filter_map(|(p, saved)| matches!(saved, SavedPath::Head).then_some(p.clone()))
-                .collect();
-            self.stage_paths(
-                repo,
-                scope,
-                &["restore", "--source=HEAD", "--worktree"],
-                &clean,
-            )?;
+            // Attempt every restoration, even if one clean path cannot be
+            // restored. Keep producer bytes on all independent paths.
+            let mut failed = false;
             for (p, saved) in &restore {
-                if matches!(saved, SavedPath::Head) {
-                    continue;
+                let path = root(repo)?.join(p);
+                if let SavedPath::Head(mode) = saved {
+                    if self
+                        .stage_paths(
+                            repo,
+                            scope,
+                            &["restore", "--source=HEAD", "--worktree"],
+                            std::slice::from_ref(p),
+                        )
+                        .is_err()
+                    {
+                        failed = true;
+                    }
+                    if let Some(mode) = mode {
+                        if fs::symlink_metadata(&path)
+                            .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+                        {
+                            failed |= fs::set_permissions(&path, mode.clone()).is_err();
+                        } else {
+                            failed = true;
+                        }
+                    }
+                } else {
+                    failed |= saved.restore(&path).is_err();
                 }
-                saved
-                    .restore(&root(repo)?.join(p))
-                    .map_err(|_| recovery("commit-worktree-restore-required"))?;
+            }
+            if failed {
+                prepared = Err(recovery("commit-worktree-restore-required"));
             }
         }
         if prepared.is_err() && wal.known_id(id).map_err(failure)? {
@@ -1017,7 +1253,10 @@ impl GitDriver {
         if wal.known_id(id).map_err(failure)? {
             let terminal = wal.inspect(id).map_err(failure)?;
             if terminal.outcome().is_some() {
-                self.compact_checkout(repo, scope, &wal, &terminal)?;
+                let warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
+                if let Ok(receipt) = &mut prepared {
+                    receipt.warnings.extend(warnings);
+                }
             }
         }
         prepared
@@ -1114,7 +1353,7 @@ fn content_digest(root: &Path, path: &str) -> Result<String> {
 // Transaction-local snapshot: uncertain/crashed attempts retain their WAL and
 // refuse replay; any inline failure with unchanged HEAD restores producer bytes.
 enum SavedPath {
-    Head,
+    Head(Option<fs::Permissions>),
     Absent,
     File(Vec<u8>, fs::Permissions),
     Link(std::path::PathBuf),
@@ -1163,7 +1402,7 @@ impl SavedPath {
             Err(e) => return Err(e),
         }
         match self {
-            Self::Head => unreachable!("clean tracked paths restore through Git"),
+            Self::Head(_) => unreachable!("clean tracked paths restore through Git"),
             Self::Absent => Ok(()),
             Self::File(bytes, mode) => {
                 if let Some(parent) = path.parent() {

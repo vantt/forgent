@@ -219,6 +219,8 @@ pub enum Phase {
         conflicts: Vec<String>,
         staged: Vec<String>,
         index_digest: String,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        clean_modes: Vec<(String, u32)>,
     },
     /// Durable one-shot barrier before Sync invokes its ref-moving commit.
     SyncCommitAttempt { tree: String },
@@ -358,7 +360,7 @@ impl Intent {
                 ..
             } = payload.as_ref();
             if !Path::new(worktree).is_absolute()
-                || self.resource_set != vec![format!("worktree:{worktree}")]
+                || !checkout_resource_valid(&self.resource_set, worktree)
             {
                 return Err(corrupt("scoped commit binding"));
             }
@@ -379,7 +381,7 @@ impl Intent {
                 message,
             } = payload.as_ref();
             if !Path::new(worktree).is_absolute()
-                || self.resource_set != vec![format!("worktree:{worktree}")]
+                || !checkout_resource_valid(&self.resource_set, worktree)
                 || message.is_empty()
                 || message.contains('\0')
             {
@@ -662,6 +664,11 @@ impl Chain {
         Ok(())
     }
 }
+fn checkout_resource_valid(resources: &[String], worktree: &str) -> bool {
+    resources == [format!("worktree:{worktree}")]
+        || resources.len() == 1 && resources[0].strip_prefix(&format!("worktree:{worktree}:custody:"))
+            .is_some_and(|p| Path::new(p).is_absolute())
+}
 fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     let i = match &records[0].phase {
         Phase::Intent(i) => i,
@@ -671,6 +678,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     let valid = match (prev, phase) {
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
             matches!(i.kind, OperationKind::ConfigChange(_))
+        }
+        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::CommitRejected { cause })) => {
+            cause == "foreign-checkout-abandoned" && matches!(i.kind, OperationKind::ScopedCommit(_) | OperationKind::Sync(_))
         }
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
@@ -697,10 +707,12 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 conflicts,
                 staged,
                 index_digest,
+                clean_modes,
             },
         ) => {
             matches!(i.kind, OperationKind::Sync(_))
                 && digest_valid(index_digest)
+                && clean_modes.iter().all(|(p, mode)| staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777)
                 && conflicts
                     .iter()
                     .chain(staged)

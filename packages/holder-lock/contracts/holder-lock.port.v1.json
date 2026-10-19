@@ -56,7 +56,7 @@
         "handle": "handle returned by acquire (EX)",
         "spec": { "argv": "string[]", "cwd": "string", "env": "string map" }
       },
-      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
+      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return. Node fd borrows and native loans carry live async sibling roots into the same Rust drain; siblings are waited on/fail closed, never signalled. Starting a borrow or minting a native loan while a drain snapshot is active refuses before spawn with retryable borrow-drain-in-progress.",
       "output": { "exit": "integer|null", "signal": "string|null", "leftoversKilled": "integer >= 0" }
     },
     "run_borrowed_io": {

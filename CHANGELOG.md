@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Bind checkout WAL to directory identity, recover hook-modified and reflog-visible commits, preserve terminal causes and landed receipts across compaction failures, protect async siblings during native Git loans, and retain clean-file permissions during rollback. Add an aged-floor Node-loan E3 row for host acceptance.
+
 - Git: recover interrupted scoped commits without replay, unblock pre-attempt/rejected Sync transactions, bound terminal WAL history, preserve concurrent sibling borrows, and restore clean merge paths on abort. E3 now measures Node-loaned checkout custody.
 
 - Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
