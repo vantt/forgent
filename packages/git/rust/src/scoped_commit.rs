@@ -445,15 +445,10 @@ impl GitDriver {
                 }
                 selected.push(path.clone());
             }
-        }
-        if let Some(grant) = &request.cutover_grant {
-            let fence = root(repo)?.join(".fgos/events");
-            if grant
-                .exact_paths
-                .iter()
-                .any(|p| p.starts_with(".fgos/events/"))
-                && fs::symlink_metadata(&fence)
-                    .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+            // The fence marks every cutover, including a baseline-only repository
+            // that never had an event directory to delete.
+            if fs::symlink_metadata(root(repo)?.join(".fgos/events"))
+                .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
             {
                 selected.push(".fgos/events".into());
             }

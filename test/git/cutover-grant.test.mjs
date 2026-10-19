@@ -8,14 +8,17 @@ import { execFileSync } from 'node:child_process';
 import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
 import { createGitScopedCommit } from '../../src/git/index.mjs';
 const built=ensureGitAddon();const loader={descriptor:{manifest:JSON.parse(fs.readFileSync(built.manifest)),releaseRoot:root}};
-for(const indexMode of ['ordinary','temporary','external','symlink']) test(`cutover grant validates exact authority and ${indexMode} hook index`,()=>{
+// A baseline-only repository has legacy files under .fgos/ but no event directory.
+const cases=[...['ordinary','temporary','external','symlink'].map(indexMode=>[indexMode,'event-directory']),['ordinary','baseline-only']];
+for(const [indexMode,layout] of cases) test(`cutover grant validates exact authority and ${indexMode} hook index (${layout})`,()=>{
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-cutover-'));const repo=path.join(temp,'repo');fs.mkdirSync(repo);
  const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
  const oldState=process.env.FGOS_STATE_ROOT;process.env.FGOS_STATE_ROOT=temp;
  try {
   git('init','-q','--initial-branch=trunk');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
-  const deleted=['.fgos/events.jsonl','.fgos/events/old.json','.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];
-  fs.mkdirSync(path.join(repo,'.fgos/events'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');
+  const directory=layout==='event-directory';
+  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];
+  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');
   fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\n');
   git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);
   const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
@@ -31,7 +34,7 @@ for(const indexMode of ['ordinary','temporary','external','symlink']) test(`cuto
   }
   const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);
   const baseline=port.preflight();
-  for(const p of deleted)fs.unlinkSync(path.join(repo,p));fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));
+  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));
   const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\n').digest('hex')};
   // A text operation selector and fd annotation are not a borrowed description.
   git('add','-A','--','.fgos/events.jsonl');

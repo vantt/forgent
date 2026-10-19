@@ -267,3 +267,52 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
     assert_eq!(result.files, vec!["a"]);
     assert!(f.main.join("untracked").exists());
 }
+#[test]
+fn baseline_only_cutover_commits_the_event_fence() {
+    use sha2::{Digest, Sha256};
+    let f = Fixture::new();
+    let deleted = vec![".fgos/events.jsonl".to_string(), ".fgos/state.json".into()];
+    for p in &deleted {
+        fs::write(f.main.join(p), "legacy\n").unwrap();
+    }
+    fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
+    let mut add = vec!["add", "--", "seal.json"];
+    add.extend(deleted.iter().map(String::as_str));
+    git(&f.main, &add);
+    git(&f.main, &["commit", "-qm", "legacy"]);
+    let legacy = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
+    let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let baseline = f.driver.preflight_commit(&main, vec![]).unwrap();
+    for p in &deleted {
+        fs::remove_file(f.main.join(p)).unwrap();
+    }
+    assert!(!f.main.join(".fgos/events").exists());
+    fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
+    let request = CommitRequest {
+        writes: vec!["logs".into()],
+        message: "cutover".into(),
+        cutover_grant: Some(CutoverGrant {
+            exact_paths: deleted.clone(),
+            legacy_ref_oid: legacy,
+            seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
+        }),
+    };
+    let result = f
+        .driver
+        .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover")
+        .unwrap();
+    assert_eq!(result.status, ResultCode::Committed);
+    assert_eq!(
+        result.files,
+        vec![".fgos/events", ".fgos/events.jsonl", ".fgos/state.json"]
+    );
+    assert_eq!(git(&f.main, &["show", "HEAD:.fgos/events"]), "legacy fence");
+    assert_eq!(
+        git(&f.main, &["ls-tree", "--name-only", "HEAD", ".fgos/"]),
+        ".fgos/events"
+    );
+}
