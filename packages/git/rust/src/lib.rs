@@ -3,6 +3,8 @@
 //! Publication uses caller-held opaque holder-lock authority, hardened borrowed
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
+mod inspect;
+pub use inspect::*;
 mod publication;
 mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};

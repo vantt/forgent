@@ -18,3 +18,5 @@ export function createEventStore(commonDir, contracts = [], loaderOptions) {
   return new (loadNativeAddon(loaderOptions).EventStore)(commonDir, contracts);
 }
 export function versions(loaderOptions) { return loadNativeAddon(loaderOptions).versions(); }
+
+export { createGitInspect } from './inspect.mjs';

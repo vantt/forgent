@@ -21,6 +21,7 @@
   ],
   "files": {
     "src/git/index.mjs": "infra",
+    "src/git/inspect.mjs": "infra",
     "src/git/native.mjs": "infra",
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",

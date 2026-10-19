@@ -263,7 +263,7 @@ impl GitDriver {
         }
     }
 
-    fn require_floor(&self) -> Result<()> {
+    pub(crate) fn require_floor(&self) -> Result<()> {
         if self.git_floor_verdict()?.supported {
             Ok(())
         } else {
@@ -290,6 +290,12 @@ impl GitDriver {
         } else if main.join("HEAD").is_file() && main.join("objects").is_dir() {
             main.clone()
         } else {
+            if main.join(".git").is_file() {
+                // A worker-controlled gitfile is never topology authority. The
+                // caller must supply the trusted main checkout; separate-git-dir
+                // needs an explicit trusted common-dir contract before support.
+                return Err(refusal("trusted-main-gitfile-unsupported"));
+            }
             return Ok(ResolveRepo::NotARepository);
         };
         let mut git_dir = common.clone();
@@ -517,7 +523,7 @@ impl GitDriver {
         }
         parse_config(&out.stdout)
     }
-    fn preflight(&self, repo: &RepoHandle) -> Result<()> {
+    pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
         for (_, key, _) in self.config(repo)? {
             if command_config(&key) {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
@@ -525,7 +531,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
+    pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke(
@@ -558,7 +564,7 @@ impl GitDriver {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn invoke(
+    pub(crate) fn invoke(
         &self,
         repo: Option<&RepoHandle>,
         cwd: &Path,
@@ -629,6 +635,9 @@ impl GitDriver {
             if i == 0 && *arg == "update-ref" {
                 argv.push("--no-deref".into());
             }
+            if i == 0 && *arg == "diff" {
+                argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
+            }
         }
         if policy == Policy::Remote && args.contains(&"protocol.file.allow=always") {
             let verb = args
@@ -657,9 +666,6 @@ impl GitDriver {
                 let at = argv.iter().position(|a| a == "--").unwrap_or(argv.len());
                 argv.insert(at, format!("{option}={command}"));
             }
-        }
-        if args.first() == Some(&"diff") {
-            argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
         }
         let mut env = Scrubbed::new();
         env.0.insert("LC_ALL".into(), "C".into());
@@ -2333,10 +2339,10 @@ mod tests {
             driver.resolve_repo(&alien.0, &dir.0).unwrap_err().cause,
             "untrusted-worktree"
         );
-        assert!(matches!(
-            driver.resolve_repo(&linked.0, &linked.0).unwrap(),
-            ResolveRepo::NotARepository
-        ));
+        assert_eq!(
+            driver.resolve_repo(&linked.0, &linked.0).unwrap_err().cause,
+            "trusted-main-gitfile-unsupported"
+        );
     }
     #[test]
     fn output_ceiling_and_borrow_gate() {
@@ -2524,7 +2530,7 @@ struct CommitCursor {
 }
 
 impl GitDriver {
-    fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
+    pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke_input(

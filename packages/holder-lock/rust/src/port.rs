@@ -245,6 +245,51 @@ impl Handle {
     }
 }
 
+/// Close-only copy of an acquired exclusive description for one synchronous call.
+/// It never settles or unlocks the owner's description on drop. Construction
+/// requires an opaque acquired handle: an arbitrary file cannot gain authority.
+#[derive(Debug)]
+pub struct BorrowedHandle<'a> {
+    handle: Handle,
+    _owner: std::marker::PhantomData<&'a Handle>,
+}
+
+impl<'a> BorrowedHandle<'a> {
+    /// Duplicate with CLOEXEC and verify before admitting it to a native scope.
+    pub fn new(owner: &'a Handle) -> Result<Self, BorrowError> {
+        if cfg!(windows) { return Err(BorrowError::Unsupported); }
+        validate(owner)?;
+        let file = owner.file().try_clone().map_err(BorrowError::Io)?;
+        let handle = Handle {
+            file: Some(file),
+            resource: owner.resource.clone(),
+            mode: owner.mode,
+            kill_wait_ms: owner.kill_wait_ms,
+            since: std::sync::Mutex::new(*owner.since.lock().map_err(|_| {
+                BorrowError::InvalidSpec("lock-history-poisoned".into())
+            })?),
+        };
+        let borrowed = Self { handle, _owner: std::marker::PhantomData };
+        validate(borrowed.as_ref())?;
+        Ok(borrowed)
+    }
+}
+
+impl AsRef<Handle> for BorrowedHandle<'_> {
+    fn as_ref(&self) -> &Handle { &self.handle }
+}
+
+impl AsRef<Handle> for Handle {
+    fn as_ref(&self) -> &Handle { self }
+}
+
+impl Drop for BorrowedHandle<'_> {
+    fn drop(&mut self) {
+        // Take before Handle::drop: the owner's release alone settles copies.
+        drop(self.handle.file.take());
+    }
+}
+
 /// Lock levels of [`Guarantee`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Level {
@@ -721,7 +766,8 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 /// creates, a second job owner (`helper`, role `job-keeper`) outlives a dead
 /// holder, and nothing is handed to the child (`borrow_windows`). `helper` is
 /// unused on POSIX.
-pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+pub fn run_borrowed(handle: &impl AsRef<Handle>, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+    let handle = handle.as_ref();
     validate(handle)?;
     #[cfg(windows)]
     {
@@ -809,7 +855,8 @@ fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn, B
 /// predecessor handling and per-OS leftover domain. Unix only; Windows keeps
 /// its existing borrow path and refuses this form before starting a child.
 /// The spec's stdio is superseded by explicit input and captured output.
-pub fn run_borrowed_io(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+pub fn run_borrowed_io(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+    let handle = handle.as_ref();
     validate(handle)?;
     #[cfg(not(unix))]
     {

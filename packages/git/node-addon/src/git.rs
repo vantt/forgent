@@ -1,4 +1,5 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
+mod inspect;
 use crate::{check, error};
 use fgos_git::{HolderAuthority, *};
 use fgos_holder_lock::{Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
