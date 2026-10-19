@@ -4,7 +4,7 @@ Viết 2026-10-19 (Asia/Saigon), sửa lần hai cùng ngày sau review độc l
 
 ## Những gì có trên nhánh
 
-- [docs/specs/workflow.md](../../docs/specs/workflow.md) (657 dòng): spec khu vực mới, tiếng Việt, luật mang id tạm `RUL-WF-1…28`.
+- [docs/specs/workflow.md](../../docs/specs/workflow.md) (khoảng 680 dòng): spec khu vực mới, tiếng Việt, luật mang id tạm `RUL-WF-1…28`, battery 26 kịch bản.
 - [component-boundary.md](../../docs/platform/component-boundary.md): các hàng Workflow, Work Lifecycle, Execution Core, Holder-lock (`advance`) mang đoạn "Proposed … pending owner approval" cạnh chữ hiện hành (không xoá chữ cũ).
 - Một dòng pointer ở [reading-map.md](../../docs/specs/reading-map.md); một đoạn pointer ở [runner.md](../../docs/specs/runner.md) (0048/0049 không bị sửa tại chỗ).
 
@@ -29,6 +29,20 @@ Kiểm: `scripts/check-decision-citation-drift.mjs` không còn finding; `test/d
 | `listedRoutesOnly` bỏ khỏi milestone trong ví dụ; `frameDefaults` không còn chuỗi trong ô số; tên hai test phải giữ xanh được nêu | review N-a, N-b, S8 |
 | Mục mới **§14 Điều kiện đảo quyết định**: với mỗi mục owner quyết hoặc mặc định hội đồng, tín hiệu quan sát được sẽ mở lại và đổi sang gì; bảng mặc định đánh dấu "owner 2026-10-19" | owner: "nhớ ghi nhận các note khi nào thay đổi" |
 | Battery thêm kịch bản 16–22; nghĩa vụ chứng minh cho plan; rủi ro R8–R10; bất đồng mới của vòng tập trung | vòng tập trung |
+
+## Sửa lần ba: theo red-team bản sửa ([review-261019-1220](review-261019-1220-agent-workflow-model-ba-spec-revision.md))
+
+| Mục | Sửa |
+|---|---|
+| B1′ | `answer` không bao giờ append ledger trực tiếp: ghi file gate-answer (runtime state, bất biến sau khi tiêu), thử `advance` một lần; bị giữ thì proposer append `gate.answer` ở lần đọc lại kế tiếp, trước khi hành động (§5.4, §7.4, §8, battery 14, RUL-WF-24) |
+| B2′ | Dispatch gọi tên một playbook case đang sống từ bên trong Unit của nó (ghi hay chỉ-đọc, kể cả mở case con) bị từ chối theo tên `playbook-case-admits-via-proposer-only`; xoá câu "rút từ trần seat launch của Unit"; ghi vào R8 là giá của Shape C; ghi việc doctrine `coordination-driver.md` phải theo (làn COOK) (§5.4, RUL-WF-28, §8, battery 23) |
+| B3′ | Mọi caller `runUnit` có `writes` tiêm port thật ngay khi land, gồm các đường Work đang chạy; không case nào ràng → `unbound`, chạy như trước; "khi cutover coding" chỉ còn nghĩa gọi tên case/activity (§5.2, §8, §9, §11.2, battery 24) |
+| S1′ | Port nhận lần giữ `advance` đang có (battery 25) |
+| S2′ | RUL-WF-27: một tên file, `state` bên trong, chỉ chủ ghi đè; thiếu bản ghi = `unbound` trên đường nóng; đối chiếu ledger là đường sửa chữa (battery 26) |
+| S3′ | `status`/`resume` theo loại case: conductor case `running` khi còn reservation sống, `resume` chỉ nhặt file gate-answer (§5.4, §7.6, battery 9) |
+| S4′ | §14 thêm dòng: hệ quả N17, luật `answer`, port nhận lần giữ, tạo-độc-quyền-là-mutex (làn holder-lock), thiếu bản ghi = `unbound`, RUL-WF-28, N8, N11 |
+
+Boundary rows (Execution Core, Holder-lock) chỉnh theo B1′, B2′, B3′, S1′. Không cần owner quyết thêm; hệ quả B2′ đã đưa vào R8 để owner thấy là giá của lựa chọn 12:20.
 
 ## Spec khoá gì, để mở gì
 
