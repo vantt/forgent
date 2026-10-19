@@ -29,3 +29,12 @@ test('setup refuses symlink identities and lock directories, preserves invalid e
   fs.rmdirSync(f.locks); fs.symlinkSync(f.stateRoot, f.locks);
   assert.throws(() => fixEventStoreLockDirs(f.repo, f.ctx), /unsafe directory/);
 });
+
+test('machine identity accepts a canonical state root beneath symlinked ancestors', t => {
+  const f = fixture(t);
+  const linked = path.join(f.temp, 'linked-state'); fs.symlinkSync(f.stateRoot, linked);
+  const options = { ...f.ctx, stateRoot: path.join(linked, 'nested') };
+  assert.equal(fixEventStoreMachineId(f.repo, options).changed, true);
+  assert.equal(fixEventStoreMachineId(f.repo, options).changed, false);
+  assert.match(fs.readFileSync(path.join(f.stateRoot, 'nested/machine-id'), 'utf8'), /^[a-z0-9-]+\n$/);
+});

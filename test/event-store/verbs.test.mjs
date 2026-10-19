@@ -86,3 +86,18 @@ test('rebuild resolves shipped consumer contracts, removes both caches and refol
   assert.deepEqual(result.rebuilt.map(e => e.result), [{ count: 1, maxAttempts: 5 }, { count: 1, maxAttempts: 5 }]);
   for (const entry of entries) assert.equal(JSON.parse(fs.readFileSync(path.join(f.repo, entry.cachePath)))[0].payload.id, 'one');
 });
+
+test('ahead and behind count only commits outside the opposite tip ancestry', t => {
+  const f = fixture(t);
+  append(f.store, [{}]); f.store.seal('project', []);
+  const first = f.git('rev-parse', 'refs/fgos/events/phase-seven');
+  append(f.store, [{ payload: { id: 'two' } }]); f.store.seal('project', []);
+  const second = f.git('rev-parse', 'refs/fgos/events/phase-seven');
+  f.git('update-ref', 'refs/fgos/remotes/origin/events/phase-seven', first);
+  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 1, behind: 0 });
+  f.git('update-ref', 'refs/fgos/remotes/origin/events/phase-seven', second);
+  f.git('update-ref', 'refs/fgos/events/phase-seven', first);
+  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 1 });
+  f.git('update-ref', 'refs/fgos/events/phase-seven', second);
+  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 0 });
+});

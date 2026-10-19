@@ -202,14 +202,12 @@ pub fn status(
     }
     let own = tips.get(&format!("refs/fgos/events/{machine}"));
     let mirror = tips.get(&format!("refs/fgos/remotes/{remote}/events/{machine}"));
-    let ahead_behind = match (own.and_then(Value::as_str), mirror.and_then(Value::as_str)) {
-        (Some(a), Some(b)) => {
-            json!({"ahead":distance(driver,repo,a,Some(b))?,"behind":distance(driver,repo,b,Some(a))?})
-        }
-        (Some(a), None) => json!({"ahead":distance(driver,repo,a,None)?,"behind":0}),
-        (None, Some(b)) => json!({"ahead":0,"behind":distance(driver,repo,b,None)?}),
-        (None, None) => json!({"ahead":0,"behind":0}),
-    };
+    let ahead_behind = ahead_behind(
+        driver,
+        repo,
+        own.and_then(Value::as_str),
+        mirror.and_then(Value::as_str),
+    )?;
     let sync = crate::sync::sync_status(layout)?;
     let shared = if let Some(tip) = mirror.and_then(Value::as_str) {
         let tip = fgos_git::Oid::parse(tip, repo.object_format())
@@ -242,16 +240,22 @@ pub fn status(
     )
 }
 
-fn distance(
+// Inspect's stop list includes the stop commits and prunes only their parents;
+// it is not rev-list's ancestry exclusion. Share two exact reachability walks
+// across both counts rather than miscounting divergent histories.
+fn ahead_behind(
     driver: &GitDriver,
     repo: &RepoHandle,
-    tip: &str,
-    stop: Option<&str>,
-) -> Result<usize, Error> {
-    if stop == Some(tip) {
-        return Ok(0);
+    own: Option<&str>,
+    mirror: Option<&str>,
+) -> Result<Value, Error> {
+    if own == mirror {
+        return Ok(json!({"ahead":0,"behind":0}));
     }
-    let reachable = |tip: &str| -> Result<BTreeSet<String>, Error> {
+    let reachable = |tip: Option<&str>| -> Result<BTreeSet<String>, Error> {
+        let Some(tip) = tip else {
+            return Ok(BTreeSet::new());
+        };
         let tips = [fgos_git::Oid::parse(tip, repo.object_format())
             .map_err(|e| crate::errors::invalid(e.to_string()))?];
         let mut commits = BTreeSet::new();
@@ -279,9 +283,7 @@ fn distance(
             );
         }
     };
-    let own = reachable(tip)?;
-    Ok(match stop {
-        Some(stop) => own.difference(&reachable(stop)?).count(),
-        None => own.len(),
-    })
+    let own = reachable(own)?;
+    let mirror = reachable(mirror)?;
+    Ok(json!({"ahead":own.difference(&mirror).count(),"behind":mirror.difference(&own).count()}))
 }

@@ -16,8 +16,9 @@ function realDirectory(dir) {
 }
 export function fixEventStoreMachineId(cwd, options = {}) {
   const stateRoot = options.stateRoot ?? resolveStateRoot().stateRoot;
-  realDirectory(stateRoot);
-  return mintEventStoreMachineId(stateRoot, os.hostname(), options.loaderOptions);
+  fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
+  const canonicalRoot = fs.realpathSync(stateRoot);
+  return mintEventStoreMachineId(canonicalRoot, os.hostname(), options.loaderOptions);
 }
 export function fixEventStoreRefspec(cwd, options = {}) {
   const { base, facts, config } = eventStoreSetupContext(cwd, options);

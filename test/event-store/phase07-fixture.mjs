@@ -21,7 +21,10 @@ export function fixture(t, { remote = false, machine = true } = {}) {
   fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
   fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
   const contracts = path.join(temp, 'contract.json');
-  fs.writeFileSync(contracts, JSON.stringify({ v: 1, types: ['work.add', 'work.edit'].map(type => ({ type, domain: 'work', schemaVersion: 1, scope: 'project', sealOnWrite: false })) }));
+  fs.writeFileSync(contracts, JSON.stringify({ v: 1, types: [
+    ...['work.add', 'work.edit', 'porting.add', 'porting.move'].map(type => ({ type, domain: type.startsWith('porting.') ? 'porting' : 'work', schemaVersion: 1, scope: 'project', sealOnWrite: false })),
+    ...['local', 'branch'].map(scope => ({ type: `private.${scope}`, domain: 'private', schemaVersion: 1, scope, sealOnWrite: false })),
+  ] }));
   if (remote) { execFileSync('git', ['init', '--bare', '-q', path.join(temp, 'remote')]); git('remote', 'add', 'origin', path.join(temp, 'remote')); }
   const ctx = { cwd: repo, stateRoot, loaderOptions, globalConfigPath: path.join(temp, 'global.json') };
   const store = machine ? openStore(addon.resolveEventStore(repo, stateRoot, repo), 'phase-seven', [contracts], loaderOptions) : null;

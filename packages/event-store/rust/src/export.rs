@@ -144,7 +144,7 @@ fn allowed(path: &str) -> bool {
 }
 fn legacy_value(e: &Envelope) -> Value {
     // Dropping v4 h is essential: the old reader verifies its own 16-hex hash rule.
-    json!({"seq":e.seq,"ts":e.ts,"type":e.event_type,"payload":e.payload,"v":3,"src":e.src})
+    json!({"seq":e.seq,"ts":e.ts,"type":e.event_type,"payload":e.payload,"v":3,"src":e.src,"eventStoreId":format!("{}:{}:{}",e.origin,e.stream,e.seq)})
 }
 /// Return both orders to the consumer adapter, which alone owns its reducers.
 /// Legacy files are authenticated at the tracked D18 pin and preserved byte for byte.
@@ -153,6 +153,13 @@ pub fn export_legacy_layout(
     repo: &RepoHandle,
     req: ExportRequest<'_>,
 ) -> Result<Value, Error> {
+    if req
+        .streams
+        .iter()
+        .any(|s| s.scope() != crate::envelope::Scope::Project)
+    {
+        return Err(invalid("legacy-layout accepts only project streams"));
+    }
     let got = query(port, repo, &req)?;
     if crate::fence::pinned_legacy(port, repo)?.is_none() && !got.legacy.is_empty() {
         return Err(invalid("legacy-layout requires the tracked legacy pin"));
@@ -167,6 +174,14 @@ pub fn export_legacy_layout(
             for entry in page.entries {
                 let path = std::str::from_utf8(&entry.path)
                     .map_err(|_| invalid("non-UTF8 export path"))?;
+                if entry.kind == ObjectType::Tree
+                    && entry.mode == 0o040000
+                    && (path == "events"
+                        || path == "porting"
+                        || allowed(&format!("{path}/events.jsonl")))
+                {
+                    continue;
+                }
                 if !allowed(path) || entry.mode != 0o100644 || entry.kind != ObjectType::Blob {
                     return Err(invalid("unsafe legacy tree entry"));
                 }
@@ -183,15 +198,6 @@ pub fn export_legacy_layout(
             );
         }
     }
-    let mut ordered: Vec<LegacyEvent> = Vec::new();
-    for (name, bytes) in &files {
-        if name != "seal.json" {
-            ordered.extend(legacy::parse_file(
-                if name == "events.jsonl" { "" } else { name },
-                std::str::from_utf8(bytes).map_err(|_| invalid("legacy UTF8"))?,
-            )?);
-        }
-    }
     let mut streams = BTreeMap::<String, Vec<u8>>::new();
     for e in &got.sequence {
         if e.seq
@@ -204,22 +210,42 @@ pub fn export_legacy_layout(
         {
             continue;
         }
-        let key = e.stream.replace(':', "-");
+        if !matches!(e.stream.as_str(), "project" | "project:porting") {
+            return Err(invalid("unsupported legacy project stream"));
+        }
+        let name = if e.stream == "project:porting" {
+            "porting/events.jsonl"
+        } else {
+            "events/v4-project.jsonl"
+        };
         streams
-            .entry(key)
+            .entry(name.into())
             .or_default()
             .extend(line(&legacy_value(e))?);
     }
-    for (stream, bytes) in streams {
-        let name = format!("events/v4-{stream}.jsonl");
-        if files.contains_key(&name) {
+    for (name, bytes) in streams {
+        if name == "porting/events.jsonl" {
+            let historical = files.entry(name).or_default();
+            if !historical.is_empty() && !historical.ends_with(b"\n") {
+                historical.push(b'\n');
+            }
+            historical.extend(bytes);
+        } else if files.insert(name, bytes).is_some() {
             return Err(invalid("v4 export name collides with legacy file"));
         }
-        ordered.extend(legacy::parse_file(
-            &name,
-            std::str::from_utf8(&bytes).map_err(|_| invalid("export UTF8"))?,
-        )?);
-        files.insert(name, bytes);
+    }
+    let mut ordered: Vec<LegacyEvent> = Vec::new();
+    for (name, bytes) in &files {
+        if name == "events.jsonl" || name.starts_with("events/") {
+            ordered.extend(legacy::parse_file(
+                if name == "events.jsonl" {
+                    ""
+                } else {
+                    name.rsplit('/').next().unwrap()
+                },
+                std::str::from_utf8(bytes).map_err(|_| invalid("legacy UTF8"))?,
+            )?);
+        }
     }
     destination(req.out)?;
     for (name, bytes) in &files {
@@ -228,10 +254,51 @@ pub fn export_legacy_layout(
     let modern: Vec<Value> = got
         .legacy
         .iter()
+        .filter(|e| e.provenance.file == "events.jsonl" || e.provenance.file.starts_with("events/"))
         .map(|e| e.event.clone())
-        .chain(got.sequence.iter().map(legacy_value))
+        .chain(
+            got.sequence
+                .iter()
+                .filter(|e| e.stream == "project")
+                .map(legacy_value),
+        )
+        .collect();
+    let modern_porting: Vec<Value> = got
+        .legacy
+        .iter()
+        .filter(|e| e.provenance.file == "porting/events.jsonl")
+        .map(|e| e.event.clone())
+        .chain(
+            got.sequence
+                .iter()
+                .filter(|e| e.stream == "project:porting")
+                .map(legacy_value),
+        )
         .collect();
     Ok(
-        json!({"out":req.out,"files":files.keys().collect::<Vec<_>>(),"legacyOrder":legacy::order(ordered).into_iter().map(|e| e.event).collect::<Vec<_>>(),"v4Order":modern,"deferred":got.deferred,"missing":got.missing}),
+        json!({"v4PortingOrder":modern_porting,"out":req.out,"files":files.keys().collect::<Vec<_>>(),"legacyOrder":legacy::order(ordered).into_iter().map(|e| e.event).collect::<Vec<_>>(),"v4Order":modern,"deferred":got.deferred,"missing":got.missing}),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn converted_origins_keep_distinct_legacy_identities() {
+        let event: Envelope = serde_json::from_value(json!({
+            "v":4,"type":"work.add","scope":"project","origin":"first",
+            "stream":"project","seq":1,"seen":{},"ts":"2026-10-19T00:00:00.000Z",
+            "src":"fixture","schemaVersion":1,"payload":{"id":"one"},"h":"unused"
+        }))
+        .unwrap();
+        let mut other = event.clone();
+        other.origin = "second".into();
+        let mut bytes = line(&legacy_value(&event)).unwrap();
+        bytes.extend(line(&legacy_value(&other)).unwrap());
+        let parsed =
+            legacy::parse_file("v4-project.jsonl", std::str::from_utf8(&bytes).unwrap()).unwrap();
+        assert_eq!(legacy::order(parsed).len(), 2);
+        assert!(legacy_value(&event).get("h").is_none());
+    }
 }

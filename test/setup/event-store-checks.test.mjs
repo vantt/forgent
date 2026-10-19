@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fixture, append } from '../event-store/phase07-fixture.mjs';
-import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
+import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
@@ -35,9 +35,9 @@ test('mapping facts fail missing/unsafe mappings and changed URL; machine missin
   const empty = fixture(t, { machine: false });
   assert.equal(checkEventStore(empty.repo, 'event-store-machine-id', empty.ctx).passed, false);
 });
-test('sync without a push warns; missing addon fails rather than silently passing', t => {
+test('sync without unpublished events passes; missing addon fails rather than silently passing', t => {
   const f = fixture(t, { remote: true });
-  assert.match(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, /^warning:/);
+  assert.equal(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, 'no unpublished events');
   assert.equal(checkEventStore(f.repo, 'event-store-native-addon', { loaderOptions: { descriptor: { manifest: {}, releaseRoot: f.repo } } }).passed, false);
 });
 
@@ -72,4 +72,46 @@ test('shared machine ref warns only after reading another clone origin on the ow
   fixEventStoreRefspec(second.repo, second.ctx); append(second.store, [{}]); syncUseCase(second.ctx);
   assert.match(checkEventStore(second.repo, 'event-store-machine-id', second.ctx).message, /^warning: event-store-machine-ref-shared/);
   assert.equal(checkEventStore(second.repo, 'event-store-sync', second.ctx).message.startsWith('warning:'), false);
+});
+
+test('refspecs allow ordinary pushes and protective negative fetches but refuse Event Store pushes', t => {
+  const f = fixture(t, { remote: true }); fixEventStoreRefspec(f.repo, f.ctx);
+  f.git('config', '--add', 'remote.origin.fetch', '^refs/fgos/local-events/*');
+  for (const refspec of ['HEAD', ':', '+:', 'refs/heads/*:refs/heads/*', ':refs/fgos/events/old']) {
+    f.git('config', 'remote.origin.push', refspec);
+    assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, true, refspec);
+  }
+  for (const refspec of ['refs/*:refs/*', '+refs/fgos/*:refs/fgos/*', 'refs/fgos/events/machine']) {
+    f.git('config', 'remote.origin.push', refspec);
+    assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false, refspec);
+  }
+});
+test('live worktree branch keys are not orphaned; removal makes the same stream orphaned', t => {
+  const f = fixture(t); f.git('commit', '--allow-empty', '-qm', 'root');
+  const linked = path.join(f.temp, 'linked');
+  f.git('worktree', 'add', '-qb', 'Feature/Live_One', linked);
+  fs.mkdirSync(path.join(f.repo, '.git/fgos/events/branch:feature-live-one'));
+  assert.equal(checkEventStore(f.repo, 'event-store-orphan-branches', f.ctx).message, 'no orphan branch streams');
+  f.git('worktree', 'remove', linked);
+  assert.match(checkEventStore(f.repo, 'event-store-orphan-branches', f.ctx).message, /^warning:.*branch:feature-live-one/);
+});
+test('one doctor invocation reuses its status snapshot; a new invocation observes new data', t => {
+  const f = fixture(t);
+  const context = eventStoreSetupContext(f.repo, f.ctx);
+  assert.strictEqual(context.status(), context.status());
+  const check = eventStoreDoctor(f.repo, f.ctx);
+  assert.equal(check('event-store-integrity').passed, true);
+  append(f.store, [{}]);
+  fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved' }));
+  assert.equal(check('event-store-integrity').passed, true);
+  assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-integrity').passed, false);
+});
+
+test('sync warns for real unpublished project events', t => {
+  const f = fixture(t, { remote: true });
+  assert.equal(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, 'no unpublished events');
+  f.store.append('local', [{ eventType: 'private.local', schemaVersion: 1, payload: { secret: true }, ts: '2026-10-19T01:00:00.000Z' }], {}, 'fixture', []);
+  assert.equal(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, 'no unpublished events');
+  append(f.store, [{}]);
+  assert.match(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, /^warning:/);
 });
