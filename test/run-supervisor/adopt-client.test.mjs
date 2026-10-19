@@ -1,6 +1,7 @@
 // The adopt client against a real host binary: it lists open attempt
 // directories, calls `fgos internal adopt` and names what goes wrong.
 // Needs FGOS_HOST_BIN pointing at a host built from this checkout.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

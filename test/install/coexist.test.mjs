@@ -2,6 +2,7 @@
 // manifest (install-coexistence D2/D4/D6). Every "detect" test also proves
 // D4's read-only-absolute claim: the marker it found is byte/mtime
 // unchanged after detection ran.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -2,6 +2,7 @@
 // every rank the scope holds; the same rank twice is refused; two scopes
 // in one process do not see each other. A violation throws before any
 // file is opened or any helper runs.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

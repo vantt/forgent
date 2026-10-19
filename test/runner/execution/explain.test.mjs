@@ -1,6 +1,7 @@
 // fgos dispatch explain: the binding a run would get for a capability, laid beside the tier cell and
 // the accounts of the family's pool. It binds through bind() and reads nothing else that decides.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';

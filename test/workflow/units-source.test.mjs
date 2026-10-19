@@ -1,5 +1,6 @@
 // test/workflow/units-source.test.mjs — A units file becomes a one-off Workflow definition
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

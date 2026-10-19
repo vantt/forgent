@@ -1,5 +1,6 @@
 // The run supervisor doctor checks and fixes, run for real: the host binary answers `--probe`, adopt
 // judges real attempt directories with real kernel locks, `flock(1)` plays a holder.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

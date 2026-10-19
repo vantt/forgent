@@ -1,6 +1,7 @@
 // host-bin-path.test.mjs -- the one Node rule for which host binary an
 // activated workspace runs (same as the fgctl shim), and the order the
 // identity facade looks in.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

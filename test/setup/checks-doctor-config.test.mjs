@@ -3,6 +3,7 @@
 // mà tsk-3um/tsk-67g đã lập: mỗi file test/setup/*.test.mjs dưới ~30s để
 // `node --test` trải suite ra các core. Thân test bê nguyên văn; chỉ
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {

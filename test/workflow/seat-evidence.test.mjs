@@ -1,5 +1,6 @@
 // test/workflow/seat-evidence.test.mjs — what a --seats start pins and what status says ran
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';

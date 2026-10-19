@@ -1,5 +1,6 @@
 // test/runner/agent-definitions.test.mjs — one lookup of an agent definition across workspace, domain and core tiers
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

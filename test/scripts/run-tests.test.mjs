@@ -1,13 +1,14 @@
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -369,6 +370,70 @@ test('runSelectedTests keeps the per-run temp dir when FGOS_TEST_KEEP_TMP=1, and
   });
   assert.equal(fs.existsSync(result.runTemp), true);
   assert.match(logs.join('\n'), new RegExp(result.runTemp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails a run that leaves fgos-* temp dirs behind and names their prefixes', () => {
+  const base = tempBase();
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => {
+      for (const name of ['fgos-leaky-test-Ab12Cd', 'fgos-leaky-test-Zy98Xw', 'fgos-other-q1w2e3', 'unrelated-dir']) fs.mkdirSync(path.join(opts.env.TMPDIR, name));
+      return { status: 0 };
+    },
+    log: (msg) => logs.push(msg),
+  });
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.tempLeftovers, { 'fgos-leaky-test-': 2, 'fgos-other-': 1 });
+  assert.match(logs.join('\n'), /fgos-leaky-test-\*: 2/);
+  assert.equal(fs.existsSync(result.runTemp), false, 'the run dir is still removed');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests passes a run whose temp root holds no fgos-* leftovers', () => {
+  const base = tempBase();
+  const result = runSelectedTests(['a.test.mjs'], { cwd: base, env: { TMPDIR: base }, spawn: () => ({ status: 0 }) });
+  assert.equal(result.status, 0);
+  assert.deepEqual(result.tempLeftovers, {});
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('leftoverTempPrefixes groups by prefix without the random suffix and tolerates a missing root', () => {
+  assert.deepEqual(leftoverTempPrefixes('/nope', () => ['fgos-cli-AAAAAA', 'fgos-cli-BBBBBB', 'x']), { 'fgos-cli-': 2 });
+  assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});
+});
+
+test('a test process that imports process-tmp-root.mjs keeps its temp files in a private dir and removes it at exit', () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};
+import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
+fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));
+console.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;
+  const base = tempBase();
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });
+  assert.equal(run.status, 0, run.stderr);
+  const { root, tmpdir } = JSON.parse(run.stdout);
+  assert.equal(tmpdir, root);
+  assert.equal(path.dirname(root), fs.realpathSync(base));
+  assert.deepEqual(fs.readdirSync(base), [], 'nothing survives the process, including the dir the script never removed');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a test process ended by SIGTERM still removes its private temp dir', async () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import ${JSON.stringify(helper)};
+import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
+fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));
+console.log('ready'); setInterval(() => {}, 1000);`;
+  const base = tempBase();
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' }, stdio: ['ignore', 'pipe', 'inherit'] });
+  await new Promise((resolve) => child.stdout.once('data', resolve));
+  const closed = new Promise((resolve) => child.once('close', resolve));
+  child.kill('SIGTERM');
+  await closed;
+  assert.deepEqual(fs.readdirSync(base), []);
   fs.rmSync(base, { recursive: true, force: true });
 });
 

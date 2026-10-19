@@ -2,6 +2,7 @@
 // projection pipeline (docs/history/agent-executor-agent-definitions/plan.md
 // Risk map): the tool-scope -> tools: mapping (D1), idempotency, and
 // platform-agnostic content enforcement.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

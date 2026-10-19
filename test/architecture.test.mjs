@@ -9,6 +9,7 @@
 //       giờ được quét vào manifest) không phải câu hỏi về tầng.
 //   (c) domain-siloing (D12) — core (src/, bin/, core/) không import domain cụ thể
 //       (domains/<name>/); domain A không import domain B (cross-domain siloing).
+import './helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

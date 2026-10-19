@@ -4,6 +4,7 @@
 // meets (time budget, idle budget, output budget, nested-dispatch depth, process-group kill) are
 // enforced by the cli-spawn launch every Unit run goes through.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -33,6 +33,7 @@
 // (every write allowed) — a canary run without it would prove nothing. The
 // dedicated self-check test below re-proves that fail-open behavior so a
 // future accidental omission here fails loudly instead of silently lying.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

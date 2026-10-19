@@ -1,4 +1,5 @@
 // Real Windows helper, nested job, supervisor and gate. No emulated LockFileEx.
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

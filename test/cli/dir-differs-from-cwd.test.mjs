@@ -1,5 +1,6 @@
 // test/cli/dir-differs-from-cwd.test.mjs — a `--dir` naming another project than the working directory
 
+import '../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

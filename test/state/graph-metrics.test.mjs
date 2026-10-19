@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap, detectCycles, computeSchedule } from '../../src/state/graph-metrics.mjs';

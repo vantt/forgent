@@ -2,6 +2,7 @@
 // checkout) and the fake herdr script the Rust driver tests use: every port
 // operation answers as the contract says, refusals come back untouched, and a
 // route problem throws a named error.
+import '../helpers/process-tmp-root.mjs';
 import { test, after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -6,6 +6,7 @@
 // real host, real Node payload); only Cargo is substituted, by a stub that
 // installs the already-built host binary (FGOS_HOST_BIN, which `npm test`
 // builds from this checkout) and the real native addon the door also builds.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

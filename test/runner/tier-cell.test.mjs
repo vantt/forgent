@@ -2,6 +2,7 @@
 // (model@pool), or an ordered list of those. The run picks the first entry served by the family's
 // own pool; the other entries are read so explain and doctor can show them.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,6 +1,7 @@
 // test/runner/dispatch-governance-operability.test.mjs
 // Verification test suite for dispatch governance, public CLI, observation truth, and doctor coherence.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

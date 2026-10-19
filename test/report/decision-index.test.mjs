@@ -6,6 +6,7 @@
 // half (computeDecisionIndex, shared by the write path and --check), and
 // the CLI verb wiring (`fgos decision-index[--check]`).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

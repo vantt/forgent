@@ -1,6 +1,7 @@
 // test/workflow/workflow-store-ledger.test.mjs — the run ledger is written through one door that holds
 // `advance`, is read fail-closed, and is shortened only by an explicit recovery of an unfinished tail.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

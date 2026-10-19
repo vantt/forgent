@@ -2,6 +2,7 @@
 // route answers the guarantee, the probe hands a real description to a real
 // child, `flock(1)` of util-linux plays a foreign holder, and the fence fix
 // goes through the host's quiesce scan.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

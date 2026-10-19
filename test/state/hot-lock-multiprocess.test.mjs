@@ -6,6 +6,7 @@
 // Needs FGOS_HOST_BIN: cleaning a dead holder takes the reclaim kernel lock
 // through the holder-lock facade, which runs the host helper.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';

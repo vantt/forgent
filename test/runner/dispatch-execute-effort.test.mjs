@@ -5,6 +5,7 @@
 // vocabulary, then the executor's own declared `supports.reasoningEffort`),
 // and is rendered into the flag the spawned CLI actually reads.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

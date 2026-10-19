@@ -1,5 +1,6 @@
 // test/workflow/architecture-advisory-workflow.test.mjs — Integration tests for Architecture Advisory Workflow (P4 Wave B Phase 3)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

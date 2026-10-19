@@ -12,6 +12,7 @@
 // của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
 // tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {

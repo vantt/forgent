@@ -291,6 +291,24 @@ export function diffGitIdentity(before, after) {
   return { added, removed, changed, leaked: added.length + removed.length + changed.length > 0 };
 }
 
+/**
+ * The `fgos-*` entries still present directly under a run's temp root, grouped by name prefix
+ * (the random mkdtemp suffix cut off): `{ prefix: count }`. Every test process removes its own
+ * temp tree at exit, so anything left here came from a file that skipped that, a killed file, or
+ * a child that outlived it.
+ */
+export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {
+  const counts = {};
+  let names = [];
+  try { names = readdir(root); } catch { return counts; }
+  for (const name of names) {
+    if (!name.startsWith('fgos-')) continue;
+    const prefix = name.replace(/[A-Za-z0-9_]{6}$/, '');
+    counts[prefix] = (counts[prefix] || 0) + 1;
+  }
+  return counts;
+}
+
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
@@ -423,6 +441,7 @@ export function runSelectedTests(files, {
 
   let result;
   let timedOut = [];
+  const tempLeftovers = {};
   const supervisor = watchdog && runTemp
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
@@ -431,6 +450,10 @@ export function runSelectedTests(files, {
     result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
   } finally {
     if (supervisor) timedOut = supervisor.stop();
+    for (const root of [runTemp, fixtureRoot]) {
+      if (!root) continue;
+      for (const [prefix, count] of Object.entries(leftoverTempPrefixes(root))) tempLeftovers[prefix] = (tempLeftovers[prefix] || 0) + count;
+    }
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -457,6 +480,14 @@ export function runSelectedTests(files, {
     for (const { file, elapsedMs, limitMs } of timedOut) {
       log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);
     }
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  result.tempLeftovers = tempLeftovers;
+  if (Object.keys(tempLeftovers).length) {
+    log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
+    for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
+    log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 

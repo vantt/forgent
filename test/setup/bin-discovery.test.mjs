@@ -1,6 +1,7 @@
 // bin-discovery.test.mjs — 3-tier fgos bin resolution + tier-3 config-cache
 // (tsk-2qc-1, D2/D4 of docs/history/install-setup-external-project-
 // reliability/CONTEXT.md).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

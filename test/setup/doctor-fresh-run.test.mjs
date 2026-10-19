@@ -13,6 +13,7 @@
 // can never legitimately report passed:true here. Confirmed by manually
 // tracing init -> setup -> doctor against a real fresh external dir before
 // writing this file, not assumed from source reading alone.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

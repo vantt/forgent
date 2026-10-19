@@ -1,6 +1,7 @@
 // The observe store lock is one kernel lock file shared by Node (holder-lock facade) and the Rust
 // `fgos` host: a Node holder must make `fgos metrics case open` wait, then time out by name, and a
 // holder that ends frees the lock at once.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

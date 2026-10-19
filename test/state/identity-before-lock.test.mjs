@@ -7,6 +7,7 @@
 // the real host. A fresh Node process (empty identity cache) runs the real
 // write paths against a real git repo reached through a symlinked path, so
 // lexical and canonical forms of the same .fgos dir both occur.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';

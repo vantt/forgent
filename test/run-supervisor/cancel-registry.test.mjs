@@ -1,6 +1,7 @@
 // Ctrl-C of a controller (r6 §16): the supervisor of every delivered attempt is asked to cancel, the
 // controller waits for the receipts and leaves with 130 / 143. Real controller process, real supervisor,
 // real sandbox; the agent is fixtures/direct-agent.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

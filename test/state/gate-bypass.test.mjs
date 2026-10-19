@@ -3,6 +3,7 @@
 // the completeness scan must never false-negative on an incomplete artifact,
 // and the D4 hard-gate floor must hold even at the highest level.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -4,6 +4,7 @@
 // from the executor, and the invocation that runs is the one that can carry the
 // capability's posture.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

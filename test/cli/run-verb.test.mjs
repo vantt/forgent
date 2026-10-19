@@ -1,5 +1,6 @@
 // test/cli/run-verb.test.mjs — Integration tests for fgos run CLI verb
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

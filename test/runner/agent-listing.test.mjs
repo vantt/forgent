@@ -1,5 +1,6 @@
 // test/runner/agent-listing.test.mjs — what a project can seat, what the renderer drops, what is hidden
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,5 +1,6 @@
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
+import '../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
