@@ -1,0 +1,29 @@
+{
+  "inputHead": "20d1b97da8046d895e1781cbe16243e8fd95c3a4",
+  "onlyAuthorizedPriorEdgeChanges": true,
+  "changes": [
+    {
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "edgeId": "maps-j-04320",
+      "before": "parked",
+      "after": "preserve",
+      "recordedSuccessorNotes": []
+    },
+    {
+      "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "edgeId": "maps-j-04345",
+      "before": "parked",
+      "after": "preserve",
+      "recordedSuccessorNotes": [
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md."
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "edgeId": "maps-j-04353",
+      "before": "parked",
+      "after": "preserve",
+      "recordedSuccessorNotes": []
+    }
+  ]
+}

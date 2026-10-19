@@ -1,0 +1,886 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "historicalFixtureAliasMigrations": [],
+  "historicalFixtureNarrativeMigrations": [
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08268",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08271",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08279",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08283",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08284",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08287",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08292",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08293",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08294",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08310",
+      "holder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+    }
+  ],
+  "historicalFixtureRegionPreserves": [],
+  "positiveRecords": 21,
+  "positiveEdges": 501,
+  "negativeProbes": 87,
+  "allRejected": true,
+  "probes": [
+    {
+      "surfaceClass": 3,
+      "probe": "unknown record field",
+      "expectedCheck": "schema",
+      "rejected": true,
+      "observedChecks": [
+        "schema"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong author digest",
+      "expectedCheck": "digest",
+      "rejected": true,
+      "observedChecks": [
+        "digest"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong declared commit",
+      "expectedCheck": "digest",
+      "rejected": true,
+      "observedChecks": [
+        "digest"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong inventory digest",
+      "expectedCheck": "digest",
+      "rejected": true,
+      "observedChecks": [
+        "digest"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "missing inventory edge",
+      "expectedCheck": "edge-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "edge-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "duplicate inventory edge",
+      "expectedCheck": "edge-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "edge-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "invented inventory edge",
+      "expectedCheck": "edge-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "edge-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong source column",
+      "expectedCheck": "source-span",
+      "rejected": true,
+      "observedChecks": [
+        "passage-correspondence",
+        "source-span"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "old ordinal rebound to different unit",
+      "expectedCheck": "passage-correspondence",
+      "rejected": true,
+      "observedChecks": [
+        "passage-correspondence",
+        "source-span"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "unknown disposition",
+      "expectedCheck": "disposition",
+      "rejected": true,
+      "observedChecks": [
+        "disposition"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "park without blocked reason",
+      "expectedCheck": "parked-state",
+      "rejected": true,
+      "observedChecks": [
+        "dependency-category",
+        "parked-state"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "park without dependency",
+      "expectedCheck": "parked-state",
+      "rejected": true,
+      "observedChecks": [
+        "dependency-category",
+        "parked-state"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "row flip scheduled now",
+      "expectedCheck": "row-semantics",
+      "rejected": true,
+      "observedChecks": [
+        "row-semantics"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "preserved citation with executable hunk",
+      "expectedCheck": "preserve-state",
+      "rejected": true,
+      "observedChecks": [
+        "preserve-state"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "missing committed target",
+      "expectedCheck": "target-tree",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution",
+        "target-tree"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "alias key used as destination",
+      "expectedCheck": "alias-destination",
+      "rejected": true,
+      "observedChecks": [
+        "alias-destination",
+        "anchor-carriage-locator",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution",
+        "target-tree"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "retired lookup spelling as destination",
+      "expectedCheck": "alias-destination",
+      "rejected": true,
+      "observedChecks": [
+        "alias-destination",
+        "anchor-carriage-locator",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "orphan edge hunk",
+      "expectedCheck": "hunk-binding",
+      "rejected": true,
+      "observedChecks": [
+        "hunk-binding",
+        "orphan-hunk"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "hunk without disposition",
+      "expectedCheck": "orphan-hunk",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "git-apply",
+        "orphan-hunk"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "candidate labelled current",
+      "expectedCheck": "authority-timing",
+      "rejected": true,
+      "observedChecks": [
+        "authority-timing"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "early cutover",
+      "expectedCheck": "authority-timing",
+      "rejected": true,
+      "observedChecks": [
+        "authority-timing"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "untraced writer",
+      "expectedCheck": "writer-boundary",
+      "rejected": true,
+      "observedChecks": [
+        "writer-boundary"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "missing anchor",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "anchor-precision",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "locator dropped or bound to wrong passage",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "patch-locator-review"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "destination in retained carriage",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "self destination",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "bad target digest",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "resolve relative link from wrong directory",
+      "expectedCheck": "relative-resolution",
+      "rejected": true,
+      "observedChecks": [
+        "relative-resolution"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "drop repo-root coordinate form",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "diff differs from declared unit edits",
+      "expectedCheck": "diff-correspondence",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "hunk-binding",
+        "orphan-hunk"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "diff cannot apply to pinned author blob",
+      "expectedCheck": "git-apply",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "git-apply"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "protected root projection hand patch",
+      "expectedCheck": "projection-source",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "git-apply",
+        "orphan-hunk",
+        "projection-source"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "partial or duplicated physical link spans",
+      "expectedCheck": "complete-unit",
+      "rejected": true,
+      "observedChecks": [
+        "complete-unit",
+        "diff-correspondence",
+        "overlap",
+        "passage-correspondence",
+        "source-span"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "overlapping distinct replacements",
+      "expectedCheck": "overlap",
+      "rejected": true,
+      "observedChecks": [
+        "description-truth-record",
+        "diff-correspondence",
+        "overlap",
+        "passage-correspondence",
+        "source-span"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "missing-target park without search witness",
+      "expectedCheck": "park-search-witness",
+      "rejected": true,
+      "observedChecks": [
+        "park-search-witness"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "invented zero or wrong hit count at pin",
+      "expectedCheck": "park-search-witness",
+      "rejected": true,
+      "observedChecks": [
+        "park-search-witness"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "omitted locator query",
+      "expectedCheck": "park-search-witness",
+      "rejected": true,
+      "observedChecks": [
+        "park-search-witness"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "witness at wrong pin",
+      "expectedCheck": "park-search-witness",
+      "rejected": true,
+      "observedChecks": [
+        "park-search-witness"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "alias search omitted",
+      "expectedCheck": "park-search-witness",
+      "rejected": true,
+      "observedChecks": [
+        "park-search-witness"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "patch target passage has no edge locator token",
+      "expectedCheck": "patch-locator-review",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "patch-locator-review"
+      ],
+      "reviewFlagObserved": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "whole-file source snapshot used as live target",
+      "expectedCheck": "anchor-carriage-locator",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "description-truth-record",
+        "label-form",
+        "relative-resolution"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "H1 anchor hides narrower rule holder",
+      "expectedCheck": "anchor-precision",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-from-evidence",
+        "anchor-precision",
+        "label-form",
+        "reason-anchor-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "retiring-tree preserve falsely says retained",
+      "expectedCheck": "retiring-preserve-wording",
+      "rejected": true,
+      "observedChecks": [
+        "retiring-preserve-wording"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "author-added disposition omitted",
+      "expectedCheck": "author-added-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-coverage",
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "author-added disposition duplicated",
+      "expectedCheck": "author-added-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "author-added coverage join omitted",
+      "expectedCheck": "author-added-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-coverage",
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "author-added edge and declaration jointly omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "whole-file supplemental candidate omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "whole-file supplemental receipt omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "identical live assessments for all hit groups",
+      "expectedCheck": "distinct-hit-assessments",
+      "rejected": true,
+      "observedChecks": [
+        "distinct-hit-assessments"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "reason names a different anchor",
+      "expectedCheck": "reason-anchor-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "reason-anchor-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "never existed contradicts Git ancestry",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "removed at commit that did not delete path",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "same-commit rename falsely called deletion",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "rename successor differs from Git rename",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "dependency category differs from blocker",
+      "expectedCheck": "dependency-category",
+      "rejected": true,
+      "observedChecks": [
+        "dependency-category"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "unknown blocker and dependency enum",
+      "expectedCheck": "dependency-category",
+      "rejected": true,
+      "observedChecks": [
+        "dependency-category",
+        "parked-state"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "prose dependency contradicts matching enum",
+      "expectedCheck": "dependency-category",
+      "rejected": true,
+      "observedChecks": [
+        "dependency-category"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "anchor differs from evidence enclosing heading",
+      "expectedCheck": "anchor-from-evidence",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-from-evidence"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "null anchor with target line evidence",
+      "expectedCheck": "anchor-from-evidence",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "label-form",
+        "reason-anchor-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "whole-file anchor without recorded justification",
+      "expectedCheck": "anchor-from-evidence",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-from-evidence"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "target evidence line differs from pinned text",
+      "expectedCheck": "anchor-from-evidence",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-from-evidence"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "partial-root edge and receipt jointly omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "rejected": true,
+      "observedChecks": [
+        "author-added-search-coverage"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "missing description comparison",
+      "expectedCheck": "description-truth-record",
+      "rejected": true,
+      "observedChecks": [
+        "description-truth-record"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "description mismatch left executable",
+      "expectedCheck": "description-truth-record",
+      "rejected": true,
+      "observedChecks": [
+        "description-truth-record"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "unknown witness hit category",
+      "expectedCheck": "distinct-hit-assessments",
+      "rejected": true,
+      "observedChecks": [
+        "distinct-hit-assessments"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "rename prose names a different successor",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "target line named in proof omitted from evidence",
+      "expectedCheck": "anchor-from-evidence",
+      "rejected": true,
+      "observedChecks": [
+        "anchor-from-evidence"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "locator-token supplementary replay count is false",
+      "expectedCheck": "supplemental-locator-replay",
+      "rejected": true,
+      "observedChecks": [
+        "supplemental-locator-replay"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "adjacent description context truncated",
+      "expectedCheck": "description-truth-record",
+      "rejected": true,
+      "observedChecks": [
+        "description-truth-record"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "description target quote invented",
+      "expectedCheck": "description-truth-record",
+      "rejected": true,
+      "observedChecks": [
+        "description-truth-record"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "standalone anchor reason differs from field",
+      "expectedCheck": "reason-anchor-consistency",
+      "rejected": true,
+      "observedChecks": [
+        "reason-anchor-consistency"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "never-existing claim without Git wording",
+      "expectedCheck": "reason-target-history",
+      "rejected": true,
+      "observedChecks": [
+        "reason-target-history"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "frozen record manifest diff hash mutation",
+      "expectedCheck": "manifest-freeze",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "seeded selected membership mutation",
+      "expectedCheck": "manifest-freeze",
+      "rejected": true
+    },
+    {
+      "probe": "missing complete file record",
+      "expectedCheck": "file-coverage",
+      "rejected": true,
+      "surfaceClass": 3
+    },
+    {
+      "probe": "cross-owner batch membership",
+      "expectedCheck": "set-membership",
+      "rejected": true,
+      "surfaceClass": 3
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "record form image marker",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "record form backticks",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "record form basename label",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "record form directory slash",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "record form repo prefix",
+      "expectedCheck": "label-form",
+      "rejected": true,
+      "observedChecks": [
+        "diff-correspondence",
+        "label-form"
+      ]
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong record in source carriage Literal Snapshot",
+      "expectedCheck": "source-region",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong record in source carriage Retained Distribution Source Detail",
+      "expectedCheck": "source-region",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong record in source carriage Added in candidate: X source carriage",
+      "expectedCheck": "source-region",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong record in source carriage Historical source section abc",
+      "expectedCheck": "source-region",
+      "rejected": true
+    },
+    {
+      "surfaceClass": 3,
+      "probe": "wrong record duplicates a Related sibling",
+      "expectedCheck": "related-duplicate",
+      "rejected": true
+    }
+  ],
+  "limits": "Semantic content/authority decisions require the independent full-file reviewer. Form/region synthetic witnesses use the same helper functions; record-level mutations use the complete real pilot records."
+}

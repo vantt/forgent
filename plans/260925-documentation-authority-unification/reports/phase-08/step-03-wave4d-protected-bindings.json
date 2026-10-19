@@ -1,0 +1,3448 @@
+{
+  "inputHead": "20d1b97da8046d895e1781cbe16243e8fd95c3a4",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/README.md",
+      "sha256": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/README.md",
+      "sha256": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/README.md",
+      "sha256": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md",
+      "sha256": "690aa23031da643113c3669423c68072dc64e35b68349ae6fb7491da46cdbab2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+      "sha256": "0e8d91d19abcf85ff39e1e935dba334556dc4d48119c15274fa0e1bad2d48344",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sha256": "e45f4c8937f1af62c856999cb8d8bc9c3e52b72d61b0d97e44025d1ab587a63c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/evidence-and-results.md",
+      "sha256": "2b0ef96800305165cba68664df0bc8ad38ffbace4a3482cb8570f79fbd930fb0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
+      "sha256": "8585c2eacbbc0b3b521edd8c3e5ff5baf3b7a4785a0e8f8e3432ccbeba6a3767",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "sha256": "8d6d41fb3057b588fe98b721220460f5234ed94fcdd84f85f71e18f7d3e044f0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/protocol-model.md",
+      "sha256": "d30fdd9bfa31afbeb157bc64568a337e766244f2c47ffac752f423125d8024d8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/run-handle.md",
+      "sha256": "8bef4d787adfd8ba1212facbb68062c16cd6f3436effa826ee7d468876469cc5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/runtime-model.md",
+      "sha256": "746fbc68d57ff9847313166db37a66cbca5c224221e2e9040d2d5df565bc0239",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+      "sha256": "d707faa742077635663d62a800aad7a0df5b5ceae6cd1e57eb1be14462fd342d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/system-context.md",
+      "sha256": "db2d23502ec7ed084a106fa1e4cd4286cc5e3dce7aa51ee0afb330c66fe3e4dd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/visibility-and-herdr.md",
+      "sha256": "c9d4a00a8c0c37ed09202a0e9545a6ab33c5645338aa51ba3256ba4f55fb4dd8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/work-integration.md",
+      "sha256": "ca81c11e7dcebe39f4f37866159682650d1e189e755af82ed96e2de093ffd10e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/README.md",
+      "sha256": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
+      "sha256": "4a160c85a9cba45820012e24b1a604e9a10bfc4388ed7a9fa1a6490b639577b0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "sha256": "5fb487cca0a93df82f800fc3d18ed3d8d3a59ed81aa8c178559aa240cd72d668",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "sha256": "834724378ab76a15883687990dc90162b0920abb94fb15482982ca9feff84ac6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/workflow-stage-operation.md",
+      "sha256": "4a6761418b0ace26ba88923c28278206029c8c586662def9e5e97287a9142a83",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "sha256": "e670e1242f4e214baadf869fe83c0db1b58b1973ccf04a4b8fd43a7e71649eb4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "sha256": "036a6087e6a19be871ee82ab90323c7db3fe5244eb9d34358b52513a970eac76",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "sha256": "17ea7c7a04427202efeffa25a92cec9fde945478e44cfce76885eab421196018",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "sha256": "417a475bcf5c5e81f191d843b8f6afcfcf702413d8f7334f153b1cc5c6899964",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "sha256": "64cf1f9f5cf5ff168e533efff95c1221db68f5fe5a7e89005c9433a3e325bb5b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "sha256": "88f1e63a0d8390c4272efb962b308ffea9a8e4e505934896e7d5d00dae1e1ff1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "sha256": "23c4d6a63643db5cd48c71763c3bd90bb3ce14be99eb91609ecebe3ac96c693d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "sha256": "922bf7f357f6a69e8cf33a17295b2891aaf4fdc52e62e5b744dba921834d7605",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "sha256": "b1252bb834c07fb4d68243d67c9ada2bb61be1bc21b870a8bf094f5e25fe9015",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "sha256": "a4a88476ef3f35a14ccbb1d9e6a5f54d3addfa5b0efe50897be2ddd6065afa50",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "sha256": "935f8fb84289db383a9273bfac34d0d4ec49147510b810d66902772c074437d3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/decisions/README.md",
+      "sha256": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/documentation-governance.md",
+      "sha256": "c28d11f0acf0bf1fdcae8260a76874ad57d10b2caf7f8bb68c407b94cb709606",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+      "sha256": "c52b6416538d94c5b6cc11ea4f75c8061ddd3392c7e00b59b17a3e42ad67d14c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/history/README.md",
+      "sha256": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "sha256": "c94c09f7562c630f7f0bd7285a1fd58d4d997a61eacd2a1035caae89daf06c61",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "sha256": "b3045c54e1284246a36403e8fab7239612c95eb4806f37597eb879f87e6f5f04",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "sha256": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "sha256": "1a0a6e7df11d09006c8679a467a85f0f8c0d8f0ad08bb11b3fbea6080b312db0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/README.md",
+      "sha256": "a24fbe9f9cb3b93524206888c25fde6afed98a6d4ce26025a57b403ea835a965",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "sha256": "0a706b04e4754589f8ed7ff20bd5fd51378a582b92320ba5a15abb1dbcfa3b7e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "sha256": "934897196984ecf980c50414395565f9fc3373d46c7b744f651c5ff860ace6ca",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "sha256": "d2515c8a298e1ac27c066aad8463773615176448c712666157495fd1732385eb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "sha256": "56815ce373a3293a5c2a701460ea8c398962baee54aec2d77d79db529ef81711",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "sha256": "cec6a8c293a6efca3221eb60d6c6c03717538a7a1b3b9aaa17269a30a58a9acd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sha256": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "sha256": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "sha256": "cd1c0a2b56fe50cd89294f9b96a05f5576946cdcd4d2be9ba5285217a8b805db",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/README.md",
+      "sha256": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
+      "sha256": "fd0d5986f3c3cac7fe5c70a3ab93021147fd161bf7f10c64080754136bf5daf8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sha256": "498cc57324b8246ca7ac4b8b6ec09e2e445087a67cd0c8afe48a4e5e092a53ca",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+      "sha256": "d483ca41a4ca1c8136ff5c792d5ffd1bd1c3f2c9a54809f0c3b8c96acb411dce",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+      "sha256": "94ac9cec8585275a01f6f3618121759db2f70669f5c8f0c358338bdba17e403d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sha256": "95b1e27b8ec072bffdca0db2f68490af8e4d9cf0fc8aa1eff825f57d08561348",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/README.md",
+      "sha256": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "sha256": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sha256": "f5f7e638d64a7eab25b5608c66fe0edcff26c3cfab2baab5c930a0e6c9a779be",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sha256": "f02d58eba5e1e54611709a90d048f4e1374d9865b6eaf9618402e368d234f262",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "sha256": "6b550f4a3896cdf21cdd982355cd6b1db4c646c6848252a2a1b1c3365eaea462",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "sha256": "d102340165321758ffda2d4933d9e91497911daeb6cc58b7a7440e9a0c138506",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "sha256": "6c707d6fe6def6fa1b199e6530476ac1d708239a81722748c3439d721b9b71c5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "sha256": "8f1b8f22f8217b65f2f8dcc0f5f29f5a169b034d7b02becb2cef1834038401b7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "sha256": "3f81eef7fe2b1916d6ce81b1662a645e47bf7c8cc80b28dc9129b32393c7eb6d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/README.md",
+      "sha256": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/vision.md",
+      "sha256": "b7737691c5eae9995ac3125712b5b946f95acdef7136dd5a716143131881a606",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/README.md",
+      "sha256": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sha256": "c5d1c7678771e0011f91a4dd184a937621b643eb773ce3bb43cdf6cb0188d8ce",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+      "sha256": "f7a2b8177b1c8e22cb7e9fd70266780e81842004bfe65f0ddfa6f1150e1594e9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "sha256": "b146eba822c2be41289cb8d49d64cffcfae157aea4450b36cfb9ac31fcbc6d38",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/architecture-intent.md",
+      "sha256": "f71f0592b1e1d8bf030c5ec247d8ad652d15dc85ef001c081fe8c90ee7d5071f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/component-boundary/README.md",
+      "sha256": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "sha256": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/component-boundary/repo-layout-vision.md",
+      "sha256": "07691b34374b874752010a5585020635cb3ff396c1719594a4b1980e2318e314",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/dispatch-control-plane-redesign.md",
+      "sha256": "ee67263b92b3c9fed2a88995f5eab3bc7768e237de7022d62e1fe7de7c8ce42a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/documentation-system-design.md",
+      "sha256": "959d8a9327ceb9744d85a3e83d026a6523fae3f195794fe96761905e96147fc5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/documentation-system-discussion.md",
+      "sha256": "5ae36d7a64cd97f7a343a783e0039c9c5da0f7a3cec74e41c060f9ecf581a851",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/doing-coordination-redesign.md",
+      "sha256": "ffc69e6749b10612e6f98bbb165f6ba0b4f150cc104080e59e90edbb3fdb8798",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/domainization/README.md",
+      "sha256": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+      "sha256": "06e5994c1f64d470f78627a3748b4daba5d123b3868f1eb28fd42a6ebc264f3a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "sha256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "sha256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "sha256": "90e6dcd22a5729f513b3104b5f2113d9fad57e677a8485b6b2452183b8f97a67",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "sha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "sha256": "6ec5a5afad77acdf0dacf5523ae8a5b452e2ff5bd92015830c7526ebcee3e41a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/knowledge-registry-redesign.md",
+      "sha256": "e589e9af6fc3ca57d5fa39127a0bf9e6597c8b8af6e2c183595982ed71a87827",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/README.md",
+      "sha256": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/future-constraints.md",
+      "sha256": "b94afa9dc318f4c0f3831bca33ed6c41571b7ce33a1adc88f818318bc9571ee7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "sha256": "9a78209b05b2780633e232c529e3be9b55157e56a20802f8e4b7a3e33e776532",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/migration-map.md",
+      "sha256": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "sha256": "c7fa1d6d36c59334da472b459d0bd2aad74975e40884de130445c4a30a0eb903",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sha256": "aec07ac49baa6fd8f02f07615fe250f6e606332a142f16117de90053485671bf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/scope-map.md",
+      "sha256": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "sha256": "f1ec0201b237d5b5b6e7f38f5f1e756daeed2d436824ea19c966390031db018a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/README.md",
+      "sha256": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/architecture-advisory-panel.md",
+      "sha256": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/component-authority-boundary-map.md",
+      "sha256": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/coordination-capability-envelope.md",
+      "sha256": "98788f9d29c5cc9215a492a95513abfee6f22c5a95fda0c3c9136f9750676492",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/coordination-dispatch-contract.md",
+      "sha256": "e31ab35e8bdd5aafae298955519bfaa205dda2ea53f1e604e1e22e32276939d0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+      "sha256": "676bc6b9b123411fd38aa75f022213035332048547ebca3bd805a82f3b8b5336",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/coordination-envelope-progress.md",
+      "sha256": "e79eebfe721cd7797fbda8ce7edb5611b4fe72ceef8bca15034f422e0852e2a7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+      "sha256": "73266b42990980ecedc53ff3b950f65ab470264de03d66cafcf57ddb1336967d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/group-thinking-plan-loop.md",
+      "sha256": "77584e332c450e0314825295cf019787bb5c9f3a127521434eac282b36bc38d5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "sha256": "c1dc2a2a03dc76402b83dc4cdacbf51f3693b17b8c3b9a8a8c9c286dfc3f9035",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "sha256": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sha256": "37a786733e0e9937cfb2584bdd332ec5b4eb6f7109fabf60d4979ad14f30c884",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "sha256": "cca8c3ce96f36e9485078ed21d67999904b333774e9093ab2e403d15ab9c51d3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "sha256": "9c45a9383a65bd4ee40738dfb6c7de39549e4d5efe079525e8e20dfd55b2c4ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/roadmap.md",
+      "sha256": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "sha256": "fe46bff47d74696f8f3784a340707738978f1e723e0911ecbe8e319fa0d6e4a1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/workspace-topology-audit.md",
+      "sha256": "3d510bc773875ebfb6116894d3156304f2bc0710b827e01fb31bd7feefcb3ce7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/workspace-topology-roadmap.md",
+      "sha256": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architect/workspace-topology.md",
+      "sha256": "3445b580bca9da4f1e2db827f48b1cec5d68cb5953c9fefa3590fae44c846ced",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/architecture-map.md",
+      "sha256": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/decisions/index.md",
+      "sha256": "a0c9f0239f56019041a4a8e01327aee43740ea0e3643c0b291a706fd4b1a4b66",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/comparison-matrix.md",
+      "sha256": "65a00a1f6665a05b0e7a464bc45722f5505b88f289f706930216e1cb99c19238",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/compound-engineering.md",
+      "sha256": "b5bbae8416fc493086433b713f47463b960948a9487828998231969b204d3af0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+      "sha256": "6f24641a70e266b92cdce646063998e9235be69068223addb06b00dcecc99909",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/fgos-harness-architecture.md",
+      "sha256": "865e114218ad578c2c256f65b8d40d011d8fe75a2bbd7f9d6f8805d4df408b64",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "sha256": "f06785382f7b585826c92d7192e9ad89d8e9af5dde2cf95824f596de3780de6c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/how-to-use-herdr.md",
+      "sha256": "95d1591943f5448d7338f60bfe7c8433466bbe5b97490629a762f79be0978715",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "sha256": "ff64302e08910767ca3d5077c2ae9de767fcae93ed04349f97291638ea1e9ad3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/routing.md",
+      "sha256": "23edc70609c0b10665a484ee29597789ef5427fe5d71d067328a2ebf9e89224b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/state.md",
+      "sha256": "3b08ea78882838907ac9e5226593fafe8aae7981ffa37343540ca1e7ffb9e420",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/tool-registry.md",
+      "sha256": "ea6e1402bd3675f3461532eea8625e79b76dd6909162a3beb1e53d40ef6640ed",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/work-item-management.md",
+      "sha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/deep-dives/work-item-schema-and-io-contracts.md",
+      "sha256": "0939f1910803cbad6e05d4a1390cf89d9face4e22fa5d0f7fad8bdfcd165c405",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/intake.md",
+      "sha256": "d7b612984651f866654b56c2bfa7d38183cdb6453d4c410d82c2a82f170a4e05",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/porting-log.md",
+      "sha256": "8da134d2d32563db0a20532ce282b3bb35707699be07ad2b5c980b6269150b2d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+      "sha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+      "sha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+      "sha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+      "sha256": "b70260067ae69bbdfd6d364090cd084951b33b05c31884c29929671e48cd11e0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-beegog-herding-design-2026-09-06.md",
+      "sha256": "44aa6a63587fcecdb26cbc430dfe00ca9f395308767274dd43e824c7051628a4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-beegog-herding-rust-2026-09-06.md",
+      "sha256": "3bcf4f01732b8d163b6ef1691e966476cb609c2797eb92ad5f0e9845880dc501",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+      "sha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/reports/scout-herdr-0.8.2-control-surface-2026-09-06.md",
+      "sha256": "98d74e5116bc102ee658fd284e53505c2c8c4b4dd5d5c71cc3f144778600b1eb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/beads-rust.md",
+      "sha256": "222f8a3919f80ef3afd8db1004c0b966f52b4279bd71e6d47650e0d1a1f6a677",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/beads-viewer-rust.md",
+      "sha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/beads.md",
+      "sha256": "557c950dd4eac874e2016f40b706a5c55d644b329631782ca4710a2dc7796f07",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/beehive.md",
+      "sha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/claudekit-engineer.md",
+      "sha256": "3ff1bf8450b8fca06f58b61b58f5f4f55bf1ddbc11bb493e99a1df9e739c917e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/compound-engineering-plugin.md",
+      "sha256": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/council-of-high-intelligence.md",
+      "sha256": "130279ae0d6e756a4d8684853ad52f77742c34ae9da3f902b4607a09421fe56f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/herdr.md",
+      "sha256": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/learn-harness-engineering.md",
+      "sha256": "374bba5cecdd59ecdbd9e48c6d3fd4b64ca4206dbdc3cde3567efc00f3b759ea",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/marketing-cockpit.md",
+      "sha256": "2c6979a47d518a71c427f76ac322e825fccb17e8c1d231e669c3c994ef8aa421",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/okf.md",
+      "sha256": "c4e6d0f82cfc3c9535e18527366c560f97c6a5798745b9717d5a609af116fa3e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/pi.md",
+      "sha256": "a02e65a539a7809b64c6577c748b76f4fe5ec8df19016a531d978a43a50c4ea7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/repository-harness.md",
+      "sha256": "66de008f2a3f01731312a944e9decff2a64d84d6487f1e1883a81cf3deadf87f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/superpowers.md",
+      "sha256": "4a1c70d9c7975b83fe12d62fbf323557abef773e4b1197d603a4c37a7b1d744b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/distillery/sources/symphony.md",
+      "sha256": "ec16bffdb69d6056b30eff80b0dcab2469e4c1a5625d11c973e1bfae097c2f34",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/doc-governance.md",
+      "sha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/agy-permission-denylist-not-allowlist.md",
+      "sha256": "0f01d2b339153b6310f13904db892343760dc925e775917f6c67f0c63b4d5b38",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/approve-cas-mismatch-block.md",
+      "sha256": "c604ddf45f9210d711b612179009dba01d6e93eead851941a6254a4bef4a99ea",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/approve-lock-lost-mid-merge-guard.md",
+      "sha256": "dfe63832c235e55161879332fc06a4833cfde75ac9cfb6cc692a1295c70a6b8a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/approve-owns-self-recovery-merge-loop-thin-caller.md",
+      "sha256": "928eb1047d955ff7337948f39d71a723be8880b29435955c61b9ce1358be5500",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+      "sha256": "9ac6ea7c59eb18dcb291c2cd2386f5bbc0edec49e8d2f2b2b63967955317a6a0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+      "sha256": "4b60c91ab0897fb3f262c9563e9b387bda35fc4b7e6e288c55d7deaaff58ac35",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "sha256": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+      "sha256": "4c22f36c63cb8e97f1af8208a7a8e726ec763b54439f282b155cd028b168bfe3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/catchup-manual-merge-fgos-write-rejected-deadlock.md",
+      "sha256": "8cade27e052769b34b74f83e8efb837b884198f2f7d3e39b62548cb716f2210d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/catchup-movework-reopens-fgos-divergence.md",
+      "sha256": "5344ca7827aa43f8ea9022bd078fef18bcb8d0abf6e4d3f9050907f6ad3b2490",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/catchup-self-recovery-shared-reference.md",
+      "sha256": "a3ed7ecff6a9ab5bfd6cb519e654cf45d2a8912e58e9ae9c9b1eca2452b636b2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+      "sha256": "59a5a98c2815585fb5af956203bc6492f0fcf31e501ddf2c4072721e8e7509b9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/checkpoint-commit-self-collides-own-lock-holder.md",
+      "sha256": "a1831066bf651f8b4568b27ba7f1ce638766efba761249bd0caa99c600415c04",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+      "sha256": "412f376096ecf490e19dc8eef685e18181a4aa35162e0095030bd159e769a94b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md",
+      "sha256": "d37229fa17df43f9c92e446413478c8c65c8e344f2f353f0d69c58e47eda7bc5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-drift-remaining-docs-cleanup.md",
+      "sha256": "583ffd81d4182c6b2d29937a98ed169b593768a0aad2e953d744ac735ae646a8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/citation-drift-runner-md-cleanup.md",
+      "sha256": "77af26bebee60e5ace5ff9cb551565bf7e46233c6c5513a8908c71ad61cbee62",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/claim-ambiguous-lock-inline-self-heal.md",
+      "sha256": "327b81b547fa2f9430e63ef3ed4f8828b81fd4f37c497c6d4a26d73b0665894f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/claude-executor-d4-proof-test-red.md",
+      "sha256": "31e5b91f40e5dee9203f74def3b517f3039da343aef7cd13c2fd7a49b99448d0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/claude-executor-rtk-hook-root-cause.md",
+      "sha256": "6daf14133128a3576397925f5e40ed8f9e260f1f3f19edd75783c1f651a5c437",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/cleanup-harness-checkmerge-blind-spots.md",
+      "sha256": "1d150d9aa45b660cbbbf479f13c6c9d320bf5044669eb4bfaaf1cad54f489c80",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/codex-bypass-executor.md",
+      "sha256": "30002dafe887df1443c292c0cac3ebbdc3f26dfe413f6cd74b60165dd72d1b3b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/compound-learn-artifact-registry.md",
+      "sha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/core-foundation-domain-boundary.md",
+      "sha256": "50c095583b425cce2cf861fde67698edef4b04c1969abf71cd4f859ed8e1b608",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/cross-provider-egress-governance.md",
+      "sha256": "0fab25a1e46c8a24d7153d80039a624062f4d485c98473dcc3da080ae85d153a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+      "sha256": "5166bedd0980842a46fabdebf95b64a0f2278068fc7eecb79c144bb1165f3244",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+      "sha256": "791dff01958326399c04dd402fdf43f63a93b5359e5fdddac4d2f45be197a7ad",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/decide-for-prefer-fix-and-dispatchplan-minimal.md",
+      "sha256": "4876f2b1d912b38e9f1b0143bb9cad17439f29e02513de33620065aea5461dc4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/discover-stage-graph-post-audit-cleanup.md",
+      "sha256": "179572e1320c5a095dcb1af51cb251d898cfcff67082064e8401da236203d071",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/discovered-work-risk-kind-vocabulary-coercion.md",
+      "sha256": "9db433bb17bdbd51a079df7baf91961044be6e44672173c1b763d29fbe85bd9e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-activation-and-handoff-redesign.md",
+      "sha256": "494c8fbec619c48b2da3406a8806a9ec9c68a572b51ddb561244ceabfa51c84c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-attestation-level-2-enforcement-halt.md",
+      "sha256": "2f8438f9d32135ac5c96332f5379235fde4c94c15ee8a74c49256875c411cdf5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "sha256": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+      "sha256": "29c6f79df795d445d9265e97fcbbb420d9fc984d52ce9fe66863bad2ccd4cc77",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-concurrency-guard.md",
+      "sha256": "558331b692a0a996fc75c8b266a1182c40f60d6fc90f2327233944bd6af64118",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md",
+      "sha256": "36272fb9135213bb721be5f1d86d447d7fbbb66088f2847beb4d5b39f3913642",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "sha256": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-repo-root-cwd-separation.md",
+      "sha256": "5aeb004fd876228d2cd5bd088d64ccf4d48a29664a1f142e6dba84b669a34086",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-execute-unsignaled-outcome.md",
+      "sha256": "38936ce390f01a56fd3529df345908fe3beb702b48c830403347624d3c3983de",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-plan-protocol-redesign.md",
+      "sha256": "6d9397691d0afbbddead52cfc5cb43afe939a8fbccd4074a29074335553a5edd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-redesign-batch-final-verify.md",
+      "sha256": "ed5b729ff4bb8e3ba3f2e0d08025ca47ca6a28e8025d0ad46bc33bff9d17e496",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-result-confidence-reader.md",
+      "sha256": "aea009e42084c87a310ea324377a1005556a6caa2ac26bcd7d812375a6870aed",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-result-normalization-ladder-extraction.md",
+      "sha256": "5aa3b0687c4e4c7a34e631d7b1f1d921b59b6070e494b6107c5abe7699f35427",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-verify-run-once-cadence.md",
+      "sha256": "7e52ddc7bc2b5b5909839731ca257ef561e81db73f81c3bc089eb04609688f79",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/dispatch-waiting-rule-end-turn-no-tool-call.md",
+      "sha256": "d2e290f67c3cd57f2eaf2bb262cf5f71c2e77484c5f790c99f7aa4cc3cf4eebc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/driving-loop-worktree-resync-on-reentry.md",
+      "sha256": "47d041935413449a7a429dd3a240f75f6ab33c4e33dcf9dc19281ab284d7f811",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/driving-pane-rename-resolved-path.md",
+      "sha256": "d5ed99ceaa6a160673c85ed939dd5b35c8d756b4ee83d69f7d83ddda9084212b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md",
+      "sha256": "e81664dd9458b3b63443f83fddbeab2fc4c33258c592002454f3a2ef42ea433d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/eventlog-guard-fail-closed-event-count-checkpoint.md",
+      "sha256": "2e7b4962a85d092042bbd4d0675696905c5d747dabca5d28b53c3239887250c6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+      "sha256": "0b2458b2d9fcd8e3f1ffe4dd55dcabec781a776dc677ffccbe42af61fc1fbe7d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+      "sha256": "39b7e53d19f48957ad557150df4db9d9d64c67ced9ffbfb7675bc8b1f5ba5511",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/events-jsonl-concurrent-data-loss-investigation.md",
+      "sha256": "8f7b420a4944b3a5ebfa02dd2abf75ab864ac1274216dab8a0ff1cdc21180199",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+      "sha256": "a100e178f0834551d357fc5a1c484dad56464016486f81361bf7ff4676047992",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md",
+      "sha256": "2c4ebb5523f4a2d61d9c0400e708deec7198a422ce7eb6b5df6cd6ba212edf8d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/expr-eval-chain-passthrough-vs-split.md",
+      "sha256": "e2af9ac34d82d7307b6e171f6b13c25f60573211c097423e534faa73600a0d7f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md",
+      "sha256": "2447cc1c9e791b3025fdf5495fe18ab67bf48bc75daaa24c7292f7489af45011",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fanout-batch-concurrent-dispatch.md",
+      "sha256": "df4d05cc6e3c46f59f808374358c95d0c8978e1c9b466f03c48c0328a9ad6955",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+      "sha256": "7f6483f9b2e3d5813096882bc0c4ef7a4a573c31821434736e9ce97ed91f508d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fanout-execute-consolidation.md",
+      "sha256": "1f47a52304027bbacd46748e251dc68078edaddd961289b6e6d8b8c03f6ce99e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fanout-proof-agy-demo.md",
+      "sha256": "533659a3757847af133661064a9a1bb04cd702797b99d070b1feac690ef753f6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-edit-role-flag.md",
+      "sha256": "8c3db743b9ce2cf81b65c17db3499f35375c70a4f7d44b6a3542aa4277cf1969",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-fanout-out-of-process-dispatch.md",
+      "sha256": "388ef7e3f2402b8a4dbea8ad26c5b954b7a13f7ba975171cbf7cb73765cc5b9f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-gateway-lifecycle-verb.md",
+      "sha256": "72ebd6528c8f5f97216207f5d5266e2e6de23ed2c9700da7d59cc92a70fd160f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+      "sha256": "16344f3f744ad817a02d72b05e3f9934313b403b4b737fbef4a6053df16ebf4b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-preflight-verb.md",
+      "sha256": "475d5ae3a7340f420888f34f6b3ad123464998d64c0be577c5dac536b7494335",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-return-skip-redundant-verify.md",
+      "sha256": "bf67f3b6201879bcf5131ea25da0b6639d40c3d3eb2f1a323fc7b79f4572c118",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/fgos-write-rejected-structural-deadlock.md",
+      "sha256": "586dc2d5476d2f4569a8e7e9c59dff8077769d0ab3c1ae38bc506c8a86980618",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/footprint-diff-research-md-noise.md",
+      "sha256": "82f3b8cd10c1a1486ffc4246a73cc6eec640fd8d2ed79e7ac51255cdf070e5f2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/gate-bypass-keyword-floor-false-positives.md",
+      "sha256": "5a7bdf4b2e670309a3b425c216fb1a1c93e56db49d71ba3f0286ea03998e693e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/general-verb-events-baseline-write-verified-fixed.md",
+      "sha256": "c60f7c885b6fb58cbb73e12d735a1e6244dcccba470778de162102f31f1882ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/gitignore-docs-history-reverify.md",
+      "sha256": "27df4c7714baabd404c9f437481da68b6b9ed73b017db3bdd9b5c2f39144a99d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/glm-openrouter-executor.md",
+      "sha256": "08c4ac9dbc3da4902582d4f63362473898b84e338b9dc2b960c452851fdcb459",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+      "sha256": "d7cdf87db715d14b410a48210814c1471c9f8c7f3d289899018b93805abd5dbb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+      "sha256": "401803a81915681269a31491eb09abbb841ee58574e99199ec7e7bb330a573b5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/iron-law-classification-recipe-path.md",
+      "sha256": "cf88a8e22ed366561283cca1a9d1b5451b3a1d68127fa86791d3baa279d034e7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/list-id-callthreads-leak-fix.md",
+      "sha256": "5c10402708514202f374e2ad56edeb1f8ace15a239a8dfe65de5a2f9e49053ef",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/list-id-fields-flag-lightweight-projection.md",
+      "sha256": "07640645b3f6957f7c28f16ee3ef840f1af385069600938bc312585342a0d012",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/lock-wait-self-vs-other-holder-identity.md",
+      "sha256": "452d1454f759ea9986ef028a4ca9ca99d065363791f9519b4ecea6ebde5e15e8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/loop-descendant-dedup-false-premise.md",
+      "sha256": "84df654aaecc4482780ff2e134a06922666262de8201d0cf28210c5543750840",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/loop-family-scheduleWakeup-self-reference-gap.md",
+      "sha256": "6e7feeb228c411ffaf521518b642bdf0adfed3939e71564ae1640ace2d2be74a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md",
+      "sha256": "f3441a2d5cd4b5599ee90edb506e6a956043f0a3c2a9bc5663f181a692f84258",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/main-checkout-lock-scope-audit.md",
+      "sha256": "42eea06436e55de13793b197a588c055dfe6ca0f5a6dbe68e5d75b924e6182c9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+      "sha256": "e3b23281624b9ba9f24bdafbcc6231394ee88ce50b4ec16e795063f527db096f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/merge-next-inline-approve-invocation.md",
+      "sha256": "df3ba47a4c5ce0446910a63f668297cedb217f74e4c85e1b90847b0c7fb4fdec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+      "sha256": "aa1be4e217aa032da56d04927bb182e9566b64452a09cc475b044f5cb6922b32",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/mergedsha-missing-unreproduced-race.md",
+      "sha256": "48468ee0d3997c19a36110a4bc5016c3b8e86d66d5cfc42ba51e024897f1b1fe",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/mode-gate-tiny-small-skip-load.md",
+      "sha256": "68ad9607716c5e30ee3265dbb4ab3b964bc36136370b4dc9c99125ca09b76052",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/no-stuck-merge-abort-doctor-check.md",
+      "sha256": "109a61f94a9027e378445a1cbe3236073239839a6d47a94d74e4b504b20a4456",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/noise-only-paths-truncation-guard-exemption.md",
+      "sha256": "c6ac3b3f03fac069d02994f23a23320752151828edcf1cb626219eb442dddf96",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/opportunistic-checks-regression-root-cause-bisection.md",
+      "sha256": "7511ba2f8a7b94a281b2c52b60bc7a7cff4a00214583917db2ae6e02a6bd6bc9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/opportunistic-checks-test-regression-fgos-oet.md",
+      "sha256": "e091e21797022ab42a13b77bafff7ba2accd5e9cb609316120831223cf7a72a0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+      "sha256": "b4103283f59f112d7300767cdd238244a9f5f20a673f0ec710101e6ba34ff975",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/partial-claim-event-loss-covered-by-tsk-1vc.md",
+      "sha256": "1ac5d528589928989006fe5cd5a656890c2f5829e0c23c3640c3da56dfbece1c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/pi-runtime-capacity.md",
+      "sha256": "6a96a241f802ad778c2f78f428a2362e291d3462f64d576593e4da0c7eb635d8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/planning-passthrough-action-footprint-sync.md",
+      "sha256": "fc60b410112e5582ef77436079ced63e3a9931429ff6799fdff0ea64caf06aab",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/planning-split-root-verify-sync.md",
+      "sha256": "50217d8024e465664908854c5f6876b7a2fb6a2deb2a8140abb3a8ee230b2326",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/postland-drift-notify-consumer.md",
+      "sha256": "e2bc12631aa7b8c9f43132a089cf30b55128702bfd34194763360cd0f19a3668",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/pre-commit-fgos-content-precedence-guard.md",
+      "sha256": "998f1dd6636610456c5d35e88ec88731c536246d43fe536a833084fd448c6443",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/resolve-park-reason-verb.md",
+      "sha256": "cc0b8b204f30cee966b11552548aff12ef4fd19d9ae17c19ad0da2b83cfcee89",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/restore-verifiedsha-docs-on-main.md",
+      "sha256": "c84c147c3073133b2678b5a59d16cfc75784642030710c8a810d1a0a0457112f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/retro-next-shared-driving.md",
+      "sha256": "e99b21f972b13bb978c5570f6d6b16133d3dd07b1384425023335f02f6065ce2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/return-approve-background-execution-guidance.md",
+      "sha256": "97d4c97c2fe6cc8cd8cd1a0f1447372549f9a9fd18c1db6b3696c0294f2e27b8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/return-ephemeral-worktree-fgos-strip.md",
+      "sha256": "8e9840360911b64c2022a44b386e3a463a32b32f80fea2d73c5835b3e660cf33",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/root-resolution-two-call-split-propagation.md",
+      "sha256": "ad12f866fc4aaad74f830f32a995b81e1b95b0a139729aa7e65bf35e85155142",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/routing-orient-stale-postdelivery-advisory.md",
+      "sha256": "6c19e33d579c0c4a06f41b4ca7459dc0911dfaad92e5e15fd5863ec3f6561ad6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/rul11-anchor-test-citation-gloss-update.md",
+      "sha256": "a34c9d753bd16ff5b5562e4d971ed529d8f0b2f4399f6cabc87ec3176d86cb81",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/rul11-tum-lum-doctrine.md",
+      "sha256": "7f9367884f44f016fa50651ceaea1d36c744b868e3fab0c681ba91a49632c491",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/runtime-claim-doing-separation.md",
+      "sha256": "0c15425e509ef07dd4853f7e1a0a494b2a6f0efba9ce3535118d0cbbcb7b45c7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/session-identity-3hop-walk-flaky-test.md",
+      "sha256": "fa665eb03d43b39f4b5d59f3d953518aebe7833b68d01019de8010e0d1011d16",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/settleclaim-revision-drift-self-caused.md",
+      "sha256": "bf74e1b1c2bb480808b7afbc557905b5394973cb0f573cbfa73546b269ad34fe",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "sha256": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-design.md",
+      "sha256": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "sha256": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "sha256": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "sha256": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "sha256": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "sha256": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "sha256": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "sha256": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "sha256": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/spawnworker-idletimeout-flaky-test-margin.md",
+      "sha256": "27921d329901f329827bc8b7f26de1c09d25642cd69f75c3af2ba16440ec016e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/state-write-single-stringify.md",
+      "sha256": "0719a9c71e7e69f207ff6d1bda4066f1f034c908f7ecec7ae544944d0c7b9ba6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/submit-dependency-scan-delivered-blindspot.md",
+      "sha256": "f14bbc1d77f1b49d458e186a5ee192c952e2730fa81b15d176bbb76fb2ca4e37",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/submit-deps-direction-blocked-vs-superseded.md",
+      "sha256": "c0945978e78b326cc3865bd251127743f7ae8f87d5739e466baf2a3a3b4bf956",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/sync-root-error-propagation.md",
+      "sha256": "9d8262dd0215a6c3788d0db3d6fc514b12af66ff04b33fadb7d0d5b7451f76f7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/sync-root-outcome-guard-citation-and-lock-lost-coverage.md",
+      "sha256": "fc5df295255935fe9b910fba26fc0922c5125d2edd49910e8f97a765d8e8dd2e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/test-suite-wallclock-file-split.md",
+      "sha256": "fc38daab2c16a4aaf594a9211a4a4a8cee307ee2cac312c745af09f40492fac9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/tsk-397-post-merge-review-remediation.md",
+      "sha256": "f4fb30a2f39fffffc0a79e11b64d6fd36e764a595f0e960cf524cd7206212a04",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/unsignaled-detection-backtick-false-positive.md",
+      "sha256": "f07217a3839e88701345a67a3657d872de56edb5cb56db97d32198c1c1abf15d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/wontfix-worktree-reclaim-startup-reap.md",
+      "sha256": "3b52346f283414d2ba7158a96991e8615f9f86fab941b7e6625b0788cdcab1c9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/work-item-lifecycle-and-domain-model.md",
+      "sha256": "3ce6008a0d449dc2f4c743d0a45ce948a39815e7517dc806facb2dd60b9de267",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "sha256": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "sha256": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/worktree-isolation-existing-path-hazard.md",
+      "sha256": "40aa2097ba3680d84cd2a9155b970238acf79e146ff8daf023b12caa811882d4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+      "sha256": "97a644fa5a29da7929e98c485e2e445a03a0073ec38b54ce14b340237d14a858",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/write-rejected-no-diff-check.md",
+      "sha256": "3a046842a92cc0f244bd2e6c35b0d5b0efb4e77a3792781fa38119153c46f263",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/explanation/write-rejected-trust-branchheadattake.md",
+      "sha256": "169a3373c48086a261f661e3fb6a56af483ed758130dfa6ce2a8302657429975",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/generated/README.md",
+      "sha256": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/author-a-plan-loop-track.md",
+      "sha256": "b6caccddc2ed6c84e5af1b8d61a752cc90e7815731b5184a1f537976f8242f74",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/check-rollup-progress.md",
+      "sha256": "851346e9b412640d798fa58747209a287e3ac091b0ac29cb387e3f804b650ebb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sha256": "2a906dc8d7a912d9c72c6cb494e95bfba958103153a0dadb57a07b1fbdecb1a2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "sha256": "37e20cd8865be2066cc2d013ecbf871cc4210fc28c0f579f3b84ecb638c77f7e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+      "sha256": "71a122831e2a1c2e3c716fac30e6ac708b98c5151998abb5b9926a27bbfbbdd5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+      "sha256": "19e1487f1afbfb7cb272f7b659ff5e731ed8c17e1fa6c32de46d6d319f7ceadc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+      "sha256": "b255714e4fcadf04bb7fe48237b3563bbd60e0ec19ec22aa8de07ad82a04ced8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+      "sha256": "0046e27b51177c7d4b8b0c9fe54abbb89c7c7f1e9322f890e0b7d70bcb9e7d70",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+      "sha256": "2dd5e30d0e1d0857fe89aba1e841f54659592c5ae2f59af2b95584c23d4cdbc1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+      "sha256": "3a24d99141ef2e073181a87943c118f2df843f3a2bb227ac86536f5cf8fa08eb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+      "sha256": "0255e7a9f986eae96b953cab6a1b3dc18caecfae15ddc071301a1e8a45866335",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+      "sha256": "89fc17ee00a7ccc254a6d3c10d26a137894e51340b34671ba45ec55ab860ba49",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "sha256": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/fix-d-local-outside-home-findings.md",
+      "sha256": "f67e2ab41492c01c8b52301cd000a0431b107f3bc588b5673c4c1843ea4df194",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sha256": "e79b3b4afcc54de275cae77c6b73c964af152c1fb43c6e0c0f57efd255b61d1b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sha256": "65c8bf8e907d50e2fc59986cb3bf26b966719818c47a45c059518bd7e89f0303",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/measure-a-real-case.md",
+      "sha256": "fa704a98abf7699c4aae3775a5866dc8c5a5b4ee78d762d4e3ccc167fb527a1f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+      "sha256": "3f102116a22128a9edbc3ae4d64140a56637e8b666ab82ffd75694a5085e3135",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/run-a-coordination-session.md",
+      "sha256": "af2dcfe5c5bc2b3386caf1fd2a6c93e255969c97653a28d447255ed1375bf04d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/use-fast-test-feedback-commands.md",
+      "sha256": "38bee7492d4b0401d52705c02c5d5d8da7ab3ae4234a0584d79a1af2413571f6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/use-fgos-architecture-panel.md",
+      "sha256": "9494cd9bb1854187bc6a54540394264d91ccdedc503d0187b7ea7f98f7f34c2a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/use-fgos-group-thinking.md",
+      "sha256": "bb8c4fb60e2cf26f0188437473b44ba4a212087762f7f56a762d343a3373601b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
+      "sha256": "20cba3fb25374d9a50dc5860aef1fb29f0626bbd38254ad13fb134c9d59b309b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "sha256": "7508fdea83ec973896ae33e141ec0c0b29c075fe8b07e197328f04f802ab314a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/journals/260728-2130-hook-reachability-tsk-3w8.md",
+      "sha256": "3c459f3a785dbb8759a54f8145fe370439cd32e6de08fb989c2c9c6829931070",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/journals/260728-2211-worktree-reclaim-data-loss-tsk-1os.md",
+      "sha256": "7d3db6ae30f949f68882d847c0aea2d0d54959dcb06b6eba407890d7caa493a2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/journals/260728-2245-lifecycle-sync-gates-three-latent-bugs.md",
+      "sha256": "4c25f6d05de28199001d181b31f4ec7b318b3be5bcb362d5035af692b8393e46",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+      "sha256": "992a3da95a615ff1e043d7d390b8dd96c13fcb0ced658e203553f4b271900cb8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "sha256": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md",
+      "sha256": "3f2ad8b5a060d1fb57abc5f304547000f1e8c5a5422e3ebb758178cb031a522c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "sha256": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+      "sha256": "eda77f8baa9850ddb947320702905e36c00130a22e242a0707baee975b305845",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "sha256": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+      "sha256": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+      "sha256": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+      "sha256": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "sha256": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/decisions-index/decision-record.md",
+      "sha256": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+      "sha256": "18682781553fc550066b2cf0eec054250d311f2b4a7009e3aa317c409b4174be",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+      "sha256": "c1008d24d135992a872a9fcdb9d9d7aebb882009f4f80cd313ec5fc567bd46ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md",
+      "sha256": "2f278010e89e49d329fdc8638a6557dac600428ca4ad2f6466a64691320b531d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md",
+      "sha256": "afc3d630c50e3ccfca5e4be969b370709bba69d4739dbb2646eec627e7ec3e6f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md",
+      "sha256": "677eb12c09115ee46be340a0e9beaee81840b85caf295f1964d6c586f231ec4c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+      "sha256": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+      "sha256": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+      "sha256": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+      "sha256": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+      "sha256": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md",
+      "sha256": "b81c14502c5931d4ad54721fd6610092180870f936b9d7d967e3fcff784f77a8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "sha256": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+      "sha256": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+      "sha256": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+      "sha256": "4051d614d62b3c5a5114df1d4524cfc30635db05abdbdda5fcb5b315be753fed",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+      "sha256": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+      "sha256": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+      "sha256": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+      "sha256": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "sha256": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "sha256": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md",
+      "sha256": "879e80394412724ef63aaa42ad849ac0b90dbbbdcc793ed849807a0cccccc64c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+      "sha256": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+      "sha256": "9b5e2fa808e434bccc38965fe724d06890806b30ea070886f8eea6ae6952b169",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+      "sha256": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+      "sha256": "213feb3b76a6bfa28a7342cf5475640f11947d971311a93d745871555edf0f08",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+      "sha256": "2d853a86c421c024f1cb77d5250055625da8b551041503d9eeb3d91a04a92d49",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+      "sha256": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "sha256": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+      "sha256": "226432b47535724640abcbe21c5f6e4d00a8e571a1d17361d1a3bc0df733a3f2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "sha256": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+      "sha256": "6b7f5e4051165365e0ed62b0781b0061ec5b3423b0048541180e7ec471b9d10d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "sha256": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+      "sha256": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+      "sha256": "9c814172778b2cecba2202dbe7197e75fe476604ab70876ff95f822e1fc499da",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+      "sha256": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+      "sha256": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "sha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+      "sha256": "ba351cd515dd8bbbbad298bc3348286bc983a63fe960bb54d9a6c3eef85c6cf7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+      "sha256": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+      "sha256": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+      "sha256": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "sha256": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "sha256": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+      "sha256": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+      "sha256": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+      "sha256": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md",
+      "sha256": "ec39837cfc6a4c3c8390e3a9794457ba53bc39a6e14e6754c4e1e8bad3e2e1fb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+      "sha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+      "sha256": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "sha256": "001c9aae61caafc3345e172df8ddb7d14d3c361d72a1ca469ae63892ce3936cf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "sha256": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+      "sha256": "200236306b0081ac87b034ffabc300fcd431c4584e75d5e3de1f097c6e67e160",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "sha256": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "sha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md",
+      "sha256": "340cabf429adb34768220a58a529c01fc9f319a010c28b0f132fb381df55d565",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md",
+      "sha256": "cf0c7be1ab2a519a7a1c6cc9b079e4c53a0127af20e7e6e7d63ed6e22a4db085",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+      "sha256": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md",
+      "sha256": "4cdd7f4d897306197c6d3c58b70abb9371a2fe72dc069956a0f057a12d4583be",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "sha256": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "sha256": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+      "sha256": "92611e49ab43531075b869592f35deb99c03e140d17ae9e213eb50ebaeb37344",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+      "sha256": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "sha256": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+      "sha256": "2fa5b40f7393ce81cc3d1d0aac8103f1010fac1c200ac6057117a4e36de2a6c8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+      "sha256": "c247d077edaf72cca273869705f79d15b4cd9369361160cf4fdfa31bcce92c11",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+      "sha256": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+      "sha256": "ae82a549d4a48d9794346f9af03c6938add3322cbd29a114f0ddbbaa81cdf7d8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+      "sha256": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+      "sha256": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+      "sha256": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+      "sha256": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+      "sha256": "b5aa56ffaa8cefd466642878efabe91a02231a037963b947f999abc863a6860d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+      "sha256": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+      "sha256": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+      "sha256": "737974e91ba956ff3e07b7b2bc4ba5d8780990f377f112cd41355a25c422abca",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "sha256": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+      "sha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "sha256": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "sha256": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+      "sha256": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+      "sha256": "09c9d35d624e13873356f381f2fb7bcceec71030252be1be8c50dfe9ba09326f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+      "sha256": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+      "sha256": "b16ea69f31b4c66c6a88e997a16d1ee29991be49cd9d96f8ea1b75c33901058e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+      "sha256": "a6e4aa8a1aba39ed5ebf4f3cebeb437a1e7907ff27fd56c47b3d56be37d9828c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+      "sha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "sha256": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "sha256": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+      "sha256": "7ac7b6e6dbf3bfa4bad486a649de2939799b02ea9cefaae6b051379069a303b8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+      "sha256": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+      "sha256": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "sha256": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "sha256": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+      "sha256": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+      "sha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+      "sha256": "f006090af52c3e7c2ffcf1cc2774d9f95933d797ffb581fecae8f063e246da06",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+      "sha256": "ac95f56ee5b7bcd7d426bf7596032374c92a38c61b9503e4328b4c8d61026609",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+      "sha256": "b4f246a647fdec09b96ed6ffdb00e6c6da3ceb0f70021efbd3d4c9e2648ea13f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+      "sha256": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+      "sha256": "2398166bf987ee68ec2afd8b703a9527bcb7dc459d0bd427a348b42f10865bb6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+      "sha256": "4d9024f0f2470797015fb26114c7afb1e96c52b47f99b66640ba763d8439d99a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md",
+      "sha256": "6458bcda95298b4c54d1b29a26c11d30d524362f0982e5f345a74538a9f1609d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+      "sha256": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+      "sha256": "c4c5ba5207a871a4ab584f17d544fe282f47f64068d6667fad300e74f004ffc2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+      "sha256": "458fef040aa8e85c3c0f4586dda4d86dec669f7d46d2841806828538892ba8a1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "sha256": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+      "sha256": "9b723f2783ae64ad500ed4979c35f6ccc1d124dc7fd557d6501afca72adc066d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+      "sha256": "d51f2ac0b381d3784413554d2e401b46599ecae1f66da4cef068c11eb5f7b5bd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/recordgateapprove-s-real-contract/recordgateapprove-contract.md",
+      "sha256": "ae528a4e2f1ee9412185af84c95538fedcfd96cffa2aced4059f0f59b087358f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md",
+      "sha256": "eaea6ba9682b763b9b3270a273d9536c96ae54669df2c3dee7169314dd316d0b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+      "sha256": "8e5f3014ed36106cfa16d4d2416d6be4c8e2798e7b465d11e8295e5a4371545b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md",
+      "sha256": "97a563929d3f31efc8c97089ff04588d3fcdba4276bcda170345833810b36a59",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md",
+      "sha256": "2c6864366e14ae08cef1991e4e6ebfcd22b992f65c072a1cd6c0208437df783b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+      "sha256": "27fef5ded87e738335203565af691eb0d7305d104d4512c153f483228b80c1e9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+      "sha256": "aaefbb62c81df89b309cfd0230506948945bfe75a9d01043ba7ec9784fbb87c7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md",
+      "sha256": "f8f1fdd174e4712221ffc8969575311ef1b4b24ea7cd82c1fc623fb6fc50a3ef",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+      "sha256": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+      "sha256": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+      "sha256": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+      "sha256": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "sha256": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "sha256": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "sha256": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "sha256": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "sha256": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "sha256": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+      "sha256": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "sha256": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+      "sha256": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "sha256": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "sha256": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "sha256": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "sha256": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform-foundations.md",
+      "sha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/README.md",
+      "sha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/README.md",
+      "sha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "sha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/README.md",
+      "sha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/README.md",
+      "sha256": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/README.md",
+      "sha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "sha256": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "sha256": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "sha256": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "sha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "sha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "sha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "sha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "sha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "sha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "sha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "sha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "sha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "sha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sha256": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "sha256": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "sha256": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "sha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "sha256": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "sha256": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "sha256": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "sha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "sha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "sha256": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "sha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "sha256": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/README.md",
+      "sha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "sha256": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "sha256": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "sha256": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "sha256": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sha256": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "sha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "sha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/README.md",
+      "sha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/README.md",
+      "sha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "sha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/claude-plugin/README.md",
+      "sha256": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/README.md",
+      "sha256": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/distillery/README.md",
+      "sha256": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "sha256": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "sha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "sha256": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/history/documentation-authority-unification/README.md",
+      "sha256": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "sha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/README.md",
+      "sha256": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/README.md",
+      "sha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/decisions/README.md",
+      "sha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "sha256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/README.md",
+      "sha256": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/observe/README.md",
+      "sha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "sha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "sha256": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "sha256": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "sha256": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/proposals/README.md",
+      "sha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "sha256": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "sha256": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "sha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "sha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "sha256": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "sha256": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/reading-map.md",
+      "sha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "sha256": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/routing-handoff-contract.md",
+      "sha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "sha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/decision-citation-drift.md",
+      "sha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/distillery.md",
+      "sha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "sha256": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/enduser-docs-authoring.md",
+      "sha256": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/enduser-docs-index.md",
+      "sha256": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/fgos-plugin.md",
+      "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "sha256": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "sha256": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "sha256": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "sha256": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "sha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "sha256": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/specs/workflow.md",
+      "sha256": "ff97bdc6edda92075ca34013604efc7e1328bdb7cb647352c6b806bdb498e6c6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "docs/user/README.md",
+      "sha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "sha256": "6045263877db11e6113d5d2ef49940d1861b2ea2dcd3cc8b13a84c9853aa5249",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-reproduction.json",
+      "sha256": "0fd8326893db6330ada3bd2da5c93b29ab3ee3f47564c6cbcb5bf8455f8bfb0b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-close-reproduction.json",
+      "sha256": "9c959cff396a01b5fcb274ee3fc57e6f03974399a97681d450c2c676cce52572",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-correction-manifest-sidecar.json",
+      "sha256": "d8ea7f80e92056617d1dc9eb6f3dc8b745c826ae8bb9d68e241012ab00510ed5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-correction-reproduction.json",
+      "sha256": "6d95b26a3f7c338e99ac594b1d8ea25b55206479fc82fb5a2bd44bce07fd16f5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-data-reproduction.json",
+      "sha256": "a9bd90803d8c1abf609647fa9408ca080ea123ea2442f8a34c779218f7ec0112",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-docs-reproduction.json",
+      "sha256": "65542983f68a0b7b17ddb7810bea183895a3c72e35cb4ee3859ad30ed0f8ea09",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-reproduction.json",
+      "sha256": "3de338a0aa34efd68568a611aab491723f417cbc49890824454ab71a20ba1ad7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-reproduction.json",
+      "sha256": "376a923cc0e42deeff36f612f36d15883eb9d091a0b532f6c8a96da11473aef8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-reproduction.json",
+      "sha256": "278740a565c3522095e7117fe6e6204278c34f91036717acd5fa13c08ca527ac",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-reproduction.json",
+      "sha256": "13e9def3dc44be21de6fd4c5a4e0732ec74aef7f76ec545b0835b342c420181b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-manifest-sidecar.json",
+      "sha256": "d3464c9ac62bc8e7d782eab3eba2ec56b8259849dc5ae78593a3dfadfc36561d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-reproduction.json",
+      "sha256": "7f364c5b63b48f8a25036a22d9b843db02839e2d7a5acc369d0b8ef101f9e43e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-reproduction.json",
+      "sha256": "29f9350aa84faa6fc6608d570a53bbbc6bc5df1852c03e62f2de865184dab317",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-reproduction.json",
+      "sha256": "e4a1c8fb9f13376343b77546b90d87c67ce306e77ea20c0d75d8ac591f89afe4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction-results.json",
+      "sha256": "f6bd016f748d3cdfa129a4a3b6e443ca38743cce3c1ba3c7eaeb132f553baedd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "7f383d4df35c44c2b2a9a4e165bd7714fbc1b27a6f6d89545514b29018e37a6c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-portable-reproduction.json",
+      "sha256": "30b6b36ad1edc8a026605bb9878363859a871ea2870c9fc92e508b46e8750b57",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-reproduction.json",
+      "sha256": "2f5ff041a55722ddef237bc838ce2bfc13030cd7d4f8ed648fb365b993bcc2a2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-manifest-sidecar.json",
+      "sha256": "3be57ad2575e6cf8f47cd91236c392af06878d2a7a600a7c2ea1cdd49296eb33",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-reproduction.json",
+      "sha256": "9f0066ed9fecd8f100760fb4e20067f08e3b2586613084e39cc4cb7b56a55de5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-reproduction.json",
+      "sha256": "aa5beaeb9092d46c60af1e6143a0f028a707ced480cebb3256b9ac88e7f81441",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-reproduction.json",
+      "sha256": "35d22d44de85849912484e07f30a1baacc9815ac9383e410e85112b12ffd984c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduction.json",
+      "sha256": "2a16af6beb7bc0381c37e6518031993b69af45c77ec8745ab69f806fa7cb2bb4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync345-reproduction.json",
+      "sha256": "20dafa3aaa915a0e6942c3f13714e6b656d90f380650b5b316e95ecfe71a0ee1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "e7dbfae5f4dc65e53946edc9aa25c876de460f59422da4ceeed5c199846fd053",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json",
+      "sha256": "58b91f7070dd5eaefba13e2a41c4bbb8cc985c43bb8334f3d2bf066d60abfdc3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-reproduction.json",
+      "sha256": "439e353405190c17188b5bbaf762c9d6cab1d8d6f1def0569be1f225695a8506",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-reproduction.json",
+      "sha256": "467fbe9517aad55d66b0f6c196ea0be27aa6a117ebc22f37ddf634cab8843837",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-manifest-sidecar.json",
+      "sha256": "b95fdee0ae6b90f65ed62ef180f4c5e3f5527f2c6379fda52a00ae67e92db73f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-request.md",
+      "sha256": "48512402aecf43dcb460a6ca0425c9522b83d685b2de485ba6080afb94df81d6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-review-request.md",
+      "sha256": "b5844c7008567fbbf18b7dc620fa9166d5943aa58bb86c142ba853862348dffe",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+      "sha256": "e480c1021d46fe6bccda2df91d29f8ce6ec32a1378a6ace8972af8c6b8e363d9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-request.md",
+      "sha256": "be46bb48444bcbdc75fdee4d154677f890ad202d10d06c420177267ab17385dc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-mapping-review-request.md",
+      "sha256": "6c2be190de35b15a9639a4b09816402ab2e133b84825a48822155503da3ef64e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-request.md",
+      "sha256": "2773cac9f4f60b43be92090c84dfc6ad3e8860e4c65f54b3c52664604706fcff",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-request.md",
+      "sha256": "1910fb33843b48915b0edd6826913db58e71519cd30552d19015d0ae59dd04f9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-mapping-review-request.md",
+      "sha256": "24d8e14310ed48b12a68bab740043069ac8a121183726298f44d2a43c42c6634",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-probes.py",
+      "sha256": "bf04d90b588c57e865ffaeb58508e3b52a87f94cf71b9bfc78db630d65615ff4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-mapping-review-request.md",
+      "sha256": "2d49b36d54a306871966c26f45aede0668140e3c62bbbf76e4d47438a0880cc7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-probes.py",
+      "sha256": "48d790d1efa9231e0df2e9978951e5956842df7f9d37c21de1aaef6bb1bbe268",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-mapping-review-request.md",
+      "sha256": "14857521399e0d66179d21ed74d96678bdb608f50d346a621886db8e62f9f846",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-probes.py",
+      "sha256": "3b9759e6369435d108bd2cfc3474e86e136279fc1547eee2a4dcec7a6ed2dcc5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-mapping-review-request.md",
+      "sha256": "9bc37975125d50a886fde7d5dea36590aaeec8e7619be0e825fdc1e405055127",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-probes.py",
+      "sha256": "10b419a73a292acd80db18c41ede8093d24315eee9852dd3055646209dbfd488",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-mapping-review-request.md",
+      "sha256": "d0746b0ae471b482c6d9bdd38280dad00f1f76621558da983ca44b81f3c43933",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-probes.py",
+      "sha256": "4ac0603eb1e5b62631bd363848e064f3c56628a57b3c7b8c24a2f8dd49b991a7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-inventory-review-request.md",
+      "sha256": "97d1cfb3fa51e1abbc802b4ff8b6306ed7d12c2ee5665d66da6563f8ff4db1a0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-probes.py",
+      "sha256": "f39f8bc2b43f97f81e5f8c34962ea7fbeb7ed87cb8ac38d47be0e4fb9c4b13f6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-inventory-review-request.md",
+      "sha256": "48275382eae384fd2110df3cf07034946328dfffbc31651736aceb432cc64060",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-probes.py",
+      "sha256": "fd0562a24e9773fbcdd2d8020041060a3a37171d73acdff60c7942b58bdc760b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r2-review-request.md",
+      "sha256": "419aedcf1f080a84ea2b48c789199eeb044b3bf1b7874b5cc8c38c7bbe57d57a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r3-review-request.md",
+      "sha256": "2aa0d5835dd0a434bd83bf8ae778e47477d5c39b09e5e9b51c3cd2d0114037d1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r4-review-request.md",
+      "sha256": "c8ecef395f03704b962fa8094c46623c62979395c91c0ec54ef7ecaf1d27b4ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-review-request.md",
+      "sha256": "c09917ef86ff62d6c88a5aa3481c652936529698c28d6edbcde4f7a05928308b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "26020e7e42701ad62bd9f2e829a88e9cc75fb707a1c247295276fe267acbcd8f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "274a0ad083d291ad632aa9654496132df5303a47f135faa7ed3e612eefcef354",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "3069bb82fc1edd87a6538f7db4391aa62df1ac0e8a02e91de81aeb75033cd140",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "de8882c4bdadd2f5aa0bf2f965fd04b2f9f5237d05e959a82f1ec16849bce496",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "b3518e4d63ff79a4d77570137958a6b0af2a13a5b2faa48edbd41fc9812b8fa7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "4c54ba05692d41cce18f67ecd93a0f60a4ac9f435d397c2f1fbc082fce937a15",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "61ac79210490083bb1470277916c78acfc4200d1b0610a8a1c3cd2ea7fe1a329",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "7b12b874b3f5b4b0f8e4a7f281a0319d6f8913ba414809366c2a8ce25dcfa6f3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl",
+      "sha256": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl",
+      "sha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "sha256": "44e22e3c315397d6691c250f902ede369037ebf97e289a5af327dd6dc7fb9258",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "sha256": "38eb0aaacea683b9fe8ca0026781cdbc564b543acd7c21c0e7648248bd15ad4d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "sha256": "11aad87a084c8a125eef008229a863f6d3acbd56e41e39b68a597057641be5f2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl",
+      "sha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl",
+      "sha256": "287d6cf3632a95ab416e2ebad3a3295bbc4d0dda34e472bafa66ea99d0cf10f4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl",
+      "sha256": "91b9faa7c292f9cdd276e0346e9fc9a230f445e5d688797f810a7bf47c1914fd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl",
+      "sha256": "caeb971925934f2f21a684d0a69ab264ad15793074f12b753666916a29061b29",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl",
+      "sha256": "079c1065a0fbc9396b9b071cb761e8048990ed874e8b6ef3e5b53d0e22be0472",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl",
+      "sha256": "911011cbf1c7ccbe53884ce1cffd615639127a1b86a1b94e5f638a5da16fc9b7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl",
+      "sha256": "c52249a7a30805b93fe3800337d2b1a36cf7907b79fa51e566bb9d47eb2bb4f3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl",
+      "sha256": "f24093b482346b77a7c17842824f8b0c55f39bf15d7d99fd6dcc43dc420fb1d5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl",
+      "sha256": "4ecaeda857f444c5bcdac7f109482f76ee9d0fd03a4b1e0ac6e29df586ed77da",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl",
+      "sha256": "02ff5b99b51d2225631801903716bb0d2791bef7b22b5982ea01689a27f9ae5b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl",
+      "sha256": "8e97a1d396eabb24a023f1b03292fb78a51ef7d767c1df5f47563905e8156f83",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl",
+      "sha256": "90df44d30f8699bf0d24a9051ad8e8dffdd0cc5b01f57bb2ace5c8c5e6e435b0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl",
+      "sha256": "097915ff94a5c6d7af9fa67b8e1da31c5e4d5ca22902cc368aed7060ca32c6bb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl",
+      "sha256": "16e4cbbb7724df633058e2779af01c7e0a1d67fd9880b42e52a183e7475ea924",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl",
+      "sha256": "ad84aa24fefb096eb1ec24090c5ad7c0e4aa5e23bf941cbeb772c10a103d11bf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl",
+      "sha256": "58138975dde677714ab67f46270594b5d78d3f2aefcc7e137b4726babcdbf78e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl",
+      "sha256": "5de2308b31bdf028b7843a47a52727573d5f1dc6706385b6b31e96214836b980",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+      "sha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl",
+      "sha256": "3d6d2f818f60d3ec6d0f21f7afc06f1274ccb2047bc6ae1d196ebccc021c0a67",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl",
+      "sha256": "b342bf3ac3e64efa815c92c3a852b42350f6fe086cc9e562adac9babee766b01",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl",
+      "sha256": "482538a35729a6fd64139f15b13b30995400544d60f903c8339a010740352703",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+      "sha256": "cf26e3113a7e730c8252deb6f7fa3616c8307be673da103f648b468a5c89f138",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl",
+      "sha256": "98e18b8e21cfaf7422bacfc16ccb42e3d6872c7aa609c68dabd3d1cf515f0690",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl",
+      "sha256": "997ec29e616454af919d70af8914aff7160bb91187ff9b59ea1db22780dd2dfc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+      "sha256": "5b2d481c4abd83d7c8f5e0087e59a1b8e629d479bb3f750f92e4fe0c1d399a96",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+      "sha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py",
+      "sha256": "01a25ad418348c89f0551e7768d437e890f6b2b4222760a6c4304439bb3c0586",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-expansion-review-request.md",
+      "sha256": "4ad409a739b8160876ea57e27a56af8271818f1a64d1121f794c0584237d5eae",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py",
+      "sha256": "8510f6d9826e424d8e3b8427301bc0dc6e132acaabb10c0709f3b16ac5e4513a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py",
+      "sha256": "ae651e7928259cf99772adbe2182cd514b5f93b7583513c1a404c9b9c3fbf045",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-review-request.md",
+      "sha256": "b8dbe6affa6cb74580c481e293e8a9c81d619784aefad22f27222e426cc1da0f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-review-request.md",
+      "sha256": "9bdab8e9794ef10b2b6adaa1894ba97a657ddf7b574bda6cdb56776628135f85",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check.py",
+      "sha256": "b62199f6a351752cc139de6f18b2dd9460366cab90df80d63b3d62de09921aea",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-request.md",
+      "sha256": "6bfab868f71ded1b7f2455a36919b6e18de5733201b01c13a1de48bf57226fd7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py",
+      "sha256": "5fdbe396d8099c51ad719348f95333656906ed234e162c996428f7e03684b00c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-review-request.md",
+      "sha256": "9dfc70d874f66ee78b5f9b283546ed538c2ae708594f1a0fdb216758b0425ad8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py",
+      "sha256": "9d1290a986d837f0f70f2381968d33a58bef24b194feeb19f5fa99b7993b86c8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-expansion-review-request.md",
+      "sha256": "03ba977135e112b202f4e8fec28a4f66ee51c92b0686b73560e6347f092fc828",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py",
+      "sha256": "ac88fc3e125f4ef918f6aa1164bc672e019085f4b7385fc35278648fd2c801d9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-request.md",
+      "sha256": "64bf6bf400c78b7b64824a25854385042ebd0a7c6d6c67521359521c3dad6e42",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py",
+      "sha256": "ceff6ba8109d0923b5d976dd95e5163461e230e473649728ff497699cb55c6f7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-review-request.md",
+      "sha256": "a72fa702e87d75744ac7963700c533ea6b8f085a8673a6f2849a5ebda8f50431",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-review-request.md",
+      "sha256": "7931d892e2a7fd61d207248a9ec4ac6b27c834987f18c669dc32af2e20517bf9",
+      "unchangedFromInputHead": true
+    }
+  ],
+  "protectedCount": 688,
+  "scopeCheck": "All protected consumers, prior review request and both reproduction manifests byte-identical; only three authorized earlier edge changes are separate.",
+  "needsWrites": []
+}

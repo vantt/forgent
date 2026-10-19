@@ -1,0 +1,16 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 25,
+  "edges": 116,
+  "failures": [
+    {
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "check": "reason-anchor-consistency",
+      "detail": ""
+    }
+  ],
+  "failureCount": 1,
+  "locatorReviewFlags": [],
+  "openLeadRulingEdgesBySet": {},
+  "notClosableSets": []
+}

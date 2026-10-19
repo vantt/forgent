@@ -1,0 +1,53 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "pairedProbes": 5,
+  "negativeProbes": 8,
+  "allRejected": true,
+  "regionBoundaryNegatives": 3,
+  "probes": [
+    {
+      "rule": "L12-40 fenced-code",
+      "positiveExempt": true,
+      "negativeWithoutRegionRejected": true,
+      "liveHolders": [
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+      ]
+    },
+    {
+      "rule": "L12-40 blockquote-captured-output",
+      "positiveExempt": true,
+      "negativeWithoutRegionRejected": true,
+      "liveHolders": [
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+      ]
+    },
+    {
+      "rule": "L12-40 explicit-history",
+      "positiveExempt": true,
+      "negativeWithoutRegionRejected": true,
+      "liveHolders": [
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+      ]
+    },
+    {
+      "rule": "L12-40 completed-grep-prose",
+      "positiveExempt": true,
+      "negativeWithoutRegionRejected": true,
+      "liveHolders": [
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+      ]
+    },
+    {
+      "rule": "L12-40 self-alias",
+      "positiveExempt": true,
+      "negativeDifferentConsumerRejected": true,
+      "holder": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+    }
+  ],
+  "actualPreserves": [
+    "04320",
+    "04345",
+    "04353"
+  ],
+  "priorArt": "Extends existing renamed_alias_holders (introduced 75ba6957a); reuses history_at and committed resolver aliases. No production mechanism."
+}

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py", line 58, in <module>
+    if __name__=='__main__':print(json.dumps(main(),ensure_ascii=False,indent=2))
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py", line 26, in main
+    names=sorted({f['check'] for f in failures});assert 'renamed-alias-preserve' in names,(change['edgeId'],names)
+AssertionError: ('maps-j-04835', ['diff-correspondence', 'orphan-hunk'])

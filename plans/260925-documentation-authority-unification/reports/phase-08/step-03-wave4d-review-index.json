@@ -1,0 +1,280 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4d-manifest.json",
+  "binding": "step-03-wave4d-binding-manifest.json",
+  "selectedFiles": 8,
+  "selectedEdges": 48,
+  "perSet": [
+    {
+      "set": "batch-073",
+      "allFiles": 25,
+      "patchedPopulation": 15,
+      "patchedSeedSample": 3,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 3,
+      "unpatchedEligiblePopulation": 6,
+      "unpatchedSample": 1,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-074",
+      "allFiles": 25,
+      "patchedPopulation": 6,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 10,
+      "unpatchedSample": 2,
+      "distinctSelected": 3,
+      "patchedStratum": {
+        "selectedDenominator": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4d-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+          "set": "batch-073",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "590f6e19777963bed2961cfa3c0a1dad3f75199188df7fae092cfc129d14b3e5",
+          "sourceDigest": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+          "diffSha256": "53285f413939d7cd69c947fcd5175fa4a77c2fd56d47c1329c9c1a8b0e9ed546",
+          "recordBytes": 95101,
+          "sourceBytes": 3970,
+          "contextPlusRecordBytes": 99071
+        },
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "set": "batch-073",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "fcb0652a909cca8b003aadbbcbd7f75d7a655f1061abf5fba1425e0bfbc454ae",
+          "sourceDigest": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 8040,
+          "sourceBytes": 8175,
+          "contextPlusRecordBytes": 16215
+        },
+        {
+          "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+          "set": "batch-073",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "25d41c8ce4446b275f2830d83515052fcc1601817ce51cc01a44a5d13960acae",
+          "sourceDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+          "diffSha256": "5a969259322d2c37806d2d2b8bd410c313e905eb8fc9618537d16bd4d5c7c680",
+          "recordBytes": 22018,
+          "sourceBytes": 7483,
+          "contextPlusRecordBytes": 29501
+        },
+        {
+          "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+          "set": "batch-073",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 7,
+          "recordSha256": "fd300a51238ff6f2433dcf0b09d5e2ae3ff411aeee465a1f4fdcd30bee7cc194",
+          "sourceDigest": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+          "diffSha256": "5cbec11efc7ff3c88fd7a6cee8fba44acd673da686acc216332558cb7fde5472",
+          "recordBytes": 39551,
+          "sourceBytes": 7408,
+          "contextPlusRecordBytes": 46959
+        },
+        {
+          "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "set": "batch-074",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "3b7355f40577ee777cbf89a9c1e5a5557ff248b1871723666a0244412f59a416",
+          "sourceDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5237,
+          "sourceBytes": 10314,
+          "contextPlusRecordBytes": 15551
+        },
+        {
+          "file": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+          "set": "batch-074",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "dca42d0bef3556761d2ace07f143c9b76641f7a9945b5b0fa44384e1886ed59c",
+          "sourceDigest": "27fef5ded87e738335203565af691eb0d7305d104d4512c153f483228b80c1e9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5898,
+          "sourceBytes": 5967,
+          "contextPlusRecordBytes": 11865
+        }
+      ],
+      "fileCount": 6,
+      "edges": 27,
+      "sourcePlusRecordBytes": 219162,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4d-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+          "set": "batch-074",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 5,
+          "recordSha256": "8eea236195858bd390494337c74c7c1e9b8dd4c5d850f28114583fd9845e574f",
+          "sourceDigest": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+          "diffSha256": "011290a5579cbc39afa1bb56a12ca9775003917d2235a68ce1ed9cc4d2618bdc",
+          "recordBytes": 24033,
+          "sourceBytes": 4183,
+          "contextPlusRecordBytes": 28216
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+          "set": "batch-073",
+          "strata": [
+            "open-lead-ruling"
+          ],
+          "edges": 16,
+          "recordSha256": "710301ae46ce43b2e11a54c947c985adb4442a9c0bdd7ba962a51b85586b12c6",
+          "sourceDigest": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+          "diffSha256": "6d611dac549f93a4be790099bb8febc5721db7389c1e67d7870ea741ce06f8ca",
+          "recordBytes": 87954,
+          "sourceBytes": 8837,
+          "contextPlusRecordBytes": 96791
+        }
+      ],
+      "fileCount": 2,
+      "edges": 21,
+      "sourcePlusRecordBytes": 125007,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 16
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "scope": "Only new batches 073–074; no batch ≤072 record is assigned here."
+}

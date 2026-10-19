@@ -1,0 +1,1080 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+      "set": "batch-073",
+      "sourceBytes": 3802,
+      "digest": "ae82a549d4a48d9794346f9af03c6938add3322cbd29a114f0ddbbaa81cdf7d8",
+      "inventoryFileDigest": "ae82a549d4a48d9794346f9af03c6938add3322cbd29a114f0ddbbaa81cdf7d8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e558aa5297118073df3ded6b315e00400eb68aec9397759ad75cef798333b4e4",
+      "recordBytes": 964,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+      "set": "batch-073",
+      "sourceBytes": 4314,
+      "digest": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+      "inventoryFileDigest": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+      "diffSha256": "5c8342b852ae1430307e3113828888b7f173b580d70b4c7ffc4289c2b3db8a94",
+      "recordSha256": "2fe0909c073f476f21453f852ccdfcef562e4d5e3f88f313da95dbb9326686c0",
+      "recordBytes": 36120,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "parked": 2,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+      "set": "batch-073",
+      "sourceBytes": 3970,
+      "digest": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "inventoryFileDigest": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+      "diffSha256": "53285f413939d7cd69c947fcd5175fa4a77c2fd56d47c1329c9c1a8b0e9ed546",
+      "recordSha256": "590f6e19777963bed2961cfa3c0a1dad3f75199188df7fae092cfc129d14b3e5",
+      "recordBytes": 95101,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+      "set": "batch-073",
+      "sourceBytes": 6054,
+      "digest": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+      "inventoryFileDigest": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+      "diffSha256": "a89061ee0073c9fe7594252f7795ecb809af2b663a6b0eef24408dfd6bf2a5db",
+      "recordSha256": "6861765dc5ec4d0f780e5e45d664e61e7deb6042f2c72ee8bd62052cf1704f59",
+      "recordBytes": 31125,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 2,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+      "set": "batch-073",
+      "sourceBytes": 7645,
+      "digest": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+      "inventoryFileDigest": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+      "diffSha256": "a5abb32ff9aaa33f9ff9ac771be176666c68a301006f2afd93d08cc1add7bede",
+      "recordSha256": "a248e0a9730801e10e95c80eb95fa5e92722619ac12f17903a7ff3fe5bb1df97",
+      "recordBytes": 25701,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+      "set": "batch-073",
+      "sourceBytes": 4152,
+      "digest": "b5aa56ffaa8cefd466642878efabe91a02231a037963b947f999abc863a6860d",
+      "inventoryFileDigest": "b5aa56ffaa8cefd466642878efabe91a02231a037963b947f999abc863a6860d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4f718cf9203c8d04cde53af410c1c9d0abb479c79699996d419f7d0c7aed7c3e",
+      "recordBytes": 969,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+      "set": "batch-073",
+      "sourceBytes": 8175,
+      "digest": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+      "inventoryFileDigest": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fcb0652a909cca8b003aadbbcbd7f75d7a655f1061abf5fba1425e0bfbc454ae",
+      "recordBytes": 8040,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+      "set": "batch-073",
+      "sourceBytes": 8293,
+      "digest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+      "inventoryFileDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+      "diffSha256": "1d8b17603b24f2f8f5fca0b944e8c7b3bc7b6cf43e1b83d7b0acfe8d98cbb1af",
+      "recordSha256": "b0a66b545c5615ff2c4474cbed54f5841984e5ce0467605fe682071aa7ec8501",
+      "recordBytes": 40160,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 3,
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+      "set": "batch-073",
+      "sourceBytes": 3669,
+      "digest": "737974e91ba956ff3e07b7b2bc4ba5d8780990f377f112cd41355a25c422abca",
+      "inventoryFileDigest": "737974e91ba956ff3e07b7b2bc4ba5d8780990f377f112cd41355a25c422abca",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a34f25f3ec7b166eec576b4533cbe483f89513f616b327a655db7a741fa58db9",
+      "recordBytes": 975,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "set": "batch-073",
+      "sourceBytes": 8837,
+      "digest": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+      "inventoryFileDigest": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+      "diffSha256": "6d611dac549f93a4be790099bb8febc5721db7389c1e67d7870ea741ce06f8ca",
+      "recordSha256": "710301ae46ce43b2e11a54c947c985adb4442a9c0bdd7ba962a51b85586b12c6",
+      "recordBytes": 87954,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "parked": 6,
+        "preserve": 9,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+      "set": "batch-073",
+      "sourceBytes": 4925,
+      "digest": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+      "inventoryFileDigest": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+      "diffSha256": "ab90c8d4d23a9bd3288b20ac9cda5f50b4ec914493a612d47d5a6cca5215f909",
+      "recordSha256": "a6993e88f8856ce5d59f5f98439b269cb76fb2b3a68fec0e6e2f21ade2202e05",
+      "recordBytes": 24735,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "parked": 2,
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "set": "batch-073",
+      "sourceBytes": 6239,
+      "digest": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+      "inventoryFileDigest": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+      "diffSha256": "b031043cf8f3c434d84d6e62ba547952db9c8b8fd1df613e3290ed130acb5e19",
+      "recordSha256": "054c164597534e48404a4ddd261062616520bc725eb59d4cbec4b03055e54771",
+      "recordBytes": 62025,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "set": "batch-073",
+      "sourceBytes": 13958,
+      "digest": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+      "inventoryFileDigest": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+      "diffSha256": "58b0c953bbf1a66ff485d7156bd669b64392668b7fec0c22dba6dcfa99a22dda",
+      "recordSha256": "8476691384f4f4c03653e7fc7317c2fd4998ee8e4f109a86236b938c8f1c646b",
+      "recordBytes": 95507,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 5,
+        "preserve": 4,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+      "set": "batch-073",
+      "sourceBytes": 7483,
+      "digest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+      "inventoryFileDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+      "diffSha256": "5a969259322d2c37806d2d2b8bd410c313e905eb8fc9618537d16bd4d5c7c680",
+      "recordSha256": "25d41c8ce4446b275f2830d83515052fcc1601817ce51cc01a44a5d13960acae",
+      "recordBytes": 22018,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+      "set": "batch-073",
+      "sourceBytes": 6392,
+      "digest": "09c9d35d624e13873356f381f2fb7bcceec71030252be1be8c50dfe9ba09326f",
+      "inventoryFileDigest": "09c9d35d624e13873356f381f2fb7bcceec71030252be1be8c50dfe9ba09326f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b001353559bbf99d768a2f44147942969b98ca04fbc809533a07b7780175c940",
+      "recordBytes": 9792,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+      "set": "batch-073",
+      "sourceBytes": 5355,
+      "digest": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+      "inventoryFileDigest": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+      "diffSha256": "3ceac083aa13bc7143cb7459ccd59ca723d51ccfd23a6fcdd952d2d65f432d8e",
+      "recordSha256": "4d4abf7d9be7052ec63f51c8c916af615091483bef0041b15ef101a7c66c9467",
+      "recordBytes": 21986,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+      "set": "batch-073",
+      "sourceBytes": 4409,
+      "digest": "b16ea69f31b4c66c6a88e997a16d1ee29991be49cd9d96f8ea1b75c33901058e",
+      "inventoryFileDigest": "b16ea69f31b4c66c6a88e997a16d1ee29991be49cd9d96f8ea1b75c33901058e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b7f4de6df088ac637d756c07facaa0ec9b37e62c52b5941ddf2d800b991f8cca",
+      "recordBytes": 4544,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+      "set": "batch-073",
+      "sourceBytes": 4036,
+      "digest": "a6e4aa8a1aba39ed5ebf4f3cebeb437a1e7907ff27fd56c47b3d56be37d9828c",
+      "inventoryFileDigest": "a6e4aa8a1aba39ed5ebf4f3cebeb437a1e7907ff27fd56c47b3d56be37d9828c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "994d7873a1bc61e8e9bf17a681611dee07980129a796491bf33a65c83d8e7c1b",
+      "recordBytes": 960,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+      "set": "batch-073",
+      "sourceBytes": 3796,
+      "digest": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+      "inventoryFileDigest": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7e0e52aad13e5e0a606cc38c8450eac99e864967a2fabd0552025387693cc88b",
+      "recordBytes": 2019,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "set": "batch-073",
+      "sourceBytes": 6093,
+      "digest": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+      "inventoryFileDigest": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+      "diffSha256": "9f06586c5876952240737b4c0d5c2c96e3cfefcfa9cd640c2a0d8478c272c457",
+      "recordSha256": "0f87529b443a9300eda4f23467c0d5c12bef65cabacb61008c77baa130e5cef4",
+      "recordBytes": 33213,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 3,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+      "set": "batch-073",
+      "sourceBytes": 3404,
+      "digest": "7ac7b6e6dbf3bfa4bad486a649de2939799b02ea9cefaae6b051379069a303b8",
+      "inventoryFileDigest": "7ac7b6e6dbf3bfa4bad486a649de2939799b02ea9cefaae6b051379069a303b8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "552b04a432ddd58ef0b3341687fdb328b420ef1b18713b282cdeaa7c3867f735",
+      "recordBytes": 3117,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+      "set": "batch-073",
+      "sourceBytes": 7408,
+      "digest": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+      "inventoryFileDigest": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+      "diffSha256": "5cbec11efc7ff3c88fd7a6cee8fba44acd673da686acc216332558cb7fde5472",
+      "recordSha256": "fd300a51238ff6f2433dcf0b09d5e2ae3ff411aeee465a1f4fdcd30bee7cc194",
+      "recordBytes": 39551,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+      "set": "batch-073",
+      "sourceBytes": 6342,
+      "digest": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+      "inventoryFileDigest": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+      "diffSha256": "140fecfbf1fb2e298583946711013bbf01712ec27c9b60e941b36598db6aded5",
+      "recordSha256": "4156fc955a3ea3c6e098e8bcc04f641b17c0f2da576ead1d7219200680aeae6e",
+      "recordBytes": 39902,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+      "set": "batch-073",
+      "sourceBytes": 5325,
+      "digest": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+      "inventoryFileDigest": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+      "diffSha256": "6c3de7b8492640e7833d4177a9a1207f21de1a156d527f7f5e4de05def4cc485",
+      "recordSha256": "e15635e82726690219d6f096667dd3aee1b4ac9f444241ae3bc853af4ce09e4c",
+      "recordBytes": 14784,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 4,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+      "set": "batch-073",
+      "sourceBytes": 3363,
+      "digest": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+      "inventoryFileDigest": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "99d97a50c05502ab7a8ea6a8a253ce887e07ef60f89f537bf852ef3b98e20eaf",
+      "recordBytes": 2022,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+      "set": "batch-074",
+      "sourceBytes": 6903,
+      "digest": "f006090af52c3e7c2ffcf1cc2774d9f95933d797ffb581fecae8f063e246da06",
+      "inventoryFileDigest": "f006090af52c3e7c2ffcf1cc2774d9f95933d797ffb581fecae8f063e246da06",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "812f1e4b29d8d31611f0867b487a3ee4de27c8046aa0cd2837d5c011430e532e",
+      "recordBytes": 3265,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+      "set": "batch-074",
+      "sourceBytes": 6256,
+      "digest": "ac95f56ee5b7bcd7d426bf7596032374c92a38c61b9503e4328b4c8d61026609",
+      "inventoryFileDigest": "ac95f56ee5b7bcd7d426bf7596032374c92a38c61b9503e4328b4c8d61026609",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "dc82f8f70b560ba92e4ad0a4a6d36d909d6e15aa6e1d127ec4e7aa6100c14166",
+      "recordBytes": 1960,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+      "set": "batch-074",
+      "sourceBytes": 3995,
+      "digest": "b4f246a647fdec09b96ed6ffdb00e6c6da3ceb0f70021efbd3d4c9e2648ea13f",
+      "inventoryFileDigest": "b4f246a647fdec09b96ed6ffdb00e6c6da3ceb0f70021efbd3d4c9e2648ea13f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2a754299cb51a8a53fd41c89a439de06b11b0b60a566c46af467b942a2144506",
+      "recordBytes": 2416,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+      "set": "batch-074",
+      "sourceBytes": 3883,
+      "digest": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+      "inventoryFileDigest": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+      "diffSha256": "44aeaf2c1f294b13496a8d1fac2be83334b79ebed30ed1a0661d8ed49931f881",
+      "recordSha256": "5b3fcd9aefa795b30b66f24b9059b332ab35c8716af120a5a6b9ed7ecc2a055c",
+      "recordBytes": 27923,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+      "set": "batch-074",
+      "sourceBytes": 7006,
+      "digest": "2398166bf987ee68ec2afd8b703a9527bcb7dc459d0bd427a348b42f10865bb6",
+      "inventoryFileDigest": "2398166bf987ee68ec2afd8b703a9527bcb7dc459d0bd427a348b42f10865bb6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "60efb454f3f677cf423d83d5f2ff913586059e01fce3d04da176349a298f50c9",
+      "recordBytes": 940,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+      "set": "batch-074",
+      "sourceBytes": 3222,
+      "digest": "4d9024f0f2470797015fb26114c7afb1e96c52b47f99b66640ba763d8439d99a",
+      "inventoryFileDigest": "4d9024f0f2470797015fb26114c7afb1e96c52b47f99b66640ba763d8439d99a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7fa9773cabdf4eb2794f1a93859ddb62391c6c28ae16b7daed9268b99e1e88c0",
+      "recordBytes": 3177,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md",
+      "set": "batch-074",
+      "sourceBytes": 8118,
+      "digest": "6458bcda95298b4c54d1b29a26c11d30d524362f0982e5f345a74538a9f1609d",
+      "inventoryFileDigest": "6458bcda95298b4c54d1b29a26c11d30d524362f0982e5f345a74538a9f1609d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "46b271109c9d82f9061421c5d3d3c5b9dce5b4a26e5f1716a1869f2b6f35d209",
+      "recordBytes": 957,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+      "set": "batch-074",
+      "sourceBytes": 5656,
+      "digest": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+      "inventoryFileDigest": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+      "diffSha256": "9cbb4c76800f666704a30a273903274389402c1aeab37343b36b9249ff1659c6",
+      "recordSha256": "fdadbae39cf60232392646e33701c96d4dd4e59eefbcac7096cfa1917a8a5b0f",
+      "recordBytes": 27057,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+      "set": "batch-074",
+      "sourceBytes": 3262,
+      "digest": "c4c5ba5207a871a4ab584f17d544fe282f47f64068d6667fad300e74f004ffc2",
+      "inventoryFileDigest": "c4c5ba5207a871a4ab584f17d544fe282f47f64068d6667fad300e74f004ffc2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d11c23948f9ed7aa78cac693b6dda0c89863b8a1bbfce111f05eec35432f93f7",
+      "recordBytes": 926,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+      "set": "batch-074",
+      "sourceBytes": 4924,
+      "digest": "458fef040aa8e85c3c0f4586dda4d86dec669f7d46d2841806828538892ba8a1",
+      "inventoryFileDigest": "458fef040aa8e85c3c0f4586dda4d86dec669f7d46d2841806828538892ba8a1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6077f5b7653491de9b3b7f299255b4e4fa6774a0effb5ff03d1191a3645c4cd5",
+      "recordBytes": 920,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "set": "batch-074",
+      "sourceBytes": 10314,
+      "digest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+      "inventoryFileDigest": "59693d424f16802ba3baf60d8d04a09b15adf4a4fe8fccc3da498d0e3dafafc7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3b7355f40577ee777cbf89a9c1e5a5557ff248b1871723666a0244412f59a416",
+      "recordBytes": 5237,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+      "set": "batch-074",
+      "sourceBytes": 1679,
+      "digest": "9b723f2783ae64ad500ed4979c35f6ccc1d124dc7fd557d6501afca72adc066d",
+      "inventoryFileDigest": "9b723f2783ae64ad500ed4979c35f6ccc1d124dc7fd557d6501afca72adc066d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "348b5cbca45db32c5e7eb02c889754b87017ccc2b86a94739111ed33565c1589",
+      "recordBytes": 2570,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+      "set": "batch-074",
+      "sourceBytes": 4221,
+      "digest": "d51f2ac0b381d3784413554d2e401b46599ecae1f66da4cef068c11eb5f7b5bd",
+      "inventoryFileDigest": "d51f2ac0b381d3784413554d2e401b46599ecae1f66da4cef068c11eb5f7b5bd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "84936651bf34e2be2d4a76bbf43311d2925307aaade52dc74105ec41bd057351",
+      "recordBytes": 10579,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/recordgateapprove-s-real-contract/recordgateapprove-contract.md",
+      "set": "batch-074",
+      "sourceBytes": 3502,
+      "digest": "ae528a4e2f1ee9412185af84c95538fedcfd96cffa2aced4059f0f59b087358f",
+      "inventoryFileDigest": "ae528a4e2f1ee9412185af84c95538fedcfd96cffa2aced4059f0f59b087358f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c369690157551eaccd566e65468ee1e193f5d8349db7ae0ad998e815346f490a",
+      "recordBytes": 905,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md",
+      "set": "batch-074",
+      "sourceBytes": 2438,
+      "digest": "eaea6ba9682b763b9b3270a273d9536c96ae54669df2c3dee7169314dd316d0b",
+      "inventoryFileDigest": "eaea6ba9682b763b9b3270a273d9536c96ae54669df2c3dee7169314dd316d0b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "df0ad89601109dd2303eaced02bd53780ee1f90d76c97e1f6ebad3997b638218",
+      "recordBytes": 914,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+      "set": "batch-074",
+      "sourceBytes": 6934,
+      "digest": "8e5f3014ed36106cfa16d4d2416d6be4c8e2798e7b465d11e8295e5a4371545b",
+      "inventoryFileDigest": "8e5f3014ed36106cfa16d4d2416d6be4c8e2798e7b465d11e8295e5a4371545b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1fbeec852d68dad118d72a4cc84f531fe48ff9faad8dc298043db6ad7f08ed37",
+      "recordBytes": 3099,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md",
+      "set": "batch-074",
+      "sourceBytes": 3707,
+      "digest": "97a563929d3f31efc8c97089ff04588d3fcdba4276bcda170345833810b36a59",
+      "inventoryFileDigest": "97a563929d3f31efc8c97089ff04588d3fcdba4276bcda170345833810b36a59",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "02700f0f94905a978cfe734b08582c7eb1675a51bafdb434e407d0d857039690",
+      "recordBytes": 943,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md",
+      "set": "batch-074",
+      "sourceBytes": 2459,
+      "digest": "2c6864366e14ae08cef1991e4e6ebfcd22b992f65c072a1cd6c0208437df783b",
+      "inventoryFileDigest": "2c6864366e14ae08cef1991e4e6ebfcd22b992f65c072a1cd6c0208437df783b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "28da27375f87d9be38d8f19d5ecaf56cd3fdf8415fad4bd19fb3ac7c3a7da032",
+      "recordBytes": 948,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+      "set": "batch-074",
+      "sourceBytes": 5967,
+      "digest": "27fef5ded87e738335203565af691eb0d7305d104d4512c153f483228b80c1e9",
+      "inventoryFileDigest": "27fef5ded87e738335203565af691eb0d7305d104d4512c153f483228b80c1e9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "dca42d0bef3556761d2ace07f143c9b76641f7a9945b5b0fa44384e1886ed59c",
+      "recordBytes": 5898,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+      "set": "batch-074",
+      "sourceBytes": 1373,
+      "digest": "aaefbb62c81df89b309cfd0230506948945bfe75a9d01043ba7ec9784fbb87c7",
+      "inventoryFileDigest": "aaefbb62c81df89b309cfd0230506948945bfe75a9d01043ba7ec9784fbb87c7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a26673df7ed27e23a632987fbafb4ddaa5bfd5c08a4f1a15195a01c4d0cd310d",
+      "recordBytes": 3620,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md",
+      "set": "batch-074",
+      "sourceBytes": 2190,
+      "digest": "f8f1fdd174e4712221ffc8969575311ef1b4b24ea7cd82c1fc623fb6fc50a3ef",
+      "inventoryFileDigest": "f8f1fdd174e4712221ffc8969575311ef1b4b24ea7cd82c1fc623fb6fc50a3ef",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "de2cb619c88430c74a30851cd59ef7229798e63067835d1e264edcccca7530a2",
+      "recordBytes": 938,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+      "set": "batch-074",
+      "sourceBytes": 4192,
+      "digest": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+      "inventoryFileDigest": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+      "diffSha256": "7285939999e21589591678fd6436a2de24374abc375c1d2aacd1efaf18103f92",
+      "recordSha256": "1995fb4e5c653fcaf14d5f0851fcd9d93a3c031cecbb1cb1b0d0e48ddc2a7008",
+      "recordBytes": 12652,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+      "set": "batch-074",
+      "sourceBytes": 2211,
+      "digest": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+      "inventoryFileDigest": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+      "diffSha256": "c2d82b0c6ec051d6e24b878dfda52d4a7e81ad10c627388c54368e81a5645851",
+      "recordSha256": "56abca4a85ca21c44421bd3a1c8d4142e2cbab614cd897fc7ccafda96f5749da",
+      "recordBytes": 21319,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+      "set": "batch-074",
+      "sourceBytes": 4755,
+      "digest": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+      "inventoryFileDigest": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+      "diffSha256": "96122fc754af893ea3502df2cdc40b8e34bd9fb092d44054ffb0d7d87ed4ef02",
+      "recordSha256": "dbdd80a4744ccf6060ab609009fd0bc815230d369e0df8036007dbab6e8da746",
+      "recordBytes": 45271,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+      "set": "batch-074",
+      "sourceBytes": 4183,
+      "digest": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+      "inventoryFileDigest": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+      "diffSha256": "011290a5579cbc39afa1bb56a12ca9775003917d2235a68ce1ed9cc4d2618bdc",
+      "recordSha256": "8eea236195858bd390494337c74c7c1e9b8dd4c5d850f28114583fd9845e574f",
+      "recordBytes": 24033,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 2
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-073",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000073",
+      "population": [
+        "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+        "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+        "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+        "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+        "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+        "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+        "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+        "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+        "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+        "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+        "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+        "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md"
+      ],
+      "populationCount": 15,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+          "rankHash": "0f908adf80103c219125e03e1c9d9805d254ea839b6bd7efca35c904f85aab83"
+        },
+        {
+          "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+          "rankHash": "1c9850486366a8e954c10928f3158fb8a44ba8481a3eb10278e5adc9286b50ec"
+        },
+        {
+          "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+          "rankHash": "2360b3a5ea8eb30c4e5ad1e17ceea4ec78f0d3a133c2f05acd27d7084f28ef82"
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+          "rankHash": "262efacaeb594d4564a82402581360239e90449c2d6d6500baabf671c549e67e"
+        },
+        {
+          "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+          "rankHash": "429a4bf84f8bc1cc47476c78c572e8d6773307bccfcc8beb5ac95965c93bc52a"
+        },
+        {
+          "file": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+          "rankHash": "44ae292ec6bd691088ee845d9d43503160206cc07cdcd575d042bbc6e16be8fa"
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+          "rankHash": "4e2a86de62b415d88ceeaf389f5ad6aa64424d0dbf2e9bc3dab947c88924d78e"
+        },
+        {
+          "file": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "rankHash": "60e2274939ac289f4ac842a9d9ca80cf055a80ceda0bc69bae77d9a77b02e467"
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+          "rankHash": "75411ed40b072d8b61456628d66315aba515834354c018d91308fa109aa9de2d"
+        },
+        {
+          "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+          "rankHash": "8fb7c980aa175f5b817d646ff5e530d02ce11bef9e0bc2c24bfa77a4b0740adc"
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+          "rankHash": "ae937afdd81d3055cce1996f24ee19d637681918f9e5bcd7023a4bd16746a3c1"
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+          "rankHash": "b7012aef0786e1a169e2aa0cfbb8f7b8c03579f36f34944f30d576215f51cb36"
+        },
+        {
+          "file": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+          "rankHash": "c41a0a0fca6d20c08b11ee020691fe1fb40c18488eb2fe2fafbd300b5cefbfa1"
+        },
+        {
+          "file": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+          "rankHash": "d402102df342630525187a331255c324bc00bb6fe2151fad8f6405ad83ac057b"
+        },
+        {
+          "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+          "rankHash": "dd4c9e0874a84d65b915a464cabe175d6fe5741afa39733fe80bcd9db0f9c8f0"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+        "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+        "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md"
+      ],
+      "distinctReviewCount": 3,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+        "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+        "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+        "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+        "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+        "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+        "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+        "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+        "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+        "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+        "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+        "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+        "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+        "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+        "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+        "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+        "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+        "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+        "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+        "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+        "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+      ],
+      "dispositions": {
+        "parked": 14,
+        "patch": 40,
+        "preserve": 62
+      }
+    },
+    {
+      "set": "batch-074",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000074",
+      "population": [
+        "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+        "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+        "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+        "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md"
+      ],
+      "populationCount": 6,
+      "ranks": [
+        {
+          "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+          "rankHash": "203342e36952142d385e08765a29b09f1efc429f162966a7d1065d5afbe198ed"
+        },
+        {
+          "file": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+          "rankHash": "2ed84f0137fb705eb65a219d12b6a7214ba2520af9f15a1ff7887e54b0fac2dc"
+        },
+        {
+          "file": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+          "rankHash": "3b17041f2d8bbadbc69cc9a139bb3472135b1b037ffc5e4a8758ce7bcdaf9401"
+        },
+        {
+          "file": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+          "rankHash": "a1f502918eda7397916d52dd63ae95345c629c5ce5d0d48c4b7b3788fce4496f"
+        },
+        {
+          "file": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+          "rankHash": "c5c8a15beb11e95435c6c5a9fff8c764af9714a3bb2a7b4b78b5df575d5d8760"
+        },
+        {
+          "file": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+          "rankHash": "f6af817535b539e741bd1fa4ca4bfb6f98382001824398a322e44b5cb4695992"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+        "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+        "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+        "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+        "docs/knowledge/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+        "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+        "docs/knowledge/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md",
+        "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+        "docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md",
+        "docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md",
+        "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+        "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+        "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+        "docs/knowledge/recordgateapprove-s-real-contract/recordgateapprove-contract.md",
+        "docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md",
+        "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+        "docs/knowledge/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md",
+        "docs/knowledge/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md",
+        "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+        "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+        "docs/knowledge/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md",
+        "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+        "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+        "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md"
+      ],
+      "dispositions": {
+        "preserve": 34,
+        "patch": 13,
+        "parked": 1
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "073": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-073",
+      "population": [
+        "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+        "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+        "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+        "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+        "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+      ],
+      "populationCount": 6,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "rankHash": "3d987ff9f5966d1f516db7270308ba5c6b739346ae5c8f9d32f65d92782cb0ee"
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+          "rankHash": "435e3b6dc9c320d3d0e49f71d1c5fa5077b1fd01d61954e4080784da0fcbda0a"
+        },
+        {
+          "file": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "rankHash": "594326081ab46b16b1627a784e205aeb0a2d1f56c7f42844943b43b77278265d"
+        },
+        {
+          "file": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "rankHash": "739c862ccc70c9ab634cbf47893a3c60145cf6ea3b7700b8b06c305cebd6946c"
+        },
+        {
+          "file": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+          "rankHash": "9a6c535956d320f4ceea21fe45be2772f4c6c1ccbee94c20c5d7a8b5bc79ded2"
+        },
+        {
+          "file": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+          "rankHash": "e101ed5229176797eb812b71aa781ce03f55c82b5b3a41d2ae39f7cf71448f02"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "074": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-074",
+      "population": [
+        "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+        "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+        "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+        "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+        "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+        "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+        "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+        "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+        "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+        "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+          "rankHash": "06c972b49b0c28e0cf923469c1d59d8f999a287c15841eec956fdbc4df6d3699"
+        },
+        {
+          "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "rankHash": "1c9e6052cdcd39ea224c56d5445f17726e164e2a7202f5a24e3c4553891d9a0e"
+        },
+        {
+          "file": "docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+          "rankHash": "20b6691234e614525c42de2724d0be6560de4076b9c8e9bc6dcae19623c4ca05"
+        },
+        {
+          "file": "docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md",
+          "rankHash": "2813c2a4b810a29f0f1b9e7230cdd428c0c7a69a3bd9bfd21d3e81507cad8341"
+        },
+        {
+          "file": "docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+          "rankHash": "41a0c7d160477176051aadf420f9378d95390f13d5c4ee414d4db73aa70a8f3d"
+        },
+        {
+          "file": "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+          "rankHash": "467372f3af7d285194befca7115cfb09c20426267ae754a5d5507f6969bbae0f"
+        },
+        {
+          "file": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+          "rankHash": "5086550687e2962bd058194af2f191f8e2fcf2963bff2aec23ca297fa647b5d0"
+        },
+        {
+          "file": "docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md",
+          "rankHash": "525ae0a2b516f38256991a9277023a8ebd0e824e0179afe05b925ccd7f604b4e"
+        },
+        {
+          "file": "docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md",
+          "rankHash": "a4eab87d925ad91dbe4544c8c2234dc56ba477e9487f0ef363d49eeccd1a7a6d"
+        },
+        {
+          "file": "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+          "rankHash": "f8454a8d100beb90ee5cb8a0901488635814b764e2ae3aa1ee029183c5683cab"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+        "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-073.jsonl",
+      "sha256": "ed08369dda97791636b382a3d3787ea24e5f65388e5de86a4e082661c7164121"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-074.jsonl",
+      "sha256": "88f2f53f4aa2c8d0628cfbf2f242e99a31f7b41a851ac7d5ccdcea58745de1e8"
+    }
+  ]
+}

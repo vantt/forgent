@@ -1,0 +1,86 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 8,
+  "allRejected": true,
+  "probes": [
+    {
+      "rule": "L12-39(1): same number but wrong heading title rejected",
+      "expectedCheck": "removed-decision-narrative-successor",
+      "observedChecks": [
+        "removed-decision-narrative-successor"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(1): Iron Law cannot acquire Team Harness successor",
+      "expectedCheck": "removed-decision-narrative-successor",
+      "observedChecks": [
+        "removed-decision-narrative-successor"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(2): non-RUL10 work-state edge cannot carry a patch",
+      "expectedCheck": "retiring-edge-no-patch",
+      "observedChecks": [
+        "retiring-edge-no-patch",
+        "schema"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(2): non-RUL10 work-state edge must retire",
+      "expectedCheck": "work-state-carried-passage",
+      "observedChecks": [
+        "work-state-carried-passage"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(2): per-edge retirement is limited to the mixed work-state record",
+      "expectedCheck": "per-edge-retirement-eligibility",
+      "observedChecks": [
+        "per-edge-retirement-eligibility",
+        "schema"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(5): only admitted park categories commit",
+      "expectedCheck": "dependency-category",
+      "observedChecks": [
+        "dependency-category",
+        "parked-state"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(6): history exemption comes from actual heading",
+      "expectedCheck": "renamed-alias-preserve",
+      "observedChecks": [
+        "author-added-search-coverage",
+        "digest",
+        "edge-coverage",
+        "passage-correspondence",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-39(7): deleted decision basename joins scan, cannot be omitted",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    }
+  ],
+  "positiveControls": [
+    "number-and-title successor notes accepted",
+    "minimal non-RUL10 retirement markers accepted",
+    "lead-ruling parks accepted with explicit notClosableSets",
+    "Document history capture identities preserve",
+    "manually added deleted basename joins extended scanner"
+  ],
+  "inheritedSuites": "87 + 23 + 25 + 16 + 11 + 4; no probe deleted"
+}

@@ -1,0 +1,20 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "set": "batch-073",
+  "edgeId": "maps-j-04444",
+  "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+  "sourceExpression": "docs/decisions/0032-iron-law-...md",
+  "actualHistoricalPath": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+  "deletedAt": "4722361aeea0513c4018793afad05a16f9e1501d",
+  "titleMatchedHolder": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người",
+  "currentComputedSuccessors": [
+    "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+  ],
+  "cause": "L12-39 successor computation includes the sibling Multi-role filename from the complete source paragraph; the Iron Law abbreviated filename lacks the Vietnamese title prefix used by its holder.",
+  "disposition": "parked",
+  "blockedCategory": "lead-ruling",
+  "recommendation": "In a separately scoped turn, authorize a narrow source-title/actual historical-path correspondence fix with a probe, then preserve this Iron Law capture with its own holder note; keep 04445 on Multi-role.",
+  "scopeCeiling": "This assignment authorizes checker changes only for L12-40; no other predicate is changed here. No consumer edit or Phase 9 authority decision is requested.",
+  "reviewSupplement": "Whole file included in the new-batch-only review request, independently of seeded membership.",
+  "setClosure": "batch-073 cannot close while this edge remains lead-ruling; all other authored sets have no open lead-ruling edge."
+}

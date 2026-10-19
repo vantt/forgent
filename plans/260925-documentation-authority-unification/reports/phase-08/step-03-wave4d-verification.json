@@ -1,0 +1,321 @@
+{
+  "authorPin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inputHead": "20d1b97da8046d895e1781cbe16243e8fd95c3a4",
+  "scope": "Plan-local author records and L12-40 checker/probes only; no consumer edit, checkout git write, state/config/production mutation",
+  "newPopulation": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "073",
+      "074"
+    ],
+    "pendingBatches": [
+      "075",
+      "076",
+      "077",
+      "078",
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "stopReason": "Turn budget: stop after whole batch 074; do not claim 075–082 authored.",
+    "files": 50,
+    "inventoryEdges": 160,
+    "addedEdges": 4,
+    "edges": 164,
+    "patchedFiles": 21,
+    "dispositions": {
+      "parked": 15,
+      "patch": 53,
+      "preserve": 96
+    },
+    "parks": {
+      "description-rewrite": 12,
+      "step5-parity": 2,
+      "lead-ruling": 1
+    },
+    "reviewAcceptance": "pending independent A51 review"
+  },
+  "perSet": [
+    {
+      "set": "batch-073",
+      "files": 25,
+      "inventoryEdges": 116,
+      "addedEdges": 0,
+      "edges": 116,
+      "patchedFiles": 15,
+      "dispositions": {
+        "parked": 14,
+        "patch": 40,
+        "preserve": 62
+      }
+    },
+    {
+      "set": "batch-074",
+      "files": 25,
+      "inventoryEdges": 44,
+      "addedEdges": 4,
+      "edges": 48,
+      "patchedFiles": 6,
+      "dispositions": {
+        "preserve": 34,
+        "patch": 13,
+        "parked": 1
+      }
+    }
+  ],
+  "sourceReadBytes": 260789,
+  "checker": {
+    "files": 552,
+    "edges": 3992,
+    "failureCount": 0,
+    "result": "step-03-wave4d-check-result.json",
+    "binding": "step-03-wave4d-binding-manifest.json",
+    "openLeadRulingEdgesPerSet": {
+      "batch-001": [],
+      "batch-002": [],
+      "batch-003": [],
+      "batch-004": [],
+      "batch-005": [],
+      "batch-006": [],
+      "batch-007": [],
+      "batch-008": [],
+      "batch-009": [],
+      "batch-010": [],
+      "batch-011": [],
+      "batch-012": [],
+      "batch-013": [],
+      "batch-014": [],
+      "batch-015": [],
+      "batch-016": [],
+      "batch-017": [],
+      "batch-018": [],
+      "batch-019": [],
+      "batch-020": [],
+      "batch-021": [],
+      "batch-022": [],
+      "batch-023": [],
+      "batch-024": [],
+      "batch-025": [],
+      "batch-026": [],
+      "batch-027": [],
+      "batch-028": [],
+      "batch-029": [],
+      "batch-030": [],
+      "batch-031": [],
+      "batch-032": [],
+      "batch-033": [],
+      "batch-034": [],
+      "batch-035": [],
+      "batch-036": [],
+      "batch-037": [],
+      "batch-038": [],
+      "batch-039": [],
+      "batch-040": [],
+      "batch-041": [],
+      "batch-042": [],
+      "batch-043": [],
+      "batch-044": [],
+      "batch-045": [],
+      "batch-046": [],
+      "batch-047": [],
+      "batch-048": [],
+      "batch-049": [],
+      "batch-050": [],
+      "batch-051": [],
+      "batch-052": [],
+      "batch-053": [],
+      "batch-054": [],
+      "batch-055": [],
+      "batch-056": [],
+      "batch-057": [],
+      "batch-058": [],
+      "batch-059": [],
+      "batch-060": [],
+      "batch-061": [],
+      "batch-062": [],
+      "batch-063": [],
+      "batch-064": [],
+      "batch-065": [],
+      "batch-066": [],
+      "batch-067": [],
+      "batch-068": [],
+      "batch-069": [],
+      "batch-070": [],
+      "batch-071": [],
+      "batch-072": [],
+      "batch-073": [
+        "maps-j-04444"
+      ],
+      "batch-074": []
+    },
+    "notClosableSets": [
+      "batch-073"
+    ],
+    "inheritedAdvisoryLocatorFlags": 5,
+    "newBatchLocatorFlags": 0
+  },
+  "probes": {
+    "negativeProbes": 182,
+    "inherited": 174,
+    "new": 8,
+    "allRejected": true,
+    "serialReplay": "step-03-wave4d-probe-replay.json",
+    "fixtureAdaptations": "04835 captured output negative retains its original mutation in a source fixture without real framing; 04295 history negative uses a different real consumer because self-alias is exempt; closed Lead-ruling positive uses immutable input-HEAD fixture. All predicates active; original inherited suite files unchanged."
+  },
+  "lightTests": {
+    "pass": 95,
+    "fail": 0,
+    "skip": 0,
+    "log": "step-03-wave4d-light-tests.log",
+    "fullNpmSuiteRun": false
+  },
+  "review": {
+    "A51Distinct": 7,
+    "openRulingSupplement": 1,
+    "files": 8,
+    "edges": 48,
+    "parts": 2,
+    "perSet": [
+      {
+        "set": "batch-073",
+        "allFiles": 25,
+        "patchedPopulation": 15,
+        "patchedSeedSample": 3,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 3,
+        "unpatchedEligiblePopulation": 6,
+        "unpatchedSample": 1,
+        "distinctSelected": 4,
+        "patchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      },
+      {
+        "set": "batch-074",
+        "allFiles": 25,
+        "patchedPopulation": 6,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 10,
+        "unpatchedSample": 2,
+        "distinctSelected": 3,
+        "patchedStratum": {
+          "selectedDenominator": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      }
+    ],
+    "bindingProof": "step-03-wave4d-review-binding-proof.json",
+    "request": "step-03-wave4d-review-request.md",
+    "reviewersStarted": 0,
+    "accepted": 0
+  },
+  "protectedFiles": 688,
+  "onlyPriorChangedEdges": [
+    "maps-j-04320",
+    "maps-j-04345",
+    "maps-j-04353"
+  ],
+  "protectedBindings": "step-03-wave4d-protected-bindings.json",
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-072.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-073.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-074.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-attempt1-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-attempt1-probe-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-attempt1-step-03-wave3-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-attempt2-probe-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-attempt2-step-03-wave4c-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-author.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-batch073-attempt1-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-binding-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-l12-40-changes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-lead-ruling-gaps.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-light-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-packet.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-population.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-pre-title-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-probe-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-probes-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-probes.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-protected-bindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-replay.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-review-binding-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave1-r2-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave1-r2-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave1-r3-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave1-r3-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave2-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave2-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave3-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave3-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4c-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4c-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4d-probes-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-step-03-wave4d-probes-replay.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-whole-file-reads.json"
+  ],
+  "proofCodeBindings": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "9c3ff23944047dc3c3d0f527596d6610144b8ed8d2778fac0706308d8309b0e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-author.py",
+      "sha256": "63df3aad6e3f3c77647c1ac9b840213ada63c09027429ab42e1d4d604bc89b13"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check.py",
+      "sha256": "f9baff9b66103f4d9cb944fbbad9f1f9be01c9592830362d79926afd909a579d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-packet.py",
+      "sha256": "40d81d2aa9a785b957607549c3605f01eb70ca61f02cfeca72548485108707ee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-probes.py",
+      "sha256": "642fe7f1f49735f1aa63db15ec9f4e343c027397633066f1f5fdd0fbea54c302"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-replay.py",
+      "sha256": "2c9a020d54df7566d882f7eabd08f949ae20194b4caef3af87a9b81a62597862"
+    }
+  ],
+  "limitations": [
+    "075–082 unauthored; no partial batch emitted",
+    "batch-073 cannot close pending 04444 title-correspondence ruling; batch-074 and all earlier sets have no open lead-ruling edge",
+    "Semantic independent A51 review pending; no self-acceptance",
+    "Inherited locator flags remain prior-record review obligations",
+    "Runner owns commit/accounting; Lead owns preview and acceptance; no service launched",
+    "No Phase 9 consumer patch applied, no Phase 8/Step 3 close claimed"
+  ],
+  "needsWrites": []
+}

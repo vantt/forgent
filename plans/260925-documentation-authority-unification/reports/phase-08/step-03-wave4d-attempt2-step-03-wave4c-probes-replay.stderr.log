@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-probes.py", line 42, in main
+    names=sorted({x['check'] for x in c.check_record(r,apply=False)});assert 'renamed-alias-preserve' in names;cases.append({'rule':'L12-39(6): history exemption comes from actual heading','expectedCheck':'renamed-alias-preserve','observedChecks':names,'rejected':True})
+AssertionError

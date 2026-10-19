@@ -1,0 +1,73 @@
+[
+  {
+    "script": "step-03-probes.py",
+    "exitCode": 0,
+    "seconds": 63.062,
+    "result": "step-03-wave4d-step-03-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "negativeProbes": 87,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave1-r2-probes.py",
+    "exitCode": 0,
+    "seconds": 1.774,
+    "result": "step-03-wave4d-step-03-wave1-r2-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave1-r2-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "negativeProbes": 23,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave1-r3-probes.py",
+    "exitCode": 0,
+    "seconds": 18.025,
+    "result": "step-03-wave4d-step-03-wave1-r3-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave1-r3-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "negativeProbes": 25,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave2-probes.py",
+    "exitCode": 0,
+    "seconds": 5.444,
+    "result": "step-03-wave4d-step-03-wave2-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave2-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "negativeProbes": 16,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave3-probes.py",
+    "exitCode": 0,
+    "seconds": 7.307,
+    "result": "step-03-wave4d-step-03-wave3-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave3-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "capturedRegionFixture": true,
+    "negativeProbes": 11,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave4-probes.py",
+    "exitCode": 0,
+    "seconds": 6.323,
+    "result": "step-03-wave4d-step-03-wave4-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave4-probes-replay.stderr.log",
+    "historicalLeadFixture": false,
+    "capturedRegionFixture": false,
+    "negativeProbes": 4,
+    "allRejected": true
+  },
+  {
+    "script": "step-03-wave4c-probes.py",
+    "exitCode": 1,
+    "seconds": 10.086,
+    "result": "step-03-wave4d-step-03-wave4c-probes-replay.json",
+    "stderr": "step-03-wave4d-step-03-wave4c-probes-replay.stderr.log",
+    "historicalLeadFixture": true,
+    "capturedRegionFixture": false
+  }
+]

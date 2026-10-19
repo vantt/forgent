@@ -1,0 +1,46 @@
+{
+  "serial": true,
+  "scratch": "/tmp/fgos-work",
+  "envUnset": [
+    "CLAUDE_CODE_SESSION_ID"
+  ],
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "commands": [
+    [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-author.py"
+    ],
+    [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-packet.py"
+    ],
+    [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-replay.py"
+    ],
+    [
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check.py"
+    ],
+    [
+      "git",
+      "diff",
+      "--check"
+    ]
+  ],
+  "diagnostics": [
+    "Batch-073 initial check rejected the prose token Candidate #2 as a reason anchor; record wording corrected, predicate unchanged.",
+    "First all-record receipt had only a stale binding after removal of obsolete lead-ruling search witnesses from the three authorized preserves.",
+    "Pre-title all-record receipt passed 552 files / 3992 edges, before 04444/04445 history facts and bounded lead-ruling park were corrected.",
+    "Inherited alias-negative 04835 was newly exempt as captured output; original mutation retained on a source fixture with its real fence/blockquote framing removed.",
+    "Closed L12-39 lead-ruling positive uses its exact input-HEAD fixture in memory; history-negative 04295 uses a different real consumer in the fixture because self-alias is now exempt. No predicate disabled.",
+    "Launcher newline quoting and unknown synthetic-consumer errors were corrected in the new replay wrapper; original suite files remain untouched."
+  ]
+}

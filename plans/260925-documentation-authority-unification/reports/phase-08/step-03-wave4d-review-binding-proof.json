@@ -1,0 +1,21 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "parts": [
+    {
+      "part": 1,
+      "files": 6,
+      "edges": 27,
+      "sourcePlusRecordBytes": 219162,
+      "allBindingsMatch": true
+    },
+    {
+      "part": 2,
+      "files": 2,
+      "edges": 21,
+      "sourcePlusRecordBytes": 125007,
+      "allBindingsMatch": true
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0
+}

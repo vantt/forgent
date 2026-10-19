@@ -559,6 +559,30 @@ def evidence_anchor(commit,e,proof):
     text=blob(commit,e['target']).decode().splitlines()
     assert proof['targetLineText']==[text[n-1] for n in lines], 'line evidence differs from pinned target'
 
+def captured_evidence_at(text, line):
+    """L12-40: source-derived fenced or blockquoted captured bytes."""
+    lines = text.splitlines()
+    start = line - 1
+    while start > 0 and lines[start - 1].strip() and not re.match(r'^#{1,6}\s', lines[start - 1]):start -= 1
+    end = line
+    while end < len(lines) and lines[end].strip() and not re.match(r'^#{1,6}\s', lines[end]):end += 1
+    paragraph = "\n".join(lines[start:end])
+    # Explicitly completed grep result, even when rendered as prose (04345).
+    if re.search(r"\bThe real run\b[\s\S]*?\bsurfaced\b", paragraph):return True
+    fence = None
+    for n, value in enumerate(lines, 1):
+        marker = re.match(r'^\s*(?:>\s*)*(`{3,}|~{3,})', value)
+        inside = fence is not None
+        if marker:
+            token = marker[1]
+            if fence is None:
+                fence = token
+            elif token[0] == fence[0] and len(token) >= len(fence):
+                fence = None
+        if n == line:
+            return inside or bool(marker) or bool(re.match(r'^\s*>', value))
+    return False
+
 class Checker:
     def __init__(self,commit):
         self.commit=commit;self.entries={e['edgeId']:e for e in census()['entries']};self.files={f['path']:f for f in census()['files']}
@@ -570,7 +594,7 @@ class Checker:
     def renamed_alias_holders(self,r,e):
         """L12-37(2): missing preserved navigation with a committed live alias."""
         f=r['file'];body=blob(self.commit,f).decode()
-        if e.get('disposition')!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f):return []
+        if e.get('disposition')!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f) or captured_evidence_at(body,e['sourceSpans'][0]['line']):return []
         if '/history/' in f or f.startswith('docs/journals/') or re.search(r'^Document type:\s*History|Superseded / implementation history only',body[:7000],re.M|re.I):return []
         inv=self.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})
         path=re.sub(r':\d+(?:[-–]\d+)?$','',path_identity(inv['normalizedReference'].removeprefix('repo/')))
@@ -583,6 +607,8 @@ class Checker:
                 if isinstance(holder,str):
                     holder=holder.split('#')[0]
                     if holder in self.tree and not resolver.carriage(blob(self.commit,holder).decode(),1,holder):holders.add(holder)
+        # L12-40(2): the alias holder cannot be its own navigation destination.
+        if f in holders:return []
         return sorted(holders)
     def check_record(self,r,apply=True):
         if r.get('retiresWithTree'):return retirement_failures(r,self)

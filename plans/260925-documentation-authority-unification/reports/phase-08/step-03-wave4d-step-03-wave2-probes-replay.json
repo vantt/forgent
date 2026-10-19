@@ -1,0 +1,192 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 16,
+  "allRejected": true,
+  "probes": [
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 636,
+      "expression": "vocabulary/",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 636,
+      "expression": "vocabulary/",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 678,
+      "expression": "architecture/",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 678,
+      "expression": "architecture/",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 687,
+      "expression": "contracts/",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 687,
+      "expression": "contracts/",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 705,
+      "expression": "architecture/{system-context,protocol-model,runtime-model}.md",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 705,
+      "expression": "architecture/{system-context,protocol-model,runtime-model}.md",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 706,
+      "expression": "contracts/assignment-run-runresult.md",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 706,
+      "expression": "contracts/assignment-run-runresult.md",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "line": 246,
+      "expression": "[Agent Coordination Foundation Vision](vision.md)",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "line": 246,
+      "expression": "[Agent Coordination Foundation Vision](vision.md)",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "line": 249,
+      "expression": "[Intent Preservation Ledger](intent-preservation-ledger.md)",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "line": 249,
+      "expression": "[Intent Preservation Ledger](intent-preservation-ledger.md)",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "line": 72,
+      "expression": "[Agent Coordination Foundation Vision](../vision.md)",
+      "mutation": "joint-omission",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "line": 72,
+      "expression": "[Agent Coordination Foundation Vision](../vision.md)",
+      "mutation": "contextual-exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    }
+  ],
+  "positiveControls": [
+    "actual proposed boundaries parent, not sibling fallback",
+    "three brace-expanded cells resolve from stated parent",
+    "new section resets stated parent",
+    "indented fence directory scopes its own child",
+    "explicit fenced root supersedes inherited parent",
+    "non-carriage source remains live"
+  ],
+  "limits": "Semantic source roles and independent sample acceptance remain reviewer/Lead responsibilities; no consumer edit."
+}
