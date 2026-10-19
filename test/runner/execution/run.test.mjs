@@ -1863,6 +1863,31 @@ test('a unit verify command runs in the worktree after the producing round and a
   assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
 });
 
+test('a writing unit\'s verify child borrows the custody lease while it runs', { skip: process.platform === 'win32' && 'the hold transport keeps the description in its helper' }, async (t) => {
+  const { resolveLock } = await import('../../../src/holder-lock/index.mjs');
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' } });
+  // Only the producer writes; the checker keeps the read-only settling worker.
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const settling = [path.join(repoRoot, 'settling-worker.mjs'), '{prompt}'];
+  cfg.runner.executors.beta.args = settling;
+  for (const invocation of cfg.runner.executors.beta.invocations) invocation.args = settling;
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  const probe = path.join(repoRoot, 'verify-probe.json');
+  const script = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(probe)}, JSON.stringify({ name: process.env.FGOS_LOCK_FD, ino: String(fs.fstatSync(3, { bigint: true }).ino) }))`;
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-custody', writes: ['docs'], verify: `node -e ${JSON.stringify(script)}` });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res));
+  assert.equal(res.results.find((r) => r.role === 'producer').commit.status, 'committed');
+  const seen = JSON.parse(fs.readFileSync(probe, 'utf8'));
+  const lock = resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path;
+  assert.equal(seen.name, 'dispatch-cwd:3');
+  assert.equal(seen.ino, String(fs.statSync(lock, { bigint: true }).ino), 'the verify child holds a copy of the lease description');
+});
+
 test('a failing unit verify becomes findings that carry its exit status and output', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);

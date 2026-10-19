@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix custody admission for busy worktrees, preserve settled results on handoff errors, distinguish reused cwd inodes, and restore 64 MiB commit output capture with overflow errors on every platform.
 
-- Writing Unit runs retain cwd custody through runner commits and lend it to git/hooks; successor admission preserves unprovable predecessor worktrees. Mutating producers require a supervised domain, and `--force-shared-cwd` with writes is refused. Workflow redispatches an unknown custody predecessor in a fresh worktree while preserving its old checkout and branch. Custody refusals include cwd, executor and capability context.
+- Writing Unit runs retain cwd custody through runner commits and lend it to git/hooks and to the Unit verify command; successor admission preserves unprovable predecessor worktrees. Mutating producers require a supervised domain, and `--force-shared-cwd` with writes is refused. Workflow redispatches an unknown custody predecessor in a fresh worktree while preserving its old checkout and branch. Custody refusals include cwd, executor and capability context.
 
 - Preserve historical Publication transfer WAL digests; classify transport config by Git scope across linked worktrees and symlinked paths. Doctor now explains refused repo-local CI credentials: use actions/checkout `persist-credentials: false` with a trusted global credential helper or `GIT_CONFIG_GLOBAL`-level setting.
 

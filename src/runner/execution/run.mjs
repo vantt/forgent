@@ -1044,7 +1044,9 @@ async function runUnitBody(options, scope) {
     const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
     if (!verifyCmd) return { pass: true };
 
-    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs);
+    // The verify child borrows the Unit's custody lease, so a controller death cannot free the
+    // worktree while it still writes.
+    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs, { custody: scope.custody });
     if (outcome.passed) return { pass: true };
     const how = outcome.timedOut
       ? `timed out after ${runnerConfig.timeoutMs}ms`
