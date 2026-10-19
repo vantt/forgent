@@ -26,7 +26,7 @@ const {
   activatedHolderLockRelease,
   MAX_KILL_WAIT_MS,
 } = await import('../../src/setup/holder-lock-checks.mjs');
-const { checkStopped, ownPidChain, fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
+const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
 const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
 const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
 
@@ -342,12 +342,22 @@ function activate(root, { withRegistry }) {
   writeConfig(path.join(root, '.fgos', 'installation', 'activation.json'), { schemaVersion: 1, status: 'ready', releasePath: release });
 }
 
-/** fgOS processes of other sessions match every workspace through their argv; name the ones running now (fences-stop-check does the same). */
-function otherSessionPids() {
-  const probe = path.join(scratch, 'foreign-probe');
-  fs.mkdirSync(probe, { recursive: true });
-  const scan = checkStopped({ workspaces: [probe], hostBin: HOST_BIN });
-  return [...ownPidChain(), ...scan.blockers.filter((b) => b.kind === 'process').map((b) => b.pid)];
+/**
+ * The production fence fix scans the whole machine (a stop-everything cutover),
+ * so what other sessions run at this moment would decide these tests. The
+ * fixture gives the fix the host's own workspace-scoped scan (`--workspace-only`,
+ * the mode the Git gate uses): only processes working in the fixture workspace
+ * count, and every other route passes through to the real host untouched.
+ */
+function workspaceScopedHost() {
+  const shim = path.join(scratch, 'workspace-scoped-host.sh');
+  if (!fs.existsSync(shim)) {
+    fs.writeFileSync(shim, `#!/bin/sh
+if [ "$2" = "quiesce-scan" ]; then exec "${HOST_BIN}" "$@" --workspace-only; fi
+exec "${HOST_BIN}" "$@"
+`, { mode: 0o755 });
+  }
+  return shim;
 }
 
 test('lock-fences sees the missing fences, and the fix places them only under an activated holder-lock release', () => {
@@ -368,11 +378,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
 
   activate(root, { withRegistry: true });
   assert.match(checkLockFences(root, { providerRuntimeDir }).message, / -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
-  let fixed;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
-    if (fixed.changed || !/still running/.test(fixed.message)) break;
-  }
+  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 13 fence\(s\)/);
   assert.equal(checkLockFences(root, { providerRuntimeDir }).passed, false);
@@ -396,11 +402,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   writeConfig(registryPath, registry);
   const owners = activatedHolderLockRelease(root).owners;
   assert.ok(owners.includes('4.2') && !owners.includes('4.4'), owners.join(','));
-  let fixed;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
-    if (fixed.changed || !/still running/.test(fixed.message)) break;
-  }
+  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 10 fence\(s\)/);
   const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir });
@@ -423,7 +425,7 @@ test('the fence fix refuses while an fgOS payload of the workspace runs, and nam
   children.add(payload);
   await new Promise((resolve) => { payload.once('spawn', resolve); });
   const providerRuntimeDir = path.join(scratch, 'fences-blocked-provider-capacity');
-  const res = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids().filter((pid) => pid !== payload.pid) });
+  const res = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
   assert.equal(res.changed, false);
   assert.match(res.message, new RegExp(`^fences not placed: fgOS processes still running, stop them first: .*pid ${payload.pid} `));
   assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false);
