@@ -149,28 +149,32 @@ impl GitDriver {
                 main = true;
             }
         }
-        {
-            for name in [
-                "MERGE_HEAD",
-                "rebase-merge",
-                "rebase-apply",
-                "CHERRY_PICK_HEAD",
-                "REVERT_HEAD",
-                "BISECT_START",
-                "index.lock",
-            ] {
-                match std::fs::symlink_metadata(repo.git_dir().join(name)) {
-                    Ok(_) => return Err(failure("foreign-main-checkout-state")),
-                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                    Err(e) => return Err(failure(e)),
-                }
-            }
-            let out = self.land_text(repo, scope, &["ls-files", "--unmerged", "-z"], &[])?;
-            if !out.is_empty() {
-                return Err(failure("foreign-main-checkout-state"));
-            }
+        if main {
+            self.land_native_state(repo, scope)?;
         }
         Ok(main)
+    }
+    fn land_native_state(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
+        for name in [
+            "MERGE_HEAD",
+            "rebase-merge",
+            "rebase-apply",
+            "CHERRY_PICK_HEAD",
+            "REVERT_HEAD",
+            "BISECT_START",
+            "index.lock",
+        ] {
+            match std::fs::symlink_metadata(repo.git_dir().join(name)) {
+                Ok(_) => return Err(failure("foreign-main-checkout-state")),
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                Err(e) => return Err(failure(e)),
+            }
+        }
+        let out = self.land_text(repo, scope, &["ls-files", "--unmerged", "-z"], &[])?;
+        if !out.is_empty() {
+            return Err(failure("foreign-main-checkout-state"));
+        }
+        Ok(())
     }
     fn land_gate(
         &self,
@@ -1185,11 +1189,28 @@ impl GitDriver {
         scope
             .acquire("recovery", &recovery_params, Wait::Ms(0))
             .map_err(failure)?;
+        if let Some(c) = compact {
+            return land_outcome_receipt(id, &intent, &c.outcome().map_err(failure)?, repo);
+        }
+        let chain = wal
+            .inspect(id)
+            .map_err(|e| crate::refs::pending(recovery(e), id))?;
+        let attempted = chain
+            .records()
+            .iter()
+            .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
+        if attempted && chain.intent().writer_identity != writer {
+            return Err(failure("land-authority-mismatch"));
+        }
+        if let Some(outcome) = chain.outcome() {
+            return land_outcome_receipt(id, chain.intent(), outcome, repo);
+        }
         self.land_target_checkout(
             repo,
             &scope,
             &RefName::parse(&req.destination).map_err(failure)?,
         )
+        .and_then(|_| self.land_native_state(repo, &scope))
         .map_err(|e| {
             if e.cause == "foreign-main-checkout-state" {
                 recovery("land-native-state-preserved")
@@ -1197,19 +1218,6 @@ impl GitDriver {
                 e
             }
         })?;
-        if let Some(c) = compact {
-            return land_outcome_receipt(id, &intent, &c.outcome().map_err(failure)?, repo);
-        }
-        let chain = wal
-            .inspect(id)
-            .map_err(|e| crate::refs::pending(recovery(e), id))?;
-        if let Some(outcome) = chain.outcome() {
-            return land_outcome_receipt(id, chain.intent(), outcome, repo);
-        }
-        let attempted = chain
-            .records()
-            .iter()
-            .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
         if !attempted {
             let terminal = wal
                 .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
@@ -1218,6 +1226,27 @@ impl GitDriver {
         }
         let destination = RefName::parse(&req.destination).map_err(failure)?;
         let observed = crate::refs::direct(self, repo, &destination)?;
+        if let (Tip::Oid(next), ExpectedTip::Oid(current)) = (&intent.next, &observed) {
+            let next = Oid::parse(next, repo.object_format()).map_err(failure)?;
+            if *current != next && self.ancestry(repo, &next, current)? {
+                // A later commit proves this unique candidate landed, but says
+                // nothing about whether its checkout was reconciled or reverted.
+                // Observe only: never repair pins, write the index or read-tree.
+                if crate::refs::direct(self, repo, &destination)? != observed {
+                    return Err(recovery("land-ref-drift"));
+                }
+                let terminal = wal
+                    .append(
+                        &chain,
+                        Phase::Outcome(Outcome::Land {
+                            checkout: "pending".into(),
+                            observed_only: true,
+                        }),
+                    )
+                    .map_err(failure)?;
+                return land_receipt(&terminal, repo);
+            }
+        }
         if crate::refs::tip(&observed) != intent.next {
             // expected may be an ABA; a third tip belongs to another writer.
             return Err(crate::refs::pending(

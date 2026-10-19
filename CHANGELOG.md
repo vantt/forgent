@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git Land can recover an observed candidate after later destination commits without touching checkout/index; unrelated main merge/bisect state no longer blocks prepare/publish or terminal receipt replay.
+
 - SafeRestore refuses untracked/ignored collisions unless exact replacement paths are authorized, captures only local bytes, preserves incoming executable modes and intent-to-add, and exposes snapshot extraction and acknowledgement-gated cleanup. Unreadable snapshots no longer permanently block a checkout.
 
 - Git Land recovery blocks unreconciled predecessor effects, tolerates index stat refresh, preserves ignored store collisions and permits acknowledged cleanup of abandoned/lost candidates.
