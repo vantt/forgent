@@ -259,7 +259,31 @@ fn recovery_matrix_child() {
 // following Intent installation. It has no running Git child at this boundary.
 // Unlike polling, ptrace cannot miss a fast operation or race the next effect.
 fn interrupt(f: &Fixture, kind: &str) { interrupt_at(f, kind, "intent"); }
+// waitpid(-1) below reaps every child of its process, so the tracer runs in its
+// own process (as in land_crash_matrix) and cannot steal the Git children that
+// other tests in this binary are waiting on.
 fn interrupt_at(f: &Fixture, kind: &str, boundary: &str) {
+    let mut controller = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "recovery_trace_controller", "--ignored", "--nocapture"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .unwrap();
+    controller.stdin.take().unwrap().write_all(json!({"main": f.main, "temp": f.temp, "kind": kind, "boundary": boundary, "target": f.request.target, "source": f.request.source, "request": f.request}).to_string().as_bytes()).unwrap();
+    assert!(controller.wait().unwrap().success(), "{kind}: trace controller failed");
+}
+#[test]
+#[ignore = "isolated ptrace controller, invoked by interrupt_at"]
+fn recovery_trace_controller() {
+    let mut input = String::new();
+    std::io::stdin().read_to_string(&mut input).unwrap();
+    let v: Value = serde_json::from_str(&input).unwrap();
+    let main = PathBuf::from(v["main"].as_str().unwrap());
+    let kind = v["kind"].as_str().unwrap();
+    let boundary = v["boundary"].as_str().unwrap();
+    let (target, source) = (v["target"].as_str().unwrap(), v["source"].as_str().unwrap());
+    let temp = PathBuf::from(v["temp"].as_str().unwrap());
     let mut command = Command::new(std::env::current_exe().unwrap());
     command
         .args([
@@ -280,7 +304,7 @@ fn interrupt_at(f: &Fixture, kind: &str, boundary: &str) {
         });
     }
     let mut child = command.spawn().unwrap();
-    child.stdin.take().unwrap().write_all(json!({"main": f.main, "temp": f.temp, "kind": kind, "target": f.request.target, "source": f.request.source, "request": f.request}).to_string().as_bytes()).unwrap();
+    child.stdin.take().unwrap().write_all(input.as_bytes()).unwrap();
     let pid = child.id() as libc::pid_t;
     let mut status = 0;
     assert_eq!(unsafe { libc::waitpid(pid, &mut status, 0) }, pid);
@@ -298,8 +322,7 @@ fn interrupt_at(f: &Fixture, kind: &str, boundary: &str) {
         unsafe { libc::ptrace(libc::PTRACE_SETOPTIONS, pid, 0, options) },
         0
     );
-    let record = f
-        .main
+    let record = main
         .join(format!(".git/fgos/git/operations/{ID}/00000000.json"));
     let mut owned = std::collections::BTreeSet::from([pid]);
     let mut reached = false;
@@ -350,13 +373,13 @@ fn interrupt_at(f: &Fixture, kind: &str, boundary: &str) {
             let renamed = [libc::SYS_rename, libc::SYS_renameat, libc::SYS_renameat2].contains(&(regs.orig_rax as i64)) && regs.rax == 0;
             reached = if boundary == "intent" { durable && record.is_file() }
             else if (durable || renamed) && record.is_file() {
-                let wal = wal::Wal::open_existing(f.repo.common_dir(), wal::OsFileSystem).unwrap();
+                let wal = wal::Wal::open_existing(&main.join(".git"), wal::OsFileSystem).unwrap();
                 let chain = wal.inspect(ID).unwrap();
                 match boundary {
-                    "pin" => f.main.join(format!(".git/refs/fgos/git-operations/{ID}/candidate")).is_file(),
+                    "pin" => main.join(format!(".git/refs/fgos/git-operations/{ID}/candidate")).is_file(),
                     "attempt" => durable && matches!(chain.last_state(), wal::Phase::TargetAttempt {..}),
-                    "transfer-effect" => renamed && fs::read_to_string(f.temp.join("remote.git/refs/heads/shared")).is_ok_and(|v| v.trim() == f.request.target),
-                    "cas" => renamed && fs::read_to_string(f.main.join(".git/refs/heads/topic")).is_ok_and(|v| v.trim() == f.request.source),
+                    "transfer-effect" => renamed && fs::read_to_string(temp.join("remote.git/refs/heads/shared")).is_ok_and(|v| v.trim() == target),
+                    "cas" => renamed && fs::read_to_string(main.join(".git/refs/heads/topic")).is_ok_and(|v| v.trim() == source),
                     _ => panic!("unknown boundary"),
                 }
             } else { false };
