@@ -391,3 +391,16 @@ All seven new findings have text dispositions; implementation, actual accounting
   3. **Closeout by checker.** Both remaining defects add preserve edges inside carriage and change no diff, disposition of another edge or target. They close when the extended checker reports 0 failures, its scan shows the named lines covered, and the new probe rejects a record missing them; no further semantic re-review is required for these two files.
   4. **Notes carried, no change now:** preserved stale descriptions in `docs/specs/reading-map.md` (08140 "v0.2 … CTR001–CTR009", 08153 `docs/decisions/`) go to the Step 10 reading-map merge owner; pathless transition sentences (docs/reading-map.md L78, L89–94) go to the Phase 9 step-10 semantic-remnant search; docs-portal L32 retained-root links ride its row flip.
 - **Wave 1 closes** on the closeout in ruling 3. Wave 2 (skills/prompts, batches 034–039) starts in the same author turn.
+
+## L12-37 — Wave 2 review: 11/13 ok; renamed-alias and live-pointer rules; wave 3 starts (Lead, A42/A51, 2026-10-20)
+
+- **Result** (`158b23b36`, wave checker at `526f87468`: 156 files / 1,769 edges, 0 failures): [p01](review-a38-step-03-wave2-p01.md) 5/6 ok — `docs/knowledge/…/wire-a-skills-classify-step-through-an-agent-executor-executor.md` rework (04520); [p02](review-a38-step-03-wave2-p02.md) 3/3 ok; [p03](review-a38-step-03-wave2-p03.md) 3/4 ok — `docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` rework (06509). Wave-1 closeout added 145 carriage preserve edges by the stated-parent scan (checker-verified, L12-36(3)).
+- **Rulings:**
+  1. **Body `## Related` lists are Related** (L12-26(8)); L12-34(4) applies to them, not only header lines. 04520 patches (Phase 9) to its registry-alias holder under `docs/knowledge/`.
+  2. **Renamed-alias preserve fails.** Outside declared carriage and history files, a preserve whose target does not exist at the pin while `docs/doc-registry.json` (or the Phase 6 alias table) maps it to a live holder is wrong: patch to the holder. Checker-enforced, with probe. Recheck every record (03951, 04835 named by the reviewer).
+  3. **Undated present-tense decision citations in live text are navigation** (06509 → `docs/platform/runner/decisions/h-36d872fbb0e5.md` decision 0062 heading, Phase 9), matching 05130.
+  4. **Live statements that name a retiring tree as an object** ("not the frozen `docs/architect/` tree", 06502) park as description-rewrite (consistent with L12-34(7)).
+  5. **Successor-holder accuracy:** CoordinationSession history phrases name `docs/platform/runner/decisions/h-aabefc85f0c9.md` (21 batch-038 notes fix).
+  6. **No in-file successor note** is added to history "Superseded by" lines; the record's successor note suffices.
+- **Expansion:** batch-037 (patched stratum) and batch-038 (unpatched stratum) breach 3% and expand to every file of each set after correction.
+- **Wave 3** (batches 042–069: 83 docs/architect files retire with the tree; contracts, decisions, distillery, explanation, how-to, journals — 189 files) is authored in the same turn as the wave-2 fixes.
