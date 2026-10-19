@@ -1,41 +1,41 @@
 // src/runner/execution/account-rotation.mjs -- may a failed seat run again on another account of
-// the same provider?
+// the same pool?
 //
 // The question is answered from the same account inventory and quarantine state the lease ranks
 // from (provider-capacity.mjs), never from a second ranking: an account is usable when the
-// inventory lists it and it is not quarantined. Which account the retry then runs on stays the
-// lease's choice; this module only says whether a retry has anything to rotate to.
+// inventory lists it, it is not disabled and it is not quarantined. Which account the retry then
+// runs on stays the lease's choice; this module only says whether a retry has anything to rotate to.
 
 import { inspectProviderCapacity } from '../dispatch/provider-capacity.mjs';
-import { getProviderFamily } from './bind.mjs';
-import { capacityProviderOf } from './account-pin.mjs';
+import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
+import { bindingIdentity } from './bind.mjs';
 
 /**
- * What an account rotation for `executorId` has to work with, read after the failed attempt was
- * settled (its account is already quarantined when the failure was a dead login or a quota).
+ * What an account rotation in `pool` has to work with, read after the failed attempt was settled
+ * (its account is already quarantined when the failure was a dead login or a quota).
  *
- * @returns {{ provider: string, total: number, healthy: number } | null}
- *   null when the executor's provider has no account inventory (nothing to rotate) or the state
- *   cannot be read (the seat then walks to the next candidate as it always did).
+ * @returns {{ pool: string, total: number, healthy: number } | null}
+ *   null when the pool has no account inventory (nothing to rotate) or the state cannot be read
+ *   (the seat then walks to the next candidate as it always did).
  */
-export function inspectAccountRotation({ runnerConfig, executorId, runtimeDir }) {
-  const provider = capacityProviderOf(runnerConfig, executorId);
+export function inspectAccountRotation({ runnerConfig, pool, runtimeDir }) {
+  const stateKey = legacyStateKey(pool);
   let accounts;
   try {
-    accounts = inspectProviderCapacity({ runnerConfig, provider, runtimeDir }).providers[provider]?.accounts;
+    accounts = inspectProviderCapacity({ runnerConfig, provider: stateKey, runtimeDir }).providers[stateKey]?.accounts;
   } catch (error) {
-    process.stderr.write(`fgos: could not read the account state of provider ${provider}, so no account rotation: ${error?.message ?? error}\n`);
+    process.stderr.write(`fgos: could not read the account state of pool ${pool}, so no account rotation: ${error?.message ?? error}\n`);
     return null;
   }
-  const list = Object.values(accounts ?? {});
+  const list = Object.values(accounts ?? {}).filter((account) => account.disabled !== true);
   if (list.length === 0) return null;
-  return { provider, total: list.length, healthy: list.filter((account) => account.healthy).length };
+  return { pool, total: list.length, healthy: list.filter((account) => account.healthy).length };
 }
 
 /**
- * Whether the seat may retry the same executor now: another usable account exists, and the
+ * Whether the seat may retry the same candidate now: another usable account exists, and the
  * retries already spent on this candidate stay below the number of accounts it has, so a
- * provider whose failures are not quarantined still never loops on one account.
+ * pool whose failures are not quarantined still never loops on one account.
  *
  * @param {{ total: number, healthy: number } | null} rotation from inspectAccountRotation
  * @param {number} rotationsSpent same-candidate retries already made
@@ -45,24 +45,43 @@ export function mayRotateAccount(rotation, rotationsSpent) {
 }
 
 /**
- * Provider families whose login failed in this unit and that a seat then walked away from, read
- * from the attempts the runner recorded (resume rebuilds from them, and the write gate recomputes
- * the same exclusion from them). `boundBefore` (epoch ms) keeps only walks made no later than
- * that instant, so an attempt is judged with exactly what was known when it was bound.
+ * The seat's earlier bindings that a walk resumes from when attempt `at` is bound (or re-checked by
+ * the write gate): every binding recorded before it, oldest first. A binding recorded before bindings
+ * carried a pool has no walk state this code can read, so it is left out and the walk restarts at the
+ * primary for it. A retry on another account of the same candidate is not a step of the walk: the
+ * earlier attempts it repeats are left out, so it resumes exactly where the attempt it retries did.
  *
- * @returns {Set<string>} lower-cased provider families
+ * @param {object[]} attempts the seat's recorded attempts (`unit.json` bindings, one role/round)
+ * @param {number} at index of the attempt being bound (past the end: the attempt about to be recorded)
+ * @returns {object[]}
  */
-export function credentialFaultFamilies(unitRecord, { boundBefore = null } = {}) {
-  const families = new Set();
-  const runnerConfig = unitRecord?.configSnapshot?.runner;
+export function triedBindingsOf(attempts, at) {
+  if (!Array.isArray(attempts) || at <= 0) return [];
+  const own = attempts[at]?.binding ? bindingIdentity(attempts[at].binding) : null;
+  return attempts.slice(0, at)
+    .map((attempt) => attempt?.binding)
+    .filter((binding) => binding && Object.hasOwn(binding, 'pool') && bindingIdentity(binding) !== own);
+}
+
+/**
+ * Pools whose login failed in this unit and that a seat then walked away from, read from the attempts
+ * the runner recorded (resume rebuilds from them, and the write gate recomputes the same exclusion
+ * from them). `boundBefore` (epoch ms) keeps only walks made no later than that instant, so an
+ * attempt is judged with exactly what was known when it was bound.
+ *
+ * @returns {Set<string>} pool names
+ */
+export function credentialFaultPools(unitRecord, { boundBefore = null } = {}) {
+  const pools = new Set();
   for (const attempts of Object.values(unitRecord?.bindings ?? {})) {
     if (!Array.isArray(attempts)) continue;
     attempts.forEach((attempt, index) => {
       const walked = attempts[index + 1];
-      if (attempt?.failureCause !== 'credential' || walked?.fallbackFrom?.kind !== 'next-candidate' || !attempt.binding?.executor) return;
+      const pool = attempt?.binding?.pool;
+      if (attempt?.failureCause !== 'credential' || walked?.fallbackFrom?.kind !== 'next-candidate' || !pool) return;
       if (boundBefore !== null && !(Date.parse(walked.boundAt) <= boundBefore)) return;
-      families.add(getProviderFamily(runnerConfig, attempt.binding.executor).toLowerCase());
+      pools.add(pool);
     });
   }
-  return families;
+  return pools;
 }

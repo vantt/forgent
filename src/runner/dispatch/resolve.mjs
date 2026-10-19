@@ -161,6 +161,11 @@ export function resolveTierCandidates(cfg, tier, provider = 'claude') {
   }
 }
 
+/** What a seat that needs a model is told when its family has no cell at the tier it runs at. */
+export function tierCellMissingDetail(family, tier) {
+  return `no model for tier "${tier}" under family "${family}" (runner.modelPolicies.${family}.${tier})`;
+}
+
 /**
  * The families `cfg.tierFallback.<tier>` declares as the walk order for a seat that failed at `tier`, or
  * null when the tier declares none (the walk then follows the capability's `prefer` order).

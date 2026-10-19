@@ -1,59 +1,13 @@
 // `fgos dispatch explain`: why a capability lands where it does. It binds the capability exactly as
-// a run would (bind() is the one authority on family, tier, model and invocation) and lays the
-// pieces out beside the config that produced them: the whole tier cell and which entry runs, and the
-// accounts the family's pool has in each inventory. Nothing is leased, spawned or written.
+// a run would (bind() is the one authority on family, tier, model, pool and invocation) and lays the
+// pieces out beside the config that produced them: the candidates in order with the reason one is
+// out, the walk a seat takes when each binding fails, and the accounts of every pool on the walk in
+// the order the lease takes them. Nothing is leased, spawned or written.
 
-import { bind } from './bind.mjs';
-import { deriveProviderFamily, resolveTierCandidates } from '../dispatch/resolve.mjs';
+import { bind, listCandidates, walkBindings } from './bind.mjs';
+import { deriveProviderFamily } from '../dispatch/resolve.mjs';
 import { readLlmAccounts, legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { credentialStoreOf, validateProviderAccountInventory } from '../dispatch/provider-capacity.mjs';
-
-/**
- * Label every entry of the tier cell: the one that runs is `used`; a later entry served by the
- * family's own pool is `fallback-same-pool`; an entry served by another pool waits for pool routing
- * (`pending-pool-routing`), since the lease rotates accounts within the family's pool only.
- */
-function labelCell(runnerConfig, tier, family, model) {
-  let entries;
-  try {
-    entries = resolveTierCandidates(runnerConfig, tier, family);
-  } catch (err) {
-    return { entries: [], problem: err.message };
-  }
-  let usedSeen = false;
-  return {
-    entries: entries.map((entry) => {
-      let status;
-      if (entry.pool !== family) status = 'pending-pool-routing';
-      else if (!usedSeen && entry.model === model) { status = 'used'; usedSeen = true; }
-      else status = 'fallback-same-pool';
-      return { model: entry.model, pool: entry.pool, status };
-    }),
-    problem: null,
-  };
-}
-
-function accountsOf(runnerConfig, pool, projectConfig) {
-  let legacy = [];
-  let legacyProblem = null;
-  try {
-    legacy = Object.keys(validateProviderAccountInventory(runnerConfig, 'runner config')?.[legacyStateKey(pool)]?.accounts ?? {});
-  } catch (err) {
-    legacyProblem = err.message;
-  }
-  const { pools, problems } = readLlmAccounts(runnerConfig, { projectConfig });
-  const declared = runnerConfig?.llmAccounts !== undefined;
-  const current = pools[pool]?.accounts ?? {};
-  return {
-    pool,
-    legacyKey: legacyStateKey(pool),
-    legacy: legacy.map((id) => ({ id, llmAccounts: declared ? (current[id] ? 'declared' : 'missing') : 'not-configured' })),
-    llmAccounts: declared
-      ? Object.entries(current).map(([id, a]) => ({ id, disabled: a.disabled, clis: Object.keys(a.stores), inLegacy: legacy.includes(id) }))
-      : null,
-    problems: [...(legacyProblem ? [{ code: 'legacy-inventory-invalid', at: 'runner.providers', detail: legacyProblem }] : []), ...problems],
-  };
-}
+import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 
 /**
  * The login store the bound invocation reads, and whether the config declares it or it is inferred from
@@ -63,6 +17,34 @@ function storeOfBinding(executorEntry, invocationId) {
   const entry = invocationId ? executorEntry?.invocations?.find((inv) => inv?.id === invocationId) : null;
   const store = entry ? credentialStoreOf({ ...entry, command: entry.command ?? executorEntry.command }) : null;
   return store ? { ...store, source: entry.credentialStore ? 'declared' : 'inferred' } : null;
+}
+
+/**
+ * The accounts of `pool` in the order the lease takes them, each with whether the CLI `cli` can run on
+ * it. A pool no inventory lists runs on the executor's own login.
+ */
+function accountsOf(runnerConfig, pool, cli, projectConfig) {
+  let accounts = {};
+  let inventoryProblem = null;
+  try {
+    accounts = providerAccountInventory(runnerConfig)?.[legacyStateKey(pool)]?.accounts ?? {};
+  } catch (err) {
+    inventoryProblem = { code: 'inventory-invalid', at: 'runner.providers', detail: err.message };
+  }
+  const declared = runnerConfig?.llmAccounts?.[pool] !== undefined;
+  const { problems } = readLlmAccounts(runnerConfig, { projectConfig });
+  return {
+    pool,
+    stateKey: legacyStateKey(pool),
+    source: declared ? 'llmAccounts' : 'providers',
+    accounts: Object.entries(accounts).map(([id, account]) => {
+      const reason = account.disabled === true ? 'disabled'
+        : cli && !credentialSourceForCli(account, cli) ? `no "${cli}" login store`
+          : null;
+      return { id, usable: reason === null, ...(reason ? { reason } : {}) };
+    }),
+    problems: [...(inventoryProblem ? [inventoryProblem] : []), ...problems.filter((p) => p.at.startsWith(`runner.llmAccounts.${pool}`) || p.at === 'runner.llmAccounts')],
+  };
 }
 
 /**
@@ -76,13 +58,29 @@ function storeOfBinding(executorEntry, invocationId) {
 export function explainCapability(runnerConfig, { capability, rigor, session, projectConfig } = {}) {
   if (typeof capability !== 'string' || !capability) throw new Error('dispatch explain requires --for <capability>');
   const unit = { id: 'explain', capability, writes: [], ...(rigor ? { rigor } : {}) };
-  const binding = bind({ unit, role: 'producer' }, { runnerConfig, session });
+  const bindAsk = { unit, role: 'producer' };
+  const bindCtx = { runnerConfig, session };
+  const binding = bind(bindAsk, bindCtx);
   const ask = { capability, rigor: rigor ?? null, session: { herdrPresent: session?.herdrPresent === true } };
   if (binding.refused) return { ask, refused: binding.refused };
 
   const executorEntry = runnerConfig.executors?.[binding.executor];
   const family = executorEntry ? deriveProviderFamily(executorEntry) : null;
   const p = binding.provenance ?? {};
+  const { candidates } = listCandidates(bindAsk, bindCtx);
+  const walk = walkBindings(bindAsk, bindCtx);
+  const storeOf = (executor, invocation) => storeOfBinding(runnerConfig.executors?.[executor], invocation);
+
+  const cellEntries = candidates
+    .filter((c) => c.executor === binding.executor && c.pool !== null)
+    .map((c) => ({
+      model: c.model,
+      pool: c.pool,
+      status: c.model === binding.model && c.pool === binding.pool ? 'used' : c.out ? 'unusable' : 'fallback',
+      ...(c.out ? { reason: c.out.detail } : {}),
+    }));
+  const pools = [...new Map(walk.filter((b) => b.pool).map((b) => [b.pool, storeOf(b.executor, b.invocation)?.use ?? null])).entries()];
+
   return {
     ask,
     family,
@@ -92,7 +90,26 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
     transport: binding.transport,
     tier: { value: binding.tier, source: p.tier?.source ?? null, ceiling: p.tier?.ceiling ?? null },
     model: { value: binding.model, source: p.model?.source ?? null },
-    cell: family ? labelCell(runnerConfig, binding.tier, family, binding.model) : { entries: [], problem: 'the bound executor is not registered in this config' },
-    accounts: family ? accountsOf(runnerConfig, family, projectConfig) : null,
+    pool: binding.pool,
+    cell: { entries: cellEntries },
+    candidates: candidates.map((c) => ({
+      family: c.family,
+      executor: c.executor,
+      invocation: c.invocation,
+      pool: c.pool,
+      model: c.model,
+      state: c.out ? 'out' : 'in',
+      ...(c.out ? { reason: c.out.reason, detail: c.out.detail } : {}),
+    })),
+    walk: walk.map((b, position) => ({
+      position,
+      family: deriveProviderFamily(runnerConfig.executors?.[b.executor]),
+      executor: b.executor,
+      invocation: b.invocation,
+      pool: b.pool,
+      model: b.model,
+      store: storeOf(b.executor, b.invocation)?.use ?? null,
+    })),
+    accounts: pools.map(([pool, cli]) => accountsOf(runnerConfig, pool, cli, projectConfig)),
   };
 }
