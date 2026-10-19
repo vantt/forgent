@@ -1,0 +1,218 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "scope": "six rework files plus every outcome/added-reference file; no text-only re-review",
+  "started": 0,
+  "accepted": 0,
+  "parts": [
+    {
+      "part": 1,
+      "report": "review-a38-step-03-wave1-r3-p01.md",
+      "files": [
+        {
+          "file": "docs/reading-map.md",
+          "set": "batch-002",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-002.jsonl",
+          "recordLine": 4,
+          "recordSha256": "04673f6de80891d1c76436c2c631d95dfec5d1eb285a7f4871d4fa42cb6ae5c6",
+          "sourceSha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+          "diffSha256": "d6c68c150d62c16f3934f5a7076ae13542be61cf2885d614217d1cc62470e233",
+          "sourceBytes": 35359,
+          "recordBytes": 1614512,
+          "edges": 98
+        }
+      ],
+      "edges": 98
+    },
+    {
+      "part": 2,
+      "report": "review-a38-step-03-wave1-r3-p02.md",
+      "files": [
+        {
+          "file": "docs/specs/reading-map.md",
+          "set": "batch-040",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-040.jsonl",
+          "recordLine": 11,
+          "recordSha256": "d326716f03aadb2324e2855b1f4a238797cf5f422699fae6cdcd9527d737d0cb",
+          "sourceSha256": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+          "diffSha256": "0b9898ada8d6b54d1a39bfd65641deea4c35ac7b99711699750c1753b5c81e29",
+          "sourceBytes": 35721,
+          "recordBytes": 1899335,
+          "edges": 91
+        }
+      ],
+      "edges": 91
+    },
+    {
+      "part": 3,
+      "report": "review-a38-step-03-wave1-r3-p03.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+          "set": "batch-015",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-015.jsonl",
+          "recordLine": 18,
+          "recordSha256": "01bc85279551e27ff56eef9a700d1a96a177556f4fe16bc40673d6921abb8883",
+          "sourceSha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+          "diffSha256": "97cdbcbdc2d689c10c66666e46fe6b2e2e070eff5d8ea7619100345fbf2134d1",
+          "sourceBytes": 13985,
+          "recordBytes": 72141,
+          "edges": 52
+        },
+        {
+          "file": "docs/platform/architecture-map.md",
+          "set": "batch-016",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-016.jsonl",
+          "recordLine": 1,
+          "recordSha256": "e08a8c46e63bad2d136937113c3b1be178a17c423fb9ba77cb7a6d4cecf97876",
+          "sourceSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+          "diffSha256": "6e6874e67a7331df57457c23215e8ba951dda427a2acce7faee3e5b53fb6f505",
+          "sourceBytes": 59475,
+          "recordBytes": 38717,
+          "edges": 39
+        },
+        {
+          "file": "docs/platform/proposals/component-authority-boundary-map.md",
+          "set": "batch-026",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-026.jsonl",
+          "recordLine": 2,
+          "recordSha256": "1d019fcae7265bf91902b291cc5b969a759ec969572d423d85b749f55a6f684e",
+          "sourceSha256": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 51833,
+          "recordBytes": 41172,
+          "edges": 28
+        },
+        {
+          "file": "docs/platform/README.md",
+          "set": "batch-013",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-013.jsonl",
+          "recordLine": 1,
+          "recordSha256": "905ef48b5910c2c61bad3bdc52c79c1025f1b97e87490a034d055f97b1d351c0",
+          "sourceSha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 9323,
+          "recordBytes": 48797,
+          "edges": 23
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+          "set": "batch-015",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-015.jsonl",
+          "recordLine": 5,
+          "recordSha256": "24342ae42571f19b3ef99678c787fc29454cefb7d17712e36374b6f755a2face",
+          "sourceSha256": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 35898,
+          "recordBytes": 10122,
+          "edges": 7
+        }
+      ],
+      "edges": 149
+    },
+    {
+      "part": 4,
+      "report": "review-a38-step-03-wave1-r3-p04.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+          "set": "batch-015",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-015.jsonl",
+          "recordLine": 6,
+          "recordSha256": "21c01377283507e252cbad604dd63798867e2fe632e4a94f5f2edfaaed7bf0a4",
+          "sourceSha256": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 20930,
+          "recordBytes": 20037,
+          "edges": 20
+        },
+        {
+          "file": "docs/platform/packaging-distribution/README.md",
+          "set": "batch-025",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-025.jsonl",
+          "recordLine": 1,
+          "recordSha256": "54f46f0a33a047d7f0a1f75faa9d7f482a16274446dbe802c391d6c231f32767",
+          "sourceSha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 24736,
+          "recordBytes": 27530,
+          "edges": 18
+        },
+        {
+          "file": "docs/platform/proposals/README.md",
+          "set": "batch-026",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-026.jsonl",
+          "recordLine": 1,
+          "recordSha256": "d329c4c398ccbcf3b087f7370b6fffd47facfb75b284053a9a95d1b64f42956d",
+          "sourceSha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 4705,
+          "recordBytes": 33439,
+          "edges": 18
+        },
+        {
+          "file": "docs/README.md",
+          "set": "batch-033",
+          "requiredSix": true,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-033.jsonl",
+          "recordLine": 1,
+          "recordSha256": "c0e312f4ff38df32856f0f4fd75ea8273c6ba45b4c6a82cd010a340d83cb85de",
+          "sourceSha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 2195,
+          "recordBytes": 18028,
+          "edges": 15
+        },
+        {
+          "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+          "set": "batch-020",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-020.jsonl",
+          "recordLine": 2,
+          "recordSha256": "9580500dff5fe9a842e6edb59093070df94fa494076bf0d91829fb784a52abcf",
+          "sourceSha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3088,
+          "recordBytes": 15830,
+          "edges": 12
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/README.md",
+          "set": "batch-015",
+          "requiredSix": false,
+          "outcomeChange": true,
+          "record": "step-03-records/batch-015.jsonl",
+          "recordLine": 4,
+          "recordSha256": "bfba9a202b97ca627cd94c4e5c1b21e0dc1a3a16e6145856a26b4bbaa41a287c",
+          "sourceSha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 1718,
+          "recordBytes": 5294,
+          "edges": 4
+        }
+      ],
+      "edges": 87
+    }
+  ]
+}

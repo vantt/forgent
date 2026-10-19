@@ -145,19 +145,71 @@ def related_header(text, line):
     return False
 
 def unit_id(text, spans):
+    """Source-derived grouping; author metadata never defines the groups."""
     n=spans[0]['line'];lines=text.splitlines();line=lines[n-1]
     if line.lstrip().startswith('|'):return 'row-L'+str(n)
     if 'Canonical for:' in line and 'current source remains' in line:return 'canonical-L'+str(n)
-    # Every status/migration bullet group has one unit, bounded by headings,
-    # blank lines and non-list paragraphs (continuations remain in the group).
-    heading='';heading_line=0
-    for i,l in enumerate(lines[:n],1):
-        if re.match(r'^#{1,6} ',l):heading=l;heading_line=i
-    if re.search(r'migration|transitional status|current (?:source|authority)|legacy source',heading,re.I) and re.match(r'^\s*[-*] ',line):
-        a=n-1
-        while a>heading_line and lines[a-1].strip() and not lines[a-1].startswith('#'):a-=1
-        return 'status-bullets-L'+str(a+1)
+    item=None;start=n-1
+    while start>=0:
+        current=lines[start]
+        if re.match(r'^\s*(?:[-*+] |\d+[.)] )',current):item=start;break
+        if not current.strip() or re.match(r'^\s*(?:#|[|]|```|~~~)',current):break
+        start-=1
+    if item is not None:
+        # Retain the stronger L12-34 contiguous status-bullet group, including
+        # continuation lines of every item in that group.
+        heading='';heading_line=0
+        for i,l in enumerate(lines[:item+1],1):
+            if re.match(r'^#{1,6} ',l):heading=l;heading_line=i
+        if re.search(r'migration|transitional status|current (?:source|authority)|legacy source',heading,re.I):
+            a=item
+            while a>heading_line and lines[a-1].strip() and not lines[a-1].startswith('#'):a-=1
+            return 'status-bullets-L'+str(a+1)
+        return 'item-L'+str(item+1)
     return 'line-L'+str(n)
+
+def reconciled_registry_row(text, line):
+    # A45 candidate reconciliations are live, even inside an older carriage shell.
+    row=text.splitlines()[line-1]
+    return bool(re.match(r'^\|.*CTR01[0-3]\b',row) and
+                'nhãn registry chỉ có trong tài liệu' in text and
+                'docs/platform/herdr-web-dashboard/' in text)
+
+@functools.lru_cache(None)
+def carriage_declarations(text):
+    lines=text.splitlines();stack=[];framing=None;whole=None;result={};fence=None
+    history_copy=bool(re.search(r'^Purpose: Preserve source material',text[:2500],re.M) and 'Added in candidate: Promotion metadata only' in text[:2500])
+    metadata_end=next((i for i,l in enumerate(lines[3:],4) if l.startswith('```')),len(lines))
+    purpose=next(((i,l) for i,l in enumerate(lines,1) if l.startswith('Purpose: Preserve source material')),None)
+    reconciled=('nhãn registry chỉ có trong tài liệu' in text and 'docs/platform/herdr-web-dashboard/' in text)
+    for n,l in enumerate(lines,1):
+        boundary=re.match(r'^(`{3,}|~{3,})',l)
+        in_fence=fence is not None
+        if boundary:
+            marker=boundary[1]
+            if fence is None:fence=marker
+            elif marker[0]==fence[0] and len(marker)>=len(fence):fence=None
+        h=None if in_fence or boundary else re.match(r'^(#{1,6})\s+(.+)',l)
+        if h:
+            level=len(h[1]);stack=[x for x in stack if x[0]<level];stack.append((level,n,l));framing=None
+        if re.search(r'retained verbatim.*(?:non.authority history|not navigation)',l,re.I):framing=(n,l)
+        if re.search(r'Original source metadata and text follow|Full source text follows|complete source.*retained verbatim',l,re.I):whole=(n,l)
+        declarations=[(i,v) for _,i,v in stack if re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained',v,re.I)]
+        declaration=declarations[-1] if declarations else framing or whole or (purpose if history_copy and n>metadata_end else None)
+        result[n]=None if reconciled and re.match(r'^\|.*CTR01[0-3]\b',l) else declaration
+    return result
+
+def carriage_declaration(text, line):
+    """Actual declaration covering the edge, never its history path/title."""
+    return carriage_declarations(text).get(line)
+
+
+def successor_notes(reason):
+    return re.findall(r'(?:Non-executable (?:file-level )?successor note|successor note):\s*`?([^\s`;,)]+)',reason,re.I)
+
+def path_identity(path):
+    return re.split(r'[*<{#]',path.rstrip('.'))[0].rstrip('/')
+
 
 def retirement_failures(r, checker):
     failures=[]
@@ -183,13 +235,10 @@ def reference_roots(file, text):
     roots=[posixpath.dirname(file)]
     if file.startswith('docs/platform/'):
         roots.append('/'.join(file.split('/')[:3]))
-        # Source-carriage subpaths retain their source-area coordinates. Bind
-        # this fallback to the explicit wrapper provenance, never to a basename
-        # match elsewhere in the repository.
         header=text.split('```',2)[1] if '```' in text[:150] else text[:2500]
         for line in header.splitlines():
             if not re.match(r'^(?:Provenance|Source type):',line):continue
-            for hit in re.findall(r'docs/(?:specs|architect)/[^\s`;,]+',line):
+            for hit in re.findall(r'docs/(?:specs|architect|platform)/[^\s`;,]+',line):
                 path=hit.rstrip('.')
                 roots.append(posixpath.dirname(path) if path.endswith('.md') else re.split(r'[*<{]',path)[0].rstrip('/'))
     return list(dict.fromkeys(roots))
@@ -199,6 +248,9 @@ def prior_added_edges(file, review_set):
     path=str(REL/'step-03-records'/(review_set+'.jsonl'))
     records=[json.loads(line) for line in blob('04913b160eac95a199718176ca75780573a3573d',path).decode().splitlines()]
     return [e for r in records if r['file']==file for e in r['edges'] if e.get('authorAddedEdge')]
+
+def legacy_reference_target(path):
+    return path.startswith(RETIRING_ROOTS) or bool(re.match(r'^docs/(?:doc-governance|reading-map|README)\.md$',path))
 
 def scan_candidates(commit,file,inventory_spans):
     """Whole-file supplemental search; candidates need an edge or an explicit exclusion.
@@ -213,17 +265,21 @@ def scan_candidates(commit,file,inventory_spans):
     pattern=re.compile(full+'|'+partial+'|'+bare)
     result=[]
     tree_set=set(tree);dirs={p[:i] for p in tree for i,c in enumerate(p) if c=='/'}
-    roots=reference_roots(file,blob(commit,file).decode())
+    body=blob(commit,file).decode();roots=reference_roots(file,body)
     relative=re.compile(r'(?<![\w/.-])(?:[.]{1,2}/)*(?:[\w.-]+/)+[\w.-]*\.md(?::\d+(?:[-–]\d+)?)?(?:#[^\s`<>\"\]\[),;|}]+)?|`([^`\n]+)`')
-    for n,line in enumerate(blob(commit,file).decode().splitlines(),1):
+    for n,line in enumerate(body.splitlines(),1):
+        row_parents=re.findall(r'`(docs/(?:architect|specs)/[^`]+/)`',line)
+        row_roots=[re.split(r'[*<{]',p)[0].rstrip('/') for p in row_parents]
+        active_roots=roots+row_roots
+        internal=carriage_declaration(body,n)
         matches=[(m.start(),m.end(),m.group()) for m in pattern.finditer(line)]
         for hit in relative.finditer(line):
             a,b=hit.span(1) if hit.group(1) is not None else hit.span();token=line[a:b]
             raw=re.sub(r':\d+(?:[-–]\d+)?$','',token.split('#')[0])
             if not re.fullmatch(r'(?:[.]{1,2}/)*[\w./-]+/?',raw):continue
-            targets={posixpath.normpath(posixpath.join(root,raw)) for root in roots}
+            targets={posixpath.normpath(posixpath.join(root,raw)) for root in active_roots}
             local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
-            if any((p in tree_set or p in dirs) and not p.startswith(RETIRING_ROOTS) for p in [posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]):continue
+            if not internal and not row_roots and any((p in tree_set or p in dirs) and not p.startswith(RETIRING_ROOTS) for p in [posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]):continue
             if not any(p.startswith(RETIRING_ROOTS) and (p in tree_set or p in dirs) for p in targets):continue
             if not any(x<=a and b<=y for x,y,_ in matches):matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,token))
         # A Markdown link is one reference, including its label. Never add
@@ -231,12 +287,13 @@ def scan_candidates(commit,file,inventory_spans):
         for link in re.finditer(r'!?\[[^\]\n]+\]\(([^)\n]+)\)',line):
             raw=link[1].split('#')[0]
             local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
-            resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in roots]
+            resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in active_roots]
             local=[posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]
-            if any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
-            if not any(p.startswith(RETIRING_ROOTS) and (p in tree_set or p in dirs) for p in resolved):continue
+            if not internal and not row_roots and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
+            if not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
             a,b=link.span();matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,link[0]))
         for a,b,token in sorted(matches):
+            if line.startswith('Purpose:') and token.strip('`')==posixpath.basename(file):continue
             if any(x['line']==n and x['columnStart']<=a+1<x['columnEndExclusive'] for x in inventory_spans):continue
             result.append({'line':n,'columnStart':a+1,'columnEndExclusive':b+1,'text':token})
     return result
@@ -393,6 +450,14 @@ class Checker:
                     assert e.get('authorAddedEdge') and e['sourceSpans']==[item['span']]
                     joins.append(e['edgeId'])
                 else:assert item.get('excludedReason')
+                span=item['span'];source_line=before.splitlines()[span['line']-1]
+                link=re.fullmatch(r'!?\[[^\]]+\]\(([^)]+)\)',span['text'])
+                raw=(link[1] if link else span['text']).split('#')[0]
+                roots=reference_roots(f,before)+[p.rstrip('/') for p in re.findall(r'`(docs/(?:architect|specs)/[^`]+/)`',source_line)]
+                targets=[posixpath.normpath(raw.removeprefix('repo/'))] if raw.startswith(('docs/','repo/docs/')) else [posixpath.normpath(posixpath.join(root,raw)) for root in roots]
+                if (link and carriage_declaration(before,span['line'])) or raw.endswith('/'):
+                    assert item.get('edgeId') or not any((legacy_reference_target(p) if link else p.startswith(RETIRING_ROOTS)) and p in self.tree|self.dirs for p in targets), 'resolving carriage/directory reference cannot be a contextual exclusion'
+
             assert collections.Counter(joins)==collections.Counter(coverage.get('authorAddedEdgeIds',[]))
         check('author-added-search-coverage',supplemental_search)
         def extra_locator_searches():
@@ -407,14 +472,30 @@ class Checker:
                 expected_unit=unit_id(before,e['sourceSpans'])
                 # Complete real records carry unitId; synthetic unit fixtures also
                 # bind it explicitly. No ordinal or edge-id unit escape.
-                assert e.get('unitId')==expected_unit
+                # unitId is advisory: grouping uses source bytes only.
                 groups[expected_unit].append(e)
             for edges in groups.values():
                 if len({e['disposition'] for e in edges})>1:
-                    assert all(isinstance(e.get('unitDispositionReason'),str) and e['unitDispositionReason'].strip() for e in edges), 'mixed unit lacks per-edge reason'
-                if edges and edges[0]['unitId'].startswith('canonical-'):
+                    assert all(isinstance(e.get('unitDispositionReason'),str) and e['edgeId'] in e['unitDispositionReason'] and e['matchedExpression'] in e['unitDispositionReason'] and 'Distinct claim:' in e['unitDispositionReason'] and e['unitDispositionReason'].split('Distinct claim:',1)[1].strip() for e in edges), 'mixed computed unit lacks a source-bound per-edge distinct-claim reason'
+                if edges and unit_id(before,edges[0]['sourceSpans']).startswith('canonical-'):
                     assert all(e['disposition']=='phase9-row-flip' for e in edges)
         check('unit-consistency',units)
+        def status_prose():
+            expected=[];lines=before.splitlines()
+            pattern=r'The (?:legacy source remains|retained legacy map remains)'
+            for n,line in enumerate(lines,1):
+                match=re.search(pattern,line)
+                if not match:continue
+                spans=[]
+                for i in (n,n+1):
+                    start=match.start() if i==n else 0;value=lines[i-1]
+                    spans.append({'line':i,'columnStart':start+1,'columnEndExclusive':len(value)+1,'text':value[start:]})
+                expected.append(spans)
+            recorded=r['checks']['coverage'].get('statusRowFlips',[])
+            assert [x['sourceSpans'] for x in recorded]==expected
+            assert all(x['disposition']=='phase9-row-flip' and x['timing']=='Phase 9' and x['dependency'] and x['replacement'] and 'L12-35' in x['reason'] for x in recorded)
+        check('migration-status-prose',status_prose)
+
         changes=[]; used_hunks=set()
         for e in r['edges']:
             eid=e['edgeId']; inv=self.entries.get(eid)
@@ -424,6 +505,21 @@ class Checker:
             if not inv: continue
             check('related-retiring-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
+            def carriage_facts(e=e):
+                declaration=carriage_declaration(before,e['sourceSpans'][0]['line'])
+                if not declaration:return
+                assert not e.get('targetFacts'), 'carriage-internal targetFacts forbidden'
+                # Quoted source itself may contain an absence statement; the
+                # record reason must state only carriage, never existence facts.
+                assert not re.search(r'\bexist(?:s|ed|ing|ence)?\b|\b(?:absent|missing|present)\b|removed at|renamed at|not found',e['reason'].replace(declaration[1],''),re.I), 'carriage-internal existence claim'
+                assert 'inside literal carriage (L12-26(5))' in e['reason']
+                assert declaration[1] in e['reason'], 'missing actual carriage declaration'
+            check('carriage-no-existence-claims',carriage_facts)
+            def successor(e=e,inv=inv):
+                forbidden={path_identity(inv['normalizedReference']),path_identity(f)}
+                assert all(path_identity(p) not in forbidden for p in successor_notes(e['reason'])), 'self-path successor note'
+            check('successor-not-self',successor)
+
             def correspondence(e=e,inv=inv):
                 if e.get('authorAddedEdge'): return
                 assert inv['consumerPath']==f
@@ -453,7 +549,7 @@ class Checker:
             if e['disposition']=='phase9-row-flip':check('row-semantics',lambda e=e:e['timing']=='Phase 9' and e['diffHunk'] is None and e['target'] is None and 'row' in e['reason'].lower() and bool(e['dependency']))
             if e['disposition']=='preserve':
                 check('preserve-state',lambda e=e:e['timing']=='none' and e['diffHunk'] is None)
-                check('retiring-preserve-wording',lambda e=e,inv=inv:not (inv['normalizedReference'].startswith(('docs/specs/','docs/architect/')) and re.search(r'\bretained\b',e['reason'],re.I)))
+                check('retiring-preserve-wording',lambda e=e,inv=inv:not (inv['normalizedReference'].startswith(('docs/specs/','docs/architect/')) and re.search(r'\bretained\b',e['reason'].replace((carriage_declaration(before,e['sourceSpans'][0]['line']) or (0,''))[1],''),re.I)))
             witness=e.get('searchWitness') or r['checks']['coverage'].get('resolutionSearches',{}).get(eid)
             if witness:
                 groups=witness.get('hitGroups',[])
@@ -466,7 +562,7 @@ class Checker:
             check('hunk-binding',lambda h=h:h in [x.splitlines()[0] for x in hunks(r['diff'])])
             check('authority-timing',lambda e=e:e['timing'] in ['now','Phase 9'] and (not f.startswith(('docs/specs/','docs/architect/')) or e['timing']=='Phase 9') and r['checks']['relativeResolution'][e['edgeId']]['authorityStatus']==('current-switchboard' if e['timing']=='now' else 'cutover-patch-only'))
             check('writer-boundary',lambda e=e:r['checks']['coverage']['writerTrace'][e['edgeId']]=='read-only citation; no writer/default-root/schema/identity change' and not e['blockedReason'])
-            check('source-region',lambda e=e:related_header(before,e['sourceSpans'][0]['line']) or not history_at(before,e['sourceSpans'][0]['line'],f))
+            check('source-region',lambda e=e:related_header(before,e['sourceSpans'][0]['line']) or reconciled_registry_row(before,e['sourceSpans'][0]['line']) or not history_at(before,e['sourceSpans'][0]['line'],f))
             target=e['target']; anchor=e['anchor']
             def target_anchor(e=e,inv=inv):
                 proof=r['checks']['anchors'][e['edgeId']]

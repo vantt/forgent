@@ -22,7 +22,11 @@ def main():
         before=m.blob(a.author_commit,r['file']).decode()
         for e in r['edges']:
             e['unitId']=m.unit_id(before,e['sourceSpans'])
-            e.setdefault('unitDispositionReason','Historical positive-fixture source role: '+e['reason'])
+            e['unitDispositionReason']=e['edgeId']+' ['+e['matchedExpression']+'] Distinct claim: Historical positive-fixture source role: '+e['reason']
+            declaration=m.carriage_declaration(before,e['sourceSpans'][0]['line'])
+            if declaration:
+                e.pop('targetFacts',None)
+                e['reason']='L12-35(4): inside literal carriage (L12-26(5)); Carriage declaration: '+declaration[1]
     baseline=c.all(rs);assert not baseline['failures'],baseline
     patch=next(r for r in rs if r['file']=='docs/routing-handoff-contract.md')
     plain=next(r for r in rs if r['file']=='README.md')

@@ -34,15 +34,15 @@ def main():
     probe('retirement wrong source digest',retired,lambda r:r.update(digest='0'*64),'digest')
     probe('retirement false marker value',retired,lambda r:r.update(retiresWithTree='yes'),'retirement-schema')
     package=next(r for r in rs if r['file']=='docs/platform/packaging-distribution/README.md')
-    probe('unit id omitted',package,lambda r:r['edges'][0].pop('unitId'),'unit-consistency')
-    probe('unit id invented per edge',package,lambda r:r['edges'][0].update(unitId='separate-edge'),'unit-consistency')
+    probe('unit id omitted cannot hide a mixed computed unit',package,lambda r:(r['edges'][0].pop('unitId'),next(e for e in r['edges'] if e['edgeId']=='maps-j-07213').update(disposition='preserve')),'unit-consistency')
+    probe('unit id invented per edge cannot hide a mixed computed unit',package,lambda r:(r['edges'][0].update(unitId='separate-edge'),next(e for e in r['edges'] if e['edgeId']=='maps-j-07213').update(disposition='preserve')),'unit-consistency')
     def mixed(r):
         e=next(e for e in r['edges'] if e['edgeId']=='maps-j-07213');e.update(disposition='preserve');e.pop('unitDispositionReason',None)
     probe('migration bullet siblings have mixed dispositions',package,mixed,'unit-consistency')
     allowed=copy.deepcopy(package);mixed(allowed)
     unit=next(e['unitId'] for e in allowed['edges'] if e['edgeId']=='maps-j-07213')
     for e in allowed['edges']:
-        if e['unitId']==unit:e['unitDispositionReason']='Per-edge fixture rationale: retained-root source lineage; sibling migration authority/status assertion is handled separately.'
+        if e['unitId']==unit:e['unitDispositionReason']=e['edgeId']+' ['+e['matchedExpression']+'] Distinct claim: retained-root source lineage; sibling migration authority/status assertion is handled separately.'
     assert 'unit-consistency' not in {f['check'] for f in c.check_record(allowed)}
     roadmap=next(r for r in rs if r['file']=='docs/platform/system-architecture/architecture/roadmap.md')
     probe('Canonical current-source line cannot preserve',roadmap,lambda r:next(e for e in r['edges'] if e['edgeId']=='maps-j-07766').update(disposition='preserve'),'unit-consistency')

@@ -1,0 +1,155 @@
+{
+  "status": "AUTHOR complete; independent targeted review pending",
+  "verifiedAt": "2026-10-19T20:35:10.058886+00:00",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "checker": {
+    "failureCount": 0,
+    "files": 96,
+    "edges": 1293,
+    "activeFiles": 63,
+    "activeEdges": 788,
+    "retiredFiles": 33,
+    "retiredEdges": 505
+  },
+  "changes": {
+    "unit-metadata-only": 252,
+    "record-text-only": 274,
+    "outcome-change": 13,
+    "added-reference": 60
+  },
+  "pathlessStatusOutcomes": 2,
+  "oldUnitCheckMissCause": {
+    "introducedBy": "6f3e4f712",
+    "checker": "step-03-check.py:unit_id / Checker.check_record.units",
+    "oldBehavior": "08020 and 08195 already computed the same physical-line unit as their parked siblings (line-L164 and line-L45). The checker accepted mixed dispositions whenever every edge had any non-empty unitDispositionReason. The generated “independent source claim” boilerplate passed without establishing a distinct claim, even though sibling reasons required rewriting the entire five-file item. Missing wrapped-list support was a separate gap, not the cause of these two misses.",
+    "evidence": [
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-08020",
+        "priorUnitId": "line-L164",
+        "priorReason": "L12-34(3): independent source claim: L12-32(1–3), L12-30: exact live holder docs/platform/packaging-distribution/spec.md; target state: exists at author pin; cutover-patch-only. Source docs/reading-map.md:164."
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08195",
+        "priorUnitId": "line-L45",
+        "priorReason": "L12-34(3): independent source claim: L12-32(1–3), L12-30: exact live holder docs/platform/packaging-distribution/spec.md; target state: exists at author pin; cutover-patch-only. Source docs/specs/reading-map.md:45."
+      }
+    ],
+    "newBehavior": "Source-computed grouping ignores advisory metadata; mixed dispositions require each edge id, exact matched source expression and a concrete Distinct claim explanation. Review still judges semantic distinctness; the two whole-item rewrite cases park together."
+  },
+  "outsideSixOutcomeFiles": [
+    "docs/platform/agent-coordination/history/README.md",
+    "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+    "docs/platform/documentation/operations/portals/docs-portal.md",
+    "docs/platform/packaging-distribution/README.md",
+    "docs/platform/proposals/README.md",
+    "docs/platform/proposals/component-authority-boundary-map.md"
+  ],
+  "probes": {
+    "inherited": 87,
+    "priorWave": 23,
+    "new": 25,
+    "allRejected": true,
+    "casesRemoved": 0,
+    "advisoryIdRuling": "Two previous id mutations remain and now include a mixed-disposition escape; pure advisory-id changes are positive controls.",
+    "archiveFixtures": "Pre-retirement fixtures retain all earlier mutations; source-bound unit rationale and carriage-only reason migration satisfy the current contract, without skipping predicates."
+  },
+  "lightTests": {
+    "tests": 131,
+    "pass": 131,
+    "fail": 0,
+    "skipped": 0
+  },
+  "review": {
+    "parts": 4,
+    "files": 13,
+    "edges": 425,
+    "boundsAndHashes": "pass",
+    "extractor": "Python snippet compiles; representative per-edge invocation verified",
+    "started": 0,
+    "accepted": 0
+  },
+  "checks": {
+    "scopeOnly": "pass",
+    "phase6Untouched": "pass",
+    "gitDiffCheck": "pass",
+    "syntaxAndWhitespace": "pass",
+    "historicalManifestsResolverOwnerAnswersAndExpansionRequest": "byte-identical to input HEAD"
+  },
+  "commands": [
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs",
+      "test/scripts/check-doc-retirement.test.mjs"
+    ],
+    [
+      "git",
+      "diff",
+      "--check"
+    ]
+  ],
+  "artifactSha256": {
+    "progress.md": "91068a6ebdd10f9c80c427fc9258607d3308250fe5653e13a5024ed8062ed843",
+    "step-03-check.py": "f1213666484ce87ae000194f3c6b650b4e9e24270348f6bb323ccd0c913ca3f5",
+    "step-03-probes.py": "0b458b8b9e19a1e8d9bccead9f412b54d7b7276bad12326d5329ffbb7afa4631",
+    "step-03-wave1-check.py": "a88eccd54833f41de489c16743e28bcddf6d47909ffc703669613682d78bf253",
+    "step-03-wave1-r2-probes.py": "8510f6d9826e424d8e3b8427301bc0dc6e132acaabb10c0709f3b16ac5e4513a",
+    "step-03-wave1-r3-probes.py": "ae651e7928259cf99772adbe2182cd514b5f93b7583513c1a404c9b9c3fbf045",
+    "step-03-pilot-r6-manifest.json": "31230517a1e16471f8edac480d5136e8579c151f7602a836aa944bd955933bf1",
+    "step-03-wave1-r3-manifest.json": "f83fcc8dab71cf7ac6df10e35249290c71ed55967fe75da60178da2b6de124f7",
+    "step-03-wave1-r3-changes.json": "5f2820ad3530389271eff30c7dcd06c5f554f849b17cd24a5b296f2a19d996ea",
+    "step-03-wave1-r3-review-request.md": "b8dbe6affa6cb74580c481e293e8a9c81d619784aefad22f27222e426cc1da0f",
+    "step-03-wave1-r3-review-index.json": "e298c2480d91a6c65e4e94f0405a89c429f2e358fcc833a6bb2b1c25afde3d4c",
+    "step-03-wave1-r3-check-result.json": "7263c72529d9eaaac4cb68777dd0501489bc91828efceb151efe3313d997bc98",
+    "step-03-wave1-r3-inherited-probes-result.json": "fe45d3e8a0b7ed70fc75cb41ae4e0cd231979567467d4b261483db47a22ccf35",
+    "step-03-wave1-r3-prior-probes-result.json": "dca387da6d19c6d5fd5e98850107e4e2259dbbb4fd11537797a17450f3cd5d19",
+    "step-03-wave1-r3-probes-result.json": "acea9071b3c749f9aab5a00ea7be59c211176725acec07150181523c0e7dfb25",
+    "step-03-wave1-r3-light-tests.log": "197aa8425ed369884197a6c3259228d61e2075407e0cefbf177db136b3021c7d"
+  },
+  "limits": [
+    "Records only, no consumer edits or authority flip.",
+    "No author blocker or needsWrites.",
+    "Lead owns independent review, committed-byte acceptance, preview and actual runner-commit accounting in both unchanged reproduction manifests.",
+    "Workflow/RUL10/GAP-02 carry and Step 5 parity remain. No Step 3 acceptance, Phase 8 close or Phase 9 authorization claimed.",
+    "Full runtime and reproduction suites not rerun; production runtime behavior is unchanged."
+  ]
+}
