@@ -68,6 +68,36 @@ fn receipt(id: &str, digest: &str) -> Receipt {
         attribution: Attribution::EffectObservedOnly,
     }
 }
+/// RepositoryConfig owns the mirror mapping policy for every consumer.
+/// A wildcard also matches the empty suffix, preserving the legacy mirror name
+/// while allowing ordinary fetch to succeed before the cutover creates the ref.
+pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
+    if remote.is_empty()
+        || !remote
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"-_".contains(&b))
+    {
+        return Err(error("invalid-fetch-mapping-remote"));
+    }
+    Ok(vec![
+        format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
+        format!("+refs/fgos/legacy*:refs/fgos/remotes/{remote}/legacy*"),
+    ])
+}
+
+fn mapping_installed(remote: &str, wanted: &[String], actual: &[ConfigFact]) -> bool {
+    let Ok(policy) = publication_fetch_mappings(remote) else {
+        return false;
+    };
+    wanted
+        .iter()
+        .all(|r| actual.iter().any(|v| v.value == r.as_bytes()))
+        && (!wanted.contains(&policy[1])
+            || !actual
+                .iter()
+                .any(|v| v.value == policy[1].replace('*', "").as_bytes()))
+}
+
 impl RepositoryConfig for GitDriver {
     fn ensure_fetch_mapping(
         &self,
@@ -90,17 +120,7 @@ impl GitDriver {
         filesystem: &F,
     ) -> Result<Receipt> {
         require_lock_scope_platform()?;
-        if remote.is_empty()
-            || !remote
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"-_".contains(&b))
-        {
-            return Err(error("invalid-fetch-mapping-remote"));
-        }
-        let allowed = [
-            format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
-            format!("+refs/fgos/legacy:refs/fgos/remotes/{remote}/legacy"),
-        ];
+        let allowed = publication_fetch_mappings(remote)?;
         if refspecs.is_empty() || refspecs.iter().any(|r| !allowed.contains(r)) {
             return Err(error("invalid-publication-fetch-mapping"));
         }
@@ -144,10 +164,7 @@ impl GitDriver {
                 {
                     let observed = self.configured_fetch_refspecs(repo, &change.remote);
                     let installed = observed.as_ref().is_ok_and(|values| {
-                        change
-                            .refspecs
-                            .iter()
-                            .all(|r| values.iter().any(|v| v.value == r.as_bytes()))
+                        mapping_installed(&change.remote, &change.refspecs, values)
                     });
                     Outcome::Transfer {
                         acknowledged: installed,
@@ -190,6 +207,8 @@ impl GitDriver {
             .into_iter()
             .map(|v| String::from_utf8(v.value).map_err(error))
             .collect::<Result<_>>()?;
+        let obsolete = allowed[1].replace('*', "");
+        let replace_legacy = refspecs.contains(&allowed[1]) && old_values.contains(&obsolete);
         let missing: Vec<_> = refspecs
             .iter()
             .filter(|r| !old_values.contains(r))
@@ -232,7 +251,7 @@ impl GitDriver {
                 return Err(error("config-change-recovery-required"))
             }
         };
-        if missing.is_empty() {
+        if missing.is_empty() && !replace_legacy {
             // Approval has no target effect. Preserve URL provenance in Intent
             // with one typed terminal record, never a fictitious transfer.
             chain = wal
@@ -262,6 +281,20 @@ impl GitDriver {
                 .to_str()
                 .ok_or_else(|| error("non-utf8-config-path"))?;
             let key = format!("remote.{remote}.fetch");
+            if replace_legacy {
+                let out = call(&[
+                    "config",
+                    "--file",
+                    staging_text,
+                    "--fixed-value",
+                    "--unset-all",
+                    &key,
+                    &obsolete,
+                ])?;
+                if !out.success {
+                    return Err(out.error("config-change-staging-failed"));
+                }
+            }
             for refspec in missing {
                 let out = call(&["config", "--file", staging_text, "--add", &key, refspec])?;
                 if !out.success {
@@ -302,10 +335,7 @@ impl GitDriver {
                 .and_then(|f| f.sync_all())
                 .map_err(error)?;
             let values = self.configured_fetch_refspecs(repo, remote)?;
-            if refspecs
-                .iter()
-                .any(|r| !values.iter().any(|v| v.value == r.as_bytes()))
-            {
+            if !mapping_installed(remote, refspecs, &values) {
                 return Err(error("config-change-readback-failed"));
             }
             wal.append(
@@ -328,11 +358,7 @@ impl GitDriver {
             {
                 let installed = self
                     .configured_fetch_refspecs(repo, remote)
-                    .is_ok_and(|values| {
-                        refspecs
-                            .iter()
-                            .all(|r| values.iter().any(|v| v.value == r.as_bytes()))
-                    });
+                    .is_ok_and(|values| mapping_installed(remote, refspecs, &values));
                 Outcome::Transfer {
                     acknowledged: installed,
                     unknown: !installed,

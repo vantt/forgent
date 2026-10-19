@@ -413,7 +413,9 @@ Refs in each clone:
 A default clone or fetch carries only `refs/heads/*`; its refspec is `+refs/heads/*:refs/remotes/origin/*`. In V-REF-01 a fresh clone had no `refs/fgos/*` (`rev-parse` exit 128) until an explicit refspec fetched it. Setup therefore installs two fetch refspecs on the remote named by `eventStore.remote` (default `origin`), in the repository-local git config:
 
 - `+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*`
-- `+refs/fgos/legacy:refs/fgos/remotes/<remote>/legacy`
+- `+refs/fgos/legacy*:refs/fgos/remotes/<remote>/legacy*`
+
+2026-10-19: Git RepositoryConfig owns these mappings; Event Store reads its policy rather than maintaining a copy. The legacy wildcard tolerates a remote with no legacy ref before cutover; its empty suffix preserves the exact destination `refs/fgos/remotes/<remote>/legacy`. Setup also replaces the old exact legacy line without changing user settings.
 
 Setup installs them before any reader expects mirrors. Until they exist, `status` and doctor report the refspec as missing (section 21), not as empty history. After that, every plain `git fetch` keeps the mirrors current. Setup never writes a push refspec, because a configured `remote.<name>.push` changes what a person's bare `git push` sends. Fetching into a mirror namespace means that a fetch can never overwrite the own ref; V-REF-01 confirmed that a fetch created no own ref.
 

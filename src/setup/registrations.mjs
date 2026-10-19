@@ -1,4 +1,4 @@
-import { checkGit, fixGitWal, fixGitFetchMapping } from './git-checks.mjs';
+import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -6635,5 +6635,6 @@ for (const id of ['git-component-compatible', 'git-trust-topology', 'git-operati
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

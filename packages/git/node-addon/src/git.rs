@@ -172,7 +172,12 @@ impl GitPublication {
 
 /// Inspection never acquires event-seal or initializes a repository WAL.
 #[napi]
-pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) -> Result<Value> {
+pub fn inspect_git(
+    state_root: String,
+    repo_path: String,
+    trusted_main: String,
+    remote: Option<String>,
+) -> Result<Value> {
     check()?;
     let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
     let floor = driver.git_floor_verdict().map_err(operation)?;
@@ -196,8 +201,10 @@ pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) 
     } else {
         json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"oldestUnresolved":null,"errors":[]})
     };
+    let remote = remote.as_deref().unwrap_or("origin");
+    let obsolete = publication_fetch_mappings(remote).map_err(operation)?[1].replace('*', "");
     let mappings = driver
-        .configured_fetch_refspecs(&repo, "origin")
+        .configured_fetch_refspecs(&repo, remote)
         .map_err(operation)?;
     let mut native_locks = ["config.lock", "packed-refs.lock", "shallow.lock"]
         .iter()
@@ -207,7 +214,7 @@ pub fn inspect_git(state_root: String, repo_path: String, trusted_main: String) 
         native_locks.push(&"index.lock");
     }
     Ok(
-        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]
@@ -252,4 +259,17 @@ pub fn ensure_git_fetch_mapping(
             .map_err(operation)?)),
         ResolveRepo::NotARepository => Err(error("not-a-repository")),
     }
+}
+
+/// Read the RepositoryConfig policy without creating a driver or changing config.
+#[napi]
+pub fn git_fetch_mappings(remote: String) -> Result<Vec<String>> {
+    check()?;
+    publication_fetch_mappings(&remote).map_err(operation)
+}
+
+#[napi]
+pub fn prepare_git_driver_directories(state_root: String) -> Result<bool> {
+    check()?;
+    GitDriver::prepare_directories(Path::new(&state_root)).map_err(operation)
 }

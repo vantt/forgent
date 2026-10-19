@@ -118,12 +118,14 @@ All mutations require operation id, validated repository, writer and **declared 
 | Land | prepare/publish/recover; immutable candidate, merge or squash, journalled CAS/checkout. Consumer supplies verification evidence. |
 | SafeRestore | preview/apply/recover; full locked checks and durable snapshot before destructive effect. `apply` may carry `reapplyLocalDelta`: after the snapshot and the restore to the new tip, the captured local delta is applied to index and tree; a failed reapply leaves the durable snapshot and returns `recovery-required` (replaces `resyncWorktree`'s `reset --hard` + `apply --index`) |
 | Checkpoint adapter | checkpointTrackedFiles; detachable, consumer-selected **non-event** tracked payload only |
-| RepositoryConfig | ensureFetchMapping, ensureHooks, removeOwnedHooksConfig; local config, user settings preserved, provenance |
+| RepositoryConfig | publicationFetchMappings(remote), ensureFetchMapping, ensureHooks, removeOwnedHooksConfig; local config, user settings preserved, provenance |
 | Remote | fetchRefs, pushRefs, inspectRemote; explicit mapping, no implicit all-refs or default push-config mutation |
 | Recovery | inspectOperation, listPending, reconcile; actual disk/ref checks and idempotent results |
 | Publication | restricted plumbing; section 4. Event Store is the only production writer of event refs |
 
 Implementation may collapse ports internally; the appendix maps lessons to this surface. Idempotency is required wherever an effect can repeat.
+
+2026-10-19 (landing repair): RepositoryConfig is the single source for publication fetch mappings. Event Store and Node setup/doctor read the Rust policy through the existing crate/addon boundary. The legacy mapping is `+refs/fgos/legacy*:refs/fgos/remotes/<remote>/legacy*`: Git permits an absent wildcard source, including before the cutover, and the empty suffix maps `refs/fgos/legacy` to exactly `refs/fgos/remotes/<remote>/legacy`. ensureFetchMapping replaces an installed old exact legacy mapping in the same journaled, native-config-lock-protected update, including when both forms exist; unrelated config and push settings remain untouched. Setup/doctor use `eventStore.remote` (project over global, default `origin`).
 
 ## 4. Publication port: refs/fgos/*
 
@@ -380,6 +382,8 @@ Activation/rollback refuses when a live predecessor writer, pending unsupported 
 Publication-before-Land is a **capability split** (different mutation layers), never two writers for one Land effect. A release may provide Publication while checkout callers remain on current implementation; once replacement Land is exposed to a caller family, that family's old mutation path is removed in **that** release. At final component completion the whole-product mutation allowlist is zero.
 
 **Ordering with the Event Store cutover (P-CUTOVER fold).** The current Land sweeps `.fgos/events.jsonl` and `.fgos/events/` into the merge commit and re-stages `.fgos` after the CAS, and claim and merge checkpoint event files under main 50; replacement Land and Checkpoint must not do either (G-181, §3 Checkpoint). So the Event Store legacy cutover (event-store §18) lands before, or in the same release as, the release that exposes replacement Land. Until then Publication is the only Git capability exposed, and the mutation allowlist keeps exactly the named event-file rows of §13, tied to the Event Store cutover; they are deleted with it. This does not change the same-release invariant of Q4.
+
+2026-10-19 (landing repair): the Git driver creates its empty-hooks and temporary probe directories with explicit safe modes regardless of a group-writable umask. The registered `git-driver-directories` setup/doctor fix creates the designated fgOS state root with mode 0700, removes group/world write bits from an existing current-user-owned root, and gives its empty `git-empty-hooks` directory mode 0500. The fix never chmods parents, symlinks, other owners' directories or populated hooks. WAL/refspec setup runs this preparation first. All six Git doctor rows name the rejected directory, mode/owner, writable-directory cause and `fgos doctor --fix` remedy; read-only doctor does not repair permissions. No config default or environment switch is added.
 
 Setup/init registers every default/path/dependency/config in existing config-merge/check registry, respects project-over-global, installs explicit fetch mirrors and no default push config, validates common-dir WAL writability and owned hooks. Read-only checks never fix. Use dev host for edited code, not activated plain `fgos`. Implementation adds changelog entry. No production env guard-bypass for tests.
 

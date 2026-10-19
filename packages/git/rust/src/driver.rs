@@ -206,12 +206,25 @@ pub struct GitDriver {
     config_sources: Mutex<BTreeMap<ConfigEnvironment, Vec<PathBuf>>>,
 }
 impl GitDriver {
+    /// Setup-only repair of the designated fgOS state root and its empty hooks
+    /// directory. Never follows a symlink or chmods a parent/unowned directory.
+    pub fn prepare_directories(state_root: &Path) -> Result<bool> {
+        let mut changed = secure_driver_directory(state_root, 0o700, true)?;
+        let hooks = state_root.join("git-empty-hooks");
+        // Check content before tightening: a foreign hooks payload is never fixed.
+        if hooks.exists() && fs::read_dir(&hooks).map_err(io)?.next().is_some() {
+            return Err(refusal("trusted-hooks-not-empty"));
+        }
+        changed |= secure_driver_directory(&hooks, 0o500, false)?;
+        Ok(changed)
+    }
     /// state_root is a caller-owned trusted directory, not a repository path.
     pub fn new(state_root: &Path) -> Result<Self> {
+        trusted_directory(state_root)?;
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
-        match fs::create_dir(&hooks) {
+        match driver_directory_builder(0o500).create(&hooks) {
             Ok(()) => {
                 #[cfg(unix)]
                 {
@@ -880,7 +893,7 @@ impl GitDriver {
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir(&dir).map_err(io)?;
+        driver_directory_builder(0o700).create(&dir).map_err(io)?;
         let result = self.probe_features(&dir, &mut verdict);
         // Probe evidence is diagnostic, not operation evidence; no WAL is here.
         let cleanup = fs::remove_dir_all(&dir).map_err(io);
@@ -1041,17 +1054,68 @@ fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
     std::str::from_utf8(bytes).map_err(|_| refusal("git-protocol-invalid-utf8"))
 }
+fn driver_directory_builder(mode: u32) -> fs::DirBuilder {
+    let builder = fs::DirBuilder::new();
+    #[cfg(unix)]
+    let mut builder = builder;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        builder.mode(mode);
+    }
+    #[cfg(not(unix))]
+    let _ = mode;
+    builder
+}
+fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bool> {
+    let existed = fs::symlink_metadata(path).is_ok();
+    let mut builder = driver_directory_builder(mode);
+    builder.recursive(recursive);
+    let created = match builder.create(path) {
+        Ok(()) => true,
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => false,
+        Err(e) => return Err(io(e)),
+    };
+    // recursive create returns Ok for an existing directory; compare mode below
+    // rather than reporting that as a change.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOFOLLOW | libc::O_DIRECTORY)
+            .open(path)
+            .map_err(io)?;
+        let meta = file.metadata().map_err(io)?;
+        if meta.uid() != current_uid() {
+            return Err(refusal("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
+        }
+        let wanted = if mode == 0o500 {
+            mode
+        } else {
+            meta.mode() & 0o777 & !0o022
+        };
+        if meta.mode() & 0o777 != wanted {
+            file.set_permissions(fs::Permissions::from_mode(wanted))
+                .map_err(io)?;
+            return Ok(true);
+        }
+    }
+    #[cfg(not(unix))]
+    trusted_directory(path)?;
+    Ok(created && !existed)
+}
 fn trusted_directory(path: &Path) -> Result<()> {
     let meta = fs::symlink_metadata(path).map_err(io)?;
     if !meta.is_dir() || meta.file_type().is_symlink() {
-        return Err(refusal("untrusted-driver-directory"));
+        return Err(refusal(format!("untrusted-driver-directory: {} must be a real directory; run fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
         // The state root must belong to this process's user, not a repository.
         if meta.mode() & 0o022 != 0 || meta.uid() != current_uid() {
-            return Err(refusal("untrusted-driver-directory"));
+            return Err(refusal(format!("untrusted-driver-directory: {} mode {:04o}, uid {} (current {}); group/world writable or wrong owner; run fgos doctor --fix (git-driver-directories); only current-user-owned fgOS directories can be repaired", path.display(), meta.mode() & 0o777, meta.uid(), current_uid())));
         }
     }
     Ok(())
