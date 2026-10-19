@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 include!("support/land.rs");
+include!("support/signing.rs");
 #[test]
 fn real_merge_evidence_and_same_id_replay() {
     let f = Fixture::new();
@@ -437,4 +438,43 @@ fn fresh_id_refuses_an_already_landed_source() {
         .unwrap();
     assert_eq!(error.cause, "land-already-merged");
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), req.target);
+}
+
+#[test]
+fn recovery_candidate_parent_check_ignores_signature_display() {
+    let f = Fixture::new();
+    enable_signing(&f.main, &f.temp);
+    let session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "unsigned").unwrap();
+    let candidate = session.candidate().unwrap();
+    let signed = git(&f.main, &["commit-tree", "-S", &candidate.tree,
+        "-p", &candidate.target, "-p", &candidate.source, "-m", "signed candidate"]);
+    assert!(git(&f.main, &["show", "-s", "--format=%P", &signed]).contains("Good "));
+    let wal = wal::Wal::open(&f.repo).unwrap();
+    let mut intent = wal.inspect("unsigned").unwrap().intent().clone();
+    let wal::OperationKind::Land(ref mut payload) = intent.kind else { panic!() };
+    payload.candidate.candidate = signed.clone();
+    intent.next = wal::Tip::Oid(signed.clone());
+    // Seed a real signed candidate at the recovery boundary. A store collision
+    // intentionally leaves checkout reconciliation pending after validation.
+    struct Seed;
+    impl wal::PublicationAuthority for Seed {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> { Ok(()) }
+    }
+    let wal::Begin::Created(chain) = wal.begin("signed", intent, &Seed).unwrap() else { panic!() };
+    let chain = wal.append(&chain, wal::Phase::Prepared).unwrap();
+    let mut e = evidence(&session);
+    e.candidate = signed.clone();
+    let chain = wal.append(&chain, wal::Phase::LandVerified {
+        evidence:e, checkout:Some(r#"{"storeCollision":true}"#.into()),
+    }).unwrap();
+    wal.append(&chain, wal::Phase::TargetAttempt {
+        prior_target_attempt:None, expected:chain.intent().expected.clone(), next:chain.intent().next.clone(),
+    }).unwrap();
+    for (suffix, oid) in [("candidate", &signed), ("source/candidate", &f.request.source), ("target/candidate", &f.request.target)] {
+        git(&f.main, &["update-ref", &format!("refs/fgos/git-operations/signed/{suffix}"), oid]);
+    }
+    git(&f.main, &["update-ref", "refs/heads/trunk", &signed]);
+    drop(session);
+    let receipt = f.driver.recover_land(&f.repo, vec![], "fixture", "signed").unwrap();
+    assert!(matches!(receipt.checkout, Checkout::Pending));
 }

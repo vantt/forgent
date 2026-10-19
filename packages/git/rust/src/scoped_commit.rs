@@ -966,7 +966,7 @@ impl GitDriver {
             {
                 let fence = ".fgos/events".to_string();
                 let tracked = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-z"])?)?;
-                if !tracked.contains(&fence) || self.dirty_paths(repo, scope)?.contains(&fence) {
+                if !tracked.contains(&fence) || dirty_paths.contains(&fence) {
                     selected.push(fence);
                 }
             }

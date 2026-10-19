@@ -116,6 +116,11 @@ impl std::fmt::Debug for RepoHandle {
     }
 }
 impl RepoHandle {
+    pub(crate) fn same_checkout(&self, other: &Self) -> bool {
+        self.git_dir == other.git_dir
+            && self.common_dir == other.common_dir
+            && self.work_tree == other.work_tree
+    }
     pub fn layout(&self) -> &RepoLayout {
         &self.layout
     }

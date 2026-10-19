@@ -750,8 +750,7 @@ impl GitDriver {
             ResolveRepo::Repository(r) => r,
             _ => return Err(refusal("untrusted-worktree")),
         };
-        if current.git_dir != repo.git_dir || current.common_dir != repo.common_dir
-            || current.work_tree != repo.work_tree {
+        if !current.same_checkout(repo) {
             return Err(refusal("untrusted-worktree"));
         }
         let config = self.validated_config(&current, None, Policy::Inspect, None)?;
@@ -872,6 +871,14 @@ impl GitDriver {
                 "rerere.enabled=false",
                 "-c",
                 "merge.autoStash=false",
+                "-c",
+                "log.showSignature=false",
+                "-c",
+                "log.decorate=false",
+                "-c",
+                "log.abbrevCommit=false",
+                "-c",
+                "color.ui=false",
             ]
             .map(str::to_owned),
         );

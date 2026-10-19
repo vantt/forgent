@@ -214,12 +214,30 @@ export function operationCensus(trace, phases, realGit) {
 }
 
 /** Narrow diagnostic census, not an E3 timing run. Trace the existing paired
- * fixtures without a driver switch or containment bypass. Linux + strace. */
+ * fixtures without a driver switch or containment bypass. Host mode requires
+ * Linux + strace; --observer wrapper counts direct Git launches for the suite. */
 async function scopedCensus(args) {
   const root = privateDir(path.resolve(args.root));
   const realGit = fs.realpathSync(process.env.PATH.split(path.delimiter)
     .map(p => path.join(p, 'git')).find(p => fs.existsSync(p)));
   const descriptor = args.descriptor ?? await stageAddon(root, fs.realpathSync(args.addon));
+  if (args.observer === 'wrapper') {
+    const bin = privateDir(path.join(root, 'counting-bin'));
+    const log = path.join(root, 'git-execs.log');
+    const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
+    fs.writeFileSync(log, '');
+    fs.writeFileSync(path.join(bin, 'git'), `#!/bin/sh
+printf '%s\\t' "$@" >> ${quote(log)}
+printf '\\n' >> ${quote(log)}
+exec ${quote(realGit)} "$@"
+`, {mode:0o755});
+    const result = execFileSync(process.execPath, [SELF, 'scoped-census-worker',
+      '--root', root, '--descriptor', descriptor, '--log', log], {
+      encoding:'utf8', env:{...process.env, PATH:bin + path.delimiter + process.env.PATH},
+    });
+    process.stdout.write(result);
+    return;
+  }
   const trace = path.join(root, 'operations.strace');
   const result = execFileSync('strace', ['-f', '-qq', '-yy', '-s', '65535', '-e',
     'trace=execve,openat,close,flock,access,faccessat,faccessat2', '-o', trace,
@@ -234,12 +252,19 @@ async function scopedCensus(args) {
 }
 async function scopedCensusWorker(args) {
   const phases = {};
+  let offset = 0;
   const observer = {
     begin(label) {
       phases[label] = {gitExecs:[], holderLockAcquisitions:[], exclusiveLockCalls:[]};
+      if (args.log) offset = fs.statSync(args.log).size;
       try { fs.accessSync(`/nonexistent-e3-marker/${label}-begin`); } catch {}
     },
     end(label) {
+      if (args.log) {
+        const calls = fs.readFileSync(args.log).subarray(offset).toString('utf8')
+          .split('\n').filter(Boolean).map(line => JSON.stringify(line.split('\t').slice(0, -1)));
+        phases[label] = {gitExecs:calls, gitExecCount:calls.length};
+      }
       try { fs.accessSync(`/nonexistent-e3-marker/${label}-end`); } catch {}
     },
   };

@@ -7,6 +7,7 @@ use std::{
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
+include!("support/signing.rs");
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 fn git(root: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -489,9 +490,10 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
     }
 }
 #[test]
-fn explicit_recovery_observes_commit_or_closes_unknown_without_replaying() {
+fn explicit_recovery_observes_signed_commit_or_closes_unknown_without_replaying() {
     for committed in [false, true] {
         let f = Fixture::new();
+        enable_signing(&f.tree, &f.temp);
         interrupted(&f, "interrupted", 2, false);
         if committed {
             git(&f.tree, &["commit", "-qm", "interrupted"]);
@@ -1181,4 +1183,13 @@ fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
     assert!(error.cause.contains("§11"));
     assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
     assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
+}
+
+#[test]
+fn scoped_commit_ignores_signature_and_display_config() {
+    let f = Fixture::new();
+    enable_signing(&f.tree, &f.temp);
+    fresh_commit(&f, "signed");
+    assert!(git(&f.tree, &["cat-file", "-p", "HEAD"]).contains("gpgsig -----BEGIN SSH SIGNATURE-----"));
+    assert!(git(&f.tree, &["show", "-s", "--format=%H"]).contains("Good "));
 }

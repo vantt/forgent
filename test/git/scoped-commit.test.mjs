@@ -238,18 +238,16 @@ test('ScopedCommit probes config and formats once per loan and once after hooks'
     const descriptor=path.join(temp,'descriptor.json');
     fs.writeFileSync(descriptor,JSON.stringify(loader.descriptor));
     const census=JSON.parse(execFileSync(process.execPath,[path.join(root,'scripts/git/e3-bench.mjs'),'scoped-census',
-      '--root',temp,'--descriptor',descriptor],{encoding:'utf8'}));
+      '--root',temp,'--descriptor',descriptor,'--observer','wrapper'],{encoding:'utf8'}));
     const before=census.phases['scoped-preflight'], after=census.phases['scoped-commit'];
-    const probes=(calls,probe)=>calls.filter(call=>call.includes(probe)).length;
-    for(const probe of ['"config", "--null", "--show-origin", "--list"','"rev-parse", "--show-object-format", "--show-ref-format"']) {
+    const probes=(calls,probe)=>calls.filter(call=>JSON.parse(call).join('\0').includes(probe.join('\0'))).length;
+    for(const probe of [['config','--null','--show-origin','--list'],['rev-parse','--show-object-format','--show-ref-format']]) {
       assert.equal(probes(before.gitExecs,probe),1,`preflight ${probe}`);
       assert.equal(probes(after.gitExecs,probe),2,`commit entry + post-hook ${probe}`);
     }
     assert.equal(before.gitExecCount + after.gitExecCount,30);
-    assert.equal(before.holderLockAcquisitionCount + after.holderLockAcquisitionCount,0,'borrowed custody is not reacquired');
     for (const phase of ['land-prepare','land-publish','land-legacy']) {
       assert.ok(census.phases[phase].gitExecCount > 0,phase);
-      assert.ok(census.phases[phase].holderLockAcquisitionCount > 0,phase);
     }
     assert.equal(census.phases['scoped-legacy'].gitExecCount,12);
 

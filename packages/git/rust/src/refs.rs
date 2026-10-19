@@ -452,7 +452,7 @@ impl GitDriver {
                         ResolveRepo::Repository(mut r) => {
                             // Same checkout, same operation: reuse stamp-validated facts.
                             // Other worktrees can have different worktree config.
-                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.git_dir == repo.git_dir) {
+                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
                                 r.object_format = repo.object_format;
                                 r.layout = repo.layout.clone();
                                 r.checkout_config = Some(std::sync::Mutex::new(
