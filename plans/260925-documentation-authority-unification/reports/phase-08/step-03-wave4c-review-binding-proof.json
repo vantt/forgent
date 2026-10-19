@@ -1,0 +1,41 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "reviewFiles": 16,
+  "reviewEdges": 112,
+  "parts": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p01.md",
+      "files": 6,
+      "edges": 30,
+      "sourcePlusRecordBytes": 260365
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p02.md",
+      "files": 6,
+      "edges": 24,
+      "sourcePlusRecordBytes": 145805
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p03.md",
+      "files": 3,
+      "edges": 19,
+      "sourcePlusRecordBytes": 76076
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p04.md",
+      "files": 1,
+      "edges": 39,
+      "sourcePlusRecordBytes": 345543
+    }
+  ],
+  "allRecordAndDiffHashesMatch": true,
+  "allOutcomeChangedFilesIncluded": true,
+  "noDuplicateReviewFile": true,
+  "seededFiles": 8,
+  "probes": {
+    "inherited": 166,
+    "new": 8,
+    "total": 174,
+    "allRejected": true
+  }
+}

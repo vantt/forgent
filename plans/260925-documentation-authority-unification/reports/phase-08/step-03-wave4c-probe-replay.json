@@ -1,0 +1,59 @@
+[
+  {
+    "script": "step-03-probes.py",
+    "exitCode": 0,
+    "seconds": 62.489,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-probes.stderr.log",
+    "negativeProbes": 87
+  },
+  {
+    "script": "step-03-wave1-r2-probes.py",
+    "exitCode": 0,
+    "seconds": 1.752,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave1-r2-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave1-r2-probes.stderr.log",
+    "negativeProbes": 23
+  },
+  {
+    "script": "step-03-wave1-r3-probes.py",
+    "exitCode": 0,
+    "seconds": 17.512,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave1-r3-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave1-r3-probes.stderr.log",
+    "negativeProbes": 25
+  },
+  {
+    "script": "step-03-wave2-probes.py",
+    "exitCode": 0,
+    "seconds": 5.344,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave2-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave2-probes.stderr.log",
+    "negativeProbes": 16
+  },
+  {
+    "script": "step-03-wave3-probes.py",
+    "exitCode": 0,
+    "seconds": 7.865,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave3-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave3-probes.stderr.log",
+    "negativeProbes": 11
+  },
+  {
+    "script": "step-03-wave4-probes.py",
+    "exitCode": 0,
+    "seconds": 6.211,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave4-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave4-probes.stderr.log",
+    "negativeProbes": 4
+  },
+  {
+    "script": "step-03-wave4c-probes.py",
+    "exitCode": 0,
+    "seconds": null,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-final-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-step-03-wave4c-probes.stderr.log",
+    "negativeProbes": 8,
+    "note": "Final extension adds two retirement-predicate negatives to the six already rejected; no inherited suite repeated."
+  }
+]

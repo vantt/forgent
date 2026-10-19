@@ -1,0 +1,35 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "072"
+  ],
+  "pendingBatches": [
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "stopReason": "Turn budget: stop after whole batch 072; do not claim 073–082 authored.",
+  "files": 25,
+  "inventoryEdges": 80,
+  "addedEdges": 0,
+  "edges": 80,
+  "patchedFiles": 11,
+  "dispositions": {
+    "preserve": 54,
+    "parked": 8,
+    "patch": 18
+  },
+  "parks": {
+    "lead-ruling": 3,
+    "phase9-carry": 1,
+    "description-rewrite": 4
+  },
+  "reviewAcceptance": "pending independent A51 review"
+}

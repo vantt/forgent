@@ -1,0 +1,252 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 25,
+  "allRejected": true,
+  "probes": [
+    {
+      "probe": "08020 cannot escape its computed list item with a declared id and boilerplate",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "authority-timing",
+        "dependency-category",
+        "description-truth-record",
+        "hunk-binding",
+        "orphan-hunk",
+        "patch-locator-review",
+        "unit-consistency",
+        "writer-boundary"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "08195 cannot escape its computed list item with a declared id and boilerplate",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "authority-timing",
+        "dependency-category",
+        "description-truth-record",
+        "hunk-binding",
+        "orphan-hunk",
+        "patch-locator-review",
+        "unit-consistency",
+        "writer-boundary"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "table-row siblings cannot split",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "preserve-state",
+        "unit-consistency"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "wrapped list uses one computed source unit",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "dependency-category",
+        "digest",
+        "edge-coverage",
+        "park-search-witness",
+        "parked-state",
+        "passage-correspondence",
+        "unit-consistency"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "lazy continuation uses one computed source unit",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "dependency-category",
+        "digest",
+        "edge-coverage",
+        "park-search-witness",
+        "parked-state",
+        "passage-correspondence",
+        "unit-consistency"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "status wrapped list uses one computed source unit",
+      "expectedCheck": "unit-consistency",
+      "observedChecks": [
+        "dependency-category",
+        "digest",
+        "edge-coverage",
+        "park-search-witness",
+        "parked-state",
+        "passage-correspondence",
+        "unit-consistency"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target never existed",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims",
+        "reason-target-history"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target is absent",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target exists at the author pin",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target removed at 1234567",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims",
+        "reason-target-history"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target existed at the pin",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target is missing",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids target is present",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage forbids structured existence facts",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "carriage must name its actual declaration",
+      "expectedCheck": "carriage-no-existence-claims",
+      "observedChecks": [
+        "carriage-no-existence-claims"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "joint omission of stated-parent directory",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "joint omission of sibling-map directory",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "joint omission of original-source snapshot link",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "joint omission of native candidate cannot hide retiring source-coordinate snapshot link",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "resolving snapshot link cannot be hidden as an exclusion",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "successor cannot name referenced path",
+      "expectedCheck": "successor-not-self",
+      "observedChecks": [
+        "successor-not-self"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "successor cannot name consumer self",
+      "expectedCheck": "successor-not-self",
+      "observedChecks": [
+        "successor-not-self"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "successor cannot name glob root",
+      "expectedCheck": "successor-not-self",
+      "observedChecks": [
+        "successor-not-self"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "pathless migration status cannot be omitted",
+      "expectedCheck": "migration-status-prose",
+      "observedChecks": [
+        "migration-status-prose"
+      ],
+      "rejected": true
+    },
+    {
+      "probe": "pathless migration status cannot preserve",
+      "expectedCheck": "migration-status-prose",
+      "observedChecks": [
+        "migration-status-prose"
+      ],
+      "rejected": true
+    }
+  ],
+  "positiveCases": [
+    "advisory unit ids do not define groups",
+    "wrapped continuation binds to first item",
+    "sibling list item stays separate"
+  ],
+  "limits": "Semantic truth of distinct-claim exceptions remains independent reviewer work."
+}

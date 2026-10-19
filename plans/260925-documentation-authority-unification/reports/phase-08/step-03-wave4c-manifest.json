@@ -1,0 +1,1102 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+      "set": "batch-071",
+      "sourceBytes": 5119,
+      "digest": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "inventoryFileDigest": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "diffSha256": "7af2e00733bb9c36a453072095e89cda20fe4516dd5cd81f9210b5d359711196",
+      "recordSha256": "50b437be4e8f6f8a2a475c342b4a14588b1a290ce82b0a0c6c21ada1082ac686",
+      "recordBytes": 12917,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+      "set": "batch-071",
+      "sourceBytes": 3075,
+      "digest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+      "inventoryFileDigest": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "63c948dc344f16354d83902294a3196a53a5306d18d76cbfbaff315fb7cef8c7",
+      "recordBytes": 891,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+      "set": "batch-071",
+      "sourceBytes": 3883,
+      "digest": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+      "inventoryFileDigest": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "18456108308486513f940baf1a07e4dcaff6467f7cf4d1e9d0388a8921e330a3",
+      "recordBytes": 1982,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "set": "batch-071",
+      "sourceBytes": 3112,
+      "digest": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "inventoryFileDigest": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "diffSha256": "49a127be94831a59262949c4cc17c6c91188b43576490b6279f662d244c7b2b5",
+      "recordSha256": "b4b7d012f7e2593a03d9d4bf6b3a8c8ddc0fbebe1db639a85cec2bcf16299386",
+      "recordBytes": 15386,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md",
+      "set": "batch-071",
+      "sourceBytes": 3151,
+      "digest": "879e80394412724ef63aaa42ad849ac0b90dbbbdcc793ed849807a0cccccc64c",
+      "inventoryFileDigest": "879e80394412724ef63aaa42ad849ac0b90dbbbdcc793ed849807a0cccccc64c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "aab033d0e2df7b6c5b05908be7806fcb0524f4246ee39b56b218d4a25b8bcfab",
+      "recordBytes": 916,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+      "set": "batch-071",
+      "sourceBytes": 14329,
+      "digest": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "inventoryFileDigest": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bd23755943ac17b1032001e8727097dea0d4784b8d691ed4f57208c485381701",
+      "recordBytes": 14279,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+      "set": "batch-071",
+      "sourceBytes": 5322,
+      "digest": "9b5e2fa808e434bccc38965fe724d06890806b30ea070886f8eea6ae6952b169",
+      "inventoryFileDigest": "9b5e2fa808e434bccc38965fe724d06890806b30ea070886f8eea6ae6952b169",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5fde444f35300029cf9c755fd7f668a77945d43a791f3c5d95ddc1df8e589029",
+      "recordBytes": 993,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+      "set": "batch-071",
+      "sourceBytes": 4106,
+      "digest": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "inventoryFileDigest": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "diffSha256": "3d3fea9b38e25ae465bbc646ec9d8afc7c68920f28c15cc7aa942fe1ae8bda9f",
+      "recordSha256": "2573da50f3203bd33da884c5980bf310a77af75fe57fa78b2c579aada39e339d",
+      "recordBytes": 14877,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+      "set": "batch-071",
+      "sourceBytes": 6183,
+      "digest": "213feb3b76a6bfa28a7342cf5475640f11947d971311a93d745871555edf0f08",
+      "inventoryFileDigest": "213feb3b76a6bfa28a7342cf5475640f11947d971311a93d745871555edf0f08",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8d2b7a7424b9555a4654f9e2728eba5bdae6f7ad3e3ad213016a5ec7b770969e",
+      "recordBytes": 9210,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+      "set": "batch-071",
+      "sourceBytes": 5436,
+      "digest": "2d853a86c421c024f1cb77d5250055625da8b551041503d9eeb3d91a04a92d49",
+      "inventoryFileDigest": "2d853a86c421c024f1cb77d5250055625da8b551041503d9eeb3d91a04a92d49",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c14f7b1009a3040dcadf81bad161040456e7e51205095c3135f7017458529175",
+      "recordBytes": 2231,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+      "set": "batch-071",
+      "sourceBytes": 15299,
+      "digest": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "inventoryFileDigest": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "diffSha256": "8b10f1ea1edf522bf9c40a8ce3ef01e3309f269f8fd2d92db644d3be7dacf124",
+      "recordSha256": "56d069bc184edfa5eb0b82c2b6f1c5fa910a9a295d4db86ce75a77f0527c2ebb",
+      "recordBytes": 26891,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "set": "batch-071",
+      "sourceBytes": 15239,
+      "digest": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "inventoryFileDigest": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "diffSha256": "a13542d3f06e4d8ed9078c0b76c79fc6f3d22af24b114f94ef3bfc2e5d4403ba",
+      "recordSha256": "f33e297f20741e4e84b36b209f32ae53fc0a3c72710d0879df42e46281fae4cb",
+      "recordBytes": 22736,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+      "set": "batch-071",
+      "sourceBytes": 24476,
+      "digest": "226432b47535724640abcbe21c5f6e4d00a8e571a1d17361d1a3bc0df733a3f2",
+      "inventoryFileDigest": "226432b47535724640abcbe21c5f6e4d00a8e571a1d17361d1a3bc0df733a3f2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "48cd288af778712cd066d90b6408b078f0b81b4dc179bf01922da46c87ec35f7",
+      "recordBytes": 12909,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "set": "batch-071",
+      "sourceBytes": 4987,
+      "digest": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+      "inventoryFileDigest": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f8c3e2902abb7d37c7ba50c4ace50dbcca6ec614ca41fbf7d1cbcf85155f0b22",
+      "recordBytes": 31369,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+      "set": "batch-071",
+      "sourceBytes": 5494,
+      "digest": "6b7f5e4051165365e0ed62b0781b0061ec5b3423b0048541180e7ec471b9d10d",
+      "inventoryFileDigest": "6b7f5e4051165365e0ed62b0781b0061ec5b3423b0048541180e7ec471b9d10d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f1233951d0503b8d7ddf02347bee83b3c0f9dbcc72a1ff9777616535e012ac94",
+      "recordBytes": 2071,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "set": "batch-071",
+      "sourceBytes": 6620,
+      "digest": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+      "inventoryFileDigest": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d1e8eccb6d2929d43f9cce73b5c44b35dd98007d3cb8dcf97ba992ac7b75cdbb",
+      "recordBytes": 4551,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+      "set": "batch-071",
+      "sourceBytes": 4724,
+      "digest": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "inventoryFileDigest": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "diffSha256": "e2d4570f9dae66798eec024a86cc5afd471e7b04c5891ac6b0482e32bfb44538",
+      "recordSha256": "471f7cfed91af4d723fbfd3f723a61da5d949ea9a07762156cbcacc62f34b5ab",
+      "recordBytes": 51174,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+      "set": "batch-071",
+      "sourceBytes": 3723,
+      "digest": "9c814172778b2cecba2202dbe7197e75fe476604ab70876ff95f822e1fc499da",
+      "inventoryFileDigest": "9c814172778b2cecba2202dbe7197e75fe476604ab70876ff95f822e1fc499da",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f7f4a9560a9d3f068c4a9c86cc7bfccf7b13868f5b1a387337486887a8d21c12",
+      "recordBytes": 2715,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+      "set": "batch-071",
+      "sourceBytes": 7673,
+      "digest": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "inventoryFileDigest": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "diffSha256": "e998e00bb618c1f3b19474de7ced1cc08f18b8e7b27d25f2bbe6f76b7138bbb1",
+      "recordSha256": "2a5c44099b41f9d437cf15c0cb0d4faaa6b8b29ad833e7aebdebb5247f0f7396",
+      "recordBytes": 11907,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+      "set": "batch-071",
+      "sourceBytes": 6645,
+      "digest": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "inventoryFileDigest": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "diffSha256": "923352c3e4f60f4f2541e72cba747952fa783d7c5a5087f83c1ea17feca11497",
+      "recordSha256": "20667f8f16e01dc7cdbdd4bab6812de20ec2a0d2110a0de76168e7ba28f46dac",
+      "recordBytes": 12866,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "set": "batch-071",
+      "sourceBytes": 9088,
+      "digest": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+      "inventoryFileDigest": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6e5c451b2dfc54870f46230dcb0abed566e93a33a9d576eed6fa5e1a7e93fc72",
+      "recordBytes": 3424,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+      "set": "batch-071",
+      "sourceBytes": 4746,
+      "digest": "ba351cd515dd8bbbbad298bc3348286bc983a63fe960bb54d9a6c3eef85c6cf7",
+      "inventoryFileDigest": "ba351cd515dd8bbbbad298bc3348286bc983a63fe960bb54d9a6c3eef85c6cf7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "03b310453fda0a5f3897e9a0fee972ada8e614c0df084b595bb6daaf4bd18cca",
+      "recordBytes": 3067,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+      "set": "batch-071",
+      "sourceBytes": 3607,
+      "digest": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+      "inventoryFileDigest": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bf4bdf3132c24e7d7bcf0ad1d43ba99c1b3e249c7bd0b5bdad283df55f552df5",
+      "recordBytes": 3778,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+      "set": "batch-071",
+      "sourceBytes": 8842,
+      "digest": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "inventoryFileDigest": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "diffSha256": "131a273a5fde3fac392665f6ef2a5893e07f924e31674c0fb6b611ce37d9258a",
+      "recordSha256": "9545959e38ba7ee2f1f1b040fe35bc8eeaaefc32ee543e34e315370fa7ffef2d",
+      "recordBytes": 86512,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 3,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+      "set": "batch-071",
+      "sourceBytes": 5323,
+      "digest": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "inventoryFileDigest": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "diffSha256": "993922d9f54191b757810de7688f401bdef986f400d9e629053ea77e628ed9d0",
+      "recordSha256": "f5269993b498952109c2a05d0b7310e37330409e775c58404743f62e16f47c72",
+      "recordBytes": 38859,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "set": "batch-072",
+      "sourceBytes": 5343,
+      "digest": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "inventoryFileDigest": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "diffSha256": "c6b9c126c7e0d9ba7b62a63c419e82088d5fed47c03b633c82ea7e73ab85d32a",
+      "recordSha256": "93b4fdafc339dad82fd799462067014b415c942a7a6be94c9218e313d1671b80",
+      "recordBytes": 43797,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "parked": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "set": "batch-072",
+      "sourceBytes": 15308,
+      "digest": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "inventoryFileDigest": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "diffSha256": "12549ec870e2263dd103c3e485146de757a8fc2b3a367c6a6ccc168c678c0cba",
+      "recordSha256": "567ec9f282805ceb0103df7feaff4eb5dc4896103f1952de96216e2f71be9ec8",
+      "recordBytes": 24868,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 4,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+      "set": "batch-072",
+      "sourceBytes": 4088,
+      "digest": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "inventoryFileDigest": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "diffSha256": "40838a85cece4f54e3e1cc584f7e1a52f43bf597b4aaad11c1eed5c6076a72f7",
+      "recordSha256": "56088a2d1a661890429fc8aefbaca12193f189652bfc5b0d650dd365077d4f29",
+      "recordBytes": 12348,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+      "set": "batch-072",
+      "sourceBytes": 6256,
+      "digest": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "inventoryFileDigest": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "diffSha256": "76002c77592f4a39758f7c98fd054b842b6563eb0ec8e2a57891ff69874ab453",
+      "recordSha256": "a7a4bd1219000f18127f0d2783a39d402c75e9f3449987e16d4f923f5bcfe99c",
+      "recordBytes": 16687,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+      "set": "batch-072",
+      "sourceBytes": 5890,
+      "digest": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "inventoryFileDigest": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "diffSha256": "c22e53206a04556c5280887bab3da70553e595e6c07ca87ab33e3bd959c32684",
+      "recordSha256": "14d58ab8515c5dc05d6ea8a39ec0933ec8f769830ac23435825a784546fe110c",
+      "recordBytes": 26398,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 3,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md",
+      "set": "batch-072",
+      "sourceBytes": 2579,
+      "digest": "ec39837cfc6a4c3c8390e3a9794457ba53bc39a6e14e6754c4e1e8bad3e2e1fb",
+      "inventoryFileDigest": "ec39837cfc6a4c3c8390e3a9794457ba53bc39a6e14e6754c4e1e8bad3e2e1fb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3d41da3b0e1ac8814e24f12f810fa5cd25ef9d30dc408745408c337d3e2e145d",
+      "recordBytes": 948,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+      "set": "batch-072",
+      "sourceBytes": 2840,
+      "digest": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+      "inventoryFileDigest": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0e1d32bc541abf6df459b3102780b768eac27ff4661d7d936d283f439c1f1ff2",
+      "recordBytes": 7119,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+      "set": "batch-072",
+      "sourceBytes": 2984,
+      "digest": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "inventoryFileDigest": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "diffSha256": "0a2da1d6b2e00002e224ae720394a910fdf67932c4b83ee4e199b3343534ecdc",
+      "recordSha256": "8feeb13a47d7796c28b9f947d27518ffcd8a985da0d60d35e1f7bf18d40d4470",
+      "recordBytes": 11217,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "set": "batch-072",
+      "sourceBytes": 9245,
+      "digest": "001c9aae61caafc3345e172df8ddb7d14d3c361d72a1ca469ae63892ce3936cf",
+      "inventoryFileDigest": "001c9aae61caafc3345e172df8ddb7d14d3c361d72a1ca469ae63892ce3936cf",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7ff34af9e1ff408e1dfcf983e35a9c681ab007f3813346373111d5b7c7ce5d7f",
+      "recordBytes": 964,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "set": "batch-072",
+      "sourceBytes": 10013,
+      "digest": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d",
+      "inventoryFileDigest": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "91922636c1afc7b92eb3a67a7d9062d3430f136abe00a805d7b50941b14c9d2a",
+      "recordBytes": 9467,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+      "set": "batch-072",
+      "sourceBytes": 8314,
+      "digest": "200236306b0081ac87b034ffabc300fcd431c4584e75d5e3de1f097c6e67e160",
+      "inventoryFileDigest": "200236306b0081ac87b034ffabc300fcd431c4584e75d5e3de1f097c6e67e160",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a8a4f397f5fcc575badd97976d2ef5fe48250d5f5e9c89a29cc12a152118bd08",
+      "recordBytes": 963,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "set": "batch-072",
+      "sourceBytes": 6680,
+      "digest": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "inventoryFileDigest": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "745706b2e8ecfe039173cdcbb376e506a0690701f77218014d21029877990012",
+      "recordBytes": 18220,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 8,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "set": "batch-072",
+      "sourceBytes": 25067,
+      "digest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "inventoryFileDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "diffSha256": "3ba87d1b8b074ed508703c93672733f01780c01e2ac83d4430591ce5758d1fca",
+      "recordSha256": "511ae342418f8adc6970140e69ccdc0267d8efb6de4dfbd4c3019eb2b837b523",
+      "recordBytes": 32082,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "patch": 1,
+        "parked": 1,
+        "preserve": 13
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md",
+      "set": "batch-072",
+      "sourceBytes": 9146,
+      "digest": "340cabf429adb34768220a58a529c01fc9f319a010c28b0f132fb381df55d565",
+      "inventoryFileDigest": "340cabf429adb34768220a58a529c01fc9f319a010c28b0f132fb381df55d565",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c38250c6254d93abe1f1cc5c4150d9f8908cadd33aa3cfda86645f91dfaed1dc",
+      "recordBytes": 951,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md",
+      "set": "batch-072",
+      "sourceBytes": 3146,
+      "digest": "cf0c7be1ab2a519a7a1c6cc9b079e4c53a0127af20e7e6e7d63ed6e22a4db085",
+      "inventoryFileDigest": "cf0c7be1ab2a519a7a1c6cc9b079e4c53a0127af20e7e6e7d63ed6e22a4db085",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f5af07ea572892f7b142f615e9619367832d70937d27cd95c6f45c87ee6739e6",
+      "recordBytes": 952,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+      "set": "batch-072",
+      "sourceBytes": 5766,
+      "digest": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "inventoryFileDigest": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "diffSha256": "f638d48b07b1c439ba6d6e86a1d7a5a7c6aa91541746aa22e1bf060828bf4d71",
+      "recordSha256": "5060e61aa1966cce21952550cfdd079f952f2f89d5c44270598ec679aacff787",
+      "recordBytes": 23348,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "parked": 2,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md",
+      "set": "batch-072",
+      "sourceBytes": 4842,
+      "digest": "4cdd7f4d897306197c6d3c58b70abb9371a2fe72dc069956a0f057a12d4583be",
+      "inventoryFileDigest": "4cdd7f4d897306197c6d3c58b70abb9371a2fe72dc069956a0f057a12d4583be",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cb1882a50104a6144311da87eb124da7bd1f3944843c0bdc9300caf4a33a2fe0",
+      "recordBytes": 953,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "set": "batch-072",
+      "sourceBytes": 7061,
+      "digest": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "inventoryFileDigest": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "diffSha256": "648e3cbbfab4773113b619f7b2d90fa131c91b098c5abed4bde63f40805ad8ec",
+      "recordSha256": "978f14a898aaafb6c75b878bc3be65b5006d993cbc0003aec5b57bc7abeaa254",
+      "recordBytes": 28641,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "set": "batch-072",
+      "sourceBytes": 6978,
+      "digest": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+      "inventoryFileDigest": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2a22f3c194afa0c58d8c16d2df7ae022c2b869ce197bc5566af2f21b24ffbd8a",
+      "recordBytes": 5427,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+      "set": "batch-072",
+      "sourceBytes": 3386,
+      "digest": "92611e49ab43531075b869592f35deb99c03e140d17ae9e213eb50ebaeb37344",
+      "inventoryFileDigest": "92611e49ab43531075b869592f35deb99c03e140d17ae9e213eb50ebaeb37344",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "87ee06257fe1f61bb74d19e8054326f15b7b52316e1258de4b207b6d72a2daa4",
+      "recordBytes": 3349,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+      "set": "batch-072",
+      "sourceBytes": 6542,
+      "digest": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "inventoryFileDigest": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "diffSha256": "7b67a2e42e15be536890337265d1a3a82ac4131b62fd8f1d36343be21e567929",
+      "recordSha256": "9a773d0ddf1ee799d077b17141bea192b5f225587e13a3cad1ed2b64e1b49f68",
+      "recordBytes": 62769,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "set": "batch-072",
+      "sourceBytes": 4284,
+      "digest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "inventoryFileDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3dbf856214bcfe5ac9e5f5c60629cd1f3f32f9267059d53a453914c6a69dff56",
+      "recordBytes": 2238,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+      "set": "batch-072",
+      "sourceBytes": 3351,
+      "digest": "2fa5b40f7393ce81cc3d1d0aac8103f1010fac1c200ac6057117a4e36de2a6c8",
+      "inventoryFileDigest": "2fa5b40f7393ce81cc3d1d0aac8103f1010fac1c200ac6057117a4e36de2a6c8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0fe766dea4fb317c8c171570bfdcdd70dc97fecaa3c39a152f8e10ba79091919",
+      "recordBytes": 967,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+      "set": "batch-072",
+      "sourceBytes": 6101,
+      "digest": "c247d077edaf72cca273869705f79d15b4cd9369361160cf4fdfa31bcce92c11",
+      "inventoryFileDigest": "c247d077edaf72cca273869705f79d15b4cd9369361160cf4fdfa31bcce92c11",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cc36c39a84ce2017b8b59521befd31153bb6e104307265b41c560636adeb289a",
+      "recordBytes": 5179,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+      "set": "batch-072",
+      "sourceBytes": 2964,
+      "digest": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "inventoryFileDigest": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "diffSha256": "ac9c9d9cbc62b8fc308ae1a0c634d7110ad6bb6c0c89a383152db42d4372e165",
+      "recordSha256": "b201c0a6b3a52a016307d09c33a8b5b6530631d33cb8c32ea82dd749342a5b76",
+      "recordBytes": 22667,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 4
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-071",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000071",
+      "population": [
+        "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+        "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+        "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+        "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+        "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+        "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+        "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+        "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+        "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+        "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+          "rankHash": "04d5a021dfd28b77672d095084f4d71ebb82e4298b8c71f744f1c6dc900a6527"
+        },
+        {
+          "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+          "rankHash": "1975d9c9f7da687ee9114b19a5deabafc854ab9ed79fba8c382786a1c1c76bb4"
+        },
+        {
+          "file": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+          "rankHash": "492c2e60ad29380db0ea2d3b532a2d67fce60860eacf9d65e6b0a6a5ea677031"
+        },
+        {
+          "file": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+          "rankHash": "4dcea63220089b033d6befe3f37deba9b1b7233f6d1fba3695248d9549fda1f7"
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+          "rankHash": "558d9a279fb2e52442832479b36318deb43a7ffffed23e7e994b77705ff72b92"
+        },
+        {
+          "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+          "rankHash": "5a9ed8d5391eae64bcebb6df735854bf744ca1d3843755f3d11a81431224e820"
+        },
+        {
+          "file": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+          "rankHash": "5f8ddd5a516cdb3d0cba30abaffc15fe3b0838fc71fb29ee7c7317ba47f6bb56"
+        },
+        {
+          "file": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+          "rankHash": "718f30284914b46758ddcc30d9bb8ca16a3ffa070b6b44b11db58bba38d25385"
+        },
+        {
+          "file": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+          "rankHash": "d26cc3cc1c7e43b372c359f72fc9332c0db5bb9b3194f5befd4f3e49f3784f81"
+        },
+        {
+          "file": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+          "rankHash": "ea38b4e061282effe69ac856c9b0fd93ccf301ce4804fbe865ab278533857317"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+        "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+        "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+        "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+        "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+        "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+        "docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md",
+        "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+        "docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+        "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+        "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+        "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+        "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+        "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+        "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+        "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+        "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+        "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+        "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+        "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+        "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+        "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+        "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+        "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+        "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md"
+      ],
+      "dispositions": {
+        "patch": 19,
+        "preserve": 39,
+        "parked": 3
+      }
+    },
+    {
+      "set": "batch-072",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000072",
+      "population": [
+        "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+        "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+        "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+        "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+        "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+        "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+        "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+        "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+        "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+        "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md"
+      ],
+      "populationCount": 11,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "rankHash": "0bc99fed1ff490c538b4cb6aaed6e607d15e65bdbe612d212f3d2f8c2bca31a5"
+        },
+        {
+          "file": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+          "rankHash": "18a5550bcf441b993fc7ad87a4937852437bc406485ea06e4bfdb564715ca3e8"
+        },
+        {
+          "file": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+          "rankHash": "202d51f1b8e5bbef8b073d4f2be3b7f65758a915aebdcb4beb308ade8af50e69"
+        },
+        {
+          "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+          "rankHash": "203461d00a3bc051ca4d1ef76749ec4acd3db7e55659e29a118d0e746fbd552a"
+        },
+        {
+          "file": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+          "rankHash": "2089fc9ed404a6a1c13966cee4e1eca5d8867db04390e424f9d4a95cd670d27f"
+        },
+        {
+          "file": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+          "rankHash": "32860a56ff02e4aadb867496fd1594516de58da9ac23f01c57a954f88d6a55e2"
+        },
+        {
+          "file": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+          "rankHash": "63a00dc9b5949357236b10ca9670bb6559a3895da66561ff93972a362b1e4c89"
+        },
+        {
+          "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "rankHash": "6ef73e1ed6836eca9361a1143934fcf8b3d443142029781a7cf63e2982e75997"
+        },
+        {
+          "file": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+          "rankHash": "964e916306526bb92aaf836124178a6719f3b599e827104c3287083bcb3711cd"
+        },
+        {
+          "file": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+          "rankHash": "bb74ac87be4f970ad122041de61b994173c5a91f9267c023ea7be3fd3aaa7397"
+        },
+        {
+          "file": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+          "rankHash": "c617964dd042c9aa97d078932e36b2b85539333fb6ac7d57732c87f77f370628"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+        "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+        "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+        "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+        "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+        "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+        "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+        "docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md",
+        "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+        "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+        "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+        "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+        "docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+        "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+        "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md",
+        "docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md",
+        "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+        "docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md",
+        "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+        "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+        "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+        "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+        "docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+        "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+        "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md"
+      ],
+      "dispositions": {
+        "preserve": 54,
+        "parked": 8,
+        "patch": 18
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "071": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-071",
+      "population": [
+        "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+        "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+        "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+        "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+        "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+        "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+        "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+        "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+        "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+        "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md"
+      ],
+      "populationCount": 12,
+      "ranks": [
+        {
+          "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+          "rankHash": "197aa0b7890044cc1ee76a7724a9cb8d4e9796efc404edb57ef07c5a9b5bd8cc"
+        },
+        {
+          "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+          "rankHash": "20712d4cb5563483707803fe214ae9b92ae8c7f80e85ce76345970a7f21c4a4d"
+        },
+        {
+          "file": "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+          "rankHash": "472ea9afea5ff0dc2582d0acfa1ceb361b8a2f1c93bbe86badd58a98bbe4666e"
+        },
+        {
+          "file": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+          "rankHash": "517889b96ed549d0937b99592997f4603d9ed2382b9fc2e8debfff45600b4855"
+        },
+        {
+          "file": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+          "rankHash": "717de4857d221f22afc397f5cfd8f03de730e629b8bf3d170e1878217c04ea94"
+        },
+        {
+          "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "rankHash": "7f56dfefc3387258e7919f7488bd3a3ae630bba1340f85533a0e1cd30603a98f"
+        },
+        {
+          "file": "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+          "rankHash": "d6a578b3cd9e1461d4c476a6eacdf3dd03a52887693a7a317aac40fc385a6022"
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+          "rankHash": "d966d35f99906ccabe372ab9f15699c32ffc5e0c2a3cfc8a14bb7064f62ed9fe"
+        },
+        {
+          "file": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+          "rankHash": "d9d41c036639cc11017335896af846122242d15bff20f964dd587c99086762d5"
+        },
+        {
+          "file": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+          "rankHash": "dc238df40fc5440048499d9a071cae8c9b318ab1333ca9b23553732716a49cb4"
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+          "rankHash": "e4600c687ab98bf856b272773c14bfe1c0b9bba6818a2048f42df71790037259"
+        },
+        {
+          "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "rankHash": "f9210fe90c8e3b397aa84a8e7744d55c1a2d62a3638282b14437befa328220ba"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+        "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "072": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-072",
+      "population": [
+        "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+        "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+        "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+        "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+        "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+        "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md"
+      ],
+      "populationCount": 7,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+          "rankHash": "008ce60084dce33b15abe9e750b250b63db02a15efe9f8d4b793d8f5b2b79f32"
+        },
+        {
+          "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+          "rankHash": "0e3334dd5f162039f22934583854c77092e207317112339a6de436eb6f447616"
+        },
+        {
+          "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+          "rankHash": "76561d5684e70eaca4c1622b3bd7ea4108f2fa915330775f8c393424b5b25dc8"
+        },
+        {
+          "file": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "rankHash": "81e13b78855df59dc4465f7d20b439788d528cc90d483ab8846c323a57476414"
+        },
+        {
+          "file": "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+          "rankHash": "c2b5d457f529254eb6a568e72c16fbef96feddaf8e90858045e2531a79d49744"
+        },
+        {
+          "file": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+          "rankHash": "cb9ecdf487b2d999c2030fe9c42be878a71ad042a922710e50c61184e9ab4eac"
+        },
+        {
+          "file": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+          "rankHash": "efcca8598ba24c5616d3b633eb002e6a9adc35c533b865af46f865be51ac5449"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+        "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-071.jsonl",
+      "sha256": "1d4723f7905dcf0c96589b3f13d13dd5667acf8a1e53f2f4d1b7e5bbfa11d776"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-072.jsonl",
+      "sha256": "49bde96facf6b0ee1c1549eac38a508caece70c96c7d593cb6dcbe984b91d6fc"
+    }
+  ]
+}

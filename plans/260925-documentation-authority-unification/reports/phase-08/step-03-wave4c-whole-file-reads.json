@@ -1,0 +1,532 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5343,
+      "lines": 117,
+      "sha256": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "caaea04bcb195142b86683dff536947df5a5bfea5997749dabed45dd6dba2f67"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 117,
+          "sha256": "6cb61f8e43bb422a44c22c19b142ab19ee684841d4ad101054e85cf2eeec45f5"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15308,
+      "lines": 278,
+      "sha256": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2a301462b22ce696025fca748154d92b97b183091d6d9da39d112af6dac2d815"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "47e6d75df6c3a5d1c18fbc95be64c9e9edd0c91c90de7d6356bc54bc3cbbc7c5"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "8687378ce64573dbda5543d205e77a09eaa865c772b4227d8801758d4a5d2d23"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 278,
+          "sha256": "5ad98492550222eae4d8081b4207c403d7ea8b80207097b8aec4874715ee0b30"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4088,
+      "lines": 88,
+      "sha256": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "61c0319f64ee69aa4c4e533cfe1dda31148ad032ea5e0c53058b7d305b754f53"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 88,
+          "sha256": "cb408613ddae8652b36be5b8a9be35c8c9b03fddf8471e1a319193ba54b2d683"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6256,
+      "lines": 127,
+      "sha256": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b1dda5a24cdc202928944ff08683d53b62f61c9efaa3c899a17a44901d2f2300"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 127,
+          "sha256": "e56b0bc169cd63c735f89c6aba40a24cac0475ed2edee0dc60b24b579ce01c15"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5890,
+      "lines": 123,
+      "sha256": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ef17c3301c461a97b96dfeab961387dfb0220ce4c6c73e77bfcdcc6e4a7d47b6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 123,
+          "sha256": "ab1aaff9823607721b8a7fccf7e13d487f23af74a2efae263e70aaa9098de905"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2579,
+      "lines": 61,
+      "sha256": "ec39837cfc6a4c3c8390e3a9794457ba53bc39a6e14e6754c4e1e8bad3e2e1fb",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "f99fe58cb32d968ea40a1d673463865694fe47e01d0c00b5ac6f89e05e8bfc74"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2840,
+      "lines": 74,
+      "sha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 74,
+          "sha256": "30631d8f1230fd93e25cf2917e6a3f7bd168517c668865bd9324d8cf427375fb"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2984,
+      "lines": 65,
+      "sha256": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 65,
+          "sha256": "9c41e55cca803314e7dcbc4dbfbd438e03aee8541af9a4952873598ccbc2f8e5"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9245,
+      "lines": 181,
+      "sha256": "001c9aae61caafc3345e172df8ddb7d14d3c361d72a1ca469ae63892ce3936cf",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "03cf57c06e6e0c5ba3d69e0f441fdb67527eabbc449d7d6c76e4e4dac9c395a3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "360c8b6174c8fa9cced7e95eb02395a9d3247a5941dc8c1130b60cd24693e3a0"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 181,
+          "sha256": "5fc60763c1ce8a55f8eebd4d30fb68c1511aaeb9cb6cd4e9785cf8499dd7cc02"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10013,
+      "lines": 193,
+      "sha256": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d18f873ddcbe4fd90d5e6b821428a6ffde0a3df8b2ddbd42c7e933b259add2b6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1fc65d6f9303764e23a5f25546ce2489a58e00e2c728f42d1bbce0df72464069"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 193,
+          "sha256": "327f9faf6e1b1f2055462994d8ee0fd4a52bf7c4a9dbaa2442db981d632555ca"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8314,
+      "lines": 169,
+      "sha256": "200236306b0081ac87b034ffabc300fcd431c4584e75d5e3de1f097c6e67e160",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7612ca2bdbaec872fce527725a7c898e0fd0e79bc498b56607b6d54dd680f8c1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1f53d1a0767793056bb3a864dedf7e3c7afc73dff89099b8e372baa85f4c1ed0"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 169,
+          "sha256": "43e699ec18bb736f75f425ddd6d23c56493fd8a8fec0aef6c6c23e47081e4527"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6680,
+      "lines": 146,
+      "sha256": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "75a026f3327d459261538aa436f014bbf8d5e0827b404b3817d426d901240f57"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 146,
+          "sha256": "97458638be091520b1bfa5fe38fd7c649f2477f289331ce06224e5661a9cc6e7"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 25067,
+      "lines": 495,
+      "sha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "757eb14217998c4d42137a75cf94aac06a333f4601fb4292b0291517a22c60ab"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "843ee040ea733dbfbc802d0c81a042ad0247cc52075c1d092dbd96b4f6d2bdb9"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "fde1417d70ab9863598341ed4f913dd9d311f51d7842ab20915039227c94f1c1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "993048d3effa82b25b5ff56565767cfdadf812d3e536e7682fb7dcf12fae3c6d"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "84879711ffecfbd1137db50cfc227865cfda06e6b5971bd8cd84e9693ea5c0bc"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "5e7333131d6413a85cc7728f561e80c0d632f9a35aac6ce822f8185db29a307c"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 495,
+          "sha256": "b1da6969135bffeebc8e09966aa1e774f0a5cf6cb0109ef7eb356e289ddfb0d1"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9146,
+      "lines": 186,
+      "sha256": "340cabf429adb34768220a58a529c01fc9f319a010c28b0f132fb381df55d565",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2522ee2250eca62ebb805fe353a37307afc985f151caae296d53e1a7ff51d5fc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fddb46daca555c737d4d594824bb9cdb3847ee8a93e5519368fc7085b878ab27"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 186,
+          "sha256": "9d7c3d0bd3cedc248290ed25a5282c7bd3011b10539bb04468cebeb811cc32a3"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3146,
+      "lines": 89,
+      "sha256": "cf0c7be1ab2a519a7a1c6cc9b079e4c53a0127af20e7e6e7d63ed6e22a4db085",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "640b200f0e83708fd2c3ae9edc3ba23c56a99f94aa5de72a24ca954a63d988a9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 89,
+          "sha256": "3adcb155c76a01324c04e74210f154a6cdabb1090358d7e6ac73a27794f63c29"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5766,
+      "lines": 134,
+      "sha256": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4df135ca06fbfd1181918a0dc1b0403fed9ee4c407f5d140c54593bcc1a4a705"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "12c58db646d7cf4e8a49d75ddacb58a63b65a474581b0ce0bc9c31f43cc90a96"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4842,
+      "lines": 103,
+      "sha256": "4cdd7f4d897306197c6d3c58b70abb9371a2fe72dc069956a0f057a12d4583be",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "68d5c9fdfa3c980e9d22a7580fd6aa44a5e917525f390bab7b0662fd0c2668a7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 103,
+          "sha256": "2e2d1d5a8414e18bbfb563181b70c14b19f7a67fca8f996e0d3ace61f40ea73d"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7061,
+      "lines": 139,
+      "sha256": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0c36096c51f8da74c2f293675c74c9300508b92341aba93634d14bd87adeac04"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 139,
+          "sha256": "fcfa9ed8b21feb61db64956b2bbfa1540bf1ca4fffb528654bcf99c72964592a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6978,
+      "lines": 130,
+      "sha256": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f96fd3cafc5dea977f5ea23f196ae6133696007cc10a61483ec8ce101dddb220"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 130,
+          "sha256": "e9b499a01d8323f3dde8d9781cb73a0f3254e6293c2c536161cfa4635d413c71"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3386,
+      "lines": 72,
+      "sha256": "92611e49ab43531075b869592f35deb99c03e140d17ae9e213eb50ebaeb37344",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "84d0f3d1b2407e62dbd34bf66c2a896aec949b37c9c9dd0ad5a4eb1ffb6a2091"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6542,
+      "lines": 138,
+      "sha256": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cd7c901fcb06c9f6988f4af7c86839635ba3c749be3c7f2223fe8105d7a1dd87"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 138,
+          "sha256": "d458306a10a5ba51a4acbcd6463ed378aa5b3963142eb7bd3ce1aee2dc446401"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4284,
+      "lines": 95,
+      "sha256": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2b38ce71c47857519a150b6cc3e69a1ad9e6a92322da7b106f8ac37df8e048dc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "751c7f463241520c1323f85e68ddcccdd9c07ef4a297231c7069dae179572cec"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3351,
+      "lines": 77,
+      "sha256": "2fa5b40f7393ce81cc3d1d0aac8103f1010fac1c200ac6057117a4e36de2a6c8",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 77,
+          "sha256": "a207ea0c759ce86ec7bb057c0944ae938dc5f91f23118fcf50c7e8e3732c9daf"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6101,
+      "lines": 126,
+      "sha256": "c247d077edaf72cca273869705f79d15b4cd9369361160cf4fdfa31bcce92c11",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a66eb2906e932e0743e0f1908cd28e306682a0fbc9a1a473646e2a0a930e8811"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 126,
+          "sha256": "11a6791fdf1bbeee90389c4d804129ffd3b442dfc06c775ee1b8537c209d8ee8"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2964,
+      "lines": 73,
+      "sha256": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 73,
+          "sha256": "877875be1e29aefa3ea627a37aaf4b03f85397532e980d9479f9fb99bd1e7a68"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 168174,
+  "method": "Complete immutable source bytes read; every inventory span bound; supplemental full-file scan and context considered. Author traversal is not independent review."
+}

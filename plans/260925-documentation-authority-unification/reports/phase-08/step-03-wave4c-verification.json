@@ -1,0 +1,290 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "mutation": "Patch records and plan-local checker/probes only; no consumer edits",
+  "PartA": {
+    "scannedFiles": 477,
+    "scannedEdges": 3744,
+    "outcomeChanges": 49,
+    "outcomeChangedFiles": [
+      "docs/distillery/porting-log.md",
+      "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "docs/specs/work-state.md"
+    ],
+    "recordTextChanges": 26,
+    "ruleHits": {
+      "number-title-successor": [
+        "maps-j-06593",
+        "maps-j-01238",
+        "maps-j-01239",
+        "maps-j-01242",
+        "maps-j-01243",
+        "maps-j-01258",
+        "maps-j-04115",
+        "maps-j-04163",
+        "maps-j-04164",
+        "maps-j-04191",
+        "maps-j-04201",
+        "maps-j-04203",
+        "maps-j-04205",
+        "maps-j-04207",
+        "maps-j-04209",
+        "maps-j-04211",
+        "maps-j-04213",
+        "maps-j-04215",
+        "maps-j-04217",
+        "maps-j-04219",
+        "maps-j-04221",
+        "maps-j-04223"
+      ],
+      "work-state-edge-retirement": [
+        "maps-j-08339",
+        "maps-j-08340",
+        "maps-j-08341",
+        "maps-j-08342",
+        "maps-j-08343",
+        "maps-j-08344",
+        "maps-j-08345",
+        "maps-j-08346",
+        "maps-j-08347",
+        "maps-j-08348",
+        "maps-j-08349",
+        "maps-j-08350",
+        "maps-j-08352",
+        "maps-j-08353",
+        "maps-j-08354",
+        "maps-j-08355",
+        "maps-j-08356",
+        "maps-j-08357",
+        "maps-j-08358",
+        "maps-j-08359",
+        "maps-j-08360",
+        "maps-j-08361",
+        "maps-j-08362",
+        "maps-j-08363",
+        "maps-j-08364",
+        "maps-j-08365",
+        "maps-j-08366",
+        "maps-j-08367",
+        "maps-j-08368",
+        "maps-j-08369",
+        "maps-j-08370",
+        "maps-j-08371",
+        "maps-j-08372",
+        "maps-j-08373",
+        "maps-j-08374",
+        "author-r3-docs-specs-work-state-L1642C58",
+        "author-r3-docs-specs-work-state-L1891C21",
+        "author-r3-docs-specs-work-state-L1894C28"
+      ],
+      "supplemental-decision-edge": [
+        "author-wave4c-docs-distillery-porting-log.md-L129C650",
+        "author-wave4c-docs-distillery-porting-log.md-L129C803",
+        "author-wave4c-docs-knowledge-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md-L108C30",
+        "author-wave4c-docs-knowledge-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md-L122C32"
+      ],
+      "01705-removal-fact": [
+        "maps-j-01705"
+      ],
+      "retained-root-wording": [
+        "maps-j-04250",
+        "maps-j-04253"
+      ],
+      "deleted-0001-dead-link": [
+        "author-wave4b-event-log-evolution-discipline-L13-decision0001"
+      ],
+      "document-history-preserve": [
+        "maps-j-04295",
+        "maps-j-04296",
+        "maps-j-04297",
+        "maps-j-04306",
+        "maps-j-04307",
+        "maps-j-04308"
+      ]
+    },
+    "newSupplementalEdges": 4,
+    "currentPriorEdges": 3748,
+    "notes": "0001 has no number-and-title narrative holder in the candidate decision files; title search is attached to the edge. Two extra 0000 basenames in dated checker/fix evidence preserve, two in the live candidate comparison park description-rewrite."
+  },
+  "PartB": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "072"
+    ],
+    "pendingBatches": [
+      "073",
+      "074",
+      "075",
+      "076",
+      "077",
+      "078",
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "stopReason": "Turn budget: stop after whole batch 072; do not claim 073–082 authored.",
+    "files": 25,
+    "inventoryEdges": 80,
+    "addedEdges": 0,
+    "edges": 80,
+    "patchedFiles": 11,
+    "dispositions": {
+      "preserve": 54,
+      "parked": 8,
+      "patch": 18
+    },
+    "parks": {
+      "lead-ruling": 3,
+      "phase9-carry": 1,
+      "description-rewrite": 4
+    },
+    "reviewAcceptance": "pending independent A51 review"
+  },
+  "checker": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-check.py",
+    "exitCode": 0,
+    "result": "step-03-wave4c-check-result.json",
+    "files": 502,
+    "edges": 3828,
+    "failureCount": 0,
+    "openLeadRulingEdgesBySet": {
+      "batch-072": [
+        {
+          "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "edgeId": "maps-j-04320"
+        },
+        {
+          "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+          "edgeId": "maps-j-04345"
+        },
+        {
+          "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "edgeId": "maps-j-04353"
+        }
+      ]
+    },
+    "notClosableSets": [
+      "batch-072"
+    ],
+    "retirementFiles": 125,
+    "retirementEdgesIncludingMixedWorkState": 1525,
+    "initialPartACheck": "step-03-wave4c-partA-check-result.json (0 failures)",
+    "firstCombinedCheck": "step-03-wave4c-attempt1-check-result.json (0 failures; predates final section-precision corrections)"
+  },
+  "probes": {
+    "inherited": 166,
+    "new": 8,
+    "total": 174,
+    "allRejected": true,
+    "replay": "step-03-wave4c-probe-replay.json",
+    "fixtureAdaptations": [
+      "Archived full runner/decision-citation-drift fixtures join the newly scanned deleted basenames with a truthful history exclusion or historical-format preserve.",
+      "Missing-note mutation moves from invalidated numeric-collision 01258 to actual title-matched Iron Law 04191.",
+      "Coverage-only mixed-retirement edges have no disposition or unit; positive fixture traversal skips that metadata, while all original mutation calls and expected checks remain."
+    ],
+    "failedAttemptsPreserved": [
+      "step-03-wave4c-attempt1-probe-replay.json",
+      "step-03-wave4c-attempt2-probe-replay.json"
+    ]
+  },
+  "lightTests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+    "exitCode": 0,
+    "pass": 95,
+    "fail": 0,
+    "skip": 0,
+    "log": "step-03-wave4c-light-tests.log"
+  },
+  "A51": [
+    {
+      "set": "batch-071",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 12,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-072",
+      "allFiles": 25,
+      "patchedPopulation": 11,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 7,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "review": {
+    "request": "step-03-wave4c-review-request.md",
+    "supersedes": "step-03-wave4b-review-request.md",
+    "wholeFiles": 16,
+    "edges": 112,
+    "parts": 4,
+    "allOutcomeChangedFilesIncluded": true,
+    "reviewersStarted": 0,
+    "accepted": 0
+  },
+  "protectedFilesUnchanged": 637,
+  "scope": {
+    "needsWrites": [],
+    "allRepositoryWritesInsideAssignedPlan": true,
+    "consumerEdits": false,
+    "productionCodeEdits": false,
+    "reproductionManifestEdits": false,
+    "fgosCLI": false,
+    "repositoryGitWrites": false,
+    "scratch": "/tmp/fgos-work/",
+    "heavyJobs": "Serial; at most one heavy job active.",
+    "outbox": "Required .tmp-then-rename exception only"
+  },
+  "limits": [
+    "Bounded batch stop after 072: 073–082 remain unauthored, no partial batch hidden.",
+    "Open lead-ruling edges block only batch-072 closure, not committing author records.",
+    "No full runtime/reproduction suite, semantic acceptance, committed-byte accounting or Phase 8 close claimed.",
+    "Lead owns actual runner-commit accounting in the two untouched reproduction manifests, independent review/acceptance and preview.",
+    "No fgOS CLI capability query or preview/service invocation under the explicit brief boundary.",
+    "Workflow/RUL10 bổ chú 3 and GAP-01/GAP-02 carry, Step 5 parity/decision-index row rewriting, Step 6 relocation and Phase 9 step-10 semantic-remnant/reading-map obligations remain."
+  ],
+  "artifactSha256": {
+    "step-03-check.py": "032f700aea38066df9273cff0abde34f2bceb1e79390d31d97c28b918df8bcc5",
+    "step-03-probes.py": "0715367a52e37f61c9bfd8b8622d35f9ede7c12d08e0f16b5040babf0f3714d5",
+    "step-03-wave4-probes.py": "96cefdf781ad926314c97d12bf38284a3fb1698be71fd5615260232b65d48568",
+    "step-03-wave4c-check.py": "a14a942971bb3bd50839813ed878d693ca3ca2768c683216f404de95cb8a1581",
+    "step-03-wave4c-probes.py": "e304ef5cc4da8ccd6d57a0cd72e47bc4b710597de6b4901552266362e7327511",
+    "step-03-wave4b-r2-changes.json": "17d13e31a85d174ae35eff853df825ec244e1f87614af12f7f0c9aa3c71b268e",
+    "step-03-wave4c-check-result.json": "f77f29afbc9d60a913fd0e3b363ca5fa0a1480dbeb0aeedccd15ec3be5ddf5e9",
+    "step-03-wave4c-manifest.json": "b4da60e7ee6778313f686b2e789fc98a7b79004c227f19d78b5dc6e9d67d5c6e",
+    "step-03-wave4c-binding-manifest.json": "2ca0a4fad3fcc7336696e5d51d775db634171a958f30782508106df0dde374b7",
+    "step-03-wave4c-review-index.json": "d796eeb2fe6e33f570cba155aef06a97d580991d04b747e4f58c220c0ebd144e",
+    "step-03-wave4c-review-request.md": "7931d892e2a7fd61d207248a9ec4ac6b27c834987f18c669dc32af2e20517bf9",
+    "step-03-records/batch-072.jsonl": "49bde96facf6b0ee1c1549eac38a508caece70c96c7d593cb6dcbe984b91d6fc"
+  }
+}

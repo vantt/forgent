@@ -5,6 +5,7 @@ No consumer edit, production resolver, or second anchor slugger is implemented h
 import sys
 sys.dont_write_bytecode=True
 import importlib.util
+import unicodedata
 import argparse, collections, difflib, functools, hashlib, json, math, os, pathlib, posixpath, re, subprocess, tempfile
 _spec=importlib.util.spec_from_file_location('step03_resolve',pathlib.Path(__file__).with_name('step-03-resolve.py'))
 resolver=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(resolver)
@@ -13,7 +14,7 @@ REL = pathlib.Path('plans/260925-documentation-authority-unification/reports/pha
 INVENTORY = '1a0f61ac53433292e08fb378ebbb6c1c72fd3b74'
 SETS = ('001', '002', '040', '041')
 FIELDS = {'file','inventoryInputCommit','authorInputCommit','inventoryFileDigest','digest','inventoryEdgeIds','diff','edges','checks','reviewSet','authoringRules'}
-CATEGORIES = {'step5-parity','phase9-carry','description-rewrite','dead-link','GAP-01','GAP-02','GAP-03','workflow-carry'}
+CATEGORIES = {'step5-parity','phase9-carry','description-rewrite','dead-link','GAP-01','GAP-02','GAP-03','workflow-carry','lead-ruling'}
 HIT_CATEGORIES = {'citation-only','carriage','partial-holder','unrelated','dead'}
 EDGE_FIELDS = {'blockedCategory','dependencyCategory','edgeId','sourceSpans','matchedExpression','disposition','diffHunk','reason','target','anchor','timing','blockedReason','dependency'}
 ENV = dict(os.environ); ENV.pop('CLAUDE_CODE_SESSION_ID', None)
@@ -49,7 +50,7 @@ def selected(rs,commit,batch):
             'sample':sample,'mandatoryWitnesses':witnesses,'selected':sorted(set(sample)|{w['file'] for w in witnesses}),
             'distinctReviewCount':len(set(sample)|{w['file'] for w in witnesses}),
             'pilotFullReviewFiles':sorted(r['file'] for r in group),
-            'dispositions':dict(collections.Counter(e['disposition'] for r in group for e in r['edges']))}
+            'dispositions':dict(collections.Counter(e.get('disposition') for r in group for e in r['edges']))}
 
 def spans_text(text,spans):
     ls=text.splitlines(); pieces=[]
@@ -346,7 +347,8 @@ def scan_candidates(commit,file,inventory_spans):
     full=r'(?<![\w/-])(?:repo/)?docs/(?:specs|architect|how-to|explanation|decisions|history|reference|tutorials|distillery)(?=/|[\s`),;]|$)(?:/[^\s`<>"\]\[),;|}]*)?'
     bare=r'(?<![\w/-])(?:'+'|'.join(re.escape(n) for n in names)+r')(?::\d+(?:[-–]\d+)?)?(?![\w.-])'
     partial=r'(?<![\w/-])(?:\.\./)?(?:specs|architect)/[^\s`<>"\]\[),;|}]+\.md(?::\d+(?:[-–]\d+)?)?(?:#[^\s`<>"\]\[),;|}]+)?'
-    pattern=re.compile(full+'|'+partial+'|'+bare)
+    decision_basename=r'(?<![\w/.-])00\d{2}-[\w-]+\.md(?![\w.-])'
+    pattern=re.compile(full+'|'+partial+'|'+bare+'|'+decision_basename)
     result=[]
     tree_set=set(tree);dirs={p[:i] for p in tree for i,c in enumerate(p) if c=='/'}
     body=blob(commit,file).decode();roots=reference_roots(file,body)
@@ -396,7 +398,7 @@ def history_at(text,line,target=''):
         if h:
             lev=len(h[1]);stack=[x for x in stack if x[0]<lev];stack.append((lev,h[2]));framed=False
         if re.search(r'retained verbatim.*(?:non.authority history|not navigation)',l,re.I):framed=True
-    return framed or any(re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained|added in candidate.*source carriage',h,re.I) for _,h in stack)
+    return framed or any(re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained|added in candidate.*source carriage|^document history\b',h,re.I) for _,h in stack)
 
 def history_scope(file, text, line):
     """L12-38: dated file classes and actual verbatim regions, not author labels."""
@@ -420,7 +422,7 @@ def decision_narrative_holders(commit, number):
         headings=heading_sections(commit,path)
         for h in headings:
             if h['level']==3 and re.match(re.escape(number)+r'\b',h['sample']):
-                if re.match(number+r' (?:Context|Decision|Consequences)$',h['sample']):
+                if any(parent['level']==2 and re.search(r'\bADR '+number+r'\b',parent['sample']) and parent['startLine']<h['startLine']<=parent['sectionEndLine'] for parent in headings):
                     h=next((parent for parent in reversed(headings) if parent['level']==2 and parent['startLine']<h['startLine']<=parent['sectionEndLine']),h)
                 holders.append(path+'#'+h['anchor'])
     return tuple(dict.fromkeys(holders))
@@ -440,7 +442,34 @@ def removed_decision_holders(commit, edge, legacy):
     removed=any(f['state']=='removed' and f['path'].startswith('docs/decisions/'+match[1]) for f in edge.get('targetFacts',[]))
     if not removed:
         removed=any(len(row)>1 and row[0]=='D' and row[1].startswith('docs/decisions/'+match[1]) for rev in path_history(commit,legacy.split('#')[0]) for row in commit_changes(rev))
-    return decision_narrative_holders(commit,match[1]) if removed else ()
+    if not removed:return ()
+    holders=decision_narrative_holders(commit,match[1])
+    # Collisions include legacy narratives without a promoted holder (0035).
+    # Compare the actual source title/filename, never choose all number hits.
+    titles=[]
+    for path in git('ls-tree','-r','--name-only',commit,'--','docs/specs').decode().splitlines():
+        if not path.endswith('.md'):continue
+        titles.extend(h['sample'] for h in heading_sections(commit,path) if re.match(match[1]+r'\b',h['sample']))
+    def words(value):
+        value=unicodedata.normalize('NFKD',value.replace('đ','d').replace('Đ','D')).encode('ascii','ignore').decode().lower()
+        return re.findall(r'[a-z]+',value)
+    def title(holder):
+        path,anchor=holder.split('#',1)
+        return next(h['sample'] for h in heading_sections(commit,path) if h['anchor']==anchor)
+    # Split numbered ADR sections collapse before testing distinct narratives.
+    candidate_titles=[title(h) for h in holders]
+    if len(holders)<=1 and not any(' — ' in t and words(t)!=words(candidate_titles[0] if candidate_titles else '') for t in titles):return holders
+    source=edge['matchedExpression']+' '+legacy
+    inv=next((e for e in census()['entries'] if e['edgeId']==edge['edgeId']),None)
+    if inv:source+=' '+adjacent_passage(blob(commit,inv['consumerPath']).decode(),edge['sourceSpans'])
+    sw=words(source);kept=[]
+    for holder in holders:
+        tw=words(title(holder))
+        # Strip section/ADR prefixes and retain the heading's distinguishing title.
+        if tw[:1]==['adr']:tw=tw[1:]
+        prefix=tw[:min(4,len(tw))]
+        if prefix and any(sw[i:i+len(prefix)]==prefix for i in range(len(sw))):kept.append(holder)
+    return tuple(kept)
 
 def make_diff(file,before,after):
     return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+file,tofile='b/'+file,n=3)) if before!=after else ''
@@ -460,6 +489,7 @@ def adjacent_passage(text,spans):
 def blocker_category(prose):
     if not prose:return None
     p=prose.lower()
+    if 'lead-ruling' in p or 'lead ruling' in p:return 'lead-ruling'
     if 'description' in p and ('rewrite' in p or 'rewrit' in p):return 'description-rewrite'
     if 'step 5' in p:return 'step5-parity'
     gap=re.search(r'GAP-0[123]',prose,re.I)
@@ -540,7 +570,7 @@ class Checker:
     def renamed_alias_holders(self,r,e):
         """L12-37(2): missing preserved navigation with a committed live alias."""
         f=r['file'];body=blob(self.commit,f).decode()
-        if e['disposition']!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f):return []
+        if e.get('disposition')!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f):return []
         if '/history/' in f or f.startswith('docs/journals/') or re.search(r'^Document type:\s*History|Superseded / implementation history only',body[:7000],re.M|re.I):return []
         inv=self.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})
         path=re.sub(r':\d+(?:[-–]\d+)?$','',path_identity(inv['normalizedReference'].removeprefix('repo/')))
@@ -560,7 +590,7 @@ class Checker:
         def check(name,fn):
             try: assert fn() is not False
             except (AssertionError,KeyError,ValueError,IndexError,TypeError,StopIteration,subprocess.CalledProcessError) as ex: failures.append({'file':r.get('file'),'check':name,'detail':str(ex)[:300]})
-        check('schema',lambda: set(r)==FIELDS and all(EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts','unitId','unitDispositionReason'} for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
+        check('schema',lambda: set(r)==FIELDS and all((set(e)=={'edgeId','sourceSpans','matchedExpression','retiresWithTree','reason'}|({'authorAddedEdge'} if e.get('authorAddedEdge') else set()) if e.get('retiresWithTree') else EDGE_FIELDS<=set(e)<=EDGE_FIELDS|{'searchWitness','authorAddedEdge','targetFacts','unitId','unitDispositionReason'}) for e in r['edges']) and isinstance(r['diff'],str) and all(isinstance(r['checks'][k],dict) for k in ['coverage','anchors','relativeResolution','labelForm']))
         f=r['file']; before=blob(self.commit,f).decode(); old=blob(INVENTORY,f).decode()
         check('digest',lambda:r['authorInputCommit']==self.commit and r['inventoryInputCommit']==INVENTORY and r['digest']==sha(before) and r['inventoryFileDigest']==sha(old)==self.files[f]['sha256'])
         expected=self.files[f]['edgeIds'];actual=[e['edgeId'] for e in r['edges'] if not e.get('authorAddedEdge')]
@@ -622,16 +652,17 @@ class Checker:
         def units():
             groups=collections.defaultdict(list)
             for e in r['edges']:
+                if e.get('retiresWithTree'):continue
                 expected_unit=unit_id(before,e['sourceSpans'])
                 # Complete real records carry unitId; synthetic unit fixtures also
                 # bind it explicitly. No ordinal or edge-id unit escape.
                 # unitId is advisory: grouping uses source bytes only.
                 groups[expected_unit].append(e)
             for edges in groups.values():
-                if len({e['disposition'] for e in edges})>1:
+                if len({e.get('disposition') for e in edges})>1:
                     assert all(isinstance(e.get('unitDispositionReason'),str) and e['edgeId'] in e['unitDispositionReason'] and e['matchedExpression'] in e['unitDispositionReason'] and 'Distinct claim:' in e['unitDispositionReason'] and e['unitDispositionReason'].split('Distinct claim:',1)[1].strip() for e in edges), 'mixed computed unit lacks a source-bound per-edge distinct-claim reason'
                 if edges and unit_id(before,edges[0]['sourceSpans']).startswith('canonical-'):
-                    assert all(e['disposition']=='phase9-row-flip' for e in edges)
+                    assert all(e.get('disposition')=='phase9-row-flip' for e in edges)
         check('unit-consistency',units)
         def status_prose():
             expected=[];lines=before.splitlines()
@@ -656,14 +687,15 @@ class Checker:
                 inv={'consumerPath':f,'physicalSpans':e['sourceSpans'],'matchedExpression':e['matchedExpression'],
                      'normalizedReference':e['authorAddedEdge']['normalizedReference'],'locatorTokens':[]}
             if not inv: continue
-            check('related-retiring-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
+            check('related-retiring-preserve',lambda e=e,inv=inv:not (e.get('disposition')=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
             check('renamed-alias-preserve',lambda e=e:not self.renamed_alias_holders(r,e))
-            check('live-decision-citation-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and live_decision_citation(f,before,e,inv['normalizedReference'].split('#')[0])))
+            check('live-decision-citation-preserve',lambda e=e,inv=inv:not (e.get('disposition')=='preserve' and live_decision_citation(f,before,e,inv['normalizedReference'].split('#')[0])))
             def narrative_successor(e=e,inv=inv):
-                if e['disposition']!='preserve':return
+                if e.get('disposition')!='preserve':return
                 wanted=removed_decision_holders(self.commit,e,inv['normalizedReference'])
                 notes=[note.rstrip('.') for note in successor_notes(e['reason'])]
-                assert all(holder in notes for holder in wanted), 'removed decision missing computed narrative-holder successor: '+repr(wanted)
+                all_numeric=decision_narrative_holders(self.commit,re.search(r'/decisions/(\d{4})',inv['normalizedReference'])[1]) if re.search(r'/decisions/(\d{4})',inv['normalizedReference']) else ()
+                assert all(holder in notes for holder in wanted) and not any(note in all_numeric and note not in wanted for note in notes), 'removed decision missing computed narrative-holder successor: '+repr(wanted)
             check('removed-decision-narrative-successor',narrative_successor)
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def carriage_facts(e=e):
@@ -692,23 +724,30 @@ class Checker:
                     assert j['inventoryExpression']==inv['matchedExpression'] and j['authorExpression']==e['matchedExpression'] and j['correspondenceReason']
                     assert j['inventoryContext'] in old and j['authorContext'] in before
             check('passage-correspondence',correspondence)
-            check('disposition',lambda e=e:e['disposition'] in ['patch','preserve','parked','phase9-row-flip'] and bool(e['reason']) and bool(re.search(r'L12-|A51|Step [345]',e['reason'])))
-            check('reason-anchor-consistency',lambda e=e:all(a==e['anchor'] for a in re.findall(r'#([^\s`;,).]+)',e['reason'])) if e['disposition']=='patch' else True)
+            if f=='docs/specs/work-state.md':
+                carried=bool(re.search(r'\bRUL10\b',adjacent_passage(before,e['sourceSpans'])))
+                check('work-state-carried-passage',lambda e=e:bool(e.get('retiresWithTree')) != carried)
+                if e.get('retiresWithTree'):
+                    check('retiring-edge-no-patch',lambda e=e:set(e)=={'edgeId','sourceSpans','matchedExpression','retiresWithTree','reason'}|({'authorAddedEdge'} if e.get('authorAddedEdge') else set()) and e['retiresWithTree'] is True and bool(e['reason']))
+                    continue
+            else:check('per-edge-retirement-eligibility',lambda e=e:not e.get('retiresWithTree'))
+            check('disposition',lambda e=e:e.get('disposition') in ['patch','preserve','parked','phase9-row-flip'] and bool(e['reason']) and bool(re.search(r'L12-|A51|Step [345]',e['reason'])))
+            check('reason-anchor-consistency',lambda e=e:all(a==e['anchor'] for a in re.findall(r'#([^\s`;,).]+)',e['reason'])) if e.get('disposition')=='patch' else True)
             check('reason-target-history',lambda e=e,inv=inv:factual_reason(self.commit,e,inv['normalizedReference'].split('#')[0]))
             def categories(e=e):
                 a=e.get('blockedCategory');b=e.get('dependencyCategory')
-                assert a==b and (a in CATEGORIES if e['disposition']=='parked' else a is None)
+                assert a==b and (a in CATEGORIES if e.get('disposition')=='parked' else a is None)
                 if a:
                     assert (not e['blockedReason'] or blocker_category(e['blockedReason'])==a) and (not e['dependency'] or blocker_category(e['dependency'])==b)
             check('dependency-category',categories)
-            if e['disposition']=='parked':check('parked-state',lambda e=e:e.get('blockedCategory') in CATEGORIES and e.get('dependencyCategory') in CATEGORIES and all(e[k] is None or isinstance(e[k],str) for k in ('blockedReason','dependency')) and e['timing']=='none' and e['diffHunk'] is None and e['target'] is None)
+            if e.get('disposition')=='parked':check('parked-state',lambda e=e:e.get('blockedCategory') in CATEGORIES and e.get('dependencyCategory') in CATEGORIES and all(e[k] is None or isinstance(e[k],str) for k in ('blockedReason','dependency')) and e['timing']=='none' and e['diffHunk'] is None and e['target'] is None)
             source_passage=resolver.passage(before,e['sourceSpans'])
-            if e['disposition']=='parked':
+            if e.get('disposition')=='parked':
                 # Explicit semantic/parity parks also replay a search; absence claims cannot escape
                 # the check by changing one wording of 'missing target'.
                 check('park-search-witness',lambda e=e: verify_witness(e['searchWitness'],self.commit,inv['normalizedReference'].split('#')[0],source_passage))
-            if e['disposition']=='phase9-row-flip':check('row-semantics',lambda e=e:e['timing']=='Phase 9' and e['diffHunk'] is None and e['target'] is None and 'row' in e['reason'].lower() and bool(e['dependency']))
-            if e['disposition']=='preserve':
+            if e.get('disposition')=='phase9-row-flip':check('row-semantics',lambda e=e:e['timing']=='Phase 9' and e['diffHunk'] is None and e['target'] is None and 'row' in e['reason'].lower() and bool(e['dependency']))
+            if e.get('disposition')=='preserve':
                 check('preserve-state',lambda e=e:e['timing']=='none' and e['diffHunk'] is None)
                 check('retiring-preserve-wording',lambda e=e,inv=inv:not (inv['normalizedReference'].startswith(('docs/specs/','docs/architect/')) and re.search(r'\bretained\b',e['reason'].replace((carriage_declaration(before,e['sourceSpans'][0]['line']) or (0,''))[1],''),re.I)))
             witness=e.get('searchWitness') or r['checks']['coverage'].get('resolutionSearches',{}).get(eid)
@@ -718,7 +757,7 @@ class Checker:
             if e['target']:
                 check('target-tree',lambda e=e:e['target'] in self.tree|self.dirs)
                 check('alias-destination',lambda e=e:not e['target'].startswith(('alias:','lookup:')) and e['target'] not in self.aliases and not e['target'].startswith(('docs/specs/','docs/architect/')))
-            if e['disposition']!='patch':continue
+            if e.get('disposition')!='patch':continue
             h=e['diffHunk'];used_hunks.add(h)
             check('hunk-binding',lambda h=h:h in [x.splitlines()[0] for x in hunks(r['diff'])])
             check('authority-timing',lambda e=e:e['timing'] in ['now','Phase 9'] and (not f.startswith(('docs/specs/','docs/architect/')) or e['timing']=='Phase 9') and r['checks']['relativeResolution'][e['edgeId']]['authorityStatus']==('current-switchboard' if e['timing']=='now' else 'cutover-patch-only'))
@@ -829,7 +868,7 @@ class Checker:
         for r in rs:
             source=blob(self.commit,r['file']).decode()
             for e in r['edges']:
-                if e['disposition']!='patch' or e['target'] not in self.tree:continue
+                if e.get('disposition')!='patch' or e['target'] not in self.tree:continue
                 proof=r['checks']['anchors'].get(e['edgeId'],{})
                 terms=resolver.tokens(resolver.passage(source,e['sourceSpans']))
                 passage=proof.get('passage',blob(self.commit,e['target']).decode())
@@ -837,13 +876,13 @@ class Checker:
                     review.append({'file':r['file'],'edgeId':e['edgeId'],'check':'patch-locator-review',
                                    'locatorTokens':terms,'reason':'No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.',
                                    'recordedScopeReason':proof.get('locatorScopeReason'),'correspondence':proof.get('locatorCorrespondence')})
-        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(edge_count(r) for r in rs),'failures':fail,'failureCount':len(fail),'locatorReviewFlags':review}
+        return {'authorCommit':self.commit,'files':len(rs),'edges':sum(edge_count(r) for r in rs),'failures':fail,'failureCount':len(fail),'locatorReviewFlags':review,'openLeadRulingEdgesBySet':{b:[{'file':r['file'],'edgeId':e['edgeId']} for r in rs if r['reviewSet']==b for e in r['edges'] if e.get('blockedCategory')=='lead-ruling'] for b in sorted({r['reviewSet'] for r in rs}) if any(e.get('blockedCategory')=='lead-ruling' for r in rs if r['reviewSet']==b for e in r['edges'])},'notClosableSets':sorted({r['reviewSet'] for r in rs for e in r['edges'] if e.get('blockedCategory')=='lead-ruling'})}
 
 def manifest_view(rs,commit):
     files=[]
     for r in rs:
         data=(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n').encode()
-        files.append({'file':r['file'],'set':r['reviewSet'],'sourceBytes':len(blob(commit,r['file'])),'digest':r['digest'],'inventoryFileDigest':r['inventoryFileDigest'],'diffSha256':sha(r['diff']),'recordSha256':sha(data),'recordBytes':len(data),'retiresWithTree':bool(r.get('retiresWithTree')),'edgeCount':edge_count(r),'dispositions':dict(collections.Counter(e['disposition'] for e in r['edges']))})
+        files.append({'file':r['file'],'set':r['reviewSet'],'sourceBytes':len(blob(commit,r['file'])),'digest':r['digest'],'inventoryFileDigest':r['inventoryFileDigest'],'diffSha256':sha(r['diff']),'recordSha256':sha(data),'recordBytes':len(data),'retiresWithTree':bool(r.get('retiresWithTree')),'edgeCount':edge_count(r),'dispositions':dict(collections.Counter(e.get('disposition') for e in r['edges']))})
     return {'authorInputCommit':commit,'inventoryInputCommit':INVENTORY,'files':files,'sets':[selected(rs,commit,b) for b in SETS]}
 
 def verify_manifest(rs,commit,manifest):

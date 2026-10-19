@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 39, in <module>
+    if __name__=='__main__':print(json.dumps(main(),ensure_ascii=False,indent=2))
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 22, in main
+    probe('L12-38(3) computed narrative successor cannot be omitted',record('maps-j-01258'),remove_note,'removed-decision-narrative-successor')
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 15, in probe
+    r=copy.deepcopy(original);mutate(r);names=sorted({x['check'] for x in c.check_record(r,apply=False)});assert expected in names,(name,names)
+AssertionError: ('L12-38(3) computed narrative successor cannot be omitted', [])

@@ -1,0 +1,142 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 11,
+  "allRejected": true,
+  "probes": [
+    {
+      "edgeId": "maps-j-03951",
+      "mutation": "restore original renamed-target preserve including quoted QA case",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-04520",
+      "mutation": "restore original renamed-target preserve including quoted QA case",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-04835",
+      "mutation": "restore original renamed-target preserve including quoted QA case",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-08367",
+      "mutation": "restore original renamed-target preserve including quoted QA case",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "author-added-search-coverage",
+        "digest",
+        "passage-correspondence",
+        "renamed-alias-preserve",
+        "source-span",
+        "work-state-carried-passage"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-08368",
+      "mutation": "restore original renamed-target preserve including quoted QA case",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "author-added-search-coverage",
+        "digest",
+        "passage-correspondence",
+        "renamed-alias-preserve",
+        "source-span",
+        "work-state-carried-passage"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-03951",
+      "mutation": "drop wrapped continuation span",
+      "expected": "passage-correspondence",
+      "observed": [
+        "description-truth-record",
+        "diff-correspondence",
+        "passage-correspondence",
+        "source-span"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-03951",
+      "mutation": "duplicate a wrapped continuation span",
+      "expected": "complete-unit",
+      "observed": [
+        "complete-unit",
+        "diff-correspondence",
+        "overlap",
+        "passage-correspondence",
+        "source-span"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-04520",
+      "mutation": "reason cannot waive renamed alias",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-04520",
+      "mutation": "unit cannot waive renamed alias",
+      "expected": "renamed-alias-preserve",
+      "observed": [
+        "diff-correspondence",
+        "orphan-hunk",
+        "renamed-alias-preserve"
+      ],
+      "rejected": true
+    },
+    {
+      "edgeId": "probe-alias-line",
+      "mutation": "repo-prefixed path:line cannot evade alias lookup",
+      "expected": "renamed-alias-preserve",
+      "rejected": true
+    },
+    {
+      "edgeId": "maps-j-03996",
+      "mutation": "extractor slug substituted for Markdown GitHub slug",
+      "expected": "anchor-from-evidence",
+      "observed": [
+        "anchor-carriage-locator",
+        "anchor-from-evidence",
+        "label-form"
+      ],
+      "rejected": true
+    }
+  ],
+  "positiveControls": [
+    "current alias patches accepted",
+    "missing path without registered alias not rejected by this rule",
+    "history file alias spelling exempt",
+    "actual declared carriage alias spelling exempt",
+    "wrapped replacement conserves every destination character and both source spans",
+    "body Related recognized independent of front-matter header"
+  ],
+  "historyFixtureAdaptation": "08367/08368 real historical preserves are valid under L12-38(4); inherited alias-negative mutations still run on a source fixture without the actual history declaration. No checker predicate disabled.",
+  "limits": "Independent target/description semantic review remains pending."
+}

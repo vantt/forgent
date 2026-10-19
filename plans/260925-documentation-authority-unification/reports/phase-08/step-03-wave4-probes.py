@@ -17,9 +17,11 @@ def main():
  def restore_live(r):
   e=next(e for e in r['edges'] if e['edgeId']=='maps-j-04514');e.update(disposition='preserve',target=None,anchor=None,timing='none',diffHunk=None,reason='L12-38: historical label cannot override live file class')
  probe('L12-38(1) undated decision citation in knowledge cannot preserve',record('maps-j-04514'),restore_live,'live-decision-citation-preserve')
+ # L12-39 removes the old 0035 numeric-collision note at 01258.
+ # Keep the missing-successor mutation on the real title-matched Iron Law holder.
  def remove_note(r):
-  e=next(e for e in r['edges'] if e['edgeId']=='maps-j-01258');e['reason']=re.sub(r' Non-executable successor note: [^\s]+','',e['reason'])
- probe('L12-38(3) computed narrative successor cannot be omitted',record('maps-j-01258'),remove_note,'removed-decision-narrative-successor')
+  e=next(e for e in r['edges'] if e['edgeId']=='maps-j-04191');e['reason']=re.sub(r' Non-executable successor note: [^\s]+','',e['reason'])
+ probe('L12-38(3) computed narrative successor cannot be omitted',record('maps-j-04191'),remove_note,'removed-decision-narrative-successor')
  r=record('maps-j-03751')
  def false_exclusion(rr):
   x=next(x for x in rr['checks']['coverage']['legacyScan']['candidates'] if x['span']['line']==32);assert not x.get('edgeId');x['excludedReason']='An unrelated same-name file; not a legacy reference.'

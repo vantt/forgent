@@ -45,12 +45,12 @@ def main():
         if changed:
             edits=[]
             for e in r['edges']:
-                if e['disposition']=='patch':edits+=m.replacement_changes(body,e['sourceSpans'],r['checks']['relativeResolution'][e['edgeId']]['replacement'])
+                if e.get('disposition')=='patch':edits+=m.replacement_changes(body,e['sourceSpans'],r['checks']['relativeResolution'][e['edgeId']]['replacement'])
             after=body
             for start,end,new in sorted(set(edits),reverse=True):after=after[:start]+new+after[end:]
             r['diff']=m.make_diff(r['file'],body,after)
             for e in r['edges']:
-                if e['disposition']=='patch':
+                if e.get('disposition')=='patch':
                     hs=[h for h in m.hunks(r['diff']) if any('-'+body.splitlines()[span['line']-1] in h.splitlines() for span in e['sourceSpans'])]
                     assert len(hs)==1;e['diffHunk']=hs[0].splitlines()[0]
     assert not fixture_migrations # L12-38 exempts all five former alias preserves in the actual retired-decision region
@@ -58,7 +58,7 @@ def main():
     for r in rs:
         body=m.blob(a.author_commit,r['file']).decode();changed=False
         for e in r['edges']:
-            if e['disposition']!='patch' or not m.history_at(body,e['sourceSpans'][0]['line'],r['file']):continue
+            if e.get('disposition')!='patch' or not m.history_at(body,e['sourceSpans'][0]['line'],r['file']):continue
             target=e['target'];anchor=e['anchor'];legacy=(c.entries.get(e['edgeId']) or e.get('authorAddedEdge',{}))['normalizedReference'].split('#')[0]
             state=fixture_author.facts(e,legacy)
             e.update(disposition='preserve',target=None,anchor=None,timing='none',diffHunk=None,reason='L12-38: preserve the actual retired-decision source region. '+state+' Non-executable successor note: '+target+('#'+anchor if anchor else '')+'.')
@@ -66,16 +66,17 @@ def main():
         if changed:
             edits=[]
             for e in r['edges']:
-                if e['disposition']=='patch':edits+=m.replacement_changes(body,e['sourceSpans'],r['checks']['relativeResolution'][e['edgeId']]['replacement'])
+                if e.get('disposition')=='patch':edits+=m.replacement_changes(body,e['sourceSpans'],r['checks']['relativeResolution'][e['edgeId']]['replacement'])
             after=body
             for start,end,new in sorted(set(edits),reverse=True):after=after[:start]+new+after[end:]
             r['diff']=m.make_diff(r['file'],body,after)
             for e in r['edges']:
-                if e['disposition']=='patch':
+                if e.get('disposition')=='patch':
                     hs=[h for h in m.hunks(r['diff']) if any('-'+body.splitlines()[span['line']-1] in h.splitlines() for span in e['sourceSpans'])];assert len(hs)==1;e['diffHunk']=hs[0].splitlines()[0]
     for r in rs:
         before=m.blob(a.author_commit,r['file']).decode()
         for e in r['edges']:
+            if e.get('retiresWithTree'):continue # L12-39: coverage-only edges have no disposition/unit.
             e['unitId']=m.unit_id(before,e['sourceSpans'])
             e['unitDispositionReason']=e['edgeId']+' ['+e['matchedExpression']+'] Distinct claim: Historical positive-fixture source role: '+e['reason']
             declaration=m.carriage_declaration(before,e['sourceSpans'][0]['line'])
@@ -92,25 +93,46 @@ def main():
             exemption=m.coverage_exemption(r['file'],body,item['span'])
             if exemption and not item.get('edgeId'):item['excludedReason']=exemption
         for e in r['edges']:
-            if e['disposition']!='preserve':continue
+            if e.get('disposition')!='preserve':continue
             legacy=(c.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})).get('normalizedReference','')
             for holder in m.removed_decision_holders(a.author_commit,e,legacy):
                 if holder not in [n.rstrip('.') for n in m.successor_notes(e['reason'])]:
                     e['reason']+=' Non-executable successor note: '+holder+'.'
                     fixture_narratives.append({'file':r['file'],'edgeId':e['edgeId'],'holder':holder})
+    # L12-39 expands the scanner even for the archived full-record fixtures.
+    # Keep their complete bytes, add true retired-format evidence/exclusions;
+    # every old mutation and expected rejection below remains unchanged.
+    for r in rs:
+        body=m.blob(a.author_commit,r['file']).decode();cov=r['checks']['coverage']
+        old={tuple(x['span'].values()):x for x in cov.get('legacyScan',{}).get('candidates',[])}
+        candidates=[]
+        for span in m.scan_candidates(a.author_commit,r['file'],[s for key in r['inventoryEdgeIds'] for s in c.entries[key]['physicalSpans']]):
+            item=old.get(tuple(span.values()))
+            if item is None:
+                exempt=m.coverage_exemption(r['file'],body,span)
+                if exempt:item={'span':span,'excludedReason':exempt}
+                else:
+                    assert r['file']=='docs/specs/decision-citation-drift.md' and span['text']=='0000-index.md'
+                    key='fixture-l12-39-deleted-index';legacy='docs/decisions/0000-index.md'
+                    e={k:None for k in m.EDGE_FIELDS}
+                    e.update(edgeId=key,sourceSpans=[span],matchedExpression=span['text'],disposition='preserve',timing='none',reason='L12-39: preserve the explicitly retired pointer-pair format, framed “Retired against the real repo”, not a current read instruction. '+fixture_author.facts(e,legacy),unitId=m.unit_id(body,[span]),authorAddedEdge={'normalizedReference':legacy,'discoveryReason':'L12-39 archived positive-fixture scanner migration','searchMethod':'scan_candidates'})
+                    e['unitDispositionReason']=key+' '+span['text']+' Distinct claim: retired pointer-pair format cited as historical evidence; sibling current checker pointers keep their own role.'
+                    r['edges'].append(e);cov['authorAddedEdgeIds'].append(key);item={'span':span,'edgeId':key}
+            candidates.append(item)
+        if 'legacyScan' in cov:cov['legacyScan']['candidates']=candidates
     baseline=c.all(rs);assert not baseline['failures'],baseline
     patch=next(r for r in rs if r['file']=='docs/routing-handoff-contract.md')
     plain=next(r for r in rs if r['file']=='README.md')
-    parked=next(r for r in rs if any(e['disposition']=='parked' for e in r['edges']))
-    row=next(r for r in rs if any(e['disposition']=='phase9-row-flip' for e in r['edges']))
+    parked=next(r for r in rs if any(e.get('disposition')=='parked' for e in r['edges']))
+    row=next(r for r in rs if any(e.get('disposition')=='phase9-row-flip' for e in r['edges']))
     checks=[]
     def probe(name,source,mutate,expected):
         r=copy.deepcopy(source);mutate(r);fail=c.check_record(r);names={x['check'] for x in fail}
         assert expected in names,(name,expected,names)
         checks.append({'surfaceClass':3,'probe':name,'expectedCheck':expected,'rejected':True,'observedChecks':sorted(names)})
-    def pe(r):return next(e for e in r['edges'] if e['disposition']=='patch')
-    def parked_e(r):return next(e for e in r['edges'] if e['disposition']=='parked')
-    def row_e(r):return next(e for e in r['edges'] if e['disposition']=='phase9-row-flip')
+    def pe(r):return next(e for e in r['edges'] if e.get('disposition')=='patch')
+    def parked_e(r):return next(e for e in r['edges'] if e.get('disposition')=='parked')
+    def row_e(r):return next(e for e in r['edges'] if e.get('disposition')=='phase9-row-flip')
     probe('unknown record field',plain,lambda r:r.update(extra=True),'schema')
     probe('wrong author digest',plain,lambda r:r.update(digest='0'*64),'digest')
     probe('wrong declared commit',plain,lambda r:r.update(authorInputCommit='0'*40),'digest')
@@ -157,7 +179,7 @@ def main():
         e=pe(r);e['sourceSpans'].append(copy.deepcopy(e['sourceSpans'][0]))
     probe('partial or duplicated physical link spans',patch,split_unit,'complete-unit')
     def overlap(r):
-        es=[e for e in r['edges'] if e['disposition']=='patch'];es[1]['sourceSpans']=copy.deepcopy(es[0]['sourceSpans']);es[1]['sourceSpans'][0]['columnStart']+=1
+        es=[e for e in r['edges'] if e.get('disposition')=='patch'];es[1]['sourceSpans']=copy.deepcopy(es[0]['sourceSpans']);es[1]['sourceSpans'][0]['columnStart']+=1
     probe('overlapping distinct replacements',patch,overlap,'overlap')
     # L12-30: deliberately wrong complete records, after real records pass.
     witnessed=next(r for r in rs if any(e.get('searchWitness') for e in r['edges']))
@@ -182,16 +204,16 @@ def main():
         r['checks']['anchors'][e['edgeId']]={'targetCommit':a.author_commit,'targetDigest':m.sha(m.blob(a.author_commit,e['target']))}
     probe('whole-file source snapshot used as live target',patch,snapshot_target,'anchor-carriage-locator')
     # L12-31: all original probes above/below remain; each new rule is mutated independently.
-    anchored=next(r for r in rs if any(e['disposition']=='patch' and r['checks']['anchors'][e['edgeId']].get('sourceLocatorTokens')==['RUL53'] for e in r['edges']))
+    anchored=next(r for r in rs if any(e.get('disposition')=='patch' and r['checks']['anchors'][e['edgeId']].get('sourceLocatorTokens')==['RUL53'] for e in r['edges']))
     def h1_instead_of_holder(r):
         e=next(e for e in r['edges'] if r['checks']['anchors'].get(e['edgeId'],{}).get('sourceLocatorTokens')==['RUL53'])
         h=next(h for h in m.heading_sections(a.author_commit,e['target']) if h['level']==1)
         e['anchor']=h['githubSlug'] if e['matchedExpression'].startswith(('[','![')) else h['anchor']
         r['checks']['anchors'][e['edgeId']]['passage']=h['body']
     probe('H1 anchor hides narrower rule holder',anchored,h1_instead_of_holder,'anchor-precision')
-    retiring=next(r for r in rs if any(e['disposition']=='preserve' and e['matchedExpression'].startswith('docs/specs/') for e in r['edges']))
+    retiring=next(r for r in rs if any(e.get('disposition')=='preserve' and e['matchedExpression'].startswith('docs/specs/') for e in r['edges']))
     def retained_word(r):
-        e=next(e for e in r['edges'] if e['disposition']=='preserve' and e['matchedExpression'].startswith('docs/specs/'))
+        e=next(e for e in r['edges'] if e.get('disposition')=='preserve' and e['matchedExpression'].startswith('docs/specs/'))
         e['reason']='L12-31: retained path exists at author pin'
     probe('retiring-tree preserve falsely says retained',retiring,retained_word,'retiring-preserve-wording')
     added=next(r for r in rs if any(e.get('authorAddedEdge') for e in r['edges']))
@@ -213,7 +235,7 @@ def main():
     probe('identical live assessments for all hit groups',many,boilerplate,'distinct-hit-assessments')
     # L12-32: each new mechanical rule rejects an independently wrong complete record.
     probe('reason names a different anchor',patch,lambda r:pe(r).update(reason='L12-32: docs/platform/work-state/spec.md#false-anchor'),'reason-anchor-consistency')
-    exists=next(r for r in rs if any(e['disposition']=='preserve' and e['matchedExpression']=='docs/backlog.md' for e in r['edges']))
+    exists=next(r for r in rs if any(e.get('disposition')=='preserve' and e['matchedExpression']=='docs/backlog.md' for e in r['edges']))
     def false_never(r):
         e=next(e for e in r['edges'] if e['matchedExpression']=='docs/backlog.md');e['reason']='L12-32: target never existed in git history';e['targetFacts']=[{'state':'never-existed','path':'docs/backlog.md'}]
     probe('never existed contradicts Git ancestry',exists,false_never,'reason-target-history')
@@ -237,7 +259,7 @@ def main():
         e=next(e for e in r['edges'] if e['anchor']);e['anchor']=None
     probe('null anchor with target line evidence',patch,null_line,'anchor-from-evidence')
     def unjustified_whole(r):
-        e=next(e for e in r['edges'] if not e['anchor'] and e['disposition']=='patch');r['checks']['anchors'][e['edgeId']].pop('wholeFileJustification')
+        e=next(e for e in r['edges'] if e.get('disposition')=='patch' and not e.get('anchor'));r['checks']['anchors'][e['edgeId']].pop('wholeFileJustification')
     probe('whole-file anchor without recorded justification',patch,unjustified_whole,'anchor-from-evidence')
     def wrong_line_text(r):
         e=next(e for e in r['edges'] if e['anchor']);r['checks']['anchors'][e['edgeId']]['targetLineText']=['wrong target text']

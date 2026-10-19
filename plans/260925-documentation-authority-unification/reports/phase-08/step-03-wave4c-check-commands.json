@@ -1,0 +1,101 @@
+{
+  "serial": true,
+  "scratch": "/tmp/fgos-work",
+  "probeCommands": [
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py"
+    ],
+    [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-probes.py"
+    ]
+  ],
+  "finalChecker": [
+    "env",
+    "-u",
+    "CLAUDE_CODE_SESSION_ID",
+    "TMPDIR=/tmp/fgos-work",
+    "python3",
+    "-B",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-check.py"
+  ],
+  "probeAttempt1": {
+    "exitCode": 1,
+    "cause": "Two archived positive full-record fixtures lacked newly scanned deleted basenames. Add true historical-format preserve/exemptions; retain every inherited mutation and expected check.",
+    "receipt": "step-03-wave4c-attempt1-probe-replay.json"
+  },
+  "probeAttempt2": {
+    "exitCode": 1,
+    "cause": "The old 01258 positive fixture no longer has a successor: it was a numeric-title collision fixed by L12-39. Move the same missing-note mutation to real title-matched 04191; retain its name and expected check.",
+    "receipt": "step-03-wave4c-attempt2-probe-replay.json"
+  },
+  "lightTests": [
+    "env",
+    "-u",
+    "CLAUDE_CODE_SESSION_ID",
+    "TMPDIR=/tmp/fgos-work",
+    "node",
+    "--test",
+    "test/scripts/doc-link-pass.test.mjs",
+    "test/scripts/check-doc-candidate-status.test.mjs",
+    "test/scripts/check-doc-constitution.test.mjs"
+  ]
+}

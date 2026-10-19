@@ -1,0 +1,512 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4c-manifest.json",
+  "binding": "step-03-wave4c-binding-manifest.json",
+  "selectedFiles": 16,
+  "selectedEdges": 112,
+  "perSet": [
+    {
+      "set": "batch-071",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 12,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-072",
+      "allFiles": 25,
+      "patchedPopulation": 11,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 7,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "outcomeChangedFiles": [
+    "docs/distillery/porting-log.md",
+    "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+    "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+    "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+    "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+    "docs/specs/work-state.md"
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p01.md",
+      "files": [
+        {
+          "file": "docs/distillery/porting-log.md",
+          "set": "batch-061",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 13,
+          "recordSha256": "3aba273f3c18ebedef7349efecaf583c7bf2a40a3072b9612a94a71091431c8d",
+          "sourceDigest": "8da134d2d32563db0a20532ce282b3bb35707699be07ad2b5c980b6269150b2d",
+          "diffSha256": "6bf7c14a141869bc58efe1f08ae1c0c8eb3d991cad9e5efb56d59148b4002f0e",
+          "recordBytes": 57331,
+          "sourceBytes": 99149,
+          "contextPlusRecordBytes": 156480
+        },
+        {
+          "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+          "set": "batch-070",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 10,
+          "recordSha256": "dd00a0805e472c99e8dc15adddebc72efd9e8848358bc076218942d08df08950",
+          "sourceDigest": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+          "diffSha256": "e204830920a5d197fcad245e0589489e72ee33d165779e2f57ddeae31df7c47c",
+          "recordBytes": 23691,
+          "sourceBytes": 8766,
+          "contextPlusRecordBytes": 32457
+        },
+        {
+          "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+          "set": "batch-071",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "50b437be4e8f6f8a2a475c342b4a14588b1a290ce82b0a0c6c21ada1082ac686",
+          "sourceDigest": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+          "diffSha256": "7af2e00733bb9c36a453072095e89cda20fe4516dd5cd81f9210b5d359711196",
+          "recordBytes": 12917,
+          "sourceBytes": 5119,
+          "contextPlusRecordBytes": 18036
+        },
+        {
+          "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+          "set": "batch-071",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "18456108308486513f940baf1a07e4dcaff6467f7cf4d1e9d0388a8921e330a3",
+          "sourceDigest": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1982,
+          "sourceBytes": 3883,
+          "contextPlusRecordBytes": 5865
+        },
+        {
+          "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "set": "batch-071",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 2,
+          "recordSha256": "f8c3e2902abb7d37c7ba50c4ace50dbcca6ec614ca41fbf7d1cbcf85155f0b22",
+          "sourceDigest": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 31369,
+          "sourceBytes": 4987,
+          "contextPlusRecordBytes": 36356
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+          "set": "batch-071",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 3,
+          "recordSha256": "d1e8eccb6d2929d43f9cce73b5c44b35dd98007d3cb8dcf97ba992ac7b75cdbb",
+          "sourceDigest": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4551,
+          "sourceBytes": 6620,
+          "contextPlusRecordBytes": 11171
+        }
+      ],
+      "fileCount": 6,
+      "edges": 30,
+      "sourcePlusRecordBytes": 260365,
+      "readingPages": [
+        {
+          "file": "docs/distillery/porting-log.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 13
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 10
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+          "set": "batch-071",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "2a5c44099b41f9d437cf15c0cb0d4faaa6b8b29ad833e7aebdebb5247f0f7396",
+          "sourceDigest": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+          "diffSha256": "e998e00bb618c1f3b19474de7ced1cc08f18b8e7b27d25f2bbe6f76b7138bbb1",
+          "recordBytes": 11907,
+          "sourceBytes": 7673,
+          "contextPlusRecordBytes": 19580
+        },
+        {
+          "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "set": "batch-071",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 3,
+          "recordSha256": "6e5c451b2dfc54870f46230dcb0abed566e93a33a9d576eed6fa5e1a7e93fc72",
+          "sourceDigest": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3424,
+          "sourceBytes": 9088,
+          "contextPlusRecordBytes": 12512
+        },
+        {
+          "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+          "set": "batch-071",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "bf4bdf3132c24e7d7bcf0ad1d43ba99c1b3e249c7bd0b5bdad283df55f552df5",
+          "sourceDigest": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3778,
+          "sourceBytes": 3607,
+          "contextPlusRecordBytes": 7385
+        },
+        {
+          "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "set": "batch-072",
+          "strata": [
+            "patched-seeded",
+            "open-lead-ruling"
+          ],
+          "edges": 5,
+          "recordSha256": "93b4fdafc339dad82fd799462067014b415c942a7a6be94c9218e313d1671b80",
+          "sourceDigest": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+          "diffSha256": "c6b9c126c7e0d9ba7b62a63c419e82088d5fed47c03b633c82ea7e73ab85d32a",
+          "recordBytes": 43797,
+          "sourceBytes": 5343,
+          "contextPlusRecordBytes": 49140
+        },
+        {
+          "file": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+          "set": "batch-072",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "14d58ab8515c5dc05d6ea8a39ec0933ec8f769830ac23435825a784546fe110c",
+          "sourceDigest": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+          "diffSha256": "c22e53206a04556c5280887bab3da70553e595e6c07ca87ab33e3bd959c32684",
+          "recordBytes": 26398,
+          "sourceBytes": 5890,
+          "contextPlusRecordBytes": 32288
+        },
+        {
+          "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+          "set": "batch-072",
+          "strata": [
+            "open-lead-ruling"
+          ],
+          "edges": 9,
+          "recordSha256": "745706b2e8ecfe039173cdcbb376e506a0690701f77218014d21029877990012",
+          "sourceDigest": "eeecd80731364b8e5798d5de7c1ecb8d9c893fa42b070003e498b394b68fc05e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 18220,
+          "sourceBytes": 6680,
+          "contextPlusRecordBytes": 24900
+        }
+      ],
+      "fileCount": 6,
+      "edges": 24,
+      "sourcePlusRecordBytes": 145805,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 9
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p03.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "set": "batch-072",
+          "strata": [
+            "open-lead-ruling"
+          ],
+          "edges": 15,
+          "recordSha256": "511ae342418f8adc6970140e69ccdc0267d8efb6de4dfbd4c3019eb2b837b523",
+          "sourceDigest": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+          "diffSha256": "3ba87d1b8b074ed508703c93672733f01780c01e2ac83d4430591ce5758d1fca",
+          "recordBytes": 32082,
+          "sourceBytes": 25067,
+          "contextPlusRecordBytes": 57149
+        },
+        {
+          "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+          "set": "batch-072",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "2a22f3c194afa0c58d8c16d2df7ae022c2b869ce197bc5566af2f21b24ffbd8a",
+          "sourceDigest": "de6ff085896b9179d3ecba8c1b6b0c9607c5e85beb5648cdab3e184a7dfefa98",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5427,
+          "sourceBytes": 6978,
+          "contextPlusRecordBytes": 12405
+        },
+        {
+          "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+          "set": "batch-072",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "3dbf856214bcfe5ac9e5f5c60629cd1f3f32f9267059d53a453914c6a69dff56",
+          "sourceDigest": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2238,
+          "sourceBytes": 4284,
+          "contextPlusRecordBytes": 6522
+        }
+      ],
+      "fileCount": 3,
+      "edges": 19,
+      "sourcePlusRecordBytes": 76076,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 15
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4c-p04.md",
+      "files": [
+        {
+          "file": "docs/specs/work-state.md",
+          "set": "batch-041",
+          "strata": [
+            "Part-A-outcome-change"
+          ],
+          "edges": 39,
+          "recordSha256": "f35fad192b46bf2338297e10f05ffbd9a298b58f3fb93aed18feac9e49e746e4",
+          "sourceDigest": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 17700,
+          "sourceBytes": 327843,
+          "contextPlusRecordBytes": 345543
+        }
+      ],
+      "fileCount": 1,
+      "edges": 39,
+      "sourcePlusRecordBytes": 345543,
+      "readingPages": [
+        {
+          "file": "docs/specs/work-state.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 39
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0
+}
