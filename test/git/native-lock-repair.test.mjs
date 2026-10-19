@@ -17,6 +17,10 @@ test('native repair transports an inspection report and preserves an unknown ext
     const report = port.repairNativeIndexLock({ operationId: 'restore' });
     assert.equal(report.status, 'inspectedRepairRequired');
     assert.match(report.inspection, /unknown external/);
+    assert.match(report.inspection, /size=14 bytes; mtimeUnix=.*age=/);
+    assert.match(report.inspection, /visible holders=/);
+    assert.match(report.inspection, /Move, never delete/);
+    assert.match(report.inspection, /Never repeat the old attempt/);
     assert.equal(report.path, lock);
     assert.ok(report.observedInode > 0);
     assert.match(report.observedState, /^[0-9a-f]{64}$/);

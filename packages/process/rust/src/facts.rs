@@ -340,6 +340,26 @@ pub fn lock_holders_among(dev: u64, ino: u64, pids: &[ProcId]) -> Holders {
     platform::current().lock_holders_among(dev, ino, pids)
 }
 
+/// A visible process with an open descriptor for a file. Diagnostic snapshot
+/// only: absence does not establish quiescence or ownership.
+#[derive(Debug, Clone)]
+pub struct FileUser {
+    /// Process identity, rechecked after reading the descriptor table.
+    pub identity: ProcTuple,
+    /// Executable path when readable.
+    pub exe: Option<std::path::PathBuf>,
+}
+
+/// Read-only visible users of `(device, inode)`, including descriptors without
+/// kernel locks. Unreadable/hidden processes are omitted; unsupported OSes
+/// return `None`. Never use this diagnostic snapshot to authorize mutation.
+pub fn file_users(dev: u64, ino: u64) -> Option<Vec<FileUser>> {
+    #[cfg(target_os = "linux")]
+    { crate::platform::linux::file_users(dev, ino) }
+    #[cfg(not(target_os = "linux"))]
+    { let _ = (dev, ino); None }
+}
+
 /// One process's place in the process tree at the moment it was read.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Relation {

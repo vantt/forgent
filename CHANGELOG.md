@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git deadline cleanup now gives children three seconds to terminate cooperatively; unowned native index locks refuse with `native-index-lock-unowned` and a read-only holder report plus the retained-lock runbook.
+
 - Git Recovery reconciles ConfigChange under repo-config authority; hooks configuration preserves inherited values and removes only owned local settings. Native quarantine detects inode substitution after rename.
 
 - SafeRestore extraction refuses sibling worktrees and the state root, binds creation to a directory descriptor, and recognizes tracked case-only aliases. Add a dormant partial Recovery facade, a GitHub timeout/query contract test, and paired typed-operation E3 budget rows.

@@ -165,7 +165,7 @@ impl GitDriver {
             "index.lock",
         ] {
             match std::fs::symlink_metadata(repo.git_dir().join(name)) {
-                Ok(_) if name == "index.lock" => return Err(recovery("land-index-lock-present: repairNativeIndexLock")),
+                Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
                 Ok(_) => return Err(failure("foreign-main-checkout-state")),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(failure(e)),
@@ -1214,7 +1214,7 @@ impl GitDriver {
         .and_then(|_| self.land_native_state(repo, &scope))
         .map_err(|e| {
             if e.cause == "foreign-main-checkout-state" {
-                recovery("land-native-state-preserved: repairNativeIndexLock for index.lock")
+                recovery("land-native-state-preserved: inspect foreign checkout state")
             } else {
                 e
             }
@@ -1338,7 +1338,7 @@ impl GitDriver {
             .land_target_checkout(repo, &scope, &destination)
             .map_err(|e| {
                 if e.cause == "foreign-main-checkout-state" {
-                    recovery("land-native-state-preserved: repairNativeIndexLock for index.lock")
+                    recovery("land-native-state-preserved: inspect foreign checkout state")
                 } else {
                     e
                 }

@@ -8,7 +8,7 @@ use fgos_holder_lock::BorrowedHandle;
 use fgos_process::{facts, ProcId};
 use serde::{Deserialize, Serialize};
 #[cfg(unix)]
-use std::{fs::OpenOptions, io::Read};
+use std::{fs::OpenOptions, io::{Read, Seek}};
 use std::{
     fs::{self, File},
     path::Path,
@@ -63,6 +63,61 @@ pub struct NativeLockReport {
     pub observed_inode: Option<u64>,
     pub observed_state: Option<String>,
 }
+pub(crate) const UNOWNED_INDEX_LOCK: &str = "native-index-lock-unowned: inspect with repairNativeIndexLock; follow Git spec §11 retained index.lock runbook";
+
+pub(crate) const INDEX_LOCK_RUNBOOK: &str = r#"1. Confirm no process uses the index: the report lists visible holders; additionally
+   `fuser -v <git-dir>/index.lock` or `ls -l /proc/*/fd 2>/dev/null | grep index.lock`.
+   If any live Git/IDE process holds it, stop; wait or close that tool. Keep the fgOS hold
+   (main 50 / worktree custody 30) so no fgOS writer starts meanwhile.
+2. Resolve the real path: `git rev-parse --path-format=absolute --git-path index.lock`.
+3. Move, never delete: `mv <that path> <git-dir>/fgos/git/native-lock-quarantine/manual-<UTC ts>/`
+   (or an operator directory outside the gitdir). Record the move in the operation's evidence.
+4. Re-run observe-only recovery for the operation id named in the refusal
+   (`fgos ... recover <operationId>`), inspect the recorded effect, then start a fresh
+   operation id. Never repeat the old attempt.
+5. If the content of the moved file matters (it is Git's partially written next index), keep
+   it until the operation is acknowledged; `index.lock` bytes are never needed to rebuild a
+   worktree whose real `index` and `HEAD` are intact."#;
+
+fn inspect_file(path: &Path) -> String {
+    let mut text = String::from("native-index-lock-unowned; unknown external lock; preserved. Visible holders are a best-effort snapshot, not proof of abandonment.\n");
+    match fs::symlink_metadata(path) {
+        Ok(m) => {
+            let modified = m.modified().ok().and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok());
+            let age = m.modified().ok().and_then(|t| t.elapsed().ok());
+            text.push_str(&format!("size={} bytes; mtimeUnix={modified:?}; age={age:?}\n", m.len()));
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::MetadataExt;
+                match facts::file_users(m.dev(), m.ino()) {
+                    Some(users) => {
+                        text.push_str(&format!("visible holders={} (hidden/unreadable processes omitted)\n", users.len()));
+                        for user in users {
+                            text.push_str(&format!("pid={} exe={:?} startTime={}\n", user.identity.pid.0, user.exe, user.identity.start_time));
+                        }
+                    }
+                    None => text.push_str("visible holders unavailable on this platform\n"),
+                }
+            }
+        }
+        Err(e) => text.push_str(&format!("metadata unavailable: {e}\n")),
+    }
+    // The optional Git pid sidecar is diagnostic text only. Reuse the bounded,
+    // no-follow regular-file read door, so a foreign FIFO/symlink cannot hang us.
+    #[cfg(unix)]
+    {
+        let sidecar = path.with_file_name("index~pid.lock");
+        if let Ok((mut file, _, _, _)) = state(&sidecar) {
+            let mut bytes = Vec::new();
+            if file.rewind().is_ok() && file.by_ref().take(4096).read_to_end(&mut bytes).is_ok() {
+                text.push_str(&format!("index~pid.lock (diagnostic only; first 4096 bytes): {:?}\n", String::from_utf8_lossy(&bytes)));
+            }
+        }
+    }
+    text.push_str(INDEX_LOCK_RUNBOOK);
+    text
+}
+
 fn state(path: &Path) -> Result<(File, u64, u64, String)> {
     #[cfg(unix)]
     {
@@ -107,8 +162,8 @@ fn state(path: &Path) -> Result<(File, u64, u64, String)> {
     }
 }
 impl GitDriver {
-    /// Test fixture recorder; production ownership must be established at the
-    /// spawn door before Git runs. Never expose artifact adoption as a public API.
+    /// Test fixture recorder; production index residue is inspection-only.
+    /// This exercises the shared quarantine path, not spawn-time attribution. Never expose artifact adoption as a public API.
     /// Record an artifact already established as operation-owned by its producer.
     /// The producer must retain its exact creation descriptor shared with the child;
     /// merely discovering a pathname is never ownership. Not exposed to Node callers.
@@ -208,9 +263,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         observed_device: None,
         observed_inode: None,
         observed_state: None,
-        inspection:
-            "unknown external lock; preserved; inspect ownership before repairNativeIndexLock"
-                .into(),
+        inspection: "artifact preserved pending ownership checks".into(),
     };
     match fs::symlink_metadata(path) {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -219,7 +272,8 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
             return Ok(report);
         }
         Err(e) => {
-            report.inspection = format!("artifact inspection unavailable; preserved: {e}");
+            report.inspection = inspect_file(path);
+            report.inspection.push_str(&format!("\nartifact inspection unavailable; preserved: {e}"));
             return Ok(report);
         }
         Ok(_) => (),
@@ -230,6 +284,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         report.observed_state = Some(digest);
     }
     let Some(owned) = owned else {
+        report.inspection = inspect_file(path);
         return Ok(report);
     };
     if owned.path != report.path {
@@ -376,6 +431,8 @@ impl NativeLockArtifact {
 #[cfg(all(test, unix))]
 mod tests {
     use crate as fgos_git;
+    use super::INDEX_LOCK_RUNBOOK;
+    use std::fs::File;
     include!("../tests/support/land.rs");
     use fgos_git::wal::{FileSystem, Outcome, Wal};
     use std::io;
@@ -487,12 +544,24 @@ mod tests {
         pending(&f);
         let path = f.main.join(".git/index.lock");
         fs::write(&path, b"external").unwrap();
+        let _open_external = File::open(&path).unwrap();
+        fs::write(path.with_file_name("index~pid.lock"), b"pid 1234\n").unwrap();
         let report = f
             .driver
             .repair_native_index_lock(&f.repo, vec![], "interrupted")
             .unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");
         assert!(report.inspection.contains("unknown external"));
+        assert!(report.inspection.contains("size=8 bytes"));
+        assert!(report.inspection.contains("mtimeUnix="));
+        assert!(report.inspection.contains("age="));
+        assert!(report.inspection.contains("pid 1234"));
+        assert!(report.inspection.contains(INDEX_LOCK_RUNBOOK));
+        #[cfg(target_os = "linux")]
+        {
+            assert!(report.inspection.contains(&format!("pid={} exe=", std::process::id())));
+            assert!(report.inspection.contains("startTime="));
+        }
         assert_eq!(fs::read(path).unwrap(), b"external");
         assert!(f
             .driver

@@ -196,8 +196,8 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
         &io,
     )
     .unwrap_err();
-    assert!(matches!(error, BorrowError::Deadline), "{error}");
-    assert_eq!(error.to_string(), "borrow-deadline");
+    assert!(matches!(error, BorrowError::Deadline { .. }), "{error}");
+    assert_eq!(error.to_string(), "borrow-deadline: terminated");
     pids_gone(&dir);
     assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     assert!(matches!(release(held(&res)), fgos_holder_lock::Release::Released { .. }));
@@ -784,4 +784,110 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
         assert!(matches!(release(held(&res)), Release::Released { .. }));
         fs::remove_dir_all(dir).unwrap();
     }
+}
+
+#[test]
+fn deadline_reports_cooperative_cleanup_or_forced_residue() {
+    let _serial = serial();
+    for cooperative in [true, false] {
+        let dir = temp_dir("io-term-lock");
+        let handle = held(&resource(&dir, "io"));
+        let script = format!(r#"import os,signal,time
+fd=os.open('index.lock',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+def cleanup(sig,frame):
+ os.unlink('index.lock')
+ os._exit(0)
+signal.signal(signal.SIGTERM,{})
+open('ready','w').close()
+while True: time.sleep(.01)
+"#, if cooperative { "cleanup" } else { "signal.SIG_IGN" });
+        let spec = BorrowSpec {
+            argv: vec!["python3".into(), "-c".into(), script],
+            cwd: Some(dir.clone()),
+            ..Default::default()
+        };
+        let mut io = bounds(vec![]);
+        io.deadline = Instant::now() + Duration::from_millis(500);
+        let started = Instant::now();
+        let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+        assert!(dir.join("ready").exists(), "handler was not installed");
+        let expected = if cooperative { Termination::Terminated } else { Termination::KilledAfterGrace };
+        assert!(matches!(error, BorrowError::Deadline { termination } if termination == expected), "{error}");
+        assert_eq!(dir.join("index.lock").exists(), !cooperative);
+        if !cooperative { assert!(started.elapsed() >= Duration::from_millis(3500)); }
+        assert!(started.elapsed() < Duration::from_secs(8));
+        assert!(matches!(release(handle), Release::Released { .. }));
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+fn git_deadline_removes_index_lock(namespaced: bool) {
+    let _serial = serial();
+    let dir = temp_dir("io-git-read-tree");
+    let git = |args: &[&str]| {
+        let out = Command::new("git").args(args).current_dir(&dir).output().unwrap();
+        assert!(out.status.success(), "{args:?}: {}", String::from_utf8_lossy(&out.stderr));
+        String::from_utf8(out.stdout).unwrap().trim().to_string()
+    };
+    git(&["init", "-q"]);
+    git(&["config", "user.email", "fixture@example.invalid"]);
+    git(&["config", "user.name", "Fixture"]);
+    git(&["commit", "--allow-empty", "-qm", "base"]);
+    let base = git(&["rev-parse", "HEAD"]);
+    fs::write(dir.join(".gitattributes"), b"*.dat filter=slow\n").unwrap();
+    fs::write(dir.join("file.dat"), b"incoming\n").unwrap();
+    git(&["add", "."]);
+    git(&["commit", "-qm", "incoming"]);
+    let target = git(&["rev-parse", "HEAD"]);
+    git(&["reset", "--hard", &base]);
+    // Pause real read-tree while it owns index.lock. TERM reaches the Git
+    // handler and its filter together; no synthetic lock or extra Git exec
+    // is involved in deadline cleanup.
+    git(&["config", "filter.slow.smudge", if namespaced {
+        "cat /proc/1/comm > namespace-init; touch ready; sleep 30; cat"
+    } else { "touch ready; sleep 30; cat" }]);
+    let mut argv: Vec<String> = vec!["git".into(), "read-tree".into(), "--reset".into(), "-u".into(), target];
+    if namespaced {
+        let mut prefix: Vec<String> = ["bwrap", "--preserve-fds", "1", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--"].into_iter().map(String::from).collect();
+        prefix.extend(argv);
+        argv = prefix;
+    }
+    let spec = BorrowSpec { argv, cwd: Some(dir.clone()), ..Default::default() };
+    let handle = held(&resource(&dir, "io"));
+    let mut io = bounds(vec![]);
+    io.deadline = Instant::now() + Duration::from_secs(2);
+    let observer = std::thread::spawn({
+        let dir = dir.clone();
+        move || {
+            let until = Instant::now() + Duration::from_secs(1);
+            while !dir.join("ready").exists() {
+                assert!(Instant::now() < until, "Git never entered its smudge filter");
+                std::thread::sleep(Duration::from_millis(2));
+            }
+            assert!(dir.join(".git/index.lock").exists(), "real Git must hold the lock at the deadline boundary");
+        }
+    });
+    let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+    observer.join().unwrap();
+    if namespaced { assert_eq!(fs::read_to_string(dir.join("namespace-init")).unwrap().trim(), "git"); }
+    assert!(matches!(error, BorrowError::Deadline { termination: Termination::Terminated }), "{error}");
+    assert!(!dir.join(".git/index.lock").exists());
+    assert!(matches!(release(handle), Release::Released { .. }));
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn real_read_tree_deadline_cleans_its_native_lock() {
+    git_deadline_removes_index_lock(false);
+}
+
+#[test]
+#[cfg(target_os = "linux")]
+fn real_read_tree_deadline_as_namespace_init_cleans_its_native_lock() {
+    let probe = Command::new("bwrap").args(["--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "true"]).output();
+    if !probe.as_ref().is_ok_and(|p| p.status.success()) {
+        eprintln!("UNVERIFIED: bwrap PID namespace unavailable: {probe:?}");
+        return;
+    }
+    git_deadline_removes_index_lock(true);
 }

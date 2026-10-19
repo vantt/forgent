@@ -27,7 +27,7 @@ pub mod state_root;
 pub mod tombstone;
 
 pub use port::{
-    validate, validate_quiescent, acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, run_borrowed_io, BorrowIo, BorrowIoOutcome, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, BorrowedHandle, Guarantee, Handle, HeldReason, HelperExe,
+    validate, validate_quiescent, acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, run_borrowed_io, BorrowIo, BorrowIoOutcome, Termination, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, BorrowedHandle, Guarantee, Handle, HeldReason, HelperExe,
     HoldersList, Level, Mode, NotBorrowerReason, Probe, Release, Resource, UnavailableReason, Wait, DEFAULT_KILL_WAIT_MS,
 };
 #[cfg(windows)]

@@ -284,7 +284,8 @@ impl GitDriver {
             "sequencer",
         ] {
             match fs::symlink_metadata(repo.git_dir.join(name)) {
-                Ok(_) => return Err(recovery(format!("restore-native-state: {name}{}", if name == "index.lock" { "; repairNativeIndexLock" } else { "" }))),
+                Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
+                Ok(_) => return Err(recovery(format!("restore-native-state: {name}"))),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
                 Err(e) => return Err(failure(e)),
             }

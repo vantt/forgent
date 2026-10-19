@@ -1084,14 +1084,14 @@ impl GitDriver {
                 } else {
                     "git-timeout"
                 });
-                self.containment.kill_all(&mut domain, 0);
+                self.containment.kill_all(&mut domain, 3000);
                 break spawned.child.wait().map_err(io)?;
             }
             std::thread::sleep(Duration::from_millis(2));
         };
         // A root exit is not proof that pipe-owning descendants have exited.
         if self.containment.is_empty(&mut domain) != DomainState::Empty {
-            self.containment.kill_all(&mut domain, 0);
+            self.containment.kill_all(&mut domain, 3000);
             if self.containment.is_empty(&mut domain) != DomainState::Empty {
                 // Readers are detached, never block indefinitely on an escapee.
                 return Err(refusal("containment-unproven"));

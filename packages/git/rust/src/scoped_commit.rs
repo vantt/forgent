@@ -534,7 +534,7 @@ impl GitDriver {
         } else {
             match fs::symlink_metadata(repo.git_dir.join("index.lock")) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                _ => return Err(recovery("commit-index-lock-present: repairNativeIndexLock")),
+                _ => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
             }
             let baseline: CommitBaseline =
                 serde_json::from_str(&payload.baseline).map_err(failure)?;

@@ -98,7 +98,7 @@ test('a missing receipt at next is observed-only through Node and keeps that att
 test('even a dangling native index lock names inspected repair before publication', () => {
   const f = fixture(); try {
     fs.symlinkSync('missing-owned-evidence', path.join(f.repo, '.git/index.lock'));
-    assert.throws(() => f.port().prepare({ operationId: 'locked', request: f.request }), /land-index-lock-present: repairNativeIndexLock/);
+    assert.throws(() => f.port().prepare({ operationId: 'locked', request: f.request }), /native-index-lock-unowned: inspect with repairNativeIndexLock; follow Git spec §11 retained index.lock runbook/);
     assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
     assert.equal(fs.lstatSync(path.join(f.repo, '.git/index.lock')).isSymbolicLink(), true);
   } finally { f.close(); }

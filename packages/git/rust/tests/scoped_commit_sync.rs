@@ -516,10 +516,12 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     interrupted(&f, "interrupted", 2, false);
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
-    assert!(f
-        .driver
+    let error = f.driver
         .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
-        .is_err());
+        .unwrap_err();
+    assert!(error.cause.starts_with("native-index-lock-unowned:"));
+    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("§11"));
     assert!(wal::Wal::open(&f.repo)
         .unwrap()
         .inspect("interrupted")
@@ -1164,4 +1166,19 @@ fn sync_terminal_replay_ignores_live_branch_and_detached_head() {
             );
         }
     }
+}
+
+#[test]
+fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
+    let f = Fixture::new();
+    interrupted(&f, "interrupted", 2, true);
+    let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
+    let path = Path::new(&gitdir).join("index.lock");
+    fs::write(&path, b"external sync lock").unwrap();
+    let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
+    assert!(error.cause.starts_with("native-index-lock-unowned:"));
+    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("§11"));
+    assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
+    assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
 }

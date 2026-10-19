@@ -270,7 +270,7 @@ fn refuses_bad_target_ancestry_head_native_state_and_conflicting_reapply_retains
         .preview_restore(&f.repo, vec![], &request(&f, false))
         .unwrap_err()
         .cause
-        .contains("native-state"));
+        .contains("native-index-lock-unowned"));
     assert_eq!(
         fs::read(f.main.join(".git/index.lock")).unwrap(),
         b"foreign"
@@ -306,7 +306,7 @@ fn interrupted_restore_preserves_native_residue_user_edits_and_corrupt_evidence(
         .recover_restore(&f.repo, vec![], "fixture", "crash")
         .unwrap_err()
         .cause
-        .contains("native-state"));
+        .contains("native-index-lock-unowned"));
     assert_eq!(
         fs::read(f.main.join(".git/index.lock")).unwrap(),
         b"unknown native bytes"
