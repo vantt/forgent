@@ -45,6 +45,7 @@ if (match) {
     runner: {
       defaultExecutor: 'mock-pass',
       rigorToTier: { standard: 'standard' },
+      modelPolicies: { mock: { standard: 'mock-model' } },
       executors: {
         'mock-pass': {
           kind: 'agent',
@@ -173,6 +174,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
     const runner = {
       defaultExecutor: 'fail-exec',
       rigorToTier: { standard: 'standard' },
+      modelPolicies: { fail: { standard: 'fail-model' } },
       executors: {
         'fail-exec': {
           kind: 'agent',

@@ -943,6 +943,7 @@ test('a step after a panel step is handed the report of every panelist and of th
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -989,6 +990,7 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -1048,6 +1050,7 @@ test('a unit template that declares inputs gets only those steps, and its own se
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -1322,6 +1325,7 @@ function useDistinctFamilies(tmp, names) {
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = names[0];
   for (const capability of Object.values(cfg.runner.capabilities)) {
