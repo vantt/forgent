@@ -1,0 +1,86 @@
+# A38 step-02i mapping review - part 64
+
+Reviewer: reviewer:sonnet-session:a4ffbdbb9c616801d@2026-10-19
+Commits: author 904d0fb5c, accounting 74e3ecf1e (worktree /home/vantt/projects/forgentX-s8-review verified at 74e3ecf1eb9a2bc1429f50a25bb7017e240ef798)
+Part: 64 (population behavioral-runtime-and-contract-triage; 60 entries; sourceTable step-02i-census-maps-portals-prose.json)
+Method: all 60 rows read in full (all fields, 5-line source context, source file at the committed tree); intent-preservation-ledger edges checked mechanically for table column (source-table column of each edge identified from the committed file); targets, anchors, source-inventory split rows and carriage headings checked against the tree.
+
+## Totals
+
+ok 56 / rework 2 / needs-Lead-judgment 2
+
+Rework ids: maps-i-04315 (#17), maps-i-04481 (#60). Judgment ids: maps-i-04313 (#15), maps-i-04314 (#16).
+Rework is 2/60 = 3.3%, above the 3% per-set threshold (A50); defect class 1 below is cross-part (maps-i-04482, 04483 and the vision.md siblings maps-i-04312 sit in other parts) and warrants a grep-level sweep of the class rather than a full re-read of this part.
+
+## Rework by defect class
+
+1. Rule/section locator citation patched to an area README that does not hold the cited rule: maps-i-04481 ('rule RUL16 ... in docs/specs/distribution.md' -> packaging-distribution/README.md; the rule lives in packaging-distribution/spec.md, i.e. the consumer itself). Sweep every '(rule RULnn ...) in `docs/specs/...`' and 'See distribution spec RULnn' edge for the same defect.
+2. Path-text label not following its patched destination: maps-i-04315 ('[node-to-rust-component-migration.md](README.md)'; sibling maps-i-04312 '[host-invocation-provider-routing.md](README.md)' in another part).
+
+## Needs-Lead-judgment
+
+- maps-i-04313, maps-i-04314 (and #17 above): vision.md 'Preserved from [X]' lineage cells are patched as navigation, whereas the equivalent 'source ... §N' evidence links in node-to-rust-migration.md and the source-preservation-audit source columns are preserved as provenance/self-reference. Pick one rule for 'Preserved from [source]' cells; the class likely spans many consumers.
+
+## Entries
+| # | edgeId | line | action / rule | verdict | note |
+|---|---|---|---|---|---|
+| 1 | maps-i-04279 | host-invocation-routing/verification/compatibility-harness.md:56 | preserve / verbatim-carriage | ok | SHA-pinned restoration citation; preserve correct. |
+| 2 | maps-i-04283 | host-invocation-routing/verification/r1-rust-host-proof.md:15 | preserve / provenance | ok | Provenance header line; preserve correct. |
+| 3 | maps-i-04285 | host-invocation-routing/verification/r2-external-process-proof.md:15 | preserve / provenance | ok | Provenance header line; preserve correct. |
+| 4 | maps-i-04291 | host-invocation-routing/verification/r3-remote-peer-proof.md:15 | preserve / provenance | ok | Provenance header line; preserve correct. |
+| 5 | maps-i-04293 | host-invocation-routing/verification/source-preservation-audit.md:16 | preserve / provenance | ok | Provenance header line; preserve correct. |
+| 6 | maps-i-04299 | host-invocation-routing/verification/source-preservation-audit.md:41 | preserve / provenance | ok | Source-preservation-audit 'Legacy source' column; audit evidence preserved per L12-21/22. |
+| 7 | maps-i-04300 | host-invocation-routing/verification/source-preservation-audit.md:41 | preserve / retained-reference | ok | Link to a retained in-place contracts/ file in the 'Preservation target' column; nothing to substitute; preserve correct. |
+| 8 | maps-i-04301 | host-invocation-routing/verification/source-preservation-audit.md:41 | preserve / retained-reference | ok | Link to a retained in-place contracts/ file in the 'Preservation target' column; nothing to substitute; preserve correct. |
+| 9 | maps-i-04302 | host-invocation-routing/verification/source-preservation-audit.md:42 | preserve / provenance | ok | Source-preservation-audit 'Legacy source' column; audit evidence preserved per L12-21/22. |
+| 10 | maps-i-04303 | host-invocation-routing/verification/source-preservation-audit.md:42 | preserve / retained-reference | ok | Link to a retained in-place contracts/ file in the 'Preservation target' column; nothing to substitute; preserve correct. |
+| 11 | maps-i-04304 | host-invocation-routing/verification/source-preservation-audit.md:42 | preserve / retained-reference | ok | Link to a retained in-place contracts/ file in the 'Preservation target' column; nothing to substitute; preserve correct. |
+| 12 | maps-i-04305 | host-invocation-routing/verification/source-preservation-audit.md:43 | preserve / provenance | ok | Source-preservation-audit 'Legacy source' column; audit evidence preserved per L12-21/22. |
+| 13 | maps-i-04306 | host-invocation-routing/verification/source-preservation-audit.md:44 | preserve / provenance | ok | Source-preservation-audit 'Legacy source' column; audit evidence preserved per L12-21/22. |
+| 14 | maps-i-04311 | host-invocation-routing/vision.md:17 | preserve / provenance | ok | Provenance header line; preserve correct. |
+| 15 | maps-i-04313 | host-invocation-routing/vision.md:64 | cutover-patch-only / navigation | needs-Lead-judgment | vision.md 'Alignment' cell 'Preserved from [legacy-cli-transition.md](old)' is lineage text (provenance-style) yet patched, while the same pattern as 'source migration' evidence links in node-to-rust-migration.md (maps-i-04146..48) and source-preservation-audit source columns is preserved. Decide: provenance (preserve) or live navigation (patch). Target file is the exact promoted file, so if patched the mapping itself is right. |
+| 16 | maps-i-04314 | host-invocation-routing/vision.md:65 | cutover-patch-only / navigation | needs-Lead-judgment | Same lineage-vs-navigation question as #15 ('Preserved from [external-provider-protocol.md]'); mapping to architecture/external-provider-protocol.md is exact. |
+| 17 | maps-i-04315 | host-invocation-routing/vision.md:66 | cutover-patch-only / navigation | rework | 'Preserved from [node-to-rust-component-migration.md](...)' patched to '[node-to-rust-component-migration.md](README.md)': the path-text label still names the retired file while the destination is the area README (L12-21: a path-text label follows its destination's patch; compare #60 of part 63 which replaces label and destination). Also same lineage-vs-navigation question as #15. |
+| 18 | maps-i-04319 | intent-preservation-ledger.md:71 | preserve-pending-target / navigation | ok | Proof/evidence column pointer to docs/specs/platform-foundations.md decision history; no unique target (all 61 references to that file are parked/preserved consistently); preserve-pending-target is correct. |
+| 19 | maps-i-04320 | intent-preservation-ledger.md:72 | preserve / provenance | ok | Platform ledger 'Source' column cell (rule/decision locators such as RUL104, D-ADR, section numbers remain in place); provenance preserve correct. |
+| 20 | maps-i-04321 | intent-preservation-ledger.md:74 | preserve / provenance | ok | Platform ledger 'Source' column cell (rule/decision locators such as RUL104, D-ADR, section numbers remain in place); provenance preserve correct. |
+| 21 | maps-i-04322 | intent-preservation-ledger.md:74 | cutover-patch-only / navigation | ok | 'Current slice' cell states docs/README.md exists; docs/README.md is a legacy-current maintained-authority row in the switchboard whose candidate is docs-portal.md; patch with Step 3 prerequisites is acceptable. |
+| 22 | maps-i-04323 | intent-preservation-ledger.md:83 | preserve / provenance | ok | Platform ledger 'Source' column cell (rule/decision locators such as RUL104, D-ADR, section numbers remain in place); provenance preserve correct. |
+| 23 | maps-i-04324 | intent-preservation-ledger.md:92 | preserve / provenance | ok | Platform ledger 'Source' column cell (rule/decision locators such as RUL104, D-ADR, section numbers remain in place); provenance preserve correct. |
+| 24 | maps-i-04326 | migration-authoring-rules.md:33 | preserve-pending-target / navigation | ok | Bare whole-root tree mention (docs/specs/**, docs/architect/**) parked for Step 3 per L12-24(2); correct. |
+| 25 | maps-i-04327 | migration-authoring-rules.md:33 | preserve-pending-target / navigation | ok | same as #24. |
+| 26 | maps-i-04340 | observe/README.md:9 | preserve / provenance | ok | 'Provenance: docs/specs/observe.md at <sha>' header; pin, preserve correct. |
+| 27 | maps-i-04342 | observe/decisions/observe-component-architecture.md:9 | preserve / provenance | ok | 'Provenance: docs/specs/observe.md at <sha>' header; pin, preserve correct. |
+| 28 | maps-i-04344 | observe/spec.md:9 | preserve / self-reference-preserved | ok | 'Provenance: docs/specs/observe.md at <sha>' header; pin, preserve correct. |
+| 29 | maps-i-04351 | packaging-distribution/README.md:157 | cutover-patch-only / navigation | ok | 'Current detailed source' pointer to the component-boundary advisory; every one of the 31 references to that file maps uniformly to docs/platform/component-boundary.md; consistent. |
+| 30 | maps-i-04356 | packaging-distribution/README.md:262 | preserve / verbatim-carriage | ok | Inside explicit 'Retained Readme Source Detail' carriage (README.md line 206+); bare docs/specs/* glob; preserve correct. |
+| 31 | maps-i-04403 | packaging-distribution/history/distribution-baseline.md:154 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 32 | maps-i-04404 | packaging-distribution/history/distribution-baseline.md:155 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 33 | maps-i-04405 | packaging-distribution/history/distribution-baseline.md:156 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 34 | maps-i-04406 | packaging-distribution/history/distribution-baseline.md:157 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 35 | maps-i-04407 | packaging-distribution/history/distribution-baseline.md:158 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 36 | maps-i-04408 | packaging-distribution/history/distribution-baseline.md:159 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 37 | maps-i-04409 | packaging-distribution/history/distribution-baseline.md:160 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 38 | maps-i-04410 | packaging-distribution/history/distribution-baseline.md:161 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 39 | maps-i-04411 | packaging-distribution/history/distribution-baseline.md:162 | preserve / verbatim-carriage | ok | Column 'Source' inside 'Retained Distribution Baseline Source Detail' carriage; source locator, preserve correct. |
+| 40 | maps-i-04418 | packaging-distribution/history/distribution-vision.md:9 | preserve / self-reference-preserved | ok | Provenance header with SHA pin; self-reference-preserved correct. |
+| 41 | maps-i-04420 | packaging-distribution/history/distribution-vision.md:37 | preserve / verbatim-carriage | ok | Inside the fenced source description block of a history file (L12-23 fenced snapshot); source prose, preserve correct. Wording 'explicit carriage region' loose. |
+| 42 | maps-i-04422 | packaging-distribution/history/distribution-vision.md:138 | preserve / retained-reference | ok | Retained path docs/architecture-manifest.json (exists); preserve correct. |
+| 43 | maps-i-04439 | packaging-distribution/history/documentation-migration/migration-map.md:126 | preserve / verbatim-carriage | ok | History migration-map inside 'Retained Migration Map Source Detail' carriage (Evidence column / work-order narrative); past narrative preserved, correct. |
+| 44 | maps-i-04440 | packaging-distribution/history/documentation-migration/migration-map.md:130 | preserve / verbatim-carriage | ok | History migration-map inside 'Retained Migration Map Source Detail' carriage (Evidence column / work-order narrative); past narrative preserved, correct. |
+| 45 | maps-i-04441 | packaging-distribution/history/documentation-migration/migration-map.md:131 | preserve / verbatim-carriage | ok | History migration-map inside 'Retained Migration Map Source Detail' carriage (Evidence column / work-order narrative); past narrative preserved, correct. |
+| 46 | maps-i-04445 | packaging-distribution/history/documentation-migration/migration-map.md:134 | preserve / verbatim-carriage | ok | History migration-map inside 'Retained Migration Map Source Detail' carriage (Evidence column / work-order narrative); past narrative preserved, correct. |
+| 47 | maps-i-04446 | packaging-distribution/history/documentation-migration/migration-map.md:140 | preserve / verbatim-carriage | ok | History migration-map inside 'Retained Migration Map Source Detail' carriage (Evidence column / work-order narrative); past narrative preserved, correct. |
+| 48 | maps-i-04450 | packaging-distribution/history/documentation-migration/rewrite-plan.md:25 | preserve / self-reference-preserved | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 49 | maps-i-04451 | packaging-distribution/history/documentation-migration/rewrite-plan.md:55 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 50 | maps-i-04452 | packaging-distribution/history/documentation-migration/rewrite-plan.md:56 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 51 | maps-i-04453 | packaging-distribution/history/documentation-migration/rewrite-plan.md:57 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 52 | maps-i-04461 | packaging-distribution/history/documentation-migration/rewrite-plan.md:147 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 53 | maps-i-04462 | packaging-distribution/history/documentation-migration/rewrite-plan.md:166 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 54 | maps-i-04465 | packaging-distribution/history/documentation-migration/rewrite-plan.md:278 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 55 | maps-i-04466 | packaging-distribution/history/documentation-migration/rewrite-plan.md:279 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 56 | maps-i-04467 | packaging-distribution/history/documentation-migration/rewrite-plan.md:280 | preserve / verbatim-carriage | ok | History rewrite-plan inside 'Retained Rewrite Plan Source Detail' carriage (Source column / planning narrative); preserved, correct. |
+| 57 | maps-i-04469 | packaging-distribution/reports/track-closeout.md:169 | preserve / provenance | ok | track-closeout 'git log' proof command / audit statement over legacy tree; provenance preserved per L12-25(4). |
+| 58 | maps-i-04470 | packaging-distribution/reports/track-closeout.md:169 | preserve / provenance | ok | track-closeout 'git log' proof command / audit statement over legacy tree; provenance preserved per L12-25(4). |
+| 59 | maps-i-04471 | packaging-distribution/reports/track-closeout.md:173 | preserve / provenance | ok | track-closeout 'git log' proof command / audit statement over legacy tree; provenance preserved per L12-25(4). |
+| 60 | maps-i-04481 | packaging-distribution/spec.md:39 | cutover-patch-only / navigation | rework | Rule-locator citation '(rule RUL16 (...) in `docs/specs/distribution.md`)' patched to docs/platform/packaging-distribution/README.md. RUL16 is not in README.md; the rule text is at packaging-distribution/spec.md line 695 (the consumer itself). The locator names a rule that the patch destination does not contain, and no patch may point into the consumer. Preserve as historical citation or have Step 3 reword to 'this spec'. Siblings maps-i-04482 (RUL15, part 65) and maps-i-04483 are the same class. |
