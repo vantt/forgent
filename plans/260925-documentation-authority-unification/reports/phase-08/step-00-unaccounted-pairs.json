@@ -1,0 +1,102 @@
+{
+  "status": "input-list-awaiting-Step-0-accounting",
+  "inputHead": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+  "authority": "L12-11",
+  "reporter": "reports/phase-08/audit-report.py",
+  "reporterExit": 1,
+  "count": 21,
+  "atDf6eab953": 20,
+  "laterPairs": 1,
+  "pairs": [
+    {
+      "commit": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck.md"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/revision-verification.json"
+    },
+    {
+      "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py"
+    },
+    {
+      "commit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json"
+    },
+    {
+      "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json"
+    }
+  ],
+  "manifestAgreement": true,
+  "manifests": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json"
+  ],
+  "futureCommitPolicy": "Re-run at Step 0. Include this author/runner commit and every later unaccounted pair only after its actual id is known. Append exact data to both manifests in a separate accounting-only commit; no accounting done in this revision."
+}

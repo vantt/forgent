@@ -156,5 +156,50 @@
       "postMergeSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
       "authority": "L12-1 supplied seven conflict paths"
     }
-  ]
+  ],
+  "bothSidesMergeVerification": {
+    "inputHead": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+    "bothSidesPathsCount": 10,
+    "manualResolutionsCount": 7,
+    "cleanAutoMergesCount": 3,
+    "proof": "git merge-file -p on first-parent/base/second-parent bytes in external scratch: exit 0, exact merge bytes; compare merge/HEAD/worktree hashes and markers; no git mutation",
+    "autoMerges": [
+      {
+        "path": "CHANGELOG.md",
+        "classification": "clean-both-sides-auto-merge",
+        "mergeFileReplayExit": 0,
+        "replayEqualsMerge": true,
+        "mergeSha256": "554448ecf6c4432b12e551d01e8cbc4b4ec5d080c223c2fcd906b81b0ed91234",
+        "headSha256": "554448ecf6c4432b12e551d01e8cbc4b4ec5d080c223c2fcd906b81b0ed91234",
+        "workingSha256": "554448ecf6c4432b12e551d01e8cbc4b4ec5d080c223c2fcd906b81b0ed91234",
+        "unchangedSinceMerge": true,
+        "conflictMarkersPresent": false,
+        "worktreeDiffClean": true
+      },
+      {
+        "path": "docs/platform/session-identity/spec.md",
+        "classification": "clean-both-sides-auto-merge",
+        "mergeFileReplayExit": 0,
+        "replayEqualsMerge": true,
+        "mergeSha256": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+        "headSha256": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+        "workingSha256": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+        "unchangedSinceMerge": true,
+        "conflictMarkersPresent": false,
+        "worktreeDiffClean": true
+      },
+      {
+        "path": "docs/specs/reading-map.md",
+        "classification": "clean-both-sides-auto-merge",
+        "mergeFileReplayExit": 0,
+        "replayEqualsMerge": true,
+        "mergeSha256": "252e6601a5de0df68be6bd559d636ea4d76528166a71b17bec8fa4ad8a7d2d8d",
+        "headSha256": "252e6601a5de0df68be6bd559d636ea4d76528166a71b17bec8fa4ad8a7d2d8d",
+        "workingSha256": "252e6601a5de0df68be6bd559d636ea4d76528166a71b17bec8fa4ad8a7d2d8d",
+        "unchangedSinceMerge": true,
+        "conflictMarkersPresent": false,
+        "worktreeDiffClean": true
+      }
+    ]
+  }
 }

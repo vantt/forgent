@@ -1,0 +1,104 @@
+{
+  "status": "recheck-revision-authored-not-independent-acceptance",
+  "inputHead": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+  "requirementsUnchangedAgainst": "df6eab953",
+  "successCriteriaUnchangedAgainst": "df6eab953",
+  "scopeCheck": "all changed/untracked files under plan; no code/tests/checker/manifest/baseline edits",
+  "step0PairCount": 21,
+  "atDf6eab953": 20,
+  "laterPairs": 1,
+  "pairPathsVerifiedAgainstCommits": true,
+  "legacyQueueRowsVerified": [
+    3,
+    4,
+    5,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "reporter": {
+    "exit": 1,
+    "scratch": "/tmp/fgos-work/p8-audit-u8ih2iub",
+    "manifests": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 1
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "driftRows": 85,
+        "unaccountedPairs": 21,
+        "B": true,
+        "Hfindings": 0,
+        "rawOk": false
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 1
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "driftRows": 85,
+        "unaccountedPairs": 21,
+        "B": true,
+        "Hfindings": 0,
+        "rawOk": false
+      }
+    ],
+    "limit": "same-anchor digests diagnostic only; native correspondence/content resolution required by Step 0"
+  },
+  "ratchet": {
+    "exit": 0,
+    "legacyFiles": 995,
+    "accountedEdits": 26,
+    "accountedNewFiles": 1
+  },
+  "diffCheckExit": 0,
+  "autoMergeProof": "merge-accounting.json: 3/3 clean replay exact bytes; merge/HEAD/worktree equality; no markers",
+  "implementationAndIndependentReview": "not run; before-only B exception lane pending actual after hash/tests/review",
+  "findings": {
+    "N1": "two-commit accounting, 21 exact pinned input pairs",
+    "N2": "one-file frozen-B external exception, pending implementation proof",
+    "N3": "L12-13 supersedes L12-6, owner design restored",
+    "N4": "identity plus exact batch files; two-tier invalidation",
+    "N5": "unavailable branch removed; current-door pins and Lead board duty",
+    "N6": "plan row, classifier/Decision F pointers and progress counts refreshed",
+    "N7": "reporter limit stated and routed through native correspondence/content journal",
+    "N8": "12 legacy-root queue rows cutover-patch-only",
+    "N9": "three auto-merges distinguished and verified",
+    "P8-4": "plan revision complete under N4; independent acceptance pending",
+    "P8-5": "plan revision complete under L12-13; independent acceptance pending"
+  },
+  "outsideScopeHandoff": {
+    "path": "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "owner": "Lead",
+    "reason": "DOC lane stale; worker write scope excludes board, no update claimed"
+  },
+  "futureCommitAccounting": "This runner commit cannot be listed until its actual id exists; rerun reporter and separately account both manifests after commit."
+}
