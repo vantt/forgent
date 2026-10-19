@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- End terminal rounds with `terminal:result-unreadable` when an invalid result stays unchanged for 30 seconds and the agent is idle, releasing custody through normal settlement.
+- Preserve committed decision-index rows missing from local state during setup and doctor fixes; exclude git-ignored setup output consistently from release payloads and checkout drift checks.
+- Warn once per unreadable pid per Worktree removal or relocation, and allow clean tracked `.fgos` while preserving reappearing skip-worktree state and dirty bytes.
+- Arm the Linux terminal gate’s parent-death signal so a killed sandbox monitor ends its namespace; read all kernel lock-table pages while retaining shared-probe release confirmation.
+
 - Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
 
 - Fix Worktree allocation under `.claude/worktrees`, multi-user cwd checks and terminal recovery of clean Git refusals; require reachable delivery before removal and report preserved dirty checkouts as advisory diagnostics.

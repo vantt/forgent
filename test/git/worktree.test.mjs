@@ -86,7 +86,7 @@ test('stripped tracked state is clean for removal and reappearing worker state i
     f.port.createDetached({path:worker,operationId:'create'});
     const proof={path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'};
     fs.mkdirSync(path.join(worker,'.fgos'));fs.writeFileSync(path.join(worker,'.fgos','foreign'),'keep');
-    assert.throws(()=>f.port.remove(proof),/worker-state-preserved/);
+    assert.throws(()=>f.port.remove(proof),/dirty-preserved/);
     fs.unlinkSync(path.join(worker,'.fgos','foreign'));fs.rmdirSync(path.join(worker,'.fgos'));
     fs.appendFileSync(path.join(f.repoPath,'.git','info','exclude'),'\nignored\n');
     fs.writeFileSync(path.join(worker,'ignored'),Buffer.from([0,255]));
@@ -140,7 +140,8 @@ test('detached undelivered tip requires a surviving non-fgos ref', {skip:process
   } finally {f.cleanup();}
 });
 
-test('Worktree remove warns and proceeds with a non-dumpable same-user process', {skip:process.platform!=='linux'},()=>{
+for (const action of ['remove','relocate']) {
+test(`Worktree ${action} warns once and proceeds with a non-dumpable same-user process`, {skip:process.platform!=='linux'},()=>{
   // A real PR_SET_DUMPABLE=0 process reproduces ssh-agent/systemd cwd permissions.
   const script = `
     import fs from 'node:fs';
@@ -157,7 +158,13 @@ test('Worktree remove warns and proceeds with a non-dumpable same-user process',
       await new Promise((resolve,reject)=>{child.once('error',reject);child.stdout.once('data',resolve);});
       assert.throws(()=>fs.readlinkSync('/proc/'+child.pid+'/cwd'), /EACCES|EPERM/);
       console.log('protected-pid='+child.pid);
-      f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'});
+      const moved=path.join(f.temp,'moved');
+      if (${JSON.stringify(action)} === 'relocate') {
+        f.port.relocate({source:worker,destination:moved,expectedTip:f.tip,operationId:'move'});
+        assert.equal(fs.existsSync(moved),true);
+      } else {
+        f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'});
+      }
       assert.equal(fs.existsSync(worker),false);
     } finally {
       if(child){const done=new Promise(r=>child.once('exit',r));child.kill();await done;}
@@ -167,5 +174,34 @@ test('Worktree remove warns and proceeds with a non-dumpable same-user process',
   const result=spawnSync(process.execPath,['--input-type=module','-e',script],{encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,result.stderr);
   const pid=/protected-pid=(\d+)/.exec(result.stdout)?.[1]; assert.ok(pid,result.stdout);
-  assert.match(result.stderr,new RegExp('warning: worktree-cwd-unreadable pid='+pid+' comm="python3"'));
+  assert.equal(result.stderr.split('warning: worktree-cwd-unreadable pid='+pid+' ').length-1,1,result.stderr);
+});
+
+}
+
+for (const changed of [false, true]) {
+  test(`plain worktree with tracked .fgos ${changed ? 'preserves modifications' : 'removes cleanly'}`, {skip:process.platform==='win32'},()=>{
+    const f=fixture('files',true); const worker=path.join(f.temp,'worker');
+    try {
+      f.git('worktree','add','--detach',worker,f.tip);
+      const proof={path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'plain-remove'};
+      if(changed) {
+        fs.writeFileSync(path.join(worker,'.fgos','fixture'),'modified state');
+        assert.throws(()=>f.port.remove(proof),/dirty-preserved/);
+        assert.equal(fs.readFileSync(path.join(worker,'.fgos','fixture'),'utf8'),'modified state');
+      } else {
+        f.port.remove(proof); assert.equal(fs.existsSync(worker),false);
+      }
+    } finally {f.cleanup();}
+  });
+}
+test('recreated skip-worktree tracked state is preserved even with identical bytes', {skip:process.platform==='win32'},()=>{
+  const f=fixture('files',true); const worker=path.join(f.temp,'worker');
+  try {
+    f.port.createDetached({path:worker,operationId:'create'});
+    fs.mkdirSync(path.join(worker,'.fgos'));
+    fs.writeFileSync(path.join(worker,'.fgos','fixture'),'tracked state');
+    assert.throws(()=>f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'}),/worker-state-preserved/);
+    assert.equal(fs.readFileSync(path.join(worker,'.fgos','fixture'),'utf8'),'tracked state');
+  } finally {f.cleanup();}
 });

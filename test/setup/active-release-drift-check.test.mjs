@@ -342,10 +342,12 @@ test('real builder selection and staged production dependency payload agree with
   assert.match(checked.message, new RegExp(`artifactDigest=${result.artifactDigest}`));
 });
 
-test('per-machine agent hook file under a declared payload directory is not counted as drift', (t) => {
+test('git-ignored setup hooks and skills under a declared payload directory are not drift', (t) => {
   const f = fixture(t);
   put(f.source, 'package.json', { name: 'drift-fixture', files: ['bin', 'src', '.agents'] });
   put(f.source, '.agents/keep.md', 'kept');
+  execFileSync('git', ['init', '-q'], { cwd: f.source });
+  put(f.source, '.gitignore', '.agents/hooks.json\n.agents/skills/instruction-audit/\n');
   f.manifest.files = listLegacyNodeSourceFiles(f.source).map((relative) => {
     const staged = put(f.release, `libexec/legacy-node/${relative}`, fs.readFileSync(path.join(f.source, relative)));
     return { path: `libexec/legacy-node/${relative}`, kind: 'file', digest: hashFile(staged) };
@@ -353,6 +355,7 @@ test('per-machine agent hook file under a declared payload directory is not coun
   f.writeManifest();
   counts(run(f.source), 0, 0, 0);
   put(f.source, '.agents/hooks.json', '{"hooks":{}}');
+  put(f.source, '.agents/skills/instruction-audit/SKILL.md', 'rendered by setup');
   const result = run(f.source);
   assert.equal(result.passed, true, result.message);
   counts(result, 0, 0, 0);

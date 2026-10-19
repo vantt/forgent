@@ -37,7 +37,7 @@ Facts are almost never on the lock decision path any more (the kernel decides); 
 | The judge table and its shared vectors ([contract](../../../packages/process/contracts/process-facts.judge.v1.json)) | Which lock anyone holds (holder-lock) |
 | Boot id, start time, pid namespace of a process, read without spawning | Writer identity (Session Identity) |
 | `lock_holders(dev, ino)` and the quiescence `scan` | Deciding what to do with a holder or a scanned process |
-| `spawn_with_fds`, `signal_by_identity` | The gate primitives (subreaper, `PR_SET_PDEATHSIG`, a new PID namespace, the tty foreground group): deferred to the run supervisor, no consumer in this track |
+| `spawn_with_fds`, `signal_by_identity`, `arm_parent_death_signal` (Linux: `PR_SET_PDEATHSIG(SIGKILL)` on the caller, refused when the visible parent changed while arming) | The other gate primitives (subreaper, a new PID namespace, the tty foreground group) and when a gate arms the death signal: the run supervisor |
 | `domain_is_empty`, `domain_kill_all` for a declared domain | The attempt, envelope and lock that use the containment port (run supervisor); the port itself is section 10 |
 | The OS-neutral `ProcessPlatform` trait and one driver per OS | mtime of anything; a boot time derived from a clock |
 
@@ -103,6 +103,7 @@ The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`)
 - **2026-10-16 — Phản biện vòng 1 (gemini R3-3): zombie và record thiếu pid.** `kill(pid, 0)` thành công với zombie nên zombie bị coi là sống; record thiếu pid bị `process-identity.mjs` coi là chết. Sửa: trạng thái `Z`/`X` → dead; thiếu pid → unknown (giữ). Design §14 vòng 1.
 - **2026-10-16 — Phản biện vòng 2 (Argon R4-1) và vòng 3 (kongming N3, N4): PID namespace.** pid trong namespace không có nghĩa với host; gate đặt `FGOS_PIDNS_ANCHOR`, record trong namespace mang anchor; anchor chết → dead, còn lại → unknown; người phán ngoài init namespace gặp record không `pidNs` → unknown (agent trong sandbox không dọn record của holder host). "Miền rỗng" của attempt là `judge(gate) == dead`, quét inode namespace chỉ để chẩn đoán. Design §5.1, §14.
 - **2026-10-16 — Plan 4.2 (Lead D3, D8): phạm vi của crate trong track này.** Không có primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) vì 4.2 không có consumer; chỉ hai primitive miền `domain_is_empty`/`domain_kill_all` với `linux-gate` cài thật, `windows-job`/`macos-tree` trả `Unknown`/`Refused` tới khi driver tương ứng có. Leaf Node `process-identity.mjs` đọc cùng vector, `resolveHolderLiveness` thành adapter của `judge`, thêm `pidExists` để các phase cutover thay mọi bản chép `isPidAlive`. [Plan](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md).
+- **2026-10-19 — `arm_parent_death_signal` và đọc `/proc/locks` tới EOF.** Primitive PDEATHSIG cho gate terminal nằm ở crate này (gate gọi trước HELLO; run supervisor đóng cửa sổ monitor chết trước khi cài, xem [run-supervisor spec](../run-supervisor/spec.md) mục 16). `lock_table_entries` đọc hết một seq_file mở tới EOF thay vì một prefix: bảng không atomic, nên vắng mặt vẫn chỉ là lý do chạy probe shared-lock, không phải bằng chứng đã nhả.
 
 ## 9. Related files
 

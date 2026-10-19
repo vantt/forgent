@@ -117,23 +117,30 @@ test('generateDecisionIndex: writes the file on first call, then reports changed
   assert.equal(fs.statSync(indexPathFor(repoRoot)).mtimeMs, mtimeAfterFirst, 'unchanged content must not rewrite the file');
 });
 
-test('generateDecisionIndex: refuses to overwrite an index with real rows when the freshly-computed content has none -- F12 tsk-1lv regression (a store with no decisions read, e.g. a worktree missing .fgos/ per ADR0020)', () => {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
-  const emptyFgosDir = path.join(repoRoot, '.fgos-nonexistent');
-  const populatedFgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(populatedFgosDir, { recursive: true });
-  addDecision(populatedFgosDir, { text: 'D1: repo-wide thing', rationale: 'r', scope: 'repo' });
-  const first = generateDecisionIndex(repoRoot, populatedFgosDir);
-  assert.equal(first.changed, true);
-  const before = fs.readFileSync(indexPathFor(repoRoot), 'utf8');
+test('generateDecisionIndex: preserves committed rows absent from local state and adds state rows idempotently', () => {
+  const repoRoot = tmpRepoRoot();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(path.dirname(indexPathFor(repoRoot)), { recursive: true });
+  const committed = { scope: 'repo', text: 'D-ADR9998: committed | decision', rationale: 'from another machine', ts: '2026-01-01' };
+  fs.writeFileSync(indexPathFor(repoRoot), buildDecisionIndexMarkdown([committed]));
+  addDecision(fgosDir, { scope: 'repo', text: 'D-ADR9999: local decision', rationale: 'local' });
+  const first = generateDecisionIndex(repoRoot, fgosDir);
+  assert.ok(first.content.includes('D-ADR9998: committed \\| decision'));
+  assert.match(first.content, /D-ADR9999: local decision/);
+  assert.equal(generateDecisionIndex(repoRoot, fgosDir).changed, false);
+  assert.equal(generateDecisionIndex(repoRoot, path.join(repoRoot, 'absent')).changed, false);
+});
 
-  assert.throws(
-    () => generateDecisionIndex(repoRoot, emptyFgosDir),
-    /refusing to overwrite/,
-  );
-
-  const after = fs.readFileSync(indexPathFor(repoRoot), 'utf8');
-  assert.equal(after, before, 'the real index must survive the refused write untouched');
+test('buildDecisionIndexMarkdown: state wins by ADR identity and fallback scope/timestamp', () => {
+  const old = [
+    { scope: 'repo', text: 'D-ADR9999: old', rationale: 'old', ts: '2026-01-01' },
+    { scope: 'repo', text: 'old unnamed', rationale: 'old', ts: '2026-01-02' },
+  ];
+  const next = old.map((d) => ({ ...d, text: d.text.replace('old', 'new') }));
+  const result = buildDecisionIndexMarkdown(next, buildDecisionIndexMarkdown(old));
+  assert.doesNotMatch(result, /old unnamed|D-ADR9999: old/);
+  assert.match(result, /new unnamed/);
+  assert.equal(buildDecisionIndexMarkdown(next, result), result);
 });
 
 test('generateDecisionIndex: an empty-to-empty regenerate (nothing was ever recorded) is not a refusal -- there is no real content to lose', () => {
@@ -199,4 +206,17 @@ test('CLI: decision-index --check never writes even when it refuses', () => {
   run(cwd, ['decision-index', '--check']);
   const afterRefusal = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
   assert.equal(beforeAll, afterRefusal, '--check must never write, even when it detects and reports drift');
+});
+
+test('buildDecisionIndexMarkdown: historical ADR IDs reused across scopes retain both decisions', () => {
+  const rows = [
+    { scope: 'runner', text: 'D-ADR0032: Iron Law', rationale: 'a', ts: '2026-01-01' },
+    { scope: 'work-state', text: 'D-ADR0032: Team Harness', rationale: 'b', ts: '2026-01-02' },
+  ];
+  const committed = buildDecisionIndexMarkdown(rows);
+  assert.equal(buildDecisionIndexMarkdown([], committed), committed);
+  const updated = buildDecisionIndexMarkdown([{ ...rows[0], text: 'D-ADR0032: updated Iron Law' }], committed);
+  assert.match(updated, /updated Iron Law/);
+  assert.match(updated, /Team Harness/);
+  assert.equal((updated.match(/D-ADR0032/g) ?? []).length, 2);
 });

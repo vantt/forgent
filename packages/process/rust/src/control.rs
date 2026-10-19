@@ -8,6 +8,23 @@ use std::process::{Child, Command};
 use crate::facts::{Observer, ProcTuple};
 use crate::{platform, FdSlot};
 
+/// Arm SIGKILL on the calling thread's parent death (Linux gates only).
+/// Call before starting children, then complete the launch handshake: a parent
+/// outside our PID namespace is reported as zero, so getppid cannot detect its
+/// death before registration. A visible parent change is refused immediately.
+#[cfg(target_os = "linux")]
+pub fn arm_parent_death_signal() -> io::Result<()> {
+    // SAFETY: getppid has no preconditions; prctl takes a signal number.
+    let parent = unsafe { libc::getppid() };
+    if unsafe { libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0) } < 0 {
+        return Err(io::Error::last_os_error());
+    }
+    if unsafe { libc::getppid() } != parent {
+        return Err(io::Error::other("parent died while arming death signal"));
+    }
+    Ok(())
+}
+
 /// The signals this crate sends.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Signal {
