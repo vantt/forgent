@@ -1,0 +1,404 @@
+{
+ "rule": "L12-34 unpatched stratum: per set, population = files with empty diff and >=1 edge, excluding files already selected; k=ceil(0.15*n); seed \"A51-step03-file-v1-unpatched\" NUL pin NUL batch-id; rank sha256(seed NUL path), tie path",
+ "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+ "sets": {
+  "batch-004": {
+   "population": [
+    "docs/architect/agent-coordination/decisions/README.md",
+    "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md"
+   ],
+   "selected": [
+    "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md"
+   ]
+  },
+  "batch-007": {
+   "population": [
+    "docs/architect/packaging-distribution/README.md",
+    "docs/architect/packaging-distribution/migration-map.md",
+    "docs/architect/packaging-distribution/scope-map.md"
+   ],
+   "selected": [
+    "docs/architect/packaging-distribution/migration-map.md"
+   ]
+  },
+  "batch-008": {
+   "population": [
+    "docs/architect/proposals/README.md"
+   ],
+   "selected": [
+    "docs/architect/proposals/README.md"
+   ]
+  },
+  "batch-010": {
+   "population": [
+    "docs/architect/workspace-topology-roadmap.md"
+   ],
+   "selected": [
+    "docs/architect/workspace-topology-roadmap.md"
+   ]
+  },
+  "batch-011": {
+   "population": [
+    "docs/generated/README.md"
+   ],
+   "selected": [
+    "docs/generated/README.md"
+   ]
+  },
+  "batch-012": {
+   "population": [
+    "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+   ],
+   "selected": [
+    "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+   ]
+  },
+  "batch-013": {
+   "population": [
+    "docs/platform/README.md"
+   ],
+   "selected": [
+    "docs/platform/README.md"
+   ]
+  },
+  "batch-014": {
+   "population": [
+    "docs/platform/agent-confinement/README.md"
+   ],
+   "selected": [
+    "docs/platform/agent-confinement/README.md"
+   ]
+  },
+  "batch-015": {
+   "population": [
+    "docs/platform/agent-coordination/architecture/README.md",
+    "docs/platform/agent-coordination/decisions/README.md",
+    "docs/platform/agent-coordination/history/README.md",
+    "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/platform/agent-coordination/history/retired-engine/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+    "docs/platform/agent-coordination/proposals/README.md",
+    "docs/platform/agent-coordination/verification/README.md",
+    "docs/platform/agent-coordination/vocabulary/README.md"
+   ],
+   "selected": [
+    "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+    "docs/platform/agent-coordination/history/retired-engine/files/README.md"
+   ]
+  },
+  "batch-016": {
+   "population": [
+    "docs/platform/architecture-map.md"
+   ],
+   "selected": [
+    "docs/platform/architecture-map.md"
+   ]
+  },
+  "batch-017": {
+   "population": [
+    "docs/platform/claude-plugin/README.md"
+   ],
+   "selected": [
+    "docs/platform/claude-plugin/README.md"
+   ]
+  },
+  "batch-018": {
+   "population": [
+    "docs/platform/decision-citation-drift/README.md"
+   ],
+   "selected": [
+    "docs/platform/decision-citation-drift/README.md"
+   ]
+  },
+  "batch-019": {
+   "population": [
+    "docs/platform/distillery/README.md"
+   ],
+   "selected": [
+    "docs/platform/distillery/README.md"
+   ]
+  },
+  "batch-020": {
+   "population": [
+    "docs/platform/documentation/operations/portals/docs-portal.md"
+   ],
+   "selected": [
+    "docs/platform/documentation/operations/portals/docs-portal.md"
+   ]
+  },
+  "batch-021": {
+   "population": [
+    "docs/platform/herdr-web-dashboard/README.md"
+   ],
+   "selected": [
+    "docs/platform/herdr-web-dashboard/README.md"
+   ]
+  },
+  "batch-023": {
+   "population": [
+    "docs/platform/host-invocation-routing/README.md",
+    "docs/platform/host-invocation-routing/architecture/README.md",
+    "docs/platform/host-invocation-routing/contracts/README.md",
+    "docs/platform/host-invocation-routing/roadmap.md"
+   ],
+   "selected": [
+    "docs/platform/host-invocation-routing/README.md"
+   ]
+  },
+  "batch-024": {
+   "population": [
+    "docs/platform/observe/README.md"
+   ],
+   "selected": [
+    "docs/platform/observe/README.md"
+   ]
+  },
+  "batch-025": {
+   "population": [
+    "docs/platform/packaging-distribution/README.md",
+    "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md"
+   ],
+   "selected": [
+    "docs/platform/packaging-distribution/README.md"
+   ]
+  },
+  "batch-026": {
+   "population": [
+    "docs/platform/proposals/README.md",
+    "docs/platform/proposals/component-authority-boundary-map.md"
+   ],
+   "selected": [
+    "docs/platform/proposals/component-authority-boundary-map.md"
+   ]
+  },
+  "batch-027": {
+   "population": [
+    "docs/platform/runner/README.md"
+   ],
+   "selected": [
+    "docs/platform/runner/README.md"
+   ]
+  },
+  "batch-028": {
+   "population": [
+    "docs/platform/system-architecture/architecture/roadmap.md",
+    "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md"
+   ],
+   "selected": [
+    "docs/platform/system-architecture/architecture/roadmap.md"
+   ]
+  },
+  "batch-029": {
+   "population": [
+    "docs/platform/ui-spec/README.md"
+   ],
+   "selected": [
+    "docs/platform/ui-spec/README.md"
+   ]
+  },
+  "batch-030": {
+   "population": [
+    "docs/platform/work-state/README.md"
+   ],
+   "selected": [
+    "docs/platform/work-state/README.md"
+   ]
+  },
+  "batch-031": {
+   "population": [
+    "docs/reference/codebase-scatter-consolidation-roadmap.md"
+   ],
+   "selected": [
+    "docs/reference/codebase-scatter-consolidation-roadmap.md"
+   ]
+  },
+  "batch-032": {
+   "population": [
+    "docs/user/README.md"
+   ],
+   "selected": [
+    "docs/user/README.md"
+   ]
+  },
+  "batch-033": {
+   "population": [
+    "docs/README.md"
+   ],
+   "selected": [
+    "docs/README.md"
+   ]
+  }
+ },
+ "parts": {
+  "u01": [
+   {
+    "set": "batch-016",
+    "file": "docs/platform/architecture-map.md",
+    "edges": 39
+   },
+   {
+    "set": "batch-026",
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "edges": 26
+   },
+   {
+    "set": "batch-007",
+    "file": "docs/architect/packaging-distribution/migration-map.md",
+    "edges": 25
+   },
+   {
+    "set": "batch-013",
+    "file": "docs/platform/README.md",
+    "edges": 23
+   },
+   {
+    "set": "batch-033",
+    "file": "docs/README.md",
+    "edges": 15
+   },
+   {
+    "set": "batch-025",
+    "file": "docs/platform/packaging-distribution/README.md",
+    "edges": 14
+   }
+  ],
+  "u02": [
+   {
+    "set": "batch-030",
+    "file": "docs/platform/work-state/README.md",
+    "edges": 14
+   },
+   {
+    "set": "batch-004",
+    "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+    "edges": 13
+   },
+   {
+    "set": "batch-015",
+    "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+    "edges": 12
+   },
+   {
+    "set": "batch-020",
+    "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "edges": 12
+   },
+   {
+    "set": "batch-028",
+    "file": "docs/platform/system-architecture/architecture/roadmap.md",
+    "edges": 10
+   },
+   {
+    "set": "batch-008",
+    "file": "docs/architect/proposals/README.md",
+    "edges": 6
+   }
+  ],
+  "u03": [
+   {
+    "set": "batch-015",
+    "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+    "edges": 6
+   },
+   {
+    "set": "batch-032",
+    "file": "docs/user/README.md",
+    "edges": 6
+   },
+   {
+    "set": "batch-015",
+    "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "edges": 5
+   },
+   {
+    "set": "batch-015",
+    "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+    "edges": 5
+   },
+   {
+    "set": "batch-010",
+    "file": "docs/architect/workspace-topology-roadmap.md",
+    "edges": 4
+   },
+   {
+    "set": "batch-011",
+    "file": "docs/generated/README.md",
+    "edges": 4
+   }
+  ],
+  "u04": [
+   {
+    "set": "batch-027",
+    "file": "docs/platform/runner/README.md",
+    "edges": 4
+   },
+   {
+    "set": "batch-029",
+    "file": "docs/platform/ui-spec/README.md",
+    "edges": 3
+   },
+   {
+    "set": "batch-012",
+    "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-014",
+    "file": "docs/platform/agent-confinement/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-017",
+    "file": "docs/platform/claude-plugin/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-018",
+    "file": "docs/platform/decision-citation-drift/README.md",
+    "edges": 2
+   }
+  ],
+  "u05": [
+   {
+    "set": "batch-019",
+    "file": "docs/platform/distillery/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-021",
+    "file": "docs/platform/herdr-web-dashboard/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-023",
+    "file": "docs/platform/host-invocation-routing/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-024",
+    "file": "docs/platform/observe/README.md",
+    "edges": 2
+   },
+   {
+    "set": "batch-031",
+    "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+    "edges": 2
+   }
+  ]
+ }
+}
