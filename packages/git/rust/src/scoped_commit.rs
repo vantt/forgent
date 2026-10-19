@@ -391,10 +391,9 @@ impl GitDriver {
                             ResultCode::Committed
                         },
                         oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
-                        files: match &old.intent().kind {
-                            OperationKind::ScopedCommit(payload) => payload.paths.clone(),
-                            _ => unreachable!(),
-                        },
+                        files: paths(&self.checkout_bytes(repo, scope, &[
+                            "diff", "--name-only", "--no-renames", "-z", &baseline.head, observed,
+                        ])?)?,
                         operation_id: id.into(),
                     });
                 }

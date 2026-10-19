@@ -198,7 +198,7 @@ fn lock_fd(args: &[String]) -> i32 {
     if mode == "--guarantee" {
         let target = PathBuf::from(flags.values("--guarantee")[0]);
         let dir = if target.is_dir() { target } else { target.parent().map(Path::to_path_buf).unwrap_or(target) };
-        return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json() }), EXIT_OK);
+        return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json(), "reachFloorTicks": fgos_process::facts::creation_mark().map(|mark| mark.ticks.to_string()) }), EXIT_OK);
     }
     if mode == "--predecessor-state" {
         return predecessor_state(Path::new(flags.values("--predecessor-state")[0]));

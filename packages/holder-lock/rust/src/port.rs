@@ -299,11 +299,29 @@ impl BorrowedHandle<'static> {
     /// # Safety
     /// `fd` must come from an acquired holder-lock handle, and that owner must
     /// remain borrowed until the synchronous operation and all copies end.
+    /// On Linux `reach_floor_ticks` must be an actual boot-tick observation
+    /// taken before the owner opened this fresh description, never at handover.
     pub unsafe fn from_acquired_description(
         fd: std::os::fd::RawFd,
         resource: Resource,
         kill_wait_ms: u64,
+        reach_floor_ticks: Option<u64>,
     ) -> Result<Self, BorrowError> {
+        // The Node bridge retains the real observation taken before opening
+        // this acquired description. Never substitute a handover-time floor:
+        // older fork copies would then fall outside every borrowed drain.
+        #[cfg(target_os = "linux")]
+        let floor = {
+            let ticks = reach_floor_ticks.ok_or_else(|| BorrowError::InvalidSpec("lock-reach-history-missing".into()))?;
+            let now = fgos_process::facts::creation_mark().ok_or_else(|| BorrowError::InvalidSpec("lock-reach-clock-unreadable".into()))?;
+            if ticks > now.ticks { return Err(BorrowError::InvalidSpec("lock-reach-floor-invalid".into())); }
+            // A cross-process observation has no trustworthy Instant or young
+            // PID-allocation window. Retain its actual boot ticks and disable
+            // that optimization; at is unused when last_pid is None.
+            Some(fgos_process::facts::CreationMark { ticks, last_pid: None, at: now.at })
+        };
+        #[cfg(not(target_os = "linux"))]
+        let floor = { let _ = reach_floor_ticks; None };
         use std::os::fd::{BorrowedFd, FromRawFd, IntoRawFd};
         let file = unsafe { BorrowedFd::borrow_raw(fd) }
             .try_clone_to_owned()
@@ -314,7 +332,7 @@ impl BorrowedHandle<'static> {
             resource,
             mode: Mode::Ex,
             kill_wait_ms,
-            since: std::sync::Mutex::new((None, None)),
+            since: std::sync::Mutex::new((floor, floor)),
         };
         let loan = Self {
             handle,
@@ -1240,6 +1258,57 @@ pub fn guarantee(dir: &Path) -> Guarantee {
 #[cfg(all(test, target_os = "linux"))]
 mod proof_tests {
     use super::*;
+
+    #[test]
+    fn ffi_handover_retains_the_acquisition_floor_and_refuses_missing_history() {
+        use std::os::fd::AsRawFd;
+        let path = std::env::temp_dir().join(format!("fgos-ffi-reach-{}", std::process::id()));
+        let resource = Resource::new("proof", &path);
+        let floor = fgos_process::facts::creation_mark().unwrap();
+        let owner = match acquire(&resource, Mode::Ex, Wait::Try, 2000) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        let missing = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, None) };
+        assert!(matches!(missing, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-history-missing"));
+        let future = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(u64::MAX)) };
+        assert!(matches!(future, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-floor-invalid"));
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(floor.ticks)) }.unwrap();
+        assert_eq!(loan.as_ref().since().unwrap().ticks, floor.ticks);
+        assert_eq!(loan.as_ref().since().unwrap().last_pid, None);
+        validate_quiescent(loan.as_ref()).unwrap();
+        drop(loan);
+        assert_eq!(probe(&resource).unwrap(), Probe::Held);
+        drop(owner);
+        assert_eq!(probe(&resource).unwrap(), Probe::Free);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn ffi_handover_does_not_skip_a_copy_created_before_the_loan() {
+        use std::os::fd::AsRawFd;
+        let path = std::env::temp_dir().join(format!("fgos-ffi-copy-{}", std::process::id()));
+        let resource = Resource::new("proof", &path);
+        let floor = fgos_process::facts::creation_mark().unwrap();
+        let owner = match acquire(&resource, Mode::Ex, Wait::Try, 2000) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        let request = borrowed_request(&owner, &BorrowSpec { argv: vec!["sleep".into(), "30".into()], ..Default::default() }).unwrap();
+        let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), owner.file())]).unwrap();
+        // Cross a real clock tick: a handover-time floor would miss this copy.
+        std::thread::sleep(Duration::from_millis(30));
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor.ticks)) }.unwrap();
+        let result = validate_quiescent(loan.as_ref());
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert!(matches!(result, Err(BorrowError::ForeignHolder { pids }) if pids.contains(&child.id())));
+        validate_quiescent(loan.as_ref()).unwrap();
+        drop(loan);
+        assert_eq!(probe(&resource).unwrap(), Probe::Held);
+        drop(owner);
+        std::fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn old_or_unreadable_pid_marks_use_the_start_time_fallback_and_kill_holders() {

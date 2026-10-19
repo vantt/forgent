@@ -24,6 +24,7 @@ pub fn mint_git_loan(
     name: String,
     path: String,
     kill_wait_ms: u32,
+    reach_floor_ticks: Option<String>,
 ) -> Result<External<Loan>> {
     check()?;
     #[cfg(unix)]
@@ -35,6 +36,7 @@ pub fn mint_git_loan(
                 fd,
                 Resource::new(name, path),
                 u64::from(kill_wait_ms),
+                reach_floor_ticks.as_deref().map(str::parse).transpose().map_err(error)?,
             )
         }
         .map_err(error)?;
@@ -42,7 +44,7 @@ pub fn mint_git_loan(
     }
     #[cfg(not(unix))]
     {
-        let _ = (fd, name, path, kill_wait_ms);
+        let _ = (fd, name, path, kill_wait_ms, reach_floor_ticks);
         Err(error("git-lock-handover-unsupported"))
     }
 }

@@ -80,7 +80,7 @@ export class LockHandle {
     this.scope = scope;
     this.projectRoot = projectRoot;
     this.killWaitMs = killWaitMs;
-    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, released: false });
+    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, released: false, reachFloorTicks: claim.reachFloorTicks ?? null });
     Object.freeze(this);
   }
 
@@ -175,8 +175,8 @@ function prepareAcquire(scope, name, params) {
   const killWaitMs = readPredecessorKillWaitMs({ projectRoot });
   const bin = hostBin({ fgosDir: params.fgosDir });
   ensureLockFile(lock);
-  assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
-  return { lock, bin, projectRoot, killWaitMs, predecessorKinds: params.predecessorKinds, env: routeEnv() };
+  const { reachFloorTicks } = assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
+  return { lock, bin, projectRoot, killWaitMs, reachFloorTicks, predecessorKinds: params.predecessorKinds, env: routeEnv() };
 }
 
 /** The lock file exists (created once, never removed while the resource
@@ -198,7 +198,7 @@ function routeTimeoutMs(wait, killWaitMs) {
 /** `claim` is what the lock lives in: `{ fd }` or `{ hold }`. */
 function makeHandle(prepared, scope, claim) {
   const { lock, projectRoot, killWaitMs } = prepared;
-  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim }, handleAuthority);
+  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim: { ...claim, reachFloorTicks: prepared.reachFloorTicks } }, handleAuthority);
   scope.track(handle);
   return handle;
 }
@@ -695,7 +695,7 @@ export function registerNativeHandover(mint, dispose) {
     try {
       for (let i = 0; i < handles.length; i += 1) {
         const handle = handles[i];
-        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs));
+        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs, entries[i].reachFloorTicks));
       }
       // Native calls are synchronous; Externals are consumed once and closed
       // before this guard ends, including marshaling/validation failures.

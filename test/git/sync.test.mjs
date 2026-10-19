@@ -24,7 +24,7 @@ test('Sync creates a clean exact two-parent merge and no resolver grant',()=>{
  const f=fixture();try {const head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
  const result=f.port.start({operationId:'clean',target:f.target,message:'consumer sync message'},f.held);assert.equal(result.state,'done');assert.deepEqual(result.resolverGrant,[]);
  assert.deepEqual(execFileSync('git',['-C',f.linked,'show','-s','--format=%P'],{encoding:'utf8'}).trim().split(' '),[head,f.target]);
- assert.equal(f.port.inspect({operationId:'clean'},f.held).state,'done');
+ const replay=f.port.inspect({operationId:'clean'},f.held);assert.equal(replay.state,'done');assert.deepEqual(replay.commit,result.commit);
  }finally{f.close();}
 });
 test('Sync leaves only temporary conflict grants and refuses markers before staging',()=>{
@@ -39,5 +39,25 @@ test('Sync abort preserves resolver bytes and only closes its own merge',()=>{
  const f=fixture(true);try {f.port.start({operationId:'abort',target:f.target,message:'sync'},f.held);fs.writeFileSync(path.join(f.linked,'a'),'keep resolver edits\n');
  assert.equal(f.port.abort({operationId:'abort'},f.held).state,'conflict-aborted');assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'keep resolver edits\n');
  assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
+ }finally{f.close();}
+});
+
+test('Sync refuses foreign staged resolver paths and retains their bytes',()=>{
+ const f=fixture(true);try {
+ f.port.start({operationId:'foreign',target:f.target,message:'sync'},f.held);
+ fs.writeFileSync(path.join(f.linked,'foreign'),'keep');execFileSync('git',['-C',f.linked,'add','foreign']);
+ assert.throws(()=>f.port.continue({operationId:'foreign'},f.held),/sync-index-changed|foreign-staged/);
+ assert.throws(()=>f.port.abort({operationId:'foreign'},f.held),/foreign-staged/);
+ assert.equal(fs.readFileSync(path.join(f.linked,'foreign'),'utf8'),'keep');
+ }finally{f.close();}
+});
+
+test('Sync preserves a rejecting hook cause and never reports its open merge as not started',()=>{
+ const f=fixture();try {
+ const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-sync-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
+ assert.throws(()=>f.port.start({operationId:'rejected',target:f.target,message:'sync'},f.held),/hook-rejected/);
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','MERGE_HEAD'],{encoding:'utf8'}).trim(),f.target);
+ assert.throws(()=>f.port.inspect({operationId:'rejected'},f.held),/sync-commit-attempt-recovery-required/);
+ assert.equal(fs.readFileSync(path.join(f.linked,'incoming'),'utf8'),'target\n');
  }finally{f.close();}
 });

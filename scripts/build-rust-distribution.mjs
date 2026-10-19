@@ -72,7 +72,7 @@ export function nativeAddonComponent(file, relativePath, repoRoot = REPO_ROOT) {
     }
   }
   if (Object.keys(crateChecksums).length !== 3) throw new Error('Expected three locked napi crates');
-  return { path: relativePath, digest: hashFile(file).slice(7), target: `${target.platform}-${target.arch}`, napiVersion: 8, crateChecksums };
+  return { path: relativePath, digest: hashFile(file).slice(7), target: `${target.platform}-${target.arch}`, napiVersion: 8, crateChecksums, capabilities: gitCapabilitiesForHost() };
 }
 
 /**

@@ -307,13 +307,25 @@ impl GitDriver {
                         ResultCode::Committed
                     },
                     oid: Some(Oid::parse(observed, repo.object_format()).map_err(failure)?),
-                    files: vec![],
+                    files: paths(&self.checkout_bytes(repo, scope, &[
+                        "diff", "--name-only", "--no-renames", "-z", head, observed,
+                    ])?)?,
                     operation_id: id.into(),
                 }),
             ));
         }
         if chain.outcome().is_some() {
+            if merge.is_some() {
+                // A rejected commit can leave our merge open. A terminal
+                // refusal is not evidence that no checkout effect remains.
+                return Err(recovery("sync-rejected-merge-recovery-required"));
+            }
             return Ok(info(id, head, target, "not-started", vec![], None));
+        }
+        // A commit may have moved HEAD and then died before its receipt.
+        // Never infer a safe retry from HEAD equality (including ABA).
+        if matches!(chain.last().phase, Phase::SyncCommitAttempt { .. }) {
+            return Err(recovery("sync-commit-attempt-recovery-required"));
         }
         if merge.is_none() {
             if self.ancestry(
@@ -406,6 +418,7 @@ impl GitDriver {
             return Err(failure("staged-set-mismatch"));
         }
         let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+        let attempted = wal.append(chain, Phase::SyncCommitAttempt { tree: tree.clone() }).map_err(failure)?;
         let out = self.checkout_call(
             repo,
             scope,
@@ -423,7 +436,12 @@ impl GitDriver {
         )?;
         let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         if &observed == head {
-            return Err(out.error("hook-rejected"));
+            if !out.success {
+                // Keep the attempted chain and target pin while the merge is
+                // open; a hook refusal does not erase its checkout effects.
+                return Err(out.error("hook-rejected"));
+            }
+            return Err(recovery("sync-commit-effect-unknown"));
         }
         let parents =
             self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", "HEAD"])?;
@@ -437,9 +455,11 @@ impl GitDriver {
                 != vec![head.as_str(), target.as_str()]
             || self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])? != tree
             || files != actual_staged;
+        let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+        crate::refs::sync_refs(repo, &RefName::parse(&reference).map_err(failure)?)?;
         let terminal = wal
             .append(
-                chain,
+                &attempted,
                 Phase::Outcome(Outcome::Commit {
                     observed: observed.clone(),
                     contract_violation: violation,

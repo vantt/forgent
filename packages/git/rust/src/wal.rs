@@ -220,6 +220,8 @@ pub enum Phase {
         staged: Vec<String>,
         index_digest: String,
     },
+    /// Durable one-shot barrier before Sync invokes its ref-moving commit.
+    SyncCommitAttempt { tree: String },
     TargetAttempt {
         prior_target_attempt: Option<()>,
         expected: Tip,
@@ -704,12 +706,16 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                     .chain(staged)
                     .all(|p| crate::fgos_scope_literal(p).is_ok())
         }
-        (Phase::TargetAttempt { .. } | Phase::SyncState { .. }, Phase::Outcome(o)) => match o {
+        (Phase::SyncState { .. }, Phase::SyncCommitAttempt { tree }) => {
+            matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
+        }
+        (Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. }, Phase::Outcome(o)) => match o {
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
                     OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
                 ) && Oid::parse(observed, i.object_format).is_ok()
+                    && (!matches!(i.kind, OperationKind::Sync(_)) || matches!(prev, Phase::SyncCommitAttempt { .. }))
             }
             Outcome::CommitRejected { cause } => {
                 matches!(
