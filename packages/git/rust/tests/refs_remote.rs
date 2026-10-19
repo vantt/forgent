@@ -454,3 +454,483 @@ fn worktree_add_queued_on_admin_cannot_attach_after_delete() {
         assert!(!f.root.join("late").exists());
     }
 }
+
+#[test]
+fn pinned_remote_refuses_rewrites_and_repository_transport_config() {
+    let f = Fixture::new("files");
+    let remote = f.remote();
+    let evil = f.root.join("evil.git");
+    git(&f.path, &["init", "-q", "--bare", evil.to_str().unwrap()]);
+    let mappings = [RefMapping {
+        source: RefName::parse("refs/heads/trunk").unwrap(),
+        destination: RefName::parse("refs/heads/shared").unwrap(),
+    }];
+    for suffix in ["insteadOf", "pushInsteadOf"] {
+        let key = format!("url.{}.{}", evil.display(), suffix);
+        git(&f.path, &["config", &key, &remote.pinned_url]);
+        // Reproduce Git's explicit-URL redirect before checking the hardened door.
+        git(
+            &f.path,
+            &[
+                "push",
+                "--",
+                &remote.pinned_url,
+                "trunk:refs/heads/reproduced",
+            ],
+        );
+        assert_eq!(
+            git(&evil, &["rev-parse", "refs/heads/reproduced"]),
+            f.second.as_str()
+        );
+        assert!(git(Path::new(&remote.pinned_url), &["for-each-ref"]).is_empty());
+        git(&evil, &["update-ref", "-d", "refs/heads/reproduced"]);
+        assert!(f
+            .driver
+            .push_refs(&f.repo, vec![], &remote, &mappings, "fixture", suffix)
+            .unwrap_err()
+            .cause
+            .contains("repository-config-untrusted"));
+        git(&f.path, &["config", "--unset", &key]);
+        assert!(git(&evil, &["for-each-ref"]).is_empty());
+        assert!(git(Path::new(&remote.pinned_url), &["for-each-ref"]).is_empty());
+    }
+    // Safe generic values are overridden; a nonexistent proxy cannot redirect
+    // or prevent a real transfer. Scoped values still refuse below.
+    git(&f.path, &["config", "http.proxy", "http://127.0.0.1:1"]);
+    git(&f.path, &["config", "http.sslVerify", "false"]);
+    git(
+        &f.path,
+        &["config", "http.extraHeader", "Authorization: untrusted"],
+    );
+    f.driver
+        .push_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &mappings,
+            "fixture",
+            "safe-overrides",
+        )
+        .unwrap();
+    for key in ["http.proxy", "http.sslVerify", "http.extraHeader"] {
+        git(&f.path, &["config", "--unset", key]);
+    }
+    for key in [
+        "http.sslCAInfo",
+        "http.https://example.invalid/.proxy",
+        "http.https://example.invalid/.extraHeader",
+        "remote.origin.proxy",
+        "protocol.file.allow",
+    ] {
+        git(&f.path, &["config", key, "false"]);
+        assert!(
+            f.driver
+                .push_refs(&f.repo, vec![], &remote, &mappings, "fixture", "transport")
+                .unwrap_err()
+                .cause
+                .contains("repository-transport-config-untrusted"),
+            "{key}"
+        );
+        git(&f.path, &["config", "--unset", key]);
+    }
+}
+
+#[test]
+fn atomic_push_rejection_leaves_every_target_unchanged() {
+    let f = Fixture::new("files");
+    let remote = f.remote();
+    git(
+        &f.path,
+        &["push", &remote.pinned_url, "trunk:refs/heads/existing"],
+    );
+    git(&f.path, &["branch", "old", f.first.as_str()]);
+    let mappings = [
+        RefMapping {
+            source: RefName::parse("refs/heads/trunk").unwrap(),
+            destination: RefName::parse("refs/heads/new").unwrap(),
+        },
+        RefMapping {
+            source: RefName::parse("refs/heads/old").unwrap(),
+            destination: RefName::parse("refs/heads/existing").unwrap(),
+        },
+    ];
+    assert!(matches!(
+        f.driver
+            .push_refs(&f.repo, vec![], &remote, &mappings, "fixture", "atomic")
+            .unwrap()
+            .remote,
+        Remote::Rejected
+    ));
+    assert_eq!(
+        git(
+            Path::new(&remote.pinned_url),
+            &["for-each-ref", "--format=%(refname)"]
+        ),
+        "refs/heads/existing"
+    );
+    let chain = wal::Wal::open(&f.repo).unwrap().inspect("atomic").unwrap();
+    assert!(
+        matches!(chain.outcome(), Some(wal::Outcome::Transfer { acknowledged:false, unknown:false, observations, .. }) if observations.len() == 2)
+    );
+}
+
+#[test]
+fn fetch_rewind_and_stale_destinations_settle_with_observations() {
+    struct Move(PathBuf, String);
+    impl FileSystem for Move {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "after-remote-transfer" {
+                git(
+                    &self.0,
+                    &["update-ref", "refs/remotes/origin/shared", &self.1],
+                );
+            }
+            Ok(())
+        }
+    }
+    for backend in ["files", "reftable"] {
+        let f = Fixture::new(backend);
+        let remote = f.remote();
+        git(
+            &f.path,
+            &[
+                "push",
+                &remote.pinned_url,
+                &format!("{}:refs/heads/shared", f.first.as_str()),
+            ],
+        );
+        git(
+            &f.path,
+            &[
+                "update-ref",
+                "refs/remotes/origin/shared",
+                f.second.as_str(),
+            ],
+        );
+        let mappings = [RefMapping {
+            source: RefName::parse("refs/heads/shared").unwrap(),
+            destination: RefName::parse("refs/remotes/origin/shared").unwrap(),
+        }];
+        let stopped = f
+            .driver
+            .transfer_refs(
+                &f.repo,
+                vec![],
+                &remote,
+                &mappings,
+                "fixture",
+                "before-install",
+                false,
+                &Stop("after-remote-transfer"),
+            )
+            .unwrap();
+        assert!(matches!(stopped.remote, Remote::Rejected));
+        let stopped_chain = wal::Wal::open(&f.repo)
+            .unwrap()
+            .inspect("before-install")
+            .unwrap();
+        assert!(matches!(
+            stopped_chain.outcome(),
+            Some(wal::Outcome::Transfer {
+                acknowledged: false,
+                unknown: false,
+                ..
+            })
+        ));
+        assert!(matches!(
+            f.driver
+                .fetch_refs(&f.repo, vec![], &remote, &mappings, "fixture", "rewind")
+                .unwrap()
+                .remote,
+            Remote::Acknowledged
+        ));
+        assert_eq!(
+            git(&f.path, &["rev-parse", "refs/remotes/origin/shared"]),
+            f.first.as_str()
+        );
+        let untouched = RefName::parse("refs/remotes/origin/untouched").unwrap();
+        let stale_mappings = [
+            RefMapping {
+                source: mappings[0].source.clone(),
+                destination: untouched.clone(),
+            },
+            mappings[0].clone(),
+        ];
+        assert!(matches!(
+            f.driver
+                .transfer_refs(
+                    &f.repo,
+                    vec![],
+                    &remote,
+                    &stale_mappings,
+                    "fixture",
+                    "stale",
+                    false,
+                    &Move(f.path.clone(), f.second.as_str().into())
+                )
+                .unwrap()
+                .remote,
+            Remote::Rejected
+        ));
+        assert!(matches!(
+            f.driver.resolve_ref(&f.repo, &untouched).unwrap(),
+            RefValue::Absent
+        ));
+        let chain = wal::Wal::open(&f.repo).unwrap().inspect("stale").unwrap();
+        assert!(
+            matches!(chain.outcome(), Some(wal::Outcome::Transfer { acknowledged:false, observations, .. }) if observations.len() == 2)
+        );
+    }
+}
+
+#[test]
+fn rebase_bisect_and_user_locked_worktrees_have_precise_membership() {
+    let f = Fixture::new("files");
+    let linked = f.root.join("linked");
+    git(&f.path, &["branch", "topic", f.first.as_str()]);
+    git(
+        &f.path,
+        &["worktree", "add", "-q", linked.to_str().unwrap(), "topic"],
+    );
+    git(&f.path, &["worktree", "lock", linked.to_str().unwrap()]);
+    let other = RefName::parse("refs/heads/other").unwrap();
+    f.driver
+        .ensure_branch(&f.repo, vec![], &other, &f.first, "fixture", "locked-user")
+        .unwrap();
+    git(&linked, &["checkout", "--detach", "-q"]);
+    let admin = f.path.join(".git/worktrees/linked");
+    let name = RefName::parse("refs/heads/topic").unwrap();
+    for (i, (state, value)) in [
+        ("rebase-merge/head-name", "refs/heads/topic"),
+        ("rebase-apply/head-name", "refs/heads/topic"),
+        ("BISECT_START", "topic"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let p = admin.join(state);
+        fs::create_dir_all(p.parent().unwrap()).unwrap();
+        fs::write(&p, value).unwrap();
+        assert_eq!(
+            f.driver
+                .delete_ref(
+                    &f.repo,
+                    vec![],
+                    &name,
+                    &f.first,
+                    "fixture",
+                    &format!("busy-{i}")
+                )
+                .unwrap_err()
+                .cause,
+            "branch-in-use"
+        );
+        fs::remove_file(p).unwrap();
+    }
+}
+
+#[test]
+fn main_checkout_fast_forward_is_refused() {
+    let f = Fixture::new("files");
+    let name = RefName::parse("refs/heads/trunk").unwrap();
+    assert_eq!(
+        f.driver
+            .fast_forward_checked_out(
+                &f.repo,
+                vec![],
+                &name,
+                &f.second,
+                &f.first,
+                "fixture",
+                "main"
+            )
+            .unwrap_err()
+            .cause,
+        "main-checkout-fast-forward-refused"
+    );
+}
+
+#[test]
+fn unchanged_ref_lock_failure_is_not_cas_loss() {
+    let f = Fixture::new("files");
+    let name = RefName::parse("refs/heads/topic").unwrap();
+    git(&f.path, &["branch", "topic", f.first.as_str()]);
+    fs::write(f.path.join(".git/refs/heads/topic.lock"), b"foreign").unwrap();
+    let error = f
+        .driver
+        .advance_ref(
+            &f.repo,
+            vec![],
+            &name,
+            &f.first,
+            &f.second,
+            "fixture",
+            "locked-ref",
+        )
+        .unwrap_err();
+    assert_eq!(error.code, ResultCode::RecoveryRequired);
+    assert_ne!(error.cause, "compare-and-swap-stale");
+    let chain = wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("locked-ref")
+        .unwrap();
+    assert!(!matches!(chain.outcome(), Some(wal::Outcome::Loss { .. })));
+}
+
+#[test]
+fn ignored_checkout_collision_refuses_before_target_attempt() {
+    use std::os::unix::fs::MetadataExt;
+    let f = Fixture::new("files");
+    fs::write(f.path.join("collision"), b"new tracked data").unwrap();
+    git(&f.path, &["add", "collision"]);
+    git(&f.path, &["commit", "-qm", "track collision"]);
+    let next = Oid::parse(
+        &git(&f.path, &["rev-parse", "HEAD"]),
+        f.repo.object_format(),
+    )
+    .unwrap();
+    let linked = f.root.join("linked");
+    git(
+        &f.path,
+        &[
+            "worktree",
+            "add",
+            "-qb",
+            "topic",
+            linked.to_str().unwrap(),
+            f.second.as_str(),
+        ],
+    );
+    fs::write(f.path.join(".git/info/exclude"), "collision\n").unwrap();
+    fs::create_dir(linked.join("collision")).unwrap();
+    fs::write(linked.join("collision/precious"), b"precious ignored data").unwrap();
+    let m = fs::metadata(&linked).unwrap();
+    let lease = match acquire(
+        &Resource::new(
+            "dispatch-cwd",
+            f.path.join(format!(
+                ".fgos/locks/dispatch-cwd--{}-{}.lock",
+                m.dev(),
+                m.ino()
+            )),
+        ),
+        Mode::Ex,
+        Wait::Try,
+        1000,
+    ) {
+        Acquire::Acquired(h) => h,
+        _ => panic!(),
+    };
+    let error = f
+        .driver
+        .fast_forward_checked_out(
+            &f.repo,
+            vec![BorrowedHandle::new(&lease).unwrap()],
+            &RefName::parse("refs/heads/topic").unwrap(),
+            &f.second,
+            &next,
+            "fixture",
+            "collision",
+        )
+        .unwrap_err();
+    assert_eq!(error.cause, "checkout-preflight-failed");
+    assert_eq!(git(&f.path, &["rev-parse", "topic"]), f.second.as_str());
+    assert_eq!(
+        fs::read(linked.join("collision/precious")).unwrap(),
+        b"precious ignored data"
+    );
+    let chain = wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("collision")
+        .unwrap();
+    assert!(!chain
+        .records()
+        .iter()
+        .any(|r| matches!(r.phase, Phase::TargetAttempt { .. })));
+}
+
+#[test]
+fn nested_registered_worktree_resolution_uses_longest_prefix() {
+    let f = Fixture::new("files");
+    let outer = f.root.join("outer");
+    let inner = outer.join("inner");
+    git(
+        &f.path,
+        &["worktree", "add", "-qb", "outer", outer.to_str().unwrap()],
+    );
+    git(
+        &f.path,
+        &["worktree", "add", "-qb", "inner", inner.to_str().unwrap()],
+    );
+    for _ in 0..3 {
+        let ResolveRepo::Repository(repo) = f.driver.resolve_repo(&inner, &f.path).unwrap() else {
+            panic!()
+        };
+        assert_eq!(repo.git_dir(), f.path.join(".git/worktrees/inner"));
+    }
+}
+
+#[test]
+fn historical_publication_remote_kind_keeps_read_compatibility() {
+    for kind in ["RemoteFetch", "RemotePush"] {
+        let value = serde_json::json!({kind: {"url":"/remote", "refspecs":["refs/fgos/events/a:refs/fgos/events/a"]}});
+        let parsed: wal::OperationKind = serde_json::from_value(value).unwrap();
+        let serialized = serde_json::to_value(parsed).unwrap();
+        assert_eq!(serialized[kind]["targets"], serde_json::json!([]));
+    }
+}
+
+#[test]
+fn wal_schema_records_from_real_refs_and_transfers() {
+    let f = Fixture::new("files");
+    let name = RefName::parse("refs/heads/topic").unwrap();
+    f.driver
+        .ensure_branch(&f.repo, vec![], &name, &f.first, "fixture", "schema-create")
+        .unwrap();
+    f.driver
+        .delete_ref(&f.repo, vec![], &name, &f.first, "fixture", "schema-delete")
+        .unwrap();
+    let remote = f.remote();
+    f.driver
+        .push_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &[RefMapping {
+                source: RefName::parse("refs/heads/trunk").unwrap(),
+                destination: RefName::parse("refs/heads/shared").unwrap(),
+            }],
+            "fixture",
+            "schema-push",
+        )
+        .unwrap();
+    f.driver
+        .fetch_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &[RefMapping {
+                source: RefName::parse("refs/heads/shared").unwrap(),
+                destination: RefName::parse("refs/remotes/origin/shared").unwrap(),
+            }],
+            "fixture",
+            "schema-fetch",
+        )
+        .unwrap();
+    let wal = wal::Wal::open(&f.repo).unwrap();
+    for id in [
+        "schema-create",
+        "schema-delete",
+        "schema-push",
+        "schema-fetch",
+    ] {
+        let chain = wal.inspect(id).unwrap();
+        for record in chain.records() {
+            let bytes = serde_json::to_vec(record).unwrap();
+            let decoded: wal::Record = serde_json::from_slice(&bytes).unwrap();
+            assert_eq!(decoded.digest, record.digest);
+            // --nocapture supplies actual serialized evidence to a schema validator.
+            println!("WAL_SCHEMA_RECORD {}", String::from_utf8(bytes).unwrap());
+        }
+    }
+}

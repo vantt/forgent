@@ -1,7 +1,7 @@
 //! Explicit non-event transfers. Remote transport is never enabled by another port.
 use crate::{
     driver::{Output, Policy},
-    refs::{admission, direct, failure, pending, receipt, sync_refs, tip, Authority},
+    refs::{admission, direct, failure, pending, receipt, recovery, sync_refs, tip, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -34,7 +34,7 @@ impl GitDriver {
             return Err(failure("remote-not-granted"));
         }
         let url = Inspect::remote_url(self, repo, &grant.name)?;
-        if url != grant.pinned_url || url.contains(['\n', '\r', '\0', '@']) || url.starts_with('-')
+        if url != grant.pinned_url || url_has_credentials_or_controls(&url) || url.starts_with('-')
         {
             return Err(failure("remote-url-not-pinned-or-credentials-present"));
         }
@@ -243,7 +243,7 @@ impl GitDriver {
                             Remote::Rejected
                         },
                     ),
-                    _ => Err(failure("operation-recovery-required")),
+                    _ => Err(recovery("operation-recovery-required")),
                 };
             }
             Err(wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => (),
@@ -294,18 +294,27 @@ impl GitDriver {
             }
             updates.push((&m.destination, old, next));
         }
-        let kind = OperationKind::RemoteTransfer(Box::new(wal::RemoteTransfer {
-            direction: if push { "push" } else { "fetch" }.into(),
-            url: url.clone(),
-            mappings: mappings
-                .iter()
-                .map(|m| (m.source.as_str().into(), m.destination.as_str().into()))
-                .collect(),
-            targets: updates
-                .iter()
-                .map(|(n, o, v)| (n.as_str().into(), tip(o), Tip::Oid(v.as_str().into())))
-                .collect(),
-        }));
+        let refspecs = mappings
+            .iter()
+            .map(|m| format!("{}:{}", m.source.as_str(), m.destination.as_str()))
+            .collect();
+        let targets = updates
+            .iter()
+            .map(|(n, o, v)| (n.as_str().into(), tip(o), Tip::Oid(v.as_str().into())))
+            .collect();
+        let kind = if push {
+            OperationKind::RemotePush {
+                url: url.clone(),
+                refspecs,
+                targets,
+            }
+        } else {
+            OperationKind::RemoteFetch {
+                url: url.clone(),
+                refspecs,
+                targets,
+            }
+        };
         let intent = Intent {
             kind,
             request_digest: digest.clone(),
@@ -349,10 +358,10 @@ impl GitDriver {
                             Remote::Rejected
                         },
                     ),
-                    _ => Err(failure("operation-recovery-required")),
+                    _ => Err(recovery("operation-recovery-required")),
                 };
             }
-            Begin::Compacted(_) => return Err(failure("operation-recovery-required")),
+            Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
         };
         let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
         scope.validate().map_err(failure)?;
@@ -366,6 +375,7 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
+        let mut install_attempted = false;
         let result = (|| {
             filesystem
                 .checkpoint("before-remote-transfer")
@@ -373,6 +383,7 @@ impl GitDriver {
             let mut args: Vec<String> = if push {
                 vec![
                     "push",
+                    "--atomic",
                     "--porcelain",
                     "--no-verify",
                     "--no-follow-tags",
@@ -408,6 +419,7 @@ impl GitDriver {
                 .map_err(failure)?;
             let mut observations = vec![];
             let mut acknowledged = out.success;
+            let mut installed = 0;
             if push {
                 let actual = self.advertised(
                     repo,
@@ -432,21 +444,23 @@ impl GitDriver {
                 sync_downloaded_objects(repo)?;
                 // Fetch objects only. Install remote-tracking destinations using
                 // exact-old no-dereference CAS, never Git fetch's blind mapping.
+                let mut stale = false;
+                for (name, old, _) in &updates {
+                    stale |= direct(self, repo, name)? != *old;
+                }
                 for (name, old, next) in &updates {
-                    if let ExpectedTip::Oid(prior) = old {
-                        if !self.ancestry(repo, prior, next)? {
-                            return Err(failure("fetch-not-fast-forward"));
-                        }
-                    }
                     scope.validate().map_err(failure)?;
-                    if direct(self, repo, name)? != *old {
-                        return Err(failure("fetch-destination-stale"));
+                    if stale {
+                        acknowledged = false;
+                        observations.push((name.as_str().into(), tip(&direct(self, repo, name)?)));
+                        continue;
                     }
                     let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
                         40
                     } else {
                         64
                     });
+                    let prior = old.clone();
                     let old = match old {
                         ExpectedTip::Oid(o) => o.as_str(),
                         _ => zero.as_str(),
@@ -454,6 +468,7 @@ impl GitDriver {
                     self.preflight(repo)?;
                     let held = scope.holding().map_err(failure)?;
                     let loan = held.last().and_then(|h| scope.handle(&h.name));
+                    install_attempted = true;
                     let cas = self.invoke(
                         Some(repo),
                         repo.trusted_main_root(),
@@ -469,7 +484,7 @@ impl GitDriver {
                         if loan.is_some() {
                             Policy::Publication
                         } else {
-                            Policy::Inspect
+                            Policy::LocalMutation
                         },
                         loan.map(|h| h as &dyn crate::driver::BorrowedSpawn),
                         true,
@@ -478,14 +493,31 @@ impl GitDriver {
                     )?;
                     let observed = direct(self, repo, name)?;
                     if !cas.success || observed != ExpectedTip::Oid(next.clone()) {
-                        return Err(failure("fetch-read-back-recovery-required"));
+                        acknowledged = false;
+                    }
+                    if cas.success
+                        && observed == ExpectedTip::Oid(next.clone())
+                        && observed != prior
+                    {
+                        installed += 1;
                     }
                     sync_refs(repo, name)?;
                     observations.push((name.as_str().into(), tip(&observed)));
                 }
             }
-            let unknown = !acknowledged
-                && (out.code.is_none() || !out.stdout.windows(10).any(|w| w == b"[rejected]"));
+            if !push && !out.success {
+                for (name, _, _) in &updates {
+                    observations.push((name.as_str().into(), tip(&direct(self, repo, name)?)));
+                }
+            }
+            // All unchanged targets establish rejection. Partial/mismatched
+            // observations cannot establish an atomic remote outcome.
+            let unchanged = updates.iter().all(|(name, old, _)| {
+                observations
+                    .iter()
+                    .any(|(n, value)| n == name.as_str() && *value == tip(old))
+            });
+            let unknown = !acknowledged && if push { !unchanged } else { installed > 0 };
             wal.append(
                 &attempted,
                 Phase::Outcome(Outcome::Transfer {
@@ -518,6 +550,37 @@ impl GitDriver {
                 },
             )
         })();
+        if !push && !install_attempted {
+            if let Err(error) = &result {
+                let observations: Result<Vec<_>> = updates
+                    .iter()
+                    .map(|(name, _, _)| Ok((name.as_str().into(), tip(&direct(self, repo, name)?))))
+                    .collect();
+                if let Ok(observations) = observations {
+                    if wal
+                        .append(
+                            &attempted,
+                            Phase::Outcome(Outcome::Transfer {
+                                acknowledged: false,
+                                unknown: false,
+                                observations,
+                                details: vec![error.cause.clone()],
+                            }),
+                        )
+                        .is_ok()
+                    {
+                        return receipt(
+                            id,
+                            attempted.intent(),
+                            ExpectedTip::Absent,
+                            false,
+                            Checkout::NotApplicable,
+                            Remote::Rejected,
+                        );
+                    }
+                }
+            }
+        }
         result.map_err(|e| {
             let mut e = pending(e, id);
             if push {
@@ -544,4 +607,45 @@ fn sync_downloaded_objects(repo: &RepoHandle) -> Result<()> {
         }
     }
     fgos_durable_file::sync_directory(&objects).map_err(failure)
+}
+
+// SSH user names select an account, not a password. Other userinfo and all
+// password-bearing SSH userinfo are refused before transport.
+pub(crate) fn url_has_credentials_or_controls(url: &str) -> bool {
+    if url.contains(['\n', '\r', '\0']) {
+        return true;
+    }
+    let Some((scheme, rest)) = url.split_once("://") else {
+        return false;
+    };
+    let authority = rest.split('/').next().unwrap_or("");
+    match authority.rsplit_once('@') {
+        None => false,
+        Some((user, _)) => scheme != "ssh" || user.is_empty() || user.contains([':', '%', '@']),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::url_has_credentials_or_controls;
+    #[test]
+    fn ssh_usernames_are_not_password_credentials() {
+        for url in [
+            "ssh://git@example.invalid/repo",
+            "ssh://example.invalid/repo",
+            "https://example.invalid/repo",
+            "/tmp/a@b.git",
+        ] {
+            assert!(!url_has_credentials_or_controls(url), "{url}");
+        }
+        for url in [
+            "ssh://git:password@example.invalid/repo",
+            "ssh://git%3Asecret@example.invalid/repo",
+            "https://user@example.invalid/repo",
+            "https://user:secret@example.invalid/repo",
+            "ssh://git@example.invalid/repo\n",
+        ] {
+            assert!(url_has_credentials_or_controls(url), "{url}");
+        }
+    }
 }

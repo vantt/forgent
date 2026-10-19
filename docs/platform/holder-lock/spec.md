@@ -116,6 +116,11 @@ After close, one read of `/proc/locks` supplies positive evidence: a FLOCK recor
 
 A positive tagged record, blocked probe or any uncertainty enters the full tagged descriptor scan. Holders of this inode whose FLOCK record stamps this process are signalled by an identity captured before scanning their descriptors and pinned again at signal time, except direct children (pre-exec copies: waited, never killed). A live own handle, or a positive record of a later acquirer, proves the old EX description gone by exclusivity and spares that acquirer and its borrowers. Recheck own handles before each signal; no kcmp is necessary once the own-handle proof holds. An empty scan alone does not prove release across an in-flight fork: repeat table/probe/scan until positively proven or `killWaitMs` passes, returning `lock-release-stuck` with killed count and remaining pids. A dropped handle runs the same settle; `release` returns its outcome. Descriptor transfer to a pre-existing process is found at release, not borrow return: such a recipient runs until release, at most the length of the hold. Shared handles close directly. The Node facade's unknown-history `lock-fd --drain-child` keeps reading every process.
 
+
+### Node handover trust boundary (2026-10-19 review)
+
+The opaque addon handover protects acquired handles from request-data forgery; it is not an isolation boundary against arbitrary code already executing inside the Node process. The first-caller registration capability is per Node worker thread. Code that loads the native addon before the trusted facade can consume that capability and deny facade startup (fail closed). A hostile module or worker thread therefore requires process isolation; possession of request data, a path or an fd number never grants a holder handle. Native borrowed copies remain close-only and are drained before the facade borrow guard releases.
+
 ## 6. Kinds
 
 | Kind | Mechanism | Used for |

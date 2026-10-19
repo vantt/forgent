@@ -1324,10 +1324,12 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
         wal::OperationKind::RemoteFetch {
             url: "/unused".into(),
             refspecs: vec!["refs/fgos/events/*".into()],
+            targets: vec![],
         },
         wal::OperationKind::RemotePush {
             url: "/unused".into(),
             refspecs: vec![reference().as_str().into()],
+            targets: vec![],
         },
     ]
     .into_iter()

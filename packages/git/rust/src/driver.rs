@@ -140,6 +140,7 @@ fn io(error: std::io::Error) -> OperationError {
 pub(crate) enum Policy {
     Inspect,
     Publication,
+    LocalMutation,
     Remote,
     HookContext,
 }
@@ -381,7 +382,12 @@ impl GitDriver {
                     let checkout = Path::new(backlink)
                         .parent()
                         .ok_or_else(|| refusal("untrusted-worktree"))?;
-                    if path.starts_with(checkout) {
+                    if path.starts_with(checkout)
+                        && (found.is_none()
+                            || work_tree.as_ref().is_none_or(|prior| {
+                                checkout.components().count() > prior.components().count()
+                            }))
+                    {
                         let registered_common = fs::read(admin.join("commondir")).map_err(io)?;
                         if fs::canonicalize(admin.join(line(&registered_common)?)).map_err(io)?
                             != common
@@ -724,6 +730,21 @@ impl GitDriver {
                 argv.push(format!("--work-tree={}", text_path(w)?));
             }
         }
+        if policy == Policy::Remote {
+            argv.extend(
+                [
+                    "-c",
+                    "http.proxy=",
+                    "-c",
+                    "http.sslVerify=true",
+                    "-c",
+                    "http.extraHeader=",
+                    "-c",
+                    "http.followRedirects=false",
+                ]
+                .map(str::to_owned),
+            );
+        }
         for (i, arg) in args.iter().enumerate() {
             argv.push((*arg).to_owned());
             if i == 0 && *arg == "update-ref" {
@@ -759,6 +780,51 @@ impl GitDriver {
                 );
                 let at = argv.iter().position(|a| a == "--").unwrap_or(argv.len());
                 argv.insert(at, format!("{option}={command}"));
+            }
+        }
+        if policy == Policy::Remote {
+            if let Some(repo) = repo {
+                // Repository transport policy is untrusted, including URL-scoped
+                // values which outrank generic -c values. Refuse the whole family.
+                for (origin, key, _) in self.config(repo)? {
+                    let local = origin
+                        .strip_prefix(b"file:")
+                        .and_then(|p| std::str::from_utf8(p).ok())
+                        .is_some_and(|p| {
+                            let p = Path::new(p);
+                            let p = if p.is_absolute() {
+                                p.to_owned()
+                            } else {
+                                repo.trusted_main_root.join(p)
+                            };
+                            p == repo.common_dir.join("config")
+                                || p == repo.git_dir.join("config.worktree")
+                        });
+                    if local
+                        && ![
+                            "http.proxy",
+                            "http.sslverify",
+                            "http.extraheader",
+                            "http.followredirects",
+                        ]
+                        .contains(&key.as_str())
+                        && (key.starts_with("http.")
+                            || key.starts_with("https.")
+                            || key.starts_with("ssh.")
+                            || key.starts_with("protocol.")
+                            || key.starts_with("credential.")
+                            || key == "core.gitproxy"
+                            || key == "remote.pushdefault"
+                            || (key.starts_with("remote.")
+                                && [".proxy", ".proxyauthmethod", ".vcs"]
+                                    .iter()
+                                    .any(|s| key.ends_with(s))))
+                    {
+                        return Err(refusal(format!(
+                            "repository-transport-config-untrusted: {key}"
+                        )));
+                    }
+                }
             }
         }
         let mut env = Scrubbed::new();
@@ -1363,7 +1429,7 @@ fn command_config(key: &str) -> bool {
                 .any(|s| key.ends_with(s)))
         || (key.starts_with("diff.") && key.ends_with(".textconv"))
         || (key.starts_with("merge.") && key.ends_with(".driver"))
-        || (key.starts_with("url.") && key.ends_with(".insteadof"))
+        || key.starts_with("url.")
         || (key.starts_with("remote.")
             && [".uploadpack", ".receivepack"]
                 .iter()
@@ -2432,6 +2498,7 @@ mod tests {
             "includeIf.gitdir:x.path",
             "credential.helper",
             "url.x.insteadOf",
+            "url.x.pushInsteadOf",
             "remote.x.uploadpack",
             "remote.x.receivepack",
             "core.sshCommand",
