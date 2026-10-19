@@ -18,10 +18,8 @@ test('release staging carries a real combined addon resolved from its release ma
     fs.mkdirSync(path.join(repo, 'bin'), {recursive: true});
     fs.writeFileSync(path.join(repo, 'bin/fgos.mjs'), 'console.log("fixture");');
     fs.writeFileSync(path.join(repo, 'package.json'), JSON.stringify({type: 'module', files: ['bin', 'src']}));
-    for (const file of ['src/git/native.mjs', 'src/run-supervisor/payload-root.mjs']) {
-      fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true});
-      fs.copyFileSync(path.join(root, file), path.join(repo, file));
-    }
+    // The loader reaches the holder-lock facade through its handover import, so the payload carries the whole source tree.
+    fs.cpSync(path.join(root, 'src'), path.join(repo, 'src'), {recursive: true});
     fs.copyFileSync(path.join(root, 'Cargo.lock'), path.join(repo, 'Cargo.lock'));
     const output = path.join(temp, 'cargo');
     fs.mkdirSync(path.join(output, 'release'), {recursive: true});
@@ -98,7 +96,8 @@ test('development host carries and loads the addon from its per-invocation manif
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dev-addon-'));
   try {
     const repo = path.join(temp, 'checkout');
-    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/build-rust-distribution.mjs', 'src/util/release-binary-path.mjs', 'src/util/release-targets.mjs', 'src/git/native.mjs', 'src/run-supervisor/payload-root.mjs', 'Cargo.lock']) {
+    fs.cpSync(path.join(root, 'src'), path.join(repo, 'src'), {recursive: true});
+    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/build-rust-distribution.mjs', 'Cargo.lock']) {
       fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true});
       fs.copyFileSync(path.join(root, file), path.join(repo, file));
     }
