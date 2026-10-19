@@ -1,0 +1,670 @@
+{
+  "council-lite": {
+    "steps": [
+      {
+        "step": "discussion",
+        "units": [
+          {
+            "unit": "deliberate",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "delphi": {
+    "steps": [
+      {
+        "step": "blind-proposals",
+        "units": [
+          {
+            "unit": "propose-round-1",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "feedback-synthesis",
+        "units": [
+          {
+            "unit": "synthesize-feedback",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "second-round",
+        "units": [
+          {
+            "unit": "propose-round-2",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "final-consensus",
+        "units": [
+          {
+            "unit": "synthesize-consensus",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "nominal-group": {
+    "steps": [
+      {
+        "step": "silent-generation",
+        "units": [
+          {
+            "unit": "generate-ideas",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "round-robin-sharing",
+        "units": [
+          {
+            "unit": "share-and-consolidate",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "voting-ranking",
+        "units": [
+          {
+            "unit": "evaluate-votes",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": "approved",
+        "outcome": "pass"
+      },
+      {
+        "step": "final-ranking",
+        "units": [
+          {
+            "unit": "synthesize-rankings",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "group-cognition": {
+    "steps": [
+      {
+        "step": "sense-making",
+        "units": [
+          {
+            "unit": "sense-making-panel",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "dialectical-inquiry",
+        "units": [
+          {
+            "unit": "dialectical-critique",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "action-synthesis",
+        "units": [
+          {
+            "unit": "synthesize-action",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "business-discussion": {
+    "steps": [
+      {
+        "step": "framing",
+        "units": [
+          {
+            "unit": "frame-problem",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "perspectives",
+        "units": [
+          {
+            "unit": "explore-perspectives",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "critique",
+        "units": [
+          {
+            "unit": "challenge-assumptions",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "synthesis",
+        "units": [
+          {
+            "unit": "synthesize-strategy",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "approval",
+        "units": [],
+        "gate": "approved",
+        "outcome": "pass"
+      },
+      {
+        "step": "action-plan",
+        "units": [
+          {
+            "unit": "develop-roadmap",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "architecture-advisory": {
+    "steps": [
+      {
+        "step": "framing",
+        "units": [
+          {
+            "unit": "frame-context",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "shaping",
+        "units": [
+          {
+            "unit": "shape-proposals",
+            "pattern": "panel",
+            "blind": true,
+            "roles": [
+              [
+                "panelist-1",
+                "panelist-2",
+                "panelist-3",
+                "synthesizer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 3
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "critique",
+        "units": [
+          {
+            "unit": "critique-proposals",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "synthesis",
+        "units": [
+          {
+            "unit": "synthesize-recommendation",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "red-team",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "explanation",
+        "units": [
+          {
+            "unit": "explain-recommendation",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "close",
+        "units": [],
+        "gate": "approved",
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "architecture-advisory-reopen": {
+    "steps": [
+      {
+        "step": "synthesis",
+        "units": [
+          {
+            "unit": "synthesize-recommendation",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "red-team",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "explanation",
+        "units": [
+          {
+            "unit": "explain-recommendation",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "close",
+        "units": [],
+        "gate": "approved",
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "marketing/content-publish": {
+    "steps": [
+      {
+        "step": "brief",
+        "units": [
+          {
+            "unit": "research-brief",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "draft",
+        "units": [
+          {
+            "unit": "draft-copy",
+            "pattern": "reviewed",
+            "blind": false,
+            "roles": [
+              [
+                "producer",
+                "reviewer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "approval",
+        "units": [],
+        "gate": "approved",
+        "outcome": "pass"
+      },
+      {
+        "step": "publish",
+        "units": [
+          {
+            "unit": "publish-content",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  },
+  "units/order-guard": {
+    "steps": [
+      {
+        "step": "w-a",
+        "units": [
+          {
+            "unit": "w-a",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "read",
+        "units": [
+          {
+            "unit": "read",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      },
+      {
+        "step": "w-b",
+        "units": [
+          {
+            "unit": "w-b",
+            "pattern": "solo",
+            "blind": false,
+            "roles": [
+              [
+                "producer"
+              ]
+            ],
+            "outcome": "pass",
+            "seats": 0
+          }
+        ],
+        "gate": null,
+        "outcome": "pass"
+      }
+    ],
+    "status": "completed:pass"
+  }
+}
