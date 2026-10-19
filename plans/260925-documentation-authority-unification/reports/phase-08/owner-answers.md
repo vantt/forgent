@@ -442,3 +442,13 @@ All seven new findings have text dispositions; implementation, actual accounting
   2. **Self-alias is never patched:** when the registry/alias holder of a legacy spelling is the consumer file itself, a patch would create a self pointer; the edge preserves (inside evidence) or parks as description-rewrite (in live prose).
   3. Checker: the renamed-alias rule exempts edges inside fenced code / blockquoted captured output / explicit history regions and edges whose alias holder equals the consumer; a probe each.
 - **Throughput:** each author turn now does only authoring plus at most the rule changes the Lead lists; reviews of finished batches run in parallel against a fixed commit.
+
+## L12-41 — Batch 071–072 review clean (Lead, A42/A51, 2026-10-20)
+
+- **Result** (`c0c64372c` records, reviewed at `20d1b97da`): [wave4c-p01](review-a38-step-03-wave4c-p01.md) … [p04](review-a38-step-03-wave4c-p04.md) — 16 files / 112 edges, 0 rework, covering the batch-071/072 samples, the Part A outcome changes (porting-log, decision-record successor notes, event-log 0001, drift-guard Document history, `docs/specs/work-state.md` retire-with-tree markers) and the open lead-ruling files (treated as ruled by L12-40). Sets 061, 070, 071, 072 close once the L12-40 edges commit.
+- **Rulings:**
+  1. A decision whose only title-matched narrative holder is the retiring `docs/specs/platform-foundations.md` parks as **P8-DOC-GAP-02**, not dead-link (event-log 0001, like 0035).
+  2. Past-event "superseded by `docs/decisions/00NN-…`" sentences in live files preserve with a title-matched successor note (04319), consistent with L12-39(3).
+  3. Note for batch-122: candidate `docs/platform/work-state/spec.md` repeats the dead `docs/history/store-atomic-rmw/` path; give it the 08351 disposition if the inventory holds it.
+  4. **Elided decision filenames** (`docs/decisions/0032-iron-law-...md`) resolve against the deleted file's full name in git history (prefix match on number + visible slug fragment), and the successor note's title match uses that resolved name — never a sibling filename in the same paragraph. Checker predicate corrected accordingly, with a probe. 04444 (an illustrative collision example) preserves with the note to `docs/platform/runner/decisions/h-36d872fbb0e5.md` heading 0032 "Cổng Iron Law".
+- **Author throughput:** `6eb2a4be6` authored batches 073–074 (50 files / 164 edges); full checker 552 files / 3,992 edges, 0 failures, 182 probes.
