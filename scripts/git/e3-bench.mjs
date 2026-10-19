@@ -757,7 +757,7 @@ async function rollbackOnly(args) {
   console.log(JSON.stringify(await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader)));
 }
 const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
-if (process.argv[1] && path.resolve(process.argv[1]) === SELF) {
+if (at >= 0) {
 if (!modes[mode]) { console.error(`usage: e3-bench.mjs ${Object.keys(modes).join('|')} [options]`); process.exit(2); }
 await modes[mode](args);
 }
