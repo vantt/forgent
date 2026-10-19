@@ -83,9 +83,17 @@ pub(crate) fn admission<F: wal::FileSystem>(
     for chain in wal.active(100_000).map_err(failure)? {
         if chain.last().operation_id != id
             && chain.intent().resource_set.iter().any(|r| {
-                resources.contains(r) || matches!(chain.intent().kind,
-                    OperationKind::WorktreeCreate { .. } | OperationKind::WorktreeRemove { .. } | OperationKind::WorktreeMove { .. })
-                    && resources.iter().any(|checkout| checkout.strip_prefix(r).is_some_and(|tail| tail.starts_with(":custody:")))
+                resources.contains(r)
+                    || matches!(
+                        chain.intent().kind,
+                        OperationKind::WorktreeCreate { .. }
+                            | OperationKind::WorktreeRemove { .. }
+                            | OperationKind::WorktreeMove { .. }
+                    ) && resources.iter().any(|checkout| {
+                        checkout
+                            .strip_prefix(r)
+                            .is_some_and(|tail| tail.starts_with(":custody:"))
+                    })
             })
         {
             return Err(recovery("resource-recovery-required"));

@@ -382,8 +382,14 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         },
         kind,
         repo_identity: wal.repository_identity().into(),
-        resource_set: vec![if legacy { format!("worktree:{}", baseline.worktree) } else {
-            format!("worktree:{}:custody:{}", baseline.worktree, f.lease.as_ref().unwrap().path().display())
+        resource_set: vec![if legacy {
+            format!("worktree:{}", baseline.worktree)
+        } else {
+            format!(
+                "worktree:{}:custody:{}",
+                baseline.worktree,
+                f.lease.as_ref().unwrap().path().display()
+            )
         }],
         authority_binding: baseline.authority,
         writer_identity: "fixture".into(),
@@ -615,12 +621,19 @@ fn recovery_observes_hook_modified_overtaken_and_aba_commits() {
         } else if moved == 2 {
             git(&f.tree, &["reset", "--hard", &baseline.head]);
         }
-        let result = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "observe");
+        let result = f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "observe");
         if moved == 2 {
             let err = result.unwrap_err();
             assert_eq!(err.code, ResultCode::RecoveryRequired);
             assert!(format!("{err:?}").contains(&landed));
-            assert!(wal::Wal::open(&f.repo).unwrap().inspect("observe").unwrap().outcome().is_none());
+            assert!(wal::Wal::open(&f.repo)
+                .unwrap()
+                .inspect("observe")
+                .unwrap()
+                .outcome()
+                .is_none());
             continue;
         }
         let result = result.unwrap();
@@ -728,7 +741,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
 
 #[test]
 fn sync_recovery_observes_modified_overtaken_and_reset_merge_commits() {
-    for moved in [0, 1, 2] {
+    for moved in [0, 1, 2, 3] {
         let f = Fixture::new();
         let baseline = git(&f.tree, &["rev-parse", "HEAD"]);
         fs::write(f.main.join("incoming"), "target").unwrap();
@@ -786,7 +799,19 @@ fn sync_recovery_observes_modified_overtaken_and_reset_merge_commits() {
         if moved == 2 {
             git(&f.tree, &["reset", "--hard", &payload.head]);
         }
-        let receipt = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "merge-observe");
+        if moved == 3 {
+            git(&f.tree, &["checkout", "-qb", "switched"]);
+        }
+        let receipt = f
+            .driver
+            .inspect_sync(&f.repo, f.held(), "fixture", "merge-observe");
+        if moved == 3 {
+            let err = receipt.unwrap_err();
+            assert_eq!(err.code, ResultCode::RecoveryRequired);
+            assert!(format!("{err:?}").contains("checkout-reference-changed"));
+            assert!(wal.inspect("merge-observe").unwrap().outcome().is_none());
+            continue;
+        }
         if moved == 2 {
             let err = receipt.unwrap_err();
             assert_eq!(err.code, ResultCode::RecoveryRequired);
@@ -809,21 +834,48 @@ fn checkout_attempts_exclude_remove_and_move() {
             let mut f = Fixture::new();
             interrupted(&f, "pending", 2, sync);
             // The effect landed but its outcome did not. The checkout is clean.
+            git(&f.tree, &["add", "a"]);
             git(&f.tree, &["commit", "-qm", "interrupted"]);
-            let tip = Oid::parse(&git(&f.tree, &["rev-parse", "HEAD"]), f.repo.object_format()).unwrap();
+            let tip = Oid::parse(
+                &git(&f.tree, &["rev-parse", "HEAD"]),
+                f.repo.object_format(),
+            )
+            .unwrap();
             drop(f.lease.take());
             let result = if remove {
-                f.driver.remove_worktree(&f.repo, vec![], &f.tree, &WorktreeDelivery {
-                    expected_tip: tip.clone(), delivered_to: tip.clone(), evidence_digest: "a".repeat(64),
-                }, "fixture", "lifecycle")
+                f.driver.remove_worktree(
+                    &f.repo,
+                    vec![],
+                    &f.tree,
+                    &WorktreeDelivery {
+                        expected_tip: tip.clone(),
+                        delivered_to: tip.clone(),
+                        evidence_digest: "a".repeat(64),
+                    },
+                    "fixture",
+                    "lifecycle",
+                )
             } else {
-                f.driver.relocate_worktree(&f.repo, vec![], &f.tree, &f.temp.join("moved"), &tip, "fixture", "lifecycle").map(|_| ())
+                f.driver
+                    .relocate_worktree(
+                        &f.repo,
+                        vec![],
+                        &f.tree,
+                        &f.temp.join("moved"),
+                        &tip,
+                        "fixture",
+                        "lifecycle",
+                    )
+                    .map(|_| ())
             };
             let err = result.unwrap_err();
             assert_eq!(err.code, ResultCode::RecoveryRequired, "{err:?}");
             assert!(format!("{err:?}").contains("resource-recovery-required"));
             assert!(f.tree.exists());
-            assert!(!wal::Wal::open(&f.repo).unwrap().known_id("lifecycle").unwrap());
+            assert!(wal::Wal::open(&f.repo)
+                .unwrap()
+                .inspect("lifecycle")
+                .is_err());
         }
     }
 }
@@ -832,37 +884,129 @@ fn checkout_attempts_exclude_remove_and_move() {
 fn lifecycle_attempts_exclude_commit_and_sync() {
     struct Held;
     impl wal::PublicationAuthority for Held {
-        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> { Ok(()) }
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
     }
     for action in ["create", "remove", "move"] {
         let f = Fixture::new();
         let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
         let path = f.tree.to_str().unwrap();
         let kind = match action {
-            "create" => wal::OperationKind::WorktreeCreate { path: path.into(), registration: "producer".into(), branch: None, session_id: None },
-            "remove" => wal::OperationKind::WorktreeRemove { path: path.into(), registration: "producer".into(), registration_identity: "original".into(), delivery: Box::new(wal::WorktreeDeliveryBinding { delivered_to: baseline.head.clone(), evidence_digest: "a".repeat(64) }) },
-            _ => wal::OperationKind::WorktreeMove { source: path.into(), destination: f.temp.join("moved").to_str().unwrap().into(), registration: "producer".into(), registration_identity: "original".into() },
+            "create" => wal::OperationKind::WorktreeCreate {
+                path: path.into(),
+                registration: "producer".into(),
+                branch: None,
+                session_id: None,
+            },
+            "remove" => wal::OperationKind::WorktreeRemove {
+                path: path.into(),
+                registration: "producer".into(),
+                registration_identity: "original".into(),
+                delivery: Box::new(wal::WorktreeDeliveryBinding {
+                    delivered_to: baseline.head.clone(),
+                    evidence_digest: "a".repeat(64),
+                }),
+            },
+            _ => wal::OperationKind::WorktreeMove {
+                source: path.into(),
+                destination: f.temp.join("moved").to_str().unwrap().into(),
+                registration: "producer".into(),
+                registration_identity: "original".into(),
+            },
         };
         let mut resources = vec![format!("worktree:{path}")];
-        if action == "move" { resources.push(format!("worktree:{}", f.temp.join("moved").display())); }
+        if action == "move" {
+            resources.push(format!("worktree:{}", f.temp.join("moved").display()));
+        }
         resources.sort();
         let wal = wal::Wal::open(&f.repo).unwrap();
-        let wal::Begin::Created(chain) = wal.begin("lifecycle", wal::Intent {
-            kind, request_digest: "a".repeat(64), repo_identity: wal.repository_identity().into(), resource_set: resources,
-            authority_binding: "admin".into(), writer_identity: "fixture".into(), object_format: f.repo.object_format(),
-            expected: if action == "create" { wal::Tip::Absent } else { wal::Tip::Oid(baseline.head.clone()) },
-            next: if action == "remove" { wal::Tip::Absent } else { wal::Tip::Oid(baseline.head.clone()) },
-        }, &Held).unwrap() else { panic!() };
+        let wal::Begin::Created(chain) = wal
+            .begin(
+                "lifecycle",
+                wal::Intent {
+                    kind,
+                    request_digest: "a".repeat(64),
+                    repo_identity: wal.repository_identity().into(),
+                    resource_set: resources,
+                    authority_binding: "admin".into(),
+                    writer_identity: "fixture".into(),
+                    object_format: f.repo.object_format(),
+                    expected: if action == "create" {
+                        wal::Tip::Absent
+                    } else {
+                        wal::Tip::Oid(baseline.head.clone())
+                    },
+                    next: if action == "remove" {
+                        wal::Tip::Absent
+                    } else {
+                        wal::Tip::Oid(baseline.head.clone())
+                    },
+                },
+                &Held,
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
         let chain = wal.append(&chain, wal::Phase::Prepared).unwrap();
-        wal.append(&chain, wal::Phase::TargetAttempt { prior_target_attempt: None, expected: chain.intent().expected.clone(), next: chain.intent().next.clone() }).unwrap();
+        wal.append(
+            &chain,
+            wal::Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: chain.intent().next.clone(),
+            },
+        )
+        .unwrap();
         fs::write(f.tree.join("a"), "producer edit").unwrap();
-        let err = f.driver.scoped_commit(&f.repo, f.held(), &baseline, &CommitRequest { writes: vec!["a".into()], message: "new".into(), cutover_grant: None }, "fixture", "new").unwrap_err();
+        let err = f
+            .driver
+            .scoped_commit(
+                &f.repo,
+                f.held(),
+                &baseline,
+                &CommitRequest {
+                    writes: vec!["a".into()],
+                    message: "new".into(),
+                    cutover_grant: None,
+                },
+                "fixture",
+                "new",
+            )
+            .unwrap_err();
         assert_eq!(err.code, ResultCode::RecoveryRequired, "{err:?}");
         fs::write(f.main.join("incoming"), "target").unwrap();
-        git(&f.main, &["add", "incoming"]); git(&f.main, &["commit", "-qm", "target"]);
-        let target = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), f.repo.object_format()).unwrap();
-        let err = f.driver.start_sync(&f.repo, f.held(), &target, "sync", "fixture", "new-sync").unwrap_err();
+        git(&f.main, &["add", "incoming"]);
+        git(&f.main, &["commit", "-qm", "target"]);
+        let target = Oid::parse(
+            &git(&f.main, &["rev-parse", "HEAD"]),
+            f.repo.object_format(),
+        )
+        .unwrap();
+        let err = f
+            .driver
+            .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "new-sync")
+            .unwrap_err();
         assert_eq!(err.code, ResultCode::RecoveryRequired, "{err:?}");
         assert!(wal.inspect("lifecycle").unwrap().outcome().is_none());
     }
+}
+
+#[test]
+fn preexisting_reset_away_commit_is_evidence_not_a_receipt() {
+    let f = Fixture::new();
+    let baseline = git(&f.tree, &["rev-parse", "HEAD"]);
+    fs::write(f.tree.join("a"), "interrupted producer").unwrap();
+    git(&f.tree, &["add", "a"]);
+    git(&f.tree, &["commit", "-qm", "interrupted"]);
+    let old = git(&f.tree, &["rev-parse", "HEAD"]);
+    git(&f.tree, &["reset", "--hard", &baseline]);
+    interrupted(&f, "never-ran", 2, false);
+    let err = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "never-ran").unwrap_err();
+    assert_eq!(err.code, ResultCode::RecoveryRequired);
+    assert!(format!("{err:?}").contains(&old));
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline);
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "a");
+    assert!(wal::Wal::open(&f.repo).unwrap().inspect("never-ran").unwrap().outcome().is_none());
 }

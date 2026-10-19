@@ -225,7 +225,9 @@ pub enum Phase {
         clean_modes: Vec<(String, u32)>,
     },
     /// Durable one-shot barrier before Sync invokes its ref-moving commit.
-    SyncCommitAttempt { tree: String },
+    SyncCommitAttempt {
+        tree: String,
+    },
     TargetAttempt {
         prior_target_attempt: Option<()>,
         expected: Tip,
@@ -387,7 +389,9 @@ impl Intent {
                 || !checkout_resource_valid(&self.resource_set, worktree)
                 || message.is_empty()
                 || message.contains('\0')
-                || reference.as_ref().is_some_and(|r| RefName::parse(r).is_err())
+                || reference
+                    .as_ref()
+                    .is_some_and(|r| RefName::parse(r).is_err())
             {
                 return Err(corrupt("sync binding"));
             }
@@ -419,9 +423,13 @@ impl Intent {
                 _ => None,
             };
             if let Some(path) = existing {
-                actual.retain(|r| !r.strip_prefix(&format!("worktree:{path}:custody:"))
-                    .is_some_and(|lock| Path::new(lock).is_absolute()));
-                if self.resource_set.len() > actual.len() + 1 { return Err(corrupt("worktree custody binding")); }
+                actual.retain(|r| {
+                    !r.strip_prefix(&format!("worktree:{path}:custody:"))
+                        .is_some_and(|lock| Path::new(lock).is_absolute())
+                });
+                if self.resource_set.len() > actual.len() + 1 {
+                    return Err(corrupt("worktree custody binding"));
+                }
             }
             let resources = worktree_resources(&self.kind)?;
             if paths.iter().any(|p| {
@@ -681,8 +689,10 @@ impl Chain {
 }
 fn checkout_resource_valid(resources: &[String], worktree: &str) -> bool {
     resources == [format!("worktree:{worktree}")]
-        || resources.len() == 1 && resources[0].strip_prefix(&format!("worktree:{worktree}:custody:"))
-            .is_some_and(|p| Path::new(p).is_absolute())
+        || resources.len() == 1
+            && resources[0]
+                .strip_prefix(&format!("worktree:{worktree}:custody:"))
+                .is_some_and(|p| Path::new(p).is_absolute())
 }
 fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     let i = match &records[0].phase {
@@ -695,10 +705,19 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             matches!(i.kind, OperationKind::ConfigChange(_))
         }
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::CommitRejected { cause })) => {
-            cause == "foreign-checkout-abandoned" && matches!(i.kind, OperationKind::ScopedCommit(_) | OperationKind::Sync(_))
+            cause == "foreign-checkout-abandoned"
+                && matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                )
         }
-        (Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. }, Phase::Outcome(Outcome::CommitRejected { cause }))
-            if cause == "foreign-checkout-effect-unknown" => matches!(i.kind, OperationKind::ScopedCommit(_) | OperationKind::Sync(_)),
+        (
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::Outcome(Outcome::CommitRejected { cause }),
+        ) if cause == "foreign-checkout-effect-unknown" => matches!(
+            i.kind,
+            OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+        ),
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
@@ -729,7 +748,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
         ) => {
             matches!(i.kind, OperationKind::Sync(_))
                 && digest_valid(index_digest)
-                && clean_modes.iter().all(|(p, mode)| staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777)
+                && clean_modes.iter().all(|(p, mode)| {
+                    staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777
+                })
                 && conflicts
                     .iter()
                     .chain(staged)
@@ -738,13 +759,17 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
         (Phase::SyncState { .. }, Phase::SyncCommitAttempt { tree }) => {
             matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
         }
-        (Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. }, Phase::Outcome(o)) => match o {
+        (
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::Outcome(o),
+        ) => match o {
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
                     OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
                 ) && Oid::parse(observed, i.object_format).is_ok()
-                    && (!matches!(i.kind, OperationKind::Sync(_)) || matches!(prev, Phase::SyncCommitAttempt { .. }))
+                    && (!matches!(i.kind, OperationKind::Sync(_))
+                        || matches!(prev, Phase::SyncCommitAttempt { .. }))
             }
             Outcome::CommitRejected { cause } => {
                 matches!(

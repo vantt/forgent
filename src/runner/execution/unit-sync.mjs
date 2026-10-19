@@ -81,13 +81,14 @@ export function runPendingSync(unitRecord, mainRoot, persist, custody) {
   sync.started = true;
   persist();
   const result = startSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, ref: sync.ref, sha: sync.sha, adoptOpenMerge, custody });
+  result.warnings = [...(sync.warnings ?? []), ...(result.warnings ?? [])];
   unitRecord.sync = result;
   persist();
   if (result.status === 'failed') {
     // Git failing, or a commit that landed holding the wrong set, is a failure; anything else (a
     // pre-commit hook's `hook-refused` included) refused to start, and left no merge open.
     const outcome = ['git-error', 'committed-set-mismatch'].includes(result.reason) ? 'execution-failure' : 'policy-refusal';
-    return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error } }] };
+    return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error }, ...(result.warnings?.length ? { warnings: result.warnings } : {}) }] };
   }
   if (result.status === 'conflicted') {
     // In scope only while the merge is open (effectiveWriteScope); writeScope is left as declared.
@@ -104,6 +105,7 @@ function syncOnlyPass(sync) {
   const commit = sync.commit?.sha
     ? { status: 'committed', sha: sync.commit.sha, subject: sync.commit.subject, outOfScope: [], preExistingInScope: [] }
     : { status: 'no-changes', outOfScope: [], preExistingInScope: [] };
+  if (sync.warnings?.length) commit.warnings = [...sync.warnings];
   return { outcome: 'pass', results: [{ outcome: 'pass', role: 'sync', round: 0, commit }] };
 }
 
@@ -130,12 +132,16 @@ export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePat
   if (sync?.status !== 'conflicted') return commitWork();
   const merge = finishSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync, custody });
   if (merge.status === 'failed') {
+    merge.warnings = [...(sync.warnings ?? []), ...(merge.warnings ?? [])];
     const { status, reason, error, ...detail } = merge;
     return { status, reason, error, ...detail, outOfScope: [], preExistingInScope: [...excludePaths], sync: merge };
   }
+  sync.warnings = [...(sync.warnings ?? []), ...(merge.warnings ?? [])];
   sync.status = 'merged';
   sync.commit = merge.status === 'committed' ? { sha: merge.sha, subject: merge.subject, files: merge.files } : { by: 'outside' };
-  return { ...commitWork(), sync: merge };
+  const commit = commitWork();
+  const warnings = [...(commit.warnings ?? []), ...(sync.warnings ?? [])];
+  return { ...commit, ...(warnings.length ? { warnings } : {}), sync: merge };
 }
 
 /** The sync part of runUnit's result. */

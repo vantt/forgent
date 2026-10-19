@@ -57,7 +57,11 @@ impl GitDriver {
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
-                reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
+                reference: Some(self.checkout_text(
+                    repo,
+                    &scope,
+                    &["symbolic-ref", "-q", "HEAD"],
+                )?),
                 worktree: root(repo)?.to_string_lossy().into(),
                 head: compact.expected.clone(),
                 target: target.as_str().into(),
@@ -331,7 +335,11 @@ impl GitDriver {
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {
                 kind: OperationKind::Sync(Box::new(wal::SyncIntent {
-                    reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
+                    reference: Some(self.checkout_text(
+                        repo,
+                        scope,
+                        &["symbolic-ref", "-q", "HEAD"],
+                    )?),
                     worktree: root(repo)?.to_string_lossy().into(),
                     head: compact.expected.clone(),
                     target: compact.next.clone(),
@@ -350,6 +358,9 @@ impl GitDriver {
                 return Err(failure("sync-authority-mismatch"));
             }
             let outcome = compact.outcome().map_err(failure)?;
+            if let Outcome::CommitRejected { cause } = &outcome {
+                if cause == "foreign-checkout-effect-unknown" { return Err(recovery(cause)); }
+            }
             let state = match &outcome {
                 Outcome::Commit { .. } => "done",
                 Outcome::CommitRejected { cause } => cause.as_str(),
@@ -414,8 +425,12 @@ impl GitDriver {
             return Err(failure("sync-authority-mismatch"));
         }
         let current_reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
-        if payload.reference.as_ref() != Some(&current_reference) {
-            return Err(recovery("sync-reference-unproven-or-changed"));
+        let reference = payload.reference.as_ref().ok_or_else(|| recovery("sync-reference-unrecorded"))?;
+        if reference != &current_reference {
+            return Err(recovery("checkout-reference-changed"));
+        }
+        if let Some(Outcome::CommitRejected { cause }) = chain.outcome() {
+            if cause == "foreign-checkout-effect-unknown" { return Err(recovery(cause)); }
         }
         let now = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         let merge = self.merge_head(repo, scope)?;

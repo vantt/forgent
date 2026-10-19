@@ -198,9 +198,15 @@ impl GitDriver {
                             .append(
                                 &chain,
                                 Phase::Outcome(Outcome::CommitRejected {
-                                    cause: if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                                    cause: if matches!(
+                                        chain.last().phase,
+                                        Phase::Intent(_) | Phase::Prepared
+                                    ) {
                                         "foreign-checkout-abandoned"
-                                    } else { "foreign-checkout-effect-unknown" }.into(),
+                                    } else {
+                                        "foreign-checkout-effect-unknown"
+                                    }
+                                    .into(),
                                 }),
                             )
                             .map_err(failure)?;
@@ -332,7 +338,10 @@ impl GitDriver {
                     return Err(recovery("sync-state-recovery-required"));
                 };
                 (
-                    payload.reference.clone().ok_or_else(|| recovery("sync-reference-unrecorded"))?,
+                    payload
+                        .reference
+                        .clone()
+                        .ok_or_else(|| recovery("sync-reference-unrecorded"))?,
                     vec![payload.head.clone(), payload.target.clone()],
                     tree.clone(),
                     payload.message.clone(),
@@ -384,33 +393,71 @@ impl GitDriver {
         }
         // One bounded walk returns immutable headers and full verbatim messages.
         // Reflog-only evidence is never proof of an effect on the current ref.
-        let raw = self.checkout_bytes(repo, scope, &["log", "-g", "-n", "1024",
-            "--format=%H%x00%P%x00%T%x00%B%x00", &reference])?;
+        let raw = self.checkout_bytes(
+            repo,
+            scope,
+            &[
+                "log",
+                "-g",
+                "-n",
+                "1024",
+                "--format=%H%x00%P%x00%T%x00%B%x00",
+                &reference,
+            ],
+        )?;
         let mut candidates = Vec::new();
         let fields: Vec<_> = raw.split(|b| *b == 0).collect();
         let mut seen = BTreeSet::new();
         let mut passed_tip = false;
-        for row in fields.chunks_exact(4) {
-            let oid = std::str::from_utf8(row[0]).map_err(failure)?.trim_start_matches('\n').to_owned();
+        for row in fields.as_chunks::<4>().0 {
+            let oid = std::str::from_utf8(row[0])
+                .map_err(failure)?
+                .trim_start_matches('\n')
+                .to_owned();
             if oid == parents[0] {
-                if passed_tip { break; }
+                if passed_tip {
+                    break;
+                }
                 continue;
             }
             passed_tip = true;
-            if !seen.insert(oid.clone()) { continue; }
-            let actual_parents: Vec<_> = std::str::from_utf8(row[1]).map_err(failure)?.split_whitespace().map(str::to_owned).collect();
+            if !seen.insert(oid.clone()) {
+                continue;
+            }
+            let actual_parents: Vec<_> = std::str::from_utf8(row[1])
+                .map_err(failure)?
+                .split_whitespace()
+                .map(str::to_owned)
+                .collect();
             if actual_parents == parents {
-                candidates.push((oid, std::str::from_utf8(row[2]).map_err(failure)?.to_owned(), row[3].to_vec()));
+                candidates.push((
+                    oid,
+                    std::str::from_utf8(row[2]).map_err(failure)?.to_owned(),
+                    row[3].to_vec(),
+                ));
             }
         }
-        let expected_message = if message.ends_with('\n') { message } else { format!("{message}\n") };
+        let expected_message = if message.ends_with('\n') {
+            message
+        } else {
+            format!("{message}\n")
+        };
         // Exhaust exact tree evidence before trying the weaker message proof.
         for exact in [true, false] {
             for (oid, actual_tree, actual_message) in &candidates {
-                if if exact { actual_tree == &tree } else { newest && actual_message == expected_message.as_bytes() } {
-                    if !self.ancestry(repo, &Oid::parse(oid, repo.object_format()).map_err(failure)?,
-                        &Oid::parse(&now, repo.object_format()).map_err(failure)?)? {
-                        return Err(recovery(format!("commit-effect-unknown: reflog-only-candidate:{oid}")));
+                if if exact {
+                    actual_tree == &tree
+                } else {
+                    newest && actual_message == expected_message.as_bytes()
+                } {
+                    if !self.ancestry(
+                        repo,
+                        &Oid::parse(oid, repo.object_format()).map_err(failure)?,
+                        &Oid::parse(&now, repo.object_format()).map_err(failure)?,
+                    )? {
+                        return Err(recovery(format!(
+                            "commit-effect-unknown: reflog-only-candidate:{oid}"
+                        )));
                     }
                     return Ok(Some((oid.clone(), actual_tree != &tree)));
                 }

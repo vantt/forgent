@@ -478,3 +478,15 @@ test('a conflicted file the worker turned into a directory refuses the conclusio
   assert.doesNotMatch(gitIn(worktree, 'diff', '--cached', '--name-only'), /inner\.txt/);
   assert.equal(mergeHeadOf(worktree), headOf(repoRoot), 'the merge stays open for a person');
 });
+
+
+test('sync aggregation preserves receipt warnings in existing result fields', async () => {
+  const { runPendingSync, commitRoundWithSync, syncSummary } = await import('../../../src/runner/execution/unit-sync.mjs');
+  const warning = 'checkout-compaction-deferred: retained evidence';
+  const record = { unit: { syncOnly: true }, sync: { status: 'merged', warnings: [warning], commit: { sha: 'abc', subject: 'merge' } } };
+  const result = runPendingSync(record, '', () => {});
+  assert.deepEqual(result.results[0].commit.warnings, [warning]);
+  assert.deepEqual(syncSummary(record.sync).warnings, [warning]);
+  const commit = { status: 'committed', warnings: [warning] };
+  assert.equal(commitRoundWithSync(record, '', () => commit, []), commit);
+});

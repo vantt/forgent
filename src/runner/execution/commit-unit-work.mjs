@@ -239,7 +239,7 @@ function withPaths(ctx, args, paths) {
  * @param {string[]} [p.excludePaths]
  * @param {string[]} [p.needsWrites] paths the agent said it needed beyond the scope, echoed back
  * @returns {{ status: 'committed'|'no-changes'|'failed', sha?: string, subject?: string, files?: string[],
- *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], reason?: string, error?: string }}
+ *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], warnings?: string[], reason?: string, error?: string }}
  */
 export function commitUnitWork({ worktree, repoRoot, custody, unitId, summary, objective, scope, changedFiles = null, excludePaths = [], needsWrites }) {
   if (!Array.isArray(scope)) throw new TypeError('commitUnitWork requires a write scope (use ["**"] for the whole worktree)');
