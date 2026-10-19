@@ -1,0 +1,68 @@
+{
+  "inputHEAD": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+  "historicalCommit": "49ad04648^1",
+  "method": "Unchanged production extractor (same implementation as each manifest unitsOf); full historical digest/native-anchor lookup, unique current full-digest passage equality or explicit reviewed-by-author content correspondence. Similarity used only to discover candidates; not approval.",
+  "bindings": 85,
+  "uniqueExactPassageMatches": 73,
+  "changedPassageCorrespondences": 12,
+  "targets": [
+    "docs/architecture-manifest.json",
+    "docs/platform/component-boundary.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/activation-binding.md",
+    "docs/platform/packaging-distribution/contracts/release-manifest.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/specs/confinement-authority.md",
+    "docs/specs/distribution.md",
+    "docs/specs/runner.md"
+  ],
+  "decisionFiles": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+  ],
+  "parked": [],
+  "noApprovalCarry": true,
+  "nativeIdentityAssigned": false,
+  "journalParts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-01.json",
+      "entries": 35,
+      "bytes": 380063,
+      "reportName": "review-a38-step-00-author-accounting-part-01.md"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-02.json",
+      "entries": 38,
+      "bytes": 366044,
+      "reportName": "review-a38-step-00-author-accounting-part-02.md"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-03.json",
+      "entries": 9,
+      "bytes": 224464,
+      "reportName": "review-a38-step-00-author-accounting-part-03.md"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-04.json",
+      "entries": 56,
+      "bytes": 374685,
+      "reportName": "review-a38-step-00-author-accounting-part-04.md"
+    }
+  ],
+  "reviewEntryCount": 138,
+  "laterReceiptsRequired": [
+    "Real author commit and exact additional pairs",
+    "Actual accounting commit and both exception literal joins",
+    "Batch-end clean committed-byte audits/checks/reproduction test",
+    "Phase 9 changed-candidate additions and unchanged inherited obligations"
+  ],
+  "DecisionF": "L12-9 keeps ratchet main landing deferred; no --record tooling. L12-14 excludes classifier/inventory changes."
+}

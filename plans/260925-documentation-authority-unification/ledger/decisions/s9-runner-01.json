@@ -11822,18 +11822,17 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-314",
+      "targetAnchor": "unheaded-block-315",
       "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
       ],
-      "rationale": "A34 pending predecessor disposition: Item 6 no longer says executors.*.for and PolicyPatch prefer* were wholly removed; retain that original obligation as historical residual. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: Item 6 no longer says executors.*.for and PolicyPatch prefer* were wholly removed; retain that original obligation as historical residual. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-314 -> unheaded-block-315. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 bc156e257f11baa165661a9485843d88034862465f95da930b0b9d719cd02fbd; source 5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14, primary target 7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27. Independent A34 acceptance pending; blocks cutover.",
       "reviewEntryId": "gap-claim_77a827ba40c328bd2c4d6a8ec713df65",
-      "evidenceDigest": "87053869adfa8d3c9e8d224a452c19932145c7e392fdb14b1c0b1e04b69db483",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
@@ -11843,18 +11842,17 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-315",
+      "targetAnchor": "unheaded-block-316",
       "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher"
       ],
-      "rationale": "A34 pending predecessor disposition: The human gate item was extended/reworded; retain its original precise gate and blocked-question obligation. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: The human gate item was extended/reworded; retain its original precise gate and blocked-question obligation. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-315 -> unheaded-block-316. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 8bc3606b98c62ce25e24758e61ab2ce29d0b1cae7946de31ef9910caf3b93046; source 24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6, primary target 715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9. Independent A34 acceptance pending; blocks cutover.",
       "reviewEntryId": "gap-claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
-      "evidenceDigest": "470725c5e5234de334a368c67bdb0b1fd929153c686ef4a0c1d0785e8debda84",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
@@ -11864,18 +11862,17 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-320",
+      "targetAnchor": "unheaded-block-321",
       "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần"
       ],
-      "rationale": "A34 pending predecessor disposition: Workflow unit.complete result provenance wording changed; retain the former item 3 verbatim. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: Workflow unit.complete result provenance wording changed; retain the former item 3 verbatim. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-320 -> unheaded-block-321. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cb83b5bf2a58b18bafc0400f3f78322b8b96752a248e369e78da5e9c05fc0afd; source dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8, primary target 6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f. Independent A34 acceptance pending; blocks cutover.",
       "reviewEntryId": "gap-claim_93d5f2d34cf452029462ea39674fd255",
-      "evidenceDigest": "758f2b0aa969ee86ebb3dba6e64eebf910a9dceafc6bbe4cb7e9c59b359c5415",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
@@ -11885,17 +11882,16 @@
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-317",
+      "targetAnchor": "unheaded-block-318",
       "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
       ],
-      "rationale": "A34 pending predecessor disposition: All 18 historical lines remain in order; current decision has additive implementation/history evidence. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: All 18 historical lines remain in order; current decision has additive implementation/history evidence. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-317 -> unheaded-block-318. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "reviewEntryId": "gap-claim_8f8191c13e179af31ad39593af9fe716",
-      "evidenceDigest": "b8c9cdaae715502a4f7d0e90182f70ea3baa0bbd187aee78f9655759f7726571",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
@@ -11966,15 +11962,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640",
+      "targetUnitDigest": "2c77a3e227682c1b54f3eb25ddb3458f5fc69fc44e5e3a1c713e9cfb3132b2fc",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "reviewEntryId": "gap-claim_4d5b7f73e28f18b31e0142bf48e21c3a",
-      "evidenceDigest": "755326a75af64d0ee0d579bd4bcf67611835bd4ed070e5ab5d7346b520581198",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
@@ -11985,16 +11980,15 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640",
+      "targetUnitDigest": "2c77a3e227682c1b54f3eb25ddb3458f5fc69fc44e5e3a1c713e9cfb3132b2fc",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "rationale": "A34 pending predecessor disposition: RUL90 fan-out/caller closure wording changed as RUL95 landed; retain the original complete RUL90 line. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "A34 pending predecessor disposition: RUL90 fan-out/caller closure wording changed as RUL95 landed; retain the original complete RUL90 line. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-94 -> unheaded-block-94. The Business Rules block still starts with RUL77 and includes RUL78..103; main revises RUL80 and appends RUL104/105 and supervisor/verify facts. Rule identities and unchanged surrounding entries identify the expanded block. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a; source 77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f, primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Independent A34 acceptance pending; blocks cutover.",
       "reviewEntryId": "gap-claim_d5ba1eda7530b865fec747ee0adbc102",
-      "evidenceDigest": "a98c12de95095279fbfc6d85b3811beb9857ac21ed752da2f92d77b69c4d3044",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
@@ -12003,7 +11997,7 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-52",
-      "targetUnitDigest": "252ea6dbb0e5e764ac177a1d694964a20df0735fe0588f2a889e8b7f9205f170",
+      "targetUnitDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Behaviors & Operations",
@@ -12011,8 +12005,9 @@
       ],
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; upstream rewrote historical lines. Verbatim untransferred residual retained, independent A34 acceptance required; blocks cutover. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
-      "remainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_41571c8f42f542be1f44c9371fad823a; row residual SHA256 6bc73a238975f903fb15b4a025ed8df0aa64a628bd8b536e99f6b23e2d3cf64b; source 1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988; primary target 325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173."
+      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; upstream rewrote historical lines. Verbatim untransferred residual retained, independent A34 acceptance required; blocks cutover. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-52 -> unheaded-block-52. The STR65 Runs when/Blocked when/What changes/Side effects/Afterwards passage is retained; events.lock is replaced by state hot mutex in Side effects. Same named behavior and continuous passage identify it. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "remainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_41571c8f42f542be1f44c9371fad823a; row residual SHA256 6bc73a238975f903fb15b4a025ed8df0aa64a628bd8b536e99f6b23e2d3cf64b; source 1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988; primary target 325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173.",
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",

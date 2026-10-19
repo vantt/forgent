@@ -1,0 +1,649 @@
+{
+  "inputHEAD": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+  "stage": "pre-accounting diagnostic; never batch-end acceptance",
+  "reporterExit": 1,
+  "fullReporterScratch": "/tmp/fgos-work/p8-audit-z5a9evme",
+  "manifests": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "checks": {
+        "B": {
+          "rows": [
+            {
+              "path": "scripts/generate-doc-inventory.mjs",
+              "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+              "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+            },
+            {
+              "path": "scripts/doc-inventory-artifact.mjs",
+              "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+              "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+            },
+            {
+              "path": "scripts/generate-shipped-path-inventory.mjs",
+              "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+              "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+            },
+            {
+              "path": "scripts/check-legacy-docs-ratchet.mjs",
+              "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+              "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+            },
+            {
+              "path": "scripts/lib/is-main-module.mjs",
+              "expected": "680570946fa1381474900c9192795514b5b88f48",
+              "actual": "680570946fa1381474900c9192795514b5b88f48"
+            }
+          ],
+          "ok": true
+        },
+        "H": {
+          "findings": [],
+          "counts": {
+            "files": 616,
+            "byStatus": {
+              "promoted": 3,
+              "candidate": 214,
+              "legacy-current": 0,
+              "non-authority": 1,
+              "unrouted": 398
+            },
+            "exemptUnrouted": 302,
+            "checked": 217,
+            "findings": 0,
+            "byType": {}
+          }
+        },
+        "I": {
+          "equal": false,
+          "links": [
+            "docs/platform/**",
+            "docs/platform/<area",
+            "docs/platform/README.md",
+            "docs/platform/agent-protocol/spec.md",
+            "docs/platform/holder-lock/spec.md",
+            "docs/platform/packaging-distribution/README.md",
+            "docs/platform/packaging-distribution/vision.md",
+            "docs/platform/process/spec.md",
+            "docs/platform/run-supervisor/spec.md",
+            "docs/platform/session-identity/spec.md",
+            "docs/platform/terminal-control/spec.md"
+          ],
+          "equalToHEAD": true,
+          "frozenBaselineUnchanged": true
+        }
+      },
+      "A": {
+        "ok": false,
+        "unaccountedPairs": [
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/cutover-write-lease-design.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json"
+          },
+          {
+            "commit": "cf28815f6122b98986784385a31330a36d28bb71",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck-02.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/recheck-revision-verification.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json"
+          },
+          {
+            "commit": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/revision-verification.json"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py"
+          },
+          {
+            "commit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json"
+          }
+        ],
+        "newWorkingViolations": [
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-rebindings.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-01.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-02.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-03.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-04.json"
+        ]
+      }
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "checks": {
+        "B": {
+          "rows": [
+            {
+              "path": "scripts/generate-doc-inventory.mjs",
+              "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+              "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+            },
+            {
+              "path": "scripts/doc-inventory-artifact.mjs",
+              "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+              "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+            },
+            {
+              "path": "scripts/generate-shipped-path-inventory.mjs",
+              "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+              "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+            },
+            {
+              "path": "scripts/check-legacy-docs-ratchet.mjs",
+              "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+              "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+            },
+            {
+              "path": "scripts/lib/is-main-module.mjs",
+              "expected": "680570946fa1381474900c9192795514b5b88f48",
+              "actual": "680570946fa1381474900c9192795514b5b88f48"
+            }
+          ],
+          "ok": true
+        },
+        "H": {
+          "findings": [],
+          "counts": {
+            "files": 616,
+            "byStatus": {
+              "promoted": 3,
+              "candidate": 214,
+              "legacy-current": 0,
+              "non-authority": 1,
+              "unrouted": 398
+            },
+            "exemptUnrouted": 302,
+            "checked": 217,
+            "findings": 0,
+            "byType": {}
+          }
+        },
+        "I": {
+          "equal": false,
+          "links": [
+            "docs/platform/**",
+            "docs/platform/<area",
+            "docs/platform/README.md",
+            "docs/platform/agent-protocol/spec.md",
+            "docs/platform/holder-lock/spec.md",
+            "docs/platform/packaging-distribution/README.md",
+            "docs/platform/packaging-distribution/vision.md",
+            "docs/platform/process/spec.md",
+            "docs/platform/run-supervisor/spec.md",
+            "docs/platform/session-identity/spec.md",
+            "docs/platform/terminal-control/spec.md"
+          ],
+          "equalToHEAD": true,
+          "frozenBaselineUnchanged": true
+        }
+      },
+      "A": {
+        "ok": false,
+        "unaccountedPairs": [
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/cutover-write-lease-design.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json"
+          },
+          {
+            "commit": "cf28815f6122b98986784385a31330a36d28bb71",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck-02.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/recheck-revision-verification.json"
+          },
+          {
+            "commit": "b89c8b02f09d5f1283cca619149df6b89eafbcc2",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json"
+          },
+          {
+            "commit": "7af1b1e6a4aa2c391e95643c11f94ad964e6d9da",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/revision-verification.json"
+          },
+          {
+            "commit": "df6eab953310e49c4c9721c516787c4590f7a044",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py"
+          },
+          {
+            "commit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json"
+          }
+        ],
+        "newWorkingViolations": [
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-rebindings.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-01.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-02.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-03.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-04.json"
+        ]
+      }
+    }
+  ],
+  "protected": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "README.md",
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "sha256": "e338f1f69e353edb95c7e24682d85ae473a8ed23957adecef4146d3d7e3913df",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "sha256": "9bb538737044b8ab8146cb8a2f098ea99aaf4d80388808ec6686f25af20b5ee1",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "sha256": "72223e1528842280083af278a8c3cf15db24ab1494f364dbb65d9bf94d70571a",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sha256": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sha256": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sha256": "ede11887fd3ceddc0b3bcb371d8322eb1efbe55cd258fca1e268392140935adf",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "sha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "sha256": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "sha256": "309ff79f0b766aaefb501590982a00c4cd28f8dab3ff82159224201af78211c8",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "502562f0aba27229878d3f5ad3a2165b23a66a15ff576b4dca0bf393507fae08",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "7bd8e281d2efbbfbbc8b40b349f2c8ddb5e9aa4d9de5a90cae286292bedfa413",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "sha256": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "equalsInputHEAD": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "sha256": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
+      "equalsInputHEAD": true
+    }
+  ],
+  "journalValidation": {
+    "bindings": 85,
+    "sourceIdentitiesPreserved": true,
+    "allPending": true,
+    "partsWithinLimits": true
+  },
+  "tests": {
+    "threeFileDiagnostic": {
+      "exit": 1,
+      "pass": 65,
+      "fail": 2,
+      "reason": "Both documented ownership reproduction tests fail at checks.mjs A before accounting; ownership assertions pass. No other test failure.",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-diagnostic-tests.log"
+    },
+    "commonLight": {
+      "exit": 0,
+      "pass": 95,
+      "fail": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-light-tests.log"
+    },
+    "ratchet": {
+      "exit": 0,
+      "legacyFiles": 995,
+      "accountedEdits": 26,
+      "accountedNew": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-ratchet.log"
+    },
+    "diffCheck": {
+      "exit": 0
+    }
+  },
+  "semanticDecisionDiff": {
+    "changedRows": 85,
+    "unrelatedRowsUnchanged": true
+  }
+}

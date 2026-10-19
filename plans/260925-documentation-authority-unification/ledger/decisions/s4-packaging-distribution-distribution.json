@@ -202,18 +202,19 @@
       "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
       "sourceUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
       "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
-      "targetAnchor": "unheaded-block-21",
+      "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
       "targetAncestry": [
         "Contract: Setup Doctor Registry",
         "Retained Distribution Source Detail",
         "Contributor hooks setup"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
@@ -251,18 +252,19 @@
       "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
       "sourceUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
       "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
-      "targetAnchor": "unheaded-block-23",
+      "targetAnchor": "unheaded-block-27",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
       "targetAncestry": [
         "Contract: Setup Doctor Registry",
         "Retained Distribution Source Detail",
         "Doctor"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_7120b40ec04026fbdb538c6454614709",
@@ -644,19 +646,20 @@
       "claimId": "claim_891db485a75cdb558cf725c3315f3857",
       "sourceUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
       "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
-      "targetAnchor": "unheaded-block-22",
+      "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
       "targetAncestry": [
         "Contract: Setup Doctor Registry",
         "Retained Distribution Source Detail",
         "Setup"
       ],
-      "sourcePath": "docs/specs/distribution.md"
+      "sourcePath": "docs/specs/distribution.md",
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     }
   ],
   "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"

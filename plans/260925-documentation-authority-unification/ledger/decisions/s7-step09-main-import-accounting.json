@@ -159,11 +159,17 @@
       "claimKind": "architecture",
       "disposition": "merge",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-15",
+      "targetAnchor": "unheaded-block-19",
       "targetUnitDigest": "06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa",
-      "rationale": "L11-21 mechanical main-import accounting: complete source unit docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-54 (SHA256 06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa) occurs byte-identically as the unique same-kind unit in the existing mapped owner docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-15. Reuses the established mapped owner and Unit-exact conservation mechanism. No new authority, current-truth verdict or approval. Independent review pending.",
+      "rationale": "L11-21 mechanical main-import accounting: complete source unit docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-54 (SHA256 06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa) occurs byte-identically as the unique same-kind unit in the existing mapped owner docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-15. Reuses the established mapped owner and Unit-exact conservation mechanism. No new authority, current-truth verdict or approval. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-15 -> unheaded-block-19. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18"
+      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_240a46117d7036e9e968f5697cf36506",

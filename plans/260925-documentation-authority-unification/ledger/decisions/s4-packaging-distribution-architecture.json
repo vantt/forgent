@@ -4628,103 +4628,109 @@
       "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
       "sourceUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-12",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-36, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-12. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
-    },
-    {
-      "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
-      "sourceUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-13",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-37, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-13. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
-    },
-    {
-      "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
-      "sourceUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-14",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-38, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-14. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
-    },
-    {
-      "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
-      "sourceUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-15",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-39, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-15. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
-    },
-    {
-      "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
-      "sourceUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-16",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-40, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-16. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
-    },
-    {
-      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
-      "sourceUnitDigest": "b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
       "targetAnchor": "unheaded-block-17",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/architect/packaging-distribution/runtime-identity-and-activation.md:369-369#unheaded-block-41 (current lines); unit SHA256 b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac.\nTarget: docs/platform/packaging-distribution/contracts/release-manifest.md:220-220#unheaded-block-17 (current lines); unit SHA256 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"Legacy CLI Transition\" (../host-invocation-routing/legacy-cli-transition.md) → \"Legacy CLI Transition\" (../../../architect/host-invocation-routing/legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/architect/host-invocation-routing/legacy-cli-transition.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-41 under docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-17; source context \"Runtime Identity And Activation / 5. ReleaseManifest\", target context \"Contract: Release Manifest / Retained Runtime Identity And Activation Source Detail / 5. ReleaseManifest\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-36, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-12. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-12 -> unheaded-block-17. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
+      "sourceUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-18",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-37, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-13. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-13 -> unheaded-block-18. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
+      "sourceUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-19",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-38, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-14. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-14 -> unheaded-block-19. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
+      "sourceUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-20",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-39, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-15. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-15 -> unheaded-block-20. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
+      "sourceUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-21",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-40, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-16. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-16 -> unheaded-block-21. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "sourceUnitDigest": "b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-22",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/architect/packaging-distribution/runtime-identity-and-activation.md:369-369#unheaded-block-41 (current lines); unit SHA256 b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac.\nTarget: docs/platform/packaging-distribution/contracts/release-manifest.md:220-220#unheaded-block-17 (current lines); unit SHA256 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"Legacy CLI Transition\" (../host-invocation-routing/legacy-cli-transition.md) → \"Legacy CLI Transition\" (../../../architect/host-invocation-routing/legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/architect/host-invocation-routing/legacy-cli-transition.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-41 under docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-17; source context \"Runtime Identity And Activation / 5. ReleaseManifest\", target context \"Contract: Release Manifest / Retained Runtime Identity And Activation Source Detail / 5. ReleaseManifest\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-17 -> unheaded-block-22. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
@@ -4747,145 +4753,153 @@
       "claimId": "claim_e53e994efd41de413243c7feb18609f5",
       "sourceUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-18",
+      "targetAnchor": "unheaded-block-23",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-42, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-18. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-42, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-18. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-18 -> unheaded-block-23. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
       "sourceUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-19",
+      "targetAnchor": "unheaded-block-24",
       "claimKind": "decision",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-43, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-19. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-43, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-19. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-19 -> unheaded-block-24. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_4486d8c871bc7cace22f5877da298119",
       "sourceUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-20",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-44, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-20. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest",
-        "Release Tree Canonicalization"
-      ]
-    },
-    {
-      "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
-      "sourceUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-21",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-45, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest",
-        "Release Tree Canonicalization"
-      ]
-    },
-    {
-      "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
-      "sourceUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-22",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-46, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest",
-        "Release Tree Canonicalization"
-      ]
-    },
-    {
-      "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
-      "sourceUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-23",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-47, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest",
-        "Release Tree Canonicalization"
-      ]
-    },
-    {
-      "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
-      "sourceUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-24",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-48, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
-      "targetAncestry": [
-        "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest",
-        "Release Tree Canonicalization"
-      ]
-    },
-    {
-      "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
-      "sourceUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
       "targetAnchor": "unheaded-block-25",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-49, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-44, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-20. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-20 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
+      "sourceUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-26",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-45, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
+      "sourceUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-27",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-46, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+      "sourceUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-28",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-47, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-28. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
+      "sourceUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-48, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-24 -> unheaded-block-29. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+      "sourceUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-30",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-49, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-25 -> unheaded-block-30. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
@@ -4907,256 +4921,271 @@
       "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
       "sourceUnitDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-12",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-50, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-12. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ]
-    },
-    {
-      "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
-      "sourceUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-13",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-51, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-13. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ]
-    },
-    {
-      "claimId": "claim_4b867492e168a488b4d812642f2aad61",
-      "sourceUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-14",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-52, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-14. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ]
-    },
-    {
-      "claimId": "claim_25d3080e64bc69696f28d89967456930",
-      "sourceUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-16",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-54, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-16. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-50, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-12. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-12 -> unheaded-block-16. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
-      "sourceUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a",
+      "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
+      "sourceUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-17",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-55, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-17. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-51, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-13. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-13 -> unheaded-block-17. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "12b89a785769f424521322c24841709e2d53a1fe5a0c7969d85b0e71129abe4b",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_2d797473f60376ca54f9086ff0856496",
-      "sourceUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13",
+      "claimId": "claim_4b867492e168a488b4d812642f2aad61",
+      "sourceUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-18",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-56, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-18. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-52, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-14. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-14 -> unheaded-block-18. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "346ec840057e1f81dffd3b79f9f0c2fa051879aeaa7d1fd1a25b619b02ad9800",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_f44d55f008d91c249201a984ce908b79",
-      "sourceUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-19",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-57, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-19. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ]
-    },
-    {
-      "claimId": "claim_5802544189befbf7e8e93082025a321f",
-      "sourceUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72",
+      "claimId": "claim_25d3080e64bc69696f28d89967456930",
+      "sourceUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-20",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-58, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-20. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-54, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-16. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-16 -> unheaded-block-20. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "dcbbe772314b4b46c605c86a35c1e5e25c64da8d299ef2ee22ee460360ac611d",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
-      "sourceUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
+      "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
+      "sourceUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-21",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-59, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-55, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-17. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-17 -> unheaded-block-21. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "3e990f9e6b22795ca945fd9b59a65b78b12c3b37fbc2ea88d3fa2bf43e15ce4a",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
-      "sourceUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13",
+      "claimId": "claim_2d797473f60376ca54f9086ff0856496",
+      "sourceUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-22",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-60, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-56, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-18. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-18 -> unheaded-block-22. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "a04d969d83b5e49defe710e91650b6705cca0acec720219e49f163c81aff2d13",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
-      "sourceUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d",
+      "claimId": "claim_f44d55f008d91c249201a984ce908b79",
+      "sourceUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-23",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-61, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-57, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-19. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-19 -> unheaded-block-23. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "88d26cd1a90388f48bc95e9cba6d19643339a3163f45cea76c829a346156247b",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_ba307bc371864f9cec89f991fef61744",
-      "sourceUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5",
+      "claimId": "claim_5802544189befbf7e8e93082025a321f",
+      "sourceUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-24",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-62, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-58, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-20. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-20 -> unheaded-block-24. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "c31de9a6af67d0eb1cd6bcfb97cdd527e5def03d15a0e2314dc09a8a48ea4f72",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_3673677485dd4449067c9e5074623e1a",
-      "sourceUnitDigest": "a1e7ae9c98f45bb7c6b136fec8f222dffea7be454b7288a802983db5a7e43599",
+      "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
+      "sourceUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-25",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target prepends the labelled Retained dated design — status note (2026-10-14), identifying the bootstrap-context permission as source design and static preflight as current behavior. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-59, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
-      "sourceUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849",
+      "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
+      "sourceUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-26",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-64, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-26. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-60, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "4eb7a14280149d74fa9814bb99ec418b4638bd08c6eac32fcbfb4d68b37a5d13",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
-      "sourceUnitDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0",
+      "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
+      "sourceUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-27",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target appends the labelled Status note (2026-10-14), identifying the candidate permission as retained dated design, static preflight and the unimplemented environment-variable bootstrap context, while retaining the must-not obligation. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-61, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "f85c2d79598886465957f90d305d2fcfb9c2510697bbac8444d542d9ebbe5e9d",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ba307bc371864f9cec89f991fef61744",
+      "sourceUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-28",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-62, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-24 -> unheaded-block-28. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "9d7e46eac50d16bd95ce331d38192f4a87d9797f99b71edf8ceea4205dd93ff5",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_3673677485dd4449067c9e5074623e1a",
+      "sourceUnitDigest": "a1e7ae9c98f45bb7c6b136fec8f222dffea7be454b7288a802983db5a7e43599",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target prepends the labelled Retained dated design — status note (2026-10-14), identifying the bootstrap-context permission as source design and static preflight as current behavior. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-25 -> unheaded-block-29. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
+      "sourceUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-30",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-64, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-26. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-26 -> unheaded-block-30. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "785e4981db56df9627b8591fd383cd6c57cc04d3e8116137b27e1b8aa1bd6849",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
+      "sourceUnitDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-31",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target appends the labelled Status note (2026-10-14), identifying the candidate permission as retained dated design, static preflight and the unimplemented environment-variable bootstrap context, while retaining the must-not obligation. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-27 -> unheaded-block-31. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
@@ -5178,205 +5207,217 @@
       "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
       "sourceUnitDigest": "0449999b7a416906c1e39a270e9c21f37d9cc2326d375cf13594e6fe38253d12",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-28",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-66, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-28. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "0449999b7a416906c1e39a270e9c21f37d9cc2326d375cf13594e6fe38253d12",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "7. Invocation Lease"
-      ]
-    },
-    {
-      "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
-      "sourceUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-29",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-67, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-29. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "7. Invocation Lease"
-      ]
-    },
-    {
-      "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
-      "sourceUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-30",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-68, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-30. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "7. Invocation Lease"
-      ]
-    },
-    {
-      "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
-      "sourceUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-31",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-69, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-31. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "7. Invocation Lease"
-      ]
-    },
-    {
-      "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
-      "sourceUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-32",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-70, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-32. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-66, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-28. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-28 -> unheaded-block-32. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "0449999b7a416906c1e39a270e9c21f37d9cc2326d375cf13594e6fe38253d12",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
-      "sourceUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f",
+      "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+      "sourceUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-33",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-71, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-33. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-67, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-29. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-29 -> unheaded-block-33. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "7db0392a7929f28b94d89e713f924622ad7f686b20f8070c87360ecd964b2b22",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
-      "sourceUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b",
+      "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
+      "sourceUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-34",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-72, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-34. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-68, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-30. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-30 -> unheaded-block-34. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "e46b094a9d547703457cd1874db926f229c5f840fdc4c04f70ee621f8d25e57a",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
-      "sourceUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8",
+      "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+      "sourceUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-35",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-73, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-35. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-69, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-31. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-31 -> unheaded-block-35. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "dc365e00a42eed9599e3c3364e4fdc6934ded461577fc2edbffbbc164163f43c",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
-      "sourceUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761",
+      "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
+      "sourceUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-36",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-74, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-36. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-70, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-32. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-32 -> unheaded-block-36. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "7925f88545b7297188e1883a5707b8dbb1dfee8bd4fd4797783de1e0d8b26267",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
-      "sourceUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b",
+      "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
+      "sourceUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-37",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-75, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-37. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-71, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-33. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-33 -> unheaded-block-37. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "e260a8e1fa942a1f5bf1c99a7ba7abd14dac6ee6231576143a44a28bc0d0a05f",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
-      "sourceUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6",
+      "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
+      "sourceUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-38",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-76, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-38. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-72, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-34. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-34 -> unheaded-block-38. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "2d86b51570e889b3275f8bd88e04ea73bf1b87ef273c55682de94fc09ee5114b",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
-      "sourceUnitDigest": "fd456a8043fdb4255157f59b82696fe42576b90151877b4cb1232a5ea854b82a",
+      "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
+      "sourceUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-39",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-77, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-39. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-73, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-35. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-35 -> unheaded-block-39. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "b8fa01639c54fb4ce334dcb069b23472fbc2478e9bad4df8d67c073289e8e2d8",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "7. Invocation Lease"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
+      "sourceUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-40",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-74, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-36. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-36 -> unheaded-block-40. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "dbfa56f1bdbb52a5388df77df070e5146275526c1da44bc23fd9162931e9d761",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "7. Invocation Lease"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
+      "sourceUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-41",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-75, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-37. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-37 -> unheaded-block-41. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "d2e41a70900c9bf7d37465e1a5e7ce95f2dabdc1d8a1a64be8258795da18205b",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "7. Invocation Lease"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+      "sourceUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-42",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-76, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-38. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-38 -> unheaded-block-42. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "a1f9632769f4cbf2465902c1773664342ac276e6a87f3d290cae2d20730110c6",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "7. Invocation Lease"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
+      "sourceUnitDigest": "fd456a8043fdb4255157f59b82696fe42576b90151877b4cb1232a5ea854b82a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-43",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-77, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-39. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-39 -> unheaded-block-43. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "fd456a8043fdb4255157f59b82696fe42576b90151877b4cb1232a5ea854b82a",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_52a973f8470cb1944a340ed858f04efb",
@@ -5821,239 +5862,253 @@
       "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
       "sourceUnitDigest": "ac51cf26ef4e4e0468e570f319c083e5225c25835f20c164d4a047cd888458c1",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-40",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-101, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-40. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "ac51cf26ef4e4e0468e570f319c083e5225c25835f20c164d4a047cd888458c1",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
-      "sourceUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-41",
-      "claimKind": "contract",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-102, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-41. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_181a82457153d16a123d8c3378c30c98",
-      "sourceUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-42",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-103, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-42. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_c6869299794e7b0b8faebb525521af54",
-      "sourceUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-43",
-      "claimKind": "contract",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-104, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-43. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
-      "sourceUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-44",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-105, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-44. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-101, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-40. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-40 -> unheaded-block-44. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "ac51cf26ef4e4e0468e570f319c083e5225c25835f20c164d4a047cd888458c1",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
-      "sourceUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419",
+      "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+      "sourceUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-45",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-106, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-45. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-102, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-41. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-41 -> unheaded-block-45. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "da01d2fc952c416ba16325b6f4493f5602a85e68e6445890d86a661ddb563d60",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_491998778e598a5385e78b541e33bff8",
-      "sourceUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8",
+      "claimId": "claim_181a82457153d16a123d8c3378c30c98",
+      "sourceUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-46",
-      "claimKind": "contract",
+      "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-107, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-46. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-103, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-42. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-42 -> unheaded-block-46. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "9a365e9b5b43ce380e4ccc724d86d039e5020c11b3875ec94a3e3547cfbbc663",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
-      "sourceUnitDigest": "4a5dcd22823a0b2ccd988467b5c6b7df81536ef3fd5372bfd5ce1d5a1ba2eda5",
+      "claimId": "claim_c6869299794e7b0b8faebb525521af54",
+      "sourceUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-47",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-108, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-47. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-104, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-43. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-43 -> unheaded-block-47. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "3608b979a603b21c6131d86953fbe07fd47dceb6f9e477d6dbf66064b3d5f4de",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+      "sourceUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-48",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-105, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-44. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-44 -> unheaded-block-48. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "60ba86001f48ba64132862a134ed1e7ede5c4233b11ea818bda2593400a6ee85",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+      "sourceUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-49",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-106, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-45. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-45 -> unheaded-block-49. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "1fa15164579b61c19fd19c467f533973c1577e9a1c708158799e0c8994f50419",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_491998778e598a5385e78b541e33bff8",
+      "sourceUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-50",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-107, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-46. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-46 -> unheaded-block-50. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "498ce4bd1a2493ee1261ae7e8632c54b2c6abfcb4fff8fbb7554cd93809c17e8",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
+      "sourceUnitDigest": "4a5dcd22823a0b2ccd988467b5c6b7df81536ef3fd5372bfd5ce1d5a1ba2eda5",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-51",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-108, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-47. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-47 -> unheaded-block-51. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "4a5dcd22823a0b2ccd988467b5c6b7df81536ef3fd5372bfd5ce1d5a1ba2eda5",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_5a5a447d501facb835101fcf15cf5f9d",
       "sourceUnitDigest": "7736cb341115949ee30f3c483b3b4547bd282597586122e1eb7662e64eeb78f0",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-48",
+      "targetAnchor": "unheaded-block-52",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-109, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-48. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-109, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-48. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-48 -> unheaded-block-52. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "7736cb341115949ee30f3c483b3b4547bd282597586122e1eb7662e64eeb78f0",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_0d7b6c7bb749583718df925f63a8ba7f",
       "sourceUnitDigest": "de9ca65ddfe8a9180b1cfc6b5075e300c8e3c63d27516f5767707a0657fabd05",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-49",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-110, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-49. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "de9ca65ddfe8a9180b1cfc6b5075e300c8e3c63d27516f5767707a0657fabd05",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
-      "sourceUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-50",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-111, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-50. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
-      "sourceUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-51",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-112, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-51. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_3a0164aced10388208f0c748829bf990",
-      "sourceUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-52",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-113, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-52. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
-    },
-    {
-      "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
-      "sourceUnitDigest": "ac7af0538dc243ffd13baf530f76a89686ff9cd2e59016f38c52877e3c3925df",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-53",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-114, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-53. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-110, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-49. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-49 -> unheaded-block-53. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "de9ca65ddfe8a9180b1cfc6b5075e300c8e3c63d27516f5767707a0657fabd05",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
+      "sourceUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-54",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-111, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-50. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-50 -> unheaded-block-54. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "70db9bdf36a7ab578e4aced8a540eefcc332495e830b507981eb3605ff53b858",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
+      "sourceUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-55",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-112, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-51. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-51 -> unheaded-block-55. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "be3d98e07c3a376719e09158f719c780c45a05d4a808f4665df1392229e81c99",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_3a0164aced10388208f0c748829bf990",
+      "sourceUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-56",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-113, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-52. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-52 -> unheaded-block-56. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "17a2c3fcd7e144c9173cd3ad9f462ba8152f488e4ae493b63123be13014b8995",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
+      "sourceUnitDigest": "ac7af0538dc243ffd13baf530f76a89686ff9cd2e59016f38c52877e3c3925df",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-57",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-114, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-53. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-53 -> unheaded-block-57. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "ac7af0538dc243ffd13baf530f76a89686ff9cd2e59016f38c52877e3c3925df",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_093f54d48d2e2a3efc8f0c865ba57b66",
@@ -6076,145 +6131,153 @@
       "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
       "sourceUnitDigest": "6974a311e550994984d962f6e8e1f71e1afc8c14fbe7f8d5282a4cdda7df0cd8",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-54",
+      "targetAnchor": "unheaded-block-58",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-115, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-54. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-115, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-54. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-54 -> unheaded-block-58. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "6974a311e550994984d962f6e8e1f71e1afc8c14fbe7f8d5282a4cdda7df0cd8",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal",
         "Existing Project Adoption"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
       "sourceUnitDigest": "b10f8721b7f1f6d51be6d22b21acb9effa78de473c0b6a2fb2f92dd71e67b158",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-55",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-116, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-55. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "b10f8721b7f1f6d51be6d22b21acb9effa78de473c0b6a2fb2f92dd71e67b158",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal",
-        "Existing Project Adoption"
-      ]
-    },
-    {
-      "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
-      "sourceUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-56",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-117, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-56. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal",
-        "Existing Project Adoption"
-      ]
-    },
-    {
-      "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
-      "sourceUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-57",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-118, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-57. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal",
-        "Existing Project Adoption"
-      ]
-    },
-    {
-      "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
-      "sourceUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65",
-      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-58",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-119, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-58. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal",
-        "Existing Project Adoption"
-      ]
-    },
-    {
-      "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
-      "sourceUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-59",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-120, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-59. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-116, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-55. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-55 -> unheaded-block-59. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "b10f8721b7f1f6d51be6d22b21acb9effa78de473c0b6a2fb2f92dd71e67b158",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal",
         "Existing Project Adoption"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
-      "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
-      "sourceUnitDigest": "07f8f1512cab1811efe3279788d3b494c699f31d6e5bf623417c53eb1241ea01",
+      "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
+      "sourceUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-60",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-121, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-60. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-117, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-56. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-56 -> unheaded-block-60. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "1f0eae3e1e42a0694560408217a0581fc8920c356521c76f38c931b04a3e21f0",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal",
+        "Existing Project Adoption"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+      "sourceUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-61",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-118, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-57. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-57 -> unheaded-block-61. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "1350217488d7df5ff2cd08fc752fef846e75b1b20161c0d22dcde1d9f7388837",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal",
+        "Existing Project Adoption"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+      "sourceUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-62",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-119, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-58. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-58 -> unheaded-block-62. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "0f882749d3e11278fb1a1150c663da4b71885a1d0a9e39574a10225f36a24d65",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal",
+        "Existing Project Adoption"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
+      "sourceUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-63",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-120, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-59. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-59 -> unheaded-block-63. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "67b295693448086f48b7539c8a2b9b6914b45d721cfe4a7926635054eb41ea81",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal",
+        "Existing Project Adoption"
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
+      "sourceUnitDigest": "07f8f1512cab1811efe3279788d3b494c699f31d6e5bf623417c53eb1241ea01",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-64",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-121, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-60. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-60 -> unheaded-block-64. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "07f8f1512cab1811efe3279788d3b494c699f31d6e5bf623417c53eb1241ea01",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal",
         "Existing Project Adoption"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
       "sourceUnitDigest": "8ca6f556298555c6b141f6386ec9ea4418f581ecaca73550d2f99de0dda9aa13",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
-      "targetAnchor": "unheaded-block-61",
+      "targetAnchor": "unheaded-block-65",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-122, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-61. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-122, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-61. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-61 -> unheaded-block-65. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
       "targetUnitDigest": "8ca6f556298555c6b141f6386ec9ea4418f581ecaca73550d2f99de0dda9aa13",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal",
         "Existing Project Adoption"
-      ]
+      ],
+      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
     },
     {
       "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
