@@ -27,7 +27,9 @@ pub use macos::MacosTree;
 pub use windows::WindowsJobDriver;
 
 /// How the attempt is started. `Direct` must outlive its supervisor; a
-/// `Terminal` attempt dies with the process that spawned it.
+/// `Terminal` attempt dies with the process that spawned it. With bwrap
+/// `--as-pid-1`, the gate must call `control::arm_parent_death_signal` before
+/// its launch handshake rather than relying on bwrap to preserve the signal.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StartMode {
     Direct,
