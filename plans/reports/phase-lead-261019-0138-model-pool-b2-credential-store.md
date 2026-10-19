@@ -93,3 +93,12 @@ No component-boundary change (the driver still does not branch on provider; only
 - `fgos doctor` could say which accounts would be refused for a store key before B1 filters the lease. Reason: a late `credential-store-empty` on an unlucky lease. Benefit: the problem shows before a run.
 
 Status: DONE_WITH_CONCERNS
+
+## Phase 06 (2026-10-19, after the B2 release went active at 10:26)
+
+- `.fgos/config.json`: removed `resourceBindings` (10 invocations) and `env[homeEnv]` (9 entries; an `env` left empty was dropped) from every invocation that declares `credentialStore`. Other env variables (`PI_CONFIG_DIR`, ...) stay. 109 lines removed, no other change. `~/.fgos/config.json`, other projects, credentials and trust stores untouched; the old-field read path in code is untouched.
+- Tests: `bind-committed-config.test.mjs` now asserts that no invocation with a store keeps `resourceBindings` or an `env` entry for its `homeEnv`, and that none keeps a binding without a store. Two other tests followed the config: `dispatch-policy-baseline-snapshot.test.mjs` (15 rows lose the home variable from `envKeys`) and `herdr-claude-invocations.test.mjs` (`inv.env` may be absent).
+- Explain before/after for `execute`, `architecture:explain`, `business:frame`, `judge`: identical except `generated_at`.
+- Tests: the 29 files that read the committed config or import touched modules: 1386 tests, 1384 pass, 0 fail (2 skipped). Wider run (`test/runner`, `test/setup`, `test/scripts`, `test/cli`, 427 files): 5390 tests, 5321 pass, 3 skipped, 1 fail: `test/setup/skill-wrappers.test.mjs`, the untracked `.claude/skills/instruction-audit` render, a known baseline failure.
+- Real confined round: `fgos run ... --provider deepseek` -> `pi-herdr` (herdr, bwrap, openrouter store, no key variable in env): `completed-pass`, exit 0, run `unit-run-1792381166287-bfe5688f`. Pane closed.
+- For the program board / MP-C: still on the old fields are `~/.fgos/config.json` (13 `resourceBindings`), mdview and mcp-skill-hub configs (24 each), and the inference branch in `credentialStoreOf`.
