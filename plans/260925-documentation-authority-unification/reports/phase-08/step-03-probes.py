@@ -32,8 +32,8 @@ def main():
     probe('wrong source column',plain,lambda r:r['edges'][0]['sourceSpans'][0].update(columnStart=2),'source-span')
     probe('old ordinal rebound to different unit',plain,lambda r:r['edges'][0].update(matchedExpression='other source'),'passage-correspondence')
     probe('unknown disposition',plain,lambda r:r['edges'][0].update(disposition='rewrite'),'disposition')
-    probe('park without blocked reason',parked,lambda r:parked_e(r).update(blockedReason=None),'parked-state')
-    probe('park without dependency',parked,lambda r:parked_e(r).update(dependency=None),'parked-state')
+    probe('park without blocked reason',parked,lambda r:parked_e(r).update(blockedReason=None,blockedCategory=None),'parked-state')
+    probe('park without dependency',parked,lambda r:parked_e(r).update(dependency=None,dependencyCategory=None),'parked-state')
     probe('row flip scheduled now',row,lambda r:row_e(r).update(timing='now'),'row-semantics')
     probe('preserved citation with executable hunk',plain,lambda r:r['edges'][0].update(diffHunk='@@ fake @@'),'preserve-state')
     probe('missing committed target',patch,lambda r:pe(r).update(target='docs/nonexistent-pilot-target.md'),'target-tree')
@@ -119,8 +119,71 @@ def main():
     many=next(r for r in rs if any(len(e.get('searchWitness',{}).get('hitGroups',[]))>1 for e in r['edges']))
     def boilerplate(r):
         e=next(e for e in r['edges'] if len(e.get('searchWitness',{}).get('hitGroups',[]))>1)
-        for g in e['searchWitness']['hitGroups']:g['liveAssessment']='Every hit is unusable.'
+        for g in e['searchWitness']['hitGroups']:
+            g['liveAssessment']='Every hit is unusable.';g.pop('category',None) # L12-32(5) replaces prose distinctness with an enum.
     probe('identical live assessments for all hit groups',many,boilerplate,'distinct-hit-assessments')
+    # L12-32: each new mechanical rule rejects an independently wrong complete record.
+    probe('reason names a different anchor',patch,lambda r:pe(r).update(reason='L12-32: docs/platform/work-state/spec.md#false-anchor'),'reason-anchor-consistency')
+    exists=next(r for r in rs if any(e['disposition']=='preserve' and e['matchedExpression']=='docs/backlog.md' for e in r['edges']))
+    def false_never(r):
+        e=next(e for e in r['edges'] if e['matchedExpression']=='docs/backlog.md');e['reason']='L12-32: target never existed in git history';e['targetFacts']=[{'state':'never-existed','path':'docs/backlog.md'}]
+    probe('never existed contradicts Git ancestry',exists,false_never,'reason-target-history')
+    foundations=next(r for r in rs if r['file']=='docs/specs/platform-foundations.md')
+    def deleted_lie(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='maps-j-08124');e['targetFacts'][0]['commit']=a.author_commit;e['reason']='L12-32: removed at '+a.author_commit
+    probe('removed at commit that did not delete path',foundations,deleted_lie,'reason-target-history')
+    def rename_as_delete(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='maps-j-08131');e['targetFacts'][0]['state']='removed';e['reason']='L12-32: removed at '+e['targetFacts'][0]['commit']
+    probe('same-commit rename falsely called deletion',foundations,rename_as_delete,'reason-target-history')
+    def wrong_rename(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='maps-j-08131');e['targetFacts'][0]['successor']='docs/backlog.md'
+    probe('rename successor differs from Git rename',foundations,wrong_rename,'reason-target-history')
+    probe('dependency category differs from blocker',parked,lambda r:parked_e(r).update(dependencyCategory='dead-link' if parked_e(r)['blockedCategory']!='dead-link' else 'phase9-carry'),'dependency-category')
+    probe('unknown blocker and dependency enum',parked,lambda r:parked_e(r).update(blockedCategory='invented',dependencyCategory='invented'),'dependency-category')
+    probe('prose dependency contradicts matching enum',parked,lambda r:parked_e(r).update(dependency='Step 5 parity' if parked_e(r)['blockedCategory']!='step5-parity' else 'Description needs rewrite'),'dependency-category')
+    def wrong_line_anchor(r):
+        e=next(e for e in r['edges'] if e['anchor']);r['checks']['anchors'][e['edgeId']]['targetLines']=[1];r['checks']['anchors'][e['edgeId']]['targetLineText']=[m.blob(a.author_commit,e['target']).decode().splitlines()[0]]
+    probe('anchor differs from evidence enclosing heading',patch,wrong_line_anchor,'anchor-from-evidence')
+    def null_line(r):
+        e=next(e for e in r['edges'] if e['anchor']);e['anchor']=None
+    probe('null anchor with target line evidence',patch,null_line,'anchor-from-evidence')
+    def unjustified_whole(r):
+        e=next(e for e in r['edges'] if not e['anchor'] and e['disposition']=='patch');r['checks']['anchors'][e['edgeId']].pop('wholeFileJustification')
+    probe('whole-file anchor without recorded justification',patch,unjustified_whole,'anchor-from-evidence')
+    def wrong_line_text(r):
+        e=next(e for e in r['edges'] if e['anchor']);r['checks']['anchors'][e['edgeId']]['targetLineText']=['wrong target text']
+    probe('target evidence line differs from pinned text',patch,wrong_line_text,'anchor-from-evidence')
+    runner=next(r for r in rs if r['file']=='docs/specs/runner.md')
+    def omit_partial(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='author-r4-docs-specs-runner-L1729C2');r['edges'].remove(e);r['checks']['coverage']['authorAddedEdgeIds'].remove(e['edgeId']);r['checks']['coverage']['legacyScan']['candidates']=[x for x in r['checks']['coverage']['legacyScan']['candidates'] if x.get('edgeId')!=e['edgeId']]
+    probe('partial-root edge and receipt jointly omitted',runner,omit_partial,'author-added-search-coverage')
+    probe('missing description comparison',patch,lambda r:r['checks']['coverage']['descriptionTruth'].pop(pe(r)['edgeId']),'description-truth-record')
+    probe('description mismatch left executable',patch,lambda r:r['checks']['coverage']['descriptionTruth'][pe(r)['edgeId']]['comparisons']['ports'].update(verdict='mismatch'),'description-truth-record')
+    def wrong_hit_category(r):
+        e=next(e for e in r['edges'] if e.get('searchWitness',{}).get('hitGroups'));e['searchWitness']['hitGroups'][0]['category']='live'
+    probe('unknown witness hit category',many,wrong_hit_category,'distinct-hit-assessments')
+    def false_rename_prose(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='maps-j-08131');e['reason']='L12-32: renamed at '+e['targetFacts'][0]['commit']+' to docs/backlog.md'
+    probe('rename prose names a different successor',foundations,false_rename_prose,'reason-target-history')
+    def omit_named_line(r):
+        e=next(e for e in r['edges'] if e['edgeId']=='maps-j-08232');r['checks']['anchors'][e['edgeId']]['targetLines']=[131]
+    probe('target line named in proof omitted from evidence',runner,omit_named_line,'anchor-from-evidence')
+    herdr=next(r for r in rs if r['file']=='docs/specs/herdr-web-dashboard.md')
+    def locator_count_lie(r):r['checks']['coverage']['extraLocatorSearches']['maps-j-08107'][0]['result']['hitCount']+=1
+    probe('locator-token supplementary replay count is false',herdr,locator_count_lie,'supplemental-locator-replay')
+    probe('adjacent description context truncated',patch,lambda r:r['checks']['coverage']['descriptionTruth'][pe(r)['edgeId']].update(adjacentPassage='truncated'),'description-truth-record')
+    probe('description target quote invented',patch,lambda r:r['checks']['coverage']['descriptionTruth'][pe(r)['edgeId']]['targetEvidence'][0].update(text='invented target quote'),'description-truth-record')
+    probe('standalone anchor reason differs from field',patch,lambda r:pe(r).update(reason='L12-32: #wrong-anchor'),'reason-anchor-consistency')
+    optional=copy.deepcopy(parked)
+    parked_e(optional)['blockedReason']=None;parked_e(optional)['dependency']=None
+    assert not c.check_record(optional), 'L12-32 makes category prose optional'
+    optional=copy.deepcopy(many)
+    for edge in optional['edges']:
+        for group in edge.get('searchWitness',{}).get('hitGroups',[]):
+            group.pop('note',None);group.pop('liveAssessment',None);group.pop('carriageAssessment',None)
+    assert not c.check_record(optional), 'L12-32 makes hit-group notes optional'
+    probe('never-existing claim without Git wording',exists,lambda r:next(e for e in r['edges'] if e['matchedExpression']=='docs/backlog.md').update(reason='L12-32: target never existed'),'reason-target-history')
+    assert m.path_history(a.author_commit,'docs/specs/runner.md:26') == m.path_history(a.author_commit,'docs/specs/runner.md')
     manifest=m.manifest_view(rs,a.author_commit)
     bad=copy.deepcopy(manifest);bad['files'][0]['diffSha256']='0'*64;assert 'files' in m.verify_manifest(rs,a.author_commit,bad)
     checks.append({'surfaceClass':3,'probe':'frozen record manifest diff hash mutation','expectedCheck':'manifest-freeze','rejected':True})
@@ -131,12 +194,14 @@ def main():
     # Complete synthetic records bound to in-memory source blobs. No fixture is written to the repo.
     def fixture(old,target='docs/platform/work-state/spec.md',prefix='# Probe\n\n',suffix='\n'):
         f='docs/pilot-probe-consumer.md';before=prefix+old+suffix;line=len(prefix.splitlines())+1
-        inv={'edgeId':'maps-j-probe','consumerPath':f,'matchedExpression':old,'physicalSpans':[{'line':line,'columnStart':1,'columnEndExclusive':len(old)+1,'text':old}],'locatorTokens':[]}
+        inv={'edgeId':'maps-j-probe','consumerPath':f,'matchedExpression':old,'physicalSpans':[{'line':line,'columnStart':1,'columnEndExclusive':len(old)+1,'text':old}],'locatorTokens':[],'normalizedReference':'docs/old.md'}
         replacement=m.form(old,f,target,None);after=prefix+replacement+suffix;diff=m.make_diff(f,before,after)
-        e={'edgeId':inv['edgeId'],'sourceSpans':inv['physicalSpans'],'matchedExpression':old,'disposition':'patch','diffHunk':m.hunks(diff)[0].splitlines()[0],'reason':'L12-26(7) complete fixture citation','target':target,'anchor':None,'timing':'Phase 9','blockedReason':None,'dependency':None}
+        e={'edgeId':inv['edgeId'],'sourceSpans':inv['physicalSpans'],'matchedExpression':old,'disposition':'patch','diffHunk':m.hunks(diff)[0].splitlines()[0],'reason':'L12-26(7) complete fixture citation','target':target,'anchor':None,'timing':'Phase 9','blockedReason':None,'dependency':None,'blockedCategory':None,'dependencyCategory':None}
         r={'file':f,'inventoryInputCommit':m.INVENTORY,'authorInputCommit':a.author_commit,'inventoryFileDigest':m.sha(before),'digest':m.sha(before),'inventoryEdgeIds':[e['edgeId']],'diff':diff,'edges':[e],'reviewSet':'batch-probe','authoringRules':['L12-26'],
         'checks':{'coverage':{'writerTrace':{e['edgeId']:'read-only citation; no writer/default-root/schema/identity change'}},'anchors':{e['edgeId']:{'targetCommit':a.author_commit,'targetDigest':m.sha(m.blob(a.author_commit,target))}},'relativeResolution':{e['edgeId']:{'replacement':replacement,'resolvedTarget':target,'targetCommit':a.author_commit,'authorityStatus':'cutover-patch-only'}},'labelForm':{}}}
         if target in c.dirs:r['checks']['anchors'][e['edgeId']]={'targetCommit':a.author_commit,'targetTreeOid':m.git('rev-parse',a.author_commit+':'+target).decode().strip()}
+        r['checks']['anchors'][e['edgeId']]['wholeFileJustification']='Fixture cites the complete Work-State spec / directory as an area owner, across all sections.'
+        r['checks']['coverage']['descriptionTruth']={e['edgeId']:{'sourcePassage':old,'adjacentPassage':m.adjacent_passage(before,e['sourceSpans']),'targetEvidence':[{'line':1,'text':m.blob(a.author_commit,target).decode().splitlines()[0]}],'targetCommit':a.author_commit,'target':target,'targetDigest':m.sha(m.blob(a.author_commit,target)), 'comparisons':{k:{'verdict':'not-asserted','note':'Fixture asserts no '+k} for k in ['counts','ports','defaults','verbFileLists','versions','shippedStatus']},'assessment':'Complete area pointer fixture.'}}
         original_blob=m.blob
         def fake_blob(commit,path):return before.encode() if path==f else original_blob(commit,path)
         return r,inv,fake_blob
@@ -149,7 +214,7 @@ def main():
 
         r,inv,fake_blob=fixture(old,target);c.entries[inv['edgeId']]=inv;c.files[r['file']]={'sha256':r['digest'],'edgeIds':[inv['edgeId']]}
         with mock_patch.object(m,'blob',side_effect=fake_blob):
-            assert c.check_record(r)==[],name
+            failures=c.check_record(r);assert failures==[],(name,failures)
             probe('record form '+name,r,lambda rr:rr['checks']['relativeResolution'][inv['edgeId']].update(replacement=wrong),'label-form')
     # Source carriage and duplicate Related list are deliberately wrong complete records.
     for title in ['Literal Snapshot','Retained Distribution Source Detail','Added in candidate: X source carriage','Historical source section abc']:

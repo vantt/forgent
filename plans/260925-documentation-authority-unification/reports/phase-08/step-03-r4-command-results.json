@@ -1,0 +1,72 @@
+[
+  {
+    "name": "checker",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    "exit": 0,
+    "output": "step-03-r4-check-result.json",
+    "elapsedSeconds": 29.42,
+    "stderr": ""
+  },
+  {
+    "name": "probes",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 64.23,
+    "output": "step-03-r4-probes-result.json",
+    "stderr": ""
+  },
+  {
+    "name": "selector",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f",
+      "--select"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 0.12,
+    "output": "step-03-r4-sample-result.json",
+    "stderr": ""
+  },
+  {
+    "name": "light-tests",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs",
+      "test/scripts/check-doc-retirement.test.mjs"
+    ],
+    "exit": 0,
+    "elapsedSeconds": 1.06,
+    "output": "step-03-r4-light-tests.log",
+    "stderr": ""
+  }
+]

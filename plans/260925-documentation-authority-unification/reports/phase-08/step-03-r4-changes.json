@@ -1,0 +1,4585 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "comparison": "Round 3 archived records vs current round 4. Outcome = disposition, target, anchor or effective per-edge replacement. Hunk-header regrouping alone is record text; complete per-file diff hashes are listed separately.",
+  "outcomeChanges": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07997",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07998",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "edgeId": "maps-j-08074",
+      "changedFields": [
+        "anchor",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/system-overview/spec.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "patch",
+        "target": "docs/platform/system-overview/spec.md",
+        "anchor": "area-map"
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08169",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/claude-plugin/spec.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08170",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08171",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08209",
+      "changedFields": [
+        "disposition",
+        "target",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/runner/spec.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "parked",
+        "target": null,
+        "anchor": null
+      }
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08232",
+      "changedFields": [
+        "anchor",
+        "diffReplacement"
+      ],
+      "before": {
+        "disposition": "patch",
+        "target": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": null
+      },
+      "after": {
+        "disposition": "patch",
+        "target": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": "62-nơi-đặt-policy"
+      }
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r4-docs-specs-runner-L1729C2",
+      "changedFields": [
+        "addedEdge"
+      ],
+      "before": null,
+      "after": {
+        "disposition": "preserve",
+        "target": null,
+        "anchor": null
+      }
+    }
+  ],
+  "recordTextOnlyChanges": [
+    {
+      "file": "README.md",
+      "edgeId": "maps-j-00001",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "README.md",
+      "edgeId": "maps-j-00002",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "README.md",
+      "edgeId": "maps-j-00003",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01902",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01903",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01904",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01905",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01906",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01907",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01908",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "edgeId": "maps-j-01909",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05086",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05087",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05088",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05089",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05090",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "edgeId": "maps-j-05091",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "edgeId": "maps-j-07239",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "edgeId": "maps-j-07240",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07952",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07953",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07954",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07955",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07956",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07957",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07958",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07959",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07960",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07961",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07962",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07963",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07964",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07965",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07966",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07967",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07968",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07969",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07970",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07971",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07972",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07973",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07974",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07975",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07976",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07977",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07978",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07979",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07980",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07981",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07982",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07983",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07984",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07985",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07986",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07987",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07988",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07989",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07990",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07991",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07992",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07993",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07994",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07995",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07996",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-07999",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08000",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08001",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08002",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08003",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08004",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08005",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08006",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08007",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08008",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08009",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08010",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08012",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08013",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08014",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08015",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08016",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08017",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08018",
+      "edgeFieldsChanged": [
+        "blockedReason",
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08019",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08020",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08021",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08022",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08023",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08024",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08025",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08026",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08027",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08028",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08029",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08030",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08031",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08032",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08033",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08034",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08035",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08036",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08037",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08038",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08039",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08040",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L163C154",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L163C237",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L163C264",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L164C98",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L164C230",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L164C337",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L164C403",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "author-r3-docs-reading-map-L164C493",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08052",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08053",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08054",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08055",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "maps-j-08057",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "maps-j-08058",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "maps-j-08059",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "maps-j-08060",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L13C53",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L582C69",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L1255C211",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L1359C157",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L1360C1158",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "edgeId": "author-r3-docs-specs-confinement-authority-L1361C297",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08061",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08062",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08063",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08064",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08065",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08066",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08067",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08068",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08069",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08070",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08071",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08072",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "maps-j-08073",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "edgeId": "author-r3-docs-specs-decision-citation-drift-L26C13",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "edgeId": "maps-j-08075",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "edgeId": "maps-j-08076",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08077",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08078",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08079",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08080",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08081",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08082",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08083",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "maps-j-08084",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "author-r3-docs-specs-distribution-L61C267",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "edgeId": "author-r3-docs-specs-distribution-L61C282",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "edgeId": "maps-j-08085",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "edgeId": "maps-j-08086",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "edgeId": "maps-j-08087",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "edgeId": "maps-j-08088",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "edgeId": "maps-j-08089",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "edgeId": "maps-j-08090",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "edgeId": "maps-j-08091",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "edgeId": "maps-j-08092",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "edgeId": "maps-j-08093",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "edgeId": "maps-j-08094",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08095",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08096",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08097",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08098",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08099",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08100",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08101",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08102",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08103",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08104",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08105",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08106",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08107",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08108",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08109",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "edgeId": "maps-j-08110",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "edgeId": "maps-j-08111",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "edgeId": "maps-j-08112",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08113",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08114",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08115",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08116",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08117",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08118",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08119",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08120",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08121",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08122",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08123",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08124",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08125",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08126",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08127",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08128",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08129",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08130",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08131",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08132",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08133",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08134",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "edgeId": "maps-j-08135",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08136",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08137",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08138",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08139",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08140",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08141",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08142",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08143",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08144",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08145",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08146",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08147",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08148",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08149",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08150",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08151",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08152",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08153",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08154",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08155",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08156",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08157",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08158",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08159",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08160",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08161",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08162",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08163",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08164",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08165",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08166",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08167",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08168",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08172",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08173",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08174",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08175",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08176",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08177",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08178",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08179",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08180",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08181",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08182",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08183",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08185",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08186",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08187",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08188",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08189",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08190",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08191",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08192",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08193",
+      "edgeFieldsChanged": [
+        "blockedReason",
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08194",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08195",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08196",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08197",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08198",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08199",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08200",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08201",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08202",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08203",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08204",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08205",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08206",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08207",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08208",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08210",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08211",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08212",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08213",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08214",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08215",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08216",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08217",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L44C154",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L44C237",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L44C264",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L45C98",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L45C230",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L45C337",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L45C403",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "author-r3-docs-specs-reading-map-L45C493",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08218",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08219",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08220",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08221",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08222",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08223",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08224",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08225",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08226",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08227",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08228",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08229",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08230",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08231",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08233",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08234",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08235",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08236",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08237",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08238",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08239",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08240",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08241",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08242",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08243",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08244",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08245",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08246",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08247",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08248",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08249",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08250",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08251",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08252",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08253",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08254",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08255",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08256",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08257",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08258",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08259",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08260",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08261",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08262",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08263",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08264",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08265",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08266",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08267",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08268",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08269",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08270",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08271",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08272",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08273",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08274",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08275",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08276",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08277",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08278",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08279",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08280",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08281",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08282",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08283",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08284",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08285",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08286",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08287",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08288",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08289",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08290",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08291",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08292",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08293",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08294",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08295",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08296",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08297",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08298",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08299",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08300",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08301",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08302",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08303",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08304",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08305",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08306",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08307",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08308",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08309",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08310",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08311",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08312",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08313",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08314",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08315",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08316",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08317",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08318",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08319",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08320",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08321",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08322",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08323",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08324",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08325",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08326",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08327",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08328",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08329",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "maps-j-08330",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1298C98",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1299C76",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1300C129",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1301C128",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1301C157",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1302C132",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1303C92",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1303C121",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1304C96",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1304C125",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1305C141",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1306C129",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1314C80",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L1315C103",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L3356C212",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L3356C227",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "edgeId": "author-r3-docs-specs-runner-L3356C343",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08331",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08332",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08333",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08334",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08335",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08336",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08337",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "maps-j-08338",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L14C95",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L15C129",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L16C254",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L17C254",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L18C122",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L19C240",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L20C129",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L21C82",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L22C168",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L23C106",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "edgeId": "author-r3-docs-specs-system-overview-L83C151",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08339",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08340",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08341",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08342",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08343",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08344",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08345",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08346",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08347",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08348",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08349",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "targetFacts",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08350",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08351",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08352",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08353",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08354",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08355",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08356",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08357",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08358",
+      "edgeFieldsChanged": [
+        "targetFacts"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08359",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08360",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08361",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08362",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08363",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08364",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08365",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08366",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08367",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08368",
+      "edgeFieldsChanged": [
+        "targetFacts",
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08369",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08370",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08371",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08372",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08373",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "maps-j-08374",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "author-r3-docs-specs-work-state-L1642C58",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "author-r3-docs-specs-work-state-L1891C21",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "edgeId": "author-r3-docs-specs-work-state-L1894C28",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08375",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08376",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08377",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08378",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness"
+      ],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "edgeFieldsChanged": [
+        "reason"
+      ],
+      "companionProofChanged": true
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08380",
+      "edgeFieldsChanged": [],
+      "companionProofChanged": false
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "author-r3-docs-specs-workflow-L639C102",
+      "edgeFieldsChanged": [
+        "dependencyCategory",
+        "blockedCategory",
+        "searchWitness",
+        "dependency"
+      ],
+      "companionProofChanged": false
+    }
+  ],
+  "files": [
+    {
+      "file": "README.md",
+      "set": "batch-002",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-00001",
+        "maps-j-00002",
+        "maps-j-00003"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "set": "batch-002",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-01902",
+        "maps-j-01903",
+        "maps-j-01904",
+        "maps-j-01905",
+        "maps-j-01906",
+        "maps-j-01907",
+        "maps-j-01908",
+        "maps-j-01909"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "set": "batch-002",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-05086",
+        "maps-j-05087",
+        "maps-j-05088",
+        "maps-j-05089",
+        "maps-j-05090",
+        "maps-j-05091"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "set": "batch-001",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-07239",
+        "maps-j-07240"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "10bab2761556240b5e97d158065b22cdc9059c0b49a458d964fce60d81cfee34",
+      "afterDiffSha256": "10bab2761556240b5e97d158065b22cdc9059c0b49a458d964fce60d81cfee34",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/reading-map.md",
+      "set": "batch-002",
+      "outcomeEdgeIds": [
+        "maps-j-07997",
+        "maps-j-07998"
+      ],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-07952",
+        "maps-j-07953",
+        "maps-j-07954",
+        "maps-j-07955",
+        "maps-j-07956",
+        "maps-j-07957",
+        "maps-j-07958",
+        "maps-j-07959",
+        "maps-j-07960",
+        "maps-j-07961",
+        "maps-j-07962",
+        "maps-j-07963",
+        "maps-j-07964",
+        "maps-j-07965",
+        "maps-j-07966",
+        "maps-j-07967",
+        "maps-j-07968",
+        "maps-j-07969",
+        "maps-j-07970",
+        "maps-j-07971",
+        "maps-j-07972",
+        "maps-j-07973",
+        "maps-j-07974",
+        "maps-j-07975",
+        "maps-j-07976",
+        "maps-j-07977",
+        "maps-j-07978",
+        "maps-j-07979",
+        "maps-j-07980",
+        "maps-j-07981",
+        "maps-j-07982",
+        "maps-j-07983",
+        "maps-j-07984",
+        "maps-j-07985",
+        "maps-j-07986",
+        "maps-j-07987",
+        "maps-j-07988",
+        "maps-j-07989",
+        "maps-j-07990",
+        "maps-j-07991",
+        "maps-j-07992",
+        "maps-j-07993",
+        "maps-j-07994",
+        "maps-j-07995",
+        "maps-j-07996",
+        "maps-j-07999",
+        "maps-j-08000",
+        "maps-j-08001",
+        "maps-j-08002",
+        "maps-j-08003",
+        "maps-j-08004",
+        "maps-j-08005",
+        "maps-j-08006",
+        "maps-j-08007",
+        "maps-j-08008",
+        "maps-j-08009",
+        "maps-j-08010",
+        "maps-j-08011",
+        "maps-j-08012",
+        "maps-j-08013",
+        "maps-j-08014",
+        "maps-j-08015",
+        "maps-j-08016",
+        "maps-j-08017",
+        "maps-j-08018",
+        "maps-j-08019",
+        "maps-j-08020",
+        "maps-j-08021",
+        "maps-j-08022",
+        "maps-j-08023",
+        "maps-j-08024",
+        "maps-j-08025",
+        "maps-j-08026",
+        "maps-j-08027",
+        "maps-j-08028",
+        "maps-j-08029",
+        "maps-j-08030",
+        "maps-j-08031",
+        "maps-j-08032",
+        "maps-j-08033",
+        "maps-j-08034",
+        "maps-j-08035",
+        "maps-j-08036",
+        "maps-j-08037",
+        "maps-j-08038",
+        "maps-j-08039",
+        "maps-j-08040",
+        "author-r3-docs-reading-map-L163C154",
+        "author-r3-docs-reading-map-L163C237",
+        "author-r3-docs-reading-map-L163C264",
+        "author-r3-docs-reading-map-L164C98",
+        "author-r3-docs-reading-map-L164C230",
+        "author-r3-docs-reading-map-L164C337",
+        "author-r3-docs-reading-map-L164C403",
+        "author-r3-docs-reading-map-L164C493"
+      ],
+      "completeDiffChanged": true,
+      "beforeDiffSha256": "a7591263e94808eb4739e742fc0ca23c98fe72320d3a8e197140b449e50fafef",
+      "afterDiffSha256": "9ce154ac7a2822b6a222e8c3766764d09fac4c05926bc7771ef1a6a2d939a5e7",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "set": "batch-002",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08052",
+        "maps-j-08053",
+        "maps-j-08054",
+        "maps-j-08055",
+        "maps-j-08056"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "89046aa1899e8f70a33ed3662f0fdb21bd7ead91a2fdf1e8439cc0e7b54a617c",
+      "afterDiffSha256": "89046aa1899e8f70a33ed3662f0fdb21bd7ead91a2fdf1e8439cc0e7b54a617c",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08057",
+        "maps-j-08058",
+        "maps-j-08059",
+        "maps-j-08060",
+        "author-r3-docs-specs-confinement-authority-L13C53",
+        "author-r3-docs-specs-confinement-authority-L582C69",
+        "author-r3-docs-specs-confinement-authority-L1255C211",
+        "author-r3-docs-specs-confinement-authority-L1359C157",
+        "author-r3-docs-specs-confinement-authority-L1360C1158",
+        "author-r3-docs-specs-confinement-authority-L1361C297"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "f668b2bd91ce9641af4a8c2f7fb6bb62fa4afe2450a6f06a1d5f46a3a5951ecf",
+      "afterDiffSha256": "f668b2bd91ce9641af4a8c2f7fb6bb62fa4afe2450a6f06a1d5f46a3a5951ecf",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08061",
+        "maps-j-08062",
+        "maps-j-08063",
+        "maps-j-08064",
+        "maps-j-08065",
+        "maps-j-08066",
+        "maps-j-08067",
+        "maps-j-08068",
+        "maps-j-08069",
+        "maps-j-08070",
+        "maps-j-08071",
+        "maps-j-08072",
+        "maps-j-08073",
+        "author-r3-docs-specs-decision-citation-drift-L26C13"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [
+        "maps-j-08074"
+      ],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08075",
+        "maps-j-08076"
+      ],
+      "completeDiffChanged": true,
+      "beforeDiffSha256": "143203ff648a9fce5d50abd0436b8d919d587547ee807de3177c7c46ac786bb9",
+      "afterDiffSha256": "9daf981d8318dadcdc5fe777111f6c83f24a6b779d8c7e3105f23b0964bc4fb7",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08077",
+        "maps-j-08078",
+        "maps-j-08079",
+        "maps-j-08080",
+        "maps-j-08081",
+        "maps-j-08082",
+        "maps-j-08083",
+        "maps-j-08084",
+        "author-r3-docs-specs-distribution-L61C267",
+        "author-r3-docs-specs-distribution-L61C282"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "3cbb2f5fded664034b4b2835735ed431e94e6cd804bfd39ce456e376363da416",
+      "afterDiffSha256": "3cbb2f5fded664034b4b2835735ed431e94e6cd804bfd39ce456e376363da416",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08085",
+        "maps-j-08086",
+        "maps-j-08087"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08088",
+        "maps-j-08089",
+        "maps-j-08090",
+        "maps-j-08091"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08092",
+        "maps-j-08093",
+        "maps-j-08094"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "2d3b378941943d1f0d35e0e9e5de6f9665837770d49bf405b2b7f56d20b23c00",
+      "afterDiffSha256": "2d3b378941943d1f0d35e0e9e5de6f9665837770d49bf405b2b7f56d20b23c00",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08095",
+        "maps-j-08096",
+        "maps-j-08097",
+        "maps-j-08098",
+        "maps-j-08099",
+        "maps-j-08100",
+        "maps-j-08101",
+        "maps-j-08102",
+        "maps-j-08103",
+        "maps-j-08104",
+        "maps-j-08105",
+        "maps-j-08106",
+        "maps-j-08107",
+        "maps-j-08108",
+        "maps-j-08109",
+        "maps-j-08110"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "df9e72bd73c26ab89bcd72ba9849a9a2bececebcfdeb1e0bd2c66d7655133295",
+      "afterDiffSha256": "df9e72bd73c26ab89bcd72ba9849a9a2bececebcfdeb1e0bd2c66d7655133295",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08111",
+        "maps-j-08112"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08113",
+        "maps-j-08114",
+        "maps-j-08115",
+        "maps-j-08116",
+        "maps-j-08117",
+        "maps-j-08118",
+        "maps-j-08119",
+        "maps-j-08120",
+        "maps-j-08121",
+        "maps-j-08122",
+        "maps-j-08123",
+        "maps-j-08124",
+        "maps-j-08125",
+        "maps-j-08126",
+        "maps-j-08127",
+        "maps-j-08128",
+        "maps-j-08129",
+        "maps-j-08130",
+        "maps-j-08131",
+        "maps-j-08132",
+        "maps-j-08133",
+        "maps-j-08134",
+        "maps-j-08135"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "set": "batch-040",
+      "outcomeEdgeIds": [
+        "maps-j-08169",
+        "maps-j-08170",
+        "maps-j-08171",
+        "maps-j-08209"
+      ],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08136",
+        "maps-j-08137",
+        "maps-j-08138",
+        "maps-j-08139",
+        "maps-j-08140",
+        "maps-j-08141",
+        "maps-j-08142",
+        "maps-j-08143",
+        "maps-j-08144",
+        "maps-j-08145",
+        "maps-j-08146",
+        "maps-j-08147",
+        "maps-j-08148",
+        "maps-j-08149",
+        "maps-j-08150",
+        "maps-j-08151",
+        "maps-j-08152",
+        "maps-j-08153",
+        "maps-j-08154",
+        "maps-j-08155",
+        "maps-j-08156",
+        "maps-j-08157",
+        "maps-j-08158",
+        "maps-j-08159",
+        "maps-j-08160",
+        "maps-j-08161",
+        "maps-j-08162",
+        "maps-j-08163",
+        "maps-j-08164",
+        "maps-j-08165",
+        "maps-j-08166",
+        "maps-j-08167",
+        "maps-j-08168",
+        "maps-j-08172",
+        "maps-j-08173",
+        "maps-j-08174",
+        "maps-j-08175",
+        "maps-j-08176",
+        "maps-j-08177",
+        "maps-j-08178",
+        "maps-j-08179",
+        "maps-j-08180",
+        "maps-j-08181",
+        "maps-j-08182",
+        "maps-j-08183",
+        "maps-j-08184",
+        "maps-j-08185",
+        "maps-j-08186",
+        "maps-j-08187",
+        "maps-j-08188",
+        "maps-j-08189",
+        "maps-j-08190",
+        "maps-j-08191",
+        "maps-j-08192",
+        "maps-j-08193",
+        "maps-j-08194",
+        "maps-j-08195",
+        "maps-j-08196",
+        "maps-j-08197",
+        "maps-j-08198",
+        "maps-j-08199",
+        "maps-j-08200",
+        "maps-j-08201",
+        "maps-j-08202",
+        "maps-j-08203",
+        "maps-j-08204",
+        "maps-j-08205",
+        "maps-j-08206",
+        "maps-j-08207",
+        "maps-j-08208",
+        "maps-j-08210",
+        "maps-j-08211",
+        "maps-j-08212",
+        "maps-j-08213",
+        "maps-j-08214",
+        "maps-j-08215",
+        "maps-j-08216",
+        "maps-j-08217",
+        "author-r3-docs-specs-reading-map-L44C154",
+        "author-r3-docs-specs-reading-map-L44C237",
+        "author-r3-docs-specs-reading-map-L44C264",
+        "author-r3-docs-specs-reading-map-L45C98",
+        "author-r3-docs-specs-reading-map-L45C230",
+        "author-r3-docs-specs-reading-map-L45C337",
+        "author-r3-docs-specs-reading-map-L45C403",
+        "author-r3-docs-specs-reading-map-L45C493"
+      ],
+      "completeDiffChanged": true,
+      "beforeDiffSha256": "4553275bffcbb774ebd72580f7d6f249e910a6d014900107e43fd2edf4eed2c1",
+      "afterDiffSha256": "225e4c54f2005ad43329cc9788dfcf17c2188b5190ef5b47ccc5eb24d3945334",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "set": "batch-041",
+      "outcomeEdgeIds": [
+        "maps-j-08232",
+        "author-r4-docs-specs-runner-L1729C2"
+      ],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08218",
+        "maps-j-08219",
+        "maps-j-08220",
+        "maps-j-08221",
+        "maps-j-08222",
+        "maps-j-08223",
+        "maps-j-08224",
+        "maps-j-08225",
+        "maps-j-08226",
+        "maps-j-08227",
+        "maps-j-08228",
+        "maps-j-08229",
+        "maps-j-08230",
+        "maps-j-08231",
+        "maps-j-08233",
+        "maps-j-08234",
+        "maps-j-08235",
+        "maps-j-08236",
+        "maps-j-08237",
+        "maps-j-08238",
+        "maps-j-08239",
+        "maps-j-08240",
+        "maps-j-08241",
+        "maps-j-08242",
+        "maps-j-08243",
+        "maps-j-08244",
+        "maps-j-08245",
+        "maps-j-08246",
+        "maps-j-08247",
+        "maps-j-08248",
+        "maps-j-08249",
+        "maps-j-08250",
+        "maps-j-08251",
+        "maps-j-08252",
+        "maps-j-08253",
+        "maps-j-08254",
+        "maps-j-08255",
+        "maps-j-08256",
+        "maps-j-08257",
+        "maps-j-08258",
+        "maps-j-08259",
+        "maps-j-08260",
+        "maps-j-08261",
+        "maps-j-08262",
+        "maps-j-08263",
+        "maps-j-08264",
+        "maps-j-08265",
+        "maps-j-08266",
+        "maps-j-08267",
+        "maps-j-08268",
+        "maps-j-08269",
+        "maps-j-08270",
+        "maps-j-08271",
+        "maps-j-08272",
+        "maps-j-08273",
+        "maps-j-08274",
+        "maps-j-08275",
+        "maps-j-08276",
+        "maps-j-08277",
+        "maps-j-08278",
+        "maps-j-08279",
+        "maps-j-08280",
+        "maps-j-08281",
+        "maps-j-08282",
+        "maps-j-08283",
+        "maps-j-08284",
+        "maps-j-08285",
+        "maps-j-08286",
+        "maps-j-08287",
+        "maps-j-08288",
+        "maps-j-08289",
+        "maps-j-08290",
+        "maps-j-08291",
+        "maps-j-08292",
+        "maps-j-08293",
+        "maps-j-08294",
+        "maps-j-08295",
+        "maps-j-08296",
+        "maps-j-08297",
+        "maps-j-08298",
+        "maps-j-08299",
+        "maps-j-08300",
+        "maps-j-08301",
+        "maps-j-08302",
+        "maps-j-08303",
+        "maps-j-08304",
+        "maps-j-08305",
+        "maps-j-08306",
+        "maps-j-08307",
+        "maps-j-08308",
+        "maps-j-08309",
+        "maps-j-08310",
+        "maps-j-08311",
+        "maps-j-08312",
+        "maps-j-08313",
+        "maps-j-08314",
+        "maps-j-08315",
+        "maps-j-08316",
+        "maps-j-08317",
+        "maps-j-08318",
+        "maps-j-08319",
+        "maps-j-08320",
+        "maps-j-08321",
+        "maps-j-08322",
+        "maps-j-08323",
+        "maps-j-08324",
+        "maps-j-08325",
+        "maps-j-08326",
+        "maps-j-08327",
+        "maps-j-08328",
+        "maps-j-08329",
+        "maps-j-08330",
+        "author-r3-docs-specs-runner-L1298C98",
+        "author-r3-docs-specs-runner-L1299C76",
+        "author-r3-docs-specs-runner-L1300C129",
+        "author-r3-docs-specs-runner-L1301C128",
+        "author-r3-docs-specs-runner-L1301C157",
+        "author-r3-docs-specs-runner-L1302C132",
+        "author-r3-docs-specs-runner-L1303C92",
+        "author-r3-docs-specs-runner-L1303C121",
+        "author-r3-docs-specs-runner-L1304C96",
+        "author-r3-docs-specs-runner-L1304C125",
+        "author-r3-docs-specs-runner-L1305C141",
+        "author-r3-docs-specs-runner-L1306C129",
+        "author-r3-docs-specs-runner-L1314C80",
+        "author-r3-docs-specs-runner-L1315C103",
+        "author-r3-docs-specs-runner-L3356C212",
+        "author-r3-docs-specs-runner-L3356C227",
+        "author-r3-docs-specs-runner-L3356C343"
+      ],
+      "completeDiffChanged": true,
+      "beforeDiffSha256": "f747d869983b2e97929f2059b7493c644c0e0e642352db2f7cda09d52e94403f",
+      "afterDiffSha256": "a27265fc97a0ac7352d9f5687690c9579c91ce4e3631e2a1d14ee8e96e72c699",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "set": "batch-041",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08331",
+        "maps-j-08332",
+        "maps-j-08333",
+        "maps-j-08334",
+        "maps-j-08335",
+        "maps-j-08336",
+        "maps-j-08337",
+        "maps-j-08338",
+        "author-r3-docs-specs-system-overview-L14C95",
+        "author-r3-docs-specs-system-overview-L15C129",
+        "author-r3-docs-specs-system-overview-L16C254",
+        "author-r3-docs-specs-system-overview-L17C254",
+        "author-r3-docs-specs-system-overview-L18C122",
+        "author-r3-docs-specs-system-overview-L19C240",
+        "author-r3-docs-specs-system-overview-L20C129",
+        "author-r3-docs-specs-system-overview-L21C82",
+        "author-r3-docs-specs-system-overview-L22C168",
+        "author-r3-docs-specs-system-overview-L23C106",
+        "author-r3-docs-specs-system-overview-L83C151"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "4cc3d5bee68e848774704e034ea611bb59146aa0de0e47330a1a853a5d293dfe",
+      "afterDiffSha256": "4cc3d5bee68e848774704e034ea611bb59146aa0de0e47330a1a853a5d293dfe",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "set": "batch-041",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08339",
+        "maps-j-08340",
+        "maps-j-08341",
+        "maps-j-08342",
+        "maps-j-08343",
+        "maps-j-08344",
+        "maps-j-08345",
+        "maps-j-08346",
+        "maps-j-08347",
+        "maps-j-08348",
+        "maps-j-08349",
+        "maps-j-08350",
+        "maps-j-08351",
+        "maps-j-08352",
+        "maps-j-08353",
+        "maps-j-08354",
+        "maps-j-08355",
+        "maps-j-08356",
+        "maps-j-08357",
+        "maps-j-08358",
+        "maps-j-08359",
+        "maps-j-08360",
+        "maps-j-08361",
+        "maps-j-08362",
+        "maps-j-08363",
+        "maps-j-08364",
+        "maps-j-08365",
+        "maps-j-08366",
+        "maps-j-08367",
+        "maps-j-08368",
+        "maps-j-08369",
+        "maps-j-08370",
+        "maps-j-08371",
+        "maps-j-08372",
+        "maps-j-08373",
+        "maps-j-08374",
+        "author-r3-docs-specs-work-state-L1642C58",
+        "author-r3-docs-specs-work-state-L1891C21",
+        "author-r3-docs-specs-work-state-L1894C28"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "83a172d2ee5d5fdc62f8b8465a9fb0d0d06917ce6e5a9212fbc36f9a1ec3fde0",
+      "afterDiffSha256": "83a172d2ee5d5fdc62f8b8465a9fb0d0d06917ce6e5a9212fbc36f9a1ec3fde0",
+      "recordMetadataChanged": true
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "set": "batch-041",
+      "outcomeEdgeIds": [],
+      "recordTextOnlyEdgeIds": [
+        "maps-j-08375",
+        "maps-j-08376",
+        "maps-j-08377",
+        "maps-j-08378",
+        "maps-j-08379",
+        "maps-j-08380",
+        "author-r3-docs-specs-workflow-L639C102"
+      ],
+      "completeDiffChanged": false,
+      "beforeDiffSha256": "71db5693f83d3b6604a770a7a9b5079383d78842f6d9a3692c77b2c340d25987",
+      "afterDiffSha256": "71db5693f83d3b6604a770a7a9b5079383d78842f6d9a3692c77b2c340d25987",
+      "recordMetadataChanged": true
+    }
+  ],
+  "counts": {
+    "files": 21,
+    "edges": 495,
+    "outcomeChanges": 9,
+    "recordTextOnlyChanges": 486,
+    "dispositions": {
+      "parked": 103,
+      "preserve": 275,
+      "patch": 105,
+      "phase9-row-flip": 12
+    }
+  }
+}
