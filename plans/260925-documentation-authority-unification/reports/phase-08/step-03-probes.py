@@ -18,7 +18,7 @@ def main():
         if r.get('retiresWithTree'):
             archived=[json.loads(line) for line in m.blob('04913b160eac95a199718176ca75780573a3573d',str(m.REL/'step-03-records'/(r['reviewSet']+'.jsonl'))).decode().splitlines()]
             rs[i]=next(x for x in archived if x['file']==r['file'])
-    # L12-37 invalidates five old preserve edges in the archived full runner
+    # L12-37 invalidates live old preserve edges in the archived full runner
     # fixture (the actual runner consumer now retires with its tree). Migrate
     # only that in-memory fixture through real aliases, targets and diffs;
     # never waive a predicate or change/remove an inherited mutation.
@@ -53,7 +53,26 @@ def main():
                 if e['disposition']=='patch':
                     hs=[h for h in m.hunks(r['diff']) if any('-'+body.splitlines()[span['line']-1] in h.splitlines() for span in e['sourceSpans'])]
                     assert len(hs)==1;e['diffHunk']=hs[0].splitlines()[0]
-    assert {x['edgeId'] for x in fixture_migrations}=={'maps-j-08275','maps-j-08299','maps-j-08300','maps-j-08308','maps-j-08309'}
+    assert not fixture_migrations # L12-38 exempts all five former alias preserves in the actual retired-decision region
+    fixture_history_preserves=[]
+    for r in rs:
+        body=m.blob(a.author_commit,r['file']).decode();changed=False
+        for e in r['edges']:
+            if e['disposition']!='patch' or not m.history_at(body,e['sourceSpans'][0]['line'],r['file']):continue
+            target=e['target'];anchor=e['anchor'];legacy=(c.entries.get(e['edgeId']) or e.get('authorAddedEdge',{}))['normalizedReference'].split('#')[0]
+            state=fixture_author.facts(e,legacy)
+            e.update(disposition='preserve',target=None,anchor=None,timing='none',diffHunk=None,reason='L12-38: preserve the actual retired-decision source region. '+state+' Non-executable successor note: '+target+('#'+anchor if anchor else '')+'.')
+            fixture_history_preserves.append({'file':r['file'],'edgeId':e['edgeId'],'successor':target});changed=True
+        if changed:
+            edits=[]
+            for e in r['edges']:
+                if e['disposition']=='patch':edits+=m.replacement_changes(body,e['sourceSpans'],r['checks']['relativeResolution'][e['edgeId']]['replacement'])
+            after=body
+            for start,end,new in sorted(set(edits),reverse=True):after=after[:start]+new+after[end:]
+            r['diff']=m.make_diff(r['file'],body,after)
+            for e in r['edges']:
+                if e['disposition']=='patch':
+                    hs=[h for h in m.hunks(r['diff']) if any('-'+body.splitlines()[span['line']-1] in h.splitlines() for span in e['sourceSpans'])];assert len(hs)==1;e['diffHunk']=hs[0].splitlines()[0]
     for r in rs:
         before=m.blob(a.author_commit,r['file']).decode()
         for e in r['edges']:
@@ -63,6 +82,22 @@ def main():
             if declaration:
                 e.pop('targetFacts',None)
                 e['reason']='L12-35(4): inside literal carriage (L12-26(5)); Carriage declaration: '+declaration[1]
+    # L12-38 migrates only positive historical fixtures: truthful exemption
+    # wording and computed narrative notes. Every inherited mutation/assertion
+    # below stays intact and executes against the current checker predicates.
+    fixture_narratives=[]
+    for r in rs:
+        body=m.blob(a.author_commit,r['file']).decode()
+        for item in r['checks']['coverage'].get('legacyScan',{}).get('candidates',[]):
+            exemption=m.coverage_exemption(r['file'],body,item['span'])
+            if exemption and not item.get('edgeId'):item['excludedReason']=exemption
+        for e in r['edges']:
+            if e['disposition']!='preserve':continue
+            legacy=(c.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})).get('normalizedReference','')
+            for holder in m.removed_decision_holders(a.author_commit,e,legacy):
+                if holder not in [n.rstrip('.') for n in m.successor_notes(e['reason'])]:
+                    e['reason']+=' Non-executable successor note: '+holder+'.'
+                    fixture_narratives.append({'file':r['file'],'edgeId':e['edgeId'],'holder':holder})
     baseline=c.all(rs);assert not baseline['failures'],baseline
     patch=next(r for r in rs if r['file']=='docs/routing-handoff-contract.md')
     plain=next(r for r in rs if r['file']=='README.md')
@@ -284,5 +319,5 @@ def main():
     assert m.form('repo/docs/architect/','docs/consumer.md','docs/platform/host-invocation-routing',None)=='repo/docs/platform/host-invocation-routing/'
     assert not m.history_at('# Added in candidate: Runner Business Rules\n## Business Rules\nRUL65b\n',3)
     assert not m.history_at('# Live\nImplementation: Carriage only\nCanonical: No\n## Current\nbody\n',5)
-    return {'authorCommit':a.author_commit,'historicalFixtureAliasMigrations':fixture_migrations,'positiveRecords':len(rs),'positiveEdges':baseline['edges'],'negativeProbes':len(checks),'allRejected':True,'probes':checks,'limits':'Semantic content/authority decisions require the independent full-file reviewer. Form/region synthetic witnesses use the same helper functions; record-level mutations use the complete real pilot records.'}
+    return {'authorCommit':a.author_commit,'historicalFixtureAliasMigrations':fixture_migrations,'historicalFixtureNarrativeMigrations':fixture_narratives,'historicalFixtureRegionPreserves':fixture_history_preserves,'positiveRecords':len(rs),'positiveEdges':baseline['edges'],'negativeProbes':len(checks),'allRejected':True,'probes':checks,'limits':'Semantic content/authority decisions require the independent full-file reviewer. Form/region synthetic witnesses use the same helper functions; record-level mutations use the complete real pilot records.'}
 if __name__=='__main__':print(json.dumps(main(),ensure_ascii=False,indent=2))

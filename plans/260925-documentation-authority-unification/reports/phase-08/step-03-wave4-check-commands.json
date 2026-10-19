@@ -1,0 +1,125 @@
+[
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py"
+    ],
+    "output": "step-03-wave4-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 8.832
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    "output": "step-03-wave4-wave1-r2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 1.819
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+    ],
+    "output": "step-03-wave4-wave1-r3-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 18.007
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+    ],
+    "output": "step-03-wave4-wave2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 5.353
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+    ],
+    "output": "step-03-wave4-wave3-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 8.488
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    "output": "step-03-wave4-inherited-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 60.433
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-packet.py"
+    ],
+    "output": "step-03-wave4-packet-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 2.255
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py"
+    ],
+    "output": "step-03-wave4-check-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 124.972
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "TMPDIR=/tmp/fgos-work",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "output": "step-03-wave4-light-tests.log",
+    "exitCode": 0,
+    "elapsedSeconds": 0.809
+  }
+]

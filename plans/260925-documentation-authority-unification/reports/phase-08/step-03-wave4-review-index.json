@@ -1,0 +1,187 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4-manifest.json",
+  "completedBatches": [
+    "070"
+  ],
+  "pendingBatches": [
+    "071",
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "selectedFiles": 5,
+  "selectedEdges": 84,
+  "perSet": [
+    {
+      "set": "batch-070",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 1,
+      "patchedAndMandatoryDistinct": 3,
+      "unpatchedEligiblePopulation": 8,
+      "unpatchedSample": 2,
+      "distinctSelected": 5,
+      "patchedStratum": {
+        "selectedDenominator": 3,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+          "set": "batch-070",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "4a34b6bacaccb8dbf5465fb5dd563faebefd1b8c69b5d0671441b5cecf923096",
+          "sourceDigest": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2429,
+          "sourceBytes": 12013,
+          "contextPlusRecordBytes": 14442
+        },
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "set": "batch-070",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 75,
+          "recordSha256": "c77f3242411ae6ceace0732941ff3b52bf2f7aaa5bae4fe3092fc294db26fd7a",
+          "sourceDigest": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 73246,
+          "sourceBytes": 16921,
+          "contextPlusRecordBytes": 90167
+        },
+        {
+          "file": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+          "set": "batch-070",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "96ab4a69cd3654b47b6afc7f44f4d236ce5228c890e57b8b776abc83e8a4e6ce",
+          "sourceDigest": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+          "diffSha256": "d1019567262698aa3be45a1404237cb2ee121ed5f0b78e91508205c8d5c57cd9",
+          "recordBytes": 12614,
+          "sourceBytes": 5111,
+          "contextPlusRecordBytes": 17725
+        },
+        {
+          "file": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+          "set": "batch-070",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "a2c15990d68ffa9085c34859b077b93b4bd13413039bf346b783ebfd648f4f90",
+          "sourceDigest": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2410,
+          "sourceBytes": 3983,
+          "contextPlusRecordBytes": 6393
+        },
+        {
+          "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+          "set": "batch-070",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 4,
+          "recordSha256": "515f77ca34cd0dd00abbeb714b1d4d9af8d2d271a1c7ce46fd1d5308bc5f90f6",
+          "sourceDigest": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+          "diffSha256": "7d245837397bf3dfae2aeeb1cfe4003daf98bca161b9b4b6c50e52019c4aa367",
+          "recordBytes": 14831,
+          "sourceBytes": 5081,
+          "contextPlusRecordBytes": 19912
+        }
+      ],
+      "fileCount": 5,
+      "edges": 84,
+      "sourcePlusRecordBytes": 148639,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 75
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0
+}

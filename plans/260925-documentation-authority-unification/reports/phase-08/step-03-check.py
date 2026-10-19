@@ -216,7 +216,7 @@ def carriage_declarations(text):
         if re.search(r'Original source metadata and text follow|Full source text follows|complete source.*retained verbatim',l,re.I):whole=(n,l)
         if 'This dated successor preserves the complete changed unit' in l:whole=(n,l)
         declarations=[(i,v) for _,i,v in stack if re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained',v,re.I)]
-        declaration=declarations[-1] if declarations else framing or whole or (purpose if history_copy and n>metadata_end else None)
+        declaration=declarations[-1] if declarations else framing or whole or (purpose if history_copy and n>metadata_end and not any(x.startswith('## Literal Snapshot') for x in lines) else None)
         result[n]=None if reconciled and re.match(r'^\|.*CTR01[0-3]\b',l) else declaration
     return result
 
@@ -325,6 +325,17 @@ def candidate_targets(file,text,span):
     if context['source'] and carriage_declaration(text,span['line']):roots=roots+[context['source']]
     return list(dict.fromkeys(p if p.startswith('docs/') else posixpath.normpath(posixpath.join(root,p)) for p in alternatives for root in roots))
 
+@functools.lru_cache(None)
+def relative_decision_origin(commit,file,raw):
+    """Moved knowledge links retain their registry-declared original coordinates."""
+    if not file.startswith('docs/knowledge/') or not re.match(r'^\.\./decisions/\d{4}[-.]',raw):return None
+    registry=json.loads(blob(commit,'docs/doc-registry.json'))
+    paths={posixpath.normpath(posixpath.join(posixpath.dirname(origin),raw))
+           for row in registry['docs'] if row['currentPath']==file
+           for origin in row.get('aliases',[]) if origin.startswith('docs/reference/')}
+    paths={p for p in paths if p.startswith('docs/decisions/')}
+    return next(iter(paths)) if len(paths)==1 else None
+
 def scan_candidates(commit,file,inventory_spans):
     """Whole-file supplemental search; candidates need an edge or an explicit exclusion.
     Basename set comes from committed retiring trees. Full paths include retained legacy
@@ -367,7 +378,7 @@ def scan_candidates(commit,file,inventory_spans):
             resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in active_roots]
             local=[posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]
             if not internal and not row_roots and not context['parents'] and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
-            if not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
+            if not relative_decision_origin(commit,file,raw) and not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
             a,b=link.span();matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,link[0]))
         for a,b,token in sorted(matches):
             if line.startswith('Purpose:') and token.strip('`')==posixpath.basename(file):continue
@@ -376,6 +387,7 @@ def scan_candidates(commit,file,inventory_spans):
     return result
 
 def history_at(text,line,target=''):
+    if any(i<=line and 'Các ADR dưới đây được di dời nguyên văn' in l for i,l in enumerate(text.splitlines(),1)):return True
     if '/history/' in target or re.search(r'^Document type:\s*History',text[:7000],re.M|re.I): return True
     stack=[]; framed=False
     for i,l in enumerate(text.splitlines(),1):
@@ -385,6 +397,50 @@ def history_at(text,line,target=''):
             lev=len(h[1]);stack=[x for x in stack if x[0]<lev];stack.append((lev,h[2]));framed=False
         if re.search(r'retained verbatim.*(?:non.authority history|not navigation)',l,re.I):framed=True
     return framed or any(re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained|added in candidate.*source carriage',h,re.I) for _,h in stack)
+
+def history_scope(file, text, line):
+    """L12-38: dated file classes and actual verbatim regions, not author labels."""
+    return (bool(carriage_declaration(text,line)) or history_at(text,line,file)
+            or file.startswith(('docs/explanation/','docs/journals/'))
+            or (file.startswith('docs/distillery/') and file!='docs/distillery/porting-log.md'))
+
+def coverage_exemption(file, text, span):
+    if not history_scope(file,text,span['line']):return None
+    token=span['text']
+    if re.fullmatch(r'!?\[[^\]]+\]\([^)]+\)',token):return None
+    if re.match(r'^(?:repo/)?docs/(?:specs|architect)(?:/|$)|^(?:specs|architect)/[^\s]+\.md',token):return None
+    return 'L12-38(5): non-link token outside explicit legacy-root forms inside carriage/dated history; supplemental coverage exempt. No assertion of unrelatedness or target absence.'
+
+@functools.lru_cache(None)
+def decision_narrative_holders(commit, number):
+    paths=git('ls-tree','-r','--name-only',commit,'--','docs/platform').decode().splitlines()
+    holders=[]
+    for path in paths:
+        if '/decisions/' not in path or not path.endswith('.md'):continue
+        headings=heading_sections(commit,path)
+        for h in headings:
+            if h['level']==3 and re.match(re.escape(number)+r'\b',h['sample']):
+                if re.match(number+r' (?:Context|Decision|Consequences)$',h['sample']):
+                    h=next((parent for parent in reversed(headings) if parent['level']==2 and parent['startLine']<h['startLine']<=parent['sectionEndLine']),h)
+                holders.append(path+'#'+h['anchor'])
+    return tuple(dict.fromkeys(holders))
+
+def live_decision_citation(file, text, edge, legacy):
+    if history_scope(file,text,edge['sourceSpans'][0]['line']):return False
+    live=(file.startswith(('docs/knowledge/','docs/platform/')) or '/playbooks/' in file or '/prompts/' in file or file=='docs/distillery/porting-log.md')
+    if not live or not legacy.startswith('docs/specs/'):return False
+    n=edge['sourceSpans'][0]['line'];lines=text.splitlines()
+    context=' '.join(lines[max(0,n-5):n+2])
+    return bool(re.search(r'decision\s+\d{4}\s+in\s+`?'+re.escape(legacy),context,re.I))
+
+def removed_decision_holders(commit, edge, legacy):
+    match=re.match(r'(?:repo/)?docs/decisions/(\d{4})(?:\b|[-.])',legacy)
+    if not match:return ()
+    # Original inventory paths may be elided; factual bindings name the real deleted record.
+    removed=any(f['state']=='removed' and f['path'].startswith('docs/decisions/'+match[1]) for f in edge.get('targetFacts',[]))
+    if not removed:
+        removed=any(len(row)>1 and row[0]=='D' and row[1].startswith('docs/decisions/'+match[1]) for rev in path_history(commit,legacy.split('#')[0]) for row in commit_changes(rev))
+    return decision_narrative_holders(commit,match[1]) if removed else ()
 
 def make_diff(file,before,after):
     return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+file,tofile='b/'+file,n=3)) if before!=after else ''
@@ -484,7 +540,7 @@ class Checker:
     def renamed_alias_holders(self,r,e):
         """L12-37(2): missing preserved navigation with a committed live alias."""
         f=r['file'];body=blob(self.commit,f).decode()
-        if e['disposition']!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']):return []
+        if e['disposition']!='preserve' or carriage_declaration(body,e['sourceSpans'][0]['line']) or history_at(body,e['sourceSpans'][0]['line'],f):return []
         if '/history/' in f or f.startswith('docs/journals/') or re.search(r'^Document type:\s*History|Superseded / implementation history only',body[:7000],re.M|re.I):return []
         inv=self.entries.get(e['edgeId']) or e.get('authorAddedEdge',{})
         path=re.sub(r':\d+(?:[-–]\d+)?$','',path_identity(inv['normalizedReference'].removeprefix('repo/')))
@@ -549,6 +605,9 @@ class Checker:
                 link=re.fullmatch(r'!?\[[^\]]+\]\(([^)]+)\)',span['text'])
                 raw=(link[1] if link else span['text']).split('#')[0]
                 targets=candidate_targets(f,before,span)
+                if coverage_exemption(f,before,span):
+                    if not item.get('edgeId'):assert item.get('excludedReason')==coverage_exemption(f,before,span), 'history exclusion must state its true L12-38 scope'
+                    continue
                 if (link and carriage_declaration(before,span['line'])) or raw.endswith('/') or stated_contexts(before)[span['line']]['parents'] or stated_contexts(before)[span['line']]['leaf']:
                     assert item.get('edgeId') or not any(legacy_reference_target(p) and p in self.tree|self.dirs for p in targets), 'resolving carriage/directory reference cannot be a contextual exclusion'
 
@@ -599,6 +658,13 @@ class Checker:
             if not inv: continue
             check('related-retiring-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and inv['normalizedReference'].startswith(RETIRING_ROOTS) and related_header(before,e['sourceSpans'][0]['line'])))
             check('renamed-alias-preserve',lambda e=e:not self.renamed_alias_holders(r,e))
+            check('live-decision-citation-preserve',lambda e=e,inv=inv:not (e['disposition']=='preserve' and live_decision_citation(f,before,e,inv['normalizedReference'].split('#')[0])))
+            def narrative_successor(e=e,inv=inv):
+                if e['disposition']!='preserve':return
+                wanted=removed_decision_holders(self.commit,e,inv['normalizedReference'])
+                notes=[note.rstrip('.') for note in successor_notes(e['reason'])]
+                assert all(holder in notes for holder in wanted), 'removed decision missing computed narrative-holder successor: '+repr(wanted)
+            check('removed-decision-narrative-successor',narrative_successor)
             check('source-span',lambda e=e:spans_text(before,e['sourceSpans'])==e['matchedExpression'])
             def carriage_facts(e=e):
                 declaration=carriage_declaration(before,e['sourceSpans'][0]['line'])

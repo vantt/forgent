@@ -1,0 +1,105 @@
+[
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py"
+    ],
+    "output": "step-03-wave4-check-result.json",
+    "exitCode": 1,
+    "elapsedSeconds": 125.299,
+    "archivedOutput": "step-03-wave4-attempt1-check-result.json"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py"
+    ],
+    "output": "step-03-wave4-probes-result.json",
+    "exitCode": 1,
+    "elapsedSeconds": 8.045,
+    "archivedOutput": "step-03-wave4-attempt1-probes-result.stdout.log",
+    "archivedStderr": "step-03-wave4-attempt1-probes-result.json.stderr.log"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "--author-commit",
+      "ae141550c2e022310de7a0efea757580c0b2479f"
+    ],
+    "output": "step-03-wave4-inherited-probes-result.json",
+    "exitCode": 1,
+    "elapsedSeconds": 1.855,
+    "archivedOutput": "step-03-wave4-attempt1-inherited-probes-result.stdout.log",
+    "archivedStderr": "step-03-wave4-attempt1-inherited-probes-result.json.stderr.log"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+    ],
+    "output": "step-03-wave4-wave1-r2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 1.753,
+    "archivedOutput": "step-03-wave4-attempt1-wave1-r2-probes-result.json"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+    ],
+    "output": "step-03-wave4-wave1-r3-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 18.104,
+    "archivedOutput": "step-03-wave4-attempt1-wave1-r3-probes-result.json"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+    ],
+    "output": "step-03-wave4-wave2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 5.314,
+    "archivedOutput": "step-03-wave4-attempt1-wave2-probes-result.json"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+    ],
+    "output": "step-03-wave4-wave3-probes-result.json",
+    "exitCode": 1,
+    "elapsedSeconds": 7.638,
+    "archivedOutput": "step-03-wave4-attempt1-wave3-probes-result.stdout.log",
+    "archivedStderr": "step-03-wave4-attempt1-wave3-probes-result.json.stderr.log"
+  }
+]

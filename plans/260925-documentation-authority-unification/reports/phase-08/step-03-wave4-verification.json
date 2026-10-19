@@ -1,0 +1,399 @@
+{
+  "status": "AUTHOR complete for Part A and bounded batch 070; independent review pending",
+  "verifiedAt": "2026-10-19T22:26:41.107591+00:00",
+  "inputHEAD": "e3632e6de3a896e5ba73affca3ca9e210ccd4773",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "partA": {
+    "scannedFiles": 427,
+    "scannedEdges": 3540,
+    "outcomeChanges": 12,
+    "recordTextChanges": 258,
+    "outcomeChangedFiles": [
+      "docs/distillery/porting-log.md",
+      "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+      "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "docs/specs/work-state.md"
+    ]
+  },
+  "ruleHits": {
+    "rule5-exclusion-text": 249,
+    "rule3-narrative-note": 9,
+    "rule1-history-note": 15,
+    "rule1-live-decision": 3,
+    "rule2-dead-link": 3,
+    "rule3-or6-description": 4,
+    "rule4-region-history": 2
+  },
+  "partB": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "070"
+    ],
+    "pendingBatches": [
+      "071",
+      "072",
+      "073",
+      "074",
+      "075",
+      "076",
+      "077",
+      "078",
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "stopReason": "Turn budget: stop after whole batch 070; do not claim 071–082 authored.",
+    "files": 25,
+    "inventoryEdges": 138,
+    "addedEdges": 5,
+    "edges": 143,
+    "patchedFiles": 10,
+    "dispositions": {
+      "preserve": 121,
+      "patch": 12,
+      "parked": 10
+    },
+    "parks": {
+      "description-rewrite": 4,
+      "GAP-01": 4,
+      "GAP-02": 2
+    },
+    "reviewAcceptance": "pending independent A51 review"
+  },
+  "checker": {
+    "files": 452,
+    "edges": 3683,
+    "failureCount": 0,
+    "retiredFiles": 125,
+    "retiredEdges": 1487
+  },
+  "locatorReviewFlags": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "0027"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "edgeId": "maps-j-03990",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§9.2."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+      "correspondence": null
+    }
+  ],
+  "probes": {
+    "total": 166,
+    "perSuite": [
+      {
+        "path": "step-03-wave4-probes-result.json",
+        "negativeProbes": 4,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave4-inherited-probes-result.json",
+        "negativeProbes": 87,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave4-wave1-r2-probes-result.json",
+        "negativeProbes": 23,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave4-wave1-r3-probes-result.json",
+        "negativeProbes": 25,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave4-wave2-probes-result.json",
+        "negativeProbes": 16,
+        "allRejected": true
+      },
+      {
+        "path": "step-03-wave4-wave3-probes-result.json",
+        "negativeProbes": 11,
+        "allRejected": true
+      }
+    ],
+    "inheritedProbeCallsAndExpectedMutationsUnchanged": true,
+    "archivedRunnerFixtureHistoryPreserves": 0
+  },
+  "lightTests": {
+    "tests": 95,
+    "pass": 95,
+    "fail": 0,
+    "skip": 0,
+    "TMPDIR": "/tmp/fgos-work"
+  },
+  "expansion": {
+    "sets": [
+      "batch-061",
+      "batch-065"
+    ],
+    "files": 56,
+    "edges": 350,
+    "parts": 11
+  },
+  "wave4Review": {
+    "files": 5,
+    "edges": 84,
+    "parts": 1,
+    "perSet": [
+      {
+        "set": "batch-070",
+        "allFiles": 25,
+        "patchedPopulation": 10,
+        "patchedSeedSample": 2,
+        "mandatoryFiles": 1,
+        "patchedAndMandatoryDistinct": 3,
+        "unpatchedEligiblePopulation": 8,
+        "unpatchedSample": 2,
+        "distinctSelected": 5,
+        "patchedStratum": {
+          "selectedDenominator": 3,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "selectedDenominator": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        }
+      }
+    ]
+  },
+  "protectedManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "784cf9a777d1840d6d5e777663745d4a48d3dddc5fdbf9e6832345616ea348c1",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "141efc8a0a204e742a0b0c650f0e67ea095c4d478a368b9ceeebd729fa32ac26",
+      "byteIdenticalToInputHEAD": true
+    }
+  ],
+  "historicalFreezes": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-closeout-manifest.json",
+      "sha256": "3fcb58f9a66f66df5ceafdfa84d6b2bc44d7381a02fa355fc6068f74ab7066a9",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout-manifest.json",
+      "sha256": "aa8d7e63694d7751dbe1e8e263180fce8ce95127f511c55509db37899f4ca437",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-manifest.json",
+      "sha256": "8b5e44fbe57fc868c2521930d45a3942ae9fb8c076d09b89cfd2786f348022d6",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-manifest.json",
+      "sha256": "b748840f71659e1c14861410d72be91b12612493ad987c7260ef70d0ec0d1694",
+      "byteIdenticalToInputHEAD": true
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py"
+      ],
+      "output": "step-03-wave4-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 8.832
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py"
+      ],
+      "output": "step-03-wave4-wave1-r2-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 1.819
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py"
+      ],
+      "output": "step-03-wave4-wave1-r3-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 18.007
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+      ],
+      "output": "step-03-wave4-wave2-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 5.353
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py"
+      ],
+      "output": "step-03-wave4-wave3-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 8.488
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+        "--author-commit",
+        "ae141550c2e022310de7a0efea757580c0b2479f"
+      ],
+      "output": "step-03-wave4-inherited-probes-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 60.433
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-packet.py"
+      ],
+      "output": "step-03-wave4-packet-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 2.255
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "TMPDIR=/tmp/fgos-work",
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py"
+      ],
+      "output": "step-03-wave4-check-result.json",
+      "exitCode": 0,
+      "elapsedSeconds": 124.972
+    },
+    {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "TMPDIR=/tmp/fgos-work",
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs"
+      ],
+      "output": "step-03-wave4-light-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.809
+    }
+  ],
+  "scope": {
+    "allChangedPathsWithinPhase08": true,
+    "needsWrites": [],
+    "noConsumerEdits": true,
+    "noGitWrites": true,
+    "noFgosCLI": true
+  },
+  "limits": [
+    "No semantic self-acceptance",
+    "Batches 071–082 are pending at the authorized budget boundary",
+    "No full runtime or reproduction suite; actual runner-commit accounting remains with Lead",
+    "Five inherited locator advisories remain"
+  ],
+  "artifactSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py": "25de02170643e514399d0abc3f0c800d34c72f1d93359898ffaa67994fcdc946",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py": "a24ec9b011a439629c3362f794b611bae3d3da33b08835dbca2d3c9f6e8ce289",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py": "ac88fc3e125f4ef918f6aa1164bc672e019085f4b7385fc35278648fd2c801d9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py": "ceff6ba8109d0923b5d976dd95e5163461e230e473649728ff497699cb55c6f7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py": "a642fdbf361e97f59df0d86b885cb435b096aff680e6c4872880a14478d39dc7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-manifest.json": "0bb2c3001a100364c5f88dd999c51cb75a91242c61486dc441e1ebf4b01b1eeb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-binding-manifest.json": "a0726f77d96ad0c754f8ff777e6779dbc9f1e39e7c1c09716719a44144f20770",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-r2-changes.json": "a98ce3868b6f24bed2f4a9dbfebf0e54c05a42ce027a960b6e3f32105e90b089",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-expansion-review-index.json": "ad44afd5df7b29ad2b0bc709cf3131fde951de1299c5ebffd4b89052a2b9fd92",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-review-index.json": "417f91cd7c2c7ac4947365fc2d82c9e196bd15ecbeecc5487a1a14914f08d6e0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check-result.json": "8ad91e5137ac481dd32b76d6114ecfd96d8d262b59e5786906d080462668d6ad",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md": "b1c80ce5f220445813365d8c0b166e9501caa8b68c16d741528f412f8c710141"
+  }
+}

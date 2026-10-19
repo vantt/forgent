@@ -1,0 +1,497 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8766,
+      "lines": 172,
+      "sha256": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bb553755f4d2a1216f5d18df30ae4869b0085cbd414b8d4d909e2278cf072632"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "68c18ae04d7dcd6ebfe0dd281d92d3b75752134a1b63b93b8cdddf0b5614b0c5"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 172,
+          "sha256": "637794603f6dded287c4d9a7caf997c3b77839a9a2af76aa1bf049d6e2846649"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4258,
+      "lines": 97,
+      "sha256": "3f2ad8b5a060d1fb57abc5f304547000f1e8c5a5422e3ebb758178cb031a522c",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1a46525841a10a6ae7910c47a02e4d59eb93748687505919b412438878de4de3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 97,
+          "sha256": "a898f300676539dcb4302e84661a3239e196dc0e22db885676807768b3145d09"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5757,
+      "lines": 123,
+      "sha256": "eda77f8baa9850ddb947320702905e36c00130a22e242a0707baee975b305845",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "61ebab188f0e124ad23bf046cbc620cfdc446b5034f63f2e3e1b837248ed47cc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 123,
+          "sha256": "ea00305d0182374ab31f9eb3898adba2b180a7d90eee04d5184017751487522a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7106,
+      "lines": 147,
+      "sha256": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "05f9bfbce0b1a932c90e66f6ebe8fd6ea47838373bcc8ade34d3a2ef3265d567"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 147,
+          "sha256": "c288ac2f5326afc4dd9df8c2a0d5483b3bc221f07287e215be1c833d4acbf798"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11630,
+      "lines": 198,
+      "sha256": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "59d2860ada1474b0981265a5aa27858a85c7331574b29c7674d328438d0cab95"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c722b991fddf93078347290e73c4a4c478ac03eeb3f7cd9b406c21a6a99ea0c3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 198,
+          "sha256": "61eb46a68a6dbad2215ec09ef8d53f3d336a8a0cba2a6edbd4b433d547ebbc00"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9614,
+      "lines": 189,
+      "sha256": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "91462d73d01f09e1159dc56e2dba186791348f58c92b85011845e35dda22fdad"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3a2bb777e8446e6654aa7242b44aae40eae0cbe089ca9ed9689265354f49d3a7"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 189,
+          "sha256": "f0859506e3c612ede3adb4c95973b6a7f561d28a2b14108c68ada0a5aa549e36"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12013,
+      "lines": 232,
+      "sha256": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f0951dfce593ed727a4544c3f75109ab099692413d3fde248b250d2410d8b086"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3d1178d2753d294772b10b579a4c47e9169b4beaa97d80b2dc8a3866aa441a32"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 232,
+          "sha256": "7c6a445a39a6d8de560dd49606ccc597e8da93ae1aa543b67ba325f06914a822"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15135,
+      "lines": 269,
+      "sha256": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d4c14d25e90f4eb0d8dc926eafe12d9bf2bb1e4346ac92dfca321d1713c8aaf6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a51319d2c6584d451ee3682c960fa3ba9b6597abe1d6c584df33048a90827ec3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "f10db38a1c688e859b210f9cf40d33fae7a1228b7fe21214bbc4c2194ffb7416"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 269,
+          "sha256": "da076fc7c2c14c41b7e33ebcdefee910723016cf4aa0df7926421c89a6b60536"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16921,
+      "lines": 51,
+      "sha256": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+      "inventoryEdges": 75,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 51,
+          "sha256": "e6fc41f850f23c134f4ef06374e23c8d50d55bb88cbdd054472178ecea340956"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4380,
+      "lines": 76,
+      "sha256": "18682781553fc550066b2cf0eec054250d311f2b4a7009e3aa317c409b4174be",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 76,
+          "sha256": "21b236a8f15ff6873ed62b439626ce8d9a2ecd70e0b1a84e0d986588eea7c2ab"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4035,
+      "lines": 92,
+      "sha256": "c1008d24d135992a872a9fcdb9d9d7aebb882009f4f80cd313ec5fc567bd46ec",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "30ba40cd11bd6e59259d3967ffc88e5f55c7daaebc3a946fe17a91f64d96db01"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 92,
+          "sha256": "718e179f686e0a712ea616460638202918e03906162097db35e5de6db8b85059"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2845,
+      "lines": 77,
+      "sha256": "2f278010e89e49d329fdc8638a6557dac600428ca4ad2f6466a64691320b531d",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 77,
+          "sha256": "a887ba604831ff95bd5689c4f7bbd899910095a50d49aed3e66d28718eb373d4"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2634,
+      "lines": 69,
+      "sha256": "afc3d630c50e3ccfca5e4be969b370709bba69d4739dbb2646eec627e7ec3e6f",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "58e2ad8a7fb9a6f333279dc402323c1b30c6442eaf93509fba60f9954059a7d9"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2925,
+      "lines": 62,
+      "sha256": "677eb12c09115ee46be340a0e9beaee81840b85caf295f1964d6c586f231ec4c",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 62,
+          "sha256": "d8c4174404c74df8b1947a41a3eca30c308482e3df8c58b394a28538c2329520"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3371,
+      "lines": 64,
+      "sha256": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 64,
+          "sha256": "60d17e56fc9f0baebc3073b970c1dee8a9efab950834689ae2c2df0a4520d87b"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4478,
+      "lines": 86,
+      "sha256": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "031a43eebd194674fb2640f999a602c4067fcdde3f678a5a2bc9fdd1b2d58e23"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "741f5a0d0977f31e163a46e8366ea8fdb48f44fb0331596336bc79f9ae4cb107"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2792,
+      "lines": 46,
+      "sha256": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 46,
+          "sha256": "bde97b5d7eb88ef777273284f3bb9b4b48a7f2fc42f288e40bba36fedb5e7d80"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5111,
+      "lines": 97,
+      "sha256": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a834deaf935b5733d06f611630ee11a5804bc31f776cfac5b65570a5b5bf1a70"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 97,
+          "sha256": "d8b761211e17df87d7adb7a99e70221ec36e2ce551c412fe35d0534ef30e0724"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3724,
+      "lines": 74,
+      "sha256": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 74,
+          "sha256": "7e8ea3eac925911517cec34fd2979e171d6029552194cfb015f93802d97d8b07"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3183,
+      "lines": 69,
+      "sha256": "b81c14502c5931d4ad54721fd6610092180870f936b9d7d967e3fcff784f77a8",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "94550e0ece6f7f935bd2b96f80967b7042bbd34e1d7bbb8370a2c280c2ea54e9"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14047,
+      "lines": 261,
+      "sha256": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "inventoryEdges": 12,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9abd8496e8c745bf83407bad4553ab62bd6f90c1f6e64a218545c453f4e5823b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "8caa4712189e3116be0fe7ab1c6be572ec2f400d8fa0f9f5bdae515683a4cc44"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "43ab3e05bf8b1d40b7f815a2b18d89b8e93f694e9022370fe551e4ca86929f58"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 261,
+          "sha256": "784ebed762b5e8c2723fb14f912bde49db2d6410ed6f22920569b20e0641ba8d"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3983,
+      "lines": 82,
+      "sha256": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b7315c67807ca03a4641162c97e0dfa84c052a900af0232fe4ba6075532bc9d8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 82,
+          "sha256": "3bd5d7182364afb5be31befd151b826ce5f8f43c728852c99ae8b43432d8d076"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5081,
+      "lines": 94,
+      "sha256": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5664e634e913fa40e2fc54db4c28627f18e844867e920a8650f66ddc2e68f791"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 94,
+          "sha256": "1efa58a48a535c6898352e6f90e7243afa7fe022f774a89ffca7930331a3ce8d"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2680,
+      "lines": 59,
+      "sha256": "4051d614d62b3c5a5114df1d4524cfc30635db05abdbdda5fcb5b315be753fed",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 59,
+          "sha256": "500ca474a9bf36c4a1f8ff0e232788652a88191281914baf901287d306a5b687"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4248,
+      "lines": 100,
+      "sha256": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0419b9546853996eff081f739f320b699b7a75abe5060b8611672717ddd6f72f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 100,
+          "sha256": "43f79efe461364ad76428e3fd1795300b55a0561150173928ec4b158b0ec1c59"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 160717,
+  "method": "Complete immutable source bytes read; every inventory span bound; supplemental full-file scan and context considered. Author traversal is not independent review."
+}

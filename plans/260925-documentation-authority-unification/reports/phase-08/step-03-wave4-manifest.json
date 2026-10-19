@@ -1,0 +1,554 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "set": "batch-070",
+      "sourceBytes": 8766,
+      "digest": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "inventoryFileDigest": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+      "diffSha256": "e204830920a5d197fcad245e0589489e72ee33d165779e2f57ddeae31df7c47c",
+      "recordSha256": "37db8950151c9be47a49c2a9be1b29f6a23390d91c0d095996401e1f7123dceb",
+      "recordBytes": 20054,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md",
+      "set": "batch-070",
+      "sourceBytes": 4258,
+      "digest": "3f2ad8b5a060d1fb57abc5f304547000f1e8c5a5422e3ebb758178cb031a522c",
+      "inventoryFileDigest": "3f2ad8b5a060d1fb57abc5f304547000f1e8c5a5422e3ebb758178cb031a522c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a6934a56ef0b1f923a9d6c940c5dae9f3cc6823e13bac7893772766176e885e5",
+      "recordBytes": 916,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+      "set": "batch-070",
+      "sourceBytes": 5757,
+      "digest": "eda77f8baa9850ddb947320702905e36c00130a22e242a0707baee975b305845",
+      "inventoryFileDigest": "eda77f8baa9850ddb947320702905e36c00130a22e242a0707baee975b305845",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4c48972565da85ef54c8496f3161fa6b8d23e46661a9872791253dd39ad49924",
+      "recordBytes": 956,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "set": "batch-070",
+      "sourceBytes": 7106,
+      "digest": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "inventoryFileDigest": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+      "diffSha256": "b935ce4bddd6b9fbb75b4d8eaf5be350f2e5aa836868a0c31bea65b70526d4d6",
+      "recordSha256": "4685bf02f801ffe2e602046ae4ade171dd4561118b14578b47765b2ed1f23902",
+      "recordBytes": 18294,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+      "set": "batch-070",
+      "sourceBytes": 11630,
+      "digest": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+      "inventoryFileDigest": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e3defe93093fa0d3f1e436dc6a6d084c9913fda89d9a8c9681e5cc9a5e0c0bad",
+      "recordBytes": 3339,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+      "set": "batch-070",
+      "sourceBytes": 9614,
+      "digest": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+      "inventoryFileDigest": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d3aec2d1a3c69846253c00d83b77acc03d2db6c8595d1f60acf5b6eae7d6c14a",
+      "recordBytes": 20578,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 6,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+      "set": "batch-070",
+      "sourceBytes": 12013,
+      "digest": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+      "inventoryFileDigest": "9f4a56d6d9cc394960652d3ecbc30f6605c27f3673b336cccf07c157b7508140",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4a34b6bacaccb8dbf5465fb5dd563faebefd1b8c69b5d0671441b5cecf923096",
+      "recordBytes": 2429,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "set": "batch-070",
+      "sourceBytes": 15135,
+      "digest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "inventoryFileDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1715c6483efe4b4b59fa07098f289d5e2a590bdee6e9bc0dbb572fd52b19d1d4",
+      "recordBytes": 3268,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "set": "batch-070",
+      "sourceBytes": 16921,
+      "digest": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+      "inventoryFileDigest": "9ab2fcb0c6c101420cb647df75f9c4a34b0fd98eb79b556a3f40fe4c29965515",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c77f3242411ae6ceace0732941ff3b52bf2f7aaa5bae4fe3092fc294db26fd7a",
+      "recordBytes": 73246,
+      "retiresWithTree": false,
+      "edgeCount": 75,
+      "dispositions": {
+        "preserve": 75
+      }
+    },
+    {
+      "file": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+      "set": "batch-070",
+      "sourceBytes": 4380,
+      "digest": "18682781553fc550066b2cf0eec054250d311f2b4a7009e3aa317c409b4174be",
+      "inventoryFileDigest": "18682781553fc550066b2cf0eec054250d311f2b4a7009e3aa317c409b4174be",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "42aae956572d7ea79e67ae996de6393acc49ca6393d0b05d2e97dfc3f3ec9ed1",
+      "recordBytes": 2411,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+      "set": "batch-070",
+      "sourceBytes": 4035,
+      "digest": "c1008d24d135992a872a9fcdb9d9d7aebb882009f4f80cd313ec5fc567bd46ec",
+      "inventoryFileDigest": "c1008d24d135992a872a9fcdb9d9d7aebb882009f4f80cd313ec5fc567bd46ec",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "18c42fa8b883e667bc3243788878b5bce1d2a9b52788821c8b718b207a223421",
+      "recordBytes": 3504,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md",
+      "set": "batch-070",
+      "sourceBytes": 2845,
+      "digest": "2f278010e89e49d329fdc8638a6557dac600428ca4ad2f6466a64691320b531d",
+      "inventoryFileDigest": "2f278010e89e49d329fdc8638a6557dac600428ca4ad2f6466a64691320b531d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d606cf50b3189e0cc857e88aabb54c6e3c1fa6190582f0df7a93512b5a65b383",
+      "recordBytes": 914,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md",
+      "set": "batch-070",
+      "sourceBytes": 2634,
+      "digest": "afc3d630c50e3ccfca5e4be969b370709bba69d4739dbb2646eec627e7ec3e6f",
+      "inventoryFileDigest": "afc3d630c50e3ccfca5e4be969b370709bba69d4739dbb2646eec627e7ec3e6f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6fe14011f83db6ce4b3a20b21b1d00819e7ae75b4b57d119e5408861d63bfc36",
+      "recordBytes": 960,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md",
+      "set": "batch-070",
+      "sourceBytes": 2925,
+      "digest": "677eb12c09115ee46be340a0e9beaee81840b85caf295f1964d6c586f231ec4c",
+      "inventoryFileDigest": "677eb12c09115ee46be340a0e9beaee81840b85caf295f1964d6c586f231ec4c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9bf171c0c54ec8b95821f70da5cd0ba479972d9188fc12b38304ffad3fe71d91",
+      "recordBytes": 937,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+      "set": "batch-070",
+      "sourceBytes": 3371,
+      "digest": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "inventoryFileDigest": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+      "diffSha256": "f0b831bfadcda95c0259ddca3ce5aa28ec8cc10f40a1769f76d67fc3b55f118b",
+      "recordSha256": "86621e3b777fb188cb472cb66354d8a10612b664bb47dfd5d106ea7322cda59c",
+      "recordBytes": 19153,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+      "set": "batch-070",
+      "sourceBytes": 4478,
+      "digest": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "inventoryFileDigest": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+      "diffSha256": "9bdc48623045bf532b145b11a942a5a5896376b316141e634aa25ad9ae79b516",
+      "recordSha256": "a08f9205c0c0c4195c3639e6d4fe3e970ca262466ba2343ce91e134aaaee7d37",
+      "recordBytes": 10983,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+      "set": "batch-070",
+      "sourceBytes": 2792,
+      "digest": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "inventoryFileDigest": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+      "diffSha256": "3fb25e5ac2898844b5707b04223504f44693241fd09a3da6756188bf76132928",
+      "recordSha256": "dfc99becf39acf5111a099414a4c47535ced13683399981d9bc0fbbe5aa71229",
+      "recordBytes": 20895,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+      "set": "batch-070",
+      "sourceBytes": 5111,
+      "digest": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "inventoryFileDigest": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+      "diffSha256": "d1019567262698aa3be45a1404237cb2ee121ed5f0b78e91508205c8d5c57cd9",
+      "recordSha256": "96ab4a69cd3654b47b6afc7f44f4d236ce5228c890e57b8b776abc83e8a4e6ce",
+      "recordBytes": 12614,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+      "set": "batch-070",
+      "sourceBytes": 3724,
+      "digest": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "inventoryFileDigest": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+      "diffSha256": "38fa98a0aafe5ab4ce2a5631d7f7591191f47f8b8494e8c9afb9d9e712f96eaa",
+      "recordSha256": "d48120c2c83765f8fbf943ba64454d8ae9d834c15185c64291ea996648e83d9b",
+      "recordBytes": 11092,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md",
+      "set": "batch-070",
+      "sourceBytes": 3183,
+      "digest": "b81c14502c5931d4ad54721fd6610092180870f936b9d7d967e3fcff784f77a8",
+      "inventoryFileDigest": "b81c14502c5931d4ad54721fd6610092180870f936b9d7d967e3fcff784f77a8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "33eeae8dbe9c7dac7f6469b6160bb2c04384c4e796055f51d97de25bb70d1374",
+      "recordBytes": 900,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+      "set": "batch-070",
+      "sourceBytes": 14047,
+      "digest": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "inventoryFileDigest": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+      "diffSha256": "90405e8756dbee3bbd73992ea583db8faf140f3ae1773d499f69671f78cce90f",
+      "recordSha256": "37f8b4d211589b7cdaab3c5744e820af260fcd9fb3543c96b4212040caad561a",
+      "recordBytes": 60808,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "preserve": 7,
+        "parked": 7,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+      "set": "batch-070",
+      "sourceBytes": 3983,
+      "digest": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+      "inventoryFileDigest": "87823047db0abad4ef20285574664aafebbbdb3196cb7b3cf78b21a38b0a6d5e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a2c15990d68ffa9085c34859b077b93b4bd13413039bf346b783ebfd648f4f90",
+      "recordBytes": 2410,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+      "set": "batch-070",
+      "sourceBytes": 5081,
+      "digest": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "inventoryFileDigest": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+      "diffSha256": "7d245837397bf3dfae2aeeb1cfe4003daf98bca161b9b4b6c50e52019c4aa367",
+      "recordSha256": "515f77ca34cd0dd00abbeb714b1d4d9af8d2d271a1c7ce46fd1d5308bc5f90f6",
+      "recordBytes": 14831,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+      "set": "batch-070",
+      "sourceBytes": 2680,
+      "digest": "4051d614d62b3c5a5114df1d4524cfc30635db05abdbdda5fcb5b315be753fed",
+      "inventoryFileDigest": "4051d614d62b3c5a5114df1d4524cfc30635db05abdbdda5fcb5b315be753fed",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e23c2fc999e31c010ef1d9456ce3cb87691cd3f6715202d29efb73e2f1d64fa6",
+      "recordBytes": 1910,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+      "set": "batch-070",
+      "sourceBytes": 4248,
+      "digest": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "inventoryFileDigest": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+      "diffSha256": "42976e89c01a9f1941d61f4a5bdb61e7ef016c3500a180bdc9338541baa5718c",
+      "recordSha256": "e2d7737c86c89582cfa5afbdf341dc478469a22a630cf78ea319a4dee3b608b5",
+      "recordBytes": 20332,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-070",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000070",
+      "population": [
+        "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+        "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+        "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+        "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+        "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+        "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+        "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+        "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+        "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+        "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+          "rankHash": "15e592719df5dabc32f41abb02ac4b2ee9acbccb51f7165da77cdbaca75fcfe3"
+        },
+        {
+          "file": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+          "rankHash": "171174e6667f8a3b6699ba3195f9c0cc287034605df5cda4b83b15a0fb33fa66"
+        },
+        {
+          "file": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+          "rankHash": "317b172b008bc9ede8e69b08c148b5d3932a5e5936059a0b18bd93b36d9a31c5"
+        },
+        {
+          "file": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+          "rankHash": "40376d42623921cadfe1c9985c3ab6df1992301c25539a0319c80b5e5fe44a99"
+        },
+        {
+          "file": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+          "rankHash": "5494d60033767c877efc44272963838c663a8d7ccb0e139ef4e10ffb1382a869"
+        },
+        {
+          "file": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+          "rankHash": "5e47284001b2f8dbd5c07063f43ba5507713e7f64d4cc02dcdcf121a98e8cb80"
+        },
+        {
+          "file": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+          "rankHash": "6f975326577b0fe1e80f2cd772ea94ff4ad02f50f0437214d1e3fd6aefad8ab2"
+        },
+        {
+          "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+          "rankHash": "893f14b3a608d285269e5b0a6ecc82093429f18ec71ebff0f7725c8b928d2eb0"
+        },
+        {
+          "file": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+          "rankHash": "e61d5b2bff4ba92bbb3512d73c681c2f2d1c8e977594abe6167d6747498682e7"
+        },
+        {
+          "file": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+          "rankHash": "e818b4e539b8c289278e01d169a8437db2e63e315fc789685e36004bbed1732d"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+        "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/knowledge/decisions-index/decision-record.md",
+          "bytes": 16921,
+          "edges": 75,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/knowledge/decisions-index/decision-record.md",
+        "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+        "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md"
+      ],
+      "distinctReviewCount": 3,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+        "docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md",
+        "docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+        "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+        "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+        "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+        "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+        "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+        "docs/knowledge/decisions-index/decision-record.md",
+        "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+        "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+        "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md",
+        "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md",
+        "docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md",
+        "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+        "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+        "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+        "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+        "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+        "docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md",
+        "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+        "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+        "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+        "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+        "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md"
+      ],
+      "dispositions": {
+        "preserve": 121,
+        "patch": 12,
+        "parked": 10
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "070": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-070",
+      "population": [
+        "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+        "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+        "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+        "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+        "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+        "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+        "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+        "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md"
+      ],
+      "populationCount": 8,
+      "ranks": [
+        {
+          "file": "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+          "rankHash": "1548f2bfa3142aeda2be7072c07f6c46b4a495777b88db37d22f1a5a7520b7aa"
+        },
+        {
+          "file": "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md",
+          "rankHash": "1f81d53116cf6c93f322c8f9bf79475473e2340a91110650bb067313d747e6ec"
+        },
+        {
+          "file": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "rankHash": "521ad0b5bbc08ba7c1a4d520832438de6edfe3cc2edc78ab43ac8baeef767ca2"
+        },
+        {
+          "file": "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
+          "rankHash": "538e3c6bf514cfd1ef4e7f40bd5f8e72e66a5d39ef2321f3712943c07180d284"
+        },
+        {
+          "file": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "rankHash": "7ee4c3ed60d82e4f98c94b30dc4b006a4426d814de3d120da7a5d9ae1ea65467"
+        },
+        {
+          "file": "docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md",
+          "rankHash": "99ac10a841e8546d0e5cef873ec8cfb6ad99ad6631f328b92d7045e4b637b27f"
+        },
+        {
+          "file": "docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md",
+          "rankHash": "9b849f48836b578ada58405a563c646e403f6018c1b4b6956a3a7a0cd63456c1"
+        },
+        {
+          "file": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+          "rankHash": "c9f2dc3b95120ddaae253f2ebcd6f275df0559711cab0bdad8d7317ef72131d9"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+        "docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-070.jsonl",
+      "sha256": "61a31649e6579b353390372f3ee5c844ef15a526cde43c04aca6da8696e5e1cc"
+    }
+  ]
+}

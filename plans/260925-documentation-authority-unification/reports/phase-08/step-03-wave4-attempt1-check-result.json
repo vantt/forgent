@@ -1,0 +1,93 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 452,
+  "edges": 3683,
+  "failures": [
+    {
+      "file": "docs/architecture-map.md",
+      "check": "author-added-search-coverage",
+      "detail": "history exclusion must state its true L12-38 scope"
+    },
+    {
+      "check": "all-current-record-binding"
+    }
+  ],
+  "failureCount": 2,
+  "locatorReviewFlags": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "0027"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "edgeId": "maps-j-03990",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§9.2."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+      "correspondence": null
+    }
+  ],
+  "checker": "L12-38 all-record schema, complete source coverage, computed decision notes/live classes/history exclusions; old predicates retained",
+  "completedBatches": [
+    "070"
+  ],
+  "pendingBatches": [
+    "071",
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "retiredFiles": 125,
+  "retiredEdges": 1487
+}

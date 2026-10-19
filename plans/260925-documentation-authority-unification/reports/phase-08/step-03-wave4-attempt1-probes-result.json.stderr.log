@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 34, in <module>
+    if __name__=='__main__':print(json.dumps(main(),ensure_ascii=False,indent=2))
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 22, in main
+    probe('L12-38(3) computed narrative successor cannot be omitted',record('maps-j-01258'),remove_note,'removed-decision-narrative-successor')
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py", line 14, in probe
+    assert not c.check_record(original,apply=False),(name,c.check_record(original,apply=False))
+AssertionError: ('L12-38(3) computed narrative successor cannot be omitted', [{'file': 'docs/architecture-map.md', 'check': 'author-added-search-coverage', 'detail': 'history exclusion must state its true L12-38 scope'}])

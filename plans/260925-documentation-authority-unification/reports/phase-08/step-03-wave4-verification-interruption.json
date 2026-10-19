@@ -1,0 +1,9 @@
+{
+  "reason": "Stopped pending all-record replay before its test step so tests run with TMPDIR=/tmp/fgos-work, as required by the brief. No tests had started.",
+  "retainedCompletedProof": [
+    "step-03-wave4-inherited-probes-result.json",
+    "step-03-wave4-packet-result.json"
+  ],
+  "incompleteCommand": "step-03-wave4-check.py",
+  "next": "Rerun all-record checker followed by light tests with confined TMPDIR."
+}
