@@ -85,7 +85,7 @@ if (match) {
  * order. Account inventory is global-only config, so it goes into a private HOME, and the
  * provider-capacity state lives in a runtime directory of its own.
  */
-function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} } = {}) {
+function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {}, declaredStore = false, cells = {}, tierFallback = null, llmAccounts = null } = {}) {
   const repoRoot = fixtureDir('fgos-failover-');
   const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, stdio: 'ignore' });
   git(['init', '-b', 'main']);
@@ -111,7 +111,18 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} }
       providerModel: family,
       command,
       args,
-      invocations: [{ id: `${name}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'ACCOUNT_HOME' } }] }],
+      invocations: [{
+        id: `${name}-cli`,
+        via: 'cli',
+        adapter: 'cli-spawn',
+        confinement: { backend: 'bwrap' },
+        command,
+        args,
+        // A pool declared in llmAccounts needs the store (and its login files) declared by the invocation.
+        ...(declaredStore
+          ? { credentialStore: { use: family, homeEnv: 'ACCOUNT_HOME', files: ['login'] } }
+          : { resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'ACCOUNT_HOME' } }] }),
+      }],
     };
     if (Object.keys(logins).length > 0) {
       globalProviders[family] = {
@@ -129,7 +140,11 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} }
       defaultExecutor: prefer[0],
       timeoutMs: 40000,
       rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: Object.fromEntries(Object.values(providers).map(({ family }) => [family, { nano: 'fake', mini: 'fake', standard: 'fake', advanced: 'fake', flagship: 'fake', frontier: 'fake' }])),
+      modelPolicies: Object.fromEntries(Object.values(providers).map(({ family }) => {
+        const cell = cells[family] ?? 'fake';
+        return [family, { nano: cell, mini: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell }];
+      })),
+      ...(tierFallback ? { tierFallback } : {}),
       executors,
       capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard' } },
       patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
@@ -140,7 +155,13 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} }
 
   const home = fixtureDir('fgos-failover-home-');
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { providers: globalProviders } }, null, 2));
+  // llmAccounts: { pool: { accountId: { family, login } } }, each account holding the family's store.
+  const globalPools = llmAccounts && Object.fromEntries(Object.entries(llmAccounts).map(([pool, accounts]) => [pool, Object.fromEntries(Object.entries(accounts).map(([accountId, { family, login }]) => {
+    const accountHome = fixtureDir(`fgos-failover-pool-${pool}-${accountId}-`);
+    fs.writeFileSync(path.join(accountHome, 'login'), login);
+    return [accountId, { credentialStore: { [family]: accountHome } }];
+  }))]));
+  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } }, null, 2));
   process.env.HOME = home;
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.
@@ -154,7 +175,7 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} }
     };
   }
   fs.writeFileSync(path.join(runtimeDir, 'state.json'), JSON.stringify(state));
-  return { repoRoot, worktreeDir, runtimeDir, runnerConfig: { ...cfg.runner, providers: globalProviders } };
+  return { repoRoot, worktreeDir, runtimeDir, runnerConfig: { ...cfg.runner, providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } };
 }
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -187,11 +208,12 @@ test('a dead login moves the seat to another account of the same provider, not t
   const attempts = attemptsOf(fx.repoRoot, res);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']], 'the same executor runs again');
   assert.equal(attempts[1].assignmentId, `${res.unitRunId}/producer/1-fb1`);
-  assert.deepEqual([attempts[0].candidateIndex, attempts[1].candidateIndex], [0, 0]);
+  assert.deepEqual(attempts.map((a) => a.binding.pool), ['alpha', 'alpha']);
+  assert.deepEqual(attempts.map((a) => a.binding.model), ['fake', 'fake']);
   assert.equal(attempts[1].binding.invocation, attempts[0].binding.invocation);
   assert.equal(attempts[0].fallbackFrom, null);
   assert.equal(attempts[1].fallbackFrom.kind, 'account-rotation');
-  assert.equal(attempts[1].fallbackFrom.provider, 'alpha');
+  assert.equal(attempts[1].fallbackFrom.pool, 'alpha');
   assert.equal(attempts[1].fallbackFrom.reason, 'provider-limit');
 
   // The first attempt ran on the dead login and ended as a credential fault; the retry got the other account.
@@ -265,7 +287,8 @@ test('a provider with one account goes straight to the next provider', { skip: S
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']]);
   assert.equal(attempts[1].fallbackFrom.kind, 'next-candidate');
   assert.equal(attempts[1].fallbackFrom.executor, 'alpha');
-  assert.deepEqual(attempts.map((a) => a.skipCandidateIndex), [-1, 0]);
+  assert.equal(attempts[1].fallbackFrom.walk, 'family');
+  assert.deepEqual(attempts.map((a) => a.binding.pool), ['alpha', 'beta']);
 });
 
 test('rotation stops after the accounts the provider has, then the walk leaves the provider', { skip: SKIP }, async () => {
@@ -300,7 +323,7 @@ test('a provider whose login just failed is not picked again by the walk, even t
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
   const attempts = attemptsOf(fx.repoRoot, res);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']], 'alpha-lite shares the failed provider and is skipped');
-  assert.deepEqual(attempts.map((a) => a.candidateIndex), [0, 2]);
+  assert.deepEqual(attempts.map((a) => a.binding.pool), ['alpha', 'beta']);
 });
 
 test('when every account and every candidate is used up the seat and the unit fail', { skip: SKIP }, async () => {
@@ -422,12 +445,12 @@ const unitRuns = (fx) => {
 
 test('a pinned account runs, even when the lease would rank another account first', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live', a2: 'live' } } }, { recentlyUsed: { alpha: ['a2'] } });
-  const res = await run(fx, solo('u-pin'), pin('a2'));
+  const res = await run(fx, solo('u-pin'), pin('alpha/a2'));
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
   assert.equal(selectedAccount(fx.repoRoot, res, '1'), 'a2');
   const [attempt] = attemptsOf(fx.repoRoot, res);
-  assert.deepEqual(attempt.binding.account, { provider: 'alpha', id: 'a2' });
-  assert.deepEqual(attempt.binding.provenance.account, { value: 'a2', source: 'override:human-cli' });
+  assert.deepEqual(attempt.binding.account, { pool: 'alpha', id: 'a2' });
+  assert.deepEqual(attempt.binding.provenance.account, { value: 'alpha/a2', source: 'override:human-cli' });
 });
 
 test('a provider limit on a pinned account ends the seat: no rotation, no other executor', { skip: SKIP }, async () => {
@@ -435,7 +458,7 @@ test('a provider limit on a pinned account ends the seat: no rotation, no other 
     { alpha: { family: 'alpha', logins: { dead1: 'dead', live1: 'live' } }, beta: { family: 'beta' } },
     { recentlyUsed: { alpha: ['live1'] } },
   );
-  const res = await run(fx, solo('u-pin-limit'), pin('dead1'));
+  const res = await run(fx, solo('u-pin-limit'), pin('alpha/dead1'));
   assert.equal(res.outcome, 'provider-limit');
   assert.deepEqual(attemptsOf(fx.repoRoot, res).map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit']]);
   const exhausted = res.results[0].fallbackExhausted;
@@ -449,14 +472,14 @@ test('a quarantined pinned account is refused before any unit run exists, and a 
     { alpha: { family: 'alpha', logins: { spent1: 'quota', live1: 'live' } }, beta: { family: 'beta' } },
     { recentlyUsed: { alpha: ['live1'] } },
   );
-  const first = await run(fx, solo('u-pin-quota'), pin('spent1'));
+  const first = await run(fx, solo('u-pin-quota'), pin('alpha/spent1'));
   assert.equal(first.outcome, 'provider-limit');
   const until = inspectProviderCapacity({ runnerConfig: fx.runnerConfig, provider: 'alpha', runtimeDir: fx.runtimeDir }).providers.alpha.accounts.spent1.quarantine.until;
   assert.ok(until);
 
   const before = unitRuns(fx);
-  await assert.rejects(run(fx, solo('u-pin-quota-again'), pin('spent1')), (err) => {
-    assert.match(err.message, /account "spent1" of provider "alpha" is quarantined/);
+  await assert.rejects(run(fx, solo('u-pin-quota-again'), pin('alpha/spent1')), (err) => {
+    assert.match(err.message, /account "alpha\/spent1" is quarantined/);
     assert.ok(err.message.includes(until), err.message);
     return true;
   });
@@ -469,26 +492,26 @@ test('a quarantined pinned account is refused before any unit run exists, and a 
     worktree: fx.worktreeDir,
     session: { herdrPresent: false, headless: true },
     providerCapacityRuntimeDir: fx.runtimeDir,
-  }), (err) => err.message.includes('"spent1"') && err.message.includes(until));
+  }), (err) => err.message.includes('"alpha/spent1"') && err.message.includes(until));
   assert.equal(attemptsOf(fx.repoRoot, first).length, 1, 'the resume dispatched nothing');
 });
 
 test('an account of another provider is refused before any unit run exists', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } });
-  await assert.rejects(run(fx, solo('u-pin-other'), pin('b1')), /applies to no seat.*"b1".*providers\.alpha\.accounts/s);
+  await assert.rejects(run(fx, solo('u-pin-other'), pin('beta/b1')), /applies to no seat.*"beta\/b1".*pool "beta"/s);
   assert.deepEqual(unitRuns(fx), []);
 });
 
 test('a pinned account on a reviewed unit pins the seat of its provider; the checker of another provider binds freely', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live', a2: 'live' } }, beta: { family: 'beta' } }, { recentlyUsed: { alpha: ['a2'] } });
-  const res = await run(fx, { ...writer('u-pin-reviewed'), pattern: 'reviewed' }, { pattern: 'reviewed', ...pin('a2') });
+  const res = await run(fx, { ...writer('u-pin-reviewed'), pattern: 'reviewed' }, { pattern: 'reviewed', ...pin('alpha/a2') });
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results.map((r) => [r.role, r.outcome, r.refused])));
-  assert.deepEqual(attemptsOf(fx.repoRoot, res)[0].binding.account, { provider: 'alpha', id: 'a2' });
+  assert.deepEqual(attemptsOf(fx.repoRoot, res)[0].binding.account, { pool: 'alpha', id: 'a2' });
   assert.equal(selectedAccount(fx.repoRoot, res, '1'), 'a2');
   const reviewer = attemptsOf(fx.repoRoot, res, 'reviewer/1')[0].binding;
   assert.equal(reviewer.executor, 'beta');
   assert.equal(reviewer.account, undefined);
-  assert.equal(reviewer.provenance.account.skipped.reason, 'account-pin-no-inventory');
+  assert.equal(reviewer.provenance.account.skipped.reason, 'account-pin-other-pool');
 });
 
 // A writing seat that already changed the worktree before its provider limit is not run again on
@@ -536,12 +559,12 @@ test('a read-only seat of a writing unit still rotates: its sandbox kept the wor
 
 test('a pinned writing seat that changed the worktree before its limit reports the changed paths, not only the pin', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { partial1: 'partial', live1: 'live' } } });
-  const res = await run(fx, writer('u-pin-partial'), pin('partial1'));
+  const res = await run(fx, writer('u-pin-partial'), pin('alpha/partial1'));
   assert.equal(res.outcome, 'provider-limit');
   const exhausted = res.results[0].fallbackExhausted;
   assert.equal(exhausted.reason, 'partial-writes');
   assert.deepEqual(exhausted.paths, ['README.md', 'README.old', 'notes.txt']);
-  assert.equal(exhausted.accountPinned, 'partial1');
+  assert.equal(exhausted.accountPinned, 'alpha/partial1');
 });
 
 test('a resume takes a new baseline: work a person kept after a partial-writes stop does not stop the next rotation', { skip: SKIP }, async () => {
@@ -565,4 +588,99 @@ test('a resume takes a new baseline: work a person kept after a partial-writes s
   const attempts = attemptsOf(fx.repoRoot, resumed);
   assert.deepEqual(attempts.slice(1).map((a) => a.fallbackFrom?.kind), ['account-rotation'], JSON.stringify(resumed.results[0].fallbackExhausted));
   assert.equal(selectedAccount(fx.repoRoot, resumed, '1-fb1'), 'live3');
+});
+
+// A seat whose accounts are used up walks the cells of its tier: the accounts of one pool in declared
+// order, then the next entry of the family's cell (another pool, its own accounts), then the next family
+// of the tier's list. The write gate recomputes each of these bindings from unit.json, so a writing seat
+// passing proves it equals the one the runner made at every step.
+const WALK_POOLS = {
+  llmAccounts: {
+    alpha: { a1: { family: 'alpha', login: 'dead' }, a2: { family: 'alpha', login: 'dead' } },
+    router: { r1: { family: 'alpha', login: 'dead' }, r2: { family: 'alpha', login: 'dead' } },
+  },
+  cells: { alpha: ['alpha-direct@alpha', 'alpha-via-router@router'] },
+  tierFallback: { standard: ['alpha', 'beta'] },
+  declaredStore: true,
+};
+
+for (const [label, unit] of [['a reading seat', solo('u-walk-read')], ['a writing seat', writer('u-walk-write')]]) {
+  test(`${label} that used up an account, a pool and a family walks pool accounts, the next entry, then the next family`, { skip: SKIP }, async () => {
+    const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'beta' } }, WALK_POOLS);
+    const res = await run(fx, unit);
+    assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+    const attempts = attemptsOf(fx.repoRoot, res);
+    assert.deepEqual(attempts.map((a) => [a.binding.executor, a.binding.pool, a.binding.model, a.outcome]), [
+      ['alpha', 'alpha', 'alpha-direct', 'provider-limit'],
+      ['alpha', 'alpha', 'alpha-direct', 'provider-limit'],
+      ['alpha', 'router', 'alpha-via-router', 'provider-limit'],
+      ['alpha', 'router', 'alpha-via-router', 'provider-limit'],
+      ['beta', 'beta', 'fake', 'pass'],
+    ]);
+    assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'account-rotation', 'next-candidate', 'account-rotation', 'next-candidate']);
+    assert.deepEqual(attempts.map((a) => a.fallbackFrom?.walk ?? null), [null, null, 'entry', null, 'family']);
+    assert.deepEqual(attempts.map((a) => a.fallbackFrom?.pool ?? null), [null, 'alpha', 'alpha', 'router', 'router']);
+    assert.deepEqual(['1', '1-fb1', '1-fb2', '1-fb3'].map((sub) => selectedAccount(fx.repoRoot, res, sub)), ['a1', 'a2', 'r1', 'r2'], 'each pool takes its accounts in declared order');
+  });
+}
+
+test('a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha' }, beta: { family: 'beta' } }, {
+    ...WALK_POOLS,
+    llmAccounts: {
+      alpha: { a1: { family: 'alpha', login: 'quota' }, a2: { family: 'alpha', login: 'live' } },
+      router: { r1: { family: 'alpha', login: 'live' } },
+    },
+  });
+  const res = await run(fx, solo('u-quota-order'));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  assert.deepEqual(attemptsOf(fx.repoRoot, res).map((a) => [a.binding.pool, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']]);
+  const capacity = inspectProviderCapacity({ runnerConfig: fx.runnerConfig, runtimeDir: fx.runtimeDir });
+  assert.equal(capacity.providers.alpha.accounts.a1.healthy, false);
+  assert.equal(capacity.providers.alpha.accounts.a2.healthy, true);
+  assert.equal(capacity.providers.router.accounts.r1.healthy, true, 'the other pool of the family is untouched');
+
+  // The next seat starts on the first account that can run, not on the one used least: a2 again.
+  const next = await run(fx, solo('u-quota-order-next'));
+  assert.equal(next.outcome, 'pass');
+  assert.equal(selectedAccount(fx.repoRoot, next, '1'), 'a2');
+});
+
+test('a resumed unit recorded before bindings carried a pool restarts its walk at the primary without a crash', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { dead1: 'dead', dead2: 'dead' } }, beta: { family: 'beta' } },
+    { prefer: ['alpha'] },
+  );
+  const first = await run(fx, solo('u-old-record'));
+  assert.equal(first.outcome, 'provider-limit');
+
+  // Rewrite the record as an earlier release wrote it: one attempt, a binding without pool and model,
+  // and a pool of two executors; the accounts' quarantine is forgotten.
+  const unitFile = path.join(unitDirOf(fx.repoRoot, first), 'unit.json');
+  const record = readJson(unitFile);
+  const [attempt] = record.bindings['producer/1'];
+  delete attempt.binding.pool;
+  delete attempt.binding.model;
+  delete attempt.outcome;
+  delete attempt.failureCause;
+  attempt.candidateIndex = 0;
+  attempt.skipCandidateIndex = -1;
+  record.bindings['producer/1'] = [attempt];
+  record.configSnapshot.runner.capabilities['docs:write'].prefer.push({ executor: 'beta', invocation: 'beta-cli' });
+  fs.writeFileSync(unitFile, JSON.stringify(record, null, 2));
+  fs.rmSync(path.join(fx.runtimeDir, 'state.json'), { force: true });
+
+  const resumed = await runUnit({
+    resumeUnitRunId: first.unitRunId,
+    repoRoot: fx.repoRoot,
+    cwd: fx.worktreeDir,
+    worktree: fx.worktreeDir,
+    session: { herdrPresent: false, headless: true },
+    providerCapacityRuntimeDir: fx.runtimeDir,
+  });
+  assert.equal(resumed.outcome, 'pass', JSON.stringify(resumed.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, resumed);
+  // The recorded attempt settled on its own; the walk then restarts at the primary (whose accounts rotate), and goes on.
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.binding.pool ?? null, a.outcome]), [['alpha', null, 'provider-limit'], ['alpha', 'alpha', 'provider-limit'], ['alpha', 'alpha', 'provider-limit'], ['beta', 'beta', 'pass']]);
+  assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'next-candidate', 'account-rotation', 'next-candidate']);
 });

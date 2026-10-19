@@ -12,8 +12,8 @@ import {
   PORT_MISSING, SEAT_LAUNCH_CEILING,
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
-import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
-import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
+import { bind, nextCandidate, retrySameCandidate } from './bind.mjs';
+import { credentialFaultPools, inspectAccountRotation, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
@@ -767,9 +767,9 @@ async function runUnitBody(options, scope) {
   for (const attempts of Object.values(unitRecord.bindings)) {
     for (const attempt of attempts) noteRoleExecutor(attempt.role, attempt.binding?.executor);
   }
-  // Provider families whose login failed in this unit and that a seat then walked away from: no
-  // later fallback walk of the unit lands on one (a resumed run rebuilds the set from its attempts).
-  const credentialFaultFamilySet = credentialFaultFamilies(unitRecord);
+  // Pools whose login failed in this unit and that a seat then walked away from: no later fallback
+  // walk of the unit lands on one (a resumed run rebuilds the set from its attempts).
+  const credentialFaultPoolSet = credentialFaultPools(unitRecord);
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
@@ -872,6 +872,8 @@ async function runUnitBody(options, scope) {
         preferInvocation: bound.invocation,
         tier: bound.tier,
         model: bound.model,
+        // The pool that serves `model`; the lease takes the account from it.
+        ...(bound.pool ? { pool: bound.pool } : {}),
         // A level bind() accepted from an override; the launch renders it into the CLI's flag.
         ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
       },
@@ -1063,12 +1065,6 @@ async function runUnitBody(options, scope) {
           transport: bound.transport,
           invocation: bound.invocation,
           fallbackFrom: bound.provenance?.fallbackFrom ?? null,
-          // Where this attempt's candidate walk resumed (-1 = from the start of the pool). A retry
-          // on another account of the same candidate resumes exactly where the attempt it retries did.
-          skipCandidateIndex: attemptNo === 0 ? -1
-            : bound.provenance?.fallbackFrom?.kind === 'account-rotation' ? (attempts[attemptNo - 1]?.skipCandidateIndex ?? -1)
-              : (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1),
-          candidateIndex: bound.candidateIndex ?? null,
           ...(readOnly ? {} : { preExistingInScope }),
           boundAt: new Date().toISOString(),
         });
@@ -1148,7 +1144,7 @@ async function runUnitBody(options, scope) {
           },
         };
       };
-      const pinned = bound.account ? { accountPinned: bound.account.id } : {};
+      const pinned = bound.account ? { accountPinned: `${bound.account.pool}/${bound.account.id}` } : {};
       const baseline = attempts[attemptNo].writeBaseline;
       if (baseline) {
         let changed;
@@ -1164,16 +1160,16 @@ async function runUnitBody(options, scope) {
         }
       }
       if (bound.account) {
-        return stopRetry('account-pinned', `account "${bound.account.id}" of provider "${bound.account.provider}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
+        return stopRetry('account-pinned', `account "${bound.account.pool}/${bound.account.id}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
       }
-      const rotation = inspectAccountRotation({ runnerConfig, executorId: bound.executor, runtimeDir: options.providerCapacityRuntimeDir });
+      const rotation = bound.pool ? inspectAccountRotation({ runnerConfig, pool: bound.pool, runtimeDir: options.providerCapacityRuntimeDir }) : null;
       if (mayRotateAccount(rotation, rotationsSpent)) {
-        bound = retrySameCandidate(bound, { provider: rotation.provider, accountsHealthy: rotation.healthy });
+        bound = retrySameCandidate(bound, { accountsHealthy: rotation.healthy });
         attemptNo += 1;
         continue;
       }
 
-      if (credentialFault) credentialFaultFamilySet.add(getProviderFamily(runnerConfig, bound.executor).toLowerCase());
+      if (credentialFault && bound.pool) credentialFaultPoolSet.add(bound.pool);
       // The independence and the spread are read again now: sibling seats may have changed executors
       // since this seat first bound, and a hard `independentOf` must hold for the executor it falls back to.
       const walkAsk = {
@@ -1181,7 +1177,10 @@ async function runUnitBody(options, scope) {
         independentOf: resolveIndependence(independentOf),
         ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
       };
-      const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', { excludeFamilies: [...credentialFaultFamilySet] });
+      const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', {
+        tried: triedBindingsOf(attempts, attemptNo + 1),
+        excludePools: [...credentialFaultPoolSet],
+      });
       if (next.refused || next.mechanism === 'inline') {
         return {
           ...result,

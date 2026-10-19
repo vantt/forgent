@@ -67,6 +67,17 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
   assert.ok(Object.isFrozen(effective.constraints));
 });
 
+test('a family with no cell at the tier is refused as tier-cell-missing, naming the cell, never run on another model', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
+  const runnerConfig = { executor: { command: 'claude' }, modelPolicies: { claude: { nano: 'haiku' } } };
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment, runnerConfig }),
+    (err) => err instanceof RunnerConfigError
+      && err.code === 'tier-cell-missing'
+      && err.message === 'tier-cell-missing: no model for tier "standard" under family "claude" (runner.modelPolicies.claude.standard)',
+  );
+});
+
 test('high-risk work raises tier rigor to flagship or frontier without downgrade', () => {
   const heavyWork = {
     id: 'tsk-risk-1',

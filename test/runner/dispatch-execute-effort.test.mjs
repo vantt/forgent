@@ -342,7 +342,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   const runner = {
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));

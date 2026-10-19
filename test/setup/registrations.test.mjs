@@ -251,6 +251,7 @@ test('setup adds a coding:plan slot beside a project bare-verb plan pool and bin
   assert.equal(config.runner.capabilities['coding:plan'].prefer, undefined);
   const runnerConfig = {
     ...config.runner,
+    modelPolicies: { ...config.runner.modelPolicies, mine: { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } },
     executors: { mine: { kind: 'agent', command: 'mine', invocations: [{ id: 'mine-cli', via: 'cli', confinement: { backend: 'bwrap' } }] } },
   };
   const bound = bind({ unit: { id: 'u', capability: 'coding:plan', writes: [] }, role: 'producer' }, { runnerConfig, session: { headless: true } });

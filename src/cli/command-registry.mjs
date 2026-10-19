@@ -1317,7 +1317,7 @@ export const COMMAND_REGISTRY = [
         ],
       },
       explain: {
-        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier, its source (rigor, override) and its ceiling (runner.maxTier, or the capability\'s own rigor when that is higher), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
+        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier, its source (rigor, override) and its ceiling (runner.maxTier, or the capability\'s own rigor when that is higher), the candidates in order with the reason one is out (a missing tier cell, a pool with no usable account), the walk a seat takes when each binding fails, and the accounts of each pool on that walk in the order the lease takes them, with whether the CLI can run on each. Leases, spawns and writes nothing.',
         parameters: {
           type: 'object',
           properties: {
@@ -1363,7 +1363,7 @@ export const COMMAND_REGISTRY = [
   }),
   {
     name: 'run',
-    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify "<cmd>"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
     description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
     parameters: {
       type: 'object',
@@ -1384,7 +1384,7 @@ export const COMMAND_REGISTRY = [
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
-        account: { type: 'string', description: 'Pin a provider account (an id in providers.<provider>.accounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose bound executor\'s provider lists it (a checker on another provider binds unpinned) and does not choose the executor: pair it with --provider. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
+        account: { type: 'string', description: 'Pin an account, written pool/account (for example openai/work; pools and accounts are in runner.llmAccounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose chosen model entry is served by that pool (a checker on another family binds unpinned) and does not choose the executor: pair it with --provider. A bare account id is refused. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         case: { type: 'string', description: 'Admit this run into a Workflow case (its id) as an activity of its guide, before anything exists: entry milestones, the guide\'s MUST rules, write overlap with the case\'s live reservations and its frame are all checked, and a refusal names the condition. A Playbook case admits through its own proposer only. Needs --activity. Without --case a read-only run is standalone and uncounted, and a writing run needs a worktree no case owns.' },
         activity: { type: 'string', description: 'With --case: the activity of the case\'s guide this run is.' },
@@ -2221,7 +2221,7 @@ export const COMMAND_REGISTRY = [
             },
             account: {
               type: 'string',
-              description: 'Pin the provider account for seats belonging to that provider; kept for resume. Seats on another provider run unpinned; refused if the account does not exist in any runner.providers.*.accounts.',
+              description: 'Pin an account, written pool/account (for example openai/work); kept for resume. Seats whose chosen model is served by another pool run unpinned; refused if the pool has no such account.',
             },
             request: { type: 'string', description: 'The owner request this run serves; every unit receives it in its objective.' },
             'stance-options': { type: 'string', description: 'Pipe-separated option labels a measured panelist picks a stance from ("a|b|c"); refused on resume with different options.' },

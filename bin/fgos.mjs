@@ -2303,7 +2303,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
-          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)'),
+          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)'),
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
@@ -2879,12 +2879,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
         }
       }
-      // `--account <id>` pins the provider account the same way: an `account` key on every override
+      // `--account <pool/account>` pins the account the same way: an `account` key on every override
       // that does not name one. runUnit checks it against each seat's bound executor before the unit
       // run exists; a resumed run keeps the account its bindings already carry.
       if (flags.account !== undefined) {
         if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)');
+        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)');
         if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
         for (const ov of overrides) {
           if (ov.account === undefined) ov.account = account;

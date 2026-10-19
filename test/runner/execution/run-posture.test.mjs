@@ -105,7 +105,7 @@ function setupProbeRepo(executorNames) {
     runner: {
       defaultExecutor: executorNames[0],
       rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: {},
+      modelPolicies: Object.fromEntries(executorNames.map((name) => [name, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
       executors,
       capabilities: {
         'docs:write': { prefer, rigor: 'standard' },

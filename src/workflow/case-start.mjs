@@ -19,6 +19,8 @@ import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
 import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
+import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, gitOut } from './unit-handoff.mjs';
@@ -273,12 +275,11 @@ export function prepareWorkflowRun(params) {
   const frame = resolveFrame(workflow.guide, params.frame);
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   if (account !== null) {
-    const inventory = providerAccountInventory(configSnapshot.runner);
-    const exists = Object.values(inventory).some(
-      (entry) => entry?.accounts && Object.hasOwn(entry.accounts, account),
-    );
-    if (!exists) {
-      throw new RunnerConfigError(`account "${account}" is not configured in runner.providers.*.accounts`);
+    const pin = parseAccountPin(account);
+    if (pin.refused) throw new RunnerConfigError(`--account: ${pin.refused.detail}`);
+    const accounts = providerAccountInventory(configSnapshot.runner)[legacyStateKey(pin.pool)]?.accounts;
+    if (!accounts || !Object.hasOwn(accounts, pin.id)) {
+      throw new RunnerConfigError(`account "${account}" is not configured: pool "${pin.pool}" has no account "${pin.id}" in runner.llmAccounts`);
     }
   }
   // A case or wave opened under a parent case is charged to the parent's frame first, in the parent's own
