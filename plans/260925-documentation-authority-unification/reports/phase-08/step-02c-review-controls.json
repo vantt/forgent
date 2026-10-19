@@ -1,0 +1,58 @@
+{
+  "entries": [
+    {
+      "entryId": "sourcePaths-AGENTS",
+      "consumerPath": "AGENTS.md",
+      "section": "fileOverlays"
+    },
+    {
+      "entryId": "native-glob-and-backfill-joins",
+      "section": "nativeReconciliationCorrections"
+    },
+    {
+      "entryId": "instruction-decision-recheck",
+      "section": "instructionDecisionReferenceRecheck"
+    },
+    {
+      "entryId": "preserve-exemptions",
+      "section": "preserveExemptions"
+    },
+    {
+      "entryId": "stub-provenance-1",
+      "consumerPath": ".agents/skills/fgos-code-panel/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 0
+    },
+    {
+      "entryId": "stub-provenance-2",
+      "consumerPath": ".agents/skills/fgos-plan-loop/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 1
+    },
+    {
+      "entryId": "stub-provenance-3",
+      "consumerPath": "core/skills/fgos-plan-loop/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 2
+    },
+    {
+      "entryId": "stub-provenance-4",
+      "consumerPath": "domains/coding/skills/fgos-code-panel/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 3
+    },
+    {
+      "entryId": "stub-provenance-5",
+      "consumerPath": "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 4
+    },
+    {
+      "entryId": "stub-provenance-6",
+      "consumerPath": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+      "section": "historicalProvenanceCorrections",
+      "index": 5
+    }
+  ],
+  "instructions": "Read these exact correction-file sections; verify pre-stripping/stub git bytes, scope exemptions, all literal/split instruction decision references and native joins."
+}
