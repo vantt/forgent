@@ -1,0 +1,158 @@
+import '../helpers/process-tmp-root.mjs';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
+import { createGitLand } from '../../src/git/index.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+const built = ensureGitAddon();
+const loader = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
+function fixture() {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-land-'));
+  const repo = path.join(temp, 'repo'); fs.mkdirSync(repo);
+  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  git('init', '-q', '--initial-branch=trunk'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
+  fs.writeFileSync(path.join(repo, 'a'), 'base\n'); fs.writeFileSync(path.join(repo, 'b'), 'base\n'); git('add', '.'); git('commit', '-qm', 'base'); const target = git('rev-parse', 'HEAD');
+  git('checkout', '-qb', 'source'); fs.writeFileSync(path.join(repo, 'a'), 'incoming\n'); git('commit', '-qam', 'source'); const source = git('rev-parse', 'HEAD'); git('checkout', '-q', 'trunk');
+  const fence = path.join(repo, '.fgos/locks/activation.lock'); fs.mkdirSync(fence, { recursive: true }); fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+  const options = { stateRoot: temp, repoPath: repo, trustedMain: repo, writer: 'fixture' };
+  const ports = [];
+  const port = () => { const p = createGitLand(options, loader); ports.push(p); return p; };
+  return { temp, repo, git, port, request: { source, target, destination: 'refs/heads/trunk', message: 'consumer land', squash: false, footprint: [], subtree: null, files: [] }, close() { for (const p of ports) p.close(); fs.rmSync(temp, { recursive: true, force: true }); } };
+}
+function evidence(candidate) { return { source: candidate.source, target: candidate.target, candidate: candidate.candidate, treeDigest: candidate.treeDigest, evidenceDigest: 'consumer-verification-record' }; }
+test('Land binds actual consumer verification and returns an established receipt after an external ABA', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'land', request: f.request });
+    // Real consumer command, outside 40/50. The evidence remains the consumer's claim.
+    execFileSync(process.execPath, ['-e', "if(require('fs').readFileSync('a','utf8')!=='incoming\\n')process.exit(1)"], { cwd: c.worktree });
+    assert.deepEqual(execFileSync('git', ['-C', c.worktree, 'show', '-s', '--format=%P'], { encoding: 'utf8' }).trim().split(' '), [f.request.target, f.request.source]);
+    const r = p.publish(evidence(c)); assert.equal(r.operationId, 'land'); assert.equal(r.consumerSettlement, 'notOwnedByGit'); assert.equal(r.checkout, 'reconciled'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate);
+    assert.deepEqual(p.publish(evidence(c)), r); p.close();
+    f.git('update-ref', f.request.destination, f.request.target);
+    assert.deepEqual(f.port().prepare({ operationId: 'land', request: f.request }).receipt, r);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+  } finally { f.close(); }
+});
+test('missing or mismatched verification and dirty candidate never move the target', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'verify', request: f.request });
+    assert.throws(() => p.publish({}), /missing field/);
+    for (const field of ['source', 'target', 'candidate', 'treeDigest', 'evidenceDigest']) assert.throws(() => p.publish({ ...evidence(c), [field]: '' }), /verification-mismatch/);
+    fs.writeFileSync(path.join(c.worktree, 'a'), 'changed by verifier');
+    assert.throws(() => p.publish(evidence(c)), /candidate-dirty/);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+  } finally { f.close(); }
+});
+test('dirty non-overlapping main is tolerated, preserved, and reported lagging', () => {
+  const f = fixture(); try {
+    fs.writeFileSync(path.join(f.repo, 'b'), 'keep local');
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'dirty', request: f.request });
+    const r = p.publish(evidence(c)); assert.equal(r.checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'keep local');
+  } finally { f.close(); }
+});
+test('own paths dirtied during verification refuse publication; declared rename source counts', () => {
+  const f = fixture(); try {
+    const p = f.port(); const request = { ...f.request, footprint: ['b'] }; const { candidate: c } = p.prepare({ operationId: 'own', request });
+    f.git('mv', 'b', 'renamed'); assert.throws(() => p.publish(evidence(c)), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), request.target);
+  } finally { f.close(); }
+});
+test('the same destination stays excluded across consumer verification', () => {
+  const f = fixture(); try {
+    const p = f.port(); p.prepare({ operationId: 'first', request: f.request });
+    assert.throws(() => f.port().prepare({ operationId: 'second', request: f.request }), /lock-acquire-unavailable/);
+    // Lower locks are free throughout the consumer phase.
+    const scope = createLockScope();
+    const admin = acquireSync(scope, 'worktree-admin', { fgosDir: path.join(f.repo, '.fgos') }); assert.equal(admin.result, 'acquired');
+    const main = acquireSync(scope, 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') }); assert.equal(main.result, 'acquired'); main.handle.release(); admin.handle.release();
+  } finally { f.close(); }
+});
+test('a held custody rank is refused before Land has any effect', () => {
+  const f = fixture(); const h = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(f.repo, '.fgos'), cwd: f.repo }); assert.equal(h.result, 'acquired');
+  try { assert.throws(() => f.port().prepare({ operationId: 'order', request: f.request }, [h.handle]), /lock-order-violation/); assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false); }
+  finally { h.handle.release(); f.close(); }
+});
+test('M4 consumer settlement identity survives an unknown append acknowledgement', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'settle', request: f.request }); const r = p.publish(evidence(c)); p.close();
+    // Work/Event Store must enforce this unique tuple and query it before retry.
+    const repoIdentity = JSON.parse(fs.readFileSync(path.join(f.repo, '.git/fgos/git/operations/settle/00000000.json'), 'utf8')).phase.data.repoIdentity;
+    const ledger = new Map(); const key = operationId => JSON.stringify([repoIdentity, operationId, 'delivered']);
+    ledger.set(key(r.operationId), { mergedSha: r.localEffect.publishedOid, mergedInto: f.request.destination }); // append happened, acknowledgement lost
+    const replay = f.port().prepare({ operationId: 'settle', request: f.request }).receipt;
+    const queried = ledger.get(key(replay.operationId)); assert.equal(queried.mergedSha, c.candidate); assert.equal(ledger.size, 1);
+    // Negative control: a fresh settlement identity would duplicate business history.
+    const withoutDedup = [queried, { ...queried }]; assert.equal(withoutDedup.length, 2);
+  } finally { f.close(); }
+});
+test('ignored incoming collisions preserve bytes and block before CAS', () => {
+  const f = fixture(); try {
+    // The source introduces b/new while main has an ignored untracked directory there.
+    f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'ignored-dir')); fs.writeFileSync(path.join(f.repo, 'ignored-dir/new'), 'incoming'); f.git('add', 'ignored-dir/new'); f.git('commit', '-qm', 'ignored incoming'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
+    fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), 'ignored-dir/\n'); fs.mkdirSync(path.join(f.repo, 'ignored-dir')); fs.writeFileSync(path.join(f.repo, 'ignored-dir/new'), 'keep ignored');
+    assert.throws(() => f.port().prepare({ operationId: 'ignored', request: f.request }), /main-checkout-dirty-mid-merge/);
+    assert.equal(fs.readFileSync(path.join(f.repo, 'ignored-dir/new'), 'utf8'), 'keep ignored'); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+  } finally { f.close(); }
+});
+test('unattached target lands without touching the main checkout; foreign attached targets refuse', () => {
+  const f = fixture(); try {
+    f.git('branch', 'destination', f.request.target); const request = { ...f.request, destination: 'refs/heads/destination', squash: true };
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'unattached', request }); const r = p.publish(evidence(c)); assert.equal(r.checkout, 'notApplicable'); assert.equal(f.git('rev-parse', 'HEAD'), request.target); assert.equal(f.git('rev-parse', request.destination), c.candidate);
+    f.git('worktree', 'add', '-q', path.join(f.temp, 'foreign'), 'destination');
+    assert.throws(() => f.port().prepare({ operationId: 'foreign', request: { ...request, target: c.candidate } }), /foreign-target-checkout/);
+  } finally { f.close(); }
+});
+test('candidate transforms are frozen before verification and staged tampering is refused', () => {
+  const f = fixture(); try {
+    const p = f.port(); const request = { ...f.request, files: [{ path: 'decision.txt', bytes: [...Buffer.from('declared bytes')] }] };
+    const { candidate: c } = p.prepare({ operationId: 'bytes', request }); assert.equal(fs.readFileSync(path.join(c.worktree, 'decision.txt'), 'utf8'), 'declared bytes');
+    fs.writeFileSync(path.join(c.worktree, 'decision.txt'), 'after verification'); execFileSync('git', ['-C', c.worktree, 'add', 'decision.txt']); assert.throws(() => p.publish(evidence(c)), /candidate-dirty/); assert.equal(f.git('rev-parse', 'HEAD'), request.target);
+  } finally { f.close(); }
+});
+test('unresolved target attempts never replay a CAS, even at the old tip', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'unknown', request: f.request }); p.publish(evidence(c)); p.close();
+    // Drop only the terminal record to model a lost outcome acknowledgement.
+    const wal = path.join(f.repo, '.git/fgos/git/operations/unknown'); const records = fs.readdirSync(wal).filter(n => /^\d{8}\.json$/.test(n)).sort(); assert.equal(JSON.parse(fs.readFileSync(path.join(wal, records.at(-1)), 'utf8')).phase.phase, 'outcome'); fs.unlinkSync(path.join(wal, records.at(-1)));
+    f.git('update-ref', f.request.destination, f.request.target);
+    assert.throws(() => f.port().prepare({ operationId: 'unknown', request: f.request }), /land-recovery-required/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+  } finally { f.close(); }
+});
+test('Land materializes tracked non-event store bytes stripped by worker allocation before verification', () => {
+  const f = fixture(); try {
+    fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{"base":true}\n'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'non-event store config'); f.request.target = f.git('rev-parse', 'HEAD');
+    const p = f.port(); const request = { ...f.request, files: [{ path: '.fgos/config.json', bytes: [...Buffer.from('{"candidate":true}\n')] }] }; const { candidate: c } = p.prepare({ operationId: 'store-bytes', request });
+    assert.equal(fs.readFileSync(path.join(c.worktree, '.fgos/config.json'), 'utf8'), '{"candidate":true}\n'); assert.equal(p.publish(evidence(c)).checkout, 'reconciled');
+  } finally { f.close(); }
+});
+test('a conflict aborts only the operation candidate and preserves both refs and main bytes', () => {
+  const f = fixture(); try {
+    fs.writeFileSync(path.join(f.repo, 'a'), 'divergent main\n'); f.git('commit', '-qam', 'divergent target'); f.request.target = f.git('rev-parse', 'HEAD');
+    assert.throws(() => f.port().prepare({ operationId: 'conflict', request: f.request }), /land-conflict-aborted/);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(f.git('rev-parse', 'source'), f.request.source); assert.equal(fs.readFileSync(path.join(f.repo, 'a'), 'utf8'), 'divergent main\n'); assert.equal(fs.existsSync(path.join(f.repo, '.git/MERGE_HEAD')), false);
+    const candidates = path.join(f.repo, '.fgos/runtime/git-candidates'); for (const name of fs.readdirSync(candidates)) assert.equal(execFileSync('git', ['-C', path.join(candidates, name), 'status', '--porcelain'], { encoding: 'utf8' }), '');
+  } finally { f.close(); }
+});
+test('missing footprint fails safe while a return subtree leaves unrelated dirt alone', () => {
+  const f = fixture(); try {
+    fs.writeFileSync(path.join(f.repo, 'b'), 'keep outside subtree');
+    assert.throws(() => f.port().prepare({ operationId: 'no-footprint', request: { ...f.request, footprint: null } }), /main-checkout-dirty-mid-merge/);
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'subtree', request: { ...f.request, footprint: null, subtree: 'a' } }); assert.equal(p.publish(evidence(c)).checkout, 'pending'); assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'keep outside subtree');
+  } finally { f.close(); }
+});
+test('an ignored store collision publishes once with a pending checkout and preserves its local bytes', () => {
+  const f = fixture(); try {
+    f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{"incoming":true}'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'incoming non-event config'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
+    fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), '.fgos/\n'); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), 'keep local config');
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'ignored-store', request: f.request }); assert.equal(p.publish(evidence(c)).checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, '.fgos/config.json'), 'utf8'), 'keep local config');
+  } finally { f.close(); }
+});
+test('a dirty file obstructing an incoming directory belongs to the clean gate', () => {
+  const f = fixture(); try {
+    f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'incoming-dir')); fs.writeFileSync(path.join(f.repo, 'incoming-dir/file'), 'incoming'); f.git('add', 'incoming-dir/file'); f.git('commit', '-qm', 'incoming directory'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk'); fs.writeFileSync(path.join(f.repo, 'incoming-dir'), 'keep obstructing bytes');
+    assert.throws(() => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
+  } finally { f.close(); }
+});

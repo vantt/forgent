@@ -24,3 +24,5 @@ export { createGitWorktree } from './worktree.mjs';
 
 export { createGitScopedCommit } from './scoped-commit.mjs';
 export { createGitSync } from './sync.mjs';
+
+export { createGitLand } from './land.mjs';

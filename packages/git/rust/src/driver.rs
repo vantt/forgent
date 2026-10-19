@@ -478,6 +478,54 @@ impl GitDriver {
         Ok(ResolveRepo::Repository(repo))
     }
 
+    /// Shared operation-local checkout door. Resource authority is selected by
+    /// the operation; topology/config and post-hook fencing belong here.
+    pub(crate) fn checkout_call_borrowed(
+        &self,
+        repo: &RepoHandle,
+        h: &fgos_holder_lock::Handle,
+        args: &[&str],
+        input: &[u8],
+        hooks: bool,
+    ) -> Result<Output> {
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let root = repo
+            .work_tree
+            .as_deref()
+            .ok_or_else(|| refusal("checkout-required"))?;
+        let current = match self.resolve_topology(root, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => r,
+            _ => return Err(refusal("untrusted-worktree")),
+        };
+        if current.git_dir != repo.git_dir
+            || current.common_dir != repo.common_dir
+            || current.work_tree != repo.work_tree
+        {
+            return Err(refusal("untrusted-worktree"));
+        }
+        fgos_holder_lock::validate(h).map_err(|e| refusal(e.to_string()))?;
+        let out = self.invoke_input(
+            Some(repo),
+            root,
+            args,
+            if hooks {
+                Policy::HookContext
+            } else {
+                Policy::Publication
+            },
+            Some(h),
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(120),
+            input,
+        );
+        if hooks {
+            self.refresh_checkout_facts(repo)?;
+        }
+        out
+    }
+
     /// Operation-layer door: even config reads borrow the caller's seal.
     pub(crate) fn publication_call(
         &self,

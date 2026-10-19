@@ -310,6 +310,49 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     Ok(())
 }
 impl GitDriver {
+    pub(crate) fn ignored_checkout_collisions(
+        &self,
+        repo: &RepoHandle,
+        candidate: &str,
+    ) -> Result<Vec<Vec<u8>>> {
+        let ignored = self.checked(
+            repo,
+            &[
+                "ls-files",
+                "--full-name",
+                "--others",
+                "--ignored",
+                "--exclude-standard",
+                "-z",
+            ],
+            Policy::Inspect,
+        )?;
+        let incoming = self.checked(
+            repo,
+            &["ls-tree", "-r", "--name-only", "-z", candidate],
+            Policy::Inspect,
+        )?;
+        let incoming: std::collections::BTreeSet<&[u8]> = incoming
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+            .collect();
+        Ok(ignored
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+            .filter(|p| {
+                incoming.contains(*p)
+                    || p.iter()
+                        .enumerate()
+                        .any(|(i, b)| *b == b'/' && incoming.contains(&p[..i]))
+                    || incoming.range(*p..).next().is_some_and(|q| {
+                        q.strip_prefix(*p)
+                            .is_some_and(|rest| rest.starts_with(b"/"))
+                    })
+            })
+            .map(<[u8]>::to_vec)
+            .collect())
+    }
+
     pub(crate) fn checkouts(
         &self,
         repo: &RepoHandle,
@@ -626,39 +669,7 @@ impl GitDriver {
             // read-tree's dry-run does not consistently reject ignored-file
             // replacement. Preserve ignored content by checking its byte paths
             // against the incoming tree, including file/directory collisions.
-            let ignored = self.checked(
-                target,
-                &[
-                    "ls-files",
-                    "--full-name",
-                    "--others",
-                    "--ignored",
-                    "--exclude-standard",
-                    "-z",
-                ],
-                Policy::Inspect,
-            )?;
-            let incoming = self.checked(
-                target,
-                &["ls-tree", "-r", "--name-only", "-z", next.as_str()],
-                Policy::Inspect,
-            )?;
-            let incoming: std::collections::BTreeSet<&[u8]> = incoming
-                .split(|b| *b == 0)
-                .filter(|p| !p.is_empty())
-                .collect();
-            let collision = ignored
-                .split(|b| *b == 0)
-                .filter(|p| !p.is_empty())
-                .any(|p| {
-                    incoming.contains(p)
-                        || p.iter()
-                            .enumerate()
-                            .any(|(i, b)| *b == b'/' && incoming.contains(&p[..i]))
-                        || incoming.range(p..).next().is_some_and(|q| {
-                            q.strip_prefix(p).is_some_and(|rest| rest.starts_with(b"/"))
-                        })
-                });
+            let collision = !self.ignored_checkout_collisions(target, next.as_str())?.is_empty();
             if collision {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))

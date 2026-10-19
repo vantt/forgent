@@ -566,6 +566,31 @@
                       "required": [
                         "Sync"
                       ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "Land": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "request": {
+                              "$ref": "#/$defs/landRequest"
+                            },
+                            "candidate": {
+                              "$ref": "#/$defs/landCandidate"
+                            }
+                          },
+                          "required": [
+                            "request",
+                            "candidate"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "Land"
+                      ]
                     }
                   ]
                 },
@@ -1088,6 +1113,27 @@
                     "kind",
                     "cause"
                   ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "land"
+                    },
+                    "checkout": {
+                      "enum": [
+                        "reconciled",
+                        "pending",
+                        "notApplicable",
+                        "recoveryRequired"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "checkout"
+                  ]
                 }
               ]
             }
@@ -1285,6 +1331,31 @@
             "phase",
             "data"
           ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "land-verified"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "evidence": {
+                  "$ref": "#/$defs/landEvidence"
+                }
+              },
+              "required": [
+                "evidence"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
         }
       ]
     },
@@ -1304,5 +1375,155 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:fgos:git:wal-record:v1",
   "title": "Git WAL immutable envelope v1",
-  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig, Remote, Worktree, ScopedCommit and Sync. Sync records its prepared index state and a one-shot commit-attempt barrier before moving the checkout ref. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority. Worktree records bind canonical paths, the exact registration identity, tip and consumer delivery digest; interrupted effects are never repeated."
+  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig, Remote, Worktree, ScopedCommit, Sync and Land. Sync records its prepared index state and a one-shot commit-attempt barrier before moving the checkout ref. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority. Worktree records bind canonical paths, the exact registration identity, tip and consumer delivery digest; interrupted effects are never repeated. Land freezes the candidate and opaque consumer evidence before its one-shot target attempt; business settlement remains consumer-owned.",
+  "$defs": {
+    "landRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "destination": {
+          "type": "string",
+          "pattern": "^refs/heads/"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "squash": {
+          "type": "boolean"
+        },
+        "footprint": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "subtree": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytes": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                }
+              }
+            },
+            "required": [
+              "path",
+              "bytes"
+            ]
+          }
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "destination",
+        "message",
+        "squash",
+        "footprint",
+        "subtree",
+        "files"
+      ]
+    },
+    "landCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "worktree": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "candidate": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "treeDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "worktree",
+        "source",
+        "target",
+        "candidate",
+        "tree",
+        "treeDigest"
+      ]
+    },
+    "landEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "candidate": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "treeDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidenceDigest": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "candidate",
+        "treeDigest",
+        "evidenceDigest"
+      ]
+    }
+  }
 }

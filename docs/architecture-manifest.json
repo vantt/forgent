@@ -340,6 +340,7 @@
     "src/setup/event-store-fixes.mjs": "use-case",
     "src/event-store/config.mjs": "infra",
     "src/git/scoped-commit.mjs": "infra",
-    "src/git/sync.mjs": "infra"
+    "src/git/sync.mjs": "infra",
+    "src/git/land.mjs": "infra"
   }
 }

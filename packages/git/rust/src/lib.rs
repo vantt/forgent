@@ -3,6 +3,8 @@
 //! Publication uses caller-held opaque holder-lock authority, hardened borrowed
 //! children and a file WAL. There is no public raw-argv escape hatch.
 mod driver;
+mod land;
+pub use land::{LandRequest, LandFile, LandEvidence, LandCandidate, LandSession};
 mod inspect;
 mod refs;
 mod worktree;

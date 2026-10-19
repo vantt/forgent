@@ -1,6 +1,6 @@
 //! Exact, custody-backed commit transaction. Hooks run once, via Git.
 use crate::{
-    driver::{Output, Policy},
+    driver::Output,
     refs::{failure, recovery, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
@@ -11,7 +11,6 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::Path,
-    time::Duration,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -584,17 +583,6 @@ impl GitDriver {
         input: &[u8],
         hooks: bool,
     ) -> Result<Output> {
-        self.require_floor()?;
-        self.preflight(repo)?;
-        // Re-resolve topology, including reciprocal registration, before every child.
-        let current = match self.resolve_topology(root(repo)?, repo.trusted_main_root())? {
-            ResolveRepo::Repository(r) => r,
-            _ => return Err(failure("untrusted-worktree")),
-        };
-        if current.git_dir != repo.git_dir || current.common_dir != repo.common_dir
-            || current.work_tree != repo.work_tree {
-            return Err(failure("untrusted-worktree"));
-        }
         let h = handle(scope, repo)?;
         #[cfg(unix)]
         if h.name() == "dispatch-cwd"
@@ -602,27 +590,7 @@ impl GitDriver {
         {
             return Err(failure("checkout-custody-stale"));
         }
-        let out = self.invoke_input(
-            Some(repo),
-            root(repo)?,
-            args,
-            if hooks {
-                Policy::HookContext
-            } else {
-                Policy::Publication
-            },
-            Some(h),
-            true,
-            64 * 1024 * 1024,
-            Duration::from_secs(120),
-            input,
-        );
-        // Hooks can rewrite config/topology even on rejection or timeout. Check
-        // before any subsequent Git command (including cleanup/recovery reads).
-        if hooks {
-            self.refresh_checkout_facts(repo)?;
-        }
-        out
+        self.checkout_call_borrowed(repo, h, args, input, hooks)
     }
     pub(crate) fn checkout_bytes(
         &self,

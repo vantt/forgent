@@ -145,7 +145,8 @@ fn prefix(entry: &str) -> String {
         .collect::<Vec<_>>()
         .join("/")
 }
-fn overlaps(a: &str, b: &str) -> bool {
+/// Whether normalized literal path prefixes intersect (empty denotes the root).
+pub fn overlaps(a: &str, b: &str) -> bool {
     a.is_empty()
         || b.is_empty()
         || a == b

@@ -103,7 +103,11 @@ pub struct SyncIntent {
     pub message: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LandIntent { pub request: crate::LandRequest, pub candidate: crate::LandCandidate }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
+    Land(Box<LandIntent>),
     ScopedCommit(Box<ScopedCommitIntent>),
     Sync(Box<SyncIntent>),
     PublicationCas,
@@ -174,6 +178,7 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Land { checkout: String },
     Commit {
         observed: String,
         contract_violation: bool,
@@ -215,6 +220,7 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
+    LandVerified { evidence: crate::LandEvidence },
     Intent(Intent),
     Prepared,
     SyncState {
@@ -355,6 +361,22 @@ impl Intent {
             || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
+        }
+        if let OperationKind::Land(payload) = &self.kind {
+            let c = &payload.candidate;
+            let r = &payload.request;
+            if !r.destination.starts_with("refs/heads/") || RefName::parse(&r.destination).is_err()
+                || self.resource_set.first() != Some(&r.destination)
+                || self.resource_set.len() != 2
+                || !checkout_resource_valid(&self.resource_set[1..], &c.worktree.to_string_lossy())
+                || !Path::new(&c.worktree).is_absolute()
+                || c.source != r.source || c.target != r.target
+                || self.expected != Tip::Oid(r.target.clone()) || self.next != Tip::Oid(c.candidate.clone())
+                || canonical_digest(&c.tree)? != c.tree_digest {
+                return Err(corrupt("land binding"));
+            }
+            for oid in [&r.source, &r.target, &c.candidate, &c.tree] { Oid::parse(oid,self.object_format).map_err(|_|corrupt("land oid"))?; }
+            return Ok(());
         }
         if let OperationKind::ScopedCommit(payload) = &self.kind {
             let ScopedCommitIntent {
@@ -718,6 +740,10 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             i.kind,
             OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
         ),
+        (Phase::Prepared, Phase::LandVerified { evidence }) => {
+            matches!(&i.kind, OperationKind::Land(p) if evidence.source == p.candidate.source && evidence.target == p.candidate.target && evidence.candidate == p.candidate.candidate && evidence.tree_digest == p.candidate.tree_digest && !evidence.evidence_digest.is_empty())
+        }
+        (Phase::LandVerified { .. }, Phase::TargetAttempt { prior_target_attempt: None, expected, next }) => matches!(i.kind,OperationKind::Land(_)) && expected == &i.expected && next == &i.next,
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
@@ -736,7 +762,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 expected,
                 next,
             },
-        ) => expected == &i.expected && next == &i.next,
+        ) => !matches!(i.kind,OperationKind::Land(_)) && expected == &i.expected && next == &i.next,
         (
             Phase::TargetAttempt { .. },
             Phase::SyncState {
@@ -763,6 +789,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
             Phase::Outcome(o),
         ) => match o {
+            Outcome::Land { checkout } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
@@ -797,6 +824,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                     OperationKind::PublicationCas
                         | OperationKind::RefUpdate { .. }
                         | OperationKind::RefDelete
+                        | OperationKind::Land(_)
                 ) || details.len() > 1024
                     || (*acknowledged && *unknown)
                 {
@@ -830,6 +858,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                     OperationKind::PublicationCas
                         | OperationKind::RefUpdate { .. }
                         | OperationKind::RefDelete
+                        | OperationKind::Land(_)
                 )
             }
             Outcome::Superseded {
@@ -1630,6 +1659,7 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Land { checkout } => vec!["d".into(), checkout.clone()],
         Outcome::Commit {
             observed,
             contract_violation,
@@ -1692,6 +1722,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("d") => o.len() == 2 && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
         Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
         Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
@@ -1737,6 +1768,7 @@ impl CompactReceipt {
             "r" => Outcome::CommitRejected {
                 cause: r[1].clone(),
             },
+            "d" => Outcome::Land { checkout: r[1].clone() },
             "w" => Outcome::Worktree {
                 completed: r[1] == "true",
                 details: vec![],

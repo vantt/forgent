@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add dormant Git Land prepare/publish ports with immutable candidates, consumer verification binding, own-file checkout protection, one-shot CAS and operation-id receipt replay; production callers remain unchanged.
+
 - Git checkout operations revalidate config file stamps before each child and refuse post-hook promisor changes while retaining the reduced preflight exec count.
 
 - Git: reuse config and storage-format checks within each ScopedCommit/Sync call, recheck after hooks, and retain per-child topology and custody validation.
