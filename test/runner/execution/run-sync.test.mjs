@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';

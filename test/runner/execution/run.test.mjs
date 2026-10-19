@@ -8,7 +8,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
+import { recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';

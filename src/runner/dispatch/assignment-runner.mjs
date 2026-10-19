@@ -54,7 +54,7 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli, withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
-import { resolveExecutorEnv, workerBaseEnv } from './adapters.mjs';
+import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
@@ -589,15 +589,18 @@ const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
  * needs to open the brief, and -- for codex, whose shell commands run under a shared daemon that does not
  * inherit the pane's environment -- the attempt's writer id as an explicit setting.
  */
-function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId }) {
+export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId, caseContext = null }) {
   const args = withRunDirReadAccess({
     adapter: 'herdr-spawn',
     interactiveMode: resolvedCmd.interactiveMode,
     args: agentArgsWithoutPrompt({ argsTemplate: resolvedCmd.argsTemplate, args: resolvedCmd.args, prompt, model }),
     runDir,
   });
+  // The case the attempt was admitted into travels beside the writer id: a codex shell command does not
+  // get the pane's environment, so the nested `fgos` call would otherwise carry no case at all.
+  const settings = [`FGOS_SESSION_ID="${writerId}"`, ...(caseContext ? [`${CASE_ID_ENV}="${caseContext.caseId}"`, `${CASE_RESERVATION_ENV}="${caseContext.reservationId}"`] : [])];
   return commandCli(resolvedCmd.command) === 'codex'
-    ? [...args, '-c', `shell_environment_policy.set={FGOS_SESSION_ID="${writerId}"}`]
+    ? [...args, '-c', `shell_environment_policy.set={${settings.join(',')}}`]
     : args;
 }
 
@@ -2261,6 +2264,8 @@ export async function executeAssignment(assignment, opts = {}) {
           // source; neither pins anything for the unsubstituted
           invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
         });
+        // Admitted into a case: the worker's own environment names it, from this admission and no other.
+        if (opts.caseContext) resolvedCmd = { ...resolvedCmd, env: { ...resolvedCmd.env, ...caseContextEnv(opts.caseContext) } };
         launchModelCheck = resolvedCmd.modelCheck;
         launchReasoningEffort = resolvedCmd.reasoningEffort;
       } catch (err) {
@@ -2275,7 +2280,7 @@ export async function executeAssignment(assignment, opts = {}) {
       const attemptIdentity = { writerId: attemptWriterId, parentWriterId };
       const terminalSocket = terminalMode ? terminalSocketPath(launchCommandId) : null;
       const attemptArgs = terminalMode
-        ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: path.resolve(runDir), writerId: attemptWriterId })
+        ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: path.resolve(runDir), writerId: attemptWriterId, caseContext: opts.caseContext ?? null })
         : resolvedCmd.args;
 
       // 5. Prepare Confinement For Launch via Confinement Authority
