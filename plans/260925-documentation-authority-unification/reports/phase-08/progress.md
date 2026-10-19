@@ -1,3 +1,99 @@
+# Step 03 wave 1 — AUTHOR handback; independent sample review pending
+
+Batches **003–033: 75/75 files, 642 inventory + 69 author-added = 711 edges** at author pin `ae141550c2e022310de7a0efea757580c0b2479f`. Complete pinned sources total **778,907 bytes**; no file differs from the inventory input, so no passage rebinding is needed. Records only: **48 patch / 70 parked / 50 Phase 9 row-flip / 543 preserve**. The 48 patch edges produce **13 complete per-file diffs**; no consumer edit or authority flip is applied. [Records](step-03-records/), [frozen hashes/selector](step-03-wave1-sample.json), [whole-file traversal and per-file measurements](step-03-wave1-whole-file-reads.json), [verification](step-03-wave1-verification.json).
+
+**Parks: phase9-carry 43; description-rewrite 27; all other categories 0. New lead-ruling gaps: none.** Carry parks name the exact source claim whose mapped candidate is only carriage or lacks a live full holder. Description parks cover Stage/Step mismatch, obsolete intent-ledger read authority, the current-status SVG, exact facade/overlay/source-tree semantics and naming/scope corrections. Every non-preserve edge has replayed pinned resolver queries/aliases/counts/hashes and per-group categories. Preserve/park target facts bind actual Git existence or detected rename history. Supplemental references and contextual exclusions are one-to-one with the checker-run full-file scan; candidate-layout leaves, repository README names and proposed placeholders are excluded with their actual context.
+
+Each remaining patch records the complete adjacent paragraph/row, six description comparisons, pinned target evidence, precise/common-parent heading or substantive whole-document justification, complete label/relative form and hunk correspondence. Migration rows describe complete authority/status transitions, keeping retained-root dependencies explicit. Whole-source historical carriers and source/evidence columns preserve their original spellings with quoted framing. The migration-map source/evidence/input roles are distinguished from the separately historical README/scope map.
+
+**Checker: 0 failures / 96 files / 1,206 edges**, including unchanged accepted pilot (21 files / 495 edges) and this wave (75 / 711). [Actual result](step-03-wave1-check-result.json). The wrapper only selects explicit sets and verifies both frozen manifests through the unchanged accepted checker; no rule/check/probe/enum/baseline was weakened or changed. There are **0 wave locator-review flags**; 11 inherited pilot flags remain unchanged. `git diff --check` and new-artifact whitespace checks pass. All existing tracked bytes except this progress entry are unchanged from input HEAD, including the accepted pilot, checker/resolver/probes, census, owner answers and Phase 6 reproduction files. Full runtime suites and inherited probes were not rerun: no implementation behavior or checker logic changed.
+
+**A51: 9 selected files / 3 parts**, with 3 files per part, 79/59/54 edges and 254,227/377,050/207,416 measured source-plus-record bytes. [ONE review request](step-03-wave1-review-request.md) assigns only the selected files to unique `review-a38-step-03-wave1-p01.md` … `p03.md`; reviewers read complete source from Git at the pin and records directly, and must not run checker/probes. All 31 sets retain their own seed, patched population, full ranks, sample, mandatory witnesses and freeze hashes. The ≥40-total-edge supplement adds one conservative review file beyond the inventory-only threshold; no mandatory file is waived. **Reviewed 0; rework numerator pending per set**, never a pooled zero. >3% expands that set to all files. No reviewer is launched or self-accepted.
+
+**Author wall time through this checkpoint: 1037.36 seconds (17.29 minutes)** from the required acknowledgement, ending 2026-10-19T19:25:06.027149+00:00. The per-file table records source bytes, final JSONL record bytes and the measured initial serial traversal/resolution time. Shared analysis, corrections and verification belong to the total wall time, not fabricated per-file human-review time.
+
+| Consumer file | Source bytes | Record bytes | Initial traversal/resolution seconds |
+|---|---:|---:|---:|
+| `docs/architect/README.md` | 2829 | 58448 | 2.5941 |
+| `docs/architect/agent-coordination/README.md` | 10535 | 79021 | 9.0256 |
+| `docs/architect/agent-coordination/architecture/README.md` | 5406 | 97988 | 1.6487 |
+| `docs/architect/agent-coordination/contracts/README.md` | 1842 | 25777 | 1.2522 |
+| `docs/architect/agent-coordination/decisions/README.md` | 3016 | 18667 | 0.0202 |
+| `docs/architect/agent-coordination/history/README.md` | 736 | 1013 | 0.0180 |
+| `docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | 35162 | 9573 | 0.0335 |
+| `docs/architect/agent-coordination/proposals/README.md` | 3660 | 48032 | 5.7582 |
+| `docs/architect/agent-coordination/roadmap/README.md` | 1940 | 18220 | 0.0738 |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md` | 1597 | 16050 | 0.0674 |
+| `docs/architect/agent-coordination/verification/README.md` | 966 | 12258 | 0.0204 |
+| `docs/architect/agent-coordination/vocabulary/README.md` | 2174 | 35752 | 0.2843 |
+| `docs/architect/component-boundary/README.md` | 10296 | 203237 | 0.5203 |
+| `docs/architect/domainization/README.md` | 10848 | 24810 | 0.2188 |
+| `docs/architect/packaging-distribution/README.md` | 9620 | 7184 | 0.0187 |
+| `docs/architect/packaging-distribution/migration-map.md` | 13633 | 28635 | 0.0211 |
+| `docs/architect/packaging-distribution/scope-map.md` | 11217 | 15588 | 0.0208 |
+| `docs/architect/proposals/README.md` | 1516 | 15781 | 0.1843 |
+| `docs/architect/proposals/component-authority-boundary-map.md` | 49963 | 77896 | 3.6840 |
+| `docs/architect/roadmap.md` | 23435 | 54734 | 0.1237 |
+| `docs/architect/workspace-topology-roadmap.md` | 5752 | 10582 | 0.0226 |
+| `docs/generated/README.md` | 1170 | 3844 | 0.0623 |
+| `docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md` | 1699 | 2705 | 0.0179 |
+| `docs/platform/README.md` | 9323 | 51413 | 1.6135 |
+| `docs/platform/agent-confinement/README.md` | 2043 | 2895 | 0.0186 |
+| `docs/platform/agent-coordination/README.md` | 6693 | 28257 | 0.0254 |
+| `docs/platform/agent-coordination/architecture/README.md` | 7287 | 6360 | 0.0579 |
+| `docs/platform/agent-coordination/decisions/README.md` | 4134 | 4293 | 0.0212 |
+| `docs/platform/agent-coordination/history/README.md` | 1718 | 2836 | 0.0164 |
+| `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | 35898 | 8714 | 0.0267 |
+| `docs/platform/agent-coordination/history/retired-engine/README.md` | 20930 | 23490 | 0.0332 |
+| `docs/platform/agent-coordination/history/retired-engine/files/README.md` | 4083 | 5200 | 0.0185 |
+| `docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md` | 8408 | 12120 | 0.0214 |
+| `docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md` | 4473 | 6502 | 0.0207 |
+| `docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md` | 5733 | 9961 | 0.0206 |
+| `docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md` | 6389 | 13117 | 0.0217 |
+| `docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md` | 4591 | 8304 | 0.0205 |
+| `docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md` | 4011 | 8590 | 0.0186 |
+| `docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md` | 3549 | 6424 | 0.0173 |
+| `docs/platform/agent-coordination/history/retired-engine/files/verification/README.md` | 5669 | 18104 | 0.0205 |
+| `docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md` | 4535 | 5393 | 0.0232 |
+| `docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | 37406 | 12086 | 0.0333 |
+| `docs/platform/agent-coordination/history/retired-engine/legacy/README.md` | 13985 | 12430 | 0.0320 |
+| `docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md` | 8895 | 22343 | 0.0211 |
+| `docs/platform/agent-coordination/proposals/README.md` | 5039 | 3407 | 0.0865 |
+| `docs/platform/agent-coordination/verification/README.md` | 4099 | 17684 | 0.0197 |
+| `docs/platform/agent-coordination/vocabulary/README.md` | 3148 | 2681 | 0.0162 |
+| `docs/platform/architecture-map.md` | 59475 | 34205 | 0.0699 |
+| `docs/platform/claude-plugin/README.md` | 1765 | 2823 | 0.0169 |
+| `docs/platform/decision-citation-drift/README.md` | 1799 | 2925 | 0.0180 |
+| `docs/platform/distillery/README.md` | 1760 | 2808 | 0.0179 |
+| `docs/platform/documentation/history/templates/README.md` | 2502 | 1521 | 0.0195 |
+| `docs/platform/documentation/operations/portals/docs-portal.md` | 3088 | 15418 | 0.2089 |
+| `docs/platform/herdr-web-dashboard/README.md` | 1928 | 2889 | 0.0166 |
+| `docs/platform/history/documentation-authority-unification/README.md` | 2406 | 1029 | 0.0184 |
+| `docs/platform/host-invocation-routing/README.md` | 11785 | 7624 | 0.0205 |
+| `docs/platform/host-invocation-routing/architecture/README.md` | 2985 | 3829 | 0.0174 |
+| `docs/platform/host-invocation-routing/contracts/README.md` | 2910 | 1942 | 0.0162 |
+| `docs/platform/host-invocation-routing/decisions/README.md` | 3237 | 1019 | 0.0164 |
+| `docs/platform/host-invocation-routing/roadmap.md` | 52227 | 20958 | 0.0468 |
+| `docs/platform/host-invocation-routing/verification/README.md` | 2662 | 1022 | 0.0188 |
+| `docs/platform/observe/README.md` | 1843 | 2781 | 0.0194 |
+| `docs/platform/packaging-distribution/README.md` | 24736 | 21137 | 0.0286 |
+| `docs/platform/packaging-distribution/history/documentation-migration/migration-map.md` | 14843 | 27188 | 0.0262 |
+| `docs/platform/proposals/README.md` | 4705 | 8607 | 0.0148 |
+| `docs/platform/proposals/component-authority-boundary-map.md` | 51833 | 34015 | 0.0467 |
+| `docs/platform/runner/README.md` | 6014 | 5420 | 0.0273 |
+| `docs/platform/system-architecture/architecture/roadmap.md` | 24670 | 12467 | 0.0243 |
+| `docs/platform/system-architecture/architecture/workspace-topology-roadmap.md` | 7063 | 6302 | 0.0191 |
+| `docs/platform/ui-spec/README.md` | 4241 | 3105 | 0.0202 |
+| `docs/platform/work-state/README.md` | 4601 | 27916 | 0.1240 |
+| `docs/reference/codebase-scatter-consolidation-roadmap.md` | 4982 | 2565 | 0.0188 |
+| `docs/user/README.md` | 1136 | 10754 | 0.0184 |
+| `docs/README.md` | 2195 | 17558 | 0.0233 |
+| `docs/architecture-map.md` | 54465 | 39832 | 1.0338 |
+
+Next: runner commits the authored records. Lead owns independent sample dispatch/budget, per-set acceptance or expansion, actual runner-commit accounting in both protected Phase 6 manifests, then clean committed-byte proof. Existing pilot GAP-02 full-content carry, workflow carry/re-resolution and Step 5 parity obligations remain; Step 3 acceptance, Phase 8 close and Phase 9 authorization are not claimed. No extra write scope is needed. Scratch stayed in /tmp/fgos-work; required atomic outbox is the exception. No fgos CLI, git write, state/secrets access, service startup, consumer edit or generated/control/baseline change. Markdown preview remains with Lead under this record-only scope.
+
+---
+
 # Step 03 pilot round 4 — AUTHOR handback; narrowed independent review pending
 
 Author pin `ae141550c2e022310de7a0efea757580c0b2479f`; same 21 untouched consumer files. [Round-3 archive](step-03-records-r3/) is byte-identical to input HEAD, including its manifest. Current records remain cutover patch specifications; no consumer edit or authority flip is applied.

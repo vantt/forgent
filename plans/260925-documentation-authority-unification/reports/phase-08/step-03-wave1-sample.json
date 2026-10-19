@@ -1,0 +1,1922 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/architect/README.md",
+      "set": "batch-003",
+      "sourceBytes": 2829,
+      "digest": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "inventoryFileDigest": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "diffSha256": "557d269dce35af80d441d0a5763ce8067b9cf2223bca8125edf587c8e73d868a",
+      "recordSha256": "d0125bb1f298c2d56c1e63e30f229a18fe63e828e3a654e5ef0d63e0227084d0",
+      "recordBytes": 58448,
+      "edgeCount": 15,
+      "dispositions": {
+        "parked": 11,
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/README.md",
+      "set": "batch-004",
+      "sourceBytes": 10535,
+      "digest": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "inventoryFileDigest": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "diffSha256": "844cf6497d74d3541caef4ffbd22978dc229e423ebb8be9bb04f4fde15c14d0c",
+      "recordSha256": "49ac10dec13cbda473cfd99e88297f32737c92fd3e6d9c0d5fbcab1f049480c4",
+      "recordBytes": 79021,
+      "edgeCount": 46,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 45
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/README.md",
+      "set": "batch-004",
+      "sourceBytes": 5406,
+      "digest": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "inventoryFileDigest": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "diffSha256": "fb82ff0918ee96bb583c541d37024a9c378ae3b61ed4fde77ede2deb7666f2cf",
+      "recordSha256": "fd81c6b597c449aa599ab791c0198cf87de120066394199aadcfbda19ad3a732",
+      "recordBytes": 97988,
+      "edgeCount": 18,
+      "dispositions": {
+        "patch": 10,
+        "parked": 4,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1842,
+      "digest": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "inventoryFileDigest": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "diffSha256": "d8288151b5a83b8e37b1d01aa09214c95f65d0c0f6d5456345092aab55adc8e6",
+      "recordSha256": "9ffdd6c5c0555fbbf72e8f0017987f8795be0fe3857d937830fd076d0752f5a7",
+      "recordBytes": 25777,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 2,
+        "parked": 3
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "set": "batch-004",
+      "sourceBytes": 3016,
+      "digest": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "inventoryFileDigest": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fb1d0e36c33518abc688211dfe88e462aface89024406451d0e8527418d07516",
+      "recordBytes": 18667,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 13
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/README.md",
+      "set": "batch-004",
+      "sourceBytes": 736,
+      "digest": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "inventoryFileDigest": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "23de8ea3065e022fd632f0c91c26099c4b7c029522c42d2ad277309066e28f14",
+      "recordBytes": 1013,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-004",
+      "sourceBytes": 35162,
+      "digest": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "inventoryFileDigest": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5dc5e7e3c57974c0bdaed2a17ce88d473c68d74f033cc243126f8b9f4c9d6d2b",
+      "recordBytes": 9573,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/README.md",
+      "set": "batch-004",
+      "sourceBytes": 3660,
+      "digest": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "inventoryFileDigest": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "diffSha256": "ad3ef502e4d51c21f33d88de2bb7d9bc92a5e69f36418022a208e9e6816fa774",
+      "recordSha256": "da5eec1be9d1a645da268429f4fab544d4c01a154e7342224f0f4137e98c50f0",
+      "recordBytes": 48032,
+      "edgeCount": 14,
+      "dispositions": {
+        "patch": 3,
+        "parked": 6,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1940,
+      "digest": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "inventoryFileDigest": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "diffSha256": "8a740a6ea62e643587e4f917e4fc0e6131652520e2f2a1b18e1d79e9fbe4c93b",
+      "recordSha256": "2308cf0e94002fb4f4f9a8783147d5c18e413272704ac9b7a30d4e458b8cacf1",
+      "recordBytes": 18220,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1597,
+      "digest": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "inventoryFileDigest": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f0f982c50d9fa12c6d3bbb86b6d531f988f9d71f0ed63215b293b5ebc1b92c8a",
+      "recordBytes": 16050,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 12,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/README.md",
+      "set": "batch-004",
+      "sourceBytes": 966,
+      "digest": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "inventoryFileDigest": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "diffSha256": "0b496591de0982f2c41b784086120085604da6aa4b6ea1bcbaa0f7b18cad6ad7",
+      "recordSha256": "c48dd17a2d6052efb89e99dce3d2bd6ca6fa922aa26113b3f7b4a1482162b417",
+      "recordBytes": 12258,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/README.md",
+      "set": "batch-004",
+      "sourceBytes": 2174,
+      "digest": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "inventoryFileDigest": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "diffSha256": "d0c7d75ccb50e558df53544126c62e39ed862f8731d309343f635ad043f9a4fc",
+      "recordSha256": "d64b244794f1901319f61116fa3ff8d4a1961f0d1e6f0720103d1a5c3bddddf6",
+      "recordBytes": 35752,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 4,
+        "parked": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/architect/component-boundary/README.md",
+      "set": "batch-005",
+      "sourceBytes": 10296,
+      "digest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "inventoryFileDigest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "diffSha256": "733826cd0579c18d2433e4259fd0812a6b9f1e7ab40a65889a29952ec52e9938",
+      "recordSha256": "7dbe1ec436e61df485fe0ab74debc58ff0cdfb5286320bb0ef653a78402f3493",
+      "recordBytes": 203237,
+      "edgeCount": 28,
+      "dispositions": {
+        "parked": 7,
+        "patch": 17,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/architect/domainization/README.md",
+      "set": "batch-006",
+      "sourceBytes": 10848,
+      "digest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "inventoryFileDigest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "diffSha256": "7fcdbf599f739a3ddbeb0819f611d8cf99ff52972aad9ebeefa01b9ee41b4ae5",
+      "recordSha256": "f3aced58220eeba6bcd6df9603d9293db1fc953494456595950709ac4d79b079",
+      "recordBytes": 24810,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/README.md",
+      "set": "batch-007",
+      "sourceBytes": 9620,
+      "digest": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "inventoryFileDigest": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "57ab3de5b42fbd1b971f37e4c6b1bf8555610e68fd67604deea005b394e58ad9",
+      "recordBytes": 7184,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/migration-map.md",
+      "set": "batch-007",
+      "sourceBytes": 13633,
+      "digest": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "inventoryFileDigest": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cb3a4074b378d8ac10d1e36ada0a1b73ce920a482a80c75210a69d827f5e0013",
+      "recordBytes": 28635,
+      "edgeCount": 25,
+      "dispositions": {
+        "preserve": 25
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/scope-map.md",
+      "set": "batch-007",
+      "sourceBytes": 11217,
+      "digest": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "inventoryFileDigest": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b22f7dbac35ccfba701e4061db303771ae90f3cdbe7bccfce57f9a3c716af137",
+      "recordBytes": 15588,
+      "edgeCount": 12,
+      "dispositions": {
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/architect/proposals/README.md",
+      "set": "batch-008",
+      "sourceBytes": 1516,
+      "digest": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "inventoryFileDigest": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a2a4957d9261b9241823fc65eddcb547e73a3f8fdf1df180d12727a97bff903a",
+      "recordBytes": 15781,
+      "edgeCount": 6,
+      "dispositions": {
+        "parked": 6
+      }
+    },
+    {
+      "file": "docs/architect/proposals/component-authority-boundary-map.md",
+      "set": "batch-008",
+      "sourceBytes": 49963,
+      "digest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "inventoryFileDigest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "diffSha256": "9256e109ed6379cd180e01a9bfd9e393e8ad47ad607032489e5d00e43d13191d",
+      "recordSha256": "3514c59678cc8fa6e94a7d071ee6aea50b6c3ff25af63d3dbd4bf08b7d174e16",
+      "recordBytes": 77896,
+      "edgeCount": 25,
+      "dispositions": {
+        "preserve": 9,
+        "patch": 1,
+        "parked": 15
+      }
+    },
+    {
+      "file": "docs/architect/roadmap.md",
+      "set": "batch-009",
+      "sourceBytes": 23435,
+      "digest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "inventoryFileDigest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "diffSha256": "36eb4bba75a7446cf2d327e4c48321bb4d5ca1eca37311ab1c2b7ecc5c790ab3",
+      "recordSha256": "3a83ccf146044144166e7c610b64f0f2f9eeeb26c464583928cde078b262b4c5",
+      "recordBytes": 54734,
+      "edgeCount": 11,
+      "dispositions": {
+        "parked": 9,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/architect/workspace-topology-roadmap.md",
+      "set": "batch-010",
+      "sourceBytes": 5752,
+      "digest": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "inventoryFileDigest": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "485135c3e8339dd318ef5330c576abb84c99e90b089809853edfe7a422a7058e",
+      "recordBytes": 10582,
+      "edgeCount": 4,
+      "dispositions": {
+        "parked": 4
+      }
+    },
+    {
+      "file": "docs/generated/README.md",
+      "set": "batch-011",
+      "sourceBytes": 1170,
+      "digest": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "inventoryFileDigest": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cba3943c32fdcdb8e1adfa961645b36f6db12f64528ba261eea0e598e6d32ea7",
+      "recordBytes": 3844,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "set": "batch-012",
+      "sourceBytes": 1699,
+      "digest": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "inventoryFileDigest": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d79d4b3fed51774e77a728b862b6a728ae31b07b3886569d56278a176b02b4e8",
+      "recordBytes": 2705,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/README.md",
+      "set": "batch-013",
+      "sourceBytes": 9323,
+      "digest": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "inventoryFileDigest": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "39f3433c44c6a70a8d497c344c0504afac0e8a605a3b1cece85d8d89db72d4db",
+      "recordBytes": 51413,
+      "edgeCount": 23,
+      "dispositions": {
+        "phase9-row-flip": 22,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/README.md",
+      "set": "batch-014",
+      "sourceBytes": 2043,
+      "digest": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "inventoryFileDigest": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a144df3c481c03baf40137589162a718c57af53fc23bd3e67e12d5b217c8285d",
+      "recordBytes": 2895,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/README.md",
+      "set": "batch-015",
+      "sourceBytes": 6693,
+      "digest": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "inventoryFileDigest": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "diffSha256": "ebd9e2fbc3103b6df1b6317dbea41e2cc99d373f4ec9d32530a5e91e44ea0f61",
+      "recordSha256": "0358a6671f54c5703128a9cc5b1f3ef3779ae6de555d5aa2f4297e3ffcfeeacb",
+      "recordBytes": 28257,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/README.md",
+      "set": "batch-015",
+      "sourceBytes": 7287,
+      "digest": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "inventoryFileDigest": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d1a0b1ca53446aa4ce77686263ae4c30153841f7cae198cd91348fbb38f67453",
+      "recordBytes": 6360,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4134,
+      "digest": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "inventoryFileDigest": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9cbbd3fdc69669591344500bc5a15d83bdb0dfe1fc23cbc58f9443311a433737",
+      "recordBytes": 4293,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/README.md",
+      "set": "batch-015",
+      "sourceBytes": 1718,
+      "digest": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "inventoryFileDigest": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3b9c750e182502ab0adf8d2c125581abe92a51b6615a538b11e21eee3298c6d5",
+      "recordBytes": 2836,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-015",
+      "sourceBytes": 35898,
+      "digest": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "inventoryFileDigest": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "290ce3785af2e2c14e9bc9cb4c7bdf911b187077ab4a604fe2cb891aa750d98c",
+      "recordBytes": 8714,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "set": "batch-015",
+      "sourceBytes": 20930,
+      "digest": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "inventoryFileDigest": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3873450010d1c4e356b0e08c2d63b2470f5ab5192cc328d8e6a407df0dbb53df",
+      "recordBytes": 23490,
+      "edgeCount": 19,
+      "dispositions": {
+        "preserve": 19
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4083,
+      "digest": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "inventoryFileDigest": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "456720b3685e00c5ee6582a97e854ad54ab47a2b51ef25de20c3eca96f83410b",
+      "recordBytes": 5200,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "set": "batch-015",
+      "sourceBytes": 8408,
+      "digest": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "inventoryFileDigest": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a36dcea4beada0873162551d64ff4d40e1f60721b71e5e74c5d58c5cf06a0a1a",
+      "recordBytes": 12120,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4473,
+      "digest": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "inventoryFileDigest": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f3934aa6dcbb68d973b73e78e3eab45d7997a24e631fe8611c62f29a3c97f6f1",
+      "recordBytes": 6502,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5733,
+      "digest": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "inventoryFileDigest": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3c4cb9e13a76da520b0fe86d54f8f3a88a8caf200337dec4b451c2b72bcd587d",
+      "recordBytes": 9961,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "set": "batch-015",
+      "sourceBytes": 6389,
+      "digest": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "inventoryFileDigest": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b44e59748eae532078f0ff88fa4e614ec62fe26a2dcab37e290f9723a0db4b68",
+      "recordBytes": 13117,
+      "edgeCount": 12,
+      "dispositions": {
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4591,
+      "digest": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "inventoryFileDigest": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4cff9dd3dc6ec8f63113f3857e074c227b3f39f1269b38b8d839455beab163ef",
+      "recordBytes": 8304,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4011,
+      "digest": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "inventoryFileDigest": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "113ee9e4772083b8a1bd00f7e856d9055451899f2e4dcddc0b90f77a4d21353d",
+      "recordBytes": 8590,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "set": "batch-015",
+      "sourceBytes": 3549,
+      "digest": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "inventoryFileDigest": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2095b88ae2575da8ff18fb352eaf1e2ed6cdcffcc389b0afaec687c539d7cf76",
+      "recordBytes": 6424,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5669,
+      "digest": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "inventoryFileDigest": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7bf52578a7d00205211d317b9add39494c30e77230eb4459bc75b3430ba46309",
+      "recordBytes": 18104,
+      "edgeCount": 16,
+      "dispositions": {
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4535,
+      "digest": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "inventoryFileDigest": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "127bf77308dd284eb180f768b20358d9205cfd16b9f9ea755145394bfbf9a168",
+      "recordBytes": 5393,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-015",
+      "sourceBytes": 37406,
+      "digest": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "inventoryFileDigest": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a8bb9ebb024338fb74091e6b4fcd77c771346a73f178bf742afea23858bd410b",
+      "recordBytes": 12086,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "set": "batch-015",
+      "sourceBytes": 13985,
+      "digest": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "inventoryFileDigest": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d29423abb5ac166d43045070301946d24e1fc070a5b41abacd164f3de6f507d3",
+      "recordBytes": 12430,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "set": "batch-015",
+      "sourceBytes": 8895,
+      "digest": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "inventoryFileDigest": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "06b69531febb15fd52cd9e3c27ec08f35abf66af7e733b92016219d0e76abbd0",
+      "recordBytes": 22343,
+      "edgeCount": 21,
+      "dispositions": {
+        "preserve": 21
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5039,
+      "digest": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "inventoryFileDigest": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "89717b5e42035ce943f225a4f03d93a95d4c1edcf6916f599e95b94ba5b481e0",
+      "recordBytes": 3407,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4099,
+      "digest": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "inventoryFileDigest": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "de9f23b750a13efae8d4f0beb4f31c127187881d46837d41043979a24606a1ff",
+      "recordBytes": 17684,
+      "edgeCount": 18,
+      "dispositions": {
+        "preserve": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/README.md",
+      "set": "batch-015",
+      "sourceBytes": 3148,
+      "digest": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "inventoryFileDigest": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c092ba117bdb5f8db89cd86c76437ab776ec10f3a3e5c268e70ec1057ce0030a",
+      "recordBytes": 2681,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/architecture-map.md",
+      "set": "batch-016",
+      "sourceBytes": 59475,
+      "digest": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "inventoryFileDigest": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "83c7d3e2702353daf7225f1910a6ae6b1f45659ae0314d12e4aa4f0e7e58b59c",
+      "recordBytes": 34205,
+      "edgeCount": 39,
+      "dispositions": {
+        "preserve": 38,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/claude-plugin/README.md",
+      "set": "batch-017",
+      "sourceBytes": 1765,
+      "digest": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "inventoryFileDigest": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e4acae7d9bd46bc35d26ac190ae18f25b0e53e93fa0843bad2a685b295c2a9a3",
+      "recordBytes": 2823,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/README.md",
+      "set": "batch-018",
+      "sourceBytes": 1799,
+      "digest": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "inventoryFileDigest": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "64a9be864975e722711bc96c8b6a82d072b95efc765482a6691054903bba7c54",
+      "recordBytes": 2925,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/distillery/README.md",
+      "set": "batch-019",
+      "sourceBytes": 1760,
+      "digest": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "inventoryFileDigest": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "14a893e012ed1804e0e9f0427333deefdd3874eb9a10f7c69e00bb50146784e3",
+      "recordBytes": 2808,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/README.md",
+      "set": "batch-020",
+      "sourceBytes": 2502,
+      "digest": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "inventoryFileDigest": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "99db0f3e605119c14e5049769f6f5ef8cb6e10c3e220f61c16e7aa2983484cf3",
+      "recordBytes": 1521,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "set": "batch-020",
+      "sourceBytes": 3088,
+      "digest": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "inventoryFileDigest": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8c05c127364cda1b4cffdaae3294c962671bea99737d7b0182bfd52e760fdaa5",
+      "recordBytes": 15418,
+      "edgeCount": 12,
+      "dispositions": {
+        "preserve": 8,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/README.md",
+      "set": "batch-021",
+      "sourceBytes": 1928,
+      "digest": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "inventoryFileDigest": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cae68e2ccd588e0ad0ce55ffcdb32e34fa35a225b02fc815f68a316c1170d38b",
+      "recordBytes": 2889,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/history/documentation-authority-unification/README.md",
+      "set": "batch-022",
+      "sourceBytes": 2406,
+      "digest": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "inventoryFileDigest": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ae7af77405965804dbdbffabb6187a55617ec607f7c0b74fc2baeb70fa91da1d",
+      "recordBytes": 1029,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/README.md",
+      "set": "batch-023",
+      "sourceBytes": 11785,
+      "digest": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "inventoryFileDigest": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a3b24a520c1e98ed64a2a3398704f9c58123eb1a8fb9065801f0f0fc1311fc59",
+      "recordBytes": 7624,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2985,
+      "digest": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "inventoryFileDigest": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4a4c712b04b79ce61ee878bbd5dfd97b15b0e74391aa677ee78424073ea1ae90",
+      "recordBytes": 3829,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2910,
+      "digest": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "inventoryFileDigest": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "512e728015aa11cf85737251d691d6703137e0b2ebcb44e52e9ce66ffef5ddb4",
+      "recordBytes": 1942,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/decisions/README.md",
+      "set": "batch-023",
+      "sourceBytes": 3237,
+      "digest": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "inventoryFileDigest": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fbc7592f9128356618200da7a96218914364783a6c35ff748926faed69ddf95b",
+      "recordBytes": 1019,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "set": "batch-023",
+      "sourceBytes": 52227,
+      "digest": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "inventoryFileDigest": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "826017a9cdc90a0bab00d7b8f80212259cdc137de15cb17bf21b41a5a8dda59d",
+      "recordBytes": 20958,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2662,
+      "digest": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "inventoryFileDigest": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "30c71877a5501679bd0722f1207e521f3a2c3bd323870d100fa77d2b93354a64",
+      "recordBytes": 1022,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/observe/README.md",
+      "set": "batch-024",
+      "sourceBytes": 1843,
+      "digest": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "inventoryFileDigest": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "adc34b10f0fdd35aea739299a39b03fc6133a63f4e77adab9117f49cb2495a76",
+      "recordBytes": 2781,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/README.md",
+      "set": "batch-025",
+      "sourceBytes": 24736,
+      "digest": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "inventoryFileDigest": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "430ab5ac0c7acf7914951718c8416690b0a743731ea3444f04ee9e8e09a48142",
+      "recordBytes": 21137,
+      "edgeCount": 14,
+      "dispositions": {
+        "preserve": 10,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "set": "batch-025",
+      "sourceBytes": 14843,
+      "digest": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "inventoryFileDigest": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2106e5decaf8b0dc144040d57ff2974b970a08be0d15f9fa419c76262576b4fc",
+      "recordBytes": 27188,
+      "edgeCount": 26,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/proposals/README.md",
+      "set": "batch-026",
+      "sourceBytes": 4705,
+      "digest": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "inventoryFileDigest": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a2bd2564e0ed88faa00df97aace9c627e6950cf01748d68f546b74d25751cc20",
+      "recordBytes": 8607,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "set": "batch-026",
+      "sourceBytes": 51833,
+      "digest": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "inventoryFileDigest": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "383d63c11cc8fe2e7532e29abff109a402f8f0d3241c07b8a41fc1209d632da0",
+      "recordBytes": 34015,
+      "edgeCount": 26,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/runner/README.md",
+      "set": "batch-027",
+      "sourceBytes": 6014,
+      "digest": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "inventoryFileDigest": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "08ab1a89b085b0936a15fc91b50024b2a1ee405f2ad553a17eb4185fe5459136",
+      "recordBytes": 5420,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/roadmap.md",
+      "set": "batch-028",
+      "sourceBytes": 24670,
+      "digest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "inventoryFileDigest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ea982610924bd68011f2b78cbef599dbfbd8a795ffbfb364d7dcab040ae582d4",
+      "recordBytes": 12467,
+      "edgeCount": 10,
+      "dispositions": {
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "set": "batch-028",
+      "sourceBytes": 7063,
+      "digest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "inventoryFileDigest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9da53b0b7a6c6d87c80343a146ea1317fb3efe44ec3097ae0e24a34dd2026a97",
+      "recordBytes": 6302,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/ui-spec/README.md",
+      "set": "batch-029",
+      "sourceBytes": 4241,
+      "digest": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "inventoryFileDigest": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "06bf16c0ad3cea46d0680e79df7c346a307d39770dd9615deb10e3bb96ac67e1",
+      "recordBytes": 3105,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/work-state/README.md",
+      "set": "batch-030",
+      "sourceBytes": 4601,
+      "digest": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "inventoryFileDigest": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cb1330c75489ce1ac90ba3fac3950eef089d14d39cd0c717a424ef1a3bfec07a",
+      "recordBytes": 27916,
+      "edgeCount": 14,
+      "dispositions": {
+        "preserve": 4,
+        "phase9-row-flip": 10
+      }
+    },
+    {
+      "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "set": "batch-031",
+      "sourceBytes": 4982,
+      "digest": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "inventoryFileDigest": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9dcec51db60a54dbe7ab060e6a28f7a26c2a916f8589cb29182f3b75be0a4e58",
+      "recordBytes": 2565,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/user/README.md",
+      "set": "batch-032",
+      "sourceBytes": 1136,
+      "digest": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "inventoryFileDigest": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "49e531d82c6b3b4372a9fdc93e36ecd1625973391a1604e3c6f86203ff5f40f6",
+      "recordBytes": 10754,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 2,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/README.md",
+      "set": "batch-033",
+      "sourceBytes": 2195,
+      "digest": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "inventoryFileDigest": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8c862242d45d5559338f372837883460351dfbf67c21a1c4db822f0851fa5ee5",
+      "recordBytes": 17558,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 11,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "set": "batch-033",
+      "sourceBytes": 54465,
+      "digest": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "inventoryFileDigest": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "acc48797200b139b35eb3aa03aa897e5e07f6185ee7a7c66365efa28c5f60c86",
+      "recordBytes": 39832,
+      "edgeCount": 40,
+      "dispositions": {
+        "preserve": 40
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-003",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000003",
+      "population": [
+        "docs/architect/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/architect/README.md",
+          "rankHash": "591d658809218e5051cef6b57078ef334b3ba6cbef007365a026487405d452cd"
+        }
+      ],
+      "sample": [
+        "docs/architect/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/architect/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "parked": 11,
+        "patch": 4
+      },
+      "allFiles": [
+        "docs/architect/README.md"
+      ]
+    },
+    {
+      "set": "batch-004",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000004",
+      "population": [
+        "docs/architect/agent-coordination/README.md",
+        "docs/architect/agent-coordination/architecture/README.md",
+        "docs/architect/agent-coordination/contracts/README.md",
+        "docs/architect/agent-coordination/proposals/README.md",
+        "docs/architect/agent-coordination/roadmap/README.md",
+        "docs/architect/agent-coordination/verification/README.md",
+        "docs/architect/agent-coordination/vocabulary/README.md"
+      ],
+      "populationCount": 7,
+      "ranks": [
+        {
+          "file": "docs/architect/agent-coordination/architecture/README.md",
+          "rankHash": "06cd52d97e17f89829dd8724cc38af7ad42dc0fd42e00a318d9e9d21793a4953"
+        },
+        {
+          "file": "docs/architect/agent-coordination/README.md",
+          "rankHash": "0e38e647e1c6ca199268cc49ae6580fcd180eea065816e13c8021b080e1b2ecb"
+        },
+        {
+          "file": "docs/architect/agent-coordination/roadmap/README.md",
+          "rankHash": "58a67f0cc8cdef181b356070f7d4f60a1c5cb74328a2d34df0712370624e0b7b"
+        },
+        {
+          "file": "docs/architect/agent-coordination/contracts/README.md",
+          "rankHash": "81e931c22cf53b727cff5278f8dee7aa8c542343554ec4f6d91d4882ef48137c"
+        },
+        {
+          "file": "docs/architect/agent-coordination/proposals/README.md",
+          "rankHash": "9c0e7c404eb11d10d2f94354df533e433b91f523423502cab735ea79f4285c50"
+        },
+        {
+          "file": "docs/architect/agent-coordination/vocabulary/README.md",
+          "rankHash": "bdbedfa0dd8a05499e92dec0a48f85b4145cb0f9a3f720a4e499b1379e3de10c"
+        },
+        {
+          "file": "docs/architect/agent-coordination/verification/README.md",
+          "rankHash": "bdd987141be4d56e63d44e8c71484c575e44db47ec472d348675ac5dca8d33ad"
+        }
+      ],
+      "sample": [
+        "docs/architect/agent-coordination/architecture/README.md",
+        "docs/architect/agent-coordination/README.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/architect/agent-coordination/README.md",
+          "bytes": 10535,
+          "edges": 46,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 45,
+          "inventoryEdgeThreshold": true,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        }
+      ],
+      "selected": [
+        "docs/architect/agent-coordination/README.md",
+        "docs/architect/agent-coordination/architecture/README.md"
+      ],
+      "distinctReviewCount": 2,
+      "dispositions": {
+        "patch": 22,
+        "preserve": 89,
+        "parked": 18
+      },
+      "allFiles": [
+        "docs/architect/agent-coordination/README.md",
+        "docs/architect/agent-coordination/architecture/README.md",
+        "docs/architect/agent-coordination/contracts/README.md",
+        "docs/architect/agent-coordination/decisions/README.md",
+        "docs/architect/agent-coordination/history/README.md",
+        "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/architect/agent-coordination/proposals/README.md",
+        "docs/architect/agent-coordination/roadmap/README.md",
+        "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+        "docs/architect/agent-coordination/verification/README.md",
+        "docs/architect/agent-coordination/vocabulary/README.md"
+      ]
+    },
+    {
+      "set": "batch-005",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000005",
+      "population": [
+        "docs/architect/component-boundary/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/architect/component-boundary/README.md",
+          "rankHash": "40465318715533549857aad6af1e27f4aefd6fe6126a09024dfe8e2acc918693"
+        }
+      ],
+      "sample": [
+        "docs/architect/component-boundary/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/architect/component-boundary/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "parked": 7,
+        "patch": 17,
+        "preserve": 4
+      },
+      "allFiles": [
+        "docs/architect/component-boundary/README.md"
+      ]
+    },
+    {
+      "set": "batch-006",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000006",
+      "population": [
+        "docs/architect/domainization/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/architect/domainization/README.md",
+          "rankHash": "4c006193bf348fae58a8e2d072a4278d5ace829d0eb3de6cd9176066bcc71972"
+        }
+      ],
+      "sample": [
+        "docs/architect/domainization/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/architect/domainization/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/architect/domainization/README.md"
+      ]
+    },
+    {
+      "set": "batch-007",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000007",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 43
+      },
+      "allFiles": [
+        "docs/architect/packaging-distribution/README.md",
+        "docs/architect/packaging-distribution/migration-map.md",
+        "docs/architect/packaging-distribution/scope-map.md"
+      ]
+    },
+    {
+      "set": "batch-008",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000008",
+      "population": [
+        "docs/architect/proposals/component-authority-boundary-map.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/architect/proposals/component-authority-boundary-map.md",
+          "rankHash": "6f4dd8f3d9be04b4d28a70a24d8c3c5521f059b5c2a6c49edb8522f63ef888d8"
+        }
+      ],
+      "sample": [
+        "docs/architect/proposals/component-authority-boundary-map.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/architect/proposals/component-authority-boundary-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "parked": 21,
+        "preserve": 9,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/architect/proposals/README.md",
+        "docs/architect/proposals/component-authority-boundary-map.md"
+      ]
+    },
+    {
+      "set": "batch-009",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000009",
+      "population": [
+        "docs/architect/roadmap.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/architect/roadmap.md",
+          "rankHash": "9f5685258f2a9165e2fb21f7356af9ba343c4b72c330763a0317f10ebf212362"
+        }
+      ],
+      "sample": [
+        "docs/architect/roadmap.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/architect/roadmap.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "parked": 9,
+        "patch": 2
+      },
+      "allFiles": [
+        "docs/architect/roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-010",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000010",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "parked": 4
+      },
+      "allFiles": [
+        "docs/architect/workspace-topology-roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-011",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000011",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 4
+      },
+      "allFiles": [
+        "docs/generated/README.md"
+      ]
+    },
+    {
+      "set": "batch-012",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000012",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+      ]
+    },
+    {
+      "set": "batch-013",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000013",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "phase9-row-flip": 22,
+        "preserve": 1
+      },
+      "allFiles": [
+        "docs/platform/README.md"
+      ]
+    },
+    {
+      "set": "batch-014",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000014",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/agent-confinement/README.md"
+      ]
+    },
+    {
+      "set": "batch-015",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000015",
+      "population": [
+        "docs/platform/agent-coordination/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/README.md",
+          "rankHash": "7dcd855daa9a3a7787d9130d10f3445bffd8e088889f735157b279015d719452"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-coordination/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 165,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/agent-coordination/README.md",
+        "docs/platform/agent-coordination/architecture/README.md",
+        "docs/platform/agent-coordination/decisions/README.md",
+        "docs/platform/agent-coordination/history/README.md",
+        "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+        "docs/platform/agent-coordination/proposals/README.md",
+        "docs/platform/agent-coordination/verification/README.md",
+        "docs/platform/agent-coordination/vocabulary/README.md"
+      ]
+    },
+    {
+      "set": "batch-016",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000016",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 38,
+        "phase9-row-flip": 1
+      },
+      "allFiles": [
+        "docs/platform/architecture-map.md"
+      ]
+    },
+    {
+      "set": "batch-017",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000017",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/claude-plugin/README.md"
+      ]
+    },
+    {
+      "set": "batch-018",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000018",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/decision-citation-drift/README.md"
+      ]
+    },
+    {
+      "set": "batch-019",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000019",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/distillery/README.md"
+      ]
+    },
+    {
+      "set": "batch-020",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000020",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 8,
+        "phase9-row-flip": 4
+      },
+      "allFiles": [
+        "docs/platform/documentation/history/templates/README.md",
+        "docs/platform/documentation/operations/portals/docs-portal.md"
+      ]
+    },
+    {
+      "set": "batch-021",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000021",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/herdr-web-dashboard/README.md"
+      ]
+    },
+    {
+      "set": "batch-022",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000022",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": [
+        "docs/platform/history/documentation-authority-unification/README.md"
+      ]
+    },
+    {
+      "set": "batch-023",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000023",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 19,
+        "phase9-row-flip": 1
+      },
+      "allFiles": [
+        "docs/platform/host-invocation-routing/README.md",
+        "docs/platform/host-invocation-routing/architecture/README.md",
+        "docs/platform/host-invocation-routing/contracts/README.md",
+        "docs/platform/host-invocation-routing/decisions/README.md",
+        "docs/platform/host-invocation-routing/roadmap.md",
+        "docs/platform/host-invocation-routing/verification/README.md"
+      ]
+    },
+    {
+      "set": "batch-024",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000024",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/platform/observe/README.md"
+      ]
+    },
+    {
+      "set": "batch-025",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000025",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 36,
+        "phase9-row-flip": 4
+      },
+      "allFiles": [
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md"
+      ]
+    },
+    {
+      "set": "batch-026",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000026",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 29
+      },
+      "allFiles": [
+        "docs/platform/proposals/README.md",
+        "docs/platform/proposals/component-authority-boundary-map.md"
+      ]
+    },
+    {
+      "set": "batch-027",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000027",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 4
+      },
+      "allFiles": [
+        "docs/platform/runner/README.md"
+      ]
+    },
+    {
+      "set": "batch-028",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000028",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 13
+      },
+      "allFiles": [
+        "docs/platform/system-architecture/architecture/roadmap.md",
+        "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-029",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000029",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 3
+      },
+      "allFiles": [
+        "docs/platform/ui-spec/README.md"
+      ]
+    },
+    {
+      "set": "batch-030",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000030",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 4,
+        "phase9-row-flip": 10
+      },
+      "allFiles": [
+        "docs/platform/work-state/README.md"
+      ]
+    },
+    {
+      "set": "batch-031",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000031",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/reference/codebase-scatter-consolidation-roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-032",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000032",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2,
+        "phase9-row-flip": 4
+      },
+      "allFiles": [
+        "docs/user/README.md"
+      ]
+    },
+    {
+      "set": "batch-033",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000033",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/architecture-map.md",
+          "bytes": 54465,
+          "edges": 40,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 39,
+          "inventoryEdgeThreshold": false,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        }
+      ],
+      "selected": [
+        "docs/architecture-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 51,
+        "phase9-row-flip": 4
+      },
+      "allFiles": [
+        "docs/README.md",
+        "docs/architecture-map.md"
+      ]
+    }
+  ],
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "d0125bb1f298c2d56c1e63e30f229a18fe63e828e3a654e5ef0d63e0227084d0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "3235bc40d377c35ea64a65be00b2ac7a91c5cbe04877f12cc5b69f29abc03dd6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "7dbe1ec436e61df485fe0ab74debc58ff0cdfb5286320bb0ef653a78402f3493"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "f3aced58220eeba6bcd6df9603d9293db1fc953494456595950709ac4d79b079"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "1f19e6ad3d63083fbaa855cbb915352ec4b291bdf1f44318356457f54722aa71"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "b604f677a1f0557db10fa47cc5f0492fd434aaa8d05b84f1604c25e144a54b2b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "3a83ccf146044144166e7c610b64f0f2f9eeeb26c464583928cde078b262b4c5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "485135c3e8339dd318ef5330c576abb84c99e90b089809853edfe7a422a7058e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "cba3943c32fdcdb8e1adfa961645b36f6db12f64528ba261eea0e598e6d32ea7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "d79d4b3fed51774e77a728b862b6a728ae31b07b3886569d56278a176b02b4e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "39f3433c44c6a70a8d497c344c0504afac0e8a605a3b1cece85d8d89db72d4db"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "a144df3c481c03baf40137589162a718c57af53fc23bd3e67e12d5b217c8285d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "bc1870668bebbdc27cea141cfe4302d95a8a74b49206bac158d9f0dd281c1cc9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+      "sha256": "83c7d3e2702353daf7225f1910a6ae6b1f45659ae0314d12e4aa4f0e7e58b59c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "e4acae7d9bd46bc35d26ac190ae18f25b0e53e93fa0843bad2a685b295c2a9a3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "64a9be864975e722711bc96c8b6a82d072b95efc765482a6691054903bba7c54"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "14a893e012ed1804e0e9f0427333deefdd3874eb9a10f7c69e00bb50146784e3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "f7475251a133157b8ef29d76e7728d211bb758003f78b4bdd4bb9d29e37377e6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "cae68e2ccd588e0ad0ce55ffcdb32e34fa35a225b02fc815f68a316c1170d38b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "ae7af77405965804dbdbffabb6187a55617ec607f7c0b74fc2baeb70fa91da1d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "b1e40e43fe6b68ed934f08c934570a83ad6f4e52d50ebb978ab9367e0cb1ec69"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "adc34b10f0fdd35aea739299a39b03fc6133a63f4e77adab9117f49cb2495a76"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "94f9acf7774e309b8b6e995324bf674382380d54c7bcaf97b9a1bd52156906d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "e5f36dcf4976dabba6d317f214332dce3072a2f7daa035c37c8dfe05e94ff9cc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "08ab1a89b085b0936a15fc91b50024b2a1ee405f2ad553a17eb4185fe5459136"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "9c5dae4696a59d24730da9681a6f19513992b28d397a43d60acfd32cc5f68dc7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "06bf16c0ad3cea46d0680e79df7c346a307d39770dd9615deb10e3bb96ac67e1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "cb1330c75489ce1ac90ba3fac3950eef089d14d39cd0c717a424ef1a3bfec07a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "9dcec51db60a54dbe7ab060e6a28f7a26c2a916f8589cb29182f3b75be0a4e58"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "49e531d82c6b3b4372a9fdc93e36ecd1625973391a1604e3c6f86203ff5f40f6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+      "sha256": "289f2c57256527b189dbc70b4044348b11d0edf0521826a8124d0a78bec56671"
+    }
+  ]
+}

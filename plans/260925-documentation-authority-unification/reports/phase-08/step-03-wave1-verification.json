@@ -1,0 +1,279 @@
+{
+  "status": "author-records-complete-independent-review-pending",
+  "authorPin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryPin": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "inputHead": "7e5e0e083990f3ebe5d551544bb56d63cb330f5f",
+  "startedAt": "2026-10-19T19:07:48.663427+00:00",
+  "authorCheckpointAt": "2026-10-19T19:25:06.027149+00:00",
+  "wallSecondsThroughCheckpoint": 1037.36,
+  "files": 75,
+  "inventoryEdges": 642,
+  "authorAddedEdges": 69,
+  "edges": 711,
+  "dispositions": {
+    "parked": 70,
+    "patch": 48,
+    "preserve": 543,
+    "phase9-row-flip": 50
+  },
+  "parksByCategory": {
+    "phase9-carry": 43,
+    "description-rewrite": 27
+  },
+  "leadRulingGaps": [],
+  "sourceBytes": 778907,
+  "recordBytes": 1478058,
+  "diffFiles": 13,
+  "selectedFiles": 9,
+  "reviewParts": 3,
+  "reviewedFiles": 0,
+  "reworkNumerator": "pending independent review per set",
+  "checker": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py",
+    "exitCode": 0,
+    "files": 96,
+    "edges": 1206,
+    "failureCount": 0,
+    "waveLocatorReviewFlags": [],
+    "inheritedPilotLocatorReviewFlags": 11,
+    "receipt": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check-result.json"
+  },
+  "diffCheckExitCode": 0,
+  "allTrackedChanges": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+  ],
+  "allNewPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-sample.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-whole-file-reads.json"
+  ],
+  "protectedControls": [
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "9ab97c4fa631ec1834fbbf30b72ec293638537e0fb360a53f961238e6018cb94",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "sha256": "9e287c021a1afb866d76d4ea41ec95c300186316e5accee67fbb3c585497552b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-manifest.json",
+      "sha256": "0556af652dc189a76a29eba14fa20ef4cda7377b6a46e14f80d2bde2b605a8e7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "2717c7ac03ac25402ae1d3d87665930af3763b98a8adc260a51dcb7453697e68",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-authoring-request.md",
+      "sha256": "b20042db4a54e24e8e5c92e468f13b7984300a7fc3e1da3184fcecea2ab7aec6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-census-maps-portals-prose.json",
+      "sha256": "cbe8775fd759b3dfbe41e4baac078f6790fd0a45a6bc96aac4cd886f05fbaae4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "9113aaff3556b828ed2b0c904e76e49d1014c6af12589a9585e1ebf1d4a0fda4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "1be863e68553fb9ad4380f14c6b61c8394999fab5c3df2b6644cc0a12dca5ac9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "f2b6f702f1b4e7f7a31a233095bb5577eb30d95412384abfd5c87887453f94d1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "sha256": "af85845e54f7996d19ad515a30b4f11faa09519638fcb9b9a39146baeb37a713",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "sha256": "6045263877db11e6113d5d2ef49940d1861b2ea2dcd3cc8b13a84c9853aa5249",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-reproduction.json",
+      "sha256": "0fd8326893db6330ada3bd2da5c93b29ab3ee3f47564c6cbcb5bf8455f8bfb0b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-close-reproduction.json",
+      "sha256": "9c959cff396a01b5fcb274ee3fc57e6f03974399a97681d450c2c676cce52572",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-correction-reproduction.json",
+      "sha256": "6d95b26a3f7c338e99ac594b1d8ea25b55206479fc82fb5a2bd44bce07fd16f5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-data-reproduction.json",
+      "sha256": "a9bd90803d8c1abf609647fa9408ca080ea123ea2442f8a34c779218f7ec0112",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-docs-reproduction.json",
+      "sha256": "65542983f68a0b7b17ddb7810bea183895a3c72e35cb4ee3859ad30ed0f8ea09",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-reproduction.json",
+      "sha256": "3de338a0aa34efd68568a611aab491723f417cbc49890824454ab71a20ba1ad7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-reproduction.json",
+      "sha256": "376a923cc0e42deeff36f612f36d15883eb9d091a0b532f6c8a96da11473aef8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-reproduction.json",
+      "sha256": "278740a565c3522095e7117fe6e6204278c34f91036717acd5fa13c08ca527ac",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-reproduction.json",
+      "sha256": "13e9def3dc44be21de6fd4c5a4e0732ec74aef7f76ec545b0835b342c420181b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-reproduction.json",
+      "sha256": "7f364c5b63b48f8a25036a22d9b843db02839e2d7a5acc369d0b8ef101f9e43e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-reproduction.json",
+      "sha256": "29f9350aa84faa6fc6608d570a53bbbc6bc5df1852c03e62f2de865184dab317",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-reproduction.json",
+      "sha256": "e4a1c8fb9f13376343b77546b90d87c67ce306e77ea20c0d75d8ac591f89afe4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction-results.json",
+      "sha256": "f6bd016f748d3cdfa129a4a3b6e443ca38743cce3c1ba3c7eaeb132f553baedd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "825113244eb680864e21a57a52289a33a653351bcfe264303177174b587dc7c9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-portable-reproduction.json",
+      "sha256": "30b6b36ad1edc8a026605bb9878363859a871ea2870c9fc92e508b46e8750b57",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-reproduction.json",
+      "sha256": "2f5ff041a55722ddef237bc838ce2bfc13030cd7d4f8ed648fb365b993bcc2a2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-reproduction.json",
+      "sha256": "9f0066ed9fecd8f100760fb4e20067f08e3b2586613084e39cc4cb7b56a55de5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-reproduction.json",
+      "sha256": "aa5beaeb9092d46c60af1e6143a0f028a707ced480cebb3256b9ac88e7f81441",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-reproduction.json",
+      "sha256": "35d22d44de85849912484e07f30a1baacc9815ac9383e410e85112b12ffd984c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduction.json",
+      "sha256": "2a16af6beb7bc0381c37e6518031993b69af45c77ec8745ab69f806fa7cb2bb4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync345-reproduction.json",
+      "sha256": "20dafa3aaa915a0e6942c3f13714e6b656d90f380650b5b316e95ecfe71a0ee1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "eac2bbc0d6f40637c7b9e93b52902649eccbdaab510ca5a735a5fd2480ec960e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json",
+      "sha256": "58b91f7070dd5eaefba13e2a41c4bbb8cc985c43bb8334f3d2bf066d60abfdc3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-reproduction.json",
+      "sha256": "439e353405190c17188b5bbaf762c9d6cab1d8d6f1def0569be1f225695a8506",
+      "unchangedFromInputHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-reproduction.json",
+      "sha256": "467fbe9517aad55d66b0f6c196ea0be27aa6a117ebc22f37ddf634cab8843837",
+      "unchangedFromInputHead": true
+    }
+  ],
+  "sourceRebindings": 0,
+  "limits": [
+    "No consumer diff applied; proposed patches are Phase 9 specifications.",
+    "Independent semantic review, per-set rework accounting and Lead acceptance are pending.",
+    "Runner commits; Lead accounts the real runner commit in the two protected manifests and runs clean committed-byte checks.",
+    "No new probe/checker rule or production behavior change; full runtime/test suites and inherited negative probes were not rerun for this record-only wave.",
+    "Initial per-file processing seconds include pinned traversal and serial resolver work; shared analysis, corrections and checking are included only in the total wall time.",
+    "No fgos CLI, git write, state/secrets read, service startup, generated surface edit or baseline change. Required atomic assignment outbox is the sole outside-scope write exception."
+  ]
+}

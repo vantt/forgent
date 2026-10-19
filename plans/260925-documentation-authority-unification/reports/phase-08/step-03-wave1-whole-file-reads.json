@@ -1,0 +1,2496 @@
+{
+  "authorPin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "sourceBytes": 778907,
+  "sourceFiles": 75,
+  "limit": "Traversal/chunk hashes and timing are author accounting, never independent semantic acceptance. Initial traversal seconds include serial resolver work; shared/rework/verification wall time is reported separately. No consumer edit was applied.",
+  "files": [
+    {
+      "file": "docs/architect/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2829,
+      "lines": 58,
+      "sha256": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 58,
+          "sha256": "98ffbb24d260bee8897276d70c34e4e2f1408fda61a54c3b931d96d32a38fdb7"
+        }
+      ],
+      "initialTraversalSeconds": 2.5941,
+      "inventoryEdges": 15,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 58448,
+      "diffBytes": 745,
+      "dispositions": {
+        "parked": 11,
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10535,
+      "lines": 192,
+      "sha256": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "abee540cee162d6de5d0294b4d3c4f95e3eef0e22926624693f4fa904bf0018b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2b965fb36c76c94f33ebb5c3ebca9fec35ffd818dd2ff1fb7fecafce81d5026e"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 192,
+          "sha256": "7899002580c1ffd8c25f6ef993605280b1f69b0b2bcefe6131a7d20ad43d1fe9"
+        }
+      ],
+      "initialTraversalSeconds": 9.0256,
+      "inventoryEdges": 45,
+      "addedEdges": 1,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 1,
+      "recordBytes": 79021,
+      "diffBytes": 1987,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 45
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5406,
+      "lines": 95,
+      "sha256": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d7194e8845e4120b8eed432f82b046ad83aa823364ab3c701f8c2e079adb8b1b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "7ef234a7476cb7b1c2a5d7ea5791302385ab7282bf6c55181c95cb42b231e007"
+        }
+      ],
+      "initialTraversalSeconds": 1.6487,
+      "inventoryEdges": 18,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 97988,
+      "diffBytes": 3975,
+      "dispositions": {
+        "patch": 10,
+        "parked": 4,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1842,
+      "lines": 33,
+      "sha256": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 33,
+          "sha256": "f20a1e0bebeacd83e247137ad70e7f5c5faae1e1b1caa7278db9e6f26599153a"
+        }
+      ],
+      "initialTraversalSeconds": 1.2522,
+      "inventoryEdges": 5,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 25777,
+      "diffBytes": 1435,
+      "dispositions": {
+        "patch": 2,
+        "parked": 3
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3016,
+      "lines": 47,
+      "sha256": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 47,
+          "sha256": "01996579aeb1916acd92d7576c0a368c1e660edc2cbd958774aeddc8578a8384"
+        }
+      ],
+      "initialTraversalSeconds": 0.0202,
+      "inventoryEdges": 13,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 18667,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 13
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 736,
+      "lines": 20,
+      "sha256": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 20,
+          "sha256": "d5950b9fb0bb941551954a775f0de97ca9b09f723bbe695016cfe5638c3179dc"
+        }
+      ],
+      "initialTraversalSeconds": 0.018,
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1013,
+      "diffBytes": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35162,
+      "lines": 1069,
+      "sha256": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bc547355836c56a24234ae3d6b432ed5e2d99faaad9fc1a2e142f35b7becadac"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "545c6d73585466898a7ebe55ac2c62ba8bb32641406c87180cec5cb7f74b590d"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "9f87bd0860c5ea5b210d84d3e9652e5e3c253d82c454f1cb904616650433ade4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "d44515e1919d9b7a4121073b4a15bbcb4e5c2e6990d26d0050c09f5bcf5a377c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "6e461972f7da97d8ade7ccab04c698e36a4815be105e0bb3e5e95be2ec40c2c1"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2e0ae01527c7563adb392d231f58670dfab141007aaeed788190a7f179ddb21b"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "4b8685721c6aeaf2f7580172d94a32612bc883d8c16ac33b1f49192b04ee2626"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "22cb05efeef7065a3c387113080f45e1d5bb0e37982218c8b33c130e196475c4"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "ed7de53d105a555ee92f78eab42d2bccf5d7d01b0611961297602b9946a42d64"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "4a8dd5936e0cae4c7967fcfae08d82d78aa833c66120602bfd426c73101a1944"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "82eabcf3f1992645247701c79786667a979271cd6b7524f8f796c80c8165c33c"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "29dd0f81ac8b131512942f21951b1fcde4c35e5d12db8b5986e59ae2ffe080f5"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "442c895da4b340503db07f9a81fcbf9c93422e4089bcdb2375e34fab889e20f6"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1069,
+          "sha256": "4114d3a426211705d08c35c32966f71e3d42376b1271f1dae2f644dfbb555cee"
+        }
+      ],
+      "initialTraversalSeconds": 0.0335,
+      "inventoryEdges": 3,
+      "addedEdges": 3,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 3,
+      "recordBytes": 9573,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3660,
+      "lines": 72,
+      "sha256": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "cc3d22c5dda4538db3c177f211d351140135f19aba1c0bf3dd2a7c82cf4dbfd3"
+        }
+      ],
+      "initialTraversalSeconds": 5.7582,
+      "inventoryEdges": 14,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 48032,
+      "diffBytes": 1302,
+      "dispositions": {
+        "patch": 3,
+        "parked": 6,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1940,
+      "lines": 41,
+      "sha256": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 41,
+          "sha256": "9da3f814dfa6d8c3267c77fe585600bb63c3b07d5ffac2825b8f9d34b975f997"
+        }
+      ],
+      "initialTraversalSeconds": 0.0738,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 18220,
+      "diffBytes": 628,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1597,
+      "lines": 35,
+      "sha256": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 35,
+          "sha256": "74cc9b2b712e59cff175d7cf75ee9f99da4959b624e9eb01dc18e5ac00324607"
+        }
+      ],
+      "initialTraversalSeconds": 0.0674,
+      "inventoryEdges": 13,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 16050,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 12,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 966,
+      "lines": 28,
+      "sha256": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 28,
+          "sha256": "c7dc45fb65ab3e07eff857eabdca638e2f456d069c3172f8e2ab728c0aee6af2"
+        }
+      ],
+      "initialTraversalSeconds": 0.0204,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 12258,
+      "diffBytes": 509,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2174,
+      "lines": 57,
+      "sha256": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 57,
+          "sha256": "07e84a70546a4eb3b7777ce44fa66f2cede8130c071c322c9e6159971cc3c49c"
+        }
+      ],
+      "initialTraversalSeconds": 0.2843,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 35752,
+      "diffBytes": 1604,
+      "dispositions": {
+        "patch": 4,
+        "parked": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/architect/component-boundary/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10296,
+      "lines": 230,
+      "sha256": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "53385adc8b3fb34a10987339fb9d06a9f30ba2bb99b57413cb6e95429ea0330a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7821b1dc7d80e23ab04d40feeb4ea06a514e6f853be0b8731f34e941ff69e181"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 230,
+          "sha256": "483a8cd3bd475ed8f02f5beed012131a97c1b2459b1e79bf69cf0431e7f5fae7"
+        }
+      ],
+      "initialTraversalSeconds": 0.5203,
+      "inventoryEdges": 24,
+      "addedEdges": 4,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 4,
+      "recordBytes": 203237,
+      "diffBytes": 5125,
+      "dispositions": {
+        "parked": 7,
+        "patch": 17,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/architect/domainization/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10848,
+      "lines": 281,
+      "sha256": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ea6e4f5f175271f0c3faf9764651b229c986c0b1d6ca7408f0daa453474d5045"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1a87e7b33e2029eb0ad009bcf22b9c454f93c44a7f18788f04708e5e5ed1e230"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ea464787e4d5e14eb7c327fb8eedad44947c2f943d7b05c7148db0df4cfb8df0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 281,
+          "sha256": "432eb76acb3eb640d80dfca17758cb9724aefa20de67d9eb52cc113110222bba"
+        }
+      ],
+      "initialTraversalSeconds": 0.2188,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 24810,
+      "diffBytes": 445,
+      "dispositions": {
+        "preserve": 5,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9620,
+      "lines": 164,
+      "sha256": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fc4705225700563d5ae68294cbd481967f7aa451d7735254708e32198aaa7d18"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b9f58b928a4b5ddb235bf1d44ea3115b21dba5cac946c368b17c3d92c322c386"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 164,
+          "sha256": "4e6b7e611dd5ec7e01980a15b16b67e098ab34d429678875b721870a1f6ab1db"
+        }
+      ],
+      "initialTraversalSeconds": 0.0187,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 7184,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/migration-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13633,
+      "lines": 140,
+      "sha256": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d41c0354b8ee2739dc410c8b6759bbcafe5d5019b81dd450f079b497eb088025"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 140,
+          "sha256": "6831ef80d2fdb28b0535fa26500db3d1e191b1b3a70ac614a650f6341302c670"
+        }
+      ],
+      "initialTraversalSeconds": 0.0211,
+      "inventoryEdges": 23,
+      "addedEdges": 2,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 2,
+      "recordBytes": 28635,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 25
+      }
+    },
+    {
+      "file": "docs/architect/packaging-distribution/scope-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11217,
+      "lines": 188,
+      "sha256": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1deb3652e7569445770b314f52d175fe65c8099b698980818a7fcb6d3d8ef553"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9dcc055995489a6dbc86bdb492c4e342ce1c228e2c51812b0ef46b1d958f2acb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 188,
+          "sha256": "b3d275d9754ccfd988e4c27a764903293c78ba1d054f7de54a6bb8f4f4396fc0"
+        }
+      ],
+      "initialTraversalSeconds": 0.0208,
+      "inventoryEdges": 7,
+      "addedEdges": 5,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 5,
+      "recordBytes": 15588,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/architect/proposals/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1516,
+      "lines": 32,
+      "sha256": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "9bc17c181fca79b21bafc372dd038616042a83bed68c387a8042478b811ad277"
+        }
+      ],
+      "initialTraversalSeconds": 0.1843,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 15781,
+      "diffBytes": 0,
+      "dispositions": {
+        "parked": 6
+      }
+    },
+    {
+      "file": "docs/architect/proposals/component-authority-boundary-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 49963,
+      "lines": 686,
+      "sha256": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f3d8b4de0e6cd63fd171e93f21d47168861310557d4af20f28b1fe921eb10af0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d51e30d80e77790ad01a455127f41aa9f2659254fab2925497cc7a2212a063df"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "625ed1a4deefe352e2673b4765ae535e593aa4643cdb872791995f1627f162b0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "6c923500501a581c7f90f87542a6da8b8939f87bfbcefaf33d1302cd7804a180"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "062e660c86b2be9eed813e2475631187ac38ed57cda47dbe57e1e65216bf95f6"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "b955ffe898b9c814e467f449efabc93fbd8385620ea32710dfd57942eacdc9e7"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "89b37e27cdbebb717808e5e9db6dd4d317e1be82b7362003d6c2155ece337824"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "a039883f0736818e1d421c85ddc81e96138f43f32722015c00d2cd0b97d2b6e2"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 686,
+          "sha256": "3ed3bc3ba32b0dda7ea4e6c4186483e2692f0a1056149cc5589cba7dc81791b8"
+        }
+      ],
+      "initialTraversalSeconds": 3.684,
+      "inventoryEdges": 15,
+      "addedEdges": 10,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 10,
+      "recordBytes": 77896,
+      "diffBytes": 3985,
+      "dispositions": {
+        "preserve": 9,
+        "patch": 1,
+        "parked": 15
+      }
+    },
+    {
+      "file": "docs/architect/roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 23435,
+      "lines": 269,
+      "sha256": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "af4b2d581f64781c38728a3964eb58432f614e28bb91d2d1d5b9b1b32f08ac47"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bf9052cf62ce5e55e91278519afea39d5df4df424d33f9cd028754941c1e98ad"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "f5bd0b528078d2649f836ea9989182c920c793863bfda5fe1dac8d37cb5619ed"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 269,
+          "sha256": "e75bf37fbd0688f4e8e2d16753d3ca7cfcefaaac0faf6e470deb68f8c209f088"
+        }
+      ],
+      "initialTraversalSeconds": 0.1237,
+      "inventoryEdges": 5,
+      "addedEdges": 6,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 6,
+      "recordBytes": 54734,
+      "diffBytes": 4324,
+      "dispositions": {
+        "parked": 9,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/architect/workspace-topology-roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5752,
+      "lines": 200,
+      "sha256": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a3bbe4d74cdc1864fd7ca35a0a08f1ce2acbfc27bfc1256629b823ddd47ffd93"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "110c52faf1e4cc1644b5c285bfb9b7c21a6f58766092170834839d2365d786b9"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 200,
+          "sha256": "291928c396b3f45a6c9bb19d6902c64b47cc8e647789b34922e6e3d40942bdba"
+        }
+      ],
+      "initialTraversalSeconds": 0.0226,
+      "inventoryEdges": 3,
+      "addedEdges": 1,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 1,
+      "recordBytes": 10582,
+      "diffBytes": 0,
+      "dispositions": {
+        "parked": 4
+      }
+    },
+    {
+      "file": "docs/generated/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1170,
+      "lines": 33,
+      "sha256": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 33,
+          "sha256": "eaad2b96c580c06d4629f290ad445051beb99c35d20bdfb400175386a2012a1a"
+        }
+      ],
+      "initialTraversalSeconds": 0.0623,
+      "inventoryEdges": 4,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 3844,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1699,
+      "lines": 30,
+      "sha256": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 30,
+          "sha256": "5689b195a18d3533fae597d3a82d350aadfef1f94d526bb9d03d9f4a45c65bca"
+        }
+      ],
+      "initialTraversalSeconds": 0.0179,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2705,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9323,
+      "lines": 111,
+      "sha256": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "67b0dfa2c5466ded4f1087bc485d0b125f77dacf0fd3e9619a55caf0cff6ae56"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 111,
+          "sha256": "05a9aed7f3ce1cd679b0cc0fe2b4d86cf172703e4d0351d6c183652aceb7f07c"
+        }
+      ],
+      "initialTraversalSeconds": 1.6135,
+      "inventoryEdges": 23,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 51413,
+      "diffBytes": 0,
+      "dispositions": {
+        "phase9-row-flip": 22,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2043,
+      "lines": 34,
+      "sha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 34,
+          "sha256": "c117fa5dc726b23cb9cc730072bf57a62416688a18f37d23bfdf98632a3287bb"
+        }
+      ],
+      "initialTraversalSeconds": 0.0186,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2895,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6693,
+      "lines": 72,
+      "sha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "6dc30250eecdba4d87da85260efccbcd59c2ae87da8a43edf8fbe2883a7816fc"
+        }
+      ],
+      "initialTraversalSeconds": 0.0254,
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 28257,
+      "diffBytes": 1635,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7287,
+      "lines": 120,
+      "sha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "731e4920a7381370990e38c9b0285fb83a50c194679d5bd1574d171c46d16a0d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 120,
+          "sha256": "a31cdd0f3010ca7203bbfa88e57cd66f07e090b7944db66d9620786ecf26fd38"
+        }
+      ],
+      "initialTraversalSeconds": 0.0579,
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 6360,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4134,
+      "lines": 63,
+      "sha256": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 63,
+          "sha256": "67812c6d806f42cc7471fc140c427ff8717258c1aac0e6a0a859de50a23b4802"
+        }
+      ],
+      "initialTraversalSeconds": 0.0212,
+      "inventoryEdges": 1,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 4293,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1718,
+      "lines": 41,
+      "sha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 41,
+          "sha256": "96715db6a9d242ac44ad08848a686719f420fd5e1dcbe9317606c6ff0327e9a2"
+        }
+      ],
+      "initialTraversalSeconds": 0.0164,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2836,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35898,
+      "lines": 1083,
+      "sha256": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0bc77dd5c69d593e4f119a45355598daab189908fec4d5d3cd5d9838a7fdb769"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "8260631d2d62bf1eb07cb2ccf44cbfd7ba526d36931edfb507f5927140c613d7"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a85d4c3ed306cb995c2afa894c251a4dd42a7c5411128dd69787a27fc77e7556"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5f41aef27c4830b165ed40520d714c16239728d005abefc2e437666a1d005481"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "9ea88b7dd630ff15a6043b89594bdf047fc930bb63fc5cf856478d806c9997c7"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "388f653aa4d56b451231accc4937dd8cbbb0b6ada584411f40ec96679ec85181"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "94144526ad290e4721aa3fc911ef68e859bd91f6aad19bd7b5480dfa4fb22545"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "7d0c9ce817f027dd0f5bb8ad0708be4f8895567fbfec083f50f3da4825fab113"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "784ef0b403e15d7870d6fc26ada12ccf0de2ea009864c6a5c14212bcd5850def"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "649d16184ba68473949fb1fb2648d8a2604796d4af893c434fba2f202775834a"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "3ce150284743e71b7ed5550e7911c6af6b29ca2659556f0446421a740d2e0645"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "262d67705ad5546f0141dc9bc9163326cd02164baaefd682a533fd767b0bdc54"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "5e7d7dcd260c6dae38b7f64bcd061a03912522b29743171cedc09100b404a4de"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1083,
+          "sha256": "5dc0769bcd78a1161d87bf6f33ab863e33c569bc73d88191e36a7cf82ad19ad2"
+        }
+      ],
+      "initialTraversalSeconds": 0.0267,
+      "inventoryEdges": 2,
+      "addedEdges": 3,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 3,
+      "recordBytes": 8714,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20930,
+      "lines": 357,
+      "sha256": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a27b484b11bfa8785beff3e76f4e48814addc54f88b008939288c4451857a308"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5f6498d185a06326c9f9eaf1652303cf97d58631cb32d85b14c803ee269833e6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cabf30093692c05b1a216d878a2706c80b320141e39ca69509439ea5c1753965"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4db6a68ec7226c7cef159acac021f6d225ea4b4549ec1e01bb8eb7c2bf68bea3"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 357,
+          "sha256": "c27b9be4503c9429ecf73d86a2e6c9816e5c9b7f7ef977ba3d2b79e743ecd2f6"
+        }
+      ],
+      "initialTraversalSeconds": 0.0332,
+      "inventoryEdges": 18,
+      "addedEdges": 1,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 1,
+      "recordBytes": 23490,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 19
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4083,
+      "lines": 69,
+      "sha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "16d8a7c65e65816563d0544a0ea486587284b97b33181d392a8fe9b98a8e251d"
+        }
+      ],
+      "initialTraversalSeconds": 0.0185,
+      "inventoryEdges": 5,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 5200,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8408,
+      "lines": 153,
+      "sha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "56f34ba40f3e103da4bf19d6b6399bd6688953d7b0cbb3a83b1d90eb94368bd7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 153,
+          "sha256": "abae7bb625f08e5747ecf1f6904a3963f584423ea44112ccaf7c2e1f75a1f80f"
+        }
+      ],
+      "initialTraversalSeconds": 0.0214,
+      "inventoryEdges": 8,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 12120,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4473,
+      "lines": 83,
+      "sha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4acb014ec83a674b541e2fd3d784a4aa8ce50dc320622550636ce7080af6b8fe"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 83,
+          "sha256": "fcd5e174c80946a9f380bc4c3dcfe12aadcfc1aa1ad5a8d3419f01592ff1f76c"
+        }
+      ],
+      "initialTraversalSeconds": 0.0207,
+      "inventoryEdges": 5,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 6502,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5733,
+      "lines": 99,
+      "sha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "93276ecea6d535893e29a24e624e271f6bd6d693c7a779a258960793f1676b35"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 99,
+          "sha256": "c158b8b609832da806695ddac5341556ef4bee2f4e33929564419bf68e3e60aa"
+        }
+      ],
+      "initialTraversalSeconds": 0.0206,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 9961,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6389,
+      "lines": 124,
+      "sha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2fea25f0e6e0367b553a7d5dc06acf474c60e1e0af530e25c4433fe2c1d12fe0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 124,
+          "sha256": "64ad86f1d04aa4f15e048c891a02427aca1fd9918858e3512239e0ea04d5f872"
+        }
+      ],
+      "initialTraversalSeconds": 0.0217,
+      "inventoryEdges": 12,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 13117,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 12
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4591,
+      "lines": 91,
+      "sha256": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c337ff03ed256b71b43c4d181f49edfac3462fefba0348ca3e63213eadf2ecb9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 91,
+          "sha256": "c3707d35ba593c2cf652868cf11ec094cc540e214243be2c85ad1a176dbce0f7"
+        }
+      ],
+      "initialTraversalSeconds": 0.0205,
+      "inventoryEdges": 8,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 8304,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4011,
+      "lines": 79,
+      "sha256": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 79,
+          "sha256": "554af1e701b36bb0d5026abe5dfe61577ed6422ec17d756af3190ff9deb338f3"
+        }
+      ],
+      "initialTraversalSeconds": 0.0186,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 8590,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3549,
+      "lines": 64,
+      "sha256": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 64,
+          "sha256": "9b9e8bfa7f9c2e1634cf2f9da84127d3f56c0a31208faa1c2d8e2dabb5b126e7"
+        }
+      ],
+      "initialTraversalSeconds": 0.0173,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 6424,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5669,
+      "lines": 90,
+      "sha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "21522f1eeb1a13b2e58f28503ee0aa5f63e61915f70f5d82d686df1cbeccfbf8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 90,
+          "sha256": "9c19cd668687a614fb9ea3a4f3fe1d69f05647d60b75509f339d25ad8d4b712c"
+        }
+      ],
+      "initialTraversalSeconds": 0.0205,
+      "inventoryEdges": 16,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 18104,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4535,
+      "lines": 101,
+      "sha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "09d4d3b89dcb79ed09c83c1a6205853e1859a19a176208f5e13d9fc11cd86111"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 101,
+          "sha256": "2e0a1c88daab62138c967efa2a55b123a9540904c5be1c99fd4419c722baf42f"
+        }
+      ],
+      "initialTraversalSeconds": 0.0232,
+      "inventoryEdges": 4,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 5393,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 37406,
+      "lines": 1111,
+      "sha256": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1ab2c82051cf37a1a310b4a9dcf05f6864ca3d575a7033fdc24b87f7539611c0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "59a39e89ac8e521cf0065f683e79bfbdf12e999c04d3c8df4db7217b01e23c90"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "584a8f99c800c4d3e17899b3d2f34f054064963b0fec77d04a97f80b6902b8ee"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "3e64815eb80a34c5cc91ae7719e8eea9b5d54d29a46d2237303313af7f431cbd"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "9aa006bfe5e004c82550dc921863d2d134e4ea3c4d1b8e115f895a3b692b8bdd"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "d79caf521bc40b3bd9efb0e72660287262743b007ea8d8be8179d200956df1db"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "f48e135aa9af828451559cb1d866e2926a09db0ca02c49691e628c8895a7752f"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "ad46f273ca7b1558d195a085245b32394dd6eef4d326a60aef3ee922da3b84b2"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "f3a4bc9e8877d2637269f849de0b875713a54e6c3dc328e779eaffc4bc3b3e39"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "5f4123bcce7495c0bc4fed66cb9615424abe4b115fc0ed77a92275dd6ff8054b"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "b033cf0c9cf5674d968e504d63474c5cdd5754159a006a5c2cd78125f0da18e3"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "ddc7d784b0de403bb5fe79da03753458398c9361bcaa411cfdd87dc9eec94bf1"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "3c0ae3786dfa717c2cc262c0f626eeac6ade4df059e3c9cfae82edadedac15ce"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1111,
+          "sha256": "1658ef9a579750c1ffb6600e99ab7fe1865c9aa9a071b1ab224508e510121956"
+        }
+      ],
+      "initialTraversalSeconds": 0.0333,
+      "inventoryEdges": 5,
+      "addedEdges": 3,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 3,
+      "recordBytes": 12086,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13985,
+      "lines": 258,
+      "sha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "19f1434ef976892183998d58117d6a4cf9d667be32ea8a7e8fb35f87c85d0523"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7afc0a2303736f966bb942ea04afb17f4af6a0529e6c8cc7ebf19f0b19626830"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "fb997750e95398c8b2a5652057fb67600cb5c52be804dc3840173204cf632520"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 258,
+          "sha256": "5ab85f6cad9c09183d5ed83999a48fa126ecaf78853dbb51e6399cbc141e8e75"
+        }
+      ],
+      "initialTraversalSeconds": 0.032,
+      "inventoryEdges": 6,
+      "addedEdges": 1,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 1,
+      "recordBytes": 12430,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8895,
+      "lines": 80,
+      "sha256": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f0be5f5640681e515a4852ae926ea4fa9d2c90ebb0e56fa50889e5723b82f965"
+        }
+      ],
+      "initialTraversalSeconds": 0.0211,
+      "inventoryEdges": 21,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 22343,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 21
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5039,
+      "lines": 86,
+      "sha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1ccc847be2600c79bb724bb12bf4cc04a6b861189ee74f868dd13dbda7d4d891"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "9f1efe260f6e1a2a05c6010fd18b06a8482498b89202d14c2065ca916d85bebc"
+        }
+      ],
+      "initialTraversalSeconds": 0.0865,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 3407,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4099,
+      "lines": 61,
+      "sha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "e432ada81d38cae59eb8748ca52dfe85297eb243f53990ff7f9400a4be0f5df5"
+        }
+      ],
+      "initialTraversalSeconds": 0.0197,
+      "inventoryEdges": 18,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 17684,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3148,
+      "lines": 69,
+      "sha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "44a97ff198ea6578cb6e978536a7637c1adbbef0928b494b17788cd4dca14478"
+        }
+      ],
+      "initialTraversalSeconds": 0.0162,
+      "inventoryEdges": 1,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2681,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/architecture-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 59475,
+      "lines": 849,
+      "sha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a3aa109fa31a15e496fccef613b1ccda13a3f4a9795d0b84ba3800b100c9df54"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "63a602aeb195ef83263d6022b48e45e22458a794a1c27a7b83cdc884e7fd5877"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "191aa05e0901fbb277525f10fe0efddd742d7074b9c4cd9ce6b2d372d43d1c01"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "06b758cce2df6becebefaedf9733437580055f47011cd34e856215bc208f7722"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "add15ce26779ee0dad879ff84d9a489fd2fe7360eae5e3a786ee9389844431c7"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "6cda2c82c388d4f17fdfe706a54a9bbf148eb23b922133b261d0503e07c4096f"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "c54f4578188b3c8a9b601298d111b26b2a5395c41a1a65d0e1fa6780bc125031"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "8db7380e4a975e3f922fcfefd9870fc2a71f15ea7c453356bd3e45008ca5477a"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "9abcd5e05953785066b7ea684d1242464ccb6b0b65c8c44ffd0727571d4d5d09"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "839a908eca891ff96430b353d7fbda000de106c7e3eb1453fecb86e9ace48c4b"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 849,
+          "sha256": "d1f7bf34df05e9e0d87a92bf1ee5acba4382ab2917db2174aeee15995b2b448f"
+        }
+      ],
+      "initialTraversalSeconds": 0.0699,
+      "inventoryEdges": 36,
+      "addedEdges": 3,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 3,
+      "recordBytes": 34205,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 38,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/claude-plugin/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1765,
+      "lines": 32,
+      "sha256": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "3306a3c774ffb78b8f26ab080f2e35225220a1571a6e7dabf31727ae0f63e0c5"
+        }
+      ],
+      "initialTraversalSeconds": 0.0169,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2823,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1799,
+      "lines": 32,
+      "sha256": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "593be22810c2836d630f79595b219a8cf537bfc7be832000d90720f65c562f72"
+        }
+      ],
+      "initialTraversalSeconds": 0.018,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2925,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/distillery/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1760,
+      "lines": 32,
+      "sha256": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "62206730fa2df5e657c3fdcf6ebdfd867470ac8289a581bf6d8969b0ca14cce4"
+        }
+      ],
+      "initialTraversalSeconds": 0.0179,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2808,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2502,
+      "lines": 48,
+      "sha256": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 48,
+          "sha256": "26e953debe2489d3ee50688944d3198e836a12e05f4e4338b1de86f4992255e9"
+        }
+      ],
+      "initialTraversalSeconds": 0.0195,
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1521,
+      "diffBytes": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3088,
+      "lines": 81,
+      "sha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e222225f4800d511fc63106951f89ce06d7a3017754f477f8b5fb2a6f4f1dfa2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 81,
+          "sha256": "329bc0e532da6227bff1a033d3636480a2e54be7ce185cdbc78e06372c593248"
+        }
+      ],
+      "initialTraversalSeconds": 0.2089,
+      "inventoryEdges": 12,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 15418,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 8,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1928,
+      "lines": 33,
+      "sha256": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 33,
+          "sha256": "a32e6c058959ae80659b9f5dc1ce26ff4d006c1e9e1ac0d370c6f8a6a7c0e8dd"
+        }
+      ],
+      "initialTraversalSeconds": 0.0166,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2889,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/history/documentation-authority-unification/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2406,
+      "lines": 37,
+      "sha256": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 37,
+          "sha256": "6aab1d09961d4539ddcca98ba9476b5e31e482c52aada191f76e0b715a3b19dc"
+        }
+      ],
+      "initialTraversalSeconds": 0.0184,
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1029,
+      "diffBytes": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11785,
+      "lines": 148,
+      "sha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4ef2aadb5cb26a311dfb421541a9002da1b95aebb1f2efafaafb56bfd1dc260a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 148,
+          "sha256": "1106573a71e6938578fa40d0a7c60f33806361aad9786e8eaa425c0f5c2a65bb"
+        }
+      ],
+      "initialTraversalSeconds": 0.0205,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 7624,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2985,
+      "lines": 49,
+      "sha256": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 49,
+          "sha256": "0338e710a0ea45bf40ad16bfec4a21401b5860522d3958e17cdc93135dffd5e4"
+        }
+      ],
+      "initialTraversalSeconds": 0.0174,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 3829,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2910,
+      "lines": 46,
+      "sha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 46,
+          "sha256": "054aefe2684f46189093441a539327ce195718125d8a83325e095ece9cdc7be9"
+        }
+      ],
+      "initialTraversalSeconds": 0.0162,
+      "inventoryEdges": 1,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1942,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/decisions/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3237,
+      "lines": 52,
+      "sha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 52,
+          "sha256": "14fbbdad332395f87fc15263ddb432e72b1e991ffb9d8851956a4d2975ed7e37"
+        }
+      ],
+      "initialTraversalSeconds": 0.0164,
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1019,
+      "diffBytes": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 52227,
+      "lines": 956,
+      "sha256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b4ac97b8b7175e54e82d247452d8aac3948d6234ab2eb6e5c1fd1fe0be3d4797"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fc6952fae65e894e8915fe54d34a879158976b8ade97363d99edc36ed9d3f599"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "010508dc631754f80dcb522b68682883141cd27065c86ba6e0fdbf140d83ac94"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "71d8d43e5c343cafd1a3685798c5cd841198f1b3c2af816c721e8422c617bcab"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "46609825144c722a401b0750328d5de6545d4379af7d357f6530aad23f9a1325"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2b54b03550961d51d138d8a0d5aa97b7bc5afcb8d4ea392604227dcd1973dc39"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "154fecd8a27ae79597846e5cbe0df1aceb1d82bb7db0e1685c2dc35107dad4b2"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "9b84c194e644b2c443e9b8d14183c3e232cd9f086768a1d5b6d6f5ad86df147d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "db5018a5b78f09e415cc556071136cdced3a8375c6ebfc8742e4c298e3bf4b97"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "4a165f19347ff04598a8d0246e281c56a6f9be075214ece2648f7a373b5c6f06"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "cd73eb435d334b17d002830447282dfcd6484e6dbc4a7716ae12791fb043f370"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 956,
+          "sha256": "16d0d3497fb600cad609b5ac769b45a9f7bf6572e2c9386b45888b12da0b4bda"
+        }
+      ],
+      "initialTraversalSeconds": 0.0468,
+      "inventoryEdges": 5,
+      "addedEdges": 10,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 10,
+      "recordBytes": 20958,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2662,
+      "lines": 47,
+      "sha256": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 47,
+          "sha256": "7d6eb59e1b4e02479f6c1ebb42d0728d758f8c681ba9e5ad07526090b5b06b79"
+        }
+      ],
+      "initialTraversalSeconds": 0.0188,
+      "inventoryEdges": 0,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 1022,
+      "diffBytes": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/observe/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1843,
+      "lines": 32,
+      "sha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 32,
+          "sha256": "0b047e76f5a83652a90c3436b324dca93f2fd0376407b1bf196a2b24911997ef"
+        }
+      ],
+      "initialTraversalSeconds": 0.0194,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2781,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 24736,
+      "lines": 373,
+      "sha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "35c915509b08ec00b12b89f58ac4f50c35b40933e234c65e09a0db3943754bff"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0af3e9c1269d5914418fff09ccc853e0d5b6eb3433d31743c7e873780dba5f55"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "9bdcd794b0900c98d4e0222fd1ae966f9dec56921ad339f6660ac4e6ed3a935b"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1d31ab9cbd259ed9c41efe131ffc9a0f5f746c14cd764dc28cb5ebd0f2dc1318"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 373,
+          "sha256": "07bb0c609cb10367d2b3628c7311eb0c76b4e59256b7843e973bb8095da1bef1"
+        }
+      ],
+      "initialTraversalSeconds": 0.0286,
+      "inventoryEdges": 14,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 21137,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 10,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14843,
+      "lines": 166,
+      "sha256": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bf4cd449dbe839c6f52815a388e1aea9991227a48bf7e2b726853b1ee6837a8d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1555db44c5a9ec5b2d5526aee935b944c409099a241f8142704b821610def2d9"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 166,
+          "sha256": "85b548aa8f5e52f535fb679ba0804738bc36fa3b39f5c01ceae31ca1352c6231"
+        }
+      ],
+      "initialTraversalSeconds": 0.0262,
+      "inventoryEdges": 24,
+      "addedEdges": 2,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 2,
+      "recordBytes": 27188,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/proposals/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4705,
+      "lines": 82,
+      "sha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "888d1a5632fb54013fd9026b6e830b0f682c6a975c02abd4af629c01cf474e8b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 82,
+          "sha256": "bc6040df5d542ed1224f595f535a3900aef45f69d840507ab2c7043b5fe26ed3"
+        }
+      ],
+      "initialTraversalSeconds": 0.0148,
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 8607,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 51833,
+      "lines": 714,
+      "sha256": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2dbd6ef4ce02ccd052f855774306ac4614dec0a13855571dc8070a2c27274160"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "ff80dfd1b5f6363828b07b5fbf61599c9bbc26716d4d8aca8a910c7b43b754c7"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "44fcd0ae1eccb6e033c95a734562f152e7bf3fe6cf9085369abb2c927279b664"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "758cae6f342b3e808818cc7b9633e65954dcfcb31bd62917d9a671c6150049a7"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "e2d2c35cd54faab4d5874497c3062ef2e7cd8c09d4b963225afa29e1c4b99785"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "a55bc8475f5088e46f72de05dafcaa3fb07895c738d95bdcf532f0a5a34bdb5c"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "069eb95cd87c78163e7880b3bc3de81afb5ee0421bfe8c18dd76e4b1ea01723e"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "79e60843a5b9e8cb73645167e19c1dced7e04e1ecd0f23db90561de57aba0fd8"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 714,
+          "sha256": "8d1be2375ed96e9d57eb12902b9c10af24c3524d92c07950d745442b253f7353"
+        }
+      ],
+      "initialTraversalSeconds": 0.0467,
+      "inventoryEdges": 17,
+      "addedEdges": 9,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 9,
+      "recordBytes": 34015,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/runner/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6014,
+      "lines": 70,
+      "sha256": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 70,
+          "sha256": "9b79485bc1f022e18ca874abf129b8cb7bc8a6ef0fcc6288c0b1b4cddcea5ce3"
+        }
+      ],
+      "initialTraversalSeconds": 0.0273,
+      "inventoryEdges": 2,
+      "addedEdges": 2,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 2,
+      "recordBytes": 5420,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 24670,
+      "lines": 292,
+      "sha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f5cf1bb334f8e52e5d19133ed5bccd8fc825812320573918d22562e0f405fb8a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d56b0a5704c98be2855628f3451a19e0bc396d1edc4ff0d44dfacf39942300b2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cce95b848c85e7f5686b9d77ace36d173be0bdb584201711c6d57bfacdb7eb43"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 292,
+          "sha256": "f1b1f9209d483bf0ecacefd2efba863d4235750e23db8de831ed0fcb3ca4afd1"
+        }
+      ],
+      "initialTraversalSeconds": 0.0243,
+      "inventoryEdges": 8,
+      "addedEdges": 2,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 2,
+      "recordBytes": 12467,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7063,
+      "lines": 223,
+      "sha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5d9bbff0b48a8ef0d5cf6bed1ef9d84cba5185ad90baa220dd56c6942e80a227"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2170fda60a3bd3416f5206b2f3c1e1be7e86e05753c1eac222652dddd69e6a02"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 223,
+          "sha256": "be3dc5d9e33028308379f9528d690142f2780cfb2133df8b169d2bd6cebb3a7d"
+        }
+      ],
+      "initialTraversalSeconds": 0.0191,
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 6302,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/ui-spec/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4241,
+      "lines": 62,
+      "sha256": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 62,
+          "sha256": "645ec88406e2522b35ca78edee8717f416db4dcc459b7927d91dff86c18e4fae"
+        }
+      ],
+      "initialTraversalSeconds": 0.0202,
+      "inventoryEdges": 3,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 3105,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/work-state/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4601,
+      "lines": 76,
+      "sha256": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 76,
+          "sha256": "dd21f32ff561edc62310f662bfaf5038ecf422d74d098ad74a4d22981af13ae1"
+        }
+      ],
+      "initialTraversalSeconds": 0.124,
+      "inventoryEdges": 14,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 27916,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 4,
+        "phase9-row-flip": 10
+      }
+    },
+    {
+      "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4982,
+      "lines": 58,
+      "sha256": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 58,
+          "sha256": "1eff8dc182379791c8b285f0278beb41197bfa82bcd96b4cadec4574a467f4ad"
+        }
+      ],
+      "initialTraversalSeconds": 0.0188,
+      "inventoryEdges": 2,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 2565,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/user/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1136,
+      "lines": 31,
+      "sha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 31,
+          "sha256": "827b03ab358f493995e9b1e60f892f5ba52c3d15f29e30722d0acd93bb28c29b"
+        }
+      ],
+      "initialTraversalSeconds": 0.0184,
+      "inventoryEdges": 6,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 10754,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 2,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2195,
+      "lines": 57,
+      "sha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 57,
+          "sha256": "d9795e865e892f76a868c6f9feb9626469f02284ce14d693fbd2371a4518c3e5"
+        }
+      ],
+      "initialTraversalSeconds": 0.0233,
+      "inventoryEdges": 15,
+      "addedEdges": 0,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 0,
+      "recordBytes": 17558,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 11,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 54465,
+      "lines": 763,
+      "sha256": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a2cde93cba24d7a1608c9d489e4fc616ec768fe63318fce353532da3a60b284b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "30cc8b580026369ba28368fabc7f3ea93347b8a4e94cc7e6d3bfa714b8ee21d4"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cc5bad2f235d6e4adb707df0905b1f3831c1de9fdf2146a7d3e3eee4c8165644"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "49df11df7746a6065ee432aa36c052a9eb3d3ac143e919f1093601a379417de1"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "6c681ec1795389192849669fb8088e923ae3049e2091526ea1297933de5bc131"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "571a3e8c020933565d685fde3affe6d930227d72273b771bcaf8826a66fa1b9b"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "3ce671fdd6493c3e481cdac923831b95f0ddb10d218a75fab4e1aba87e7f11c8"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "374792ef7544ade2885df1e34a7cd2aaee06c8fede889c88e5a51eaaa15659da"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "73f265968a8e4e4a80f015ca63a57578fc796d1427b6e11209abd9bffc464495"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 763,
+          "sha256": "a8fded95b07d1c32e83abd36554b6c3a893cc12979257d6c6a0cedc3d88acaa6"
+        }
+      ],
+      "initialTraversalSeconds": 1.0338,
+      "inventoryEdges": 39,
+      "addedEdges": 1,
+      "scope": "All source bytes loaded from committed Git tree; every line scanned with the unchanged checker; whole-file framing and complete adjacent reference units assessed. Independent semantic review remains required.",
+      "authorAddedEdges": 1,
+      "recordBytes": 39832,
+      "diffBytes": 0,
+      "dispositions": {
+        "preserve": 40
+      }
+    }
+  ]
+}
