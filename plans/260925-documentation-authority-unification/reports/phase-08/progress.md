@@ -1,3 +1,51 @@
+# Step 2e author checkpoint — complete-reference parser and A50 regeneration, 2026-10-19
+
+State: **L12-21 author regeneration complete; independent A50 review pending; class 3 / Step 2 OPEN.** Input HEAD `04366dfdd9a17640de87bb19a3929c846432541c`. This is an author checkpoint, not independent acceptance. The runner owns the commit; the Doer performed no git write or fgOS CLI call.
+
+**Supersession:** `step-02c-mapping-review-request.md` and its **97 logical parts are SUPERSEDED**, including the undispatched parts 36–97. The 35 existing deep-read reports and replay are retained as evidence. The older 338-part per-edge packet remains superseded. Old census, requests, reports, slice-1/2 corrections and both Phase 6 reproduction manifests remain byte-for-byte unchanged. This prefix is the only shared progress control update.
+
+- **Whole class-3 static reparse:** **5,427 → 5,440 edges / 1,036 freshly enumerated files; 1,018 → 1,330 mappings.** The same tracked class boundary is re-enumerated, excluding 350 already-owned instruction/skill files and immutable collections/history as before. Every old row has an explicit disposition: **5,403** join new full units, **24** are code/subtoken exclusions with source pins. There are **4,694** regenerated edges joined to original maps IDs and **746** supplemental/expanded full-reference rows; multiplicity changes are explicit, not inferred conservation. All 59 stored external URLs remain preserved and unvalidated remotely.
+- **Fixed plan-local read-only parser:** one Markdown link = one unit, path-text labels follow destinations; source-relative resolution, repo prefixes, full token boundaries, brace expansion, wrapped physical spans, JS/regex/minified false-positive exclusions and complete-reference patches. Actual documentation strings embedded in generated JS remain generated/provenance rows. Every patch is Phase 9 only. Existing source/locator/pinned citations, `authoritative_for`, templates, external project conventions and verbatim carriage are preserved. Status tables require row semantics. Generated outputs route through their sources. Operative reads use an exact retained file or park; no area-portal fallback. Writer/check overrides win over carriage. Deleted citations receive non-executable successor notes, including the checked implementation-alignment snapshot. Roadmap sentences are semantic Step 3 work.
+- **ONE new A50 request:** `step-02e-mapping-review-request.md`; **94 logical parts / 5,159 entries**, largest **397,442 bytes**, every part ≤60 entries/400,000 bytes including resolved rows and metadata. One index, no per-part payload files. Unique independent reports `review-a38-step-02e-map-part-NN.md`; every mapping/exception is deep-read, plus **816 seeded edges (15%)**, seed `A50-step02e-L12-21-2026-10-19-v1`. All role/action variants are required. >3% rework expands the affected set; a sample breach expands all edges. **Started 0 / accepted 0 / independent elapsed 0 / budget unassigned**; Lead sizes actual volume.
+- **Exception populations (overlap intentional):** behavioral-runtime-and-contract-triage **1061**; mechanical-target-failures **9**; native-dynamic-patterns **9**; overlay-precedence-controls **197**; phase9-row-flip **53**; preserve-pending-behavioral-proof **160**; preserve-pending-target **626**; prior-anchor-check-failures **21**; prior-target-failure-dispositions **104**; seeded-semantic-edge-sample **816**; semantic-roadmap **4**; writers-and-writer-triage **769**. The 104 former target failures remain individual disposition controls even where links merge; all 21 earlier anchor failures and nine native dynamic patterns remain open. Missing placeholder targets are not mechanical passes. Census rows and index publish retiring-root consumer counts under L12-7.
+- **Overlay precedence:** **197** full/partial correction/addition controls are replayed chronologically from the immutable original rows. Corrected source digests/spans are checked directly. Every mapping, sample, exception and review part resolves final effective rows/fingerprints; stale downstream uses fail, even if an old physical span still matches. The five class-3 L12-19 writer/check overrides remain behavioral, with no executable patch.
+- **Proof:** final read-only replay **PASS**, **5,440 edges / 1,036 files / 1,330 mappings**, nine parser probes and eight rejected mutation probes (source digest, span, mapping membership, effective overlay, downstream corrected row, exception, sample and part). Fresh original scanner: **8,852 tracked files / 574 class-3 hit files / 3,864 hit rows**; all class-3 file digests agree with the independent parser. Common light tests **95/95**, zero failures/skips, with fixtures confined via `TMPDIR=/tmp/fgos-work`. Ratchet **clean: 995 / 26 accounted edits / one accounted new file**. Exact receipts/pins are in `step-02e-verification.json`. No heavy inventory export, full suite, state/secrets/ignored/global read, service, consumer edit or target-content change was made.
+
+## Systemic diff against 02c
+
+| Defect class | Before → after detected instances |
+|---|---:|
+| partial-reference-patch | 1312 → 0 |
+| corrupted-reference-key | 192 → 0 |
+| split-markdown-link | 168 → 0 |
+| evidence-prefix-or-suffix-patch | 444 → 0 |
+| prefix-inside-longer-token | 95 → 0 |
+| code-token-as-path | 22 → 0 |
+| unexpanded-brace-list | 2 → 0 |
+| provenance-rewritten | 775 → 0 |
+| migration-cell-path-substitution | 62 → 0 |
+| generated-hand-patch | 40 → 0 |
+| operative-read-to-area-portal | 51 → 0 |
+| self-link-patch | 32 → 0 |
+| verbatim-carriage-patch | 4 → 0 |
+| authoritative-for-key-rewrite | 4 → 0 |
+| reading-map-wrong-owner | 30 → 0 |
+| evidence-wrong-mirror | 38 → 0 |
+| live-writer-treated-as-navigation | 10 → 0 |
+| checker-scope-treated-as-navigation | 12 → 0 |
+| external-citation-with-fgos-owner | 103 → 0 |
+| ui-compiler-self-reference-rewritten | 0 → 0 |
+| roadmap-without-semantic-disposition | 4 → 0 |
+| template-placeholder-rewritten | 4 → 0 |
+
+Counts overlap and use the recorded measurement populations, IDs and examples in `step-02e-review-data.json`. Zero is an author regression result under those predicates, not a semantic verdict or behavioral proof. The complete-link span population is separate from the review's exact 444 evidence prefix/suffix patches. The whole-token boundary check finds all 95 architecture-prefix cases; brace measurement includes truncated old brace keys.
+
+**Class boundary / blockers:** class 4 **NOT STARTED**. Class-3 current-coordinate/native non-joins, adoption and operational IO parity remain open; dependent rewrites stay parked. Target/semantic approval, source/generator behavior, installed-package reachability, external/ignored exports, later classes and independent review are still needed. There is no author write-scope blocker. The local request can be opened directly; MDView is not available in this assignment's tool surface and no external registration/service was started.
+
+**Next:** runner commits this author packet; Lead performs separate L12-11 accounting of every actual commit/path pair in both unchanged manifests, then clean committed-byte audits/checks/tests. Lead sizes and dispatches this ONE replacement A50 packet under A38. No guessed commit id, accounting acceptance, gate waiver, authority flip or self-approval.
+
+## Earlier author checkpoints (preserved verbatim)
+
 # Step 2d author checkpoint — corrections, wrapped citations and A50 re-cut, 2026-10-19
 
 State: **L12-20 corrections and wrapped-citation expansion authored; A50 replacement review packet ready for Lead sizing; Step 2 OPEN.** Input HEAD `e067bfa1f81e6b07179c34421b7e22e377747dd7`; latest slice-3 committed-pair accounting `e503d5a6a36f21b1f1dff9a7b3e2f449ac53c7d3`. Original slices, old requests/parts, consumers, switchboard and both reproduction manifests remain untouched. This is an author checkpoint, never independent acceptance.

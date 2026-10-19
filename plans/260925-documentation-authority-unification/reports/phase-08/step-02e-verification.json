@@ -1,0 +1,365 @@
+{
+  "inputHEAD": "04366dfdd9a17640de87bb19a3929c846432541c",
+  "timestamp": "2026-10-19T06:15:50.563433+00:00",
+  "status": "AUTHOR_MECHANICAL_PASS_INDEPENDENT_REVIEW_PENDING",
+  "mechanicalReplay": {
+    "status": "PASS",
+    "counts": {
+      "actions": {
+        "cutover-patch-only": 1276,
+        "phase9-row-flip": 53,
+        "preserve": 3325,
+        "preserve-pending-behavioral-proof": 160,
+        "preserve-pending-target": 626
+      },
+      "codeExclusions": 40,
+      "edges": 5440,
+      "files": 1036,
+      "rules": {
+        "authoritative_for": 7,
+        "checker-scope": 15,
+        "contract-data": 25,
+        "external-project": 860,
+        "generated": 108,
+        "historical-quote": 1,
+        "live-evidence-writer": 7,
+        "migration-state": 53,
+        "navigation": 1793,
+        "operative-read": 105,
+        "provenance": 994,
+        "retained-reference": 319,
+        "roadmap-semantic": 4,
+        "self-reference-preserved": 258,
+        "template": 8,
+        "ui-spec-self-reference": 1,
+        "verbatim-carriage": 877,
+        "writer-L12-19": 5
+      },
+      "mappings": 1330,
+      "maxResolvedPartBytes": 397442,
+      "parts": 94,
+      "reviewEntries": 5159,
+      "sample": 816
+    },
+    "parserProbes": [
+      "one link; label follows destination",
+      "relative consumer directory",
+      "repo prefix stripped",
+      "whole architecture token",
+      "brace list expansion",
+      "wrapped inline reference",
+      "JS indexing is not a markdown link",
+      "nonpath prefix excluded",
+      "literal citation inside JS comment preserved"
+    ],
+    "negativeProbes": [
+      {
+        "name": "wrong source digest",
+        "rejected": true
+      },
+      {
+        "name": "shifted full span",
+        "rejected": true
+      },
+      {
+        "name": "removed mapping membership",
+        "rejected": true
+      },
+      {
+        "name": "stale effective overlay",
+        "rejected": true
+      },
+      {
+        "name": "stale downstream corrected-row hash",
+        "rejected": true
+      },
+      {
+        "name": "removed exception membership",
+        "rejected": true
+      },
+      {
+        "name": "stale sampled row",
+        "rejected": true
+      },
+      {
+        "name": "stale review-part payload",
+        "rejected": true
+      }
+    ],
+    "failureCount": 0,
+    "failures": [],
+    "limits": "Author mechanical regression only. Independent A50 deep reads and semantic approval pending; class-3 native/current-coordinate/adoption and later classes remain open."
+  },
+  "commands": {
+    "parser": "PYTHONDONTWRITEBYTECODE=1 python3 plans/260925-documentation-authority-unification/reports/phase-08/step-02e-parser.py > /tmp/fgos-work/step-02e-final-data.json",
+    "packet": "PYTHONDONTWRITEBYTECODE=1 python3 plans/260925-documentation-authority-unification/reports/phase-08/step-02e-packet.py /tmp/fgos-work/step-02e-final-data.json > /tmp/fgos-work/step-02e-final-packet.json",
+    "replay": "PYTHONDONTWRITEBYTECODE=1 python3 plans/260925-documentation-authority-unification/reports/phase-08/step-02e-replay.py",
+    "scanner": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py",
+    "lightTests": "TMPDIR=/tmp/fgos-work env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+    "ratchet": "node scripts/check-legacy-docs-ratchet.mjs",
+    "scope": "git diff --check; git diff --name-only HEAD; git ls-files --others --exclude-standard"
+  },
+  "freshScanner": {
+    "exit": 0,
+    "scannedFiles": 8852,
+    "class3HitFiles": 574,
+    "class3HitRows": 3864,
+    "allSelectedHitDigestsMatch": true,
+    "sha256": "76aa159d432a77d61655e2f0164fefa4e851365413268490bc8be0300fa8a3d3"
+  },
+  "lightTests": {
+    "exit": 0,
+    "tests": 95,
+    "pass": 95,
+    "fail": 0,
+    "skip": 0,
+    "stdout": "✔ status comes only from the switchboard (1.304548ms)\n✔ a Design status header never changes the computed status (4.37405ms)\n✔ a candidate missing candidateCore fields is reported; a complete one is clean (1.809334ms)\n✔ a headerless candidate is reported (0.576917ms)\n✔ a promoted document needs the governance baseline plus the promotion extras (0.910719ms)\n✔ unresolved relative links and Related paths are reported, resolved ones are not (1.085826ms)\n✔ link and Related extraction helpers (0.227448ms)\n✔ runCli is report-only by default and fatal under --strict (23.054702ms)\n✔ the real switchboard routes every promoted and candidate area entry point (10.204231ms)\n✔ a routed document that matches no placement pattern is reported, and an ambiguous switchboard route is surfaced (1.271138ms)\n✔ strict candidate status includes untracked Markdown but not ignored draft files (12.857338ms)\n✔ committed vocabulary and constitution are internally consistent (5.002552ms)\n✔ vocabulary: a duplicate id inside a section is reported (0.671482ms)\n✔ vocabulary: a disposition naming an undefined file class is reported (1.026563ms)\n✔ vocabulary: a disposition without allowed file classes is reported (0.430757ms)\n✔ vocabulary: a file class restricted to an unknown disposition is reported (0.509847ms)\n✔ vocabulary: a change entry without evidence is reported (0.468565ms)\n✔ vocabulary: claim kinds that disagree on the ledger field list are reported (0.423667ms)\n✔ constitution: an unknown claim kind reference is reported (1.480337ms)\n✔ constitution: a claim kind served by no document kind is reported (1.754896ms)\n✔ constitution: a vocabulary document type with no document kind is reported (1.184238ms)\n✔ constitution: duplicate document kind ids and duplicate placement patterns are reported (1.684506ms)\n✔ constitution: an undeclared placeholder and a bad cardinality are reported (1.13966ms)\n✔ constitution: a canonical placement under a legacy root is reported (0.891004ms)\n✔ constitution: an alias to a missing kind and an alias that is also unmapped are reported (0.843158ms)\n✔ constitution: a gate that names a missing script is reported (1.099066ms)\n✔ constitution: a planned gate without a deliverable is reported (0.8611ms)\n✔ constitution: a deferred item without a revisit trigger is reported (0.766934ms)\n✔ constitution: an outcome disposition outside the vocabulary and a class mismatch are reported (0.723508ms)\n✔ constitution: a corpus that has no placement is reported (1.002116ms)\n✔ row validator accepts a complete row and a row with typed relations (1.071791ms)\n✔ row validator accepts identity gap claim ids and assigned targets (0.26641ms)\n✔ row validator reports each defect with a stable reason code (0.763473ms)\n✔ row validator requires a target owner when the disposition needs one (0.240833ms)\n✔ ledger summary counts valid and invalid rows, duplicate ids, usage and gaps (0.769429ms)\n✔ ledger summary flags usage drift between the vocabulary and the rows (0.309697ms)\n✔ item summary reports values the vocabulary or constitution does not define (0.469877ms)\n✔ cli: committed files without a ledger exit 0 (3.128348ms)\n✔ cli: invalid ledger rows are reported but exit 0; strict mode exits 1 (7.469353ms)\n✔ cli: an undefined item value is reported, and fatal only in strict mode (3.513279ms)\n✔ cli: --json prints one machine-readable summary (2.144379ms)\n✔ cli: an unreadable inventory is fatal and prints how to regenerate it (5.318003ms)\n✔ cli: a structurally broken vocabulary is fatal (1.604213ms)\n✔ row validator requires a rationale where the disposition needs one (0.325163ms)\n✔ row validator checks the target owner against the placement rules (3.178087ms)\n✔ row validator rejects a reviewed row that is still blocking (0.351262ms)\n✔ placement: each path matches exactly one kind, most specific pattern first (0.331126ms)\n✔ placement: equally specific patterns of different kinds are reported as ambiguous (0.811257ms)\n✔ placement check lists leftovers and recorded exceptions (0.369067ms)\n✔ placement: every markdown file under docs/platform matches exactly one kind (46.780916ms)\n✔ constitution: a governance reference to a missing heading is reported (0.789705ms)\n✔ constitution: candidate marker, amendment rule and placement exceptions are required (0.694853ms)\n✔ constitution: a kind with neither placements nor a marker is reported (0.654882ms)\n✔ constitution: retirement gate records the conservation requirements (0.119624ms)\n✔ vocabulary: an amendment without evidence is reported (0.306677ms)\n✔ item summary reports a disposition that its file class does not allow (0.146854ms)\n✔ cli: strict mode fails on an item whose disposition its file class does not allow (2.937594ms)\n✔ cli: a row rationale may come from its inventory item (2.657868ms)\n✔ governance baseline fields are derived from doc-governance, not copied (0.146746ms)\n✔ constitution: candidate fields outside the governance baseline and bad promotion fields are reported (1.085646ms)\n✔ promotion report lists the fields each canonical document lacks (0.764752ms)\n✔ cli: the promotion report is informational and never fatal (41.740467ms)\n✔ constitution: the retirement gate requires an own reviewed rationale (0.136844ms)\n✔ evidence payloads are classified by location, not by missing header (0.166316ms)\n✔ placement check reports evidence whose verification index is missing (0.166663ms)\n✔ promotion report skips evidence payloads but lists other headerless canonical files (0.224401ms)\n✔ constitution: an evidence kind that is canonical or has no owner rule is reported (0.659374ms)\n✔ reports are history and the verification kind is a verification record (0.161191ms)\n✔ authority classes are a vocabulary section and every kind uses a defined one (0.604624ms)\n✔ the usage amendment rests on dispositions that the committed decision shards use (9.940979ms)\n✔ the reading map stays outside docs/platform for a recorded reason (0.113575ms)\n✔ cutover rows: a retained claim needs an owner, an anchor and a classified kind (0.31725ms)\n✔ cutover rows: unreviewed, blocking and rationale-less rows are counted per reason (0.173951ms)\n✔ cli: --cutover is fatal while any row is blocking or unreviewed, and a reviewed ledger reports no cutover rows (3.373635ms)\n✔ constitution CLI merges every decision input and rejects a stale source proof (860.29138ms)\n✔ never repoints a source relationship or a link to its own file (3.021566ms)\n✔ source column header protects subsequent table rows (0.349243ms)\n✔ chooses a restored same-named candidate before a portal (0.387439ms)\n✔ chooses the unique per-anchor target when no same-named candidate exists (0.192916ms)\n✔ restores and classifies a portal alias with no specific target (0.210688ms)\n✔ wrapped labels are repointed and labels preserved (0.215657ms)\n✔ fences and historical referents are retained (0.190181ms)\n✔ anchored destinations preserve the explicit alias anchor (0.157802ms)\n✔ ambiguous specific targets fail closed (0.142792ms)\n✔ uses the source heading alias for a split document without guessing among sections (0.216949ms)\n✔ a canonical data cell does not protect unrelated following table rows (0.424812ms)\n✔ restored same-named document takes precedence over an archived heading alias (3.525777ms)\n✔ all source relationship row labels retain legacy destinations and verbatim labels (0.360726ms)\n✔ Source and Legacy source columns protect only their own cells (0.350321ms)\n✔ canonical in narrative text is not a source relationship label (0.182161ms)\n✔ a labelled source relationship inside any cell protects that cell alone (0.280353ms)\n✔ a source relationship link label inside any cell stays verbatim (0.121922ms)\n✔ a source-column link label does not turn preservation targets into source relationships (0.159789ms)\n✔ prose destinations and bare legacy names do not protect candidate links (0.174057ms)\n✔ relationship labels protect their own link, not other links in the same cell (0.126581ms)\nℹ tests 95\nℹ suites 0\nℹ pass 95\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1142.553151\n",
+    "sha256": "dc8cbe06a39fda5e60d5202136f36595d3aa2712a1e6f0e01b168a7c65307b24"
+  },
+  "ratchet": {
+    "exit": 0,
+    "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 26 accounted edit(s), 1 accounted new file(s)).\n"
+  },
+  "gitDiffCheck": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "changedPathsBeforeVerificationArtifact": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-census-maps-portals-prose.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-distinct-mappings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-packet.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-parser.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-replay.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-review-data.json"
+  ],
+  "protectedPins": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "matchesHEAD": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "matchesHEAD": true
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "sha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "matchesHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "matchesHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "ab2c12e00f8d01c3ef0aa569fd5259f77523a24fb3406eb8bad51bbd388a353b",
+      "matchesHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "48e6866b660fc19248ce1b306fde21a56f2a649ee014ac37436663d213d16e20",
+      "matchesHEAD": true
+    }
+  ],
+  "artifactPins": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-census-maps-portals-prose.json",
+      "sha256": "51276c724c415936730aa5cebb47ee7175d316be82867bdfc68e83c8905f2f90",
+      "bytes": 19649575
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-review-data.json",
+      "sha256": "711d77396366a988ba217ba03f763c0922a0d0dcb73f17584645b234648cfc1e",
+      "bytes": 1793756
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-index.json",
+      "sha256": "585ea6c51f413361415fe096fa5de35560050f348b83de5d2457179a0541461c",
+      "bytes": 146904
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-packet.py",
+      "sha256": "10e8cdaf81f3a73ab034f67f93a215aa33ef27cfacc85b6be7d93c252daf4c34",
+      "bytes": 18038
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-parser.py",
+      "sha256": "3ad4b7fd44c9a842eb68a66cdb7986be3deee4dedbddf4edd0f1eb1569a34ce1",
+      "bytes": 30050
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-replay.py",
+      "sha256": "55982240a46dbd8853c6b3a54c937da27dd302f5f8aa27f1889e60f3e676dd26",
+      "bytes": 8288
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-distinct-mappings.json",
+      "sha256": "3e2d6cb14c92237d8b757beb043cfa52e87a353d6fa7092914c5e3aef0de5811",
+      "bytes": 1014271
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-request.md",
+      "sha256": "1910fb33843b48915b0edd6826913db58e71519cd30552d19015d0ae59dd04f9",
+      "bytes": 10697
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "sha256": "d41dd82995e2669f2e62b536becda76c25cd38356b5d855e43184e6549a7f960",
+      "bytes": 54264
+    }
+  ],
+  "actualTargetContentEdits": [],
+  "actualN1Scope": [],
+  "reviewCounts": {
+    "edges": 5440,
+    "mappings": 1330,
+    "maxResolvedPartBytes": 397442,
+    "parts": 94,
+    "reviewEntries": 5159,
+    "sample": 816
+  },
+  "exceptionSetSizes": {
+    "behavioral-runtime-and-contract-triage": 1061,
+    "mechanical-target-failures": 9,
+    "native-dynamic-patterns": 9,
+    "overlay-precedence-controls": 197,
+    "phase9-row-flip": 53,
+    "preserve-pending-behavioral-proof": 160,
+    "preserve-pending-target": 626,
+    "prior-anchor-check-failures": 21,
+    "prior-target-failure-dispositions": 104,
+    "seeded-semantic-edge-sample": 816,
+    "semantic-roadmap": 4,
+    "writers-and-writer-triage": 769
+  },
+  "defectCounts": [
+    {
+      "class": "partial-reference-patch",
+      "before": 1312,
+      "after": 0
+    },
+    {
+      "class": "corrupted-reference-key",
+      "before": 192,
+      "after": 0
+    },
+    {
+      "class": "split-markdown-link",
+      "before": 168,
+      "after": 0
+    },
+    {
+      "class": "evidence-prefix-or-suffix-patch",
+      "before": 444,
+      "after": 0
+    },
+    {
+      "class": "prefix-inside-longer-token",
+      "before": 95,
+      "after": 0
+    },
+    {
+      "class": "code-token-as-path",
+      "before": 22,
+      "after": 0
+    },
+    {
+      "class": "unexpanded-brace-list",
+      "before": 2,
+      "after": 0
+    },
+    {
+      "class": "provenance-rewritten",
+      "before": 775,
+      "after": 0
+    },
+    {
+      "class": "migration-cell-path-substitution",
+      "before": 62,
+      "after": 0
+    },
+    {
+      "class": "generated-hand-patch",
+      "before": 40,
+      "after": 0
+    },
+    {
+      "class": "operative-read-to-area-portal",
+      "before": 51,
+      "after": 0
+    },
+    {
+      "class": "self-link-patch",
+      "before": 32,
+      "after": 0
+    },
+    {
+      "class": "verbatim-carriage-patch",
+      "before": 4,
+      "after": 0
+    },
+    {
+      "class": "authoritative-for-key-rewrite",
+      "before": 4,
+      "after": 0
+    },
+    {
+      "class": "reading-map-wrong-owner",
+      "before": 30,
+      "after": 0
+    },
+    {
+      "class": "evidence-wrong-mirror",
+      "before": 38,
+      "after": 0
+    },
+    {
+      "class": "live-writer-treated-as-navigation",
+      "before": 10,
+      "after": 0
+    },
+    {
+      "class": "checker-scope-treated-as-navigation",
+      "before": 12,
+      "after": 0
+    },
+    {
+      "class": "external-citation-with-fgos-owner",
+      "before": 103,
+      "after": 0
+    },
+    {
+      "class": "ui-compiler-self-reference-rewritten",
+      "before": 0,
+      "after": 0
+    },
+    {
+      "class": "roadmap-without-semantic-disposition",
+      "before": 4,
+      "after": 0
+    },
+    {
+      "class": "template-placeholder-rewritten",
+      "before": 4,
+      "after": 0
+    }
+  ],
+  "class4": "not started; stop at class-3 boundary; native/adoption/parity remains open",
+  "acceptance": "Author working-tree proof only; L12-11 actual runner-commit/path accounting and independent A50 review remain Lead-owned. No committed-byte batch acceptance claimed.",
+  "preview": "No MDView MCP available; no external service/registration write performed.",
+  "limits": [
+    "No git mutation or fgOS CLI",
+    "No .fgos/state/secrets/ignored/global access; only the required atomic assignment outbox exception",
+    "No consumer/code/docs/checker/test/baseline/skill/switchboard change",
+    "No protected-manifest change",
+    "No heavy inventory export/full suite/gateway",
+    "No authority flip, semantic approval or writer parity claim"
+  ]
+}
