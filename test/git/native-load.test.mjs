@@ -192,7 +192,7 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     assert.equal(mode(fresh), 0o700);
     assert.equal(mode(path.join(fresh, 'git-empty-hooks')), 0o500);
     assert.equal(addon.prepareGitDriverDirectories(fresh), false);
-    const old = path.join(root, 'old');
+    const old = path.join(root, 'fgos');
     fs.mkdirSync(old);
     fs.mkdirSync(path.join(old, 'git-empty-hooks'));
     assert.equal(mode(old), 0o775);
@@ -215,17 +215,26 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     const git = (...args) => execFileSync('git', ['-C', repo, ...args], {encoding:'utf8'}).trim();
     execFileSync('git', ['init', '-q', repo]);
     git('remote', 'add', 'upstream', '/fixture/remote');
+    git('remote', 'add', 'origin', '/fixture/origin');
+    const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');
+    git('config', '--add', 'remote.origin.fetch', oldOrigin);
     const fence = path.join(repo, '.fgos/locks/activation.lock');
     fs.mkdirSync(fence, {recursive:true});
     fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));
     fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));
-    const obsolete = addon.gitFetchMappings('upstream')[1].replaceAll('*', '');
+    const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');
     git('config', '--add', 'remote.upstream.fetch', obsolete);
     assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, false);
     const mappingFix = fixGitFetchMapping(repo, options);
     assert.equal(mappingFix.changed, true, mappingFix.message);
     const mappingCheck = checkGit(repo, 'git-publication-refspecs', options);
     assert.equal(mappingCheck.passed, true, mappingCheck.message);
+    assert.equal(git('config', '--get-all', 'remote.origin.fetch').includes(oldOrigin), false);
+    git('config', '--add', 'remote.origin.fetch', oldOrigin);
+    const originCheck = checkGit(repo, 'git-publication-refspecs', options);
+    assert.equal(originCheck.passed, false);
+    assert.match(originCheck.message, /obsolete exact legacy mapping.*plain fetch.*doctor --fix/);
+    assert.equal(fixGitFetchMapping(repo, options).changed, true);
     assert.equal(git('config', '--get-all', 'remote.upstream.fetch').split('\\n').includes(obsolete), false);
     assert.equal(fixGitFetchMapping(repo, options).changed, false);
     git('config', '--add', 'remote.upstream.fetch', obsolete);
@@ -233,14 +242,60 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     assert.equal(fixGitFetchMapping(repo, options).changed, true);
     assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, true);
 
+    // Reserved legacy mirrors are diagnosed, never silently read as event tips.
+    git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
+    git('commit', '--allow-empty', '-qm', 'fixture');
+    const badRef = 'refs/fgos/remotes/origin/legacy/events/m';
+    git('update-ref', badRef, 'HEAD');
+    const reserved = checkGit(repo, 'git-publication-refspecs', options);
+    assert.equal(reserved.passed, false); assert.ok(reserved.message.includes(badRef));
+    git('update-ref', '-d', badRef);
+
     const other = path.join(root, 'other');
     fs.mkdirSync(other);
     const link = path.join(root, 'symlink');
-    fs.symlinkSync(other, link);
-    assert.throws(() => addon.prepareGitDriverDirectories(link));
+    fs.symlinkSync(old, link);
+    assert.equal(addon.prepareGitDriverDirectories(link), false);
+    process.env.FGOS_STATE_ROOT = link;
+    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
+    fs.chmodSync(old, 0o775);
+    assert.equal(addon.prepareGitDriverDirectories(link), true);
+    assert.equal(mode(old), 0o755);
+    // A mis-pinned unrelated root is never chmodded.
+    assert.throws(() => addon.prepareGitDriverDirectories(other), /refusing to chmod.*FGOS_STATE_ROOT/);
     assert.equal(mode(other), 0o775);
     fs.symlinkSync(other, path.join(other, 'git-empty-hooks'));
     assert.throws(() => addon.prepareGitDriverDirectories(other));
+    const hooks = path.join(old, 'git-empty-hooks');
+    fs.chmodSync(hooks, 0o700);
+    fs.writeFileSync(path.join(hooks, 'foreign'), 'foreign');
+    assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /inspect.*remove foreign.*doctor --fix/.test(error.message));
+    assert.equal(mode(hooks), 0o700);
+    fs.unlinkSync(path.join(hooks, 'foreign'));
+    fs.chmodSync(hooks, 0o000);
+    if (process.getuid() !== 0) {
+      const unreadable = checkGit(repo, 'git-component-compatible', options);
+      assert.equal(unreadable.passed, false); assert.ok(unreadable.message.includes(hooks));
+      assert.match(unreadable.message, /restore owner read.search.*doctor --fix/);
+      assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
+    }
+    fs.chmodSync(hooks, 0o700);
+    assert.equal(addon.prepareGitDriverDirectories(old), true);
+    fs.rmdirSync(hooks);
+    fs.symlinkSync(other, hooks);
+    assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks));
+    assert.equal(mode(other), 0o775);
+    fs.unlinkSync(hooks);
+    assert.equal(addon.prepareGitDriverDirectories(old), true);
+    // A real driver floor record also identifies a custom named fgOS root.
+    const custom = path.join(root, 'custom');
+    fs.mkdirSync(custom, {mode:0o700});
+    process.env.FGOS_STATE_ROOT = custom;
+    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
+    fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));
+    fs.chmodSync(custom, 0o775);
+    assert.equal(addon.prepareGitDriverDirectories(custom), true);
+    assert.equal(mode(custom), 0o755);
   `;
   try {
     execFileSync('/bin/sh', ['-c', 'umask 002; exec "$@"', 'umask-probe', process.execPath, '--input-type=commonjs', '-e', `(async()=>{${probe}})().catch(e=>{console.error(e);process.exit(1)})`, built.addon, temp, new URL('../../src/setup/git-checks.mjs', import.meta.url).href, JSON.stringify(descriptor)], { encoding: 'utf8' });

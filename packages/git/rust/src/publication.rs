@@ -1601,9 +1601,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             return Err(err("invalid-publication-fetch-mapping"));
         }
         let allowed = crate::publication_fetch_mappings(remote)?;
-        let events = &allowed[0];
-        let legacy = &allowed[1];
-        if refspecs.iter().any(|r| r != events && r != legacy) {
+        if refspecs.iter().any(|r| !allowed.contains(r)) {
             return Err(err("fetch-destination-not-granted"));
         }
         let advertised = self.remote_call(
@@ -1629,12 +1627,12 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             let oid = Oid::parse(oid, repo.object_format())
                 .map_err(|_| err("remote-object-format-mismatch"))?;
             RefName::parse(source).map_err(|_| err("invalid-remote-ref"))?;
-            let target = if source.starts_with("refs/fgos/events/") && refspecs.contains(events) {
+            let target = if source.starts_with("refs/fgos/events/") && refspecs.iter().any(|r| r.starts_with("+refs/fgos/events/")) {
                 format!(
                     "refs/fgos/remotes/{remote}/events/{}",
                     &source["refs/fgos/events/".len()..]
                 )
-            } else if source == "refs/fgos/legacy" && refspecs.contains(legacy) {
+            } else if source == "refs/fgos/legacy" && refspecs.iter().any(|r| r.starts_with("+refs/fgos/legacy*:")) {
                 format!("refs/fgos/remotes/{remote}/legacy")
             } else {
                 continue;

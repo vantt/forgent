@@ -1195,3 +1195,15 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
   assert.equal(invalidRes.passed, false);
   assert.match(invalidRes.message, /not cumulative/);
 });
+
+test('Event Store remote defaults to origin and setup preserves an explicit remote', () => {
+  const entry = CONFIG_DEFAULT_REGISTRATIONS.find(r => r.key === 'eventStore');
+  assert.deepEqual(entry.shape, { remote: 'origin' });
+  const temp = mkTempDir();
+  try {
+    fs.mkdirSync(path.join(temp, '.fgos'));
+    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ eventStore: { remote: 'upstream' } }));
+    ensureSharedConfigDefaults(temp);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).eventStore.remote, 'upstream');
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});

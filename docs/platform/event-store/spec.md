@@ -451,6 +451,8 @@ Garbage collection: V-REF-01 kept refs and objects that only `refs/fgos/*` reach
 
 A forge may hide custom refs in its UI; reading them goes through `fgos events export` or `git log -p <ref>`. V-REF-01 tested the behavior of `refs/fgos/*` under push, fetch, packed refs, gc and prune, fresh clones and divergence against a local bare repository used as the remote (section 23.1 item 2), which needed no external push and no owner authorization. Whether the owner's own forge accepts and serves `refs/fgos/*` stays an acceptance gate on the owner's real remote (section 23.2 item 5); a local bare repository cannot answer it.
 
+2026-10-19 landing review: Mirror readers remove exactly one `<remote>/` segment below `refs/fgos/remotes/` and accept only exact `legacy` or the `events/`, `branch-events/`, `local-events/` stream prefixes. A suffix such as `legacy/events/<machine>` is ignored, never reinterpreted as an event tip. All `refs/fgos/legacy?*` names (nonempty suffix after `legacy`) are reserved and must never be created: the optional-source Git wildcard necessarily fetches those names too. `git-publication-refspecs` reports their mirrors for manual inspection and source/mirror cleanup.
+
 ## 15. Views, cursors and verbs
 
 A view is a cache owned by its consumer (Work: `.fgos/cache/state.json`, `src/state/fgos-file-registry.mjs:36`), never tracked, never truth, rebuildable from zero. A consumer may choose another engine, SQLite included, without touching this spec; that engine's concurrency is the consumer's concern.
@@ -581,6 +583,8 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 | `eventStore.sync.intervalSec` | 300 (0 = explicit sync only) |
 | `eventStore.rebuild.maxAttempts` | 5 (rebuild-install attempts before `event-store-rebuild-busy`) |
 | `eventStore.remote` | `origin` |
+
+`eventStore.remote` has the setup config-merge registration `event-store`, defaulting to `origin`; explicit project/global selection keeps precedence. With another configured remote, doctor/setup also migrate any obsolete exact legacy mapping on `origin` through RepositoryConfig's existing journaled `ensure_fetch_mapping` door.
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 

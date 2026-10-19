@@ -81,21 +81,29 @@ pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
     }
     Ok(vec![
         format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
-        format!("+refs/fgos/legacy*:refs/fgos/remotes/{remote}/legacy*"),
+        legacy_fetch_mapping(remote),
     ])
 }
 
+fn legacy_fetch_mapping(remote: &str) -> String {
+    format!("+refs/fgos/legacy*:refs/fgos/remotes/{remote}/legacy*")
+}
+
+/// The pre-wildcard mapping, which breaks fetch when the source is absent.
+pub fn obsolete_legacy_fetch_mapping(remote: &str) -> Result<String> {
+    publication_fetch_mappings(remote)?;
+    Ok(legacy_fetch_mapping(remote).replace('*', ""))
+}
+
 fn mapping_installed(remote: &str, wanted: &[String], actual: &[ConfigFact]) -> bool {
-    let Ok(policy) = publication_fetch_mappings(remote) else {
+    let Ok(obsolete) = obsolete_legacy_fetch_mapping(remote) else {
         return false;
     };
     wanted
         .iter()
         .all(|r| actual.iter().any(|v| v.value == r.as_bytes()))
-        && (!wanted.contains(&policy[1])
-            || !actual
-                .iter()
-                .any(|v| v.value == policy[1].replace('*', "").as_bytes()))
+        && (!wanted.contains(&legacy_fetch_mapping(remote))
+            || !actual.iter().any(|v| v.value == obsolete.as_bytes()))
 }
 
 impl RepositoryConfig for GitDriver {
@@ -207,8 +215,9 @@ impl GitDriver {
             .into_iter()
             .map(|v| String::from_utf8(v.value).map_err(error))
             .collect::<Result<_>>()?;
-        let obsolete = allowed[1].replace('*', "");
-        let replace_legacy = refspecs.contains(&allowed[1]) && old_values.contains(&obsolete);
+        let obsolete = obsolete_legacy_fetch_mapping(remote)?;
+        let replace_legacy =
+            refspecs.contains(&legacy_fetch_mapping(remote)) && old_values.contains(&obsolete);
         let missing: Vec<_> = refspecs
             .iter()
             .filter(|r| !old_values.contains(r))

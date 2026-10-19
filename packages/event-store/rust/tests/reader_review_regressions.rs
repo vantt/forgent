@@ -644,3 +644,20 @@ fn covered_seal_discovers_unknown_origin_with_open_or_rebuilt_receipt_coverage()
         assert_eq!(result.cursor.cover[&format!("{}:project", c1.origin)], 1);
     }
 }
+
+#[test]
+fn reserved_legacy_mirror_is_not_a_phantom_event_tip() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/remotes/origin/events/test-aa");
+    let oid = seal(&p, &f.repo, vec![], &[event('a', 1, 1)], "test-aa");
+    // A perfectly valid event commit under the wildcard legacy namespace must
+    // never become an event stream, even when its suffix contains /events/.
+    for name in ["refs/fgos/remotes/origin/legacy/events/test-aa", "refs/fgos/remotes/origin/legacy-old", "refs/fgos/remotes/origin/legacyx/y"] {
+        assert!(std::process::Command::new("git").arg("-C").arg(f.root.join("repo")).args(["update-ref", name, oid.as_str()]).status().unwrap().success());
+    }
+    let result = read_project(&f, &Cursor::default(), &[]);
+    assert!(result.events.is_empty());
+    assert!(result.sequence.is_empty());
+    assert!(result.legacy.is_empty());
+}
