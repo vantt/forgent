@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Provider accounts of one pool are now taken in the order the config declares them, no longer by fewest leases or oldest use: the first account takes every lease until it is quarantined or disabled, then the next. A pool declared in `runner.llmAccounts` now supplies its own accounts to the lease (a `codex` store as a Codex home, any other store with the login files its invocations declare); a pool it does not declare keeps reading `runner.providers`. An account id of digits only is refused, since such a key would sort ahead of the others. `runner.tierFallback` (tier to ordered list of families) is accepted and checked by the new doctor row `tier-fallback`; no run reads it yet.
+
 - `fgos doctor` row `git-worktree-recovery` no longer fails on a worktree whose `git worktree lock` reason names a process that is still running (pid and start time checked, a reused pid does not count); a lock naming a dead or unparseable owner stays a finding.
 
 - Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.

@@ -197,6 +197,9 @@ const EXPECTED_CLOSURE = [
   'src/runner/dispatch/visibility-session.mjs',
   'src/runner/dispatch/worker-artifacts.mjs',
   'src/runner/dispatch/provider-capacity.mjs',
+  // The account inventory provider-capacity.mjs reads for a pool declared in runner.llmAccounts
+  // (imports only provider-adapter.mjs and provider-capacity.mjs; no process control).
+  'src/runner/dispatch/llm-accounts.mjs',
   'src/config/global-config.mjs',
   'src/config/shared-config-file.mjs',
   'src/setup/config-merge.mjs',

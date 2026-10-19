@@ -7,7 +7,7 @@
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
-import { readLlmAccounts, compareWithLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
+import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveTierCeiling } from '../runner/execution/bind.mjs';
 import { resolveTierModel } from '../runner/dispatch/resolve.mjs';
@@ -98,6 +98,10 @@ export function checkLlmAccountsShape(cwd) {
     return { passed: false, message: problems.map((p) => `${p.at}: ${p.detail}`).join('; ') };
   }
   if (runnerConfig.llmAccounts === undefined) return { passed: true, message: 'runner.llmAccounts not declared; accounts come from runner.providers' };
+  const { unusable } = deriveLegacyInventory(runnerConfig);
+  if (unusable.length > 0) {
+    return { passed: true, message: `warning: login stores no invocation declares files for, so those accounts cannot run on that CLI: ${unusable.map((u) => `${u.pool}/${u.account} (${u.cli})`).join(', ')}` };
+  }
   const count = Object.values(pools).reduce((n, p) => n + Object.keys(p.accounts).length, 0);
   return { passed: true, message: `runner.llmAccounts declares ${count} accounts in ${Object.keys(pools).length} pools` };
 }

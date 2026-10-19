@@ -6,7 +6,7 @@
 import { bind } from './bind.mjs';
 import { deriveProviderFamily, resolveTierCandidates } from '../dispatch/resolve.mjs';
 import { readLlmAccounts, legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
+import { credentialStoreOf, validateProviderAccountInventory } from '../dispatch/provider-capacity.mjs';
 
 /**
  * Label every entry of the tier cell: the one that runs is `used`; a later entry served by the
@@ -37,7 +37,7 @@ function accountsOf(runnerConfig, pool, projectConfig) {
   let legacy = [];
   let legacyProblem = null;
   try {
-    legacy = Object.keys(providerAccountInventory(runnerConfig)?.[legacyStateKey(pool)]?.accounts ?? {});
+    legacy = Object.keys(validateProviderAccountInventory(runnerConfig, 'runner config')?.[legacyStateKey(pool)]?.accounts ?? {});
   } catch (err) {
     legacyProblem = err.message;
   }

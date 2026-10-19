@@ -37,7 +37,6 @@ export {
   validateProviderAccountInventory,
   providerAccountInventory,
   hasProviderAccounts,
-  stableHash,
   rankProviderAccounts,
   acquireProviderAccountLease,
   releaseProviderAccountLease,
