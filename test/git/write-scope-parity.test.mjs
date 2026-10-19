@@ -1,4 +1,5 @@
 // Execute the unchanged golden suite through the native leaf as well as Node.
+import '../helpers/process-tmp-root.mjs';
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
@@ -14,6 +15,7 @@ export const expandGenerated=(scope,mappings=[])=>call('expand',{scope,mappings}
 export const matchesWriteScope=(path,scope)=>typeof path==='string'&&call('matches',{path,scope});
 export const partitionPaths=(paths,scope)=>({inScope:paths.filter(p=>matchesWriteScope(p,scope)),outOfScope:paths.filter(p=>!matchesWriteScope(p,scope))});
 `;
-const source=fs.readFileSync(new URL('../runner/write-scope.test.mjs',import.meta.url),'utf8').replace('../../src/runner/dispatch/write-scope.mjs','data:text/javascript;base64,'+Buffer.from(facade).toString('base64'));
+const source=fs.readFileSync(new URL('../runner/write-scope.test.mjs',import.meta.url),'utf8').replace('../../src/runner/dispatch/write-scope.mjs','data:text/javascript;base64,'+Buffer.from(facade).toString('base64'))
+  .replace('../helpers/process-tmp-root.mjs',new URL('../helpers/process-tmp-root.mjs',import.meta.url).href);
 await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 await import('../runner/write-scope.test.mjs');
