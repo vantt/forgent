@@ -7,6 +7,7 @@ edition.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+fgos-write-scope = { path = "../write-scope" }
 napi = { version = "=2.16.17", default-features = false, features = ["napi8", "serde-json", "dyn-symbols", "compat-mode"] }
 napi-derive = "=2.16.13"
 serde.workspace = true

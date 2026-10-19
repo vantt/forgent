@@ -8,8 +8,8 @@ mod refs;
 mod worktree;
 pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};
 mod remote;
-pub use remote::{RefMapping, RemoteRef};
 pub use inspect::*;
+pub use remote::{RefMapping, RemoteRef};
 mod publication;
 mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
@@ -519,3 +519,21 @@ pub fn require_lock_scope_platform() -> Result<()> {
     }
     Ok(())
 }
+
+mod scoped_commit;
+pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult, CutoverGrant};
+/// Exact scope spelling suitable for literal path staging or a resolver grant.
+pub(crate) fn fgos_scope_literal(path: &str) -> Result<()> {
+    if fgos_write_scope::canonicalize(path).map_err(refs::failure)? != path
+        || path.contains('*')
+        || path.chars().any(char::is_control)
+    {
+        return Err(refs::failure("unscopable-conflict-path"));
+    }
+    Ok(())
+}
+
+mod sync;
+pub use sync::{has_conflict_markers, SyncResult};
+
+mod grant;

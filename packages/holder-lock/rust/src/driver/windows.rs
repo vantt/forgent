@@ -214,7 +214,7 @@ impl LockDriver for LockFileExDriver {
     }
 
 
-    fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration, _since: Option<fgos_process::facts::CreationMark>) -> Result<u32, Leftovers> {
+    fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration, _since: Option<fgos_process::facts::CreationMark>, _protected_roots: &[u32]) -> Result<u32, Leftovers> {
         Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
     }
 

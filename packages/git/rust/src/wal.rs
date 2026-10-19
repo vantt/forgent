@@ -83,7 +83,29 @@ pub struct WorktreeDeliveryBinding {
     pub evidence_digest: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct ScopedCommitIntent {
+    pub worktree: String,
+    pub baseline: String,
+    pub request: String,
+    pub paths: Vec<String>,
+    pub tree: String,
+    pub cutover_grant: Option<crate::CutoverGrant>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct SyncIntent {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
+    pub worktree: String,
+    pub head: String,
+    pub target: String,
+    pub message: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
+    ScopedCommit(Box<ScopedCommitIntent>),
+    Sync(Box<SyncIntent>),
     PublicationCas,
     WorktreeCreate {
         path: Box<str>,
@@ -152,6 +174,13 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Commit {
+        observed: String,
+        contract_violation: bool,
+    },
+    CommitRejected {
+        cause: String,
+    },
     /// Effect-free approval; URL and mappings live in the ConfigChange intent.
     ConfigApproved,
     Worktree {
@@ -188,6 +217,17 @@ pub enum Outcome {
 pub enum Phase {
     Intent(Intent),
     Prepared,
+    SyncState {
+        conflicts: Vec<String>,
+        staged: Vec<String>,
+        index_digest: String,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        clean_modes: Vec<(String, u32)>,
+    },
+    /// Durable one-shot barrier before Sync invokes its ref-moving commit.
+    SyncCommitAttempt {
+        tree: String,
+    },
     TargetAttempt {
         prior_target_attempt: Option<()>,
         expected: Tip,
@@ -316,6 +356,50 @@ impl Intent {
         {
             return Err(corrupt("intent binding"));
         }
+        if let OperationKind::ScopedCommit(payload) = &self.kind {
+            let ScopedCommitIntent {
+                worktree,
+                paths,
+                tree,
+                ..
+            } = payload.as_ref();
+            if !Path::new(worktree).is_absolute()
+                || !checkout_resource_valid(&self.resource_set, worktree)
+            {
+                return Err(corrupt("scoped commit binding"));
+            }
+            for path in paths {
+                if crate::fgos_scope_literal(path).is_err() {
+                    return Err(corrupt("scoped commit path"));
+                }
+            }
+            Oid::parse(tree, self.object_format).map_err(|_| corrupt("commit tree"))?;
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
+        }
+        if let OperationKind::Sync(payload) = &self.kind {
+            let SyncIntent {
+                worktree,
+                head,
+                target,
+                message,
+                reference,
+            } = payload.as_ref();
+            if !Path::new(worktree).is_absolute()
+                || !checkout_resource_valid(&self.resource_set, worktree)
+                || message.is_empty()
+                || message.contains('\0')
+                || reference
+                    .as_ref()
+                    .is_some_and(|r| RefName::parse(r).is_err())
+            {
+                return Err(corrupt("sync binding"));
+            }
+            Oid::parse(head, self.object_format).map_err(|_| corrupt("sync head"))?;
+            Oid::parse(target, self.object_format).map_err(|_| corrupt("sync target"))?;
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
+        }
         let paths = match &self.kind {
             OperationKind::WorktreeCreate {
                 path, registration, ..
@@ -332,6 +416,21 @@ impl Intent {
             _ => None,
         };
         if let Some((paths, registration)) = paths {
+            let mut actual = self.resource_set.clone();
+            let existing = match &self.kind {
+                OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+                OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+                _ => None,
+            };
+            if let Some(path) = existing {
+                actual.retain(|r| {
+                    !r.strip_prefix(&format!("worktree:{path}:custody:"))
+                        .is_some_and(|lock| Path::new(lock).is_absolute())
+                });
+                if self.resource_set.len() > actual.len() + 1 {
+                    return Err(corrupt("worktree custody binding"));
+                }
+            }
             let resources = worktree_resources(&self.kind)?;
             if paths.iter().any(|p| {
                 !Path::new(&***p).is_absolute()
@@ -345,7 +444,7 @@ impl Intent {
                 || registration.contains(['/', '\\'])
                 || registration.as_ref() == "."
                 || registration.as_ref() == ".."
-                || self.resource_set != resources
+                || actual != resources
             {
                 return Err(corrupt("worktree binding"));
             }
@@ -588,6 +687,13 @@ impl Chain {
         Ok(())
     }
 }
+fn checkout_resource_valid(resources: &[String], worktree: &str) -> bool {
+    resources == [format!("worktree:{worktree}")]
+        || resources.len() == 1
+            && resources[0]
+                .strip_prefix(&format!("worktree:{worktree}:custody:"))
+                .is_some_and(|p| Path::new(p).is_absolute())
+}
 fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     let i = match &records[0].phase {
         Phase::Intent(i) => i,
@@ -598,6 +704,20 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
             matches!(i.kind, OperationKind::ConfigChange(_))
         }
+        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::CommitRejected { cause })) => {
+            cause == "foreign-checkout-abandoned"
+                && matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                )
+        }
+        (
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::Outcome(Outcome::CommitRejected { cause }),
+        ) if cause == "foreign-checkout-effect-unknown" => matches!(
+            i.kind,
+            OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+        ),
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
@@ -617,7 +737,46 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 next,
             },
         ) => expected == &i.expected && next == &i.next,
-        (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
+        (
+            Phase::TargetAttempt { .. },
+            Phase::SyncState {
+                conflicts,
+                staged,
+                index_digest,
+                clean_modes,
+            },
+        ) => {
+            matches!(i.kind, OperationKind::Sync(_))
+                && digest_valid(index_digest)
+                && clean_modes.iter().all(|(p, mode)| {
+                    staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777
+                })
+                && conflicts
+                    .iter()
+                    .chain(staged)
+                    .all(|p| crate::fgos_scope_literal(p).is_ok())
+        }
+        (Phase::SyncState { .. }, Phase::SyncCommitAttempt { tree }) => {
+            matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
+        }
+        (
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::Outcome(o),
+        ) => match o {
+            Outcome::Commit { observed, .. } => {
+                matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                ) && Oid::parse(observed, i.object_format).is_ok()
+                    && (!matches!(i.kind, OperationKind::Sync(_))
+                        || matches!(prev, Phase::SyncCommitAttempt { .. }))
+            }
+            Outcome::CommitRejected { cause } => {
+                matches!(
+                    i.kind,
+                    OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
+                ) && !cause.is_empty()
+            }
             Outcome::Worktree { details, .. } => {
                 matches!(
                     i.kind,
@@ -1385,6 +1544,8 @@ pub struct CompactReceipt {
     pub expected: String,
     #[serde(default, rename = "n", with = "ledger_hex")]
     pub next: String,
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "f")]
+    pub reference: Option<String>,
     #[serde(with = "ledger_hex")]
     pub digest: String,
 }
@@ -1469,6 +1630,11 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Commit {
+            observed,
+            contract_violation,
+        } => vec!["k".into(), observed.clone(), contract_violation.to_string()],
+        Outcome::CommitRejected { cause } => vec!["r".into(), cause.clone()],
         Outcome::Worktree { completed, .. } => vec!["w".into(), completed.to_string()],
         Outcome::ConfigApproved => vec!["c".into()],
         Outcome::AbandonedBeforeAttempt => vec!["a".into()],
@@ -1526,6 +1692,8 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
+        Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
         Some("a" | "c") => o.len() == 1,
         Some("t") => {
@@ -1562,6 +1730,13 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "k" => Outcome::Commit {
+                observed: r[1].clone(),
+                contract_violation: r[2] == "true",
+            },
+            "r" => Outcome::CommitRejected {
+                cause: r[1].clone(),
+            },
             "w" => Outcome::Worktree {
                 completed: r[1] == "true",
                 details: vec![],
@@ -1666,6 +1841,17 @@ impl<F: FileSystem> Wal<F> {
         // exact-request replay readable; missing facts must never be guessed.
         let d = if c.v == 1 {
             canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
+        } else if c.v == 3 {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+                &c.reference,
+            ))?
         } else {
             canonical_digest(&(
                 c.v,
@@ -1684,7 +1870,11 @@ impl<F: FileSystem> Wal<F> {
                 *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit())
             })
         };
-        if !matches!(c.v, 1 | 2)
+        if !matches!(c.v, 1..=3)
+            || (c.v < 3 && c.reference.is_some())
+            || c.reference
+                .as_ref()
+                .is_some_and(|r| RefName::parse(r).is_err())
             || c.id != id
             || c.digest != d
             || !digest_valid(&c.request)
@@ -1733,24 +1923,45 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: 2,
+            v: if matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
+                3
+            } else {
+                2
+            },
             id: id.clone(),
             request: i.request_digest.clone(),
             binding: binding_digest(i)?,
             expected: compact_tip(&i.expected),
             next: compact_tip(&i.next),
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
+            reference: match &i.kind {
+                OperationKind::Sync(p) => p.reference.clone(),
+                _ => None,
+            },
             digest: String::new(),
         };
-        c.digest = canonical_digest(&(
-            c.v,
-            &c.id,
-            &c.request,
-            &c.binding,
-            &c.receipt,
-            &c.expected,
-            &c.next,
-        ))?;
+        c.digest = if c.v == 3 {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+                &c.reference,
+            ))?
+        } else {
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+            ))?
+        };
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -2733,6 +2944,7 @@ mod tests {
             expected: "e".repeat(64),
             next: "f".repeat(64),
             receipt: compact_outcome(&o),
+            reference: None,
             digest: "d".repeat(64),
         };
         let bytes = serde_json::to_vec(&c).unwrap();

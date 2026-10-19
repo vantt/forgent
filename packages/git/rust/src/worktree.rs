@@ -393,7 +393,18 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let resource_set = wal::worktree_resources(&kind).map_err(failure)?;
+        let mut resource_set = wal::worktree_resources(&kind).map_err(failure)?;
+        let existing = match &kind {
+            OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+            OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+            _ => None,
+        };
+        #[cfg(unix)]
+        if let Some(path) = existing {
+            let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
+            resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
+            resource_set.sort();
+        }
         admission(wal, id, &resource_set)?;
         let request_digest =
             wal::canonical_digest(&(&kind, &old, &next, writer)).map_err(failure)?;

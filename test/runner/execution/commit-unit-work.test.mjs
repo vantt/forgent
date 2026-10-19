@@ -388,3 +388,18 @@ test('author identity and global config variables still reach the runner commit'
   }
   assert.equal(git(dir, 'log', '-1', '--format=%an').trim(), 'Env Author');
 }));
+
+test('a pre-commit hook refusing a sync merge commit is reported hook-refused with its own words', async () => {
+  const { startSyncMerge } = await import('../../../src/runner/execution/commit-unit-work.mjs');
+  withRepo({ 'README.md': 'base\n' }, (repoRoot) => {
+    const linked = path.join(repoRoot, 'linked');
+    git(repoRoot, 'worktree', 'add', '-qb', 'producer', linked);
+    write(repoRoot, 'incoming', 'incoming\n');git(repoRoot,'add','incoming');git(repoRoot,'commit','-qm','incoming');
+    const target=head(repoRoot);
+    const hooks=path.join(repoRoot,'hooks');fs.mkdirSync(hooks);
+    fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-refusal >&2\nexit 1\n',{mode:0o755});
+    git(repoRoot,'config','core.hooksPath',hooks);
+    const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target});
+    assert.equal(result.reason,'hook-refused');assert.match(result.error,/original-refusal/);
+  });
+});

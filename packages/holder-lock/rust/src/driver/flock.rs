@@ -216,9 +216,9 @@ impl LockDriver for FlockDriver {
         request.process_group = true;
     }
 
-    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
+    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
         if cfg!(target_os = "linux") {
-            end_listed_holders(file, child_pid, kill_wait, since)
+            end_listed_holders(file, child_pid, kill_wait, since, protected_roots)
         } else {
             end_process_group(child_pid, kill_wait)
         }
@@ -227,23 +227,19 @@ impl LockDriver for FlockDriver {
 
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
-fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?)
+fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
+    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, protected_roots)
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
 pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?).map(|_| ())
+    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?, &[]).map(|_| ())
 }
 
 /// Which processes a drain reads descriptor tables of.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Reach {
-    /// Every process on the host: nothing is known about when the
-    /// description could first have been copied (a helper handed someone
-    /// else's description).
-    Everyone,
     /// Lagged per-spawn floor, assuming fork inheritance and ordinary PID
     /// allocation. Descriptor transfer to existing processes is covered by
     /// the release-time kernel lock-table settle. Reads processes
@@ -315,6 +311,21 @@ fn cleanup_loop(kill_wait: Duration, mut pass: impl FnMut(&mut Cleanup, Instant)
     }
 }
 
+/// A direct child can be an adopted borrower rather than an unrelated
+/// pre-exec fork. Only an explicitly mapped, non-CLOEXEC locked descriptor
+/// proves that distinction; unreadable facts keep the child protected.
+#[cfg(target_os = "linux")]
+fn has_borrowed_copy(dev: u64, ino: u64, pid: u32) -> bool {
+    use fgos_process::{facts::locked_fds, ProcId};
+    locked_fds(dev, ino, Some(&[ProcId(pid)])).is_ok_and(|fds| fds.iter().any(|fd| {
+        if fd.lock.kind != "FLOCK" { return false; }
+        let Ok(info) = std::fs::read_to_string(format!("/proc/{pid}/fdinfo/{}", fd.fd.0)) else { return false; };
+        info.lines().find_map(|line| line.strip_prefix("flags:")
+            .and_then(|flags| u32::from_str_radix(flags.trim(), 8).ok()))
+            .is_some_and(|flags| flags & libc::O_CLOEXEC as u32 == 0)
+    }))
+}
+
 /// Close first; the kernel's locker stamp distinguishes our escaped copies
 /// from a later acquirer's fresh description, without taking a probe lock.
 #[cfg(target_os = "linux")]
@@ -380,8 +391,10 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
             if locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).is_ok_and(|mine| mine.iter().any(|fd| fd.lock.kind == "FLOCK")) {
                 return Ok(true);
             }
-            // Unknown parent is not authority to kill; re-read each pass.
-            if parent_and_group(pid).is_some_and(|(parent, _)| parent != *me) {
+            // Unknown parent/flags are not authority to kill. Adopted
+            // borrowers are direct children too; their explicit mapping lacks
+            // CLOEXEC, unlike unrelated pre-exec copies.
+            if parent_and_group(pid).is_some_and(|(parent, _)| parent != *me || has_borrowed_copy(*dev, *ino, pid)) {
                 cleanup.signal_identity(&candidates[&pid]);
             }
         }
@@ -400,6 +413,7 @@ pub(crate) fn drain_description(
     owner: u32,
     kill_wait: Duration,
     reach: Reach,
+    protected_roots: &[u32],
 ) -> Result<u32, Leftovers> {
     use fgos_process::facts::{file_key, lock_holders, lock_holders_among, Holders};
     use fgos_process::ProcId;
@@ -415,7 +429,6 @@ pub(crate) fn drain_description(
         // The processes that may hold a copy, with their parent and group:
         // all of them, or only those created since the reach's mark.
         let (tree, candidates) = match reach {
-            Reach::Everyone => (Tree::read(), None),
             Reach::Since(mark) => match fgos_process::facts::created_since(&mark) {
                 Some(created) => {
                     let tree = Tree::of(created);
@@ -481,13 +494,15 @@ pub(crate) fn drain_description(
         }
         for tuple in holders {
             let pid = tuple.pid.0;
-            if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+            if protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) {
+                foreign.push(pid);
+            } else if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
                 || (child_pid.is_some()
-                    && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner))
+                    && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid)))
             {
                 // Each acquire owns a fresh CLOEXEC description. An outside
-                // holder other than an owner's direct pre-exec child can only
-                // be an escaped borrower descendant, even after reparenting.
+                // holder other than an owner's CLOEXEC pre-exec child can
+                // only be an escaped borrower, including adopted direct children.
                 domain.push(pid);
             } else {
                 foreign.push(pid);
@@ -498,8 +513,8 @@ pub(crate) fn drain_description(
         let mut live = Vec::new();
         for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
             // Re-check membership immediately before pinning and signalling.
-            if (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
-                || (child_pid.is_some() && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner)))
+            if !protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) && (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+                || (child_pid.is_some() && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid))))
                 && cleanup.signal(pid)
             { live.push(pid); }
         }

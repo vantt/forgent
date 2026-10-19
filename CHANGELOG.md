@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git: defer foreign-checkout cleanup failures after durable closure, preserve Sync receipt replay across branch changes, name detached-HEAD refusal, and document reflog-only recovery.
+
+- Restore WAL exclusion between checkout and worktree lifecycle operations; refuse reflog-only commit attribution, bind Sync recovery to its recorded branch, close foreign attempted chains honestly, and retain sync warnings in runner results.
+
+- Bind checkout WAL to directory identity, recover hook-modified and reflog-visible commits, preserve terminal causes and landed receipts across compaction failures, protect async siblings during native Git loans, and retain clean-file permissions during rollback. Add an aged-floor Node-loan E3 row for host acceptance.
+
+- Git: recover interrupted scoped commits without replay, unblock pre-attempt/rejected Sync transactions, bound terminal WAL history, preserve concurrent sibling borrows, and restore clean merge paths on abort. E3 now measures Node-loaned checkout custody.
+
+- Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
+
+- Preserve acquisition reach provenance in native holder-lock handover and emit Git WAL addon capabilities from the shared release/dev/test producer. Prevent uncertain Sync commit retries after a controller crash and preserve actual hook-modified file sets on receipt replay. Phase 05 remains unreleased pending its remaining acceptance proofs.
+
+- Add dormant native ScopedCommit, Sync and non-event Checkpoint ports, a Rust write-scope leaf, and an activated-host cutover grant check. Linux-x64 activation refuses a missing addon or missing `git-wal-v1` addon capability. Production adapter migration remains phase 07.
+
 - Workflow definitions load into one guide model (milestones, activities, decision points, MUST rows that each name an existing check, unenforced rules, frame defaults). Playbooks keep their steps and gain a short guide head; a MUST naming a check outside the catalog, an expression field, `listedRoutesOnly` outside a decision point, or `rigorCeiling` is a load error. A run's start event records the normalised guide.
 
 - `fgos workflow start --plan` is removed (an unknown flag now): the AgentKit plan is read as an artifact and its phases run as Units through `fgos run` or `fgos workflow start --units <file>`. The coding workflow file drops its dead runner fields (`units`, `dependsOn`, `gate` and the `integrate` and `approval` steps); its lifecycle part is unchanged.
