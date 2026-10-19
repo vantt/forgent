@@ -26,3 +26,5 @@ export { createGitScopedCommit } from './scoped-commit.mjs';
 export { createGitSync } from './sync.mjs';
 
 export { createGitLand } from './land.mjs';
+
+export { createGitSafeRestore } from './restore.mjs';

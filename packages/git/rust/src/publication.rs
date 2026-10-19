@@ -595,10 +595,10 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             | Outcome::Superseded { .. } => {
                 tip(&self.ref_tip(repo, &i.resource_set[0])?)
             }
-            Outcome::Land { .. } | Outcome::Commit { .. } | Outcome::CommitRejected { .. } | Outcome::Worktree { .. } | Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
+            Outcome::Restore { .. } | Outcome::Land { .. } | Outcome::Commit { .. } | Outcome::CommitRejected { .. } | Outcome::Worktree { .. } | Outcome::Success { .. } | Outcome::Loss { .. } => Tip::Absent,
         };
         let (observed, state, attribution) = match outcome {
-            Outcome::Land { .. } | Outcome::Commit { .. } | Outcome::CommitRejected { .. } | Outcome::Worktree { .. } | Outcome::ConfigApproved
+            Outcome::Restore { .. } | Outcome::Land { .. } | Outcome::Commit { .. } | Outcome::CommitRejected { .. } | Outcome::Worktree { .. } | Outcome::ConfigApproved
             | Outcome::AbandonedBeforeAttempt
             | Outcome::Transfer { .. } => (
                 &current,

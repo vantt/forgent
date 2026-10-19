@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add dormant SafeRestore preview/apply/recover ports with durable binary/index/untracked/mode snapshots, verified checkout custody, local delta reapplication and observe-only crash recovery.
+
 - Git Land preserves unrelated staged changes, closes abandoned prepares at admission, and reports attempted retries and CAS failures consistently with recovery.
 
 - Add dormant Land recovery through the existing Rust/addon/Node port, observe-only CAS recovery, recorded checkout fingerprints, acknowledgement-gated cleanup and compacted receipt replay.

@@ -341,6 +341,7 @@
     "src/event-store/config.mjs": "infra",
     "src/git/scoped-commit.mjs": "infra",
     "src/git/sync.mjs": "infra",
-    "src/git/land.mjs": "infra"
+    "src/git/land.mjs": "infra",
+    "src/git/restore.mjs": "infra"
   }
 }

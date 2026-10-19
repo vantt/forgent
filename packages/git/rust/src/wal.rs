@@ -108,6 +108,7 @@ pub struct LandIntent { pub request: crate::LandRequest, pub candidate: crate::L
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     Land(Box<LandIntent>),
+    Restore(Box<crate::restore::RestoreIntent>),
     ScopedCommit(Box<ScopedCommitIntent>),
     Sync(Box<SyncIntent>),
     PublicationCas,
@@ -179,6 +180,7 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
+    Restore { state: String },
     Land { checkout: String, #[serde(default, rename = "observedOnly", skip_serializing_if = "is_false")] observed_only: bool },
     Commit {
         observed: String,
@@ -221,6 +223,7 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
+    RestoreApplied { snapshot: String },
     LandVerified { evidence: crate::LandEvidence, #[serde(default, skip_serializing_if = "Option::is_none")] checkout: Option<String> },
     Intent(Intent),
     Prepared,
@@ -362,6 +365,17 @@ impl Intent {
             || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
+        }
+        if let OperationKind::Restore(p) = &self.kind {
+            if !Path::new(&p.worktree).is_absolute() || !checkout_resource_valid(&self.resource_set, &p.worktree)
+                || RefName::parse(&p.reference).is_err() || !digest_valid(&p.snapshot)
+                || canonical_digest(&p.request)? != self.request_digest
+                || self.expected != Tip::Oid(p.request.expected_head.clone()) || self.next != Tip::Oid(p.request.target.clone()) {
+                return Err(corrupt("restore binding"));
+            }
+            Oid::parse(&p.request.expected_head, self.object_format).map_err(|_|corrupt("restore head"))?;
+            Oid::parse(&p.request.target, self.object_format).map_err(|_|corrupt("restore target"))?;
+            return Ok(());
         }
         if let OperationKind::Land(payload) = &self.kind {
             let c = &payload.candidate;
@@ -724,6 +738,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
     };
     let prev = &records.last().ok_or_else(|| corrupt("empty"))?.phase;
     let valid = match (prev, phase) {
+        (Phase::TargetAttempt { .. }, Phase::RestoreApplied { snapshot }) => matches!(i.kind, OperationKind::Restore(_)) && digest_valid(snapshot),
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::ConfigApproved)) => {
             matches!(i.kind, OperationKind::ConfigChange(_))
         }
@@ -787,9 +802,10 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
         }
         (
-            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
+            Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. } | Phase::RestoreApplied { .. },
             Phase::Outcome(o),
         ) => match o {
+            Outcome::Restore { state } => matches!(i.kind, OperationKind::Restore(_)) && ["restored", "effectObservedOnly", "recoveryRequired"].contains(&state.as_str()),
             Outcome::Land { checkout, .. } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
             Outcome::Commit { observed, .. } => {
                 matches!(
@@ -1087,6 +1103,49 @@ impl<F: FileSystem> Wal<F> {
             fs: fsys,
             identity,
         })
+    }
+    pub(crate) fn store_restore_snapshot<T: Serialize>(&self, value: &T) -> WalResult<String> {
+        let bytes = serde_json::to_vec(value).map_err(|_| corrupt("snapshot serialize"))?;
+        if bytes.len() > 128 * 1024 * 1024 {
+            return Err(corrupt("restore snapshot capacity"));
+        }
+        let digest = canonical_digest(value)?;
+        let git = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?;
+        let dir = git.child("restore-snapshots", true, &self.fs)?;
+        install_ordered(
+            &dir.path(),
+            &digest,
+            &bytes,
+            &FaultAdapter(&self.fs),
+            None,
+            &mut || Ok(()),
+            &[],
+        )
+        .map_err(|e| WalError::Io(e.source))?;
+        self.fs.checkpoint("restore-snapshot-durable")?;
+        let _: serde_json::Value = self.read_restore_snapshot(&digest)?;
+        Ok(digest)
+    }
+    pub(crate) fn read_restore_snapshot<T: serde::de::DeserializeOwned>(
+        &self,
+        digest: &str,
+    ) -> WalResult<T> {
+        if !digest_valid(digest) {
+            return Err(corrupt("snapshot digest"));
+        }
+        let dir = self
+            .common
+            .child("fgos", false, &self.fs)?
+            .child("git", false, &self.fs)?
+            .child("restore-snapshots", false, &self.fs)?;
+        let value: serde_json::Value = read_json(&dir.path().join(digest), 128 * 1024 * 1024)?;
+        if canonical_digest(&value)? != digest {
+            return Err(corrupt("snapshot digest mismatch"));
+        }
+        serde_json::from_value(value).map_err(|_| corrupt("snapshot shape"))
     }
     pub fn repository_identity(&self) -> &str {
         &self.identity
@@ -1660,6 +1719,7 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Restore { state } => vec!["z".into(), state.clone()],
         Outcome::Land { checkout, observed_only } => vec!["d".into(), checkout.clone(), observed_only.to_string()],
         Outcome::Commit {
             observed,
@@ -1723,6 +1783,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("z") => o.len() == 2 && ["restored", "effectObservedOnly", "recoveryRequired"].contains(&o[1].as_str()),
         Some("d") => (o.len() == 2 || (o.len() == 3 && ["true", "false"].contains(&o[2].as_str()))) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
         Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
         Some("r") => o.len() == 2 && !o[1].is_empty(),
@@ -1762,6 +1823,7 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "z" => Outcome::Restore { state: r[1].clone() },
             "k" => Outcome::Commit {
                 observed: r[1].clone(),
                 contract_violation: r[2] == "true",
@@ -1936,6 +1998,9 @@ impl<F: FileSystem> Wal<F> {
         let id = &chain.last().operation_id;
         let actual = self.inspect(id)?;
         if actual.last().digest != chain.last().digest
+            // Restore retains its snapshot binding until explicit repair/retention
+            // is implemented; never turn a full receipt into an unusable id.
+            || matches!(actual.intent().kind, OperationKind::Restore(_))
             || !(matches!(actual.last().phase, Phase::PinReleased)
                 || (actual.intent().kind != OperationKind::PublicationCas
                     && actual.outcome().is_some()))

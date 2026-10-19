@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "docs/platform/git/spec.md \u00a73\u20134",
-  "implementationStatus": "Publication and RepositoryConfig fetch mapping implemented; dormant Inspect, Refs, Remote and Worktree ports; public worktree create enabled by owner Q2; checkout mutation and consumer migration pending",
+  "implementationStatus": "Publication and RepositoryConfig fetch mapping implemented; dormant Inspect, Refs, Remote, Worktree, ScopedCommit, Sync, Land and SafeRestore ports; public worktree create enabled by owner Q2; consumer migration and remaining RepositoryConfig/Recovery operations pending",
   "ports": {
     "Inspect": [
       "resolveRepo",

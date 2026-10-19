@@ -680,7 +680,7 @@ impl GitDriver {
             Err(out.error("merge-head-unreadable"))
         }
     }
-    fn dirty_paths(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
+    pub(crate) fn dirty_paths(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
         let mut result = paths(&self.checkout_bytes(
             repo,
             scope,
@@ -1388,22 +1388,46 @@ fn content_digest(root: &Path, path: &str) -> Result<String> {
 
 // Transaction-local snapshot: uncertain/crashed attempts retain their WAL and
 // refuse replay; any inline failure with unchanged HEAD restores producer bytes.
-enum SavedPath {
+#[derive(Serialize, Deserialize)]
+pub(crate) enum SavedPath {
+    #[serde(skip)]
     Head(Option<fs::Permissions>),
     Absent,
-    File(Vec<u8>, fs::Permissions),
+    File(Vec<u8>, #[serde(with = "saved_permissions")] fs::Permissions),
     Link(std::path::PathBuf),
 }
 impl SavedPath {
-    fn capture(path: &Path) -> Result<Self> {
+    pub(crate) fn capture(path: &Path) -> Result<Self> {
+        Self::capture_bounded(path, u64::MAX - 1)
+    }
+    pub(crate) fn capture_bounded(path: &Path, limit: u64) -> Result<Self> {
+        use std::io::Read;
         match fs::symlink_metadata(path) {
             Ok(m) if m.file_type().is_symlink() => {
                 Ok(Self::Link(fs::read_link(path).map_err(failure)?))
             }
-            Ok(m) if m.is_file() => Ok(Self::File(
-                fs::read(path).map_err(failure)?,
-                m.permissions(),
-            )),
+            Ok(m) if m.is_file() => {
+                let mut options = fs::OpenOptions::new();
+                options.read(true);
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::OpenOptionsExt;
+                    options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+                }
+                let file = options.open(path).map_err(failure)?;
+                let actual = file.metadata().map_err(failure)?;
+                if !actual.is_file() || actual.len() > limit {
+                    return Err(failure("snapshot-file-capacity-or-type"));
+                }
+                let mut bytes = Vec::new();
+                file.take(limit.saturating_add(1))
+                    .read_to_end(&mut bytes)
+                    .map_err(failure)?;
+                if bytes.len() as u64 > limit {
+                    return Err(failure("snapshot-file-capacity"));
+                }
+                Ok(Self::File(bytes, actual.permissions()))
+            }
             Ok(_) => Err(failure("commit-snapshot-non-file")),
             Err(e)
                 if matches!(
@@ -1416,7 +1440,7 @@ impl SavedPath {
             Err(e) => Err(failure(e)),
         }
     }
-    fn restore(&self, path: &Path) -> std::io::Result<()> {
+    pub(crate) fn restore(&self, path: &Path) -> std::io::Result<()> {
         // Do not follow a hook-created parent symlink outside the checkout.
         for parent in path.ancestors().skip(1) {
             if fs::symlink_metadata(parent).is_ok_and(|m| m.file_type().is_symlink()) {
@@ -1461,6 +1485,38 @@ impl SavedPath {
                     Err(std::io::Error::other("snapshot symlink unsupported"))
                 }
             }
+        }
+    }
+}
+
+mod saved_permissions {
+    use super::*;
+    pub fn serialize<S: serde::Serializer>(
+        p: &fs::Permissions,
+        s: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            p.mode().serialize(s)
+        }
+        #[cfg(not(unix))]
+        {
+            p.readonly().serialize(s)
+        }
+    }
+    pub fn deserialize<'de, D: serde::Deserializer<'de>>(
+        d: D,
+    ) -> std::result::Result<fs::Permissions, D::Error> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            Ok(fs::Permissions::from_mode(u32::deserialize(d)?))
+        }
+        #[cfg(not(unix))]
+        {
+            let _ = d;
+            Err(serde::de::Error::custom("snapshot-platform-unsupported"))
         }
     }
 }
