@@ -162,3 +162,10 @@ All seven new findings have text dispositions; implementation, actual accounting
 - **Decision:** rows 16 and 17 become **cutover-patch-only**: the exact patch repoints them to `docs/platform/work-state/spec.md#11-business-rules` (RUL10), valid only after Phase 9's first obligation (A47 main-import accounting) has carried bổ chú 3 into the candidate. Added to the Phase 9 dependency list. No early target edit.
 - **P8-DOC-GAP-01:** the participant contract's prose still instructs reimplementing the retired wx/dead-pid `events.lock` protocol; that is stale content, not a link problem. It becomes a separate backlog item (rewrite against Holder-lock §15 `withStateTx`), outside Phase 8 (RUL104: link migration does not grow into content rewrites).
 - **Result counts after this decision:** 2 rewrite / 21 cutover-patch-only / 24 preserve / 0 parked.
+
+## L12-18 — Accept Step 1 (Lead, A42)
+
+- **Evidence:** proposals `33b80f0de`, Lead L12-17 `c75796efa`, accounting `1b8603207` (13 pairs per manifest). Batch-end acceptance on clean committed bytes at `1b8603207`: reporter exit 0, three-file tests 67/67, ratchet 0. Independent review `review-a38-step-01-pilot-b-01.md`: 47/47 ok, 0 rework, agrees with L12-17.
+- **Effective dispositions:** 2 rewrite / 21 cutover-patch-only / 24 preserve / 0 parked (the proposals file still shows the pre-L12-17 counts 2/19/24/2; this entry is authoritative).
+- **Carried conditions:** P8-DOC-GAP-01 (participant-contract prose) must land before or with the cutover patch for rows 16/17; row 17's `:1045` line suffix is replaced together with its path. Rows 32/33 may use a different target section; the current one is acceptable.
+- **Main drift:** Step 2's first census attempt was stopped after six minutes so main `51c61af64` (30 commits, 94 files) can be merged first; its partial outputs were saved outside the repo, not committed, and Step 2 reruns on the merged base.
