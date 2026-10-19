@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
+
 - Fix Worktree allocation under `.claude/worktrees`, multi-user cwd checks and terminal recovery of clean Git refusals; require reachable delivery before removal and report preserved dirty checkouts as advisory diagnostics.
 
 - Add `fgos worktree create <path> [--branch <name> | --detach] [--base <ref>]`: serialized worker checkout creation with stripped `.fgos`, plus read-only `git-worktree-recovery` diagnostics. Dormant native Worktree removal, relocation and evidence-bound crash recovery preserve dirty or uncertain checkouts.

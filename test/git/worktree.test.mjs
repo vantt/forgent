@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture } from './worktree-fixture.mjs';
 for (const backend of ['files','reftable']) test(`Worktree create, move, guarded remove (${backend})`, { skip: process.platform === 'win32' }, () => {
@@ -138,4 +138,34 @@ test('detached undelivered tip requires a surviving non-fgos ref', {skip:process
     f.git('update-ref','refs/heads/delivered',tip);
     f.port.remove(proof);
   } finally {f.cleanup();}
+});
+
+test('Worktree remove warns and proceeds with a non-dumpable same-user process', {skip:process.platform!=='linux'},()=>{
+  // A real PR_SET_DUMPABLE=0 process reproduces ssh-agent/systemd cwd permissions.
+  const script = `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import assert from 'node:assert/strict';
+    import {spawn} from 'node:child_process';
+    import {fixture} from ${JSON.stringify(new URL('./worktree-fixture.mjs',import.meta.url).href)};
+    const f=fixture(); const worker=path.join(f.temp,'worker'); let child;
+    try {
+      f.port.createDetached({path:worker,operationId:'create'});
+      child=spawn('python3',['-c',
+        'import ctypes,os,time; assert ctypes.CDLL(None).prctl(4,0,0,0,0)==0; print(os.getpid(),flush=True); time.sleep(60)'],
+        {cwd:f.repoPath,stdio:['ignore','pipe','inherit']});
+      await new Promise((resolve,reject)=>{child.once('error',reject);child.stdout.once('data',resolve);});
+      assert.throws(()=>fs.readlinkSync('/proc/'+child.pid+'/cwd'), /EACCES|EPERM/);
+      console.log('protected-pid='+child.pid);
+      f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'});
+      assert.equal(fs.existsSync(worker),false);
+    } finally {
+      if(child){const done=new Promise(r=>child.once('exit',r));child.kill();await done;}
+      f.cleanup();
+    }
+  `;
+  const result=spawnSync(process.execPath,['--input-type=module','-e',script],{encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,result.stderr);
+  const pid=/protected-pid=(\d+)/.exec(result.stdout)?.[1]; assert.ok(pid,result.stdout);
+  assert.match(result.stderr,new RegExp('warning: worktree-cwd-unreadable pid='+pid+' comm="python3"'));
 });

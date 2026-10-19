@@ -33,6 +33,7 @@ test('CLI adapter creates the checkout and emits the public JSON envelope', {ski
     const host=ensureHostBin({...process.env,FGOS_HOST_BIN:''},REPO_ROOT);
     const manifest=structuredClone(f.loader.descriptor.manifest);
     manifest.entries.fgos=path.relative(REPO_ROOT,host);
+    manifest.components.legacyNode={root:'.',entry:'bin/fgos.mjs'};
     const manifestPath=path.join(f.temp,'manifest.json');fs.writeFileSync(manifestPath,JSON.stringify(manifest));
     const env={...process.env,FGOS_HOST_BIN:host,FGOS_ACTIVE_MANIFEST_PATH:manifestPath,FGOS_STATE_ROOT:path.join(f.temp,'fgos')};
     for(const name of ['CLAUDE_CODE_SESSION_ID','CODEX_THREAD_ID','FGOS_SESSION_ID'])delete env[name];
