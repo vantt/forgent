@@ -27,7 +27,7 @@ import {
   resumeWorkflowDetached,
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
-import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';

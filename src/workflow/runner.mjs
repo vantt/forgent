@@ -11,13 +11,13 @@ import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow } from './loader.mjs';
 import {
-  createAdvanceHold,
   createWorkflowRun,
   appendWorkflowEvent,
   readWorkflowEvents,
-  recoverWorkflowLedgerTail,
   projectWorkflowState,
 } from './store.mjs';
+import { advanceReport, withAdvanceLock, withAdvanceLockSync, workflowRunDirOf, PROGRESS_LINE_LIMIT } from './case-lock.mjs';
+import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import {
   createWorkflowWorktree,
   mergeWorkflowBranch,
@@ -36,8 +36,7 @@ import { providerAccountInventory } from '../runner/dispatch/provider-capacity.m
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { nulPaths } from '../util/git-paths.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
-import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
-import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
+import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -361,8 +360,6 @@ function settleUnitWorktrees({ mainRoot, state, workflow }) {
   }
   return { removed, kept };
 }
-
-const PROGRESS_LINE_LIMIT = 300;
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -818,127 +815,6 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
   return state;
 }
 
-// The advance lock is a kernel mutex on `<runDir>/locks/advance.lock` (src/holder-lock): the kernel
-// lets one process advance a run at a time and releases it the moment that process dies, so a holder
-// killed mid-advance never leaves the run stuck.
-function workflowRunDirOf(mainRoot, workflowRunId) {
-  return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId);
-}
-
-function advanceLockParams(mainRoot, workflowRunId) {
-  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: workflowRunDirOf(mainRoot, workflowRunId) };
-}
-
-/** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
-function advanceHolderPid(params) {
-  const holders = lockHolders('advance', params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
-}
-
-/** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */
-function liveAdvanceHolder(mainRoot, workflowRunId) {
-  const params = advanceLockParams(mainRoot, workflowRunId);
-  // A run whose lock file was never created was never advanced under this lock: nothing to probe.
-  if (!fs.existsSync(resolveLock('advance', params).v3Path)) return null;
-  // The kernel's holder list takes no lock, so a status read never makes a concurrent advance see
-  // the lock held; the probe, which does, is only for a platform that cannot list holders.
-  const holders = lockHolders('advance', params);
-  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0] } : null;
-  return probe('advance', params).result === 'free' ? null : { pid: null };
-}
-
-function advanceRefusal(workflowRunId, pid) {
-  const holder = pid ? `process ${pid}` : 'another process';
-  return new RunnerConfigError(
-    `Workflow run "${workflowRunId}" is already being advanced by ${holder}; read progress with "fgos workflow status ${workflowRunId}" and retry once it parks or finishes`,
-  );
-}
-
-/**
- * Hold the run for this process while it advances, so two processes never advance one run at
- * once. Returns the hold the ledger demands for every append; `hold.release()` frees the run. A
- * ledger that ends in an unfinished line (an append cut short by a crash) is repaired here, by the
- * one process allowed to, before anything reads or appends.
- */
-export function acquireAdvanceLock(mainRoot, workflowRunId) {
-  const params = advanceLockParams(mainRoot, workflowRunId);
-  // Taking the lock creates its directory; never bring back a run that was deleted.
-  if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  const res = acquireSync(createLockScope('advance'), 'advance', params);
-  if (res.result !== 'acquired') throw advanceRefusal(workflowRunId, advanceHolderPid(params));
-  const hold = createAdvanceHold({ workflowRunId, release: () => res.handle.release() });
-  try {
-    recoverWorkflowLedgerTail({ repoRoot: mainRoot, workflowRunId, hold });
-  } catch (err) {
-    hold.release();
-    throw err;
-  }
-  return hold;
-}
-
-const ADVANCE_TAIL_LINES = 20;
-const ADVANCE_TAIL_READ_BYTES = 64 * 1024;
-// A recorded run whose advance has not taken the lock yet is still starting; past this age with no
-// live holder it is a dead child.
-const ADVANCE_STALE_MS = 30 * 1000;
-
-function tailAdvanceLog(logPath) {
-  let fd;
-  try {
-    fd = fs.openSync(logPath, 'r');
-    const { size } = fs.fstatSync(fd);
-    const length = Math.min(size, ADVANCE_TAIL_READ_BYTES);
-    const buffer = Buffer.alloc(length);
-    fs.readSync(fd, buffer, 0, length, size - length);
-    return buffer
-      .toString('utf8')
-      .split('\n')
-      .filter((line) => line.length > 0)
-      .slice(-ADVANCE_TAIL_LINES)
-      .map((line) => line.slice(0, PROGRESS_LINE_LIMIT));
-  } catch {
-    return [];
-  } finally {
-    if (fd !== undefined) fs.closeSync(fd);
-  }
-}
-
-/** What the detached advance of a run is doing: liveness from the lock holder, plus its log tail. */
-function advanceReport(mainRoot, workflowRunId, state, events) {
-  const runDir = workflowRunDirOf(mainRoot, workflowRunId);
-  const holder = liveAdvanceHolder(mainRoot, workflowRunId);
-  const logPath = path.join(runDir, 'advance.log');
-  const advance = { running: holder !== null, pid: holder?.pid ?? null, logPath };
-  if (state.status !== 'completed') {
-    const lastLines = tailAdvanceLog(logPath);
-    if (lastLines.length > 0) advance.lastLines = lastLines;
-  }
-  const lastTs = Date.parse(events[events.length - 1].ts);
-  if (state.status === 'running' && holder === null && Date.now() - lastTs > ADVANCE_STALE_MS) {
-    advance.hint = `The advance of this run is not running and nothing was recorded for a while; continue it with: fgos workflow resume ${workflowRunId}`;
-  }
-  return advance;
-}
-
-/** Run `advance(hold)` while this process holds the run's advance lock. */
-async function withAdvanceLock(mainRoot, workflowRunId, advance) {
-  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
-  try {
-    return await advance(hold);
-  } finally {
-    hold.release();
-  }
-}
-
-/** Run `action(hold)` while this process holds the run's advance lock; for a caller that does not advance. */
-function withAdvanceLockSync(mainRoot, workflowRunId, action) {
-  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
-  try {
-    return action(hold);
-  } finally {
-    hold.release();
-  }
-}
 
 /**
  * Spawn `fgos workflow resume <id> --foreground` as a detached process whose output goes to
@@ -1238,7 +1114,11 @@ function resolveAnswerTarget(workflowRunId, params) {
   return { mainRoot, worktreePath };
 }
 
-/** Append the gate answer to the run's event log; returns the run state as it was before the answer. */
+/**
+ * Record the gate answer as a round (its file is made once and never rewritten) and append the
+ * `gate.answer` event that consumes it, under the run's `advance` hold. A second answer to a gate
+ * that is already answered is refused by name. Returns the run state as it was before the answer.
+ */
 function recordGateAnswer(workflowRunId, params, mainRoot, hold) {
   const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   if (events.length === 0) {
@@ -1249,90 +1129,19 @@ function recordGateAnswer(workflowRunId, params, mainRoot, hold) {
   // The file comes first: an answer that cannot be kept where later units read it is refused,
   // not recorded.
   const approved = params.approved === true || params.approved === 'true';
-  const answeredAt = new Date().toISOString();
   const question = state.questions.find((q) => q.stepId === params.stepId)?.question ?? state.steps[params.stepId]?.gate?.question ?? '';
-  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt, approved });
-
-  appendWorkflowEvent({
-    repoRoot: mainRoot,
-    workflowRunId,
-    hold,
-    event: {
-      type: 'gate.answer',
-      payload: {
-        stepId: params.stepId,
-        answer: params.answer,
-        approved,
-        answeredAt,
-      },
-    },
+  recordGateAnswerRound({
+    mainRoot,
+    caseId: workflowRunId,
+    events,
+    stepId: params.stepId,
+    answer: String(params.answer),
+    approved,
+    question,
+    mode: state.steps[params.stepId]?.gate?.mode === 'input' ? 'input' : 'consent',
   });
+  drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
   return state;
-}
-
-/**
- * Keep the owner's answer to a human gate as a file in the run directory, the one place later
- * units are handed it from (`gate-answer:<workflowRunId>/<stepId>`). A second answer to the same
- * gate replaces the first.
- */
-function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt, approved }) {
-  const file = gateAnswerFile(mainRoot, workflowRunId, stepId);
-  if (!file) {
-    throw new RunnerConfigError(`gate answer refused: "${stepId}" is not a step id that can name an answer file`);
-  }
-  let baseHeader = '';
-  let priorRounds = '';
-  if (fs.existsSync(file)) {
-    const existing = fs.readFileSync(file, 'utf8');
-    const roundsIndex = existing.indexOf('## Rounds');
-    if (roundsIndex !== -1) {
-      baseHeader = existing.slice(0, roundsIndex).trim();
-      priorRounds = existing.slice(roundsIndex).trim();
-    } else {
-      baseHeader = existing.trim();
-    }
-  }
-
-  const roundEntry = [
-    `### Round at ${answeredAt} (${approved ? 'Approved' : 'Clarification'})`,
-    '',
-    `- Approved: ${approved ? 'yes' : 'no'}`,
-    '',
-    '#### Answer',
-    '',
-    answer,
-    '',
-  ].join('\n');
-
-  let text;
-  if (!baseHeader) {
-    text = [
-      `# Owner's answer at the "${stepId}" gate`,
-      '',
-      `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
-      '',
-      `- Workflow run: ${workflowRunId}`,
-      `- Step: ${stepId}`,
-      `- Answered by: the owner, through "fgos workflow answer"`,
-      '',
-      '## Question',
-      '',
-      question,
-      '',
-      '## Rounds',
-      '',
-      roundEntry,
-    ].join('\n');
-  } else if (priorRounds) {
-    text = `${baseHeader}\n\n${priorRounds}\n\n${roundEntry}\n`;
-  } else {
-    text = `${baseHeader}\n\n## Rounds\n\n${roundEntry}\n`;
-  }
-
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, text);
-  fs.renameSync(tmp, file);
 }
 
 /**
