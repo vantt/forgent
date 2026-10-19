@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git checkout operations revalidate config file stamps before each child and refuse post-hook promisor changes while retaining the reduced preflight exec count.
+
 - Git: reuse config and storage-format checks within each ScopedCommit/Sync call, recheck after hooks, and retain per-child topology and custody validation.
 
 - Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.

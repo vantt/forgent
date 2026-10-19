@@ -89,7 +89,7 @@ impl std::error::Error for InvalidInput {}
 pub struct RepoHandle {
     // Present only on an operation-local checkout handle; inner None fences
     // all later commands if the post-hook refresh fails.
-    checkout_config: Option<std::sync::Mutex<Option<Vec<driver::ConfigRecord>>>>,
+    checkout_config: Option<std::sync::Mutex<Option<driver::ConfigCache>>>,
     common_dir: PathBuf,
     trusted_main_root: PathBuf,
     object_format: ObjectFormat,

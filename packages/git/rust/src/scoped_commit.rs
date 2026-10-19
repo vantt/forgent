@@ -620,15 +620,7 @@ impl GitDriver {
         // Hooks can rewrite config/topology even on rejection or timeout. Check
         // before any subsequent Git command (including cleanup/recovery reads).
         if hooks {
-            if let Some(config) = &repo.checkout_config {
-                // Invalidate first: a failed recheck must also fence cleanup.
-                *config.lock().map_err(failure)? = None;
-                let fresh = self.checkout_repository(repo)?;
-                *config.lock().map_err(failure)? = fresh.checkout_config
-                    .expect("operation config").into_inner().map_err(failure)?;
-            } else {
-                self.checkout_repository(repo)?;
-            }
+            self.refresh_checkout_facts(repo)?;
         }
         out
     }

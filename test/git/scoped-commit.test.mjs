@@ -282,3 +282,15 @@ test('ScopedCommit checks object format again on an existing port',()=>{
     assert.ok(f.port.preflight({},f.held).head);
   } finally {fs.writeFileSync(config,original);f.close();}
 });
+
+for(const rejected of [false,true]) test(`ScopedCommit refuses post-hook promisor changes on ${rejected?'rejection':'success'}`,()=>{
+  const f=fixture();try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\ngit config remote.origin.promisor true\nexit ${rejected?1:0}\n`,{mode:0o755});
+    f.git('config','core.hooksPath','hooks');
+    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
+    assert.throws(()=>f.port.commit({operationId:'hook-promisor',baseline,request:{writes:['a'],message:'promisor',cutoverGrant:null}},f.held),/repository-promisor-changed/);
+    f.git('config','--unset','remote.origin.promisor');
+    assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),rejected?'base':'producer');
+  } finally {f.close();}
+});
