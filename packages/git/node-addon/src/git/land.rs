@@ -80,6 +80,33 @@ impl GitLand {
             .map_err(operation)?))
     }
     #[napi]
+    pub fn recover(&self, args: Value, loans: Vec<External<Loan>>) -> Result<Value> {
+        check()?;
+        if self.session.is_some() {
+            return Err(error("land-session-already-open"));
+        }
+        let id = text(&args, "operationId")?;
+        let receipt = self
+            .driver
+            .recover_land(&self.repo, consume(loans)?, &self.writer, id)
+            .map_err(operation)?;
+        let warnings = match args.get("consumerAcknowledgement") {
+            Some(value) => {
+                let acknowledgement = value
+                    .as_str()
+                    .ok_or_else(|| error("expected consumerAcknowledgement string"))?;
+                if acknowledgement.is_empty() {
+                    return Err(error("land-consumer-acknowledgement-required"));
+                }
+                self.driver
+                    .acknowledge_land(&self.repo, &self.writer, id, acknowledgement)
+                    .unwrap_or_else(|e| vec![format!("land-cleanup-deferred: {}", e.cause)])
+            }
+            None => vec![],
+        };
+        Ok(json!({"receipt": receipt, "warnings": warnings}))
+    }
+    #[napi]
     pub fn close(&mut self) -> Result<()> {
         check()?;
         self.session.take();

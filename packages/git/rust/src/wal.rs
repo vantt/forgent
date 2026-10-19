@@ -160,6 +160,7 @@ pub struct Intent {
     pub expected: Tip,
     pub next: Tip,
 }
+fn is_false(value: &bool) -> bool { !value }
 /// Strings are validated against Intent.objectFormat before use, including on
 /// reads; serde is never a way around Oid/RefName validation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -178,7 +179,7 @@ pub enum Attribution {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Outcome {
-    Land { checkout: String },
+    Land { checkout: String, #[serde(default, rename = "observedOnly", skip_serializing_if = "is_false")] observed_only: bool },
     Commit {
         observed: String,
         contract_violation: bool,
@@ -220,7 +221,7 @@ pub enum Outcome {
     deny_unknown_fields
 )]
 pub enum Phase {
-    LandVerified { evidence: crate::LandEvidence },
+    LandVerified { evidence: crate::LandEvidence, #[serde(default, skip_serializing_if = "Option::is_none")] checkout: Option<String> },
     Intent(Intent),
     Prepared,
     SyncState {
@@ -740,12 +741,12 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             i.kind,
             OperationKind::ScopedCommit(_) | OperationKind::Sync(_)
         ),
-        (Phase::Prepared, Phase::LandVerified { evidence }) => {
+        (Phase::Prepared, Phase::LandVerified { evidence, .. }) => {
             matches!(&i.kind, OperationKind::Land(p) if evidence.source == p.candidate.source && evidence.target == p.candidate.target && evidence.candidate == p.candidate.candidate && evidence.tree_digest == p.candidate.tree_digest && !evidence.evidence_digest.is_empty())
         }
         (Phase::LandVerified { .. }, Phase::TargetAttempt { prior_target_attempt: None, expected, next }) => matches!(i.kind,OperationKind::Land(_)) && expected == &i.expected && next == &i.next,
         (Phase::Intent(_), Phase::Prepared) => true,
-        (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
+        (Phase::Intent(_) | Phase::Prepared | Phase::LandVerified { .. }, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true
         }
         (
@@ -789,7 +790,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
             Phase::Outcome(o),
         ) => match o {
-            Outcome::Land { checkout } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
+            Outcome::Land { checkout, .. } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
@@ -1659,7 +1660,7 @@ mod ledger_hex_vec {
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
-        Outcome::Land { checkout } => vec!["d".into(), checkout.clone()],
+        Outcome::Land { checkout, observed_only } => vec!["d".into(), checkout.clone(), observed_only.to_string()],
         Outcome::Commit {
             observed,
             contract_violation,
@@ -1722,7 +1723,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
-        Some("d") => o.len() == 2 && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
+        Some("d") => (o.len() == 2 || (o.len() == 3 && ["true", "false"].contains(&o[2].as_str()))) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
         Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
         Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
@@ -1768,7 +1769,7 @@ impl CompactReceipt {
             "r" => Outcome::CommitRejected {
                 cause: r[1].clone(),
             },
-            "d" => Outcome::Land { checkout: r[1].clone() },
+            "d" => Outcome::Land { checkout: r[1].clone(), observed_only: r.get(2).is_some_and(|s| s == "true") },
             "w" => Outcome::Worktree {
                 completed: r[1] == "true",
                 details: vec![],
@@ -1808,6 +1809,9 @@ impl CompactReceipt {
     }
 }
 fn binding_digest(i: &Intent) -> WalResult<String> {
+    if matches!(i.kind, OperationKind::Land(_)) {
+        return canonical_digest(&("land", &i.repo_identity, i.resource_set.first(), &i.authority_binding, &i.writer_identity, &i.expected, &i.next, i.object_format));
+    }
     canonical_digest(&(
         &i.repo_identity,
         &i.resource_set,
@@ -1955,7 +1959,7 @@ impl<F: FileSystem> Wal<F> {
         }
         let i = actual.intent();
         let mut c = CompactReceipt {
-            v: if matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
+            v: if matches!(i.kind, OperationKind::Land(_)) || matches!(&i.kind, OperationKind::Sync(p) if p.reference.is_some()) {
                 3
             } else {
                 2
@@ -1968,6 +1972,7 @@ impl<F: FileSystem> Wal<F> {
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
             reference: match &i.kind {
                 OperationKind::Sync(p) => p.reference.clone(),
+                OperationKind::Land(p) => Some(p.request.destination.clone()),
                 _ => None,
             },
             digest: String::new(),

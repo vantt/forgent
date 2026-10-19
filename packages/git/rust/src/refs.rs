@@ -76,6 +76,22 @@ pub(crate) fn admission<F: wal::FileSystem>(
     id: &str,
     resources: &[String],
 ) -> Result<()> {
+    admission_with_land(wal, id, resources, None)
+}
+pub(crate) fn admission_land<F: wal::FileSystem>(
+    wal: &Wal<F>,
+    id: &str,
+    resources: &[String],
+    binding: &str,
+) -> Result<()> {
+    admission_with_land(wal, id, resources, Some(binding))
+}
+fn admission_with_land<F: wal::FileSystem>(
+    wal: &Wal<F>,
+    id: &str,
+    resources: &[String],
+    land_binding: Option<&str>,
+) -> Result<()> {
     let scan = wal.scan(100_000).map_err(failure)?;
     if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
         return Err(recovery("git-wal-unreadable"));
@@ -83,7 +99,8 @@ pub(crate) fn admission<F: wal::FileSystem>(
     for chain in wal.active(100_000).map_err(failure)? {
         if chain.last().operation_id != id
             && chain.intent().resource_set.iter().any(|r| {
-                resources.contains(r)
+                (resources.contains(r) && !(land_binding == Some(chain.intent().authority_binding.as_str())
+                    && matches!(&chain.intent().kind, OperationKind::Land(p) if &p.request.destination == r)))
                     || matches!(
                         chain.intent().kind,
                         OperationKind::WorktreeCreate { .. }
@@ -669,7 +686,9 @@ impl GitDriver {
             // read-tree's dry-run does not consistently reject ignored-file
             // replacement. Preserve ignored content by checking its byte paths
             // against the incoming tree, including file/directory collisions.
-            let collision = !self.ignored_checkout_collisions(target, next.as_str())?.is_empty();
+            let collision = !self
+                .ignored_checkout_collisions(target, next.as_str())?
+                .is_empty();
             if collision {
                 let terminal = wal
                     .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))

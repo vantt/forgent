@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add dormant Land recovery through the existing Rust/addon/Node port, observe-only CAS recovery, recorded checkout fingerprints, acknowledgement-gated cleanup and compacted receipt replay.
+
 - Add dormant Git Land prepare/publish ports with immutable candidates, consumer verification binding, own-file checkout protection, one-shot CAS and operation-id receipt replay; production callers remain unchanged.
 
 - Git checkout operations revalidate config file stamps before each child and refuse post-hook promisor changes while retaining the reduced preflight exec count.

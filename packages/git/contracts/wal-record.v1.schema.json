@@ -1128,6 +1128,9 @@
                         "notApplicable",
                         "recoveryRequired"
                       ]
+                    },
+                    "observedOnly": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -1345,6 +1348,12 @@
               "properties": {
                 "evidence": {
                   "$ref": "#/$defs/landEvidence"
+                },
+                "checkout": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [

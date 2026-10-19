@@ -8,6 +8,7 @@ export function createGitLand(options, loaderOptions) {
   const port = new native.GitLand(options.stateRoot, options.repoPath, options.trustedMain, options.writer);
   return Object.freeze({
     prepare(args, held = []) { outside(); return withNativeLocks(native, held, loans => port.prepare(args, loans)); },
+    recover(args, held = []) { outside(); return withNativeLocks(native, held, loans => port.recover(args, loans)); },
     publish(evidence) { outside(); return port.publish(evidence); },
     close() { outside(); port.close(); },
   });
