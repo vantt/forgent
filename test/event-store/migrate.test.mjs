@@ -36,6 +36,9 @@ test('HEAD inventory, check-only parity, anchored cache and explicit baseline us
 
 test('real import is deterministic, preserves nested bytes, replaces unfenced stale legacy ref and does not cut over main', t => {
   const f = fixture(t); trackedLegacy(f); const before = snapshot(f);
+  const dry = importPlan(before);
+  assert.throws(() => f.git('cat-file', '-e', dry.legacyRefOid));
+  assert.throws(() => f.git('cat-file', '-e', dry.dataTree));
   const pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
   assert.equal(importPlan(before).legacyRefOid, pin.legacyRefOid);
   assert.deepEqual(f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), pin);
@@ -119,4 +122,32 @@ test('cutover restoration respects typed recovery and unknown outcomes', () => {
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'checkout-command-failed' }))).restore, false);
   assert.equal(cutoverFailure(new Error('unknown failure')).restore, false);
   assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'future-error', cause: 'commit-rejected' }))).restore, false);
+});
+
+test('published stale mirrors refuse before local ref creation or replacement, including check', t => {
+  for (const local of ['absent', 'stale', 'published']) {
+    const f = fixture(t); trackedLegacy(f);
+    const before = snapshot(f);
+    const old = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+    f.git('update-ref', 'refs/fgos/remotes/origin/legacy', old.legacyRefOid);
+    fs.appendFileSync(path.join(f.repo, '.fgos/events.jsonl'), JSON.stringify({ ts, type: 'work.add', payload: { id: 'new' }, v: 3 }) + '\n');
+    f.git('add', '.fgos/events.jsonl'); f.git('commit', '-qm', 'new legacy HEAD');
+    const head = f.git('rev-parse', 'HEAD');
+    if (local === 'absent') f.git('update-ref', '-d', 'refs/fgos/legacy');
+    if (local === 'stale') f.git('update-ref', 'refs/fgos/legacy', before.inventory.fromCommit);
+    const ref = path.join(f.repo, '.git/refs/fgos/legacy');
+    const bytes = fs.existsSync(ref) ? fs.readFileSync(ref) : null;
+    assert.throws(() => importPlan(snapshot(f)), /event-store-legacy-mismatch.*pull the fenced main.*owner decision/);
+    assert.throws(() => f.store.importLegacy({ expectedHead: head }, []), /event-store-legacy-mismatch.*pull the fenced main.*owner decision/);
+    assert.deepEqual(fs.existsSync(ref) ? fs.readFileSync(ref) : null, bytes, local);
+  }
+});
+
+test('a matching local and mirror import is published even when the computed import matches', t => {
+  const f = fixture(t); trackedLegacy(f);
+  const before = snapshot(f), pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+  f.git('update-ref', 'refs/fgos/remotes/origin/legacy', pin.legacyRefOid);
+  assert.throws(() => importPlan(snapshot(f)), /local import is published/);
+  assert.throws(() => f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), /local import is published/);
+  assert.equal(f.git('rev-parse', 'refs/fgos/legacy'), pin.legacyRefOid);
 });

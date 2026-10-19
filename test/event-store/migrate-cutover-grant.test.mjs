@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
 import * as gitPorts from '../../src/git/index.mjs';
 import { root } from '../helpers/git-addon.mjs';
 import { fixture } from './phase07-fixture.mjs';
@@ -81,4 +83,35 @@ test('real hook rejection restores baseline-only inputs and rerun uses a fresh W
   assert.notEqual(f.git('rev-parse', 'HEAD'), head);
   assert.equal(fs.existsSync(path.join(f.repo, '.gitattributes')), false);
   assert.deepEqual(JSON.parse(f.git('show', 'HEAD:.fgos/events')), result.pin);
+});
+
+// Real OS process/argv classification, using a waiting Node payload so the
+// process stays observable independently of migration/ScopedCommit availability.
+test('quiesce reports another running fgos events migrate payload', async t => {
+  const f = fixture(t);
+  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin }))) return;
+  const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs'), 'events', 'migrate'], { cwd: f.repo, stdio: ['ignore', 'pipe', 'pipe'] });
+  try {
+    await once(child.stdout, 'data');
+    const scan = checkStopped({ workspaces: [f.repo], hostBin });
+    assert.equal(scan.status, 'blocked', JSON.stringify(scan));
+    assert.ok(scan.blockers.some(p => p.pid === child.pid), JSON.stringify(scan));
+  } finally { child.kill(); await once(child, 'exit'); }
+});
+
+test('pre-commit filesystem failure restores deleted inputs without naming a Git record', { skip: typeof gitPorts.createGitScopedCommit !== 'function' ? 'Requires Git 05 merge and activated release; no substitute Git writer' : false }, async t => {
+  const f = fixture(t); const files = trackedLegacy(f);
+  if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin }))) return;
+  const head = f.git('rev-parse', 'HEAD');
+  // Empty directories are invisible to Git's clean-tree check. This real
+  // filesystem obstruction makes rmdir fail after the tracked deletions.
+  fs.mkdirSync(path.join(f.repo, '.fgos/events/empty'));
+  await assert.rejects(migrateUseCase({ ...f.ctx, hostBin, writer: 'fixture' }), error => {
+    assert.equal(error.code, 'ENOTEMPTY');
+    assert.equal(error.message.includes('inspect Git ScopedCommit record'), false);
+    return true;
+  });
+  assert.equal(f.git('rev-parse', 'HEAD'), head);
+  assert.equal(f.git('diff', '--cached', '--name-only'), '');
+  for (const [name, bytes] of Object.entries(files)) assert.equal(fs.readFileSync(path.join(f.repo, name), 'utf8'), bytes);
 });

@@ -3,7 +3,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { createHash } from 'node:crypto';
 import { eventStoreFacts } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { checkStopped } from '../../holder-lock/fences.mjs';
@@ -72,13 +71,7 @@ export async function migrateUseCase(ctx, options = {}) {
   fixEventStoreLockDirs(cwd, base); fixEventStoreMachineId(cwd, base); fixEventStoreRefspec(cwd, base);
   const { store, heldRanks } = eventsContext(ctx, options);
   const snapshot = store.readLegacyFromHead({}, heldRanks);
-  const operationId = snapshot.operationId;
-  try { store.readLegacyFromHead({ check: true }, heldRanks); }
-  catch (error) {
-    error.operationId = operationId;
-    error.message += `; inspect Git ScopedCommit record ${operationId} if this is an interrupted migration`;
-    throw error;
-  }
+  store.readLegacyFromHead({ check: true }, heldRanks);
   if (snapshot.inventory.migrated) {
     const check = store.legacyLayout(heldRanks);
     if (!check.passed) refuse('event-store-legacy-mismatch', JSON.stringify(check.problems));
@@ -102,9 +95,10 @@ export async function migrateUseCase(ctx, options = {}) {
   const baseline = scoped.preflight();
   // Import revalidates HEAD and dirt under event-seal; that lock is dropped
   // before ScopedCommit borrows main-checkout 50. CAS-before-commit reruns reuse it.
-  const pin = store.importLegacy({ expectedHead: plan.fromCommit }, heldRanks);
+  const { operationId, ...pin } = store.importLegacy({ expectedHead: plan.fromCommit }, heldRanks);
   if (pin.legacyRefOid !== plan.import.legacyRefOid) refuse('event-store-migration-parity', 'published import differs from HEAD data tree', { operationId });
   if (store.read({ streams: ['project', 'project:porting'] }, heldRanks).sequence.length) refuse('event-store-migration-parity', 'published v4 events exist before cutover', { operationId });
+  let commitCalled = false;
   try {
     for (const p of deletions) fs.unlinkSync(path.join(cwd, p));
     const fence = path.join(cwd, '.fgos/events');
@@ -114,11 +108,12 @@ export async function migrateUseCase(ctx, options = {}) {
       if (attributeBytes.length) fs.writeFileSync(path.join(cwd, '.gitattributes'), attributeBytes);
       else fs.unlinkSync(path.join(cwd, '.gitattributes'));
     }
+    commitCalled = true;
     const result = scoped.commit({ operationId, baseline, request: { writes, message: plan.message, cutoverGrant: { exactPaths, legacyRefOid: pin.legacyRefOid, sealDigest: pin.sealDigest } } });
-    if (result.status !== 'committed' || store.readLegacyFromHead({}, heldRanks).inventory.fromCommit === plan.fromCommit) refuse('event-store-cutover-review-required', JSON.stringify(result), { operationId, result });
+    if (result.status !== 'committed' || !result.oid || result.oid === plan.fromCommit) refuse('event-store-cutover-review-required', JSON.stringify(result), { operationId, result });
     return { plan, parity, pin, operationId, commit: result };
   } catch (error) {
-    const failure = cutoverFailure(error);
+    const failure = commitCalled ? cutoverFailure(error) : { code: error.code, restore: true };
     error.code = failure.cause ?? failure.code;
     error.gitCode = failure.code;
     if (failure.restore) try {
@@ -131,36 +126,15 @@ export async function migrateUseCase(ctx, options = {}) {
       }
     } catch (restoreError) { error.restoreError = restoreError.message; }
     error.operationId = operationId;
-    error.message += `; inspect Git ScopedCommit record ${operationId}`;
+    if (commitCalled) error.message += `; inspect Git ScopedCommit record ${operationId}`;
     throw error;
   }
 }
 
 // Dry-run Git object identity: hashes bytes only, never installs an object.
 // The real Publication result must equal this plan before any cutover edits.
-export function importPlan({ inventory, existingLegacyOid }) {
-  const algorithm = inventory.fromCommit.length === 64 ? 'sha256' : 'sha1';
-  const object = (kind, bytes) => createHash(algorithm).update(`${kind} ${bytes.length}\0`).update(bytes).digest();
-  const tree = files => {
-    const entries = new Map();
-    for (const [name, bytes] of files) {
-      const slash = name.indexOf('/');
-      if (slash < 0) entries.set(name, { mode: '100644', oid: object('blob', bytes) });
-      else {
-        const dir = name.slice(0, slash);
-        if (!entries.has(dir)) entries.set(dir, { mode: '40000', files: [] });
-        entries.get(dir).files.push([name.slice(slash + 1), bytes]);
-      }
-    }
-    const sorted = [...entries].sort(([a, x], [b, y]) => Buffer.compare(Buffer.from(a + (x.files ? '/' : '')), Buffer.from(b + (y.files ? '/' : ''))));
-    return object('tree', Buffer.concat(sorted.map(([name, e]) => Buffer.concat([Buffer.from(`${e.mode} ${name}\0`), e.files ? tree(e.files) : e.oid]))));
-  };
-  const files = Object.entries(inventory.files).flatMap(([name, bytes]) => name === '.fgos/events.jsonl' || /^\.fgos\/events\/[^/]+\.jsonl$/.test(name) ? [[name.slice(6), Buffer.from(bytes)]] : name === inventory.portingLog ? [[`porting/${name}`, Buffer.from(bytes)]] : []);
-  const dataTree = tree(files).toString('hex');
-  files.push(['seal.json', Buffer.from(JSON.stringify({ fromCommit: inventory.fromCommit, kind: 'legacy', treeOfFgosEvents: dataTree }) + '\n')]);
-  const identity = 'fgOS Event Store <event-store@fgos.invalid> 0 +0000';
-  const commit = Buffer.from(`tree ${tree(files).toString('hex')}\nauthor ${identity}\ncommitter ${identity}\n\nfgos-events legacy import`);
-  const legacyRefOid = object('commit', commit).toString('hex');
+export function importPlan({ dataTree, legacyRefOid, existingLegacyOid, legacyMirrors = [] }) {
+  if (legacyMirrors.some(({ oid }) => oid !== legacyRefOid || oid === existingLegacyOid)) refuse('event-store-legacy-mismatch', 'published legacy refs disagree with HEAD import or local import is published; pull the fenced main; if main has no fence because cutover was reverted after the ref was pushed, the remote legacy ref needs an owner decision');
   return { legacyRefOid, dataTree, existingLegacyOid, action: !existingLegacyOid ? 'create' : existingLegacyOid === legacyRefOid ? 'reuse' : 'replace-unfenced-stale' };
 }
 

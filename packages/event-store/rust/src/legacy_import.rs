@@ -225,40 +225,117 @@ pub(crate) fn read_consumer_from_head(
 }
 
 fn tree(
-    port: &dyn Publication,
-    repo: &RepoHandle,
     files: &BTreeMap<String, Vec<u8>>,
+    blob: &impl Fn(&[u8]) -> Result<Oid, Error>,
+    build: &impl Fn(&[TreeEntry]) -> Result<Oid, Error>,
 ) -> Result<Oid, Error> {
-    fn level(
-        port: &dyn Publication,
-        repo: &RepoHandle,
-        files: &BTreeMap<String, Vec<u8>>,
-    ) -> Result<Oid, Error> {
-        let mut dirs = BTreeMap::<String, BTreeMap<String, Vec<u8>>>::new();
-        let mut entries = Vec::new();
-        for (path, bytes) in files {
-            if let Some((dir, rest)) = path.split_once('/') {
-                dirs.entry(dir.into())
-                    .or_default()
-                    .insert(rest.into(), bytes.clone());
-            } else {
-                entries.push(TreeEntry {
-                    name: path.as_bytes().to_vec(),
-                    mode: 0o100644,
-                    oid: port.write_blob(repo, bytes).map_err(git_error)?,
-                });
-            }
-        }
-        for (name, children) in dirs {
+    let mut dirs = BTreeMap::<String, BTreeMap<String, Vec<u8>>>::new();
+    let mut entries = Vec::new();
+    for (path, bytes) in files {
+        if let Some((dir, rest)) = path.split_once('/') {
+            dirs.entry(dir.into())
+                .or_default()
+                .insert(rest.into(), bytes.clone());
+        } else {
             entries.push(TreeEntry {
-                name: name.into_bytes(),
-                mode: 0o040000,
-                oid: level(port, repo, &children)?,
+                name: path.as_bytes().to_vec(),
+                mode: 0o100644,
+                oid: blob(bytes)?,
             });
         }
-        port.write_tree(repo, &entries).map_err(git_error)
     }
-    level(port, repo, files)
+    for (name, children) in dirs {
+        entries.push(TreeEntry {
+            name: name.into_bytes(),
+            mode: 0o040000,
+            oid: tree(&children, blob, build)?,
+        });
+    }
+    build(&entries)
+}
+fn import_files(inv: &Inventory) -> BTreeMap<String, Vec<u8>> {
+    inv.files
+        .iter()
+        .filter_map(|(path, bytes)| {
+            if work_path(path) {
+                Some((path.strip_prefix(".fgos/").unwrap().into(), bytes.clone()))
+            } else if porting_path(path) {
+                Some((format!("porting/{path}"), bytes.clone()))
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+/// Compute migration identities without installing Git objects or changing refs.
+pub fn import_identity(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    inv: &Inventory,
+) -> Result<(Oid, Oid), Error> {
+    let hash_tree = |files: &BTreeMap<String, Vec<u8>>| {
+        tree(
+            files,
+            &|bytes| {
+                driver
+                    .hash_object(repo, ObjectType::Blob, bytes)
+                    .map_err(git_error)
+            },
+            &|entries| {
+                let mut entries: Vec<_> = entries.iter().collect();
+                entries.sort_by_key(|e| {
+                    let mut key = e.name.clone();
+                    if e.mode == 0o040000 {
+                        key.push(b'/');
+                    }
+                    key
+                });
+                let mut bytes = Vec::new();
+                for e in entries {
+                    bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
+                    bytes.extend_from_slice(&e.name);
+                    bytes.push(0);
+                    for pair in e.oid.as_str().as_bytes().as_chunks::<2>().0 {
+                        bytes.push(
+                            u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap(),
+                        );
+                    }
+                }
+                driver
+                    .hash_object(repo, ObjectType::Tree, &bytes)
+                    .map_err(git_error)
+            },
+        )
+    };
+    let mut files = import_files(inv);
+    let data_tree = hash_tree(&files)?;
+    files.insert(
+        "seal.json".into(),
+        Seal::Legacy {
+            from_commit: inv.from_commit.as_str().into(),
+            tree_of_fgos_events: data_tree.as_str().into(),
+        }
+        .canonical_line()?,
+    );
+    let root = hash_tree(&files)?;
+    let input =
+        crate::publish::event_commit_input(root, vec![], 0, b"fgos-events legacy import".to_vec());
+    let mut bytes = format!(
+        "tree {}\nauthor {} <{}> {}\ncommitter {} <{}> {}\n\n",
+        input.tree.as_str(),
+        input.author.name,
+        input.author.email,
+        input.author_date,
+        input.committer.name,
+        input.committer.email,
+        input.committer_date
+    )
+    .into_bytes();
+    bytes.extend_from_slice(&input.message);
+    let commit = driver
+        .hash_object(repo, ObjectType::Commit, &bytes)
+        .map_err(git_error)?;
+    Ok((data_tree, commit))
 }
 /// Authenticate the complete data tree (the legacy commit tree sans seal.json).
 pub fn verify_legacy_tree(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<(), Error> {
@@ -322,6 +399,40 @@ pub(crate) fn all_entries(
         );
     }
 }
+pub fn legacy_mirrors(port: &dyn Inspect, repo: &RepoHandle) -> Result<Vec<RefEntry>, Error> {
+    Ok(crate::refs::list(
+        port,
+        repo,
+        &[RefPrefix::parse("refs/fgos/remotes/").map_err(|e| invalid(e.to_string()))?],
+    )?
+    .into_iter()
+    .filter(|r| {
+        r.name
+            .as_str()
+            .strip_prefix("refs/fgos/remotes/")
+            .is_some_and(|s| crate::read::mirror_suffix(s).ok().flatten() == Some("legacy"))
+    })
+    .collect())
+}
+
+/// Check all mirror observations before any local ref mutation. A matching
+/// local/mirror pair is a published import, even if HEAD's fence was reverted.
+fn validate_legacy_refs(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    computed: &Oid,
+    observed: &RefValue,
+) -> Result<(), Error> {
+    for r in legacy_mirrors(port, repo)? {
+        if !matches!(&r.value, RefValue::Direct(value) if value == computed) || observed == &r.value
+        {
+            return Err(Error::new(ErrorCode::EventStoreLegacyMismatch,
+                "published legacy refs disagree with HEAD import or local import is published; pull the fenced main; if main has no fence because cutover was reverted after the ref was pushed, the remote legacy ref needs an owner decision"));
+        }
+    }
+    Ok(())
+}
+
 /// Publication runs under event-seal and drops that description before returning.
 pub fn import_legacy(
     driver: &GitDriver,
@@ -358,24 +469,25 @@ pub fn import_legacy(
     )
     .map_err(git_error)?;
     let port = PublicationPort::new(driver, authority);
-    let mut files = BTreeMap::new();
-    for (path, bytes) in &inv.files {
-        if work_path(path) {
-            files.insert(path.strip_prefix(".fgos/").unwrap().into(), bytes.clone());
-        } else if porting_path(path) {
-            files.insert(format!("porting/{path}"), bytes.clone());
-        }
-    }
+    let mut files = import_files(&inv);
     if files.keys().any(|p| !crate::export::allowed(p)) {
         return Err(invalid("unsafe legacy import path"));
     }
-    let data_tree = tree(&port, repo, &files)?;
+    let data_tree = tree(
+        &files,
+        &|bytes| port.write_blob(repo, bytes).map_err(git_error),
+        &|entries| port.write_tree(repo, entries).map_err(git_error),
+    )?;
     let seal = Seal::Legacy {
         from_commit: inv.from_commit.as_str().into(),
         tree_of_fgos_events: data_tree.as_str().into(),
     };
     files.insert("seal.json".into(), seal.canonical_line()?);
-    let tree = tree(&port, repo, &files)?;
+    let tree = tree(
+        &files,
+        &|bytes| port.write_blob(repo, bytes).map_err(git_error),
+        &|entries| port.write_tree(repo, entries).map_err(git_error),
+    )?;
     let oid = crate::publish::event_commit(
         &port,
         repo,
@@ -385,8 +497,15 @@ pub fn import_legacy(
         b"fgos-events legacy import".to_vec(),
     )?;
     let reference = RefName::parse("refs/fgos/legacy").map_err(|e| invalid(e.to_string()))?;
+    // Recovery itself can settle ref writes: reject published conflicts before
+    // entering it, then authenticate its final observations before our CAS.
+    let before_recovery = port.read_ref(repo, &reference).map_err(git_error)?;
+    validate_legacy_refs(driver, repo, &oid, &before_recovery)?;
     port.recover_publications(repo).map_err(git_error)?;
-    match port.read_ref(repo, &reference).map_err(git_error)? {
+    let observed = port.read_ref(repo, &reference).map_err(git_error)?;
+    validate_legacy_refs(driver, repo, &oid, &observed)?;
+    let operation_id = cutover_operation_id(repo, inv.from_commit.as_str())?;
+    match observed {
         observed @ (RefValue::Absent | RefValue::Direct(_))
             if observed != RefValue::Direct(oid.clone()) =>
         {
@@ -435,7 +554,7 @@ pub fn import_legacy(
         }
     }
     Ok(
-        serde_json::json!({"legacyRefOid":oid.as_str(),"sealDigest":seal.digest()?,"fromCommit":inv.from_commit.as_str()}),
+        serde_json::json!({"legacyRefOid":oid.as_str(),"sealDigest":seal.digest()?,"fromCommit":inv.from_commit.as_str(),"operationId":operation_id}),
     )
 }
 pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> Result<(), Error> {
@@ -612,7 +731,7 @@ pub fn event_attribute(pattern: &str) -> bool {
 
 /// Inspect retained receipts before selecting a new cutover attempt. Uncertain
 /// attempts keep their id so ScopedCommit's recovery refusal remains binding.
-pub fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> {
+fn cutover_operation_id(repo: &RepoHandle, head: &str) -> Result<String, Error> {
     let prefix = format!("event-store-cutover-{}", &head[..32]);
     if !repo.common_dir().join("fgos/git").exists() {
         return Ok(format!("{prefix}-1"));

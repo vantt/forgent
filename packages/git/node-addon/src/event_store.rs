@@ -527,6 +527,7 @@ impl EventStore {
         if check {
             fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
         }
+        let (data_tree, legacy_oid) = fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
         let existing_legacy = match driver
             .resolve_ref(
                 repo,
@@ -544,7 +545,7 @@ impl EventStore {
         )
         .map_err(error)?;
         Ok(
-            json!({"existingLegacyOid":existing_legacy,"operationId":fgos_event_store::legacy_import::cutover_operation_id(repo, inv.from_commit.as_str()).map_err(error)?,"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
+            json!({"dataTree":data_tree.as_str(),"legacyRefOid":legacy_oid.as_str(),"existingLegacyOid":existing_legacy,"legacyMirrors":fgos_event_store::legacy_import::legacy_mirrors(driver, repo).map_err(error)?.into_iter().map(|r| json!({"name":r.name,"oid": match r.value { fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()), _ => None }})).collect::<Vec<_>>(),"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
         )
     }
     #[napi]
