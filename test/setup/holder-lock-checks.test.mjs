@@ -252,10 +252,11 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   const lock = path.join(dir, 'attempt.lock');
   fs.writeFileSync(lock, '');
 
-  // The monitor is a copy of sleep named bwrap: only a process of that name can be a member.
+  // The monitor is a script named bwrap: only a process of that name can be a member. A copied
+  // binary is not portable (a multi-call coreutils sleep picks its tool from argv[0]). Its sleep
+  // child drops the lock descriptor, so the monitor is the only other holder.
   const bwrap = path.join(scratch, 'bwrap');
-  fs.copyFileSync(execFileSync('sh', ['-c', 'command -v sleep'], { encoding: 'utf8' }).trim(), bwrap);
-  fs.chmodSync(bwrap, 0o755);
+  fs.writeFileSync(bwrap, '#!/bin/sh\nsleep "$1" 9>&- &\nwait\n', { mode: 0o755 });
   // The parent plays the supervisor (it carries the lock marker); its child keeps the same description
   // with no marker at all, as the bwrap monitor does.
   const supervisor = spawn('sh', ['-c', 'exec 9>>"$1"; flock -x 9; env -i "$2" 30 & wait', 'sh', lock, bwrap], { env: foreignEnv({ FGOS_LOCK_FD: 'attempt:9' }), stdio: 'ignore' });
@@ -271,6 +272,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
     assert.ok(Date.now() < deadline, 'supervisor and monitor did not both hold the lock');
     await new Promise((resolve) => { setTimeout(resolve, 20); });
   }
+  const monitorCmdline = fs.readFileSync(`/proc/${monitorPid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
   const member = checkLockHolders(root);
   assert.match(member.message, /^1 lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
 
@@ -283,7 +285,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
       await new Promise((resolve) => { setTimeout(resolve, 20); });
     }
   })();
-  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(${bwrap.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')} 30\\), not a fgOS process nor a borrowed child`));
+  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(${monitorCmdline.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}\\), not a fgOS process nor a borrowed child`));
   process.kill(monitorPid, 'SIGKILL');
 });
 
