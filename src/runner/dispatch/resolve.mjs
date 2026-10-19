@@ -162,6 +162,15 @@ export function resolveTierCandidates(cfg, tier, provider = 'claude') {
 }
 
 /**
+ * The families `cfg.tierFallback.<tier>` declares as the walk order for a seat that failed at `tier`, or
+ * null when the tier declares none (the walk then follows the capability's `prefer` order).
+ */
+export function tierFallbackOf(cfg, tier) {
+  const families = cfg?.tierFallback?.[tier];
+  return Array.isArray(families) ? [...families] : null;
+}
+
+/**
  * Resolve a tier to the model name the provider family runs: the first entry
  * of cfg.modelPolicies[provider][tier] served by the family's own pool. A cell
  * that names only other pools has no model for this family yet.
