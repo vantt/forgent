@@ -7,6 +7,7 @@
 
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
 export const GATE_KILL_GRACE_KEY = 'dispatch.gateKillGraceMs';
 export const DEFAULT_GATE_KILL_GRACE_MS = 10_000;
@@ -38,7 +39,7 @@ export function resolveGateKillGrace({ project, global } = {}) {
 
 /**
  * The grace for the project rooted at `projectRoot`. A half-typed config reads as "nothing
- * configured" (doctor reports it); a present but unusable value throws, never guessed around.
+ * configured" (doctor reports it); a present but unusable value throws a named validation error (`RunnerConfigError`, the same message the doctor check prints), never guessed around.
  */
 export function readGateKillGraceMs({ projectRoot } = {}) {
   let merged;
@@ -49,7 +50,7 @@ export function readGateKillGraceMs({ projectRoot } = {}) {
   }
   const { value } = resolveGateKillGrace({ project: merged });
   const problem = gateKillGraceProblem(value);
-  if (problem) throw new Error(problem);
+  if (problem) throw new RunnerConfigError(problem, { code: 'invalid-gate-kill-grace' });
   return value;
 }
 
@@ -87,6 +88,6 @@ export function readCancelWaitMs({ projectRoot } = {}) {
   }
   const { value } = resolveCancelWait({ project: merged });
   const problem = cancelWaitProblem(value);
-  if (problem) throw new Error(problem);
+  if (problem) throw new RunnerConfigError(problem, { code: 'invalid-cancel-wait' });
   return value;
 }
