@@ -3453,9 +3453,9 @@ Superseding this decision needs a new record; do not edit it in place.
 - **Ranh giới:** Đổi component-boundary: hàng Workflow (guide + case, admission, binding, ledger; không chọn thứ tự), Work Lifecycle (không sở hữu sequencing), Execution Core (sở hữu giao diện AdmissionPort, không sở hữu quyết định), Holder-lock (`advance` theo Shape C, không hàng khoá mới). Không component mới.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### Model pool B1 — a seat walks a tier's declared order, accounts rotate in declared order, lease state is per pool (supersede một phần 0051 mục 1 và 0058 mục 2, 3, 6)
+### D-ADR0071 (per-tier model fallback and pool-keyed leases) — a seat walks a tier's declared order, accounts rotate in declared order, lease state is per pool (supersede một phần 0051 mục 1 và 0058 mục 2, 3, 6)
 
-- **Trạng thái:** Settled (owner, 2026-10-19 23:07 và 23:20; hai câu trả lời cho báo cáo `plans/reports/problem-261017-0022-model-tier-selection-misfit.md`). Id decision gán khi ghi vào state bằng `fgos decision` lúc landing.
+- **Trạng thái:** Settled (owner, 2026-10-19 23:07 và 23:20; hai câu trả lời cho báo cáo `plans/reports/problem-261017-0022-model-tier-selection-misfit.md`). Ghi vào state bằng `fgos decision` lúc landing 2026-10-20 (D-ADR0071 (per-tier model fallback and pool-keyed leases)).
 - **Bối cảnh:** thứ tự fallback theo từng capability (`prefer`) không nói được "ở tier này thì thử họ nào trước"; thứ tự account là least-lease rồi least-recently-used, nên hai seat song song rải ra khắp nơi và quota một account bị đốt khó đoán; lease, state và quarantine keyed theo họ, nên pool `router` không có state riêng; ô tier thiếu thì rơi về `executor.model` hoặc mặc định CLI, hai hành vi khác nhau ở `bind()` và `assignment-policy`.
 - **Quyết định:**
   1. Thứ tự fallback khai theo tier (`runner.tierFallback`); capability chỉ thu hẹp qua `prefer`, không mở rộng. Ghế đầu giữ thứ tự `prefer` (council cần dẫn bằng họ khác nhau).
