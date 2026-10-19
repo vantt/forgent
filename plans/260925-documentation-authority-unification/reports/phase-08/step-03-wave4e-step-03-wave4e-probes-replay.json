@@ -1,0 +1,35 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 5,
+  "allRejected": true,
+  "resolvedDeletedName": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+  "expectedSuccessor": [
+    "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  ],
+  "distinctSiblingSuccessor": [
+    "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+  ],
+  "probes": [
+    {
+      "mutation": "missing-note",
+      "rejected": true
+    },
+    {
+      "mutation": "sibling-note",
+      "rejected": true
+    },
+    {
+      "mutation": "both-number-collisions",
+      "rejected": true
+    },
+    {
+      "mutation": "unmatched-fragment",
+      "rejected": true
+    },
+    {
+      "mutation": "ambiguous-number-with-no-fragment",
+      "rejected": true
+    }
+  ],
+  "priorArt": "Extends removed_decision_holders; reuses git history, committed headings and existing narrative-successor check. L12-41 only."
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+    "part": 1,
+    "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+    "recordSha256": "4bba410d63c43f224ae5e83e6e6d72fd078799d9a43210e36ec9c7697c001efb",
+    "diffSha256": "d8e718d332d45062cac55f2bde258ff0be496800ec347f58da622794f8639549",
+    "matches": true
+  },
+  {
+    "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+    "part": 1,
+    "sourceDigest": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+    "recordSha256": "86248070c325ca61c80df5ba4d7d4619791593723d7bbcee3ec15128d331cf9d",
+    "diffSha256": "21b2eb7a557545cdd19e37aa63228ae15cf7cf48023b38fc16cc572b70e9f470",
+    "matches": true
+  },
+  {
+    "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+    "part": 1,
+    "sourceDigest": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+    "recordSha256": "8e3eaa25b8eb877f0606880005ab53aa4926e849afd16e3e150473d3c0b96ee5",
+    "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matches": true
+  },
+  {
+    "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+    "part": 1,
+    "sourceDigest": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+    "recordSha256": "bf34d4e14b469d1f8a9e3e1f4e5ad75615ffd8da502687f077b48635ba25cb92",
+    "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matches": true
+  }
+]

@@ -1,0 +1,50 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "negativeProbes": 4,
+  "allRejected": true,
+  "probes": [
+    {
+      "rule": "L12-38(1) undated decision citation in knowledge cannot preserve",
+      "expectedCheck": "live-decision-citation-preserve",
+      "observedChecks": [
+        "diff-correspondence",
+        "live-decision-citation-preserve",
+        "orphan-hunk"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-38(3) computed narrative successor cannot be omitted",
+      "expectedCheck": "removed-decision-narrative-successor",
+      "observedChecks": [
+        "removed-decision-narrative-successor"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "L12-38(5) dated shorthand exemption cannot falsely claim unrelatedness",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage"
+      ],
+      "rejected": true
+    },
+    {
+      "rule": "Moved numeric decision link cannot escape coverage after registry rename",
+      "expectedCheck": "author-added-search-coverage",
+      "observedChecks": [
+        "author-added-search-coverage",
+        "diff-correspondence",
+        "orphan-hunk"
+      ],
+      "rejected": true
+    }
+  ],
+  "positiveControls": [
+    "current complete records pass all predicates before mutation",
+    "verbatim retired-decision region exempts aliases",
+    "bare dated shorthand exempt; Markdown link and explicit partial legacy root not exempt",
+    "knowledge remains live"
+  ],
+  "inheritedSuites": "87 + 23 + 25 + 16 + 11 retained; replayed separately, no deletion or weakened expected assertion"
+}

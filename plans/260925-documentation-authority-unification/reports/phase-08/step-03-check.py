@@ -435,9 +435,27 @@ def live_decision_citation(file, text, edge, legacy):
     context=' '.join(lines[max(0,n-5):n+2])
     return bool(re.search(r'decision\s+\d{4}\s+in\s+`?'+re.escape(legacy),context,re.I))
 
+@functools.lru_cache(None)
+def resolved_elided_decision(commit, legacy):
+    """Bind visible slug fragments to one deleted full filename, never context siblings."""
+    path=legacy.removeprefix('repo/').split('#')[0]
+    match=re.fullmatch(r'docs/decisions/(\d{4})-(.*?)\.\.\.(?:md|\.md)?',path)
+    if not match:return None
+    fragment=match[2].strip('-')
+    deleted=set()
+    for row in git('log','--format=','--diff-filter=D','--name-only',commit,'--','docs/decisions/'+match[1]+'*').decode().splitlines():
+        if row.startswith('docs/decisions/'+match[1]+'-') and row.endswith('.md'):
+            slug=row.split('/')[-1][5:-3]
+            if not fragment or re.search(r'(?:^|-)'+re.escape(fragment)+r'(?:-|$)',slug):deleted.add(row)
+    return next(iter(deleted)) if len(deleted)==1 else None
+
 def removed_decision_holders(commit, edge, legacy):
     match=re.match(r'(?:repo/)?docs/decisions/(\d{4})(?:\b|[-.])',legacy)
     if not match:return ()
+    # Resolve an elided filename before title comparison; paragraph siblings cannot vote.
+    resolved=resolved_elided_decision(commit,legacy)
+    if resolved:legacy=resolved
+    elif '...' in legacy:return ()  # unresolved elision never borrows a sibling title
     # Original inventory paths may be elided; factual bindings name the real deleted record.
     removed=any(f['state']=='removed' and f['path'].startswith('docs/decisions/'+match[1]) for f in edge.get('targetFacts',[]))
     if not removed:
@@ -459,9 +477,9 @@ def removed_decision_holders(commit, edge, legacy):
     # Split numbered ADR sections collapse before testing distinct narratives.
     candidate_titles=[title(h) for h in holders]
     if len(holders)<=1 and not any(' — ' in t and words(t)!=words(candidate_titles[0] if candidate_titles else '') for t in titles):return holders
-    source=edge['matchedExpression']+' '+legacy
+    source=legacy if resolved else edge['matchedExpression']+' '+legacy
     inv=next((e for e in census()['entries'] if e['edgeId']==edge['edgeId']),None)
-    if inv:source+=' '+adjacent_passage(blob(commit,inv['consumerPath']).decode(),edge['sourceSpans'])
+    if inv and not resolved:source+=' '+adjacent_passage(blob(commit,inv['consumerPath']).decode(),edge['sourceSpans'])
     sw=words(source);kept=[]
     for holder in holders:
         tw=words(title(holder))

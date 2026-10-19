@@ -1,0 +1,556 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+      "set": "batch-075",
+      "sourceBytes": 11369,
+      "digest": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+      "inventoryFileDigest": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+      "diffSha256": "7cfb005feed5f87c38b113a5a0e13ba43bea8986657b4beab5058c1d9703e99e",
+      "recordSha256": "2b5bb4419bfe76a7986f01289de87c4a42771eb7c7777ff19c8ea20b4bc6bd10",
+      "recordBytes": 31352,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+      "set": "batch-075",
+      "sourceBytes": 4353,
+      "digest": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+      "inventoryFileDigest": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+      "diffSha256": "48a5b6b151e1f591c92003c856e8914993c24a6fdaeb219fa675621efe87ab23",
+      "recordSha256": "20adc4dc3cecda2f7673544afb6db222051f25bebd5f81c1c0e8ae0002ff2201",
+      "recordBytes": 26017,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+      "set": "batch-075",
+      "sourceBytes": 3974,
+      "digest": "9f824520f8f0ef1ff7c874797b25035f90d6fd59892ac339bbfcd82cfae0c918",
+      "inventoryFileDigest": "9f824520f8f0ef1ff7c874797b25035f90d6fd59892ac339bbfcd82cfae0c918",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "160e1c71fb1551e5b3019536d5d203e60bea0dd3d1495df1daef13da50c1cea9",
+      "recordBytes": 2278,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "set": "batch-075",
+      "sourceBytes": 6755,
+      "digest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "inventoryFileDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "diffSha256": "d8e718d332d45062cac55f2bde258ff0be496800ec347f58da622794f8639549",
+      "recordSha256": "4bba410d63c43f224ae5e83e6e6d72fd078799d9a43210e36ec9c7697c001efb",
+      "recordBytes": 14027,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "set": "batch-075",
+      "sourceBytes": 5610,
+      "digest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "inventoryFileDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "diffSha256": "b27f409d90ba7bea88cfdcb9f3944dd4a14f49ea060fbb14b6147d6a01742a6c",
+      "recordSha256": "5d2b3e6feea6ccb585b1568e8fb11cd161c76dfac7827bff8778a1d55f05eb30",
+      "recordBytes": 403700,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "set": "batch-075",
+      "sourceBytes": 5409,
+      "digest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "inventoryFileDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "270aa9570dc356a8867a653be7640ffb20545ba900afac4a325fbcaade093563",
+      "recordBytes": 4457,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "set": "batch-075",
+      "sourceBytes": 5291,
+      "digest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "inventoryFileDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e83aca933b39dc32e880b7082d1621118d7d67e4dad75dd7e2fad390a6a0b182",
+      "recordBytes": 3050,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+      "set": "batch-075",
+      "sourceBytes": 8998,
+      "digest": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+      "inventoryFileDigest": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+      "diffSha256": "9433f7a6ab2af6c6a75b6c1cb1d602c00e7b442ac93bcf8152d3aa42b762dc9b",
+      "recordSha256": "4b014e7e7dcd0076865e7d3e2e958fca1e1b392eca6a9674178866d8de735361",
+      "recordBytes": 4010286,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 4,
+        "parked": 1,
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+      "set": "batch-075",
+      "sourceBytes": 3621,
+      "digest": "1473f9facba459536b32c2f3f601de1f57689bcc6a435408a166a1d56b9360c2",
+      "inventoryFileDigest": "1473f9facba459536b32c2f3f601de1f57689bcc6a435408a166a1d56b9360c2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "43de883ddf4a8160cf8bdabdfacd22afbc641760fc76af0504a92e00fece3444",
+      "recordBytes": 2982,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+      "set": "batch-075",
+      "sourceBytes": 19091,
+      "digest": "1fc6b5faad80b9e0b4eb164806999e711dd96511d54390aafbeb811c1a456e0d",
+      "inventoryFileDigest": "1fc6b5faad80b9e0b4eb164806999e711dd96511d54390aafbeb811c1a456e0d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d5167b48d4a73c9520f332fadfcda45285798b5976202e0c8ca06a92b3cd26de",
+      "recordBytes": 8426,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+      "set": "batch-075",
+      "sourceBytes": 4683,
+      "digest": "304174344338eff56e934cbdf815a429fdd7f9df295c19679630e73b68a62598",
+      "inventoryFileDigest": "304174344338eff56e934cbdf815a429fdd7f9df295c19679630e73b68a62598",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "91afaa66734060ab6f4a7da46e5ef910d23068adde26b3cc8b7aecf66ebf7270",
+      "recordBytes": 4321,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+      "set": "batch-075",
+      "sourceBytes": 4678,
+      "digest": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+      "inventoryFileDigest": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+      "diffSha256": "f794418f9fe6c30eb649b6569036164f27605dd36725b0d9704bf9e3f87aa3f9",
+      "recordSha256": "ab08b3f9100e5e9ac4dc19601a958a576e724332545601e9493be83ebb461396",
+      "recordBytes": 12685,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+      "set": "batch-075",
+      "sourceBytes": 5277,
+      "digest": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+      "inventoryFileDigest": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+      "diffSha256": "899ae1015f345383f4456471419bf6fa078d1815da0bab3736404e1aa1734e11",
+      "recordSha256": "08e2b053a535d468d72f47cbdaa778f6596a8b4e2863ba9439045f47a547fb3c",
+      "recordBytes": 20688,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+      "set": "batch-075",
+      "sourceBytes": 7199,
+      "digest": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+      "inventoryFileDigest": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+      "diffSha256": "21b2eb7a557545cdd19e37aa63228ae15cf7cf48023b38fc16cc572b70e9f470",
+      "recordSha256": "86248070c325ca61c80df5ba4d7d4619791593723d7bbcee3ec15128d331cf9d",
+      "recordBytes": 12269,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-per-stage-exception-in-the-driver-meant-that-stage-had/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
+      "set": "batch-075",
+      "sourceBytes": 4000,
+      "digest": "17fa81fa59ed3bd05be20b8bb683a90547383fcc054291b3eda86fd9aff47624",
+      "inventoryFileDigest": "17fa81fa59ed3bd05be20b8bb683a90547383fcc054291b3eda86fd9aff47624",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6318631f6b2f3912c9ee704a7ab5210cb29caaf74cb2471196237301d1708c9c",
+      "recordBytes": 975,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-a-real-trip-and-acknowledge-event-recordironlawacknowled/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+      "set": "batch-075",
+      "sourceBytes": 1869,
+      "digest": "1941db9c88ac3cb8cdadf06a3a52d4bb2dba7d45bf43a8a40e4d14ed3126471d",
+      "inventoryFileDigest": "1941db9c88ac3cb8cdadf06a3a52d4bb2dba7d45bf43a8a40e4d14ed3126471d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e034b768f4e4427b55dbe479fb35e4a54f3689ab039357851eae7c42323cbc6d",
+      "recordBytes": 971,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+      "set": "batch-075",
+      "sourceBytes": 8456,
+      "digest": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+      "inventoryFileDigest": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8e3eaa25b8eb877f0606880005ab53aa4926e849afd16e3e150473d3c0b96ee5",
+      "recordBytes": 5435,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+      "set": "batch-075",
+      "sourceBytes": 5788,
+      "digest": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+      "inventoryFileDigest": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bf34d4e14b469d1f8a9e3e1f4e5ad75615ffd8da502687f077b48635ba25cb92",
+      "recordBytes": 3343,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+      "set": "batch-075",
+      "sourceBytes": 21804,
+      "digest": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+      "inventoryFileDigest": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+      "diffSha256": "c2c09f9aeadecf139ca00d458b576597c06b4c3f4d65824e65a967adbf24c5fa",
+      "recordSha256": "d5eec1d69d82f6d1e9d05ec79dfbd94879d98128942451db76c7c63b2bba3099",
+      "recordBytes": 25281,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+      "set": "batch-075",
+      "sourceBytes": 3467,
+      "digest": "ef29ee5e6427f7d3107e7f490c5ac9bed704362316c1fd8bd1d38d8db607fc9b",
+      "inventoryFileDigest": "ef29ee5e6427f7d3107e7f490c5ac9bed704362316c1fd8bd1d38d8db607fc9b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0c85a32cbaeec5fc64eb5e5d5bd1de0cd898698855e2deda4b7976a683be6647",
+      "recordBytes": 2460,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+      "set": "batch-075",
+      "sourceBytes": 6162,
+      "digest": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+      "inventoryFileDigest": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+      "diffSha256": "79cc858f0881c87dabcfdd9540f749aa30083992c40fe6d668da39dc554aeeaf",
+      "recordSha256": "19b87e4fcf8c9660ecdea1d76984b4a88f1717dbf21d524ef398c8837472f629",
+      "recordBytes": 13204,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md",
+      "set": "batch-075",
+      "sourceBytes": 2357,
+      "digest": "5d54f8d39e320a3780bba4f57234812c47216aca8e3af3f5fa0fecce5f1d6009",
+      "inventoryFileDigest": "5d54f8d39e320a3780bba4f57234812c47216aca8e3af3f5fa0fecce5f1d6009",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "45c5e55d4967e4fac2e24d1a4fde5239a110370c969955320e46b4371e5b2481",
+      "recordBytes": 1978,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation/pure-fgos-state-items-cannot-close-through-return.md",
+      "set": "batch-075",
+      "sourceBytes": 5174,
+      "digest": "724412d7392c1d52d2f9d128a834c9d070d0766350261d1bc5f6507fc64cb6c9",
+      "inventoryFileDigest": "724412d7392c1d52d2f9d128a834c9d070d0766350261d1bc5f6507fc64cb6c9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "77cd6e68c31481e75732326f42b5fc3ff932374bddecaf3c54af5815a001d392",
+      "recordBytes": 955,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
+      "set": "batch-075",
+      "sourceBytes": 3667,
+      "digest": "212fcce91bd528a59f4c6bfb36ada8c0a3cb3f613c0746e281ddb7f0fa0083ef",
+      "inventoryFileDigest": "212fcce91bd528a59f4c6bfb36ada8c0a3cb3f613c0746e281ddb7f0fa0083ef",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cc7d50fe7949b8d2b31a36241e946dbc2787401d98e98ea7298c734853443fd2",
+      "recordBytes": 962,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md",
+      "set": "batch-075",
+      "sourceBytes": 4466,
+      "digest": "b49242c1729bb54bae6575bd84808d4115142ead671f8bde31818884f21822b1",
+      "inventoryFileDigest": "b49242c1729bb54bae6575bd84808d4115142ead671f8bde31818884f21822b1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f23e0fee265c94fd4e53084198c5489288cba8c0703658cb44ccb3713d7e1e03",
+      "recordBytes": 947,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-075",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000075",
+      "population": [
+        "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+        "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+        "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+        "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+        "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+        "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+        "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+        "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+        "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+        "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+          "rankHash": "0c7d28d87efc8b06d3bd08835fce9a32c545407754b2890b76d65fc7766d6b30"
+        },
+        {
+          "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+          "rankHash": "139ca78c0b30bbd7c37631525c8a595cdbd70e5e1f71c426e0c62cf8e1a011bf"
+        },
+        {
+          "file": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+          "rankHash": "21112776e3ba8fb6f5bc5d708df7ed7ccbd24ba12c32f3263c3e965685d45c37"
+        },
+        {
+          "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+          "rankHash": "387d7d9c07f6456b94bd96e3efa20c3b971a0799d46dc28e467e95eca5643282"
+        },
+        {
+          "file": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+          "rankHash": "68d8eb736aa51266eb105696fea2b54bad130bec27de94072bbe01a7c6773100"
+        },
+        {
+          "file": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+          "rankHash": "93973439868fab47cafa76770e16c3c2f13a55490a879d42be6e0cc8107eeca6"
+        },
+        {
+          "file": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+          "rankHash": "a52077440dc82fd193810e261489b5180495f61a0f70a8a812cd4d856a532681"
+        },
+        {
+          "file": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+          "rankHash": "a5b4752fc9df529a23bf785722b621cb0ef98fc79692b2bc71f3a4b316ed2ae4"
+        },
+        {
+          "file": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+          "rankHash": "ca81e5c87fba50ae64ddc6e450efe992490b5234803b3acc14ee3f91b17f95e7"
+        },
+        {
+          "file": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+          "rankHash": "cbb7320d600f5488a25127c7a44992dbf1dc47fddbd453aeddf3a5fff4344a72"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+        "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+        "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+        "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+        "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+        "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+        "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+        "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+        "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+        "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+        "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+        "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+        "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+        "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+        "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+        "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+        "docs/knowledge/why-a-per-stage-exception-in-the-driver-meant-that-stage-had/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
+        "docs/knowledge/why-a-real-trip-and-acknowledge-event-recordironlawacknowled/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+        "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+        "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+        "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+        "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+        "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+        "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md",
+        "docs/knowledge/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation/pure-fgos-state-items-cannot-close-through-return.md",
+        "docs/knowledge/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
+        "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md"
+      ],
+      "dispositions": {
+        "patch": 19,
+        "preserve": 44,
+        "parked": 1
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "075": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-075",
+      "population": [
+        "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+        "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+        "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+        "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+        "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+        "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+        "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+        "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+        "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+        "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+          "rankHash": "21cce8215b7afd43cc541aeba3ec12126ab2b3e49a9a1770308f770a62e7bd4d"
+        },
+        {
+          "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+          "rankHash": "6e84e1968a694924af290eee7a52c0a5565094edf261864fb375fcee11eceb9b"
+        },
+        {
+          "file": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+          "rankHash": "740cb08d2d68dd5f02543b53c7427d34992d951298872d6b2e29860fd5797f0c"
+        },
+        {
+          "file": "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+          "rankHash": "7787eb7637ce3134de3cf784d52d05c607910500fdcb0b227605dc0810cba46e"
+        },
+        {
+          "file": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+          "rankHash": "a05fa90c45bbfc1fc69751b9b737209a99745e6fd05e1791ff2d97ed188fee7e"
+        },
+        {
+          "file": "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+          "rankHash": "a53407145a2fc1562facf2446b018d0e6c01e8a9e55a33440ab836358712b8f3"
+        },
+        {
+          "file": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+          "rankHash": "c3bdb3905b892ac3ef26da57af1a8abdb123637cdd45645ff2bcc703caf9648d"
+        },
+        {
+          "file": "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+          "rankHash": "ce5851cd8690846a9531473c3deddd9115d2beed2a4e35f4dea62f1d16a87536"
+        },
+        {
+          "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+          "rankHash": "d2d88ea6cdbd090dcb1bd80a5aa915fdaea027d63a765333bf2082429b545253"
+        },
+        {
+          "file": "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md",
+          "rankHash": "f4e1f7b9bcda2ded2f2d357c9d3d595ab5d5c02fdc93ecf5451dce8fc490ba07"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+        "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-075.jsonl",
+      "sha256": "37123a7b74e3136258bfca24e49aee0bf607c93d63dfc4ae50731ee848dcf190"
+    }
+  ]
+}

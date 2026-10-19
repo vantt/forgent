@@ -1,0 +1,147 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4e-manifest.json",
+  "binding": "step-03-wave4e-binding-manifest.json",
+  "selectedFiles": 4,
+  "selectedEdges": 8,
+  "perSet": [
+    {
+      "set": "batch-075",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 10,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4e-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+          "set": "batch-075",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "4bba410d63c43f224ae5e83e6e6d72fd078799d9a43210e36ec9c7697c001efb",
+          "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+          "diffSha256": "d8e718d332d45062cac55f2bde258ff0be496800ec347f58da622794f8639549",
+          "recordBytes": 14027,
+          "sourceBytes": 6755,
+          "contextPlusRecordBytes": 20782
+        },
+        {
+          "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+          "set": "batch-075",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "86248070c325ca61c80df5ba4d7d4619791593723d7bbcee3ec15128d331cf9d",
+          "sourceDigest": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+          "diffSha256": "21b2eb7a557545cdd19e37aa63228ae15cf7cf48023b38fc16cc572b70e9f470",
+          "recordBytes": 12269,
+          "sourceBytes": 7199,
+          "contextPlusRecordBytes": 19468
+        },
+        {
+          "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+          "set": "batch-075",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "8e3eaa25b8eb877f0606880005ab53aa4926e849afd16e3e150473d3c0b96ee5",
+          "sourceDigest": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 5435,
+          "sourceBytes": 8456,
+          "contextPlusRecordBytes": 13891
+        },
+        {
+          "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+          "set": "batch-075",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "bf34d4e14b469d1f8a9e3e1f4e5ad75615ffd8da502687f077b48635ba25cb92",
+          "sourceDigest": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3343,
+          "sourceBytes": 5788,
+          "contextPlusRecordBytes": 9131
+        }
+      ],
+      "fileCount": 4,
+      "edges": 8,
+      "sourcePlusRecordBytes": 63272,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "scope": "New batch 075 only. Batches 076–082 unauthored; records ≤074 and their review requests are not assigned."
+}

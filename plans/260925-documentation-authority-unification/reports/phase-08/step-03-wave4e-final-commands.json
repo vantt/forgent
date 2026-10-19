@@ -1,0 +1,29 @@
+[
+  {
+    "name": "probe-replay",
+    "command": [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-replay.py"
+    ],
+    "CLAUDE_CODE_SESSION_ID": "unset",
+    "exitCode": 0,
+    "seconds": 121.151,
+    "stdout": "step-03-wave4e-probe-replay.stdout.log",
+    "stderr": "step-03-wave4e-probe-replay.stderr.log"
+  },
+  {
+    "name": "light-tests",
+    "command": [
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "CLAUDE_CODE_SESSION_ID": "unset",
+    "exitCode": 0,
+    "seconds": 0.831,
+    "stdout": "step-03-wave4e-light-tests.stdout.log",
+    "stderr": "step-03-wave4e-light-tests.stderr.log"
+  }
+]

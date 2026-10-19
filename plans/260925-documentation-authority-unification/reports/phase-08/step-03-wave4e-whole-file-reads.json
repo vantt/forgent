@@ -1,0 +1,522 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11369,
+      "lines": 223,
+      "sha256": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f4fc4ef5737c17145d60f41d5ef2b366a4c070a2df96c10fcfc9aefd72f26680"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "4fe69491b63febe41a98fea8388a7f2ddec82f10e7476f543b0a24480d941d40"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 223,
+          "sha256": "cb66ce659c61923b6799b0a43f0e6f789787ad62d0ad0be5a16127d304ccdfd9"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4353,
+      "lines": 81,
+      "sha256": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6f4855647efb22d574a6f976d1214bbfddcbfdf85722efbd1a3737e9391a00d7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 81,
+          "sha256": "b7cd7a04d696dfd4437d199dbf15e5e07776a8e20e77d80ce31107aa2eec110f"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3974,
+      "lines": 77,
+      "sha256": "9f824520f8f0ef1ff7c874797b25035f90d6fd59892ac339bbfcd82cfae0c918",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 77,
+          "sha256": "8e5b2b1da1fd646024ea8346dfe0990adb6b4d33cc2e4a537af0447d46cb1f4a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6755,
+      "lines": 127,
+      "sha256": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6e755f9f64a9b2e74d1c5634e5c836972c22ca5a1c6a5a25f06ef677d492bc76"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 127,
+          "sha256": "69e3bcafb2eb5af91cf119d2e586a5c7aa903faf14ffb60a87b70d36f1095f0f"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5610,
+      "lines": 98,
+      "sha256": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7f89f929efe589cb831e39b96e59bbf27f1164afc314f89b892f64665345ea4b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 98,
+          "sha256": "d41d9e0ae266b918f48a1c232e60916746b5c7318850312d0b606681b5ac1fa1"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5409,
+      "lines": 107,
+      "sha256": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "98d067deed47eea2916f35f7145f384c040f3873c23a0ff7401bf26a8ec7258c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 107,
+          "sha256": "f8b9f6e4555f3a289758c05b0c01da03e90ad85f9947fc7030c756695b6eaa9b"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5291,
+      "lines": 132,
+      "sha256": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a9512de7aa0352b1fc0a11d7e990e4f38e7552b1d436f3fc57148e6dcaa0920c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 132,
+          "sha256": "73940831b14af766af4f6ecd968350bd9a99546f4c64b9d58ccf118c07b25d53"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8998,
+      "lines": 208,
+      "sha256": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9f46f87a577b6c5a36ba047951c1cb59e17520253dd7f1598dc3fae4367d4d5f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3468e1676a0fe1e4ad1bfe74bd1ae1c075574aa95db58c57e078d5d7243f4a06"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 208,
+          "sha256": "a85cc047dfa17d53e728297d62ebae82342fe6902154037fc3e2e6bad74edfb2"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3621,
+      "lines": 77,
+      "sha256": "1473f9facba459536b32c2f3f601de1f57689bcc6a435408a166a1d56b9360c2",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 77,
+          "sha256": "920075530dbe76e05a9e3c6c928b7800cf2ac05bcd8d14c7c7939ab2483abd4d"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19091,
+      "lines": 315,
+      "sha256": "1fc6b5faad80b9e0b4eb164806999e711dd96511d54390aafbeb811c1a456e0d",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d27ed2819557aa01582c9e77e0369aa250a732f36bec0481100df3ad0917af2e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c4d6d8747cee94ab6d3987a77c8c43ac3b466b70ea9dd0e0c1c72a73b077567b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "7d7e1bdae78b0ab63eb0ae85bdbccebef1bf50e86071c449588244d17114aff9"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 315,
+          "sha256": "9cfbce9f285f29845c9db83ca7b5ab89edf1e22e73d4df4496965a8f54d55a62"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4683,
+      "lines": 86,
+      "sha256": "304174344338eff56e934cbdf815a429fdd7f9df295c19679630e73b68a62598",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "176b245567fe431e4528f5192d1381c875d7b2febeeb612897a5e71042e57476"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "7046d97d94e18b72bca238eeed08c7dfca64fc8aa550cc496979e193c47cc24e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4678,
+      "lines": 89,
+      "sha256": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2e84ff4bf0b394429e5692edbd1801f4c75e5a95f77af45de122b96f5a720c1d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 89,
+          "sha256": "6ffacd5a748ef5edf88f1c12fd18c6379fe865542b2173b949624b4b5d52e7fc"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5277,
+      "lines": 103,
+      "sha256": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "eb84b2fe35c6dce296ea24d8e864a4ee2e3e24bb29a8113f8c544b8bd100a42c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 103,
+          "sha256": "24a401f0cd196be133a0e408bdc036a2e549c0e393c5a4acf4eceeb460b33029"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7199,
+      "lines": 128,
+      "sha256": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2dfee2986a87585870fb11f744d83e78ad1033a1960ce45e00074f7069a580ba"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 128,
+          "sha256": "3221bf7ad5a93170ce3ecc490b88a8cd9ea52f98be50f01df30b7616ea7a95bf"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-per-stage-exception-in-the-driver-meant-that-stage-had/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4000,
+      "lines": 87,
+      "sha256": "17fa81fa59ed3bd05be20b8bb683a90547383fcc054291b3eda86fd9aff47624",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8db3bd899a5c654c993d3626ea1882a64e8afdbc9ea4eff53492b579385a47b7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "b2cc896fc1b4692d89a9450c1017a34c15d73eb4873d48cd986b4f8b227aeeb8"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-real-trip-and-acknowledge-event-recordironlawacknowled/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1869,
+      "lines": 40,
+      "sha256": "1941db9c88ac3cb8cdadf06a3a52d4bb2dba7d45bf43a8a40e4d14ed3126471d",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 40,
+          "sha256": "3234ec49506c27dda51a5401bfb9ec014faf595274d853e285c91fe73139a9a4"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8456,
+      "lines": 177,
+      "sha256": "2bab2783bc48545322b04d82c43f26402b5a6f574475bbadcfd54bb14a9a569c",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "da1e2780877c3c409a6d4cb85d14789b22df7468a535c4425d981a45f399717f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6982e75544866f44d3a5fc53fc9996a21fd93d602f661d6d37fc5fe32983689a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 177,
+          "sha256": "491102e45691b21cc772846a682505849bfc67a22c20c96afbecb7b76f32e584"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5788,
+      "lines": 108,
+      "sha256": "dd937d91d14a06a9690e0fe6b853c72d25efd2c7d336db4f12f9c77bcbb54f43",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8b60ea39db267795cb4b1d00d602e30863d94b0b241987437f654c0ed5cbd800"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 108,
+          "sha256": "1b94a933620e40acbe45893e93e628178a69b45226bc241bdc96dea1475c8c8f"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21804,
+      "lines": 375,
+      "sha256": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "63cf7b03fa1c203590024ab7b19ce4be7d56bc9c59de16c86dd40564542e9e63"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "703459353bdbfd240538e5c170c5c103650fe06ca5d749f22052f8b3559ad28e"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "84dbf15462b00a88919b6266fc8d78d36db257370cddd03c88f288ec2e9005a5"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1b8d75263f1aa54d932d82839604cf89d336f484862870eaa519ae4124d9b0c6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 375,
+          "sha256": "677b73a168bae25ac40e5fdadce53f6082a0da97eca313024f0c690c5ac8321c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3467,
+      "lines": 68,
+      "sha256": "ef29ee5e6427f7d3107e7f490c5ac9bed704362316c1fd8bd1d38d8db607fc9b",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 68,
+          "sha256": "ec5f340e2ec05ed3a59fa4264e3b4d3cc83a34443d888951705fe1d3caabb111"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6162,
+      "lines": 127,
+      "sha256": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6f300bd60c6590cb382ac062256e3c40c4452070bf21638071b9a39ca29bfae4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 127,
+          "sha256": "9290d1e1b261dc7b758dfaf5186baefb890334afcb0a188db2f95ea25ca8b823"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2357,
+      "lines": 48,
+      "sha256": "5d54f8d39e320a3780bba4f57234812c47216aca8e3af3f5fa0fecce5f1d6009",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 48,
+          "sha256": "03e431becb13ef671f149be9e2bf1ea48a0959ece9a4ee5cb6712364826c073e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation/pure-fgos-state-items-cannot-close-through-return.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5174,
+      "lines": 107,
+      "sha256": "724412d7392c1d52d2f9d128a834c9d070d0766350261d1bc5f6507fc64cb6c9",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "81ad6eec551eb14d047fb6aa495ebae9234b9e7feb96823ba791053f67c6dc2e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 107,
+          "sha256": "0c955e770bbbcc34cdb1f4d7988c813a7dd324a545a3f5eafe7a674fe5e8b452"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3667,
+      "lines": 87,
+      "sha256": "212fcce91bd528a59f4c6bfb36ada8c0a3cb3f613c0746e281ddb7f0fa0083ef",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "dc94c6bd4db3ade0e65adbcc1f34b9218e5070c8d4efc2364ab9180d831a0ab5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "844337a61f251559eb0bbbd7ab6c0453a4db8512a90dd27bf9b7710bade8eac0"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4466,
+      "lines": 94,
+      "sha256": "b49242c1729bb54bae6575bd84808d4115142ead671f8bde31818884f21822b1",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f3165bfd21652a850a115744afe35bfcbcee2e35c75f7c20737b904ec66a1df3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 94,
+          "sha256": "18aa8cf4d96a57cd85ba7aa104ae9e0cb1c1d00a9cbaf8d45546ff7cd287bfd0"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 163518,
+  "method": "Complete immutable source bytes read; every inventory span bound; supplemental full-file scan and context considered. Author traversal is not independent review."
+}

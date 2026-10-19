@@ -1,0 +1,30 @@
+[
+  {
+    "script": "step-03-wave4e-author.py",
+    "exitCode": 0,
+    "seconds": 44.175,
+    "stdout": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-author-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-author.stderr.log"
+  },
+  {
+    "script": "step-03-wave4e-packet.py",
+    "exitCode": 0,
+    "seconds": 0.356,
+    "stdout": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-packet-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-packet.stderr.log"
+  },
+  {
+    "script": "step-03-wave4e-check.py",
+    "exitCode": 0,
+    "seconds": 169.098,
+    "stdout": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-check-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-check.stderr.log"
+  },
+  {
+    "script": "step-03-wave4e-probes.py",
+    "exitCode": 0,
+    "seconds": 4.134,
+    "stdout": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-probes-result.json",
+    "stderr": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-probes.stderr.log"
+  }
+]

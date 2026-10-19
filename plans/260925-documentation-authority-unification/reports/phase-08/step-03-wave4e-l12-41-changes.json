@@ -1,0 +1,263 @@
+[
+  {
+    "set": "batch-073",
+    "edgeId": "maps-j-04444",
+    "before": {
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 36,
+          "columnStart": 2,
+          "line": 124,
+          "text": "docs/decisions/0032-iron-law-...md"
+        }
+      ],
+      "diffHunk": null,
+      "blockedCategory": "lead-ruling",
+      "disposition": "parked",
+      "edgeId": "maps-j-04444",
+      "blockedReason": "Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made.",
+      "dependencyCategory": "lead-ruling",
+      "target": null,
+      "timing": "none",
+      "reason": "A51, L12-39, L12-40 scope ceiling: Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made. Source path removed at 4722361aeea0513c4018793afad05a16f9e1501d with no successor file: docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md.",
+      "anchor": null,
+      "dependency": "Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made.",
+      "matchedExpression": "docs/decisions/0032-iron-law-...md",
+      "unitId": "line-L124",
+      "searchWitness": {
+        "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "roots": [
+          "docs/platform",
+          "docs/knowledge",
+          "docs/reference",
+          "docs/tutorials"
+        ],
+        "legacyPath": "docs/decisions/0032-iron-law-...md",
+        "passage": "`docs/decisions/0032-iron-law-...md` (the Iron Law trunk-boundary decision)",
+        "aliasLookups": [
+          {
+            "source": "plans/260925-documentation-authority-unification/alias-table.json",
+            "matches": []
+          },
+          {
+            "source": "docs/doc-registry.json",
+            "matches": []
+          }
+        ],
+        "queries": [
+          {
+            "query": "docs/decisions/0032-iron-law-...md",
+            "hitCount": 1,
+            "liveHitCount": 1,
+            "hitsSha256": "a9194daa978174d8ab81a383c92b7e917ec58b4a082719b08035a3e874aff5c2"
+          }
+        ],
+        "assessment": "Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made.",
+        "hitGroups": [
+          {
+            "query": "docs/decisions/0032-iron-law-...md",
+            "carriageCount": 0,
+            "liveCount": 1,
+            "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+            "liveAssessment": "Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made.",
+            "category": "citation-only",
+            "note": "Lead ruling required: this source elides the Iron Law trunk-boundary 0032 filename, whose actual deleted file is docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. Its real title-matched holder is docs/platform/runner/decisions/h-36d872fbb0e5.md (0032 Cổng Iron Law). The current L12-39 predicate instead requires the multi-role-team-harness 0032 note from the sibling filename in the same paragraph. Naming that different narrative would falsify this edge, while correcting the title predicate exceeds this turn’s L12-40-only checker authorization. Keep this exact source identity non-executable pending the bounded Lead ruling; no missing-target claim is made."
+          }
+        ]
+      },
+      "targetFacts": [
+        {
+          "path": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+          "state": "removed",
+          "commit": "4722361aeea0513c4018793afad05a16f9e1501d"
+        }
+      ]
+    },
+    "after": {
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 36,
+          "columnStart": 2,
+          "line": 124,
+          "text": "docs/decisions/0032-iron-law-...md"
+        }
+      ],
+      "diffHunk": null,
+      "disposition": "preserve",
+      "edgeId": "maps-j-04444",
+      "blockedReason": null,
+      "target": null,
+      "timing": "none",
+      "reason": "A51, L12-26, L12-38: Source path removed at 4722361aeea0513c4018793afad05a16f9e1501d with no successor file: docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md. L12-41(4): preserve this illustrative completed collision example. The visible elided Iron Law filename resolves uniquely against the deleted full name in git history; the sibling Multi-role Team Harness decision is a distinct narrative and supplies no title evidence for this edge. Non-executable successor note: docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người.",
+      "anchor": null,
+      "dependency": null,
+      "matchedExpression": "docs/decisions/0032-iron-law-...md",
+      "unitId": "line-L124",
+      "targetFacts": [
+        {
+          "path": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+          "state": "removed",
+          "commit": "4722361aeea0513c4018793afad05a16f9e1501d"
+        }
+      ],
+      "blockedCategory": null,
+      "dependencyCategory": null
+    }
+  },
+  {
+    "set": "batch-071",
+    "edgeId": "author-wave4b-event-log-evolution-discipline-L13-decision0001",
+    "before": {
+      "timing": "none",
+      "matchedExpression": "0001-event-log-la-su-that.md",
+      "diffHunk": null,
+      "anchor": null,
+      "edgeId": "author-wave4b-event-log-evolution-discipline-L13-decision0001",
+      "dependency": "Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried.",
+      "dependencyCategory": "dead-link",
+      "sourceSpans": [
+        {
+          "line": 13,
+          "columnStart": 2,
+          "columnEndExclusive": 30,
+          "text": "0001-event-log-la-su-that.md"
+        }
+      ],
+      "disposition": "parked",
+      "blockedReason": "Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried.",
+      "reason": "L12-30, L12-32, L12-34: Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried. Source path removed at 4722361aeea0513c4018793afad05a16f9e1501d with no successor file: docs/decisions/0001-event-log-la-su-that.md.",
+      "target": null,
+      "blockedCategory": "dead-link",
+      "unitId": "line-L13",
+      "authorAddedEdge": {
+        "normalizedReference": "docs/decisions/0001-event-log-la-su-that.md",
+        "discoveryReason": "Full pinned source reading found a bare deleted decision basename outside inventory and the existing scan. Git ancestry confirms this exact decision path was removed at 4722361aeea0513c4018793afad05a16f9e1501d.",
+        "searchMethod": "Whole-source line 13 plus Git path-history and candidate decision-heading search at author pin."
+      },
+      "targetFacts": [
+        {
+          "path": "docs/decisions/0001-event-log-la-su-that.md",
+          "state": "removed",
+          "commit": "4722361aeea0513c4018793afad05a16f9e1501d"
+        }
+      ],
+      "searchWitness": {
+        "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "roots": [
+          "docs/platform",
+          "docs/knowledge",
+          "docs/reference",
+          "docs/tutorials"
+        ],
+        "legacyPath": "docs/decisions/0001-event-log-la-su-that.md",
+        "passage": "`0001-event-log-la-su-that.md` establishes the doctrine: the append-only event",
+        "aliasLookups": [
+          {
+            "source": "plans/260925-documentation-authority-unification/alias-table.json",
+            "matches": []
+          },
+          {
+            "source": "docs/doc-registry.json",
+            "matches": []
+          }
+        ],
+        "queries": [
+          {
+            "query": "docs/decisions/0001-event-log-la-su-that.md",
+            "hitCount": 1,
+            "liveHitCount": 1,
+            "hitsSha256": "6f0e2da1df6462fb1d1721cb8ed1f867a411dacb3d63a59cbf50a639c1ab0ce8"
+          }
+        ],
+        "assessment": "Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried.",
+        "hitGroups": [
+          {
+            "query": "docs/decisions/0001-event-log-la-su-that.md",
+            "carriageCount": 0,
+            "liveCount": 1,
+            "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+            "liveAssessment": "Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried.",
+            "category": "citation-only",
+            "note": "Dead link: deleted 0001 event-log doctrine citation. Number and title search found no promoted candidate decision narrative holder; existing event-store/laws discussions are principles or incidental citations, not the deleted 0001 decision narrative. Retain the historical spelling until a holder is explicitly carried."
+          }
+        ]
+      }
+    },
+    "after": {
+      "timing": "none",
+      "matchedExpression": "0001-event-log-la-su-that.md",
+      "diffHunk": null,
+      "anchor": null,
+      "edgeId": "author-wave4b-event-log-evolution-discipline-L13-decision0001",
+      "dependency": "P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination.",
+      "dependencyCategory": "GAP-02",
+      "sourceSpans": [
+        {
+          "line": 13,
+          "columnStart": 2,
+          "columnEndExclusive": 30,
+          "text": "0001-event-log-la-su-that.md"
+        }
+      ],
+      "disposition": "parked",
+      "blockedReason": "P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination.",
+      "reason": "L12-41(1): P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination. Source path removed at 4722361aeea0513c4018793afad05a16f9e1501d with no successor file: docs/decisions/0001-event-log-la-su-that.md.",
+      "target": null,
+      "blockedCategory": "GAP-02",
+      "unitId": "line-L13",
+      "authorAddedEdge": {
+        "normalizedReference": "docs/decisions/0001-event-log-la-su-that.md",
+        "discoveryReason": "Full pinned source reading found a bare deleted decision basename outside inventory and the existing scan. Git ancestry confirms this exact decision path was removed at 4722361aeea0513c4018793afad05a16f9e1501d.",
+        "searchMethod": "Whole-source line 13 plus Git path-history and candidate decision-heading search at author pin."
+      },
+      "targetFacts": [
+        {
+          "path": "docs/decisions/0001-event-log-la-su-that.md",
+          "state": "removed",
+          "commit": "4722361aeea0513c4018793afad05a16f9e1501d"
+        }
+      ],
+      "searchWitness": {
+        "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "roots": [
+          "docs/platform",
+          "docs/knowledge",
+          "docs/reference",
+          "docs/tutorials"
+        ],
+        "legacyPath": "docs/decisions/0001-event-log-la-su-that.md",
+        "passage": "`0001-event-log-la-su-that.md` establishes the doctrine: the append-only event",
+        "aliasLookups": [
+          {
+            "source": "plans/260925-documentation-authority-unification/alias-table.json",
+            "matches": []
+          },
+          {
+            "source": "docs/doc-registry.json",
+            "matches": []
+          }
+        ],
+        "queries": [
+          {
+            "query": "docs/decisions/0001-event-log-la-su-that.md",
+            "hitCount": 1,
+            "liveHitCount": 1,
+            "hitsSha256": "6f0e2da1df6462fb1d1721cb8ed1f867a411dacb3d63a59cbf50a639c1ab0ce8"
+          }
+        ],
+        "assessment": "P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination.",
+        "hitGroups": [
+          {
+            "query": "docs/decisions/0001-event-log-la-su-that.md",
+            "carriageCount": 0,
+            "liveCount": 1,
+            "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+            "liveAssessment": "P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination.",
+            "category": "citation-only",
+            "note": "P8-DOC-GAP-02 (L12-41(1)): the only title-matched 0001 event-log doctrine narrative is in retiring docs/specs/platform-foundations.md. Carry that exact narrative before deleting the specs tree; incidental event-store/law citations are not a promoted decision holder. No dead-link classification or invented destination."
+          }
+        ]
+      }
+    }
+  }
+]
