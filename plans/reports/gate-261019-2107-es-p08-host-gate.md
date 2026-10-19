@@ -4,7 +4,7 @@ Date: 2026-10-19, Asia/Saigon. Host fg-server2. Branch tip aa237c062: ES 08 merg
 
 ## Verdict
 
-**Not pushed.** One failure in the full suite is caused by ES 08: `test/event-store/migrate-cutover-grant.test.mjs` fails all 5 tests under `npm test`, but passes 5/5 with zero skips when run alone. Fixing it needs an owner decision (see below). Every other failure is either pre-existing on main or caused by the gate environment.
+**Superseded by the update at the end: green after the coordinator's decision, pushed.** First pass: one failure in the full suite was caused by ES 08: `test/event-store/migrate-cutover-grant.test.mjs` fails all 5 tests under `npm test`, but passes 5/5 with zero skips when run alone. Fixing it needs an owner decision (see below). Every other failure is either pre-existing on main or caused by the gate environment.
 
 | Check | Result |
 |---|---|
@@ -48,3 +48,18 @@ Each failing file was rerun alone. The rerun used a release workspace compiled i
   3. Keep the hard failure and run the file only in host gates. The cost: `npm test` stays red on every machine.
 - **Recommendation:** option 1 plus a host-gate step that runs the file alone. It is test-only, small, and keeps the proof where it is meaningful.
 - **What the answer covers:** only these real-quiesce Event Store tests, not production quiesce semantics.
+
+## Update: coordinator decision applied
+
+The coordinator chose none of the three options. Production quiesce stays machine-wide, because Event Store spec §18 step 1 says migration is a one-time stop-everything cutover. Following the precedent of 6d9d05968 (`test/setup/holder-lock-checks.test.mjs`), b48c0d464 gives the migrate fixture a shim host as `ctx.hostBin`. The shim forwards to the real host and appends the host's existing `--workspace-only` flag to `internal quiesce-scan`. The real scan still runs, but only processes working inside the fixture workspace count. The PID-namespace refusal is unchanged, because the host checks it before scoping.
+
+The former payload-classification case is now "a process working inside the fixture workspace blocks migrate before any Git or ref effect". A real `bin/fgos.mjs events migrate` payload waits with its cwd in the fixture. The scan reports it as the blocker, and `migrateUseCase` refuses with `event-store-writers-active` naming its pid. HEAD, `refs/fgos/legacy` and the legacy files stay unchanged.
+
+Results after merging origin/main again (3b698b9cc, which brings in 7c56c4501, the temp-root signal fix):
+
+| Check | Result |
+|---|---|
+| Focused Node tests, one process per file | 27 files, 200 tests: 199 pass, 0 fail, 1 skip (the Windows-only native-load case) |
+| `migrate-cutover-grant` / `migrate` / `rollback-export` alone | 5/5, 9/9, 1/1, **0 skipped** |
+| `npm test` (release workspace linked at `target/release`) | 8461 tests: 8358 pass, 6 fail, 32 skipped, 65 todo. All 5 cutover cases and the typed-outcome case pass inside the suite with **0 skipped**. |
+| Remaining failures | `fences-v1-tombstone` (1, pre-existing `yaml`), `run-supervisor-checks` (4, socket path length under the suite root, environment), `skill-wrappers` (1, git-ignored render absent in a fresh worktree). `run.test.mjs` and `cancel-registry` now pass because of the main fix. |
