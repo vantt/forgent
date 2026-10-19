@@ -1062,12 +1062,8 @@ impl GitDriver {
         let old_index_tree = self.land_text(repo, scope, &["write-tree"], &[])?;
         // Two-tree read-tree retains staged entries outside the changed paths.
         // Capture that expected index explicitly, rather than assuming candidate tree equality.
-        let entries = |r: &RepoHandle| -> Result<BTreeMap<Vec<u8>, Vec<u8>>> {
-            let out = self.land_call(r, scope, &["ls-files", "--stage", "-z"], &[])?;
-            if !out.success {
-                return Err(out.error("land-index-entries-failed"));
-            }
-            out.stdout
+        let entries = |bytes: &[u8]| -> Result<BTreeMap<Vec<u8>, Vec<u8>>> {
+            bytes
                 .split(|b| *b == 0)
                 .filter(|e| !e.is_empty())
                 .map(|entry| {
@@ -1079,9 +1075,17 @@ impl GitDriver {
                 })
                 .collect()
         };
-        let mut next_entries = entries(repo)?;
+        let old_entries = self.land_call(repo, scope, &["ls-files", "--stage", "-z"], &[])?;
+        if !old_entries.success {
+            return Err(old_entries.error("land-index-entries-failed"));
+        }
+        let candidate_entries = self.land_call(candidate, scope, &["ls-files", "--stage", "-z"], &[])?;
+        if !candidate_entries.success {
+            return Err(candidate_entries.error("land-index-entries-failed"));
+        }
+        let mut next_entries = entries(&old_entries.stdout)?;
         next_entries.retain(|path, _| !paths.iter().any(|changed| path == changed));
-        for (path, entry) in entries(candidate)? {
+        for (path, entry) in entries(&candidate_entries.stdout)? {
             if paths.contains(&path) {
                 next_entries.insert(path, entry);
             }
@@ -1093,10 +1097,6 @@ impl GitDriver {
                 e
             })
             .collect();
-        let old_entries = self.land_call(repo, scope, &["ls-files", "--stage", "-z"], &[])?;
-        if !old_entries.success {
-            return Err(old_entries.error("land-index-entries-failed"));
-        }
         let proof = CheckoutProof {
             next_index_digest: Some(wal::canonical_digest(&next_entries).map_err(failure)?),
             old_index: None,

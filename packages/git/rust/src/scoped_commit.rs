@@ -936,7 +936,8 @@ impl GitDriver {
         }
         let excluded: BTreeSet<_> = baseline.dirty.iter().map(|(p, _)| p).collect();
         let mut selected = vec![];
-        for path in self.dirty_paths(repo, scope)? {
+        let dirty_paths = self.dirty_paths(repo, scope)?;
+        for path in dirty_paths.iter().cloned() {
             if !excluded.contains(&path)
                 && fgos_write_scope::matches(path.as_bytes(), &writes).map_err(failure)?
             {
@@ -1021,7 +1022,7 @@ impl GitDriver {
         // Snapshot producer bytes before staging. Clean tracked paths retain
         // only a HEAD marker; dirty, ignored and absent paths retain their state.
         let checkout = root(repo)?;
-        let dirty: BTreeSet<_> = self.dirty_paths(repo, scope)?.into_iter().collect();
+        let dirty: BTreeSet<_> = dirty_paths.into_iter().collect();
         let inventory = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-v", "-z"])?)?;
         let skipped: BTreeSet<_> = inventory
             .iter()
@@ -1149,7 +1150,13 @@ impl GitDriver {
                 request.message.as_bytes(),
                 true,
             )?;
-            let observed = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
+            // One immutable header observation binds oid, tree and parents together.
+            let header = self.checkout_text(repo, scope, &["show", "-s", "--format=%H%x00%T%x00%P%x00", "HEAD"])?;
+            let mut fields = header.split_terminator('\0');
+            let observed = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?.to_owned();
+            let actual_tree = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
+            let parents = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
+            if fields.next().is_some() { return Err(recovery("commit-header-invalid")); }
             if observed == baseline.head {
                 // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
                 if !out.success {
@@ -1164,7 +1171,6 @@ impl GitDriver {
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
-            let actual_tree = self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?;
             let actual = paths(&self.checkout_bytes(
                 repo,
                 scope,
@@ -1177,12 +1183,10 @@ impl GitDriver {
                     &observed,
                 ],
             )?)?;
-            let parents =
-                self.checkout_text(repo, scope, &["rev-list", "--parents", "-n", "1", "HEAD"])?;
             let violation = !out.success
                 || actual_tree != tree
                 || actual != selected
-                || parents.split_whitespace().skip(1).collect::<Vec<_>>()
+                || parents.split_whitespace().collect::<Vec<_>>()
                     != vec![baseline.head.as_str()];
             let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
             crate::refs::sync_refs(repo, &RefName::parse(&baseline.reference).map_err(failure)?)?;

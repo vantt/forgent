@@ -448,8 +448,25 @@ impl GitDriver {
                 let resolved = if fact.bare {
                     None
                 } else {
-                    match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(r) => Some(r),
+                    match self.resolve_topology(&path(&fact.path)?, repo.trusted_main_root())? {
+                        ResolveRepo::Repository(mut r) => {
+                            // Same checkout, same operation: reuse stamp-validated facts.
+                            // Other worktrees can have different worktree config.
+                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.git_dir == repo.git_dir) {
+                                r.object_format = repo.object_format;
+                                r.layout = repo.layout.clone();
+                                r.checkout_config = Some(std::sync::Mutex::new(
+                                    config.lock()
+                                        .map_err(|_| failure("config-cache-poisoned"))?.clone(),
+                                ));
+                            } else {
+                                r = match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
+                                    ResolveRepo::Repository(r) => r,
+                                    _ => return Err(failure("worktree-registration-uncertain")),
+                                };
+                            }
+                            Some(r)
+                        },
                         _ => return Err(failure("worktree-registration-uncertain")),
                     }
                 };

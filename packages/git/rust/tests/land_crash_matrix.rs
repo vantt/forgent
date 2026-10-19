@@ -828,7 +828,14 @@ fn fresh_land_waits_for_observed_predecessor_and_stat_refresh_is_safe() {
     assert_eq!(err.operation_id.as_deref(), Some("x"));
     let before_refresh = fs::read(f.main.join(".git/index")).unwrap();
     fs::write(f.main.join("b"), "base\n").unwrap();
-    git(&f.main, &["status", "--porcelain"]);
+    // A faster prepare can finish in the index's timestamp second. Force a
+    // distinct stat value, then refresh explicitly (status refresh is optional).
+    fs::File::open(f.main.join("b")).unwrap().set_times(
+        fs::FileTimes::new().set_modified(
+            std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_600_000_000),
+        ),
+    ).unwrap();
+    git(&f.main, &["update-index", "--refresh"]);
     assert_ne!(fs::read(f.main.join(".git/index")).unwrap(), before_refresh);
     f.driver
         .recover_land(&f.repo, vec![], "fixture", "x")

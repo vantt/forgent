@@ -335,14 +335,17 @@ impl GitDriver {
         let config = self.config(repo)?;
         self.check_config(repo, &config)?;
         // Config trust and format facts are obtained once for this resolution.
-        let format = self.repository_fact(repo, "--show-object-format")?;
-        repo.object_format = match line(&format)? {
+        let facts = self.repository_formats(repo)?;
+        let mut facts = std::str::from_utf8(&facts).map_err(|_| refusal("repository-facts-invalid"))?.lines();
+        let format = facts.next().ok_or_else(|| refusal("unsupported-object-format"))?;
+        repo.object_format = match format {
             "sha1" => ObjectFormat::Sha1,
             "sha256" => ObjectFormat::Sha256,
             _ => return Err(refusal("unsupported-object-format")),
         };
-        let refs = self.repository_fact(repo, "--show-ref-format")?;
-        repo.layout.refs = match line(&refs)? {
+        let refs = facts.next().ok_or_else(|| refusal("unsupported-ref-storage"))?;
+        if facts.next().is_some() { return Err(refusal("unsupported-ref-storage")); }
+        repo.layout.refs = match refs {
             "files" => RefStorage::Files,
             "reftable" => RefStorage::Reftable,
             _ => return Err(refusal("unsupported-ref-storage")),
@@ -353,9 +356,9 @@ impl GitDriver {
         Ok(config)
     }
 
-    fn repository_fact(&self, repo: &RepoHandle, fact: &str) -> Result<Vec<u8>> {
+    fn repository_formats(&self, repo: &RepoHandle) -> Result<Vec<u8>> {
         let out = self.invoke(Some(repo), &repo.trusted_main_root,
-            &["rev-parse", fact], Policy::Inspect, None, true,
+            &["rev-parse", "--show-object-format", "--show-ref-format"], Policy::Inspect, None, true,
             PATH_LIMIT, Duration::from_secs(30))?;
         if !out.success { return Err(out.error("git-command-failed")); }
         Ok(out.stdout)
