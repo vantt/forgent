@@ -1,0 +1,565 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5119,
+      "lines": 103,
+      "sha256": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f402ed9884247bc94290ece0095b9536a7530ab3276d27871462b9ee474d7a61"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 103,
+          "sha256": "5ab86e49b5c09aaccdcc794f252f4edcb8ee864c6d90d43d14f27a61d4e5f889"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-triage-table-columns/triage-table-columns.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3075,
+      "lines": 63,
+      "sha256": "4911e8f2a96eb1af83e107184211d9ad3e02a74f082ff45fe9e9907c67d87e5d",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 63,
+          "sha256": "0dfb039caf30e33f9136366eb6b0a2bcd449f5d5a737d1e0e5a421049cedebb1"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3883,
+      "lines": 91,
+      "sha256": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "44d97f6d7de01ffd782c7fdcbbdf077527d21f0405a6ba4175374b51efcec578"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 91,
+          "sha256": "91cb221d2e3b371717df5b3c2ce28877dc07a9c712e86a0f2b36ba07d096f41a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3112,
+      "lines": 64,
+      "sha256": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 64,
+          "sha256": "53ad1fabdedfc4be46ce28b4d236c1ec82c26924a07ef84472b979f9aeff3f6c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3151,
+      "lines": 68,
+      "sha256": "879e80394412724ef63aaa42ad849ac0b90dbbbdcc793ed849807a0cccccc64c",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 68,
+          "sha256": "ec64f2d937a8ad157f2467417a90bdef2b7514848b782b28c74f296ba3601f74"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14329,
+      "lines": 262,
+      "sha256": "5eb79d4ff8ab48d0252da6e962b80d120fa49075c51f3fadfd78447d9c498c18",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "63b9d230acbe97de3fa76c3d04e32c5e427f78f32c461d9446f7bdfdba2fb7fb"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0c6d4c7cc515bb78334b7f1b324859026f5757d8ae51a48fd6c4f4309ec4e970"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "3816c7cd3a551f27bd2a582515c498dea49f0adeaf09f8c47f508d1c2c519aed"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 262,
+          "sha256": "b4e8f097ef67cb79a23ac47fccf5a2ae69d49eaef328e181de518f32bfbbb7a8"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5322,
+      "lines": 109,
+      "sha256": "9b5e2fa808e434bccc38965fe724d06890806b30ea070886f8eea6ae6952b169",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "54ab9015f47cbcbd55b85592bfb2f92fd38e81a68b9f12c80bc95975d492a355"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 109,
+          "sha256": "78340393421bfa3ebfae783cb3939c017f8262ea2b7255360313a577cbc75321"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4106,
+      "lines": 80,
+      "sha256": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "911a8303590fb54a38d4a97828e5aad92a6cbf887e7ee2ef69b29ae2d2f97694"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6183,
+      "lines": 148,
+      "sha256": "213feb3b76a6bfa28a7342cf5475640f11947d971311a93d745871555edf0f08",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "92fcf5d6f82b8c64bfcf94527607704da9bc7ad21c772888a0f73718912aedba"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 148,
+          "sha256": "c95a91bae3b16a81954c78986151e62dbbc0649bce7ba47bd8f208babf0dd47e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5436,
+      "lines": 105,
+      "sha256": "2d853a86c421c024f1cb77d5250055625da8b551041503d9eeb3d91a04a92d49",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "04671d95c70a50391d8406e1da1723d7fbaf429bb02bfecbda328eb217f62f71"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 105,
+          "sha256": "883ffbe4110416bc3216e6c93104f7b2841e3e22c842b610c90a5b04fa67a807"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15299,
+      "lines": 294,
+      "sha256": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a2c68895e6e6532778bdf977e792e7282feefa40c59f1d04f871f40dbf2c4da9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9b216104bb1c725e9d0673f30f9a066130266dba0779496ff426466e632bc54d"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "5c036bcee90198262fe3cb78604ee8dbe37ca6529d7259a6ce6d39e22a7915b1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 294,
+          "sha256": "833d298356fd845fc06be12fe1d593fb90db78016f668cbd0490bd6da5151f8c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15239,
+      "lines": 266,
+      "sha256": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7334cf3727ccbe850d4a4a7a55c78899eb5c52ff1742a174628d2df08545d715"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "543c3962018be540133005e29e1cd6e9d7e478a7fc64a358f44450a4fd64380e"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "2e1ef0132699e0fdafe886a2c9836d3292d0176b3027cda2da6937c7b2ae76b0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 266,
+          "sha256": "6fbcf164f3d7400b8ef7da7341261587e45af94f1408cf13a2974e684b26aa42"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 24476,
+      "lines": 407,
+      "sha256": "226432b47535724640abcbe21c5f6e4d00a8e571a1d17361d1a3bc0df733a3f2",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bccd81bf6d508b0210ed13a5428792a433148a7e893711dbd655653592844699"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6cb6da1b52237f150358d188800ce070e5fcc34506f0015ffeb7d1b664c5ae47"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "00337b4e0f9bfa88be7cf84c68cc922a87e813585f0262295e6c18b6f3d72089"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "dad4293d1deb76786bf8a8131b109056c4a5fed89678378330ed5227b34854f6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "3ba23336e493bd2074fbbc669dbb19147051b97f903dc736036409463b630f2d"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 407,
+          "sha256": "17cf2a9fcde28b4b9517aa44ebf636ba57190e83bb1cfca5ea096e3dc14f012a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4987,
+      "lines": 90,
+      "sha256": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "44ba7eb62614c9bff7373b6f49fb5945c16606e67fef189c9d685157cea56608"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 90,
+          "sha256": "a7066fe3362b95aac126060eacdc89d7f6bcd246338c5c6b1c5605ea436f5ad3"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5494,
+      "lines": 117,
+      "sha256": "6b7f5e4051165365e0ed62b0781b0061ec5b3423b0048541180e7ec471b9d10d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "607d4fea8d42d98297b1a371c58a69f015858766931b5885a1d81225095ab052"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 117,
+          "sha256": "2d817b07741e75232bc4050e6d941f12970c0c95cd0f144bc5fa23c28010a1da"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6620,
+      "lines": 140,
+      "sha256": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "82752e4e9df7b82f40178288e149730710b3b0b44840069027d5de1e8a4684ce"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 140,
+          "sha256": "ca7ebba2c8ad1be3700194c27ea2d941f5c19a1c74dada55cd1dbb7bb52a14e3"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4724,
+      "lines": 125,
+      "sha256": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "04c5c9224334efc0a5779c5200a8a1ef5b7d1996a7a15429339494a90a48c797"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 125,
+          "sha256": "39f38f89f857468ffb9600d992485a390ec837c16653e00c4ece6d9801b4bd3c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3723,
+      "lines": 87,
+      "sha256": "9c814172778b2cecba2202dbe7197e75fe476604ab70876ff95f822e1fc499da",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fadd202913d3aea13b2358ece8e42904cf4c5ea2e4d0fb97dd82d2ff90f59894"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "45cd55a533765268cb49b412341396706afab5e11b709e78d8e3f14ba9ec7ee0"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7673,
+      "lines": 166,
+      "sha256": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "10abca147568bc95a93b62bbb40dce2064ed01975d6be128a55fec0394257429"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "c8d7442dbffd108154c52c1549421a7ac09970a7ef55e15397ab58971684ba33"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 166,
+          "sha256": "74b0180e78ff9df49b48039e09a7bd37ef0ab06eaa9293c9f3c95ba104547134"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6645,
+      "lines": 141,
+      "sha256": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "734fb2c90b414c8fd4c7795b40d81b433685acaf0879ca423091388805ee026f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 141,
+          "sha256": "e4ad7fd8eb9ef343667875d13081410c89eab686d6518df81a21ea7f02a97423"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9088,
+      "lines": 236,
+      "sha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2b3fda251997b84171e333f46ad0add4f0f1b07ed487b38161be3498bcd0a6f6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d19701034e28752b0291533527815857ffd6cf0f9ebdcd24659019ddb6b39abf"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 236,
+          "sha256": "cf01baad33bca3154694852167c01a034093ea2337a368805a91792c32da1cb9"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4746,
+      "lines": 104,
+      "sha256": "ba351cd515dd8bbbbad298bc3348286bc983a63fe960bb54d9a6c3eef85c6cf7",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a2c10cabb5da1ec8a550ab346a9ec74f745ea44b5912f9ba527424a42ce58a66"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 104,
+          "sha256": "df8c8e16d3a08b81e35c7dccff4651435dca98e35cacd95aef212f40f26c83bc"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3607,
+      "lines": 83,
+      "sha256": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cb154190031c7d062dcaa5435d4d8d42f7d6df6cbaa9979f53f15122ecd03ea0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 83,
+          "sha256": "1cfdc40f38fdb9f6d5fd965c094f39f82fbf51d6c661e08523d57863cdd33215"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8842,
+      "lines": 169,
+      "sha256": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2c4b7c4521ce2f8d76af0f77055fb7adf0368ca1fb62573ec38cae2cc75d4da3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "a1e56e3f9bae8c7f60e245270158911d6c2adc262e901a8429330a8c38a512c8"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 169,
+          "sha256": "0889b9718199b6af86a685c4104d77d9b840c3c5ee7744286dcbeca018d09d28"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5323,
+      "lines": 114,
+      "sha256": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "67f719a17c930e5d6cd65d9296a28f6d04b61e5f72e42dbc39d2144b09872041"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 114,
+          "sha256": "34d909c58b390e046cec7be17978e961c51a2885389a253c8f8734f480195c04"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 180202,
+  "method": "Complete immutable source bytes read; every inventory span bound; supplemental full-file scan and context considered. Author traversal is not independent review.",
+  "supplementalManualCoverage": [
+    {
+      "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "edgeId": "author-wave4b-event-log-evolution-discipline-L13-decision0001",
+      "span": {
+        "line": 13,
+        "columnStart": 2,
+        "columnEndExclusive": 30,
+        "text": "0001-event-log-la-su-that.md"
+      },
+      "reason": "Lead ruling required: full source line 13 attributes the event-log doctrine to the bare deleted decision basename 0001-event-log-la-su-that.md. The frozen inventory and scan_candidates both omit this explicit shorthand because its deleted basename is absent from the pinned tree. Manual supplemental coverage retains the complete source span; no candidate decision 0001 heading is returned by the unchanged narrative-holder lookup. Determine the exact doctrine/narrative holder and strengthen deleted-basename coverage separately; this turn must not change checker or resolver. The brief requires lead-ruling; the unchanged checker does not admit that category."
+    }
+  ]
+}

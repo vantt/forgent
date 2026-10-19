@@ -1,0 +1,174 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "leadRulingEdges": 7,
+  "files": [
+    {
+      "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+      "recordDigest": "a7310aaa811d45547a121be0b007b2ebe5c7013246cb6ee997456e5a14048c3f",
+      "edges": [
+        {
+          "edgeId": "author-wave4b-event-log-evolution-discipline-L13-decision0001",
+          "sourceSpans": [
+            {
+              "line": 13,
+              "columnStart": 2,
+              "columnEndExclusive": 30,
+              "text": "0001-event-log-la-su-that.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: full source line 13 attributes the event-log doctrine to the bare deleted decision basename 0001-event-log-la-su-that.md. The frozen inventory and scan_candidates both omit this explicit shorthand because its deleted basename is absent from the pinned tree. Manual supplemental coverage retains the complete source span; no candidate decision 0001 heading is returned by the unchanged narrative-holder lookup. Determine the exact doctrine/narrative holder and strengthen deleted-basename coverage separately; this turn must not change checker or resolver. The brief requires lead-ruling; the unchanged checker does not admit that category. Source path removed at 4722361aeea0513c4018793afad05a16f9e1501d with no successor file: docs/decisions/0001-event-log-la-su-that.md.",
+          "targetFacts": [
+            {
+              "path": "docs/decisions/0001-event-log-la-su-that.md",
+              "state": "removed",
+              "commit": "4722361aeea0513c4018793afad05a16f9e1501d"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+      "recordDigest": "3da141dcf9f6dfffa3919c66f3056c35241f9173b851c38c817beda7880507ae",
+      "edges": [
+        {
+          "edgeId": "maps-j-04295",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 63,
+              "columnStart": 3,
+              "line": 123,
+              "text": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path renamed at c30261fac51fc00433a46fc194ef93a0ef24ea8b to docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md; original source spelling conserved.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md",
+              "state": "renamed",
+              "commit": "c30261fac51fc00433a46fc194ef93a0ef24ea8b",
+              "successor": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        },
+        {
+          "edgeId": "maps-j-04296",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 61,
+              "columnStart": 1,
+              "line": 125,
+              "text": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path renamed at c30261fac51fc00433a46fc194ef93a0ef24ea8b to docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md; original source spelling conserved.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md",
+              "state": "renamed",
+              "commit": "c30261fac51fc00433a46fc194ef93a0ef24ea8b",
+              "successor": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        },
+        {
+          "edgeId": "maps-j-04297",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 77,
+              "columnStart": 17,
+              "line": 133,
+              "text": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path renamed at c30261fac51fc00433a46fc194ef93a0ef24ea8b to docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md; original source spelling conserved.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md",
+              "state": "renamed",
+              "commit": "c30261fac51fc00433a46fc194ef93a0ef24ea8b",
+              "successor": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+      "recordDigest": "a3e2fa73e6641beeae05b97de0ae00e23bcbed2fb300233883dadefa426019ff",
+      "edges": [
+        {
+          "edgeId": "maps-j-04306",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 55,
+              "columnStart": 19,
+              "line": 212,
+              "text": "docs/how-to/check-rollup-progress.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path exists at author pin: docs/how-to/check-rollup-progress.md; current retained path stays literal.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/check-rollup-progress.md",
+              "state": "exists"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        },
+        {
+          "edgeId": "maps-j-04307",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 37,
+              "columnStart": 1,
+              "line": 214,
+              "text": "docs/how-to/check-rollup-progress.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path exists at author pin: docs/how-to/check-rollup-progress.md; current retained path stays literal.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/check-rollup-progress.md",
+              "state": "exists"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        },
+        {
+          "edgeId": "maps-j-04308",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 53,
+              "columnStart": 17,
+              "line": 222,
+              "text": "docs/how-to/check-rollup-progress.md"
+            }
+          ],
+          "reason": "L12-30, L12-32, L12-34: Lead ruling required: the explicit “## Document history (compound-learn capture linkage)” section records the original docPath and fgos doc-sources query, including a verbatim work.outcome capture. These are historical exact identity coordinates, not current navigation. The committed registry aliases this spelling to the consumer itself. Preserve would trigger renamed-alias-preserve because this genuine history heading is not recognized; patching would falsify the quoted capture identity. The brief requires blockedCategory lead-ruling for a checker gap, but the unchanged checker CATEGORIES excludes lead-ruling. Keep the capture bytes and all consumer bytes untouched pending Lead decision; do not weaken or edit the checker. Source path exists at author pin: docs/how-to/check-rollup-progress.md; current retained path stays literal.",
+          "targetFacts": [
+            {
+              "path": "docs/how-to/check-rollup-progress.md",
+              "state": "exists"
+            }
+          ],
+          "blockedCategory": "lead-ruling",
+          "dependencyCategory": "lead-ruling"
+        }
+      ]
+    }
+  ],
+  "categoryConflict": "The assignment requires lead-ruling; frozen step-03-check.py CATEGORIES and blocker_category do not support it. No checker, probe or resolver was changed.",
+  "priorAcceptance": "Unchanged; independent Lead review remains pending.",
+  "needsWrites": []
+}

@@ -1,0 +1,252 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4b-manifest.json",
+  "completedBatches": [
+    "071"
+  ],
+  "pendingBatches": [
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "selectedFiles": 7,
+  "selectedEdges": 13,
+  "A51DistinctSelected": 4,
+  "perSet": [
+    {
+      "set": "batch-071",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 12,
+      "unpatchedSample": 2,
+      "A51DistinctSelected": 4,
+      "leadRulingSupplementFiles": 3,
+      "distinctReviewFiles": 7,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4b-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+          "set": "batch-071",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "50b437be4e8f6f8a2a475c342b4a14588b1a290ce82b0a0c6c21ada1082ac686",
+          "sourceDigest": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+          "diffSha256": "7af2e00733bb9c36a453072095e89cda20fe4516dd5cd81f9210b5d359711196",
+          "recordBytes": 12917,
+          "sourceBytes": 5119,
+          "contextPlusRecordBytes": 18036
+        },
+        {
+          "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+          "set": "batch-071",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "18456108308486513f940baf1a07e4dcaff6467f7cf4d1e9d0388a8921e330a3",
+          "sourceDigest": "9e8006c45e7219af4bbf02071d663c5fa886ae644b9be35d4cf52bf7f3e5688e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1982,
+          "sourceBytes": 3883,
+          "contextPlusRecordBytes": 5865
+        },
+        {
+          "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "set": "batch-071",
+          "strata": [
+            "lead-ruling-supplement"
+          ],
+          "edges": 2,
+          "recordSha256": "a7310aaa811d45547a121be0b007b2ebe5c7013246cb6ee997456e5a14048c3f",
+          "sourceDigest": "b829434d91d0eaeafb6671fc61e72a36285a8e645f7c9658466660b7ad7816c8",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 7378,
+          "sourceBytes": 4987,
+          "contextPlusRecordBytes": 12365
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+          "set": "batch-071",
+          "strata": [
+            "lead-ruling-supplement"
+          ],
+          "edges": 3,
+          "recordSha256": "3da141dcf9f6dfffa3919c66f3056c35241f9173b851c38c817beda7880507ae",
+          "sourceDigest": "eaab1838a59d6d821ad6fab4f2630ee148850896f912e537f7ce36396b00d58e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 19783,
+          "sourceBytes": 6620,
+          "contextPlusRecordBytes": 26403
+        },
+        {
+          "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+          "set": "batch-071",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "2a5c44099b41f9d437cf15c0cb0d4faaa6b8b29ad833e7aebdebb5247f0f7396",
+          "sourceDigest": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+          "diffSha256": "e998e00bb618c1f3b19474de7ced1cc08f18b8e7b27d25f2bbe6f76b7138bbb1",
+          "recordBytes": 11907,
+          "sourceBytes": 7673,
+          "contextPlusRecordBytes": 19580
+        },
+        {
+          "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "set": "batch-071",
+          "strata": [
+            "lead-ruling-supplement"
+          ],
+          "edges": 3,
+          "recordSha256": "a3e2fa73e6641beeae05b97de0ae00e23bcbed2fb300233883dadefa426019ff",
+          "sourceDigest": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 17975,
+          "sourceBytes": 9088,
+          "contextPlusRecordBytes": 27063
+        }
+      ],
+      "fileCount": 6,
+      "edges": 11,
+      "sourcePlusRecordBytes": 109312,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4b-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+          "set": "batch-071",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "bf4bdf3132c24e7d7bcf0ad1d43ba99c1b3e249c7bd0b5bdad283df55f552df5",
+          "sourceDigest": "25506c74e4d547edb1a6290e5701b3d3bd68200cffcf77b30e884c1f7f424a1f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3778,
+          "sourceBytes": 3607,
+          "contextPlusRecordBytes": 7385
+        }
+      ],
+      "fileCount": 1,
+      "edges": 2,
+      "sourcePlusRecordBytes": 7385,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "semanticAcceptance": "Pending independent review and Lead rulings. No zero-failure claim."
+}

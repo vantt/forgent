@@ -1,0 +1,207 @@
+{
+  "status": "blocked: bounded batch 071 authored; zero-failure gate not met; 072–082 unauthored",
+  "verifiedAt": "2026-10-19T22:44:07.494150+00:00",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inputHead": "5a4ca0621ec905e31fcc65b5bdb2d78156ef68b3",
+  "completedBatches": [
+    "071"
+  ],
+  "pendingBatches": [
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "pendingFiles": 264,
+  "population": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "071"
+    ],
+    "pendingBatches": [
+      "072",
+      "073",
+      "074",
+      "075",
+      "076",
+      "077",
+      "078",
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "stopReason": "Whole-batch budget boundary after 071; 072–082 remain unauthored. Seven edges require Lead ruling; checker/probes/resolver unchanged.",
+    "files": 25,
+    "inventoryEdges": 60,
+    "addedEdges": 1,
+    "edges": 61,
+    "patchedFiles": 10,
+    "dispositions": {
+      "patch": 19,
+      "preserve": 33,
+      "parked": 9
+    },
+    "parks": {
+      "description-rewrite": 2,
+      "lead-ruling": 7
+    },
+    "reviewAcceptance": "pending independent A51 review",
+    "leadRulingGaps": [
+      "Historical capture/docPath identity vs live-alias rule; lead-ruling category absent from frozen checker enum.",
+      "Deleted decision basename 0001 omitted by inventory and existing scan; exact narrative holder unresolved. Supplemental edge covers it; Lead ruling parked."
+    ]
+  },
+  "checker": {
+    "files": 477,
+    "edges": 3744,
+    "failureCount": 15,
+    "failureClasses": {
+      "author-added-search-coverage": 1,
+      "dependency-category": 7,
+      "parked-state": 7
+    },
+    "finalDriverExitCode": 1,
+    "elapsedSeconds": 153.166,
+    "initialAttemptFailures": 18,
+    "initialAttemptDriverExitCode": 0,
+    "initialAttemptNote": "Initial scratch driver printed failureCount 18 but did not propagate it as its process exit. That result is failed, not green. Final driver propagates failureCount as exit 1.",
+    "correctedRecordOnlyErrors": [
+      "maps-j-04300 nearest ranked-table heading",
+      "maps-j-04312 nearest implementation-pointers heading",
+      "maps-j-04314 remove incident-region lines from fix evidence"
+    ],
+    "checkerSourceSha256": "25de02170643e514399d0abc3f0c800d34c72f1d93359898ffaa67994fcdc946",
+    "resolverSourceSha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+    "predicatesUnchanged": true,
+    "probesUnchanged": true,
+    "probesRunThisTurn": false,
+    "invocation": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 -B /tmp/fgos-work/check-wave4b.py",
+    "replayMethod": "Import existing step-03-wave4-check.py; m = module.m; m.SETS = tuple(f\"{i:03}\" for i in range(1,72)); rs = m.records(); result = m.Checker(module.PIN).all(rs). No predicate overrides. Print/serialize result and exit(bool(result[\"failureCount\"])).",
+    "locatorReviewFlags": [
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-08011",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/routing-handoff-contract.md",
+        "edgeId": "maps-j-08056",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "ADR-0005"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08184",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/workflow.md",
+        "edgeId": "maps-j-08379",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0027"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+        "edgeId": "maps-j-03990",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§9.2."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+        "correspondence": null
+      }
+    ]
+  },
+  "A51": [
+    {
+      "set": "batch-071",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 12,
+      "unpatchedSample": 2,
+      "A51DistinctSelected": 4,
+      "leadRulingSupplementFiles": 3,
+      "distinctReviewFiles": 7,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "review": {
+    "files": 7,
+    "edges": 13,
+    "parts": 2,
+    "reviewersStarted": 0,
+    "accepted": 0,
+    "frozenManifestMatchesCurrentRecords": true,
+    "allPartBindingsMatch": true
+  },
+  "protectedFilesUnchanged": 145,
+  "scope": {
+    "needsWrites": [],
+    "consumerEdits": false,
+    "gitWrites": false,
+    "fgosCLI": false,
+    "checkerProbeResolverEdits": false
+  },
+  "limits": [
+    "No zero-failure claim; seven lead-ruling parks produce 14 category/state failures and manual deleted-basename coverage produces one scan-join failure.",
+    "No acceptance, full runtime/reproduction suite or committed-byte accounting; Lead owns them.",
+    "Batch 071 is the whole-batch budget stop, not completion of 071–082.",
+    "No preview/service startup under this assignment; Lead owns preview."
+  ],
+  "artifactSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-071.jsonl": "41820f4d55cc17f6c17793c19f59364818a7aa7cb0ba2c71dbfe9adeeac2dee4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-attempt1-check-result.json": "29dfb859bd7fef3fcda8f0474cb4e8f7abf6fc7bc5b71bd7b8fe453442279c7c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-binding-manifest.json": "a1329179b24b7ba7a7c64cea44616056188569b54b098a121cf8f1a0be3a6f84",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-check-result.json": "8fba46d44bdebc73cd78ac6b2a97b035a45fea7576d6473e5bd58386465bfaf2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-lead-ruling-gaps.json": "53a26056f79e85bdcd18294303b3d9240a037cf692b938708e525726664c1976",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-manifest.json": "1322249c6fb3313ecddb800c496660107766e0a27ab4c400d642eb9125fa84f0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-population.json": "d19089297594d14044daf4f5b32c5ebabf1840d4c6320ee67ae7c5628d9e8242",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-protected-bindings.json": "ba8402368159d7697d9f41492cd31a9879dab708d7699ec388f6a97fae03cbec",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-review-index.json": "4c2732fada6d6278f374f71f23e2a6f7d418c7a094fe671616e5bb2ebd8d2a13",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-whole-file-reads.json": "e4a81121dddc37c28d86e876c91d7016ae6d81b6381ad0760bc21704afca27e2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-review-request.md": "efd61d43d5b0d87cd37a1ff748b10445ccbd4f7a6d03efa62e98378e1f6b3338"
+  }
+}

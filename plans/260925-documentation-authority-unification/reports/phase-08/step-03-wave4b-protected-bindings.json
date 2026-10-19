@@ -1,0 +1,731 @@
+{
+  "inputHead": "5a4ca0621ec905e31fcc65b5bdb2d78156ef68b3",
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "sha256": "6045263877db11e6113d5d2ef49940d1861b2ea2dcd3cc8b13a84c9853aa5249",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-reproduction.json",
+      "sha256": "0fd8326893db6330ada3bd2da5c93b29ab3ee3f47564c6cbcb5bf8455f8bfb0b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-close-reproduction.json",
+      "sha256": "9c959cff396a01b5fcb274ee3fc57e6f03974399a97681d450c2c676cce52572",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-correction-manifest-sidecar.json",
+      "sha256": "d8ea7f80e92056617d1dc9eb6f3dc8b745c826ae8bb9d68e241012ab00510ed5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-correction-reproduction.json",
+      "sha256": "6d95b26a3f7c338e99ac594b1d8ea25b55206479fc82fb5a2bd44bce07fd16f5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-data-reproduction.json",
+      "sha256": "a9bd90803d8c1abf609647fa9408ca080ea123ea2442f8a34c779218f7ec0112",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-docs-reproduction.json",
+      "sha256": "65542983f68a0b7b17ddb7810bea183895a3c72e35cb4ee3859ad30ed0f8ea09",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-reproduction.json",
+      "sha256": "3de338a0aa34efd68568a611aab491723f417cbc49890824454ab71a20ba1ad7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-reproduction.json",
+      "sha256": "376a923cc0e42deeff36f612f36d15883eb9d091a0b532f6c8a96da11473aef8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-reproduction.json",
+      "sha256": "278740a565c3522095e7117fe6e6204278c34f91036717acd5fa13c08ca527ac",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-reproduction.json",
+      "sha256": "13e9def3dc44be21de6fd4c5a4e0732ec74aef7f76ec545b0835b342c420181b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-manifest-sidecar.json",
+      "sha256": "d3464c9ac62bc8e7d782eab3eba2ec56b8259849dc5ae78593a3dfadfc36561d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-reproduction.json",
+      "sha256": "7f364c5b63b48f8a25036a22d9b843db02839e2d7a5acc369d0b8ef101f9e43e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-reproduction.json",
+      "sha256": "29f9350aa84faa6fc6608d570a53bbbc6bc5df1852c03e62f2de865184dab317",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-reproduction.json",
+      "sha256": "e4a1c8fb9f13376343b77546b90d87c67ce306e77ea20c0d75d8ac591f89afe4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction-results.json",
+      "sha256": "f6bd016f748d3cdfa129a4a3b6e443ca38743cce3c1ba3c7eaeb132f553baedd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "42afe1361627e62f2ab5e27da53c78b195e879e16e6e3c01e31a6c5495ccd81c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-portable-reproduction.json",
+      "sha256": "30b6b36ad1edc8a026605bb9878363859a871ea2870c9fc92e508b46e8750b57",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-reproduction.json",
+      "sha256": "2f5ff041a55722ddef237bc838ce2bfc13030cd7d4f8ed648fb365b993bcc2a2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-manifest-sidecar.json",
+      "sha256": "3be57ad2575e6cf8f47cd91236c392af06878d2a7a600a7c2ea1cdd49296eb33",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-reproduction.json",
+      "sha256": "9f0066ed9fecd8f100760fb4e20067f08e3b2586613084e39cc4cb7b56a55de5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-reproduction.json",
+      "sha256": "aa5beaeb9092d46c60af1e6143a0f028a707ced480cebb3256b9ac88e7f81441",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-reproduction.json",
+      "sha256": "35d22d44de85849912484e07f30a1baacc9815ac9383e410e85112b12ffd984c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduction.json",
+      "sha256": "2a16af6beb7bc0381c37e6518031993b69af45c77ec8745ab69f806fa7cb2bb4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync345-reproduction.json",
+      "sha256": "20dafa3aaa915a0e6942c3f13714e6b656d90f380650b5b316e95ecfe71a0ee1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "6d74115b06555e2056b8db3b07545c67b19900870fe91148cdadbdf4ee326add",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json",
+      "sha256": "58b91f7070dd5eaefba13e2a41c4bbb8cc985c43bb8334f3d2bf066d60abfdc3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-reproduction.json",
+      "sha256": "439e353405190c17188b5bbaf762c9d6cab1d8d6f1def0569be1f225695a8506",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-reproduction.json",
+      "sha256": "467fbe9517aad55d66b0f6c196ea0be27aa6a117ebc22f37ddf634cab8843837",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-manifest-sidecar.json",
+      "sha256": "b95fdee0ae6b90f65ed62ef180f4c5e3f5527f2c6379fda52a00ae67e92db73f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-request.md",
+      "sha256": "48512402aecf43dcb460a6ca0425c9522b83d685b2de485ba6080afb94df81d6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-review-request.md",
+      "sha256": "b5844c7008567fbbf18b7dc620fa9166d5943aa58bb86c142ba853862348dffe",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+      "sha256": "e480c1021d46fe6bccda2df91d29f8ce6ec32a1378a6ace8972af8c6b8e363d9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-request.md",
+      "sha256": "be46bb48444bcbdc75fdee4d154677f890ad202d10d06c420177267ab17385dc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-mapping-review-request.md",
+      "sha256": "6c2be190de35b15a9639a4b09816402ab2e133b84825a48822155503da3ef64e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-request.md",
+      "sha256": "2773cac9f4f60b43be92090c84dfc6ad3e8860e4c65f54b3c52664604706fcff",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-request.md",
+      "sha256": "1910fb33843b48915b0edd6826913db58e71519cd30552d19015d0ae59dd04f9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-mapping-review-request.md",
+      "sha256": "24d8e14310ed48b12a68bab740043069ac8a121183726298f44d2a43c42c6634",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-probes.py",
+      "sha256": "bf04d90b588c57e865ffaeb58508e3b52a87f94cf71b9bfc78db630d65615ff4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-mapping-review-request.md",
+      "sha256": "2d49b36d54a306871966c26f45aede0668140e3c62bbbf76e4d47438a0880cc7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-probes.py",
+      "sha256": "48d790d1efa9231e0df2e9978951e5956842df7f9d37c21de1aaef6bb1bbe268",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-mapping-review-request.md",
+      "sha256": "14857521399e0d66179d21ed74d96678bdb608f50d346a621886db8e62f9f846",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-probes.py",
+      "sha256": "3b9759e6369435d108bd2cfc3474e86e136279fc1547eee2a4dcec7a6ed2dcc5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-mapping-review-request.md",
+      "sha256": "9bc37975125d50a886fde7d5dea36590aaeec8e7619be0e825fdc1e405055127",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-probes.py",
+      "sha256": "10b419a73a292acd80db18c41ede8093d24315eee9852dd3055646209dbfd488",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-mapping-review-request.md",
+      "sha256": "d0746b0ae471b482c6d9bdd38280dad00f1f76621558da983ca44b81f3c43933",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-probes.py",
+      "sha256": "4ac0603eb1e5b62631bd363848e064f3c56628a57b3c7b8c24a2f8dd49b991a7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-inventory-review-request.md",
+      "sha256": "97d1cfb3fa51e1abbc802b4ff8b6306ed7d12c2ee5665d66da6563f8ff4db1a0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-probes.py",
+      "sha256": "f39f8bc2b43f97f81e5f8c34962ea7fbeb7ed87cb8ac38d47be0e4fb9c4b13f6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-inventory-review-request.md",
+      "sha256": "48275382eae384fd2110df3cf07034946328dfffbc31651736aceb432cc64060",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-probes.py",
+      "sha256": "fd0562a24e9773fbcdd2d8020041060a3a37171d73acdff60c7942b58bdc760b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "25de02170643e514399d0abc3f0c800d34c72f1d93359898ffaa67994fcdc946",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r2-review-request.md",
+      "sha256": "419aedcf1f080a84ea2b48c789199eeb044b3bf1b7874b5cc8c38c7bbe57d57a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r3-review-request.md",
+      "sha256": "2aa0d5835dd0a434bd83bf8ae778e47477d5c39b09e5e9b51c3cd2d0114037d1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r4-review-request.md",
+      "sha256": "c8ecef395f03704b962fa8094c46623c62979395c91c0ec54ef7ecaf1d27b4ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-review-request.md",
+      "sha256": "c09917ef86ff62d6c88a5aa3481c652936529698c28d6edbcde4f7a05928308b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "sha256": "a24ec9b011a439629c3362f794b611bae3d3da33b08835dbca2d3c9f6e8ce289",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "26020e7e42701ad62bd9f2e829a88e9cc75fb707a1c247295276fe267acbcd8f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "274a0ad083d291ad632aa9654496132df5303a47f135faa7ed3e612eefcef354",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "3069bb82fc1edd87a6538f7db4391aa62df1ac0e8a02e91de81aeb75033cd140",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "de8882c4bdadd2f5aa0bf2f965fd04b2f9f5237d05e959a82f1ec16849bce496",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+      "sha256": "4e0fa6c4a19fdf33a516f897133c3a429763b20f17b59402a7e230e2ff7b7d69",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "b3518e4d63ff79a4d77570137958a6b0af2a13a5b2faa48edbd41fc9812b8fa7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "4c54ba05692d41cce18f67ecd93a0f60a4ac9f435d397c2f1fbc082fce937a15",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "61ac79210490083bb1470277916c78acfc4200d1b0610a8a1c3cd2ea7fe1a329",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "7b12b874b3f5b4b0f8e4a7f281a0319d6f8913ba414809366c2a8ce25dcfa6f3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+      "sha256": "b30f2c80175fc6947dfcff8e40edc9c248d4ab3031dfcd5629bddbcd628623ad",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl",
+      "sha256": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl",
+      "sha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "sha256": "44e22e3c315397d6691c250f902ede369037ebf97e289a5af327dd6dc7fb9258",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "sha256": "38eb0aaacea683b9fe8ca0026781cdbc564b543acd7c21c0e7648248bd15ad4d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "sha256": "11aad87a084c8a125eef008229a863f6d3acbd56e41e39b68a597057641be5f2",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl",
+      "sha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "sha256": "569a2ddd97ab66db204aeef662b254c883a3311d55a78b81c5570ba38efc7d23",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl",
+      "sha256": "287d6cf3632a95ab416e2ebad3a3295bbc4d0dda34e472bafa66ea99d0cf10f4",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl",
+      "sha256": "91b9faa7c292f9cdd276e0346e9fc9a230f445e5d688797f810a7bf47c1914fd",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl",
+      "sha256": "caeb971925934f2f21a684d0a69ab264ad15793074f12b753666916a29061b29",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl",
+      "sha256": "079c1065a0fbc9396b9b071cb761e8048990ed874e8b6ef3e5b53d0e22be0472",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl",
+      "sha256": "911011cbf1c7ccbe53884ce1cffd615639127a1b86a1b94e5f638a5da16fc9b7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl",
+      "sha256": "c52249a7a30805b93fe3800337d2b1a36cf7907b79fa51e566bb9d47eb2bb4f3",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl",
+      "sha256": "f24093b482346b77a7c17842824f8b0c55f39bf15d7d99fd6dcc43dc420fb1d5",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl",
+      "sha256": "4ecaeda857f444c5bcdac7f109482f76ee9d0fd03a4b1e0ac6e29df586ed77da",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl",
+      "sha256": "02ff5b99b51d2225631801903716bb0d2791bef7b22b5982ea01689a27f9ae5b",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl",
+      "sha256": "8e97a1d396eabb24a023f1b03292fb78a51ef7d767c1df5f47563905e8156f83",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl",
+      "sha256": "90df44d30f8699bf0d24a9051ad8e8dffdd0cc5b01f57bb2ace5c8c5e6e435b0",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl",
+      "sha256": "097915ff94a5c6d7af9fa67b8e1da31c5e4d5ca22902cc368aed7060ca32c6bb",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl",
+      "sha256": "16e4cbbb7724df633058e2779af01c7e0a1d67fd9880b42e52a183e7475ea924",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl",
+      "sha256": "ad84aa24fefb096eb1ec24090c5ad7c0e4aa5e23bf941cbeb772c10a103d11bf",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl",
+      "sha256": "58138975dde677714ab67f46270594b5d78d3f2aefcc7e137b4726babcdbf78e",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl",
+      "sha256": "5de2308b31bdf028b7843a47a52727573d5f1dc6706385b6b31e96214836b980",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+      "sha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl",
+      "sha256": "3d6d2f818f60d3ec6d0f21f7afc06f1274ccb2047bc6ae1d196ebccc021c0a67",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl",
+      "sha256": "b342bf3ac3e64efa815c92c3a852b42350f6fe086cc9e562adac9babee766b01",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-061.jsonl",
+      "sha256": "99bc25d2f0c655ce978dd13bfc93d23db36891444f17ac3b26d2433671cf70ec",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl",
+      "sha256": "482538a35729a6fd64139f15b13b30995400544d60f903c8339a010740352703",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+      "sha256": "cf26e3113a7e730c8252deb6f7fa3616c8307be673da103f648b468a5c89f138",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl",
+      "sha256": "98e18b8e21cfaf7422bacfc16ccb42e3d6872c7aa609c68dabd3d1cf515f0690",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl",
+      "sha256": "f94ca666ab5189837caff94f2870f5a46d3988ab8186460600763cbaef271e5f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl",
+      "sha256": "997ec29e616454af919d70af8914aff7160bb91187ff9b59ea1db22780dd2dfc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+      "sha256": "5b2d481c4abd83d7c8f5e0087e59a1b8e629d479bb3f750f92e4fe0c1d399a96",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+      "sha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-069.jsonl",
+      "sha256": "63e7b50c6f29a002b379c1951fbf0276acf51f683743af185992ff3af0703e4c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-070.jsonl",
+      "sha256": "61a31649e6579b353390372f3ee5c844ef15a526cde43c04aca6da8696e5e1cc",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py",
+      "sha256": "01a25ad418348c89f0551e7768d437e890f6b2b4222760a6c4304439bb3c0586",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-expansion-review-request.md",
+      "sha256": "4ad409a739b8160876ea57e27a56af8271818f1a64d1121f794c0584237d5eae",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py",
+      "sha256": "8510f6d9826e424d8e3b8427301bc0dc6e132acaabb10c0709f3b16ac5e4513a",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py",
+      "sha256": "ae651e7928259cf99772adbe2182cd514b5f93b7583513c1a404c9b9c3fbf045",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-review-request.md",
+      "sha256": "b8dbe6affa6cb74580c481e293e8a9c81d619784aefad22f27222e426cc1da0f",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-review-request.md",
+      "sha256": "9bdab8e9794ef10b2b6adaa1894ba97a657ddf7b574bda6cdb56776628135f85",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check.py",
+      "sha256": "b62199f6a351752cc139de6f18b2dd9460366cab90df80d63b3d62de09921aea",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-request.md",
+      "sha256": "6bfab868f71ded1b7f2455a36919b6e18de5733201b01c13a1de48bf57226fd7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py",
+      "sha256": "5fdbe396d8099c51ad719348f95333656906ed234e162c996428f7e03684b00c",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-review-request.md",
+      "sha256": "9dfc70d874f66ee78b5f9b283546ed538c2ae708594f1a0fdb216758b0425ad8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py",
+      "sha256": "9d1290a986d837f0f70f2381968d33a58bef24b194feeb19f5fa99b7993b86c8",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-expansion-review-request.md",
+      "sha256": "03ba977135e112b202f4e8fec28a4f66ee51c92b0686b73560e6347f092fc828",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py",
+      "sha256": "ac88fc3e125f4ef918f6aa1164bc672e019085f4b7385fc35278648fd2c801d9",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-request.md",
+      "sha256": "64bf6bf400c78b7b64824a25854385042ebd0a7c6d6c67521359521c3dad6e42",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py",
+      "sha256": "ceff6ba8109d0923b5d976dd95e5163461e230e473649728ff497699cb55c6f7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py",
+      "sha256": "a642fdbf361e97f59df0d86b885cb435b096aff680e6c4872880a14478d39dc7",
+      "unchangedFromInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-review-request.md",
+      "sha256": "a72fa702e87d75744ac7963700c533ea6b8f085a8673a6f2849a5ebda8f50431",
+      "unchangedFromInputHead": true
+    }
+  ],
+  "changedProtectedPaths": []
+}

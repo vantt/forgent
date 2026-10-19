@@ -1,0 +1,39 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "071"
+  ],
+  "pendingBatches": [
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "stopReason": "Whole-batch budget boundary after 071; 072–082 remain unauthored. Seven edges require Lead ruling; checker/probes/resolver unchanged.",
+  "files": 25,
+  "inventoryEdges": 60,
+  "addedEdges": 1,
+  "edges": 61,
+  "patchedFiles": 10,
+  "dispositions": {
+    "patch": 19,
+    "preserve": 33,
+    "parked": 9
+  },
+  "parks": {
+    "description-rewrite": 2,
+    "lead-ruling": 7
+  },
+  "reviewAcceptance": "pending independent A51 review",
+  "leadRulingGaps": [
+    "Historical capture/docPath identity vs live-alias rule; lead-ruling category absent from frozen checker enum.",
+    "Deleted decision basename 0001 omitted by inventory and existing scan; exact narrative holder unresolved. Supplemental edge covers it; Lead ruling parked."
+  ]
+}
