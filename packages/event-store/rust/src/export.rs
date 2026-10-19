@@ -130,7 +130,20 @@ pub fn export_jsonl(
 pub(crate) fn allowed(path: &str) -> bool {
     let p: Vec<_> = path.split('/').collect();
     let safe = |s: &str| {
-        !s.is_empty() && s != "." && s != ".." && !s.chars().any(|c| c.is_control() || c == '\\')
+        let stem = s.split('.').next().unwrap_or("").to_ascii_uppercase();
+        let device = matches!(stem.as_str(), "CON" | "PRN" | "AUX" | "NUL")
+            || stem
+                .strip_prefix("COM")
+                .or_else(|| stem.strip_prefix("LPT"))
+                .is_some_and(|n| n.len() == 1 && "123456789".contains(n));
+        !s.is_empty()
+            && s != "."
+            && s != ".."
+            && !device
+            && !s.ends_with(['.', ' '])
+            && !s
+                .chars()
+                .any(|c| c.is_control() || "\\:<>\"|?*".contains(c))
     };
     p.iter().all(|s| safe(s))
         && (path == "events.jsonl"
@@ -165,7 +178,7 @@ pub fn export_legacy_layout(
         let mut cursor = None;
         loop {
             let page = port
-                .list_tree(repo, &pin, b"", cursor, 1024)
+                .list_tree(repo, &pin, b"", cursor, 100_000)
                 .map_err(git_error)?;
             for entry in page.entries {
                 let path = std::str::from_utf8(&entry.path)
@@ -194,6 +207,20 @@ pub fn export_legacy_layout(
             );
         }
     }
+    let historical_porting: Vec<_> = files
+        .keys()
+        .filter(|p| p.starts_with("porting/") && p.ends_with("/events.jsonl"))
+        .cloned()
+        .collect();
+    if historical_porting.len() > 1 {
+        return Err(invalid(
+            "multiple historical porting logs; rollback requires owner decision",
+        ));
+    }
+    let porting_target = historical_porting
+        .first()
+        .map(String::as_str)
+        .unwrap_or("porting/events.jsonl");
     let mut streams = BTreeMap::<String, Vec<u8>>::new();
     for e in &got.sequence {
         if e.seq
@@ -210,7 +237,7 @@ pub fn export_legacy_layout(
             return Err(invalid("unsupported legacy project stream"));
         }
         let name = if e.stream == "project:porting" {
-            "porting/events.jsonl"
+            porting_target
         } else {
             "events/v4-project.jsonl"
         };
@@ -220,7 +247,7 @@ pub fn export_legacy_layout(
             .extend(line(&legacy_value(e))?);
     }
     for (name, bytes) in streams {
-        if name == "porting/events.jsonl" {
+        if name.starts_with("porting/") {
             let historical = files.entry(name).or_default();
             if !historical.is_empty() && !historical.ends_with(b"\n") {
                 historical.push(b'\n');
@@ -280,6 +307,21 @@ pub fn export_legacy_layout(
 mod tests {
     use super::*;
 
+    #[test]
+    fn export_paths_are_portable_to_windows() {
+        for p in [
+            "porting/CON/events.jsonl",
+            "porting/a:b/events.jsonl",
+            "porting/Lpt1.txt/events.jsonl",
+            "porting/trailing./events.jsonl",
+            "events/NUL.jsonl",
+        ] {
+            assert!(!allowed(p), "{p}");
+        }
+        assert!(allowed(
+            "porting/docs/distillery/state/porting/events.jsonl"
+        ));
+    }
     #[test]
     fn converted_origins_keep_distinct_legacy_identities() {
         let event: Envelope = serde_json::from_value(json!({

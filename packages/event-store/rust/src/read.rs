@@ -200,25 +200,13 @@ fn read_legacy(
         crate::fence::validate_refs(Some(&oid), refs.values())?;
         legacy_files(port, repo, &oid, streams)
     } else {
-        let head = match port.resolve_head(&authority).map_err(git_error)? {
-            HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
-            HeadFact::Unborn { .. } => return Ok(Vec::new()),
-        };
-        for oid in refs.values() {
-            if !matches!(walk::header(port, repo, oid)?, crate::envelope::Seal::Legacy { ref from_commit, .. } if from_commit == head.as_str())
-            {
-                return Err(Error::new(
-                    ErrorCode::EventStoreLegacyMismatch,
-                    "unfenced import does not match HEAD",
-                ));
-            }
-            crate::legacy_import::verify_legacy_tree(port, repo, oid)?;
+        if matches!(
+            port.resolve_head(&authority).map_err(git_error)?,
+            HeadFact::Unborn { .. }
+        ) {
+            return Ok(Vec::new());
         }
-        if let Some(oid) = refs.values().next() {
-            legacy_files(port, repo, oid, streams)
-        } else {
-            crate::legacy_import::read_legacy_from_head(port, repo, streams)
-        }
+        crate::legacy_import::read_consumer_from_head(port, repo, streams)
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.

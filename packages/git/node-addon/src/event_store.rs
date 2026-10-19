@@ -527,13 +527,24 @@ impl EventStore {
         if check {
             fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
         }
+        let existing_legacy = match driver
+            .resolve_ref(
+                repo,
+                &fgos_git::RefName::parse("refs/fgos/legacy").map_err(error)?,
+            )
+            .map_err(operation)?
+        {
+            fgos_git::RefValue::Absent => None,
+            fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()),
+            _ => return Err(error("event-store-legacy-mismatch: symbolic legacy ref")),
+        };
         let events = fgos_event_store::legacy_import::events(
             &inv,
             &stream_ids(&["project".into(), "project:porting".into()])?,
         )
         .map_err(error)?;
         Ok(
-            json!({"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
+            json!({"existingLegacyOid":existing_legacy,"operationId":fgos_event_store::legacy_import::cutover_operation_id(repo, inv.from_commit.as_str()).map_err(error)?,"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
         )
     }
     #[napi]

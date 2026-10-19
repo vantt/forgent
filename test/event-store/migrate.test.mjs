@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { root } from '../helpers/git-addon.mjs';
 import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
-import { migrationParity, migrateUseCase } from '../../src/verbs/events/migrate.mjs';
+import { migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';
 import { readAllEventsFromDir, foldEvents, buildSnapshotFromDir, serializeView } from '../../src/state/replay.mjs';
 import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
 const ts = '2026-01-01T00:00:00.000Z';
@@ -34,9 +34,10 @@ test('HEAD inventory, check-only parity, anchored cache and explicit baseline us
   assert.throws(() => snapshot(f), /dirty or untracked/);
 });
 
-test('real import is deterministic, preserves nested bytes, rejects foreign legacy ref and does not cut over main', t => {
+test('real import is deterministic, preserves nested bytes, replaces unfenced stale legacy ref and does not cut over main', t => {
   const f = fixture(t); trackedLegacy(f); const before = snapshot(f);
   const pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+  assert.equal(importPlan(before).legacyRefOid, pin.legacyRefOid);
   assert.deepEqual(f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), pin);
   assert.equal(f.git('rev-parse', 'HEAD'), before.inventory.fromCommit);
   for (const [p, bytes] of Object.entries(before.inventory.files)) {
@@ -48,7 +49,9 @@ test('real import is deterministic, preserves nested bytes, rejects foreign lega
   assert.equal(read.legacy.length, 3);
   for (const record of read.legacy) assert.equal(JSON.stringify(record.event), JSON.stringify(JSON.parse(record.raw)));
   f.git('update-ref', 'refs/fgos/legacy', before.inventory.fromCommit);
-  assert.throws(() => f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), /existing legacy ref differs/);
+  assert.equal(importPlan(snapshot(f)).action, 'replace-unfenced-stale');
+  assert.deepEqual(f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), pin);
+  assert.equal(importPlan(snapshot(f)).action, 'reuse');
 });
 
 test('baseline-only project, multiple porting refusal, migration write admission and missing pinned ref', t => {
@@ -62,10 +65,10 @@ test('baseline-only project, multiple porting refusal, migration write admission
   assert.throws(() => snapshot(f), /multiple porting/);
 });
 
-test('legacy-layout doctor fails on pre-migration inventory', t => {
+test('legacy-layout doctor warns on pre-migration inventory', t => {
   const f = fixture(t); trackedLegacy(f);
   const result = checkEventStore(f.repo, 'event-store-legacy-layout', f.ctx);
-  assert.equal(result.passed, false); assert.match(result.message, /events|legacy/);
+  assert.equal(result.passed, true); assert.match(result.message, /warning: event-store-migration-required.*fgos events migrate/);
 });
 
 test('current checkout tracked Work history reproduces its legacy fold in a temporary repository', t => {
@@ -86,4 +89,34 @@ test('current checkout tracked Work history reproduces its legacy fold in a temp
   assert.equal(migrationParity({ inventory: before.inventory, events: got.legacy }).equal, true);
   assert.equal(f.git('rev-parse', 'refs/fgos/legacy'), pin.legacyRefOid);
   t.diagnostic(`Copied ${paths.length} tracked event files; ${parity.workEvents} unique Work records`);
+});
+
+test('fresh project doctor passes and unfenced reads ignore stale local/mirror imports', t => {
+  const f = fixture(t);
+  assert.deepEqual(f.store.legacyLayout([]), { passed: true, problems: [], warning: null });
+  fs.writeFileSync(path.join(f.repo, 'README'), 'fresh'); f.git('add', 'README'); f.git('commit', '-qm', 'fresh');
+  assert.deepEqual(f.store.legacyLayout([]), { passed: true, problems: [], warning: null });
+  trackedLegacy(f);
+  const before = snapshot(f), pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+  f.git('update-ref', 'refs/fgos/remotes/origin/legacy', before.inventory.fromCommit);
+  assert.equal(f.store.read({ streams: ['project'] }, []).legacy.length, 2);
+  assert.throws(() => f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []), /published legacy refs disagree/);
+  f.git('update-ref', '-d', 'refs/fgos/remotes/origin/legacy');
+  const p = path.join(f.repo, '.fgos/events.jsonl');
+  fs.appendFileSync(p, JSON.stringify({ ts, type: 'work.add', payload: { id: 'later' }, v: 3 }) + '\n');
+  f.git('add', '.fgos/events.jsonl'); f.git('commit', '-qm', 'new HEAD');
+  assert.equal(f.store.read({ streams: ['project'] }, []).legacy.length, 3);
+  const next = snapshot(f);
+  assert.notEqual(f.store.importLegacy({ expectedHead: next.inventory.fromCommit }, []).legacyRefOid, pin.legacyRefOid);
+});
+
+test('cutover restoration respects typed recovery and unknown outcomes', () => {
+  for (const cause of ['commit-effect-unknown', 'commit-unstage-recovery-required', 'commit-attempt-recovery-required', 'commit-worktree-restore-required', 'commit-prepared-state-changed']) {
+    assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'recovery-required', cause }))).restore, false, cause);
+  }
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'commit-rejected' }))).restore, true);
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'source-baseline-stale' }))).restore, true);
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'refused', cause: 'checkout-command-failed' }))).restore, false);
+  assert.equal(cutoverFailure(new Error('unknown failure')).restore, false);
+  assert.equal(cutoverFailure(new Error(JSON.stringify({ code: 'future-error', cause: 'commit-rejected' }))).restore, false);
 });
