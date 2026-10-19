@@ -194,6 +194,7 @@ def carriage_declarations(text):
             level=len(h[1]);stack=[x for x in stack if x[0]<level];stack.append((level,n,l));framing=None
         if re.search(r'retained verbatim.*(?:non.authority history|not navigation)',l,re.I):framing=(n,l)
         if re.search(r'Original source metadata and text follow|Full source text follows|complete source.*retained verbatim',l,re.I):whole=(n,l)
+        if 'This dated successor preserves the complete changed unit' in l:whole=(n,l)
         declarations=[(i,v) for _,i,v in stack if re.search(r'literal snapshot|historical source section|source carriage|retained.*source (?:detail|material)|full source retained',v,re.I)]
         declaration=declarations[-1] if declarations else framing or whole or (purpose if history_copy and n>metadata_end else None)
         result[n]=None if reconciled and re.match(r'^\|.*CTR01[0-3]\b',l) else declaration
@@ -246,11 +247,63 @@ def reference_roots(file, text):
 @functools.lru_cache(None)
 def prior_added_edges(file, review_set):
     path=str(REL/'step-03-records'/(review_set+'.jsonl'))
-    records=[json.loads(line) for line in blob('04913b160eac95a199718176ca75780573a3573d',path).decode().splitlines()]
+    prior='04913b160eac95a199718176ca75780573a3573d'
+    if not git('ls-tree',prior,'--',path).strip():return [] # Set not authored before the retirement ruling.
+    records=[json.loads(line) for line in blob(prior,path).decode().splitlines()]
     return [e for r in records if r['file']==file for e in r['edges'] if e.get('authorAddedEdge')]
 
 def legacy_reference_target(path):
     return path.startswith(RETIRING_ROOTS) or bool(re.match(r'^docs/(?:doc-governance|reading-map|README)\.md$',path))
+
+@functools.lru_cache(None)
+def stated_contexts(text):
+    """Section-scoped parent declarations and indentation-scoped fenced paths.
+    Keep source coordinates distinct from proposed nested directories: boundaries/
+    README.md cannot fall back to the coordination root's README.md.
+    """
+    result={}; parents=[]; source=None; fence=None; tree=[]
+    for n,line in enumerate(text.splitlines(),1):
+        if re.match(r'^(?:Source|Provenance):',line):
+            origin=re.search(r'docs/(?:architect|specs)/[^\s`;]+\.md',line)
+            if origin:source=posixpath.dirname(origin[0])
+        mark=re.match(r'^\s*(`{3,}|~{3,})',line)
+        if mark:
+            if fence is None:fence=mark[1];tree=[]
+            elif mark[1][0]==fence[0] and len(mark[1])>=len(fence):fence=None;tree=[]
+            result[n]={'parents':[p for _,p in parents], 'source':source, 'leaf':None};continue
+        if fence is None:
+            heading=re.match(r'^(#{1,6}) ',line)
+            if heading:parents=[x for x in parents if x[0]<len(heading[1])]
+            declarations=re.findall(r'`(docs/(?:architect|specs)/[^`]*?/)`',line)
+            if declarations:
+                level=len(heading[1]) if heading else 7
+                parents=[x for x in parents if x[0]!=level]+[(level,p.rstrip('/')) for p in declarations]
+        leaf=None
+        if fence is not None:
+            hit=re.fullmatch(r'(\s*(?:[│| ]*[├└]── )?)([\w./-]+/?)\s*',line)
+            if hit:
+                indent=len(hit[1]);token=hit[2]
+                while tree and tree[-1][0]>=indent:tree.pop()
+                base=tree[-1][1] if tree else (parents[-1][1] if parents else None)
+                path=token.rstrip('/') if token.startswith('docs/') else posixpath.normpath(posixpath.join(base,token)) if base else None
+                leaf={'start':hit.start(2),'end':hit.end(2),'text':token,'path':path}
+                if token.endswith('/') and path:tree.append((indent,path))
+        result[n]={'parents':[p for _,p in parents], 'source':source, 'leaf':leaf}
+    return result
+
+def candidate_targets(file,text,span):
+    context=stated_contexts(text)[span['line']]
+    if context['leaf'] and context['leaf']['text']==span['text']:
+        return [context['leaf']['path']] if context['leaf']['path'] else []
+    link=re.fullmatch(r'!?\[[^\]]+\]\(([^)]+)\)',span['text'])
+    raw=(link[1] if link else span['text']).split('#')[0]
+    raw=re.sub(r':\d+(?:[-–]\d+)?$','',raw).removeprefix('repo/')
+    alternatives=[raw]
+    brace=re.search(r'\{([^}]+)\}',raw)
+    if brace:alternatives=[raw[:brace.start()]+part+raw[brace.end():] for part in brace[1].split(',')]
+    roots=context['parents'] or reference_roots(file,text)
+    if context['source'] and carriage_declaration(text,span['line']):roots=roots+[context['source']]
+    return list(dict.fromkeys(p if p.startswith('docs/') else posixpath.normpath(posixpath.join(root,p)) for p in alternatives for root in roots))
 
 def scan_candidates(commit,file,inventory_spans):
     """Whole-file supplemental search; candidates need an edge or an explicit exclusion.
@@ -270,18 +323,22 @@ def scan_candidates(commit,file,inventory_spans):
     for n,line in enumerate(body.splitlines(),1):
         row_parents=re.findall(r'`(docs/(?:architect|specs)/[^`]+/)`',line)
         row_roots=[re.split(r'[*<{]',p)[0].rstrip('/') for p in row_parents]
-        active_roots=roots+row_roots
+        context=stated_contexts(body)[n]
+        active_roots=roots+row_roots+context['parents']+([context['source']] if context['source'] else [])
         internal=carriage_declaration(body,n)
         matches=[(m.start(),m.end(),m.group()) for m in pattern.finditer(line)]
         for hit in relative.finditer(line):
             a,b=hit.span(1) if hit.group(1) is not None else hit.span();token=line[a:b]
             raw=re.sub(r':\d+(?:[-–]\d+)?$','',token.split('#')[0])
-            if not re.fullmatch(r'(?:[.]{1,2}/)*[\w./-]+/?',raw):continue
-            targets={posixpath.normpath(posixpath.join(root,raw)) for root in active_roots}
+            if not re.fullmatch(r'(?:[.]{1,2}/)*[\w./{},-]+/?',raw):continue
+            targets=set(candidate_targets(file,body,{'line':n,'text':token}))
             local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
-            if not internal and not row_roots and any((p in tree_set or p in dirs) and not p.startswith(RETIRING_ROOTS) for p in [posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]):continue
+            if not internal and not row_roots and not context['parents'] and any((p in tree_set or p in dirs) and not p.startswith(RETIRING_ROOTS) for p in [posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]):continue
             if not any(p.startswith(RETIRING_ROOTS) and (p in tree_set or p in dirs) for p in targets):continue
             if not any(x<=a and b<=y for x,y,_ in matches):matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,token))
+        leaf=context['leaf']
+        if leaf and leaf['path'] and legacy_reference_target(leaf['path']) and leaf['path'] in tree_set|dirs:
+            a,b=leaf['start'],leaf['end'];matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,leaf['text']))
         # A Markdown link is one reference, including its label. Never add
         # separate sibling-path edges for the label and destination.
         for link in re.finditer(r'!?\[[^\]\n]+\]\(([^)\n]+)\)',line):
@@ -289,7 +346,7 @@ def scan_candidates(commit,file,inventory_spans):
             local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
             resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in active_roots]
             local=[posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]
-            if not internal and not row_roots and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
+            if not internal and not row_roots and not context['parents'] and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
             if not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
             a,b=link.span();matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,link[0]))
         for a,b,token in sorted(matches):
@@ -453,10 +510,9 @@ class Checker:
                 span=item['span'];source_line=before.splitlines()[span['line']-1]
                 link=re.fullmatch(r'!?\[[^\]]+\]\(([^)]+)\)',span['text'])
                 raw=(link[1] if link else span['text']).split('#')[0]
-                roots=reference_roots(f,before)+[p.rstrip('/') for p in re.findall(r'`(docs/(?:architect|specs)/[^`]+/)`',source_line)]
-                targets=[posixpath.normpath(raw.removeprefix('repo/'))] if raw.startswith(('docs/','repo/docs/')) else [posixpath.normpath(posixpath.join(root,raw)) for root in roots]
-                if (link and carriage_declaration(before,span['line'])) or raw.endswith('/'):
-                    assert item.get('edgeId') or not any((legacy_reference_target(p) if link else p.startswith(RETIRING_ROOTS)) and p in self.tree|self.dirs for p in targets), 'resolving carriage/directory reference cannot be a contextual exclusion'
+                targets=candidate_targets(f,before,span)
+                if (link and carriage_declaration(before,span['line'])) or raw.endswith('/') or stated_contexts(before)[span['line']]['parents'] or stated_contexts(before)[span['line']]['leaf']:
+                    assert item.get('edgeId') or not any(legacy_reference_target(p) and p in self.tree|self.dirs for p in targets), 'resolving carriage/directory reference cannot be a contextual exclusion'
 
             assert collections.Counter(joins)==collections.Counter(coverage.get('authorAddedEdgeIds',[]))
         check('author-added-search-coverage',supplemental_search)

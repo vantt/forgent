@@ -1,0 +1,998 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 156,
+  "edges": 1769,
+  "failures": [],
+  "failureCount": 0,
+  "locatorReviewFlags": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "0027"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+      "correspondence": null
+    }
+  ],
+  "checker": "step-03-check.py; pilot + waves 1–2; L12-36 source-context/table/fence coverage",
+  "sourceScans": [
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "candidateCount": 17,
+      "scanSha256": "5ac2ff4ae18b575ca3e5b79c809b258b1486e5f0f53d3c52966f8e86a39cb4dc",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/reading-map.md",
+      "candidateCount": 12,
+      "scanSha256": "0d43b8a385643462847f6cfd4d13ba20659e3df1cd8803f0af69d1ce4d73d591",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/architect/README.md",
+      "candidateCount": 2,
+      "scanSha256": "fe2a188e76c25e02b565b6570bd5b9acdd9e5e4f09ecdb2caff564d1f62cb867",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/README.md",
+      "candidateCount": 1,
+      "scanSha256": "8eec9357e3fe26352114d8a07f642e240d3c81ea16c7a47d98a3d6903899bab6",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/README.md",
+      "candidateCount": 2,
+      "scanSha256": "be0b078e8c6baa4d059e1999a7ab79ee8a2a7d83e1bf2c44fbaeed37fee713a9",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "candidateCount": 4,
+      "scanSha256": "4238e0ae34671a79e5bbf8d38392f4b12494470be8f5309643055775fb494cad",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/component-boundary/README.md",
+      "candidateCount": 4,
+      "scanSha256": "ec44b4cb25bc33536c0aac837d948e21f467bd743883f2a3de53055d20db0981",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/domainization/README.md",
+      "candidateCount": 1,
+      "scanSha256": "35451160e21ff075a1ded28d9425c430a5cfbcd67c3eea1e8deeaec939f474dd",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/packaging-distribution/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/packaging-distribution/migration-map.md",
+      "candidateCount": 15,
+      "scanSha256": "777841cb3dfb6a98b93e0f035d00f74552a2054ea62f7f3f95a022c3eb7a31cf",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/packaging-distribution/scope-map.md",
+      "candidateCount": 6,
+      "scanSha256": "30fd4fe1e313180149a13f81cc57d7c75a6db21aa9407fc289c152f13cefae17",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/proposals/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/proposals/component-authority-boundary-map.md",
+      "candidateCount": 38,
+      "scanSha256": "8d269f66b31e2e8c758bc4b5ccaf6ea3e4ac1bcedda8db13b64557546f5dfae6",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/roadmap.md",
+      "candidateCount": 17,
+      "scanSha256": "e788f9cfe698e3edd4ea0db923c0b39262342bf0068072ca386b963fa30a8f0d",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/workspace-topology-roadmap.md",
+      "candidateCount": 1,
+      "scanSha256": "6c52eab76a7eeff9faac1c4f9f67363ad01a45387c5943bf793ed722256f13ca",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/generated/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/README.md",
+      "candidateCount": 17,
+      "scanSha256": "68cc56fcd668b2c79aa9058f94b3904e63bcbd06f2005400779acfc805022933",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-confinement/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/README.md",
+      "candidateCount": 1,
+      "scanSha256": "7f61a15eb20f15ff179d8993a9c322b8afba408fb691d7233c327214f9d6f5f6",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/README.md",
+      "candidateCount": 10,
+      "scanSha256": "0f119e6638a13a5b0efd42fec730ec6c68c56fb3a735a1eac7a3ccb625fb380c",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/README.md",
+      "candidateCount": 8,
+      "scanSha256": "9c35bf840810d8fcc61c4400dc65ea3467341bc74e4d366c2976c9d63b4a1281",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/README.md",
+      "candidateCount": 2,
+      "scanSha256": "0126a4af5cef9cc22b06e7f141a204244d09bc488db978b5986052c9073da994",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "candidateCount": 5,
+      "scanSha256": "63197376e0c897282cb6c93849e4d2e2c7b307407c3e1b58514cd0f95e97b516",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "candidateCount": 51,
+      "scanSha256": "f14af8a334091025458fb084845229a9d831237529fa792b8a327e346f29109a",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "candidateCount": 16,
+      "scanSha256": "b3f3bbb533e7e76612f2736fd9a6bd4cb3fa79f73875e4101abc12ec2bd17668",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "candidateCount": 5,
+      "scanSha256": "489e1cf3afb8cce0a913ed644de34920ed44d34039ef701d3ac73077d53dc7af",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "candidateCount": 12,
+      "scanSha256": "12234455b00cb03964bfd6361a1700ab53fb935c42796fa3c5bac95b3868cb84",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "candidateCount": 7,
+      "scanSha256": "9e9b47c92808d9170a295f772d07dd338adf17a99835b620c92a625a15725e18",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "candidateCount": 4,
+      "scanSha256": "8623566509442ae8d91e24717ae866470dba9ada59746cc6e805b1ca992e498e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "candidateCount": 11,
+      "scanSha256": "3c5ba1ea036115c14951896d8f140c524f74ebb7984c8cf428ea14152a0539ca",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "candidateCount": 1,
+      "scanSha256": "a5481e45e9af81210b4ec7ce7bc4cdac2954f7b56d494f8b7a72b70a9b50a7ee",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "candidateCount": 6,
+      "scanSha256": "bf5a91e89fa02529334798988b6ff718609726c6030556b892782a80c4e5b31e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "candidateCount": 6,
+      "scanSha256": "ed789abd57b3a6dd636b1529297b4832d26e078a79036bde3d241b6cc901c0a9",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "candidateCount": 49,
+      "scanSha256": "368ca90532bc8d167b68941fd7fbb6c63d8ba273f2936bdb5c30ac7a0901448a",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "candidateCount": 1,
+      "scanSha256": "742d083be326f542e78e8d08290a2ca2256af696b9998505a6385ff3ce8d14ba",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/README.md",
+      "candidateCount": 2,
+      "scanSha256": "ba046ea1f3bd4ad76ee3bc0c42adbda9fe47a777e6f9ec62f18afcf04959fc4b",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/README.md",
+      "candidateCount": 3,
+      "scanSha256": "3dd31b8bcd6e90b997a136db3fdfbd6b9f3cae3c6886b750705d4ca3c643988d",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/architecture-map.md",
+      "candidateCount": 6,
+      "scanSha256": "5a860b8d351187a8b8e2a9507db81144bc72ae8a706a28e81038f239572b809e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/claude-plugin/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/distillery/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/README.md",
+      "candidateCount": 2,
+      "scanSha256": "c7ce9f57f7dc1bd2270dd8b4d5e26dd06d02efbfa4ab3dbaec7853ca7347e25e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/history/documentation-authority-unification/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/README.md",
+      "candidateCount": 14,
+      "scanSha256": "7f8c42cc2b82fb9a97a1c7d3908585fc3ca3f1af2a9a6ea52bb52d16d2b746b0",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/README.md",
+      "candidateCount": 4,
+      "scanSha256": "cecb29e97f1042554190557d7d85de735c1622f64ae6a2b596d07e399da4348f",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/decisions/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "candidateCount": 13,
+      "scanSha256": "094c5390e47204e01c67e1331a9a3b2195bce92e78576926fee6bffc09c9048c",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/observe/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/packaging-distribution/README.md",
+      "candidateCount": 9,
+      "scanSha256": "c34a640f629c6d31c718de93152626bc5ab620fabd1b77fdc12e6f87db84a67e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "candidateCount": 12,
+      "scanSha256": "05af7545b3bc5221f310c8ac6a7cef19adeb421a358a083b08cdda7351094fe8",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/proposals/README.md",
+      "candidateCount": 18,
+      "scanSha256": "d29900c60623b83f1971dc31060fce8c430ff4730050d04fdb9454268ce043ff",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "candidateCount": 39,
+      "scanSha256": "dbd0f92a893e26c1ac5abe5c0a46dd81917b25016a6a792bd4b5a4b89ef4ecd7",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/runner/README.md",
+      "candidateCount": 2,
+      "scanSha256": "ce0823180dbc72b3d4d3e5adbf4a0b1a1ff799818283e4092210631a4ee43124",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/roadmap.md",
+      "candidateCount": 17,
+      "scanSha256": "9bead9fe2582998f22967f30f3d68d46b3a8f3bf9b9a0e6f858e52b07a045aa6",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "candidateCount": 7,
+      "scanSha256": "fff965a16717596593c940b0f661fe2dba0e67ec2413479fb1286349439e5053",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/ui-spec/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/work-state/README.md",
+      "candidateCount": 1,
+      "scanSha256": "1e277db5050ccedf677b2fb615a7ce2630f3ba85116c671ffec0329b0ac5c3b2",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/user/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "candidateCount": 4,
+      "scanSha256": "b4c53b6dcadab223426b487011168a8b74a16387d63d4d56cf10f61a280b60eb",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/README.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "candidateCount": 29,
+      "scanSha256": "a459842e3fd6ae4d5c004b38eb1e305daf768825440305c2dc02f852c4d5c63c",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "candidateCount": 14,
+      "scanSha256": "eb17d768ab8554df2474e26349a5361a13a682ac3ef4523aaddd66f46b254b57",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "candidateCount": 12,
+      "scanSha256": "eb665dc39b8e3b652f6c996b2af8937da46e4876c193f218dc1d1050b68a035b",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "candidateCount": 12,
+      "scanSha256": "4f138e6c277c4534113315c896da4e5c75d3921b83e3787c5aeb48125e582832",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "candidateCount": 20,
+      "scanSha256": "aa6ab8291c64553974a095edce24527776ca896385040305f4d3f70e2e2df061",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "candidateCount": 30,
+      "scanSha256": "5ee641df4b37bc4c4c87c1c52bad0d84a31f92c3dbfd5e32e3feffb8d48229b5",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "candidateCount": 11,
+      "scanSha256": "e4e538a60456fe3785d61757bbe5a99275b91c9f33cef6d27ff6a1873b47fbb9",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "candidateCount": 1,
+      "scanSha256": "87991d9eb20210d1fc5228033258874c388824065d77704264ce1df5bcc60c43",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "candidateCount": 3,
+      "scanSha256": "6be896672ff9c0e4f733380108edbb743becf96616c092b7bcf976059579594b",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "candidateCount": 4,
+      "scanSha256": "05c51c51ca0425aa517325f39529bb868e459dfb466215f5a0ac3e8fadb8a6a9",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "candidateCount": 33,
+      "scanSha256": "2938fd55b22f25575ecd12e0862d933c45d804b92ae016ad12c7722bbfa84edc",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "candidateCount": 15,
+      "scanSha256": "446f4114f7fe96307c62fe0418be1ffba7d5d7a2105028d02fa2c8d871c8f072",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "candidateCount": 17,
+      "scanSha256": "02cd9e5433ecebe707432402f708efcdc6fd6fdc968688c25c8ba8ab1386314b",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "candidateCount": 14,
+      "scanSha256": "a1a5427116420b62a210bb222d675cd8efb88525888c9ebbd2a8b203b7d76ef6",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "candidateCount": 27,
+      "scanSha256": "7c5fd81552f7cc7a83f8a5064804038ddd987c6af7b6ab46986f0d5fc3ab1691",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "candidateCount": 88,
+      "scanSha256": "efeb3e2566977c4152b246bd11ba3d219f51eaecf717abedbd3e7fcb2137f30b",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "candidateCount": 11,
+      "scanSha256": "5d07720987af9aa49894e9d9619d98bc72d4f9189fb15dde40bb488714cd2f8a",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/README.md",
+      "candidateCount": 4,
+      "scanSha256": "d3d8608046ecea96cab6cf8ccb1e005ec21e0b653bbc1a43d2d2c9731a1a8023",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "candidateCount": 28,
+      "scanSha256": "0aa937b4c32ff5f83f6d597a07711c0eddceadf538f879e1c04c9430b29346a6",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "candidateCount": 4,
+      "scanSha256": "086cbbee5eafd8da5e36e16d01f51d2a5a45023c7774a192bf4beb0ea313b16c",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "candidateCount": 12,
+      "scanSha256": "31b3c99b1829cfc46c7b814235c7d07a7220234996417d77e52804a1222cfb82",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "candidateCount": 12,
+      "scanSha256": "71eb4d771264b02d49d34fdaf658564f8d3ee3a76c2775ce4dd5f0fcd500db02",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "candidateCount": 12,
+      "scanSha256": "a92b7cae6be40ef0dcc85a4f624fb29631070f66f76b74d32b37406b40af7954",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "candidateCount": 6,
+      "scanSha256": "565ae5b158e70aee4fc14760c8c2b2572455ff80c24d08ada9e0c6cab6537abd",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "candidateCount": 1,
+      "scanSha256": "dfa85fe1bb74af7f08f6fcdbe91de4c603c23a8fbacd3a292d9564a319ab9a88",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "candidateCount": 4,
+      "scanSha256": "525fdd0baf7101c4a2bbbf4074cc323b92f86066ddeeaa7d8b64c79673615607",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "candidateCount": 0,
+      "scanSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "candidateCount": 10,
+      "scanSha256": "67c8d4a18cca34c577d6b730261fbd3e37ba970728305b6d95dd6b5e1341d1d2",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "candidateCount": 19,
+      "scanSha256": "61db42322a95045b79484c14931d224e45ce4cf1789aed01bd1861e64538b285",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "candidateCount": 12,
+      "scanSha256": "b23d76299eccd6589732eb98bcf89bbdbad6a5e9be9898e928df9ef5b35e7cb7",
+      "coverage": "file retires with tree; no per-edge authoring"
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "candidateCount": 3,
+      "scanSha256": "d311c33e187bd8540c5af65d974f4a6d1d0a784e6938dd19bb48d4ca2903dd2e",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "candidateCount": 1,
+      "scanSha256": "1e50a3fff2f1f825d4c523d19670fd2049d523bf01844a5bda1529f173f69011",
+      "coverage": "checker-validated one-to-one edge/exclusion receipt"
+    }
+  ],
+  "retiredFiles": 43,
+  "retiredEdges": 603,
+  "activeFiles": 113,
+  "activeEdges": 1166,
+  "wave2Files": 60,
+  "wave2Edges": 331
+}

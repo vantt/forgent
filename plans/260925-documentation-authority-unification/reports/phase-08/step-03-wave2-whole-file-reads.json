@@ -1,0 +1,2198 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "method": "Read complete pinned bytes in ordered chunks; inventory bindings + full-file checker scan; source context and dispositions are independently reviewable, not semantic acceptance.",
+  "files": [
+    {
+      "file": "docs/architect/agent-coordination/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3837,
+      "lines": 86,
+      "sha256": "a24fbe9f9cb3b93524206888c25fde6afed98a6d4ce26025a57b403ea835a965",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5bd76ada3e60d1f9c7b801f6c94252f007345833ae5827b039ebd5065785f9f8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "cadd99369cdfcce6d78ce6c307ab6b19c787b5412b187ab67960e92e3670edc5"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0051
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 39387,
+      "lines": 1085,
+      "sha256": "0a706b04e4754589f8ed7ff20bd5fd51378a582b92320ba5a15abb1dbcfa3b7e",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a96a0ae1af3f34572da1eebdbc991fa545b57fefcc371f4ee71fce05c3e13a06"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e4823c2b136b75bd9f68a3482f1a01b7f2644ea4a447387d6b04e9a352fdf078"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "81d55d1ecbf087bc253032cc76a587886d366d1cb5b40236a08b71267b7e5361"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "42013643ee434c04dc7085075e79df5b4e2fe5c568019248b7244b1012c6f205"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "29e43d49f0c6b8ffd08c1b3aeb63ba314399937a7f8b5b9087c7b543c6748ebe"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "eb25700b735b536d7e27afd739439fcf6fe85886554be4a42befa310f8ceec0b"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "63368f0f744bf11ff5a8bae983a0183bf048c4fb43ac1f696ec21b2a20d22389"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "33e420031b26a55f1daeda9512511af0a6a558b27804e4642a12753838217c79"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "062e53d0d91ed1f6504e7879d1551376fe391017ebfae974d0b6358eb1710775"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "0bda6c3307b1c57b195d28e257918a9e40d49a94bbb88bf0b9eb31f6a446e18b"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "1a05e828897f3f78c00f65b5699983ad44009947779557469e49bf2395b34b19"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "7380e8157d5554ebc5669ed9fbe35cfb25158b05f34df16b4d6754e5723df616"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "550488a04ee653effa4afd36307b7e22953666bfa89a804c53baadaacb4ae275"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1085,
+          "sha256": "9bf1f8755dabc76d9d851a836a8d112495e8efd3da83421f3bb7641fdadbf3ec"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0061
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20030,
+      "lines": 413,
+      "sha256": "934897196984ecf980c50414395565f9fc3373d46c7b744f651c5ff860ace6ca",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "55b2f3082a34a106b9cda15529ee52c3c7d926d43c94c59300166baa83852de0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b4a3668aa2ddb81a9896c804c037c26eb84401e3768cd5c3e52347a9ccfd63f6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "c1788f95a06679ab16107fa969907e5e343f18f54ebffd4b6388b03abcdcdff8"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "3c5f11722f80d0e1b419b7d5d66998be39b368f4774d838505a8a7d9371abb4b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "2d6f07a270c032b95f89664b34f5b2f0354a277b3a20190c7c6b139fb5deb34f"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 413,
+          "sha256": "44668a1e770bd1981ebe0eafca5a98134fbb1bc105463d71445f9febce6b6970"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0059
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 84699,
+      "lines": 1607,
+      "sha256": "d2515c8a298e1ac27c066aad8463773615176448c712666157495fd1732385eb",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cfe31a46d0d78f5f327f10410e185746b522853f2227fa1e9e2e4a182932c4c7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0890559e859e15248c0f2fda59c1837463f9590a35504caaad2239694c2a5eee"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "07c46b0ae18f82ceda8a3a768b33f6e83987f63e7a69d0b7ac91b921f9bf5945"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "973fed979443c62226b9d05fc0d1bf534f1de10b0734d05e6c208589cf3b2605"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "7b340cb82cf4ba9bf82a9cae287a9c35e5824151eb163c45c5f99e43625bcb05"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "76ab0677a23e8926861431a035b3b959ce24baf277a92b750c842a1f75dd18c7"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "cee100061520be0b9e6a0d76c6de7e3958e862034302e1735f60b617b53dc494"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "1750701bfd6bf588171a628641e4a30d19eebda2ad37654789921f77e3960852"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "8dc90447a42b3e39506409cc4da95e3e68658e6251a339244d117c49adb0a11f"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "5ca80b322d1e283fcdd932e61e5ff855b085cd0fadfa95958589b5b66130717f"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "e58b7f158480b56fc1ba7e714dccc81d1e92e59f843431755d23ceb3cbb29484"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "c03b9c74ce051218e7b0877c29cb4296d27e943b876a534af21d0f41102f3fa8"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "924930241e7f0e091a18a3fd7459f77bd5dbd95dd613dab4ae6e92a3ee0c5ced"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "07d2f6d40a12df24ddfe19aa6c215b8daf0304352ed8372ec5a7f12a0e760c5d"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "016f2779516c0f685e4f83007d34988473d9f71f57dcdb2f89241507396bedf3"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "3b27a57ae2e71243c7f2735afe9f53d833baf7197caddc727e569137ec319125"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "0bc63671f368852f5a59bb2792ed0e5e9dc498c1fbb6b20ad637d4e306494cf5"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "99e3e8f5db24f38bbcd896b1b5f091573d2f1db4a1c705eb0ffd929f530d5b07"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "61eaf01efa21046e1f9fdfc62a9e93ff4dba4cd692def94e7ed9dc2bb587ec2b"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "96e2e2bd5ff93b645c577fdd725654bfc97d3b6b7ab1fd859edf23eb7fe39142"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1607,
+          "sha256": "9455f9f0a964e1f1682afdbad05e70cda9f720799ce56eb8cd1b3018983b0402"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0067
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15395,
+      "lines": 486,
+      "sha256": "56815ce373a3293a5c2a701460ea8c398962baee54aec2d77d79db529ef81711",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a0c2d2551da9e8b416e28ce30bf7ef7e887f53589bef350178ff37032cd39590"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "05b5d4e08f084c5980c4eb0986aa2424a3d827af7243ec870fefca15b155a6fe"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "aa7b1b98c8d93e9d29f4b66afbf81e20e90d94c9ce136eff1bd0a8db687a1237"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "2dfa68746c277f1296b0d427c9449d61d587cd2f32e6116d24ed4cc04a9ee2f6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "b1bf56af69fd91232a1d61910558e6c197c075822a22ac4769e2e7e90d7aa108"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "8842e911b5c94fae5ebde989273184915a337ef26def75a902a88ecd36d324a6"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 486,
+          "sha256": "bbf2dbfad998c7420dfbe9a3c1870c88d29e3a770312de5159a6d13551021d74"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0053
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19933,
+      "lines": 339,
+      "sha256": "cec6a8c293a6efca3221eb60d6c6c03717538a7a1b3b9aaa17269a30a58a9acd",
+      "inventoryEdges": 21,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ab9b369b3404748780290f41ff7879cc994e8615316d967c68bc37a83540bf24"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "41e990075edd7adfaf5df9d4568c376c40189e63646a8e0ecfb4d983fbed9b74"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0618992dafafb1cf4faad212542a7998bfae5b7ac4a0fb14179623b944419ae1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "2747f52ec59305fbf577b0c135e421a2521c80327d2f64ee12b68659352ff10b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 339,
+          "sha256": "b6c7ab57bc9a6ce118cb4fba3e60cd6b5ecf14edd3417454396fc8a298138e39"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0047
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 46639,
+      "lines": 834,
+      "sha256": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1a049161ad292410e463d3ccb3489317a207816970252bab58d6a167ce0f1a68"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "328c630f50e50931bac57d36d544dcf22d79e8e1875374acfb5c7ff3f50f98a1"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "224a9360598754745f48946681287880d9d1ebeab2d7db6f748341ad5dcf2571"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "0f812168296ce3d8c2ac85f9ac97c84daa3b3c5516bba517a7ae1dccb1234767"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "1b7c498b04696dab2fc41ae3cec79ddeaf603cd637eed58397c48f29225f07e9"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "2b7eca20f7b94e013a63f66a6721bc56ff060d6082ee24f26929d98de5d57ec0"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "ec6ff670a827185774bb1c4355748508e8b1066bb57316a7899b7b3e36192ed4"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "b9f428dda2b2b78724c1ecc715d580476b0d87f580c53bf9d853b591c6258e7e"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "ac095bc64850402ce8c5221ed64f081a714195d1eaae0078917fafe732353807"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "ddc8f1e15c862e904d668aa99595ce3fdaa1314fbc8cc89fb4785844dd121027"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 834,
+          "sha256": "68d1344811363b7c7487afcfb5c6e7c8d669d208fd05796af9b913a46e661c58"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0054
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 27337,
+      "lines": 576,
+      "sha256": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "743def6ce14d433bab452897b81852b8bee5daab8bb4cb92a7a13d20aef63b35"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3338ddfc508d89cdfe137294b814887aaaf8570772c523ab9e05087c4ad4b137"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "2b16a7af01329a4177e605caccbf9973d8ff6bb5634a0cbd7b24d461248c4ddb"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "36494e4d647d0d2cc0d231e5c27f4ffaaeb57d5bbe9579a4ffda272efb3652fa"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "e512f0f6812ea97c3b7eaab9beb8b2f93389c24c6124ac925c41e9782cddaf50"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "8647637e9eec6dda5ba37b126c87f981ad8923d8692151c9da35fd13e9ffb25d"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "9a98bb209899595b60da398db134b95f5dd013ba9982f3c245781fb015043099"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 576,
+          "sha256": "a6166369af59b6458afeb0fd5349909d46e75c8f2cfa59fea0f676427170048a"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0041
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21960,
+      "lines": 413,
+      "sha256": "cd1c0a2b56fe50cd89294f9b96a05f5576946cdcd4d2be9ba5285217a8b805db",
+      "inventoryEdges": 19,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cc69ab59a5a1da2d67c8ca6500f158ec1cbd5fcebab60a14a3613d6e3f6fade2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e192c17fba0c756c05a89eb1eec10e8d97881d4716a48a7f9b819e8d0d3a03cb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "8bf2e179ed6c63edebfe2eff5059aef7f6d1c407409d304f32cac19ca6191377"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "d25ea3cf6cfa6102e30079507fbd08bbb5be96569a49a8e9a20b136ff6db632a"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "02b92a604e31a5f0ff6e3f582af59f3dd59c30f1fd9bda7c3e1cd5fc3f96613c"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 413,
+          "sha256": "b23f428bcdc3774b283ba1489f952853f9c4b829ea0e76bbf798044ac9511529"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.004
+    },
+    {
+      "file": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7380,
+      "lines": 145,
+      "sha256": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "inventoryEdges": 18,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cb15c47b791e2198a8cea36f64557438f6ee3c5edde6149e0c5528f98897223c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 145,
+          "sha256": "a5a7d521136cb53861c1df7e1c370f23ea291dab37f09d28f1439dc7fa021e6c"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0043
+    },
+    {
+      "file": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1580,
+      "lines": 33,
+      "sha256": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 33,
+          "sha256": "b8e82494cacd3d6146e0ca1edeba53ae1ab0c18d05a393359cf30f467c7c9fe4"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0517
+    },
+    {
+      "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2545,
+      "lines": 47,
+      "sha256": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 47,
+          "sha256": "f1ef6e0db6615b8dc231a25ac99a2c8ad88c96843eaa0c34c985d9d1b2d8590a"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0495
+    },
+    {
+      "file": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2719,
+      "lines": 50,
+      "sha256": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 50,
+          "sha256": "e7fdef8fe947b0c4dd317a5a0157e13459661f8c27df79b9d5e4203cbb855bbc"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0573
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 738,
+      "lines": 14,
+      "sha256": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 14,
+          "sha256": "507d6b3bdca0d50efb532da288c3b6bdd2dc591d120e320b134f998ea99c45a5"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0472
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5502,
+      "lines": 101,
+      "sha256": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d76d81d8e4ab2fa713430bde7b91fb16efb48ab993e8518aa074854e4d6dbd64"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 101,
+          "sha256": "bc48ad75e2c3342ee6d325b2f1aefce62cb67155811b7b24e09ff37489187aaa"
+        }
+      ],
+      "addedEdges": 1,
+      "initialTraversalAndResolutionSeconds": 3.0022
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 515,
+      "lines": 12,
+      "sha256": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 12,
+          "sha256": "eb912d03c4790d867216878f66f7e34b38c8d9dc9170b1541ba11bde97e364f0"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0528
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 861,
+      "lines": 17,
+      "sha256": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 17,
+          "sha256": "896750d932275bdbe22a731601677f6ebdb2e76f50b0457db11951fd7d15d16a"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0454
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 512,
+      "lines": 12,
+      "sha256": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 12,
+          "sha256": "6fe37c141300aba740008b8da4390d39dbb987aa73026f698d9c5af5eca48d1a"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0466
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 518,
+      "lines": 13,
+      "sha256": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 13,
+          "sha256": "c1c334358cf117675025323b2626d5d8caad37fe00b9e47c9299be3652bba0f1"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0493
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 707,
+      "lines": 15,
+      "sha256": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 15,
+          "sha256": "128522fb468d2e0758e4d4aac6f6cd1213b697eb8f90df75ef7f149b9cd14ca2"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0487
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 772,
+      "lines": 16,
+      "sha256": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 16,
+          "sha256": "77c212af2e9b6a1502015ab293f856c160c3b0dfd592ea23f63649b532f9e23e"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0471
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 784,
+      "lines": 15,
+      "sha256": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 15,
+          "sha256": "8f7b7703976891a312b1e874d4698a185f25eca5c018bad003d7f27ab885d20d"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.047
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1304,
+      "lines": 24,
+      "sha256": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 24,
+          "sha256": "1afbac514e2f06c35e11d6a87b3dde37c99ab74d3251f0c10c92c54c817c68cf"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0512
+    },
+    {
+      "file": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3970,
+      "lines": 78,
+      "sha256": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 78,
+          "sha256": "9235c3f61830a933ce512f222031025bfc232ff1933027ced69ee83d268edf41"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0536
+    },
+    {
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3856,
+      "lines": 67,
+      "sha256": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 67,
+          "sha256": "582c36c549810c9a56718f131641c2c325173ccc5d02456007e5edf545097e8e"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1243
+    },
+    {
+      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6341,
+      "lines": 131,
+      "sha256": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2a9f825a2eedc2bb45dd744c861b7a54318abb1071471972509bd2079e616464"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 131,
+          "sha256": "d54d15d1e16a951e370f1c9c902920f40920f24563b617870a87eb9249460617"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1746
+    },
+    {
+      "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4071,
+      "lines": 90,
+      "sha256": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a5fccb04b2e2559a8343234ac4b4efd9953aa4ab2fcc1a8422ffad86bc154336"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 90,
+          "sha256": "76346a924e87c66aebd57f0516c56c8ccf704a042f9241f0e495947226b242bd"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0538
+    },
+    {
+      "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3654,
+      "lines": 86,
+      "sha256": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ef857a38589bd42ec1e016b942fa116254f565955db35b6c2829c550f528315d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "7050569d77380d285e70ab88b1a21cfeef80b79453fa2f4dc2c92b7b41a2bcb2"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1667
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3326,
+      "lines": 82,
+      "sha256": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b432f57cc39c1c6f35029cbb3e38a2a5ff8e396a4e468afbadc890b4dd8aad8a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 82,
+          "sha256": "3361b0025270f4eb6a774641fed6bfe4f474edca217e0de582fce9a0c3cfe4c3"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0507
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7895,
+      "lines": 161,
+      "sha256": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "33ab8206df46fa14773881d1af7caaf073054b30e4335c4a2371cd03ace7ec0e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "8775f41fae897d536807b796953da4afd4089b501f57d7fc8747ce31b57944d2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 161,
+          "sha256": "6f962397010f1ae2531a50c675bfd7e867ea396e31a902c8268146c32fac0cc0"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.2752
+    },
+    {
+      "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9211,
+      "lines": 184,
+      "sha256": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2822b8ccf24bdd18f01c5c3f7f2ad77b47fc9ac40e193b57eee83b65314be95a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "45accc8365417942af2e5a9e0f73f6f7c8d639778c94763cf51ba9a017d39643"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 184,
+          "sha256": "3300b5e6f5a140df33a2dbad5120228f571f26c398e585bdb25a3791200541a3"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1116
+    },
+    {
+      "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5393,
+      "lines": 96,
+      "sha256": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9efe5f96c4f66d9e9e90feaf9e8bf94d243f8f7876b6072a813449ffffcb9c8b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 96,
+          "sha256": "f1d7dbf7e59455a56858a364f4ac8a802b867f3e7c9cde0b57ebb0a7dc77b0f5"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0505
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6262,
+      "lines": 113,
+      "sha256": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6d5e1d6dec440392ff2258cf2338e4d505c05afa17ff010fc766a1cd02aa7ca5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 113,
+          "sha256": "9a23aa1b7fb650a7d5ad5e8e741875881d28bae09941aee499e181a7e3d9f885"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0573
+    },
+    {
+      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4854,
+      "lines": 97,
+      "sha256": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3aeb596acf4570d7414a5fa922540ae5c3d523d5097bc58af11b7a03dfccc6b8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 97,
+          "sha256": "fc23103e2493d1cdf187389b444f0fc8711e84bf7e6fb11efa6714d8b17af342"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0903
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4062,
+      "lines": 77,
+      "sha256": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 77,
+          "sha256": "8b4c6d822be4c5942ab26f5f444d63873f6f4fa9ca9a85d69d3982732fe9cb92"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1372
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4279,
+      "lines": 93,
+      "sha256": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "63dab0e17057e042fca22b3122885e7a7b1df45c00d1f7fc35732bf46524a1ea"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 93,
+          "sha256": "f963bd8f24136c063f0940c8b12cb1575a72e58d32cac3cdef4c1f606fdbbeab"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0495
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9021,
+      "lines": 159,
+      "sha256": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "14f3eb17965d13e93cd197323350586306c326286c045da817b0811e9201b256"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 159,
+          "sha256": "fb984168f871ded930199ab1575aafef18e791561063f15eb48d295ef2c4a917"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1927
+    },
+    {
+      "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1960,
+      "lines": 41,
+      "sha256": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 41,
+          "sha256": "89c77b4d7a3053c1587c7717902657a8d970acfd1e0d6630602876662e5dbdf9"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0897
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6139,
+      "lines": 109,
+      "sha256": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ecc2871ee45808b747f9331ee460102a71bf2e007189c6e0375931dd7fe12b6c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 109,
+          "sha256": "c06f76591c50197eed9142d8dbea67ef2dcb37eb7d0684e53e940c55cb811e11"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.092
+    },
+    {
+      "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3385,
+      "lines": 75,
+      "sha256": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 75,
+          "sha256": "7427149b809cfb5a1a0114572847c45d6ff1efd026e411fa87c8492b3b9f13b3"
+        }
+      ],
+      "addedEdges": 2,
+      "initialTraversalAndResolutionSeconds": 0.0563
+    },
+    {
+      "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5089,
+      "lines": 94,
+      "sha256": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6d3fc4113fbe4213db3cce66794ae04bcdfbb53a0fc27afa4b94a95442f21e99"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 94,
+          "sha256": "65bcfc1f8fae8067d127e5a95c2e99bf611d3c5443fd3a8e106c0ff02d684737"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1375
+    },
+    {
+      "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3343,
+      "lines": 61,
+      "sha256": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "296832a23bf463937979e4dffa1e0120745e19d44227d7606bffbf565ff785c2"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0534
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8893,
+      "lines": 169,
+      "sha256": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "inventoryEdges": 21,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3ade1b705b8de0490ee54cf1009968dd6fcd90574f3b4adfd701585e79525745"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e070346d13e08d69ae625ed4323cc1f963f75e9683e5edee451d714c06a5885f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 169,
+          "sha256": "38b49bc925f195aa8a455853c2496b34968a44b9746b6c6e788c5a803d1373b4"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0998
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6536,
+      "lines": 137,
+      "sha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7b0c6906d5af41f03285f7172c3ed0980cf4a1124de1ca67a435c71e0a70f260"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 137,
+          "sha256": "dabc2492e49e5162e8dad012d8838e98b1cf89d5d2b10ef605594ca3007a0cde"
+        }
+      ],
+      "addedEdges": 4,
+      "initialTraversalAndResolutionSeconds": 0.1835
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 41907,
+      "lines": 1129,
+      "sha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8e43c4cb855e58fb62050a4625c0c1ed85bbe0e71fabf7458ef6f93725a56089"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e4e8993f6039002f1b2e0ccbe97ca0660102b7d35693f0cacb504e6467b88296"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b816e043a4a03fc76f74a170d0eb42b567f4b94a404220544bcafa40008d857e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "0c793c55337e30b3f08f9d1a10f5d092e8049cac01091b467e5bf44eb026e5ed"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "559a2fa3c651a315696997ad52bc94a8cb57dddf080fd339444c3b1d748ce8b9"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "bef1e4fa979efe43e39d1d28b849eb2a8ec7f601845897afd4d7eab5b78e85a1"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "09339c1d60c5f52223e8b715bf3bb4b3539ae951292d06b8d07abef2d898f58b"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "4a629b73cd6276157dcb7f60e041b17adb8cd789bc06abf10302d8eb1bb1359c"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "a99982561a8cff17a07a08e141489371ba24e2778a4f38538b3d8775f6f55ca2"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "87d96c0d2869a9d917d69d70d32b90b21189239e8d36c16de5aeb41820e04969"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "54f4496cf27fc634bdd22c5662ca84856f1b738294ebf7f57c31a0e05b1d6726"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "2813c94925f7189ce8f2374aab80d9c0f0005595f5f107cc98873b1a089ff423"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "26cc95f535f0d9b54c1b8f938582b134fa99a033f76b5ac041727836b3d44761"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "7e87f9f52ee6e3d1e293f031df707ec63e40d7bec819dda1c97b7fc6463cef4d"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1129,
+          "sha256": "2bce84cb05b843afd452fe0a818eca18c3cc1c02cc5830b1226f4bf48e01100d"
+        }
+      ],
+      "addedEdges": 4,
+      "initialTraversalAndResolutionSeconds": 0.113
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22380,
+      "lines": 455,
+      "sha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "66c243cab472d9ef9cdffbd9f8cbe3bde7156c2af79cfba48d1451faa2d3e60d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1d11f0ed202ab9a73c9065f096a50fc767936a931cba5d004d5ed11de5825c2d"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b04879aa1281039098fb4918f699ed0d4ce68e244e8833a34b814ce1d4e96f62"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "1cf17fc6c7dd664c30d79715751dad74f85d240dfe6d2a054c9fd8ba322d18f6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "47aa48f60474bab75d931b733b2ade2a9700cdeae8f9507bf630894379d480a4"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 455,
+          "sha256": "3cbb6c12c4cc5c19c399c026c9326ed812c5342b68d90daf7b0a0492f9ce3a85"
+        }
+      ],
+      "addedEdges": 1,
+      "initialTraversalAndResolutionSeconds": 0.0647
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 87296,
+      "lines": 1651,
+      "sha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e68c53893b0010f0aa10b65fd18d0e8e3a8ec743c064046ac33e69710e84a707"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "139ad4c22ec6b3736dbc9fa24c86418dd0c0e733947da0250323b87011e99a06"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1effdbbc41f85422ed42fe44b4a2c861835983434442bb3e6912aaf0f7f655ab"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "83857cb2cacbc1590ec58b986cc9f7e9d3b783b46b579a5ab4e46353fe637c76"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "5ca09c0374a7ebca8e92f44173211768e35ec83ee73b0f9af2b8bb4e2a0930b4"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "d25c77d59bb3a65a4defd26f442070f10362ece864cc741b3ad60ee6e8d3fcbf"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "9e182b69d457816324aeacbf58014697812229c829c2891a582ffa80f9d9c62e"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "90e22dbcee877fc0b8496e0c56252505ef1c3418ef2e7a025a69f66fe95f96c4"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "d6e96653a8813ffd5de4f1cddb6b4f09b7adcf2e995e9768224c2af70b7efa29"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "df1e57551d5e27966e692ae072c380b776bea330af7b23d5e5a962629284e49f"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "8cf67179881dda754f97426fde297176470365d8ae27b514615b04126f3b3992"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "43d7a9ccbcaaaad4316e951a6b2d51d060bcf5ec106cc88683c0c9c7fb24aebd"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "9720b5e75e1989b19ecac94f9ae912cbddf01eecaf04a19af68d2b7645ebe7c3"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "480610583437cc9ddc598bd65e126f581b3114f44982b37f53deb536f7a8042a"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "0794461878bda249d33f80aa63683a29923882b74f6efbfec5fe5a41eb49a505"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "54a3b28f06bc3bf546feab2968a0413482fc3d5510ad35bb9baec7a6f2337a38"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "4a84f16723a942e3c47694057aef87952d3a86da9fd68da327b33c2cc2b5de4c"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "18920b573e5ede45f87b813851c24c8dd9cff6ba9e7c5e10a2f21543daf6abde"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "3a45f357e4a8990bce62d76f3bdd0bd03281a34ff8a0a31a511ba35a50e3723b"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "3b5842345311cd2ea9bd01ea49e5e98cdb7c568a630e874c00d784df376406c0"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1651,
+          "sha256": "1cd3fe3fc9849ae3832697dfdc2b4121d54e85cb2543fc9180fef5fa76fb8267"
+        }
+      ],
+      "addedEdges": 6,
+      "initialTraversalAndResolutionSeconds": 0.1065
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17757,
+      "lines": 529,
+      "sha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "796f1735d6d75d0fdc840967c5f7e5a8723fdfe31d4c8e26be38d1a1add06928"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0f00e3913df243ae202c82d9001e8085c40b9d77838ceff86752ad9302a2bb03"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d934be519130c7198c78fffc6313883e121210c43bde8bea9577f31f9a638dc2"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "a05d7136e7fcafc5feea592f549506e475d6e459665a5358320c9012e93d8155"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "83b5c2a5ebd040165a8dffe18b681c77db04c27be6884f7c09067a29bcf31cb2"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "390971c1ae95912a86b013545c95ab0c887eb09548a143e9d8ddce2a0b767511"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 529,
+          "sha256": "d7ea6f9e100350309bb4ccf93e6b5e36897b66b76d000200ceba7ebd0703f1d9"
+        }
+      ],
+      "addedEdges": 2,
+      "initialTraversalAndResolutionSeconds": 0.0718
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22346,
+      "lines": 383,
+      "sha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "inventoryEdges": 18,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b776bba620ef319012ae7bdae2a1ef59391bcd082d7296ca791e1b66ddfee1eb"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "aeed1eb22a51b0b44ebcf36b16b42b0b489a8976388d0ea73d3846d687d66973"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d75b0b8b15ee57ea1c8fe8a3c711f81566f83c6431767425038efac1134b8adf"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "2b7395bcbe50da26b8c17de0999ffecb8302e30c1af185dac04c0c302bad950b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 383,
+          "sha256": "702a798d34c2c8749d1f0c636b4ab60507a586680f35879e1c7cbf8a7a04cac8"
+        }
+      ],
+      "addedEdges": 7,
+      "initialTraversalAndResolutionSeconds": 0.0778
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 127583,
+      "lines": 2267,
+      "sha256": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3a273fda4b01677bc3056ad100a0266b30dfbdd41be52af395dce987f3ed6cdd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bf6350b324a023c00778d8e58ab385c25dfe4b4ab5ea944b89fbf02b9e2d54c2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "f57fa2f42cd5c9659811a5ea35d6887808ba6f560c5d88501aca432dd23fedec"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4b49a96ffe2c35c941c8930840beb3a3bf02a4bbce5b3e390a26cea79bf50388"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "ff29f3a9c948c93bcb95d8ccb049f5a2900821cbdfc0d28e09fdc2430d901e8b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "0442ef486914322609303743feccdfdfd0c80cfe407ab22e79370bdbaf4c29f3"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "8664606130f4ad9f8774bc12589e97bb223a147c49003cf8264316d9a693a416"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "c0e99ac10c58e8ac22b2ba37d66610085a49e438ba6934f0d459469cbd1f6c4d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "b30ae459cb037ace780c955f532edde0dd336561743a157474603816e4162594"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "d5bc708ac8c8a44d6fed15fb2fc5212a03835d94fc249ec75dbc66d23f8650e6"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "b169efb01e99283fe3626940f89b177f3c9c621d9f17cbec1d2054c8d9473f2f"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "08d42a64c88f5fc1bfa121ae5a6e7afaaa8bf1e54766068c042b24a3d9be71ff"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "624830c5b03b850becddd61e828404fc22cdf73325f59cae607ffbdf93c39bd3"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "e2c2c1dda1fde6902704bf9ab852c6ac1ac530e82d4832ec32f5a80d8c2b6e75"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "de7fadb9e02cd6379551077e47a825396af073331e84ff5e9db31369e3a79d87"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "f8c941391f90b4d36e14461f153014d2598a2e7468cf2876940aef088e3949dc"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "117b892da361d2335fcc37215364fc6b67207d0f7628f8173c66ab06125dc48a"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "6f75b5a40f3d1f196d84ef39f0a671861cac9081548d5b99628a1d62193f8724"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "499f41a73c96ed622d689b551757f7af7c3b56a9477e5fb1208e5bb3b58c9482"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1600,
+          "sha256": "89495629af92acf863328467bca9b3131abfc2ba07eead8199b981627fd093c5"
+        },
+        {
+          "firstLine": 1601,
+          "lastLine": 1680,
+          "sha256": "0f43547ff68409e0b3e5a4de76161607bd130e0b680d5278587f697b6270a703"
+        },
+        {
+          "firstLine": 1681,
+          "lastLine": 1760,
+          "sha256": "5fb49437157fca1ca5fefb528037a7daf731845a9d4f69813823af117ad47be1"
+        },
+        {
+          "firstLine": 1761,
+          "lastLine": 1840,
+          "sha256": "1eaa26a5d9f355bff7e796966483b9033647942740e26bcefcf0db801b86c2e0"
+        },
+        {
+          "firstLine": 1841,
+          "lastLine": 1920,
+          "sha256": "9993ac3a09d221469dedc73513a8940a003a2e082b951dd46f97c24a4a778bff"
+        },
+        {
+          "firstLine": 1921,
+          "lastLine": 2000,
+          "sha256": "60109993cc4d987745b4cb5a3e1d12419fb32ea35dc9f0ff5304c7f350af1f05"
+        },
+        {
+          "firstLine": 2001,
+          "lastLine": 2080,
+          "sha256": "ae379d3fa18927a2339bcb4956fd64d164db10121725b9121aec994ed7c36b15"
+        },
+        {
+          "firstLine": 2081,
+          "lastLine": 2160,
+          "sha256": "76986fd1a8a5950eb8bb7c3d2e5c9424a51edb70ce06e09edcf15846ebd6bbd0"
+        },
+        {
+          "firstLine": 2161,
+          "lastLine": 2240,
+          "sha256": "37225c8addb19a9ef2f0f717bef8c605036d0c175d3db3585c4fc6ad7c716faa"
+        },
+        {
+          "firstLine": 2241,
+          "lastLine": 2267,
+          "sha256": "62a0cc3a0b0f442b62ceb119f5e03cbe6326b7eb66c668e1c2b629500092abaa"
+        }
+      ],
+      "addedEdges": 9,
+      "initialTraversalAndResolutionSeconds": 0.1572
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 29605,
+      "lines": 618,
+      "sha256": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "inventoryEdges": 12,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "34c29264270fd1231d22e6c265447fde241113c1e4100163b9b3e58a90883b17"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "976ff3b6e7e537a5a6c0157c39616e349040e7781801d7c14678d4e60b43f65a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1ecb74b33055d5e630120a827d473abd71a1f88a330192511b13ed52fff46db0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "d2daa045187573ff7053c98d81390fcffd861a6b5dbe1face91ab4453e65f98f"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "4b545f87de242d81845e9c52af6f7abecce388876f5ce5b7b8f1c5aed2411eb1"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "e7235093e1192a0cf86a93836e9a78807bd893c7242b548dd7bcb94339f2d449"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "6c606aed0b09d1b8e334f9364e01aa46b315487fd16e4e8960c3fd9c8908c0da"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 618,
+          "sha256": "95613406214de24bf19d5aa69536f423eec2f1685ef300c4df36b335e44daf15"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0715
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 24207,
+      "lines": 455,
+      "sha256": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "inventoryEdges": 23,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e577620771cedb76098ad7a13fb532d8ffd05807221ca57447364decf55ec298"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6315791ca8e1874aa00038f2edee985e0ef3dba07dc416337fb5dea2e5119b49"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cb840a44ef22c4915e310854d5eed6ba8242e955980153793e0e465c7b0a5f22"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "158b01a0c2ceb285fd9fc6c05ad041bafa4b096897f44c582f74cf41d65c7ea4"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "b0fc0c36d96ce397bb98667bc506080141117765a508c290327748a649381cbe"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 455,
+          "sha256": "9fac3620ad6172196b7609fc5d889f91b70ad3ab89f88d5170398b50553522be"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0718
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5563,
+      "lines": 109,
+      "sha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "058778c028c580aaff69dad7fd2d17443a6c8ba177b2c5c8b5abc784bc4f721b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 109,
+          "sha256": "ba131fb5cfef9b580badee26cea518b76a72a3fa46cb5e929c3abfff90cccee9"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.3075
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 45289,
+      "lines": 1166,
+      "sha256": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ae94a5da66613428c948991d56be4ba3ea3347be898fdae4865da5d90d3c77cc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0de2c68ba4aff3f5d7d26baae08494f61fc60508bbc9d561da3d68285d64a541"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "45b6b060f619570344ecd811772478253859d1e65ca3c721486bfaa10914737f"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "969a81c0fc1f22735c4a4ddad5291285689c7258798da93ce8cf891013edf13c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "f235e62833cb46a4aaf408ba75677f5ce4a4d897143e98d2d9ed4b5365af4c33"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "26a84cce3530c3bfe605b33dd369524714ee459a7073c3fdb6069fd42e23dff3"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "84a83af4de1faa7c1bf86125e46ef1f13db7f1cb785e2a016f90c7714cdfe1e7"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "66a69bbe589fc402df2230c8254000ddf8a7d2576b0c8da0bd8c88a6b1cc610b"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "1c3d68e6f486daf549689d6291267e1ae3defd85355d531d39487fad5572a8d2"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "5b00a7a39552ce676df8921f15dbd3070d36a156bac34b9b9628ed6567ca4356"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "28d31249db47700750c96c86e36f1c961cacc6b9d2f4a3af0a6a39bb41aba0cc"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "b210e74e5750a823a5c3d3c139939ca40ebcd012d5d0d23ccd900af3f0e9cd7b"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "e55b670802fb7d5d25426a6dae7779fefc53206c042bb73498bc41c19c34585c"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "6cac26212f41f1ba9c1520ab130e08813850bb5d7471f8b22f215af09152201d"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1166,
+          "sha256": "c54dce44e530fc9999b7fd882f73af0fa134dc7b3d7e8110f81b8d5d90e0bc05"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.079
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21840,
+      "lines": 404,
+      "sha256": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5ca8edfc1f0704caa7aa45415f1d014f1c439f6626773b7a5f7a619a05710380"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "98dc08341e6e8356fe0388605f2a0ca888bc7b2a163a7537148c4c6a2c93f733"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "cd4ef3b6d6e57184999348c9d9d72a5fab15a252261add4dd97352bcf5f0e4ff"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "9944f2c40429d0092dc6b6c5dd2a17ff1595c772d7b64d0c19eb6e185414bd01"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "33752fc4c1723ee4812890a7278a5e65f95b5e08d1c95bcc1ddab699ebbdad96"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 404,
+          "sha256": "3c0f5d9f2aa4b370baa44c59860fe31c1aa6c053ef41c65d132feabe23cfa55c"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0589
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 82161,
+      "lines": 1542,
+      "sha256": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1a83987a1635d1fd82db064e3d8cfcd32b96932ed2080d0c48f975917bf7a36f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "78eb79347308ad65aa00eb6fb1b56da6a3fbf791a8245459c4debd5d713e54b0"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b88f3c20ca40b184469d6c61f8702f92cda8c1c8be6be2375ae4a91fc96288c9"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "b6b90f7d8d4f6f96d3ca96bee17b121e6e519eba8cf29f78b6b15e0bbbb6d113"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "17bc431a446afd75d7e7039eaee55847d89f8eec761efde2fd8bddafe6288237"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7306a0df0f9cd852ff072cd916f94759785f4a8fe7966740ce0e3c0fc51d0e7c"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "17f555f36b3756f37125a2f8caafcbf3c8bdbe6babd3b7d321b0a503b39cb7f2"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "357f8990024d26700870f51035d35b8df71357b08c488b9cc2b5fd220e284d20"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "2a674886cc8a6ad48fb6f76490d10d59432d010a4f63df7ea7e3ce5005a81afd"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "17996ef204f05af5d4f4475aced8f79eca924d65845d2c8b64a5d101d1b3ed6e"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "dde00d85484a69434b6bf16fe1c4a10fd2dcc96d34b49086e7948e9f664eceda"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "040bba0f9aa49a6444b83edbe4a01d3bcbe3f90f3c8b8162b37c955ae2031355"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "e6421122cd3a8d5475850fa1e512b87be9798bccb5ded3f4ae5d99b90fb0f6e4"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "b0f6d1ce2fb71a7dfa76b2f837249b732ddd11a7a6623c766b7dc4d8d5526065"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1200,
+          "sha256": "ec190143b433e7ed4598ea68874f16e928cf6c795536c00e010816b87ff6ebb2"
+        },
+        {
+          "firstLine": 1201,
+          "lastLine": 1280,
+          "sha256": "c65e7d848da9f388dcf0914d0f826cda0abcaf2ae22943d18f2b5dd7426d4225"
+        },
+        {
+          "firstLine": 1281,
+          "lastLine": 1360,
+          "sha256": "9cc78ef388549dccf38f1ece3851c3ef82ab2c0f44b33925457073ae1f212d35"
+        },
+        {
+          "firstLine": 1361,
+          "lastLine": 1440,
+          "sha256": "c55e898c3b1aa16708e46ac6fc8b4563cd7bb7406ccb07090ae8e55b03f8efbb"
+        },
+        {
+          "firstLine": 1441,
+          "lastLine": 1520,
+          "sha256": "07f55d6b7f97236a94f4646a0d377412d3ec77f2747318351774cf7b07e6140f"
+        },
+        {
+          "firstLine": 1521,
+          "lastLine": 1542,
+          "sha256": "d59c4a064b5e3eaba8d24a0112768a3c3e0b855fd768d275c7f83290731a6da0"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0901
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 16287,
+      "lines": 495,
+      "sha256": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a8293ec327a5cb40f8b3893382947d4af32ba6667e86766d6d78ec9572b6ef9e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "27e21ebbdef7bcf663898ad3dbdc019a1cd6ca350facb94e5af79be6add5155f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "2660f9c22d5f29b6847324b53ab9a6bccd48d0a88f01885d0fe12d242bcdb894"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "c4b128d3014d6089b5a7c863739afd0164bee8cb066d0169264392bd7ac0c1ea"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "348b6f55f03943be68ac611ec3d139db0e217f2f1859c5ce077f3a7ead7349e2"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "ca255136453d0602d2fab1c1391babdce5c9256af11460a80e981fac033ebeac"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 495,
+          "sha256": "746af0ab40e5fd8fbb8a2ea77f763c5d182f071f45c24027716c4b47c6ac0029"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0596
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3669,
+      "lines": 44,
+      "sha256": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 44,
+          "sha256": "772fd1d46734d0869f841932da13d7d18ab1225bebc14bf62506fbafe1842214"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0487
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 27675,
+      "lines": 575,
+      "sha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a2957f0c6a0b4a4722bc5571e9c371b0732ea6eed561e160058fa095931300d7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0aef19b6638ba1a2629ff1a6a5b18d8caf14ad02441dc0a4caaa2bd1bbacddd3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d24d2e19808f44413bb62008136a7eab30000cf68fc9ae1034c2ef7dabe5b73e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "b059dab57f9750d3f8c9b15eb921fc6139056f6dc35b3bb66bd772a4d35ad761"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "28a4e5c6994e8fe2ce10f43e69686b02df1c01a6f9b5cce835d1cd9c6039365d"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "41085a93017d35849bd6e463258301b7600163833ceca64e6b44583b388dc080"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "02c5b51fe8ae5ba77b719291febc313ad38e8bd3ec02587c06d33a9884b4e031"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 575,
+          "sha256": "f2911843c1929a00d1f2860cc61926f82593f22bc59947f66d2766167929e6a0"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.0618
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11957,
+      "lines": 212,
+      "sha256": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e60d07c7d9a9136be1a957aea66917bd134e029b86f7ab8a566d5b98c19dd968"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6cabed817e300a234e032d7871029d3bd7bddb602a27b981fb016f3f0869c1a6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 212,
+          "sha256": "196665ea6926564c071df6f6147d43eb3cabe12b54712cc3f1219197f23506ce"
+        }
+      ],
+      "addedEdges": 0,
+      "initialTraversalAndResolutionSeconds": 0.1201
+    }
+  ],
+  "sourceBytes": 1004716,
+  "authorElapsedSeconds": 7.516
+}

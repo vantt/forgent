@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay L12-35 records across pilot and wave 1 and verify both current freezes.
+"""Replay L12-36 records across pilot and wave 1 and verify both current freezes.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -58,14 +58,14 @@ def main():
     result = check.Checker(PIN).all(records)
     check.SETS = PILOT
     pilot = check.records()
-    recorded_pilot = json.loads((P / 'step-03-pilot-r6-manifest.json').read_text())
+    recorded_pilot = json.loads((P / 'step-03-pilot-closeout-manifest.json').read_text())
     if recorded_pilot != pilot_manifest(pilot):
-        result['failures'].append({'check':'pilot-r6-manifest-and-selector-freeze'})
-    recorded = json.loads((P / 'step-03-wave1-r3-manifest.json').read_text())
+        result['failures'].append({'check':'pilot-closeout-manifest-and-selector-freeze'})
+    recorded = json.loads((P / 'step-03-wave1-closeout-manifest.json').read_text())
     if recorded != frozen:
         result['failures'].append({'check': 'wave1-manifest-and-selector-freeze'})
     result['failureCount'] = len(result['failures'])
-    result['checker'] = 'step-03-check.py: L12-35 computed units, carriage facts, dual-coordinate directory/link scan and self-successor checks; pilot + wave 1'
+    result['checker'] = 'step-03-check.py: L12-36 stated parents and original-source contexts; computed units, carriage facts, dual-coordinate directory/link scan and self-successor checks; pilot + wave 1'
     result['waveFiles'] = len(wave)
     result['retiredFiles']=sum(bool(r.get('retiresWithTree')) for r in records)
     result['retiredEdges']=sum(check.edge_count(r) for r in records if r.get('retiresWithTree'))

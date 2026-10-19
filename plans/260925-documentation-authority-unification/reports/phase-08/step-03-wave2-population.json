@@ -1,0 +1,23 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 60,
+  "inventoryEdges": 295,
+  "retiringFiles": 10,
+  "retiringEdges": 98,
+  "activeFiles": 50,
+  "activeEdges": 233,
+  "addedEdges": 36,
+  "patchedFiles": 21,
+  "dispositions": {
+    "preserve": 203,
+    "parked": 5,
+    "patch": 24,
+    "phase9-row-flip": 1
+  },
+  "parks": {
+    "description-rewrite": 3,
+    "phase9-carry": 2
+  },
+  "leadRulingGaps": [],
+  "acceptance": "AUTHOR only; independent A51 per-set and per-stratum review pending; no self-acceptance."
+}

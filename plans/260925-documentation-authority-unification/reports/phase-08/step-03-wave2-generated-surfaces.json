@@ -1,0 +1,489 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "checkedFiles": 60,
+  "files": [
+    {
+      "file": "docs/architect/agent-coordination/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "a24fbe9f9cb3b93524206888c25fde6afed98a6d4ce26025a57b403ea835a965",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "0a706b04e4754589f8ed7ff20bd5fd51378a582b92320ba5a15abb1dbcfa3b7e",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "934897196984ecf980c50414395565f9fc3373d46c7b744f651c5ff860ace6ca",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "d2515c8a298e1ac27c066aad8463773615176448c712666157495fd1732385eb",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "56815ce373a3293a5c2a701460ea8c398962baee54aec2d77d79db529ef81711",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "cec6a8c293a6efca3221eb60d6c6c03717538a7a1b3b9aaa17269a30a58a9acd",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "cd1c0a2b56fe50cd89294f9b96a05f5576946cdcd4d2be9ba5285217a8b805db",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/README.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "digest": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "generatedSurface": false,
+      "canonicalSkillSource": false,
+      "evidence": "Consumer is a documentation file; no generated-from/source header or generated-wrapper marker; skill paths mentioned in prose do not make this document a render."
+    }
+  ],
+  "generatedRenderParks": [],
+  "canonicalSkillSourceRecords": [],
+  "limits": "These six accepted scheduling sets contain documentation consumers only. No .agents/skills, plugins/**/skills, .claude/skills or core/skills consumer is in this 60-file inventory. Skill paths discussed by docs are not imported as consumers; generated/source coordination for other classes remains Step 5. No synthetic generated-render park or source mapping is invented."
+}

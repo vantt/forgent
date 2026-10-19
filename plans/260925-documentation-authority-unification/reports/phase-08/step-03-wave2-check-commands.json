@@ -1,0 +1,56 @@
+[
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py"
+    ],
+    "output": "step-03-wave1-closeout-check-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 30.969
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check.py"
+    ],
+    "output": "step-03-wave2-check-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 45.136
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py"
+    ],
+    "output": "step-03-wave2-probes-result.json",
+    "exitCode": 0,
+    "elapsedSeconds": 7.691
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-link-pass.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "output": "step-03-wave2-light-tests.log",
+    "exitCode": 0,
+    "elapsedSeconds": 1.29
+  }
+]

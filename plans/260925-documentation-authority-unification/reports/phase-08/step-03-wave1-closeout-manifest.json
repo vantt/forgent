@@ -1,0 +1,2474 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/architect/README.md",
+      "set": "batch-003",
+      "sourceBytes": 2829,
+      "digest": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "inventoryFileDigest": "d54892138630589055b39fd63d3df81ab51a4886008a413393362d429428ed35",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4",
+      "recordBytes": 1250,
+      "retiresWithTree": true,
+      "edgeCount": 15,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/README.md",
+      "set": "batch-004",
+      "sourceBytes": 10535,
+      "digest": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "inventoryFileDigest": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0aa7ed524318d95019bb5a93d8bc27b82d4dfd68e5865c4bfd572dd2ebd36b9c",
+      "recordBytes": 2753,
+      "retiresWithTree": true,
+      "edgeCount": 46,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/architecture/README.md",
+      "set": "batch-004",
+      "sourceBytes": 5406,
+      "digest": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "inventoryFileDigest": "0925b3c0cf87840e07757bfe24140ba195f38fb932b382b27c01d633615502be",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "64b772e712e72635ab33aa1adea4e568989f8bb851d0866a150e52c4f30a6879",
+      "recordBytes": 1372,
+      "retiresWithTree": true,
+      "edgeCount": 18,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/contracts/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1842,
+      "digest": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "inventoryFileDigest": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4bec86ecf97904e82d15128c0e344dfa8848517325c65c297dc08dc2509f8344",
+      "recordBytes": 979,
+      "retiresWithTree": true,
+      "edgeCount": 5,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/decisions/README.md",
+      "set": "batch-004",
+      "sourceBytes": 3016,
+      "digest": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "inventoryFileDigest": "01c9e283e31a787e1d80bab2763a145a0b2b795f311579bc807fcae380dd887a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ab3b22a621bfa471d6e2c70f83ebd3b24a564c5d512e25272d2bfd3cc6d10e20",
+      "recordBytes": 1219,
+      "retiresWithTree": true,
+      "edgeCount": 13,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/README.md",
+      "set": "batch-004",
+      "sourceBytes": 736,
+      "digest": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "inventoryFileDigest": "b0a57f6a40f44d05c4339df11cb30c7d2afdeab40f6e48a15777c4fe94eab5d1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "98041b0d50ed4de465d17959398fbc8d7ba6daa2b9ca2bd8be4792d0b444ec26",
+      "recordBytes": 829,
+      "retiresWithTree": true,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-004",
+      "sourceBytes": 35162,
+      "digest": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "inventoryFileDigest": "2a30e030e17321af686f8a30ccb3cad29979ef91b63e6365b8ee15f9597c65b9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0135936c5c94e7a2c5e2dad817c04b07ac9f3ed910e69d5b399602f9dff78028",
+      "recordBytes": 3278,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/proposals/README.md",
+      "set": "batch-004",
+      "sourceBytes": 3660,
+      "digest": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "inventoryFileDigest": "b8bce6982a238b76bc49ff8745431bb0831a2b8fb4f864a5866fece253c503ce",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "33df1ca6082fce44c2f2f608d1e1c8b61dbe13fa1b2f9a4edff7e45737989bb0",
+      "recordBytes": 1249,
+      "retiresWithTree": true,
+      "edgeCount": 14,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1940,
+      "digest": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "inventoryFileDigest": "6f8a9f4ebffd4812f4953c3b16f4dfeaf2e832f8e91844527647eef63b7e2d1c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bbd5f66ab15dd72f2109cc9de8d22bba75feac0e320ec388a060bf564b1b30d1",
+      "recordBytes": 1007,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "set": "batch-004",
+      "sourceBytes": 1597,
+      "digest": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "inventoryFileDigest": "909b3c8a7143c1eea70e1cd40827b016246e7fed4121cf89bd1940924ebce146",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ff98a7fc2485ce03d198dbd1203126406baa2258c8eb0166df5bbc6b3f8efee5",
+      "recordBytes": 1234,
+      "retiresWithTree": true,
+      "edgeCount": 13,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/README.md",
+      "set": "batch-004",
+      "sourceBytes": 966,
+      "digest": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "inventoryFileDigest": "7640ff2f009319d60e190ada6fe26b08f4a0f4d7901a21274e7cc7d96e82c0ab",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "81b4586edf4bd861e519ec545d9138241c47a3bfa7a6e5882617902e369cb8b2",
+      "recordBytes": 892,
+      "retiresWithTree": true,
+      "edgeCount": 2,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/vocabulary/README.md",
+      "set": "batch-004",
+      "sourceBytes": 2174,
+      "digest": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "inventoryFileDigest": "b9d081ace63fcc5efd6d76d8eba32757f847279c88287c5a34c862e436598263",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c494e3a9ae88e44619fcc02e489baaf3d087a8cf61a0c2233df4a8be828f1df8",
+      "recordBytes": 1010,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/component-boundary/README.md",
+      "set": "batch-005",
+      "sourceBytes": 10296,
+      "digest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "inventoryFileDigest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2",
+      "recordBytes": 4131,
+      "retiresWithTree": true,
+      "edgeCount": 28,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/domainization/README.md",
+      "set": "batch-006",
+      "sourceBytes": 10848,
+      "digest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "inventoryFileDigest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1",
+      "recordBytes": 994,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/packaging-distribution/README.md",
+      "set": "batch-007",
+      "sourceBytes": 9620,
+      "digest": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "inventoryFileDigest": "c79aaf6d07d9e6aad7019b139aa311ab06e33e459a6d3bb6c42b34aece711caa",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2f31a6c1efc3d309bb53bca56b57de7d6907a31aa2f51cdbd8c01a548be09763",
+      "recordBytes": 1003,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/packaging-distribution/migration-map.md",
+      "set": "batch-007",
+      "sourceBytes": 13633,
+      "digest": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "inventoryFileDigest": "ab74edfd6ae5455873de4298c80ce259df46a5d53b29cb11c2dacef6f9e2bf04",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c872326893cb831f13e32fcf8744118ea8b504948f741747e07bfca9ba7a88b4",
+      "recordBytes": 2892,
+      "retiresWithTree": true,
+      "edgeCount": 25,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/packaging-distribution/scope-map.md",
+      "set": "batch-007",
+      "sourceBytes": 11217,
+      "digest": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "inventoryFileDigest": "ce23b26593867f37339102eed75bae93258bebf6de38734570dc5c87b05f8481",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0856f9d4a3ab663fcfc599d0d0675b4a8fb03b11a9953925d78dc31df4ce29e3",
+      "recordBytes": 4153,
+      "retiresWithTree": true,
+      "edgeCount": 12,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/proposals/README.md",
+      "set": "batch-008",
+      "sourceBytes": 1516,
+      "digest": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "inventoryFileDigest": "5a46dde7807e8ccbfac1dd8a3aae7045c9fc9c54cfdc4747b916d3212be42400",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "236d0e8fb1b80e5ffbe0098834710c389c0a685e53e5bcd5fd8228a5eb2a758f",
+      "recordBytes": 990,
+      "retiresWithTree": true,
+      "edgeCount": 6,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/proposals/component-authority-boundary-map.md",
+      "set": "batch-008",
+      "sourceBytes": 49963,
+      "digest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "inventoryFileDigest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6cb7edc9797afaa44d8c41ef477e04377e4663180447f0ac09a242b74ddabb6b",
+      "recordBytes": 7827,
+      "retiresWithTree": true,
+      "edgeCount": 25,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/roadmap.md",
+      "set": "batch-009",
+      "sourceBytes": 23435,
+      "digest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "inventoryFileDigest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a",
+      "recordBytes": 4506,
+      "retiresWithTree": true,
+      "edgeCount": 11,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/workspace-topology-roadmap.md",
+      "set": "batch-010",
+      "sourceBytes": 5752,
+      "digest": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "inventoryFileDigest": "b7670cd9dc41aa9fb3fbc9a4d4cb1201985485213aeaee88af2ad34e6707d913",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf",
+      "recordBytes": 1513,
+      "retiresWithTree": true,
+      "edgeCount": 4,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/generated/README.md",
+      "set": "batch-011",
+      "sourceBytes": 1170,
+      "digest": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "inventoryFileDigest": "0bb19ebc6fd6ae3e64b8ee7d9b99994e1f521450ebc0338a23187c7ad3d44e4e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb",
+      "recordBytes": 4030,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+      "set": "batch-012",
+      "sourceBytes": 1699,
+      "digest": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "inventoryFileDigest": "89bd78e693d750947865e497780aa5babf36b2fd561f5fd58ff080d9bbee2824",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057",
+      "recordBytes": 3062,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/README.md",
+      "set": "batch-013",
+      "sourceBytes": 9323,
+      "digest": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "inventoryFileDigest": "bcaf7a435c3e777c5785f4ef417d0c39d61f8818fbf4c340b8eb717b3c203bf0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306",
+      "recordBytes": 48917,
+      "retiresWithTree": false,
+      "edgeCount": 23,
+      "dispositions": {
+        "preserve": 5,
+        "phase9-row-flip": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-confinement/README.md",
+      "set": "batch-014",
+      "sourceBytes": 2043,
+      "digest": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "inventoryFileDigest": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+      "diffSha256": "a00e9c05281e6965c06c69027d621fc53f91cfda577818eb6389495f01315353",
+      "recordSha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4",
+      "recordBytes": 7367,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/README.md",
+      "set": "batch-015",
+      "sourceBytes": 6693,
+      "digest": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "inventoryFileDigest": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+      "diffSha256": "09eae8c5159823d0489d2d733e1d8434aa637e838c6039832901c34585af5122",
+      "recordSha256": "246f05e225353e7c13859c50dde5ab0529920aca94032d1ac2487893b013208d",
+      "recordBytes": 32516,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/architecture/README.md",
+      "set": "batch-015",
+      "sourceBytes": 7287,
+      "digest": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "inventoryFileDigest": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+      "diffSha256": "0a46865e0ec8da995513793ea0569c436b163b725e32ed7faf447de389ff43db",
+      "recordSha256": "c8ec882aa5a84c639fe94dae2b3435c453ceca87a7925c7ac8fba959de4c5444",
+      "recordBytes": 10908,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/decisions/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4134,
+      "digest": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "inventoryFileDigest": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "diffSha256": "51d441355c605361664f2e599346cdb274e651ec3be8d0cd58a25d703bf3090a",
+      "recordSha256": "a5d9666fdff0ae968d18c815586e6f54ddffa7c8d44b26720397d5e773a88fcc",
+      "recordBytes": 8840,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/README.md",
+      "set": "batch-015",
+      "sourceBytes": 1718,
+      "digest": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "inventoryFileDigest": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "03827fc85dc80e1d878414346fc64dd97b3045f01d717306f421c3c8532b46cc",
+      "recordBytes": 5414,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-015",
+      "sourceBytes": 35898,
+      "digest": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "inventoryFileDigest": "5bc35099b543a8512187a7fddafa45f9ff9bf0335dc9c8505be475554248ab08",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2ac261c0ae013096e22ce62d9b8418401a4575a3c13b9e418e8f7f909a1caf6e",
+      "recordBytes": 10242,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "set": "batch-015",
+      "sourceBytes": 20930,
+      "digest": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "inventoryFileDigest": "f6d58bc25861604c541e6c75ec8dcc7dd446a693d5a8e0e88c8ca18956884929",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8b9202d136c0020d5002006c34dee567ab9e9c1a7227a361061fb9f067bd70db",
+      "recordBytes": 76714,
+      "retiresWithTree": false,
+      "edgeCount": 68,
+      "dispositions": {
+        "preserve": 68
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4083,
+      "digest": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "inventoryFileDigest": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+      "diffSha256": "659b327ffceb75eee5e92da77f885c02792f49e0c402bb890ab1f9ce061a214a",
+      "recordSha256": "cf8c99315626faf14aa4028f590d232ad6b476c0b970397624970b4acc1d16ee",
+      "recordBytes": 9482,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "set": "batch-015",
+      "sourceBytes": 8408,
+      "digest": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "inventoryFileDigest": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+      "diffSha256": "165a4ed72531b186ef1610828b1496c807803384ca765af7ddd4938d9e5697dd",
+      "recordSha256": "9b5e6be27e2230eec3100967df9a385860cceeade30aa38ca93f9ac2f012dcba",
+      "recordBytes": 33327,
+      "retiresWithTree": false,
+      "edgeCount": 24,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 23
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4473,
+      "digest": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "inventoryFileDigest": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+      "diffSha256": "528ef9ba2a42924a1460551b054870ff0e9b4cfda3fd691d0d3695acc545c395",
+      "recordSha256": "ce97323c59850f27eb3688b9e332386fc1d11124d02ac3d866198162fc341dc5",
+      "recordBytes": 16182,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5733,
+      "digest": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "inventoryFileDigest": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+      "diffSha256": "4bfd5795e1f90f1265f45829507f7d3b62f7c037a5294e9704c70ed537aea14b",
+      "recordSha256": "29dc7640ae440cd3a9959640adc090999f77b109d8e257cb8faefa9e4f9c1d57",
+      "recordBytes": 28679,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 17
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "set": "batch-015",
+      "sourceBytes": 6389,
+      "digest": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "inventoryFileDigest": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+      "diffSha256": "794e2945d0880269ad1441285add17ea2de35688138515f473c0ec0f16f43690",
+      "recordSha256": "174b116ff1d93885d0f522835d9c12a3bd944abb97954d986d41a547cf785afb",
+      "recordBytes": 24031,
+      "retiresWithTree": false,
+      "edgeCount": 19,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4591,
+      "digest": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "inventoryFileDigest": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+      "diffSha256": "ef0160b9ff484d91226eb88ee401f434beaf623b0cb6216a38e4880e6a3161ce",
+      "recordSha256": "f4aecfdb18b06e35497c10cad95a12949ee4b2a74e6f6585e4c02a8b5e74bf16",
+      "recordBytes": 16820,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 11
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4011,
+      "digest": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "inventoryFileDigest": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+      "diffSha256": "2cff66864360430e4494bd393bf71376bcb5026901084f8a531d00c14593fba2",
+      "recordSha256": "3ca15920fb1322e90c7b940097ece44168f59ab6f5eef0053e6646b7dbb197c4",
+      "recordBytes": 26239,
+      "retiresWithTree": false,
+      "edgeCount": 17,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "set": "batch-015",
+      "sourceBytes": 3549,
+      "digest": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "inventoryFileDigest": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+      "diffSha256": "1cb5926f99e657e980a99cbeeec96da8c953d23c89d3ecd4558754e5d4f76143",
+      "recordSha256": "41229050b05a1e8120955137c6942d0446231855af8dd4fbd4d4b5ea487d101b",
+      "recordBytes": 10326,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5669,
+      "digest": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "inventoryFileDigest": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+      "diffSha256": "9dc2ca0c8d9dab9ebb5da19b96e971d85af4b44f977b0f484cba7a812672ba97",
+      "recordSha256": "5e373c7bc3180b6597032cc896ae5880ade09d12321836e1de021af76e5abfa5",
+      "recordBytes": 18758,
+      "retiresWithTree": false,
+      "edgeCount": 17,
+      "dispositions": {
+        "preserve": 16,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4535,
+      "digest": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "inventoryFileDigest": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+      "diffSha256": "1cb4d0b3dcfcce2320125c601ffadfa6bbf0039d21956a74e78f810b81c8731e",
+      "recordSha256": "4b827f09740e0aad9dd1c03780fd74bb27363cdb57e12322fdb81f41c4b03243",
+      "recordBytes": 17376,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "set": "batch-015",
+      "sourceBytes": 37406,
+      "digest": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "inventoryFileDigest": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+      "diffSha256": "345a42b7d18413f205e98c19ba0a03d25ef509ed4767e1ecd5932bbb208276e4",
+      "recordSha256": "f9e1ec852d99c7d34e28732370b714a016f1d2d0ee9e556001e2e057d828f761",
+      "recordBytes": 19253,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+      "set": "batch-015",
+      "sourceBytes": 13985,
+      "digest": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "inventoryFileDigest": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+      "diffSha256": "97cdbcbdc2d689c10c66666e46fe6b2e2e070eff5d8ea7619100345fbf2134d1",
+      "recordSha256": "3227236241fb8927f569d2d5de22225fc8319f18456f21bd6c9419087bb1fc8d",
+      "recordBytes": 74044,
+      "retiresWithTree": false,
+      "edgeCount": 54,
+      "dispositions": {
+        "preserve": 53,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "set": "batch-015",
+      "sourceBytes": 8895,
+      "digest": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "inventoryFileDigest": "b9f59a868e456dcb19e0c5d0014d3ba8bf539f7a624730dff00ee70e1519a656",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "46cbe805f8cb1e5c304632ca8396b7f97a2e0d04fd4d28787d46fa589b423322",
+      "recordBytes": 16602,
+      "retiresWithTree": false,
+      "edgeCount": 22,
+      "dispositions": {
+        "preserve": 22
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/proposals/README.md",
+      "set": "batch-015",
+      "sourceBytes": 5039,
+      "digest": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "inventoryFileDigest": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "diffSha256": "1090b0ea98fa2a0c1ff15c9f58addeb0b52a9a266a638eb8430b0e0222a9aff8",
+      "recordSha256": "f11858e07f1bd90ec85b264b39bb37312ae14aa820b3ac72b33f284fc2dc9b05",
+      "recordBytes": 7950,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/README.md",
+      "set": "batch-015",
+      "sourceBytes": 4099,
+      "digest": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "inventoryFileDigest": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+      "diffSha256": "416d79a101a6ab014754032c6806fcba01e0d2aed30a0768da99b01d11ec0549",
+      "recordSha256": "fabebde58fd5d9404e2215499c32422fa7104a4b064831a52853418db5df38a0",
+      "recordBytes": 20787,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 17
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/vocabulary/README.md",
+      "set": "batch-015",
+      "sourceBytes": 3148,
+      "digest": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "inventoryFileDigest": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+      "diffSha256": "fc75411b19cb524b381821fcebb7778cc84d02d9e9a08d420bb88d752439b4f0",
+      "recordSha256": "1cc0a6b475a791d5becbc86df19d3d1fa1fdbcc1f4dc976e92a4a5208665e70c",
+      "recordBytes": 7230,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/architecture-map.md",
+      "set": "batch-016",
+      "sourceBytes": 59475,
+      "digest": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "inventoryFileDigest": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "diffSha256": "6e6874e67a7331df57457c23215e8ba951dda427a2acce7faee3e5b53fb6f505",
+      "recordSha256": "615957eec0da3e803cd1dad8991be1995a2ecb0e1b73f6fce0b195b3490a6c5a",
+      "recordBytes": 38837,
+      "retiresWithTree": false,
+      "edgeCount": 39,
+      "dispositions": {
+        "preserve": 36,
+        "phase9-row-flip": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/claude-plugin/README.md",
+      "set": "batch-017",
+      "sourceBytes": 1765,
+      "digest": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "inventoryFileDigest": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+      "diffSha256": "2ebee5fbd498e1255e344789d56a42f80b7376b31ed47e410d6caceafca4832c",
+      "recordSha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1",
+      "recordBytes": 7182,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/README.md",
+      "set": "batch-018",
+      "sourceBytes": 1799,
+      "digest": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "inventoryFileDigest": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+      "diffSha256": "c74a92731c7d08b26d366a218951e1931f86d49a5087b0e471de40fcb2fe20f2",
+      "recordSha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3",
+      "recordBytes": 7468,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/distillery/README.md",
+      "set": "batch-019",
+      "sourceBytes": 1760,
+      "digest": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "inventoryFileDigest": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+      "diffSha256": "5946489773632e42f1db02d943a42e1dd80c99f93c19e6c24ad046d47dc483b8",
+      "recordSha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8",
+      "recordBytes": 7130,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/documentation/history/templates/README.md",
+      "set": "batch-020",
+      "sourceBytes": 2502,
+      "digest": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "inventoryFileDigest": "9610c219b52b87e6bc82e3bbadc200dd4199330464c95c080563d56f04fc1ba2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8f64aa3dcc042046e760b122fe79bc015d8bbeb2c80a6def263cc4c3f1a5fd99",
+      "recordBytes": 1839,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "set": "batch-020",
+      "sourceBytes": 3088,
+      "digest": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "inventoryFileDigest": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ed8db14579bbeaad196310bfcf0a7eb71abdd75d188cc7415c0b4bc60f9957e9",
+      "recordBytes": 15950,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "preserve": 7,
+        "phase9-row-flip": 5
+      }
+    },
+    {
+      "file": "docs/platform/herdr-web-dashboard/README.md",
+      "set": "batch-021",
+      "sourceBytes": 1928,
+      "digest": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "inventoryFileDigest": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "diffSha256": "2293908827966f1d44d44454d9f91840d6d05d1dc40f7788cf2e8228c0b71e4c",
+      "recordSha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb",
+      "recordBytes": 7367,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/history/documentation-authority-unification/README.md",
+      "set": "batch-022",
+      "sourceBytes": 2406,
+      "digest": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "inventoryFileDigest": "cea889bfc3b5053b64c8740695c55ca05c78fe20faf7209c759f609c347300a9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980",
+      "recordBytes": 1347,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/README.md",
+      "set": "batch-023",
+      "sourceBytes": 11785,
+      "digest": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "inventoryFileDigest": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "836160f5f87a49d07be194f0079bb94395960ca1e5f4b186160ba59484035e59",
+      "recordBytes": 7731,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2985,
+      "digest": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "inventoryFileDigest": "de479c0ab0d3790d4d9150c07c9b5ae1ef77149bf42bbedc77e5813352ac8488",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7e0c75698460bfdcc8352dfb4d97b8d39b941ce7e745487667acedfcf352e183",
+      "recordBytes": 4183,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2910,
+      "digest": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "inventoryFileDigest": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0f23d5b7ba5ea108ce0b0526d25e6df5d3f277eb1997c4747d3dc659b9bc319f",
+      "recordBytes": 2277,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/decisions/README.md",
+      "set": "batch-023",
+      "sourceBytes": 3237,
+      "digest": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "inventoryFileDigest": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0c62fe7aadc757a83adc07820c0e6c63865d6783fd02d9956014a0bdac5c77f4",
+      "recordBytes": 1337,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "set": "batch-023",
+      "sourceBytes": 52227,
+      "digest": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "inventoryFileDigest": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7e2845639f67eafcad57eb2db8ab73f986d6722d9202429ff1e9ca14f10ef974",
+      "recordBytes": 17271,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/README.md",
+      "set": "batch-023",
+      "sourceBytes": 2662,
+      "digest": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "inventoryFileDigest": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c8707a7d58efbddd6480f0329bab961e8831b539fb6208a7a7b5ed7820f0f631",
+      "recordBytes": 1340,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/observe/README.md",
+      "set": "batch-024",
+      "sourceBytes": 1843,
+      "digest": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "inventoryFileDigest": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+      "diffSha256": "2b32b3ab5d3c10dd42244faaa468866c090c7208145f1827e4bd397ca1045a4b",
+      "recordSha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165",
+      "recordBytes": 7082,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/README.md",
+      "set": "batch-025",
+      "sourceBytes": 24736,
+      "digest": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "inventoryFileDigest": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3cc56874e6cbdedeb4cef83c873dbde7530a917e6df42c4d0b3b8d829f648bf7",
+      "recordBytes": 27650,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "preserve": 12,
+        "phase9-row-flip": 6
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "set": "batch-025",
+      "sourceBytes": 14843,
+      "digest": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "inventoryFileDigest": "f5486c33fd7b637e32c2d541fe708570685b4fa7db9a9a89c4d814633feef644",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "79d8f5b74401a40410ba028aaab8fd5ff2b33dcc17c6c734114a4c3d42fa7ff0",
+      "recordBytes": 21712,
+      "retiresWithTree": false,
+      "edgeCount": 26,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/platform/proposals/README.md",
+      "set": "batch-026",
+      "sourceBytes": 4705,
+      "digest": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "inventoryFileDigest": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "57f5175798d03fbdb9815fbb3a5c0b0c82ff2b34334d66e6afa45183c3f744b4",
+      "recordBytes": 33559,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "preserve": 17,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "set": "batch-026",
+      "sourceBytes": 51833,
+      "digest": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "inventoryFileDigest": "f6b4e0d096d2fbe33f727f2d6736deb69f51e07486157f48b79b243ae36abd12",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f7c820ac7ee591726b8da81c3368f8cf1a9c3995c16e545611a8709c33106058",
+      "recordBytes": 84320,
+      "retiresWithTree": false,
+      "edgeCount": 55,
+      "dispositions": {
+        "preserve": 54,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/runner/README.md",
+      "set": "batch-027",
+      "sourceBytes": 6014,
+      "digest": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "inventoryFileDigest": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "diffSha256": "63c07447d86cf4d911508a52eab775cebf0ba5276b6a7d55582bc77a0c5f811d",
+      "recordSha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85",
+      "recordBytes": 9748,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/roadmap.md",
+      "set": "batch-028",
+      "sourceBytes": 24670,
+      "digest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "inventoryFileDigest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b87043463c8f0003d0878937a0b038bc2c615b6bada17b6585cc4ac8f04900bf",
+      "recordBytes": 30233,
+      "retiresWithTree": false,
+      "edgeCount": 21,
+      "dispositions": {
+        "preserve": 19,
+        "phase9-row-flip": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "set": "batch-028",
+      "sourceBytes": 7063,
+      "digest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "inventoryFileDigest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "af18e08f24fd2a4127d8b508882f45ca289c4f3be36e982adbd92701a224b19b",
+      "recordBytes": 9845,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "phase9-row-flip": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/ui-spec/README.md",
+      "set": "batch-029",
+      "sourceBytes": 4241,
+      "digest": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "inventoryFileDigest": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433",
+      "recordBytes": 3246,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/work-state/README.md",
+      "set": "batch-030",
+      "sourceBytes": 4601,
+      "digest": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "inventoryFileDigest": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6",
+      "recordBytes": 24471,
+      "retiresWithTree": false,
+      "edgeCount": 14,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 5,
+        "phase9-row-flip": 8
+      }
+    },
+    {
+      "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+      "set": "batch-031",
+      "sourceBytes": 4982,
+      "digest": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "inventoryFileDigest": "f125466752a0b962aa33cd783a36eda6bebba241c24cc760159fdef1e77d4ae9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de",
+      "recordBytes": 2922,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/user/README.md",
+      "set": "batch-032",
+      "sourceBytes": 1136,
+      "digest": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "inventoryFileDigest": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708",
+      "recordBytes": 10747,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 2,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/README.md",
+      "set": "batch-033",
+      "sourceBytes": 2195,
+      "digest": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "inventoryFileDigest": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d25b2418916c1c15c71ff307ec30539f34821a777c7dd079e6a66ab0451dec69",
+      "recordBytes": 18148,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 7,
+        "phase9-row-flip": 8
+      }
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "set": "batch-033",
+      "sourceBytes": 54465,
+      "digest": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "inventoryFileDigest": "d70414923eaeaf0dd34c4e260d4c4a8cf0cf58b517f417fb03a0c2b0fe74de9a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b051a40e40e834a581e65cbd62f2c72cade5705627e2dc0011c89cd98e41de41",
+      "recordBytes": 44350,
+      "retiresWithTree": false,
+      "edgeCount": 42,
+      "dispositions": {
+        "preserve": 38,
+        "parked": 4
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-003",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000003",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-004",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000004",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-005",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000005",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-006",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000006",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-007",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000007",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-008",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000008",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-009",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000009",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-010",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000010",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": []
+    },
+    {
+      "set": "batch-011",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000011",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 4
+      },
+      "allFiles": [
+        "docs/generated/README.md"
+      ]
+    },
+    {
+      "set": "batch-012",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000012",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+      ]
+    },
+    {
+      "set": "batch-013",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000013",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 5,
+        "phase9-row-flip": 18
+      },
+      "allFiles": [
+        "docs/platform/README.md"
+      ]
+    },
+    {
+      "set": "batch-014",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000014",
+      "population": [
+        "docs/platform/agent-confinement/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-confinement/README.md",
+          "rankHash": "6f4282aeab8053ed174f874bfc9f02781d95e0c79d1889ad5b41333d157c8624"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-confinement/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/agent-confinement/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/agent-confinement/README.md"
+      ]
+    },
+    {
+      "set": "batch-015",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000015",
+      "population": [
+        "docs/platform/agent-coordination/README.md",
+        "docs/platform/agent-coordination/architecture/README.md",
+        "docs/platform/agent-coordination/decisions/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+        "docs/platform/agent-coordination/proposals/README.md",
+        "docs/platform/agent-coordination/verification/README.md",
+        "docs/platform/agent-coordination/vocabulary/README.md"
+      ],
+      "populationCount": 18,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+          "rankHash": "32efef87afc468da3986bbe445e225627957e19a7a197e3f6402c2174fe86ed8"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+          "rankHash": "4a88e818a09f4dc4595c8c61f4e2791cd94e8a859ed18d8ebc51f384945bf53b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+          "rankHash": "507135685ee42fdd4a030b19f38063a44d7b7340df01ad7dd8efaeb2848d75af"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+          "rankHash": "56e7ab58039b6aa3408e1c057659ecebcf1cdb5ff77d9c954489f61803d721a9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+          "rankHash": "59d3530bb833eeb99217b1b66c4da990e49307edb6617c49784cdd8d03a55fff"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+          "rankHash": "636babfff01119516d68547477080852fbb74f7410118c84e58c677d9fd17e3f"
+        },
+        {
+          "file": "docs/platform/agent-coordination/README.md",
+          "rankHash": "7dcd855daa9a3a7787d9130d10f3445bffd8e088889f735157b279015d719452"
+        },
+        {
+          "file": "docs/platform/agent-coordination/verification/README.md",
+          "rankHash": "a18222fb296dfdf8b44b763047e8929896c76a8fd954446fa49ab980aec83492"
+        },
+        {
+          "file": "docs/platform/agent-coordination/proposals/README.md",
+          "rankHash": "a23114d1633b6ca57d07391849983b8cd1c538ab7749c245cc3657bd840058e9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+          "rankHash": "b3724865de458099a65e9d373e2d71dcf738c9a7eb8b5258e9526080c752b241"
+        },
+        {
+          "file": "docs/platform/agent-coordination/vocabulary/README.md",
+          "rankHash": "bb363581609079c0bfb287e25055ab3451d038978a70621a6c5d2ec7ce90e602"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+          "rankHash": "c84ff640bfa46641a7c70abe476556f6fc42005128c104e3201d3be522ab4cf6"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+          "rankHash": "d000eeb21405b82024c90ffc43b19c3b490bf4d5e1c5ce55a35944d1ae1e0022"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+          "rankHash": "d33d89ae420abb22c800a7eb41f9c131268813da53b121c724fdcc0d09bc2aa0"
+        },
+        {
+          "file": "docs/platform/agent-coordination/architecture/README.md",
+          "rankHash": "dc106a7d833b7426e68584a9bf270e935f6200ec704a7c71418b891a539400a7"
+        },
+        {
+          "file": "docs/platform/agent-coordination/decisions/README.md",
+          "rankHash": "e752cc2de9664c5260423e3a0988f89db39cfab3ab76f90e105cb441a35b485b"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+          "rankHash": "e863fb317504c67125d69dccda3ea2f1d629988ad5b8c40cd39354feef447ad4"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+          "rankHash": "f2493e2a474431f456404caf31d3ef6d81338b3f0d78ecfbbd2796ed77a73966"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/README.md",
+          "bytes": 20930,
+          "edges": 68,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 18,
+          "inventoryEdgeThreshold": false,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+          "bytes": 13985,
+          "edges": 54,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 6,
+          "inventoryEdgeThreshold": false,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/README.md"
+      ],
+      "distinctReviewCount": 5,
+      "dispositions": {
+        "patch": 19,
+        "preserve": 313
+      },
+      "allFiles": [
+        "docs/platform/agent-coordination/README.md",
+        "docs/platform/agent-coordination/architecture/README.md",
+        "docs/platform/agent-coordination/decisions/README.md",
+        "docs/platform/agent-coordination/history/README.md",
+        "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+        "docs/platform/agent-coordination/proposals/README.md",
+        "docs/platform/agent-coordination/verification/README.md",
+        "docs/platform/agent-coordination/vocabulary/README.md"
+      ]
+    },
+    {
+      "set": "batch-016",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000016",
+      "population": [
+        "docs/platform/architecture-map.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/architecture-map.md",
+          "rankHash": "4958033fc41f21f08e2a821f0464ec806f4162df4af706ba658b8cc73344147c"
+        }
+      ],
+      "sample": [
+        "docs/platform/architecture-map.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/architecture-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 36,
+        "phase9-row-flip": 2,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/architecture-map.md"
+      ]
+    },
+    {
+      "set": "batch-017",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000017",
+      "population": [
+        "docs/platform/claude-plugin/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/claude-plugin/README.md",
+          "rankHash": "e21bfd7f391804dea36a3c33d23271ce56220dfe5641d9bc5537319210a014f3"
+        }
+      ],
+      "sample": [
+        "docs/platform/claude-plugin/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/claude-plugin/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/claude-plugin/README.md"
+      ]
+    },
+    {
+      "set": "batch-018",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000018",
+      "population": [
+        "docs/platform/decision-citation-drift/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/decision-citation-drift/README.md",
+          "rankHash": "7ff70147222e2f6d38fa5fd7b8a0bee075ac4fe28160f13113b7a9569c29bd8d"
+        }
+      ],
+      "sample": [
+        "docs/platform/decision-citation-drift/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/decision-citation-drift/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/decision-citation-drift/README.md"
+      ]
+    },
+    {
+      "set": "batch-019",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000019",
+      "population": [
+        "docs/platform/distillery/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/distillery/README.md",
+          "rankHash": "6ddc18fe550d369fff58f93f92e0e4c63d2b0b8985192d5cbd8478c59027a3de"
+        }
+      ],
+      "sample": [
+        "docs/platform/distillery/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/distillery/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/distillery/README.md"
+      ]
+    },
+    {
+      "set": "batch-020",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000020",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 7,
+        "phase9-row-flip": 5
+      },
+      "allFiles": [
+        "docs/platform/documentation/history/templates/README.md",
+        "docs/platform/documentation/operations/portals/docs-portal.md"
+      ]
+    },
+    {
+      "set": "batch-021",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000021",
+      "population": [
+        "docs/platform/herdr-web-dashboard/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/herdr-web-dashboard/README.md",
+          "rankHash": "153d6a2b0d88c6b8f87828f4a368c06554b3493dd1d703051e2d9f0e60a99631"
+        }
+      ],
+      "sample": [
+        "docs/platform/herdr-web-dashboard/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/herdr-web-dashboard/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/herdr-web-dashboard/README.md"
+      ]
+    },
+    {
+      "set": "batch-022",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000022",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {},
+      "allFiles": [
+        "docs/platform/history/documentation-authority-unification/README.md"
+      ]
+    },
+    {
+      "set": "batch-023",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000023",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 19,
+        "phase9-row-flip": 1
+      },
+      "allFiles": [
+        "docs/platform/host-invocation-routing/README.md",
+        "docs/platform/host-invocation-routing/architecture/README.md",
+        "docs/platform/host-invocation-routing/contracts/README.md",
+        "docs/platform/host-invocation-routing/decisions/README.md",
+        "docs/platform/host-invocation-routing/roadmap.md",
+        "docs/platform/host-invocation-routing/verification/README.md"
+      ]
+    },
+    {
+      "set": "batch-024",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000024",
+      "population": [
+        "docs/platform/observe/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/observe/README.md",
+          "rankHash": "9937ab60bb95016d2d1e314443fada71c518f7c728c543cfbe2e7ba2bb6caa34"
+        }
+      ],
+      "sample": [
+        "docs/platform/observe/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/observe/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/observe/README.md"
+      ]
+    },
+    {
+      "set": "batch-025",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000025",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 38,
+        "phase9-row-flip": 6
+      },
+      "allFiles": [
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md"
+      ]
+    },
+    {
+      "set": "batch-026",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000026",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/proposals/component-authority-boundary-map.md",
+          "bytes": 51833,
+          "edges": 55,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 17,
+          "inventoryEdgeThreshold": false,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        }
+      ],
+      "selected": [
+        "docs/platform/proposals/component-authority-boundary-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 71,
+        "parked": 2
+      },
+      "allFiles": [
+        "docs/platform/proposals/README.md",
+        "docs/platform/proposals/component-authority-boundary-map.md"
+      ]
+    },
+    {
+      "set": "batch-027",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000027",
+      "population": [
+        "docs/platform/runner/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/runner/README.md",
+          "rankHash": "dd366d9b1b7d89e65f569037fe2aabe40b0ed1a930dbe1a38dc060a0b96fe242"
+        }
+      ],
+      "sample": [
+        "docs/platform/runner/README.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/runner/README.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      },
+      "allFiles": [
+        "docs/platform/runner/README.md"
+      ]
+    },
+    {
+      "set": "batch-028",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000028",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 20,
+        "phase9-row-flip": 2,
+        "parked": 2
+      },
+      "allFiles": [
+        "docs/platform/system-architecture/architecture/roadmap.md",
+        "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-029",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000029",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 3
+      },
+      "allFiles": [
+        "docs/platform/ui-spec/README.md"
+      ]
+    },
+    {
+      "set": "batch-030",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000030",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 5,
+        "phase9-row-flip": 8
+      },
+      "allFiles": [
+        "docs/platform/work-state/README.md"
+      ]
+    },
+    {
+      "set": "batch-031",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000031",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2
+      },
+      "allFiles": [
+        "docs/reference/codebase-scatter-consolidation-roadmap.md"
+      ]
+    },
+    {
+      "set": "batch-032",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000032",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "dispositions": {
+        "preserve": 2,
+        "phase9-row-flip": 4
+      },
+      "allFiles": [
+        "docs/user/README.md"
+      ]
+    },
+    {
+      "set": "batch-033",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000033",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/architecture-map.md",
+          "bytes": 54465,
+          "edges": 42,
+          "sizeThreshold": false,
+          "edgeThreshold": true,
+          "inventoryEdges": 39,
+          "inventoryEdgeThreshold": false,
+          "note": "Supplemental edges can add review files; no inventory-threshold file is waived."
+        }
+      ],
+      "selected": [
+        "docs/architecture-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "dispositions": {
+        "preserve": 45,
+        "phase9-row-flip": 8,
+        "parked": 4
+      },
+      "allFiles": [
+        "docs/README.md",
+        "docs/architecture-map.md"
+      ]
+    }
+  ],
+  "unpatchedStrata": {
+    "003": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-003",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "004": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-004",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "005": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-005",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "006": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-006",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "007": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-007",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "008": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-008",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "009": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-009",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "010": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-010",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "011": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-011",
+      "population": [
+        "docs/generated/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/generated/README.md",
+          "rankHash": "1a07cafb84dc36cf6f4c81c04eb2e29cb4e155a177a1fecd3fdee1308389eadc"
+        }
+      ],
+      "selected": [
+        "docs/generated/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "012": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-012",
+      "population": [
+        "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md",
+          "rankHash": "978222952d0eda1c67626fb31a961383a9a40ec25f4ee504a7172aef56583940"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "013": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-013",
+      "population": [
+        "docs/platform/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/README.md",
+          "rankHash": "66659872e67453c0b1baf6da0a9348aa81fdfff217ab6857e631da3a55834e14"
+        }
+      ],
+      "selected": [
+        "docs/platform/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "014": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-014",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "015": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-015",
+      "population": [
+        "docs/platform/agent-coordination/history/README.md",
+        "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md"
+      ],
+      "populationCount": 3,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+          "rankHash": "0c4e8128c437a4d57b99207445f4424bf377f8f2de42a12db7d329d964f41b52"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/README.md",
+          "rankHash": "5c772c90c6e48257be6048f86665a7b8bdd4e239ce98b45ee341e72ed89da173"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+          "rankHash": "aa2dda9ed8892402f23a767a0214bc9ca17c5ebe9f3a5a668f64b71143b7c793"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "016": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-016",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "017": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-017",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "018": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-018",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "019": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-019",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "020": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-020",
+      "population": [
+        "docs/platform/documentation/operations/portals/docs-portal.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/documentation/operations/portals/docs-portal.md",
+          "rankHash": "1c67ae9fb497bd07b04871a97277dae139168cbdd3a8e3b4fae73399c6bd24ee"
+        }
+      ],
+      "selected": [
+        "docs/platform/documentation/operations/portals/docs-portal.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "021": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-021",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "022": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-022",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "023": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-023",
+      "population": [
+        "docs/platform/host-invocation-routing/README.md",
+        "docs/platform/host-invocation-routing/architecture/README.md",
+        "docs/platform/host-invocation-routing/contracts/README.md",
+        "docs/platform/host-invocation-routing/roadmap.md"
+      ],
+      "populationCount": 4,
+      "ranks": [
+        {
+          "file": "docs/platform/host-invocation-routing/README.md",
+          "rankHash": "43e8c4455aa72dd6666ad8ba6bf56cf854e3db07b0daf9c4737142fe40bcb5be"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/README.md",
+          "rankHash": "90177994be4b9003040074b967a4b96b28d2167c3192c8ddeffe2cfe47eff549"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/roadmap.md",
+          "rankHash": "bd71f062a04e53787e93d449ee786c6a7c5a94a1c0740d672cd6c5ac6c54391d"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/README.md",
+          "rankHash": "cc5030ba5812d873a28a0c72cfb48c730a2ea63f611596d58688b7607f484118"
+        }
+      ],
+      "selected": [
+        "docs/platform/host-invocation-routing/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "024": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-024",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "025": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-025",
+      "population": [
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/packaging-distribution/README.md",
+          "rankHash": "5f994ad6283dedb751752a4e7da77e71f1cf86c328b425b08d4fd45b338112a8"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+          "rankHash": "6b27250eeea1316f3c5f5c7c95905e3299ce97c879e4d6f36eb8db7575258758"
+        }
+      ],
+      "selected": [
+        "docs/platform/packaging-distribution/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "026": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-026",
+      "population": [
+        "docs/platform/proposals/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/proposals/README.md",
+          "rankHash": "8b5a6a8b576a1f62cba6f4d79f8980801ce12bf22d807d5c71e7389d6a3f1b74"
+        }
+      ],
+      "selected": [
+        "docs/platform/proposals/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "027": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-027",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "028": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-028",
+      "population": [
+        "docs/platform/system-architecture/architecture/roadmap.md",
+        "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/system-architecture/architecture/roadmap.md",
+          "rankHash": "758f66a1f417021fe69468ff150f8159f96db7846f47686ea9d142e587018963"
+        },
+        {
+          "file": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+          "rankHash": "f3fc477e68055211875e03b76f23f7aea5e375cb4b05a0ddd82f0b5a3337c0e2"
+        }
+      ],
+      "selected": [
+        "docs/platform/system-architecture/architecture/roadmap.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "029": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-029",
+      "population": [
+        "docs/platform/ui-spec/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/ui-spec/README.md",
+          "rankHash": "f6572dc4cb71d8d215bcfc304dd8b05a3025467b2be2ded79a09cdb411ea0ea7"
+        }
+      ],
+      "selected": [
+        "docs/platform/ui-spec/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "030": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-030",
+      "population": [
+        "docs/platform/work-state/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/work-state/README.md",
+          "rankHash": "2b0b0dd2c771a76a72fbf941931052c5f0694b5236df3efb93c65ba45ec1c658"
+        }
+      ],
+      "selected": [
+        "docs/platform/work-state/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "031": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-031",
+      "population": [
+        "docs/reference/codebase-scatter-consolidation-roadmap.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/reference/codebase-scatter-consolidation-roadmap.md",
+          "rankHash": "2a692ddd5eec4bd3ffea48fa259d9ba34151ace6160d8f8f4a2b72c86ebfdd0e"
+        }
+      ],
+      "selected": [
+        "docs/reference/codebase-scatter-consolidation-roadmap.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "032": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-032",
+      "population": [
+        "docs/user/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/user/README.md",
+          "rankHash": "fac1aa72e0597813dac572689810bb72bb5487b39ded0a95976ca0180ff6a028"
+        }
+      ],
+      "selected": [
+        "docs/user/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "033": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-033",
+      "population": [
+        "docs/README.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/README.md",
+          "rankHash": "ba468bf7df789e1a1520e53df28a4166103ecf218ccf88225844cd6d90018e09"
+        }
+      ],
+      "selected": [
+        "docs/README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "26020e7e42701ad62bd9f2e829a88e9cc75fb707a1c247295276fe267acbcd8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "274a0ad083d291ad632aa9654496132df5303a47f135faa7ed3e612eefcef354"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "3069bb82fc1edd87a6538f7db4391aa62df1ac0e8a02e91de81aeb75033cd140"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "0fff96797ff76635298605ff6f04c3061b8e891deb050739be7270d41236d54e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+      "sha256": "615957eec0da3e803cd1dad8991be1995a2ecb0e1b73f6fce0b195b3490a6c5a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "cee06ea383d9c7a40dfa69df957759e7ca3a862b31900a5387ae9cfbe860a2fc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "1452b945ae1220dbbc2c09d98fd62611d9475e472f313dbe96cf05167be551d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "a8ee5791cdbb7242ae51ed2bafcbc0c9d2d39c528e977b8ebc4814ed65d5c671"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "05624fe88c84daae563059062b080e215acb9d59516d98c0348ab41d127c06a0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+      "sha256": "34fe3b7e2c9a0e9a660e3be8a15efabb24cf8ef6833538bd0507e34b6db62421"
+    }
+  ]
+}

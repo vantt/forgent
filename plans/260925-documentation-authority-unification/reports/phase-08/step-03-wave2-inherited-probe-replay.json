@@ -1,0 +1,23 @@
+[
+  {
+    "script": "step-03-probes.py",
+    "result": "step-03-wave2-inherited-probes-result.json",
+    "negativeProbes": 87,
+    "allRejected": true,
+    "seconds": 70.049
+  },
+  {
+    "script": "step-03-wave1-r2-probes.py",
+    "result": "step-03-wave2-prior-wave-probes-result.json",
+    "negativeProbes": 23,
+    "allRejected": true,
+    "seconds": 1.702
+  },
+  {
+    "script": "step-03-wave1-r3-probes.py",
+    "result": "step-03-wave2-L12-35-probes-result.json",
+    "negativeProbes": 25,
+    "allRejected": true,
+    "seconds": 17.755
+  }
+]

@@ -1,0 +1,357 @@
+{
+  "status": "AUTHOR complete; independent wave-2 review pending",
+  "verifiedAt": "2026-10-19T21:03:54.539954+00:00",
+  "inputHEAD": "1e3b1e3b65a7d98f91d12ecaae0262ae6924377d",
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "partA": {
+    "scannedRecords": 96,
+    "addedEdges": 145,
+    "filesWithAddedEdges": 14,
+    "existingEdgeOutcomeChanges": 0,
+    "diffChanges": 0,
+    "recordTextOnly": 4,
+    "namedLineUnits": 28,
+    "proof": "step-03-wave1-closeout.json"
+  },
+  "partB": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "files": 60,
+    "inventoryEdges": 295,
+    "retiringFiles": 10,
+    "retiringEdges": 98,
+    "activeFiles": 50,
+    "activeEdges": 233,
+    "addedEdges": 36,
+    "patchedFiles": 21,
+    "dispositions": {
+      "preserve": 203,
+      "parked": 5,
+      "patch": 24,
+      "phase9-row-flip": 1
+    },
+    "parks": {
+      "description-rewrite": 3,
+      "phase9-carry": 2
+    },
+    "leadRulingGaps": [],
+    "acceptance": "AUTHOR only; independent A51 per-set and per-stratum review pending; no self-acceptance."
+  },
+  "checker": {
+    "files": 156,
+    "edges": 1769,
+    "failureCount": 0,
+    "activeFiles": 113,
+    "activeEdges": 1166,
+    "retiredFiles": 43,
+    "retiredEdges": 603,
+    "wave2Files": 60,
+    "wave2Edges": 331
+  },
+  "sourceScans": 156,
+  "locatorReviewFlags": {
+    "inherited": 4,
+    "newWave2": 0
+  },
+  "probes": {
+    "inherited": [
+      87,
+      23,
+      25
+    ],
+    "new": 16,
+    "total": 151,
+    "allRejected": true,
+    "casesRemoved": 0
+  },
+  "lightTests": {
+    "tests": 95,
+    "pass": 95,
+    "fail": 0,
+    "skipped": 0,
+    "log": "step-03-wave2-light-tests.log"
+  },
+  "review": {
+    "selectedFiles": 13,
+    "edges": 60,
+    "parts": 3,
+    "patchedAndMandatoryDistinct": 7,
+    "unpatchedSelected": 6,
+    "started": 0,
+    "accepted": 0,
+    "perSet": [
+      {
+        "set": "batch-034",
+        "allFiles": 9,
+        "retiringFiles": 9,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "selectedFileDenominator": 0,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 0,
+          "seededSample": 0,
+          "mandatoryUnionSelected": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 0,
+          "sample": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      },
+      {
+        "set": "batch-035",
+        "allFiles": 1,
+        "retiringFiles": 1,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 0,
+        "unpatchedSample": 0,
+        "distinctSelected": 0,
+        "selectedFileDenominator": 0,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 0,
+          "seededSample": 0,
+          "mandatoryUnionSelected": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 0,
+          "sample": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      },
+      {
+        "set": "batch-036",
+        "allFiles": 15,
+        "retiringFiles": 0,
+        "patchedPopulation": 1,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 13,
+        "unpatchedSample": 2,
+        "distinctSelected": 3,
+        "selectedFileDenominator": 3,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 1,
+          "seededSample": 1,
+          "mandatoryUnionSelected": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 13,
+          "sample": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      },
+      {
+        "set": "batch-037",
+        "allFiles": 17,
+        "retiringFiles": 0,
+        "patchedPopulation": 5,
+        "patchedSeedSample": 1,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 1,
+        "unpatchedEligiblePopulation": 10,
+        "unpatchedSample": 2,
+        "distinctSelected": 3,
+        "selectedFileDenominator": 3,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 5,
+          "seededSample": 1,
+          "mandatoryUnionSelected": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 10,
+          "sample": 2,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      },
+      {
+        "set": "batch-038",
+        "allFiles": 17,
+        "retiringFiles": 0,
+        "patchedPopulation": 15,
+        "patchedSeedSample": 3,
+        "mandatoryFiles": 3,
+        "patchedAndMandatoryDistinct": 5,
+        "unpatchedEligiblePopulation": 2,
+        "unpatchedSample": 1,
+        "distinctSelected": 6,
+        "selectedFileDenominator": 6,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 15,
+          "seededSample": 3,
+          "mandatoryUnionSelected": 5,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 2,
+          "sample": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      },
+      {
+        "set": "batch-039",
+        "allFiles": 1,
+        "retiringFiles": 0,
+        "patchedPopulation": 0,
+        "patchedSeedSample": 0,
+        "mandatoryFiles": 0,
+        "patchedAndMandatoryDistinct": 0,
+        "unpatchedEligiblePopulation": 1,
+        "unpatchedSample": 1,
+        "distinctSelected": 1,
+        "selectedFileDenominator": 1,
+        "reviewedFileDenominator": 0,
+        "reviewedFiles": 0,
+        "patchedStratum": {
+          "population": 0,
+          "seededSample": 0,
+          "mandatoryUnionSelected": 0,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "unpatchedStratum": {
+          "eligiblePopulation": 1,
+          "sample": 1,
+          "reviewedDenominator": 0,
+          "reworkNumerator": "pending"
+        },
+        "reworkNumerator": "pending independent review",
+        "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+      }
+    ]
+  },
+  "protectedManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "f0c394d25bf32fe3fbb2f1bcdf501b9c6251a6519ea93fa6cf7f369f622e92c0",
+      "byteIdenticalToInputHEAD": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "8dced695a951c307b00363b9f86e8934c51ef9767e3e40e33bc6fdc9a0b9483c",
+      "byteIdenticalToInputHEAD": true
+    }
+  ],
+  "checks": {
+    "pythonSyntax": true,
+    "jsonAndJsonlSyntax": true,
+    "scopeOnly": true,
+    "gitDiffCheck": true,
+    "artifactWhitespace": true,
+    "partBounds": true,
+    "reviewMembershipUnique": true,
+    "noExistingCloseoutOutcomesChanged": true
+  },
+  "commands": "step-03-wave2-check-commands.json",
+  "priorArt": "Extended existing scan_candidates/reference_roots, source-computed units, resolver and list-doc-anchors API; git log -S reference_roots shows 566ba1c7f and 6f3e4f712. No replacement resolver, slugger or runtime mechanism. Newly authored retired sets have no pre-ruling added-id corpus, verified by committed tree listing; existing sets retain their complete pre-ruling supplemental coverage.",
+  "leadRulingGaps": [],
+  "needsWrites": [],
+  "limits": [
+    "Independent semantic review and actual runner-commit accounting remain Lead-owned.",
+    "No consumer patch applied; no authority flip or Phase 9 authorization.",
+    "Full runtime/reproduction suites not run for plan-local records/checker-only changes.",
+    "Preview deferred under the record-only write boundary; fgOS CLI and service startup were not used."
+  ],
+  "artifactSha256": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md": "590ca4330eee11f0cf569ed132db9dc4875068e0ee51192ea1a675cb3a897818",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py": "824cc08f0696e5cf3027fbb3ff6b00932b66209020346e7217ad2ef2692eb9a9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl": "0fff96797ff76635298605ff6f04c3061b8e891deb050739be7270d41236d54e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl": "615957eec0da3e803cd1dad8991be1995a2ecb0e1b73f6fce0b195b3490a6c5a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl": "cee06ea383d9c7a40dfa69df957759e7ca3a862b31900a5387ae9cfbe860a2fc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl": "1452b945ae1220dbbc2c09d98fd62611d9475e472f313dbe96cf05167be551d2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl": "a8ee5791cdbb7242ae51ed2bafcbc0c9d2d39c528e977b8ebc4814ed65d5c671",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl": "05624fe88c84daae563059062b080e215acb9d59516d98c0348ab41d127c06a0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl": "34fe3b7e2c9a0e9a660e3be8a15efabb24cf8ef6833538bd0507e34b6db62421",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl": "e25a051466c6be45b124fe00f8215a4eff8ffad714b0d671e0e1b705361a81fa",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py": "01a25ad418348c89f0551e7768d437e890f6b2b4222760a6c4304439bb3c0586",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-closeout-manifest.json": "3fcb58f9a66f66df5ceafdfa84d6b2bc44d7381a02fa355fc6068f74ab7066a9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl": "cd37f836e0fec68463bb2ea62811d5a2b15d12f2a20e6f94911dbd307c18dc12",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl": "620ce4991ca54271384e377a0e3611c72c3d31e2e312c9223b85f777183eae5b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl": "7c569797b48f9feb9de342809f2385faffb44a187a146ed0c38c57d2e41f8bdc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout-check-result.json": "70f24f8f685db5e1f1adcff0e6693a36fb39f79ade0983ed211c797496e507b9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout-manifest.json": "aa8d7e63694d7751dbe1e8e263180fce8ce95127f511c55509db37899f4ca437",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout.json": "a7b404ec85851777ea3784e8301dfa9d46c9ad2418f0d3bad66a67a7f43552b3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout.py": "41fee1056ff472b45068f90edb7485b5812c3ebcb6515c3d09a29f133dc3f046",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-L12-35-probes-result.json": "acea9071b3c749f9aab5a00ea7be59c211176725acec07150181523c0e7dfb25",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-author.py": "27697b603fa12eca191f7ab2c20358795c92458ec4ec2ff0e9bd34da7fca5191",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check-commands.json": "d2926da88c7b08cdc6d4ab0194cc6cd1c2ccfe57b005d210984e688dac8d74c0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check-result.json": "9b651c663940a510e04f29fab568fc0c2bf5f81e85053d689c21448c1bb1e30e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check.py": "b62199f6a351752cc139de6f18b2dd9460366cab90df80d63b3d62de09921aea",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-generated-surfaces.json": "7bb1ef43baed05ad4fcaaac1275008c5c828c224bdd25f66fc68233defabf35f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-inherited-probe-replay.json": "013ef3786fc065595178eb75e1eb820b1597d75f615a7590bb37108bff36e42a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-inherited-probes-result.json": "332066f88081d919e74382ba363b9e5663d67f5af0c6bebcddc01deb8593a1f7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-light-tests.log": "2b7efaada85f80bf0ab447b8841d84a768bbcd5f630b8f9c7241f1fadedc9939",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-manifest.json": "8b5e44fbe57fc868c2521930d45a3942ae9fb8c076d09b89cfd2786f348022d6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-packet.py": "d0b0c49d79c860d2afdcba57d0eaa44fe954a30bad0ab461f584221face3bc20",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-population.json": "713e3757840b32d93419cd319d80492163cd83b6527e99e58650eaf6d0a758a8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-prior-wave-probes-result.json": "dca387da6d19c6d5fd5e98850107e4e2259dbbb4fd11537797a17450f3cd5d19",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes-result.json": "59674ea194a044793e64d21a24e548f1dcde968707b86c76c3fc9b4cdec53b36",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py": "5fdbe396d8099c51ad719348f95333656906ed234e162c996428f7e03684b00c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-review-index.json": "5762533f588a4f9d61d0e0a745a38180537392003e04ee1537dfb30b18ae0a11",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-review-request.md": "9dfc70d874f66ee78b5f9b283546ed538c2ae708594f1a0fdb216758b0425ad8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-whole-file-reads.json": "ae6c0bfbfbc57f0773f0178fd1a406dd9af10d868b1d79ca3791d22ef321179d"
+  }
+}

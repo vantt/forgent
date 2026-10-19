@@ -1,0 +1,1432 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/architect/agent-coordination/playbooks/README.md",
+      "set": "batch-034",
+      "sourceBytes": 3837,
+      "digest": "a24fbe9f9cb3b93524206888c25fde6afed98a6d4ce26025a57b403ea835a965",
+      "inventoryFileDigest": "a24fbe9f9cb3b93524206888c25fde6afed98a6d4ce26025a57b403ea835a965",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c14805fd6b076f743f151112d9b9b6424683efbc460d5a498a1b375a1a477fb2",
+      "recordBytes": 1071,
+      "retiresWithTree": true,
+      "edgeCount": 4,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-034",
+      "sourceBytes": 39387,
+      "digest": "0a706b04e4754589f8ed7ff20bd5fd51378a582b92320ba5a15abb1dbcfa3b7e",
+      "inventoryFileDigest": "0a706b04e4754589f8ed7ff20bd5fd51378a582b92320ba5a15abb1dbcfa3b7e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ee4cd1b57a52781af6998fce424470f1b557ae1a1b7e4e92513e2b401e16f6d5",
+      "recordBytes": 1135,
+      "retiresWithTree": true,
+      "edgeCount": 5,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-034",
+      "sourceBytes": 20030,
+      "digest": "934897196984ecf980c50414395565f9fc3373d46c7b744f651c5ff860ace6ca",
+      "inventoryFileDigest": "934897196984ecf980c50414395565f9fc3373d46c7b744f651c5ff860ace6ca",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6d8a20733a458187e1ada547fed8f380d2ff87a242c602ae72c8b4345e4dd10b",
+      "recordBytes": 1014,
+      "retiresWithTree": true,
+      "edgeCount": 1,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-034",
+      "sourceBytes": 84699,
+      "digest": "d2515c8a298e1ac27c066aad8463773615176448c712666157495fd1732385eb",
+      "inventoryFileDigest": "d2515c8a298e1ac27c066aad8463773615176448c712666157495fd1732385eb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2bc07d5e066c92e8593b3068538eb5e9ca9b217858510722c6f80daacef86b00",
+      "recordBytes": 1130,
+      "retiresWithTree": true,
+      "edgeCount": 5,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "set": "batch-034",
+      "sourceBytes": 15395,
+      "digest": "56815ce373a3293a5c2a701460ea8c398962baee54aec2d77d79db529ef81711",
+      "inventoryFileDigest": "56815ce373a3293a5c2a701460ea8c398962baee54aec2d77d79db529ef81711",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "57abf3306010a74e0aafcafe8e0a7ffdaa3b05b4d542aa48df750ff8e586da9f",
+      "recordBytes": 1185,
+      "retiresWithTree": true,
+      "edgeCount": 7,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "set": "batch-034",
+      "sourceBytes": 19933,
+      "digest": "cec6a8c293a6efca3221eb60d6c6c03717538a7a1b3b9aaa17269a30a58a9acd",
+      "inventoryFileDigest": "cec6a8c293a6efca3221eb60d6c6c03717538a7a1b3b9aaa17269a30a58a9acd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1a417765be2a33b48afd2fe8919d420540e70f5e54f7f45d62a5c393c5a190fc",
+      "recordBytes": 1595,
+      "retiresWithTree": true,
+      "edgeCount": 21,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-034",
+      "sourceBytes": 46639,
+      "digest": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "inventoryFileDigest": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "133ff381e8cb0b32ef870967390c16c4e6272f82608f3904fcd9c5d8eda6914b",
+      "recordBytes": 1286,
+      "retiresWithTree": true,
+      "edgeCount": 10,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "set": "batch-034",
+      "sourceBytes": 27337,
+      "digest": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "inventoryFileDigest": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ecc3949e286a3c4ecc6f6e6fcc473160528f4978ccbbb328c850087f8a3bd04d",
+      "recordBytes": 1211,
+      "retiresWithTree": true,
+      "edgeCount": 8,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "set": "batch-034",
+      "sourceBytes": 21960,
+      "digest": "cd1c0a2b56fe50cd89294f9b96a05f5576946cdcd4d2be9ba5285217a8b805db",
+      "inventoryFileDigest": "cd1c0a2b56fe50cd89294f9b96a05f5576946cdcd4d2be9ba5285217a8b805db",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8e86c0436f3b83d07023aa808763b91918465572ef2daa6294af6aaaf534cffe",
+      "recordBytes": 1556,
+      "retiresWithTree": true,
+      "edgeCount": 19,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "set": "batch-035",
+      "sourceBytes": 7380,
+      "digest": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "inventoryFileDigest": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a",
+      "recordBytes": 1503,
+      "retiresWithTree": true,
+      "edgeCount": 18,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+      "set": "batch-036",
+      "sourceBytes": 1580,
+      "digest": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "inventoryFileDigest": "eddbb6e7a0da51c5472b172ef7f3eb6c05e77752d063cf9ae06f0967dbbbc489",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "84711ce6af73b609fc5c157644ce280f2e8da86074adb5225323828bea34f222",
+      "recordBytes": 951,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "set": "batch-036",
+      "sourceBytes": 2545,
+      "digest": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "inventoryFileDigest": "2cd0c4d6ede6c9fdc20c2132ee8fa542107766e2ecabf5bd5466d74bc5a17c76",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2c856baba4fcbccf59249501634eb6ccd27ea352d570e45df77562dfd3c64b15",
+      "recordBytes": 2375,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+      "set": "batch-036",
+      "sourceBytes": 2719,
+      "digest": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "inventoryFileDigest": "122c61cbf9a0c10b562a00fc2539afde000d1c23d5de9e164f7a5fbe44c740f7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f0a478d18d24a390d0c547ff27ce4a4947f3907d6b98bfcf5c2a39febdbbc400",
+      "recordBytes": 4514,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+      "set": "batch-036",
+      "sourceBytes": 738,
+      "digest": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "inventoryFileDigest": "593cf366987f856c3fd6718d43cdcf7ff5dc7d9b9f7e69beeb10804e1e95e719",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0bcb306590e81549ec8722bde2911ec84c31e868953d4796bf1d1eca311e7fbb",
+      "recordBytes": 1724,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-design.md",
+      "set": "batch-036",
+      "sourceBytes": 5502,
+      "digest": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "inventoryFileDigest": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d4f4887472c3c1c8dcc72c670a676b13560dc64e909a4cb3573b68457ce983b3",
+      "recordBytes": 12619,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+      "set": "batch-036",
+      "sourceBytes": 515,
+      "digest": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "inventoryFileDigest": "d37a53512d246177243029f0f4829cba12a71e7d34a855f92c4689fcc50471d4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "311df41728007cb423f56011ae1888519f0f77980f1db6a4d971e6cb2394caac",
+      "recordBytes": 1726,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+      "set": "batch-036",
+      "sourceBytes": 861,
+      "digest": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "inventoryFileDigest": "afa7ba9292e12ae393819018fa859dac67da862ea0c7bcf6111eacc9ce812954",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "20f35f3b8091389600ef3f163ecff59f9afbc369ea727a1391e3697454aef2c4",
+      "recordBytes": 1726,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+      "set": "batch-036",
+      "sourceBytes": 512,
+      "digest": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "inventoryFileDigest": "fe07afa679a759556ce6abb79723f80bb02315164efe1debdf439940738e957d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fbead99365c525c519688deb6036bbd34a1b661c2515fef1bc8f793bbcc8e318",
+      "recordBytes": 1725,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+      "set": "batch-036",
+      "sourceBytes": 518,
+      "digest": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "inventoryFileDigest": "e2654b651b4d3fb1238a5333391b77666b41e083b15426c01b782c68114ad945",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "85cbd82a6712ea7b7579e33ccf3d3cf84531076979efe3caa4d381eef4036e44",
+      "recordBytes": 1727,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+      "set": "batch-036",
+      "sourceBytes": 707,
+      "digest": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "inventoryFileDigest": "9823a33254982394b326f9bba292783e365c2ca4ccfb04d392fdf9d9b3386d02",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6b7a00f626907bda90a96f1d8520e198da5f885819472f43c8393a15cc737432",
+      "recordBytes": 1716,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+      "set": "batch-036",
+      "sourceBytes": 772,
+      "digest": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "inventoryFileDigest": "73c23f14087484fa130d9b9a1a126258de107130886908e1f5bab82f1e88bcf1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ea801aedf43f49dced600f434395179817ce0a14f98cac2b532e18c48b7be02c",
+      "recordBytes": 1715,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+      "set": "batch-036",
+      "sourceBytes": 784,
+      "digest": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "inventoryFileDigest": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "eb30c9931a177e7596e93851b29e1386591c125d37de684f31d57defef7e53fa",
+      "recordBytes": 1729,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+      "set": "batch-036",
+      "sourceBytes": 1304,
+      "digest": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "inventoryFileDigest": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9e4a2ab2c9e52991d8bbd2bc2952ef79c640bd1680828dcf799b24f0ec34b103",
+      "recordBytes": 1716,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "set": "batch-036",
+      "sourceBytes": 3970,
+      "digest": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "inventoryFileDigest": "da3210f32714aa276d16703851df47c67ed56921acc4e3dc27904c466df5dc95",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a512b9eb82138428428d7cd2091d9d92170b7888e3366ea36a8c8a1a6f62b0f9",
+      "recordBytes": 1765,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "set": "batch-036",
+      "sourceBytes": 3856,
+      "digest": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "inventoryFileDigest": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+      "diffSha256": "72819ee4a0a77cff05dd8c333f40005bd459512919def243d139e9b852a9f638",
+      "recordSha256": "98968f0ce59e2b6e77ceb505ba47821a8bce76efca7416912610c5bb85c4cc5e",
+      "recordBytes": 14204,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+      "set": "batch-037",
+      "sourceBytes": 6341,
+      "digest": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "inventoryFileDigest": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+      "diffSha256": "cf8dfbd8437522e4855a3f065b2acb079bd156690683da54c44738fca96f72fb",
+      "recordSha256": "163b0a703cf97494ef86743bf9ed9f41fcd99343a7fd2a3719f3d3e84b6a91d7",
+      "recordBytes": 14004,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+      "set": "batch-037",
+      "sourceBytes": 4071,
+      "digest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "inventoryFileDigest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "27e5341402b694db875eb3a63755887fa37fe24fd7f16381b396187993dfefd9",
+      "recordBytes": 1786,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+      "set": "batch-037",
+      "sourceBytes": 3654,
+      "digest": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "inventoryFileDigest": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+      "diffSha256": "5b4f61fd45535321555f3c9ca5fbbd20370c16126520e177e3e976f2c047334a",
+      "recordSha256": "293958847ac477ce969e30264180db88d0b7d6788115b6d33299d712040b0661",
+      "recordBytes": 20042,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "set": "batch-037",
+      "sourceBytes": 3326,
+      "digest": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "inventoryFileDigest": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b4211f947375eeaa0c154060c51fda2ff44c5adc07262bde04de575cc285438a",
+      "recordBytes": 1820,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "set": "batch-037",
+      "sourceBytes": 7895,
+      "digest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "inventoryFileDigest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "diffSha256": "67d894e09d533fe3dfdfba36a953bb38e3793ab94951230e6df11a3c5bc3e84d",
+      "recordSha256": "a368667256d7cf9bad6636ae94293b210e7dd9c56df58127ae8ab2b88e8e77c0",
+      "recordBytes": 27930,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "set": "batch-037",
+      "sourceBytes": 9211,
+      "digest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "inventoryFileDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6cb9f4544a06d6f89a9d0774963553204f3465baa493953daf0916e49ea603c4",
+      "recordBytes": 3618,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+      "set": "batch-037",
+      "sourceBytes": 5393,
+      "digest": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "inventoryFileDigest": "4f1b08ebaa9230ac933d8fabfedf4621eb7d1259a9f8aa9d1a0716dc4f294ce9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e3076ea52193a722fe0a9af39b55ae35923579deb36e5e046ac34434afd5f026",
+      "recordBytes": 2660,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+      "set": "batch-037",
+      "sourceBytes": 6262,
+      "digest": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "inventoryFileDigest": "642ca7d4d67b99d1fa678f59b050f8b9cbb73f2a04431e1f58d3639da0311515",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4577e17fa1527fc0ecaf66cda53adf582677f1f1906488b6db4407525bfa7f2d",
+      "recordBytes": 2551,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+      "set": "batch-037",
+      "sourceBytes": 4854,
+      "digest": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "inventoryFileDigest": "b78e93f829bb71e075dcb12302b4740e7ee6fc545c30d1213d3ef21cfc6b910c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "478ccf696369388f70376779d0c0754dd7105991924f7b0d0f71aeea04915776",
+      "recordBytes": 3465,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+      "set": "batch-037",
+      "sourceBytes": 4062,
+      "digest": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "inventoryFileDigest": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+      "diffSha256": "2e3df9d92c8fda06bbed2fc8790db0373faff240aa0c385d47bfaf1f9a83d008",
+      "recordSha256": "27265d67cc4be2abab2971b4bf88250c5acd41e93efb4ad9c3c95fbe4301229a",
+      "recordBytes": 12274,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+      "set": "batch-037",
+      "sourceBytes": 4279,
+      "digest": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+      "inventoryFileDigest": "44bb30bf4001f3b2c29cefef297608514ed1cf5308abba8d9c75645674e8df16",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "81cd9bb87a1fca8a223de2e737fc38540081ca0466abbcbb78f8e96322876614",
+      "recordBytes": 1033,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+      "set": "batch-037",
+      "sourceBytes": 9021,
+      "digest": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "inventoryFileDigest": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+      "diffSha256": "6abda6321a9e22e8b9d9babbbd63d27bd4847cd155e3102206621c166c0baa4d",
+      "recordSha256": "26dc6c243d74de897f316d6d17a8fd4d72593cb0fe13e3c92a0fcfc0866197df",
+      "recordBytes": 21930,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+      "set": "batch-037",
+      "sourceBytes": 1960,
+      "digest": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+      "inventoryFileDigest": "ed4e14f7288f623c2580b62fd0956658bc8a37b57f33c03dfe2a05f49ae2fc7b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ea01bd3ab423766211c28d56601fd7e050c5c3857f5d42f1b8f22478810710d2",
+      "recordBytes": 6753,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+      "set": "batch-037",
+      "sourceBytes": 6139,
+      "digest": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "inventoryFileDigest": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0c3336fdb1fe8adf7229ee117449af807864abc8f66c12e668ab1ff448d89c93",
+      "recordBytes": 6598,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+      "set": "batch-037",
+      "sourceBytes": 3385,
+      "digest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "inventoryFileDigest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4e3bacd91d6369024d783b8f3ba604ec89db75d8e5d98eecdcfe30615a9f7283",
+      "recordBytes": 4084,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+      "set": "batch-037",
+      "sourceBytes": 5089,
+      "digest": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "inventoryFileDigest": "2e12aa1132327294aa2b7b064afa8c4693923fe8ebd435f713e0bc83b0945735",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "80de6f2f47455c9d38a1317cffbbe94b60afc7c629c5e631856637e51e881f64",
+      "recordBytes": 5295,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+      "set": "batch-037",
+      "sourceBytes": 3343,
+      "digest": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "inventoryFileDigest": "76244abf2826654ecef1b623ef12b7f730d84fc0a618d43ce7e667b031af657f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "746aba9b8f7a1767d33946031b1ffa2e30ad7778c1a4eb152c86a8e2c03ca7e1",
+      "recordBytes": 1054,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "set": "batch-038",
+      "sourceBytes": 8893,
+      "digest": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "inventoryFileDigest": "90f07b2fe30267ed4b0d86dfa7d1d38e69b62dcfe81195f05dcf4e1c17e66279",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1c459e995466ae6de6e55e362d3f64f3d9a1dd9414a224e6fcb6a8a12bb6e98c",
+      "recordBytes": 23970,
+      "retiresWithTree": false,
+      "edgeCount": 21,
+      "dispositions": {
+        "preserve": 20,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "set": "batch-038",
+      "sourceBytes": 6536,
+      "digest": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "inventoryFileDigest": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+      "diffSha256": "3ac3f1833c4fec281b664acd666da214dc63d344aa07a14d248f2eb7e65d7065",
+      "recordSha256": "8075f6a6033fb70fb716107db643eb1d43f0a37a9805eb309f6322c1a2de0272",
+      "recordBytes": 15160,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "sourceBytes": 41907,
+      "digest": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "inventoryFileDigest": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+      "diffSha256": "bd5a183ececd9dc3205a768297fbfd0dfd23a4d63f976fdbd8d4e7c5f76c27fe",
+      "recordSha256": "b407d4e801e41b6289b701d5907713fae0881d5e054da2adb8f90dac7c9ec522",
+      "recordBytes": 30924,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "sourceBytes": 22380,
+      "digest": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "inventoryFileDigest": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+      "diffSha256": "38537f3eae16f21a6792dcd0d6cfdbfa386df36c882922c7d0a3cab6073819b7",
+      "recordSha256": "faf241b60e21baa101d505dc75fa988ec97f84bbdc2c2bd4dc8df473331ca0ac",
+      "recordBytes": 19252,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "sourceBytes": 87296,
+      "digest": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "inventoryFileDigest": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+      "diffSha256": "a0828fd95b9a3ecd4fb8e595081be2bde34e4ceb679734fee25a911ec7a78d37",
+      "recordSha256": "96d47e7e2df7d041bde4c5872736599f720970825e01abc3c17e992f01f7b5ac",
+      "recordBytes": 24411,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "sourceBytes": 17757,
+      "digest": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "inventoryFileDigest": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+      "diffSha256": "84a69c84888f0272724f5ee39c10ca03f2a61f513629e7878cc0e65d48a2bb6f",
+      "recordSha256": "02d0447a936ad19839f52d4374daaae484340ccac0780039f0c3c611dbd6f6ff",
+      "recordBytes": 22060,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "set": "batch-038",
+      "sourceBytes": 22346,
+      "digest": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "inventoryFileDigest": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+      "diffSha256": "fc731992e3e2f095c074272ba9f96b31f062f0555e762323a056595ea9aca6b5",
+      "recordSha256": "31da0e3959b1b65c591bea28326a0f34b02674c0fcb31df67485ceab1e581751",
+      "recordBytes": 39192,
+      "retiresWithTree": false,
+      "edgeCount": 25,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 24
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "sourceBytes": 127583,
+      "digest": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "inventoryFileDigest": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+      "diffSha256": "d11cb66dcbfd740b977a939555262f5b67b3ebd7737d72b8e0bcf50607e7e9ec",
+      "recordSha256": "adf74c31f52b01bf8e309d7f5269efc5d8c03fed7f859a2146a0d839f2b5b4e2",
+      "recordBytes": 74912,
+      "retiresWithTree": false,
+      "edgeCount": 19,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 18
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "set": "batch-038",
+      "sourceBytes": 29605,
+      "digest": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "inventoryFileDigest": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+      "diffSha256": "b7cbc7e8d1829a565223b352adea5374ed7cace4c2912b31f860a693050501ae",
+      "recordSha256": "caa960f8368421c54f09e17d76d4ccee969d9dc7f05c4ebc1b9b1ecd52f4e4bc",
+      "recordBytes": 19997,
+      "retiresWithTree": false,
+      "edgeCount": 12,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 11
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "set": "batch-038",
+      "sourceBytes": 24207,
+      "digest": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "inventoryFileDigest": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+      "diffSha256": "c38d17a7370804474f3a251405210600041d1f9085af4e9a922a6feef4c0f986",
+      "recordSha256": "d336f014c051bc2feab2b8fdf94947282b3b60fed040f7c2d9d769bcfd44aee1",
+      "recordBytes": 20305,
+      "retiresWithTree": false,
+      "edgeCount": 23,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 22
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/README.md",
+      "set": "batch-038",
+      "sourceBytes": 5563,
+      "digest": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "inventoryFileDigest": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+      "diffSha256": "82f0e765cc5ab5776832a32bb28463813349e5aef14c1db9331514538a29575f",
+      "recordSha256": "4b6351086d7c72f27d2bbddebddadca9d6f55e42d3e7374be5e1b3ca2dadd0a5",
+      "recordBytes": 11388,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "set": "batch-038",
+      "sourceBytes": 45289,
+      "digest": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "inventoryFileDigest": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+      "diffSha256": "435a1ecd34e7bc43b139e39282c22091b2e6ad040aa50e361f5223e9e90e4638",
+      "recordSha256": "27e3407ff111703a82091174677bb29d8390b96aacac67e18eb8e4eeb27ed11a",
+      "recordBytes": 19135,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "set": "batch-038",
+      "sourceBytes": 21840,
+      "digest": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "inventoryFileDigest": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+      "diffSha256": "6c3a2c080e17fa4993238c9ec69bb3dcee42c96b58fdfd3e3bd9ff675b1eaa00",
+      "recordSha256": "fe927a6ba976e74c55513195a4c630f2a92bbab860688c5608116863f8daae4b",
+      "recordBytes": 9320,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "set": "batch-038",
+      "sourceBytes": 82161,
+      "digest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "inventoryFileDigest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+      "diffSha256": "f490684095f91a0563612242920407fd4bae102636a71cc89acc90c68edacf21",
+      "recordSha256": "6f95cb00cb7261a8e564d1882556ac584fa819666b5796058af3accf4f8ef2dd",
+      "recordBytes": 13016,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "set": "batch-038",
+      "sourceBytes": 16287,
+      "digest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "inventoryFileDigest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "diffSha256": "91c6fe1f5655a10ce0f39f1fe10c0781f3c4185c41044a96ffc9d8c7c29dca02",
+      "recordSha256": "7649e6bce5d08101972b53e2cc8b242ff68506d74d3ac66fdc56a6cb52810972",
+      "recordBytes": 15551,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "set": "batch-038",
+      "sourceBytes": 3669,
+      "digest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "inventoryFileDigest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0146d0e3e7288b05aef2dc9970d5971d8bd222d4651710557bf75338a5f646f2",
+      "recordBytes": 3495,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "set": "batch-038",
+      "sourceBytes": 27675,
+      "digest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "inventoryFileDigest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "diffSha256": "17f1cc1937c0b225eb09b19ae8530557ff2e4c0dd8afd761b63f5a845ec58506",
+      "recordSha256": "7e810977cd53e15182a563d89173d0906927addac8cf112fffbcea9370530017",
+      "recordBytes": 13397,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "set": "batch-039",
+      "sourceBytes": 11957,
+      "digest": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "inventoryFileDigest": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d",
+      "recordBytes": 4066,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "parked": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-034",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000034",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [],
+      "dispositions": {}
+    },
+    {
+      "set": "batch-035",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000035",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [],
+      "dispositions": {}
+    },
+    {
+      "set": "batch-036",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000036",
+      "population": [
+        "docs/explanation/worker-prompt-iron-law-evidence-timing.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+          "rankHash": "cfeddd2c048a4351c32322a01726b505e082bcc7cf7514c02fde75c73e33ae6b"
+        }
+      ],
+      "sample": [
+        "docs/explanation/worker-prompt-iron-law-evidence-timing.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/explanation/worker-prompt-iron-law-evidence-timing.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
+        "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+        "docs/explanation/dispatch-execute-prompt-file-flag.md",
+        "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+        "docs/explanation/skill-prose-cleanup-design.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+        "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+        "docs/explanation/skill-prose-cleanup-merge-loop.md",
+        "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+        "docs/explanation/worker-prompt-inline-completion-signal.md",
+        "docs/explanation/worker-prompt-iron-law-evidence-timing.md"
+      ],
+      "dispositions": {
+        "preserve": 25,
+        "parked": 1,
+        "patch": 1
+      }
+    },
+    {
+      "set": "batch-037",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000037",
+      "population": [
+        "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+        "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+        "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+        "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+        "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md"
+      ],
+      "populationCount": 5,
+      "ranks": [
+        {
+          "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+          "rankHash": "5fbf282f4b2cc5275268714b7998c6f8032383594098ad04a640a5bc0fc0fe7b"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+          "rankHash": "765f32e1acd59b350b3806a9b8bb8c0914518d8de8c7facc17fef2e7de09f761"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+          "rankHash": "9460eea1a34f279ecee16336727b370cabb14bc00164f909f0e5c5e595c4f6c5"
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+          "rankHash": "ca2a64ed6e450b072da457e008e04ead4833966cad8d0584a37d5861d56ba531"
+        },
+        {
+          "file": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+          "rankHash": "e69a2adbd68d9b0ee6eea454f8c76152dd6e54919bc9107a5fc4c9f6b6b89f05"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+        "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+        "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+        "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+        "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+        "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+        "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+        "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+        "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+        "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+        "docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+        "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+        "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+        "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+        "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+        "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+        "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md"
+      ],
+      "dispositions": {
+        "preserve": 31,
+        "patch": 8,
+        "parked": 2
+      }
+    },
+    {
+      "set": "batch-038",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000038",
+      "population": [
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "docs/platform/agent-coordination/playbooks/README.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+        "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md"
+      ],
+      "populationCount": 15,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "rankHash": "16afd2be157e53b0eec80e21ef61858e5ba0d8a9dd75fee9da0b6cf211f671f9"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "rankHash": "240f27004ad14462d4cf452564da8379ca36b8d1fdf9c66744fdd968fd990a8d"
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+          "rankHash": "2c7b7e78b69216c5611a356ed499a9dd32f29bc92f11bd0ce843c54c4d2e8cb7"
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+          "rankHash": "2dd43119f84b6150e403b6de5e44bdaa196671f913c9e132cab5a2da047590ae"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "rankHash": "3b1cd4e76bbec5b5da3866a622928fe61dc80e4e28411b703933f0698a2544a1"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+          "rankHash": "4f90749153e6c38d0e8e767b7236545b9aa848e04d8d0a9ca230a07c9d390d48"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "rankHash": "62888bc0c6332f82b4e0cae466729b406674e79c9c7e73bd136dc38346118a6a"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "rankHash": "64097b2a9156002dedb98bccb36dd34a4accaed57395f4797d1a97c5ffad21ff"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+          "rankHash": "66bf676cdd7a5275edfcc99029fe9a7c8d2998cccaa58d7fa4b8325e86e11427"
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/README.md",
+          "rankHash": "7bfd49360e88a139a6dc775a665ac693d913230ab39a1736da2a984b06ae159f"
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+          "rankHash": "7f11f517d9d79c505acd15cde407bb988e24939039e31560834c224f6661daa6"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "rankHash": "91ca6fe0f9d0fed997a97ddd9cfcfd91a8acba9bb4b6f2aacc97bbf813dad153"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+          "rankHash": "b82c521b2924d55d8bbe874b4e2cd5c8e99bf7910c1c1391154be37af00550de"
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+          "rankHash": "bb44e0deb7cf592ab4fd99ddacef0c8c5f52701bae3b7db093ecfad4b6ec3dc3"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "rankHash": "bcab305c25f1eff15de8fe69169dbf25f48cc8c291ac04b11275d39a73ebc86b"
+        }
+      ],
+      "sample": [
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "bytes": 87296,
+          "edges": 10,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "bytes": 127583,
+          "edges": 19,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "bytes": 82161,
+          "edges": 2,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md"
+      ],
+      "distinctReviewCount": 5,
+      "pilotFullReviewFiles": [
+        "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "docs/platform/agent-coordination/playbooks/README.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+        "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md"
+      ],
+      "dispositions": {
+        "preserve": 147,
+        "parked": 1,
+        "patch": 15,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "set": "batch-039",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000039",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/packaging-distribution/contracts/skill-package-distribution.md"
+      ],
+      "dispositions": {
+        "parked": 1
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "034": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-034",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "035": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-035",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "036": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-036",
+      "population": [
+        "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+        "docs/explanation/dispatch-execute-prompt-file-flag.md",
+        "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+        "docs/explanation/skill-prose-cleanup-design.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+        "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+        "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+        "docs/explanation/skill-prose-cleanup-merge-loop.md",
+        "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+        "docs/explanation/worker-prompt-inline-completion-signal.md"
+      ],
+      "populationCount": 13,
+      "ranks": [
+        {
+          "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+          "rankHash": "1555e3c8f6affc6ef950d2e229c6ef05639a5ac5fbd439b7f8cacf927fb01011"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+          "rankHash": "22edf36dc34065c3a907c90dac6712cbddb7cc7660d60693614259d4be8d3abe"
+        },
+        {
+          "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+          "rankHash": "488abe9df0283d61f43589dc04ff69d32823d4613f0e84d01250d4d4d60771ec"
+        },
+        {
+          "file": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+          "rankHash": "5a3676916476427687b773d8958ce075aed434f27d4f33ee10b52211e4fc13fb"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-design.md",
+          "rankHash": "6f99941697387fbec4721576bed845802e8d88049d8aa6f102dc4d4374025683"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-merge-loop.md",
+          "rankHash": "7f3094886f326dd9672c1880a871b2d877aa31956b5161ab55f4fbd89afdc1bd"
+        },
+        {
+          "file": "docs/explanation/worker-prompt-inline-completion-signal.md",
+          "rankHash": "a3a7489672ccaef42e7298bf86b6657a0997fd1d5efa460c44760d7309209f1c"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
+          "rankHash": "aad63f167158cadf8e96cc9a68e946525099e4e7d9c9d687f872c647f076502c"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md",
+          "rankHash": "c5c8636af9194b3b8ba96344b2426b146aef1ebc52182ecf4750511855da19e5"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-fgos-fanout.md",
+          "rankHash": "ea3f5f48d552811c0b8603cddd82edcb2ead0845b10ab8b7dc4c9d832a271234"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
+          "rankHash": "ef159caa9966532fe7cf8c0f40efa046da1a80410cd675e643cc97065862e4e5"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
+          "rankHash": "f515473e9e5985c148f6d96ec593fdf40a8c30113cf4a0fef3639955555268e9"
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
+          "rankHash": "f90e57fcc8d93ccf1be08414a3b20bfe51b82fa1e9592219225a84aa4ba53e77"
+        }
+      ],
+      "selected": [
+        "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "037": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-037",
+      "population": [
+        "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+        "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+        "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+        "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+        "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+        "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+        "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+        "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+        "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+        "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+          "rankHash": "1085903781b278d3201ea8346b9d634197a7836d3dbf1ab2ae5751171dc1a52f"
+        },
+        {
+          "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+          "rankHash": "1ed9161819885e13faed70823061e43ca764148ea23ff1c172951cd1503dc3c7"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+          "rankHash": "33395e65fec0f096a39dae7669bd53dc8a7d8f78511986540deb007a20ba1484"
+        },
+        {
+          "file": "docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+          "rankHash": "3a13c7e03d78ab3eb620f26ebc297208780682b30fa9ba6e5b4c1ce04527abf6"
+        },
+        {
+          "file": "docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md",
+          "rankHash": "924339a5673a8bc7470b71000536b21b880d606ff4019c09c0d3bf4025525474"
+        },
+        {
+          "file": "docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+          "rankHash": "9fd605a89732ab71dbd8267891b70dfcdbafe8852c67aacc4cc30916bb98f7ad"
+        },
+        {
+          "file": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+          "rankHash": "add0bdfe7f17590b1f8892e6b1239acfe7c353e463dfd80db51f24002b3d3263"
+        },
+        {
+          "file": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+          "rankHash": "b59f545bde07eff937d81bc332e83f0e09b4cf2422281b16e22704871444d73f"
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+          "rankHash": "cf9dae7a438646b8c4baf155f99addaccc7c07d7c57fbe373b2b1a867fe239ab"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "rankHash": "d9f95c3b517c2a0d261c9b7504cd6eb3dfd2fada20f225fa2a5d55ef10737009"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+        "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "038": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-038",
+      "population": [
+        "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "rankHash": "72b12024b09b70b4b5ee5a8bc84737501a2dfb2359355df93b92f6426257b9b5"
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+          "rankHash": "e2240e9724114a6aba16bc0cda05b026d7c4fad9a6073c4836c6ae46d9104c68"
+        }
+      ],
+      "selected": [
+        "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "039": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-039",
+      "population": [
+        "docs/platform/packaging-distribution/contracts/skill-package-distribution.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+          "rankHash": "682914697c215d62714b10a9f7619a3c9d4a14a372ab5aede13baed86dc76885"
+        }
+      ],
+      "selected": [
+        "docs/platform/packaging-distribution/contracts/skill-package-distribution.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl",
+      "sha256": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl",
+      "sha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "sha256": "cd37f836e0fec68463bb2ea62811d5a2b15d12f2a20e6f94911dbd307c18dc12"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "sha256": "620ce4991ca54271384e377a0e3611c72c3d31e2e312c9223b85f777183eae5b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "sha256": "7c569797b48f9feb9de342809f2385faffb44a187a146ed0c38c57d2e41f8bdc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl",
+      "sha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d"
+    }
+  ]
+}

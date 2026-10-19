@@ -1,0 +1,557 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "set": "batch-001",
+      "sourceBytes": 10573,
+      "digest": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "inventoryFileDigest": "2873f7a9a716621c2e9d44164f5a760fad473343ed817138f57a524954447511",
+      "diffSha256": "10bab2761556240b5e97d158065b22cdc9059c0b49a458d964fce60d81cfee34",
+      "recordSha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a",
+      "recordBytes": 32733,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "README.md",
+      "set": "batch-002",
+      "sourceBytes": 8740,
+      "digest": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "inventoryFileDigest": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cf069be89261f70720837192d7710dd74dca087d40c58cb056deb9f003e94100",
+      "recordBytes": 3970,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/doc-governance.md",
+      "set": "batch-002",
+      "sourceBytes": 18420,
+      "digest": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "inventoryFileDigest": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "00feba5108d818708aa554d1694de2ee4d25daa3d8c24022e8f7e23b7e6849d1",
+      "recordBytes": 18813,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "preserve": 8,
+        "parked": 1,
+        "phase9-row-flip": 2
+      }
+    },
+    {
+      "file": "docs/platform-foundations.md",
+      "set": "batch-002",
+      "sourceBytes": 16932,
+      "digest": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+      "inventoryFileDigest": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "02169d1a14a5424706d709fe065c8ff1cca9501ed21e8d1400ebfe2339428b6f",
+      "recordBytes": 6863,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/reading-map.md",
+      "set": "batch-002",
+      "sourceBytes": 35359,
+      "digest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "inventoryFileDigest": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "diffSha256": "d6c68c150d62c16f3934f5a7076ae13542be61cf2885d614217d1cc62470e233",
+      "recordSha256": "b002fc7d999eef471da9383f6b80b17287c0cac79c4e412b6d552370f82338d8",
+      "recordBytes": 1614632,
+      "retiresWithTree": false,
+      "edgeCount": 98,
+      "dispositions": {
+        "preserve": 31,
+        "parked": 30,
+        "phase9-row-flip": 7,
+        "patch": 30
+      }
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "set": "batch-002",
+      "sourceBytes": 7045,
+      "digest": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "inventoryFileDigest": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+      "diffSha256": "89046aa1899e8f70a33ed3662f0fdb21bd7ead91a2fdf1e8439cc0e7b54a617c",
+      "recordSha256": "3251aafb0077da8ca8118f944c52a7f0f9a0fce13cccc26452522ca218a302b8",
+      "recordBytes": 55761,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/specs/confinement-authority.md",
+      "set": "batch-040",
+      "sourceBytes": 95294,
+      "digest": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "inventoryFileDigest": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2a68fd50fd52345b585ff8a067ed5ecc4f5f9548091e6a41070fe1615eafd4dc",
+      "recordBytes": 4615,
+      "retiresWithTree": true,
+      "edgeCount": 10,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "set": "batch-040",
+      "sourceBytes": 6045,
+      "digest": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "inventoryFileDigest": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9c736f71f39605d71245ebd7c33c21c0cfe9739036ddbf7177440cc580eb071e",
+      "recordBytes": 1795,
+      "retiresWithTree": true,
+      "edgeCount": 14,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/distillery.md",
+      "set": "batch-040",
+      "sourceBytes": 7355,
+      "digest": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "inventoryFileDigest": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8ba6d733f738405214d72772f1fa1e0ea74791072c5412bb9334635916e31257",
+      "recordBytes": 890,
+      "retiresWithTree": true,
+      "edgeCount": 3,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/distribution.md",
+      "set": "batch-040",
+      "sourceBytes": 83387,
+      "digest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "inventoryFileDigest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6d964640e78555e6940d0d509a6f254d0b3cf34b2b01707ae02275afbdad0c01",
+      "recordBytes": 2188,
+      "retiresWithTree": true,
+      "edgeCount": 10,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/enduser-docs-authoring.md",
+      "set": "batch-040",
+      "sourceBytes": 8989,
+      "digest": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "inventoryFileDigest": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "80a6f38584347a5f09d182e5776d31adc1f61fa5d030aa86c6bebb2f2c5fef81",
+      "recordBytes": 902,
+      "retiresWithTree": true,
+      "edgeCount": 3,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/enduser-docs-index.md",
+      "set": "batch-040",
+      "sourceBytes": 19960,
+      "digest": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "inventoryFileDigest": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "efc96237da255b37418161f845cdf795b287235ca87a7846bad1c1a747a24e74",
+      "recordBytes": 928,
+      "retiresWithTree": true,
+      "edgeCount": 4,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/fgos-plugin.md",
+      "set": "batch-040",
+      "sourceBytes": 10199,
+      "digest": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "inventoryFileDigest": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "65cfde038c04794097de91eef92111c6b1f059b8509e7b6bddd647353b24bcff",
+      "recordBytes": 891,
+      "retiresWithTree": true,
+      "edgeCount": 3,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/herdr-web-dashboard.md",
+      "set": "batch-040",
+      "sourceBytes": 21374,
+      "digest": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "inventoryFileDigest": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "910c088ed4561205800f3e0347b0a0c8be6cc3207962839f5aa6fa6ae606db63",
+      "recordBytes": 1289,
+      "retiresWithTree": true,
+      "edgeCount": 16,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "set": "batch-040",
+      "sourceBytes": 20737,
+      "digest": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+      "inventoryFileDigest": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fb010c22724fdb3eb75457c2f47cc0e64e428ccc631519e273eb1a4509efe069",
+      "recordBytes": 857,
+      "retiresWithTree": true,
+      "edgeCount": 2,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/platform-foundations.md",
+      "set": "batch-040",
+      "sourceBytes": 41031,
+      "digest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+      "inventoryFileDigest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "40274aa6d5b73c7396a6434c206ca12d3e7856018d77fb653cac2ccd940b938f",
+      "recordBytes": 1500,
+      "retiresWithTree": true,
+      "edgeCount": 23,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "set": "batch-040",
+      "sourceBytes": 35721,
+      "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+      "inventoryFileDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+      "diffSha256": "0b9898ada8d6b54d1a39bfd65641deea4c35ac7b99711699750c1753b5c81e29",
+      "recordSha256": "65086087ec6986f61cefa72e00f8b93b0bf2651c717614a9fbaa2cad68961d66",
+      "recordBytes": 1899455,
+      "retiresWithTree": false,
+      "edgeCount": 91,
+      "dispositions": {
+        "phase9-row-flip": 3,
+        "preserve": 24,
+        "parked": 33,
+        "patch": 31
+      }
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "set": "batch-041",
+      "sourceBytes": 635616,
+      "digest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+      "inventoryFileDigest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b53ff3a8185a9df087f0d47f9ed8df63208e5295caa63be2727d643426a109bc",
+      "recordBytes": 14590,
+      "retiresWithTree": true,
+      "edgeCount": 131,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/system-overview.md",
+      "set": "batch-041",
+      "sourceBytes": 18940,
+      "digest": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "inventoryFileDigest": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7fd5ab1785159fb75f651e7b3505ed128bebb5311482abcb8271d3db5f9b1eaa",
+      "recordBytes": 7666,
+      "retiresWithTree": true,
+      "edgeCount": 19,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "set": "batch-041",
+      "sourceBytes": 327843,
+      "digest": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "inventoryFileDigest": "499ec68376dd202ea6c55b1c7db136cc1523605dc7c83bb9d964dded970eb3a8",
+      "diffSha256": "83a172d2ee5d5fdc62f8b8465a9fb0d0d06917ce6e5a9212fbc36f9a1ec3fde0",
+      "recordSha256": "b1c9a0fae08086c58d5f3479b38e09ced29ddfdf4c33aa0ca9e4adf95aaa061a",
+      "recordBytes": 61088,
+      "retiresWithTree": false,
+      "edgeCount": 39,
+      "dispositions": {
+        "preserve": 35,
+        "parked": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "set": "batch-041",
+      "sourceBytes": 99377,
+      "digest": "ff97bdc6edda92075ca34013604efc7e1328bdb7cb647352c6b806bdb498e6c6",
+      "inventoryFileDigest": "ff97bdc6edda92075ca34013604efc7e1328bdb7cb647352c6b806bdb498e6c6",
+      "diffSha256": "71db5693f83d3b6604a770a7a9b5079383d78842f6d9a3692c77b2c340d25987",
+      "recordSha256": "671f1d91f0fd73181d9a97816d93aa1d828149f4a8b345d7d8e1f95873939e6b",
+      "recordBytes": 223423,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 2,
+        "parked": 4,
+        "preserve": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-001",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000001",
+      "population": [
+        "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+          "rankHash": "cfbf264caa05b8bc320e6aee35f3cfa6347a8f5dd984df500d2ca1e9ba81acd6"
+        }
+      ],
+      "sample": [
+        "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md"
+      ],
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "set": "batch-002",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000002",
+      "population": [
+        "docs/reading-map.md",
+        "docs/routing-handoff-contract.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/routing-handoff-contract.md",
+          "rankHash": "0319fc972a208982a65e3f66dbc1517367d5cced799fc068b85d22174f56c611"
+        },
+        {
+          "file": "docs/reading-map.md",
+          "rankHash": "d9fa2211e462f655edb03eec0ff9c7c474eeae5bfaa55b2519c66bace670ced0"
+        }
+      ],
+      "sample": [
+        "docs/routing-handoff-contract.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/reading-map.md",
+          "bytes": 35359,
+          "edges": 98,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/reading-map.md",
+        "docs/routing-handoff-contract.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "README.md",
+        "docs/doc-governance.md",
+        "docs/platform-foundations.md",
+        "docs/reading-map.md",
+        "docs/routing-handoff-contract.md"
+      ],
+      "dispositions": {
+        "preserve": 50,
+        "parked": 31,
+        "phase9-row-flip": 9,
+        "patch": 33
+      }
+    },
+    {
+      "set": "batch-040",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000040",
+      "population": [
+        "docs/specs/reading-map.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/specs/reading-map.md",
+          "rankHash": "956b3ad35a444b1353b3faeae370a84610247fcace4284b5b0ba618ed0e12de6"
+        }
+      ],
+      "sample": [
+        "docs/specs/reading-map.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/specs/reading-map.md",
+          "bytes": 35721,
+          "edges": 91,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/specs/reading-map.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/specs/reading-map.md"
+      ],
+      "dispositions": {
+        "phase9-row-flip": 3,
+        "preserve": 24,
+        "parked": 33,
+        "patch": 31
+      }
+    },
+    {
+      "set": "batch-041",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000041",
+      "population": [
+        "docs/specs/work-state.md",
+        "docs/specs/workflow.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/specs/work-state.md",
+          "rankHash": "50df9b71913a62f8df944fe28a7d1f9b34620bb6aa6be9c21ae36491f7cb352c"
+        },
+        {
+          "file": "docs/specs/workflow.md",
+          "rankHash": "facb99f0635a3f0294cf5995292d4732e5375dc15b28116485165f0339dd29b6"
+        }
+      ],
+      "sample": [
+        "docs/specs/work-state.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/specs/work-state.md",
+          "bytes": 327843,
+          "edges": 39,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        },
+        {
+          "file": "docs/specs/workflow.md",
+          "bytes": 99377,
+          "edges": 7,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/specs/work-state.md",
+        "docs/specs/workflow.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/specs/work-state.md",
+        "docs/specs/workflow.md"
+      ],
+      "dispositions": {
+        "preserve": 36,
+        "parked": 7,
+        "patch": 3
+      }
+    }
+  ],
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "sha256": "e25a051466c6be45b124fe00f8215a4eff8ffad714b0d671e0e1b705361a81fa"
+    }
+  ],
+  "unpatchedStrata": {
+    "001": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-001",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "002": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-002",
+      "population": [
+        "README.md",
+        "docs/doc-governance.md",
+        "docs/platform-foundations.md"
+      ],
+      "populationCount": 3,
+      "ranks": [
+        {
+          "file": "README.md",
+          "rankHash": "0f3328f62ea262faf3b399da40ec07f571b8e40f66e5e00c74ad990d51d7be63"
+        },
+        {
+          "file": "docs/doc-governance.md",
+          "rankHash": "232162f7113e9d17d2506fc7fe46c5d65438430a381168afde4599d6b21e97d0"
+        },
+        {
+          "file": "docs/platform-foundations.md",
+          "rankHash": "3e33f95dc091216fa304026eed9795c3da704793a1c8e015630332a81a95f8e2"
+        }
+      ],
+      "selected": [
+        "README.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "040": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-040",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "041": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-041",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  }
+}

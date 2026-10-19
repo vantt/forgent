@@ -1,0 +1,406 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave2-manifest.json",
+  "selectedFiles": 13,
+  "selectedEdges": 60,
+  "perSet": [
+    {
+      "set": "batch-034",
+      "allFiles": 9,
+      "retiringFiles": 9,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "selectedFileDenominator": 0,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 0,
+        "seededSample": 0,
+        "mandatoryUnionSelected": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 0,
+        "sample": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    },
+    {
+      "set": "batch-035",
+      "allFiles": 1,
+      "retiringFiles": 1,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "distinctSelected": 0,
+      "selectedFileDenominator": 0,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 0,
+        "seededSample": 0,
+        "mandatoryUnionSelected": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 0,
+        "sample": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    },
+    {
+      "set": "batch-036",
+      "allFiles": 15,
+      "retiringFiles": 0,
+      "patchedPopulation": 1,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 13,
+      "unpatchedSample": 2,
+      "distinctSelected": 3,
+      "selectedFileDenominator": 3,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 1,
+        "seededSample": 1,
+        "mandatoryUnionSelected": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 13,
+        "sample": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    },
+    {
+      "set": "batch-037",
+      "allFiles": 17,
+      "retiringFiles": 0,
+      "patchedPopulation": 5,
+      "patchedSeedSample": 1,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 1,
+      "unpatchedEligiblePopulation": 10,
+      "unpatchedSample": 2,
+      "distinctSelected": 3,
+      "selectedFileDenominator": 3,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 5,
+        "seededSample": 1,
+        "mandatoryUnionSelected": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 10,
+        "sample": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    },
+    {
+      "set": "batch-038",
+      "allFiles": 17,
+      "retiringFiles": 0,
+      "patchedPopulation": 15,
+      "patchedSeedSample": 3,
+      "mandatoryFiles": 3,
+      "patchedAndMandatoryDistinct": 5,
+      "unpatchedEligiblePopulation": 2,
+      "unpatchedSample": 1,
+      "distinctSelected": 6,
+      "selectedFileDenominator": 6,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 15,
+        "seededSample": 3,
+        "mandatoryUnionSelected": 5,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 2,
+        "sample": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    },
+    {
+      "set": "batch-039",
+      "allFiles": 1,
+      "retiringFiles": 0,
+      "patchedPopulation": 0,
+      "patchedSeedSample": 0,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 0,
+      "unpatchedEligiblePopulation": 1,
+      "unpatchedSample": 1,
+      "distinctSelected": 1,
+      "selectedFileDenominator": 1,
+      "reviewedFileDenominator": 0,
+      "reviewedFiles": 0,
+      "patchedStratum": {
+        "population": 0,
+        "seededSample": 0,
+        "mandatoryUnionSelected": 0,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "eligiblePopulation": 1,
+        "sample": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "reworkNumerator": "pending independent review",
+      "threshold": "≤3% within each set and stratum; >3% expands to every surviving file in that set, including zero-edge files; no pooling or reseeding"
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-p01.md",
+      "files": [
+        {
+          "file": "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
+          "set": "batch-036",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "eb30c9931a177e7596e93851b29e1386591c125d37de684f31d57defef7e53fa",
+          "sourceDigest": "662acb0b8f2aa9b1342c4840bcf495ef6f58cbc3e6ac0c44315712bd259eec17",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1729,
+          "sourceBytes": 784,
+          "contextPlusRecordBytes": 2513
+        },
+        {
+          "file": "docs/explanation/skill-prose-cleanup-smoke-tests.md",
+          "set": "batch-036",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "9e4a2ab2c9e52991d8bbd2bc2952ef79c640bd1680828dcf799b24f0ec34b103",
+          "sourceDigest": "a3066d7cbd8f6f4528371ec21e858aa57269f0d56315e88fe7eaa2aa38a8e547",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1716,
+          "sourceBytes": 1304,
+          "contextPlusRecordBytes": 3020
+        },
+        {
+          "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+          "set": "batch-036",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "98968f0ce59e2b6e77ceb505ba47821a8bce76efca7416912610c5bb85c4cc5e",
+          "sourceDigest": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+          "diffSha256": "72819ee4a0a77cff05dd8c333f40005bd459512919def243d139e9b852a9f638",
+          "recordBytes": 14204,
+          "sourceBytes": 3856,
+          "contextPlusRecordBytes": 18060
+        },
+        {
+          "file": "docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md",
+          "set": "batch-037",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "27e5341402b694db875eb3a63755887fa37fe24fd7f16381b396187993dfefd9",
+          "sourceDigest": "ba5dcc4675151a8d0b7aaf6cba7616fe91b5248a24c0e84c7f0d99a89eee090e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1786,
+          "sourceBytes": 4071,
+          "contextPlusRecordBytes": 5857
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+          "set": "batch-037",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "a368667256d7cf9bad6636ae94293b210e7dd9c56df58127ae8ab2b88e8e77c0",
+          "sourceDigest": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+          "diffSha256": "67d894e09d533fe3dfdfba36a953bb38e3793ab94951230e6df11a3c5bc3e84d",
+          "recordBytes": 27930,
+          "sourceBytes": 7895,
+          "contextPlusRecordBytes": 35825
+        },
+        {
+          "file": "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md",
+          "set": "batch-037",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "4e3bacd91d6369024d783b8f3ba604ec89db75d8e5d98eecdcfe30615a9f7283",
+          "sourceDigest": "671088c4185eb341a48b219b6f06563cebe79be71a9876dcbd7ba98c80995087",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4084,
+          "sourceBytes": 3385,
+          "contextPlusRecordBytes": 7469
+        }
+      ],
+      "fileCount": 6,
+      "edges": 14,
+      "sourcePlusRecordBytes": 72744,
+      "recordBytes": 51449
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-p02.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "set": "batch-038",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 5,
+          "recordSha256": "faf241b60e21baa101d505dc75fa988ec97f84bbdc2c2bd4dc8df473331ca0ac",
+          "sourceDigest": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+          "diffSha256": "38537f3eae16f21a6792dcd0d6cfdbfa386df36c882922c7d0a3cab6073819b7",
+          "recordBytes": 19252,
+          "sourceBytes": 22380,
+          "contextPlusRecordBytes": 41632
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "set": "batch-038",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 10,
+          "recordSha256": "96d47e7e2df7d041bde4c5872736599f720970825e01abc3c17e992f01f7b5ac",
+          "sourceDigest": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+          "diffSha256": "a0828fd95b9a3ecd4fb8e595081be2bde34e4ceb679734fee25a911ec7a78d37",
+          "recordBytes": 24411,
+          "sourceBytes": 87296,
+          "contextPlusRecordBytes": 111707
+        },
+        {
+          "file": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "mandatory-threshold"
+          ],
+          "edges": 19,
+          "recordSha256": "adf74c31f52b01bf8e309d7f5269efc5d8c03fed7f859a2146a0d839f2b5b4e2",
+          "sourceDigest": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+          "diffSha256": "d11cb66dcbfd740b977a939555262f5b67b3ebd7737d72b8e0bcf50607e7e9ec",
+          "recordBytes": 74912,
+          "sourceBytes": 127583,
+          "contextPlusRecordBytes": 202495
+        }
+      ],
+      "fileCount": 3,
+      "edges": 34,
+      "sourcePlusRecordBytes": 355834,
+      "recordBytes": 118575
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave2-p03.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "set": "batch-038",
+          "strata": [
+            "patched-seeded",
+            "mandatory-threshold"
+          ],
+          "edges": 2,
+          "recordSha256": "6f95cb00cb7261a8e564d1882556ac584fa819666b5796058af3accf4f8ef2dd",
+          "sourceDigest": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+          "diffSha256": "f490684095f91a0563612242920407fd4bae102636a71cc89acc90c68edacf21",
+          "recordBytes": 13016,
+          "sourceBytes": 82161,
+          "contextPlusRecordBytes": 95177
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+          "set": "batch-038",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 6,
+          "recordSha256": "7649e6bce5d08101972b53e2cc8b242ff68506d74d3ac66fdc56a6cb52810972",
+          "sourceDigest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+          "diffSha256": "91c6fe1f5655a10ce0f39f1fe10c0781f3c4185c41044a96ffc9d8c7c29dca02",
+          "recordBytes": 15551,
+          "sourceBytes": 16287,
+          "contextPlusRecordBytes": 31838
+        },
+        {
+          "file": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+          "set": "batch-038",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "0146d0e3e7288b05aef2dc9970d5971d8bd222d4651710557bf75338a5f646f2",
+          "sourceDigest": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3495,
+          "sourceBytes": 3669,
+          "contextPlusRecordBytes": 7164
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+          "set": "batch-039",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d",
+          "sourceDigest": "072ae4f8716d26421bd2f4608a4c051e45fd597c76038030ca9f1073aa51a77e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4066,
+          "sourceBytes": 11957,
+          "contextPlusRecordBytes": 16023
+        }
+      ],
+      "fileCount": 4,
+      "edges": 12,
+      "sourcePlusRecordBytes": 150202,
+      "recordBytes": 36128
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "semanticAcceptance": "Pending Lead; author freezes membership only."
+}
