@@ -15,3 +15,8 @@ export function createGitPublication(options, loaderOptions) {
   return Object.freeze(facade);
 }
 export function versions(loaderOptions) { return loadNativeAddon(loaderOptions).versions(); }
+
+export { createGitInspect } from './inspect.mjs';
+
+export { createGitRefs } from './refs.mjs';
+export { createGitRemote } from './remote.mjs';

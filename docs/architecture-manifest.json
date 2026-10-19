@@ -21,6 +21,9 @@
   ],
   "files": {
     "src/git/index.mjs": "infra",
+    "src/git/inspect.mjs": "infra",
+    "src/git/refs.mjs": "infra",
+    "src/git/remote.mjs": "infra",
     "src/git/native.mjs": "infra",
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
@@ -152,6 +155,7 @@
     "src/report/authoritative-match.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/holder-lock/index.mjs": "infra",
+    "src/holder-lock/native-handover.mjs": "infra",
     "src/holder-lock/registry.mjs": "infra",
     "src/holder-lock/state-root.mjs": "infra",
     "src/holder-lock/driver.mjs": "infra",
@@ -311,6 +315,14 @@
     "src/event-store/consumers.mjs": "infra",
     "src/holder-lock/hot-guard.mjs": "kernel",
     "src/event-store/index.mjs": "infra",
-    "src/event-store/native.mjs": "infra"
+    "src/event-store/native.mjs": "infra",
+    "src/verbs/events/context.mjs": "use-case",
+    "src/verbs/events/status.mjs": "use-case",
+    "src/verbs/events/sync.mjs": "use-case",
+    "src/verbs/events/export.mjs": "use-case",
+    "src/verbs/events/rebuild.mjs": "use-case",
+    "src/setup/event-store-checks.mjs": "use-case",
+    "src/setup/event-store-fixes.mjs": "use-case",
+    "src/event-store/config.mjs": "infra"
   }
 }

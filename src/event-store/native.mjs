@@ -3,6 +3,7 @@ import path from 'node:path';
 import { loadNativeAddon } from '../git/native.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
+import { eventStoreConfig } from './config.mjs';
 import { registryFiles } from './consumers.mjs';
 
 function refusal(code) { return Object.assign(new Error(code), { code }); }
@@ -41,8 +42,9 @@ function call(fn) {
 }
 const prepared = new Map();
 /** Resolve before acquiring a hot mutex; pass the result as prefetched.eventStore. */
-export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions } = {}) {
+export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config } = {}) {
   available();
+  eventStoreConfig(config);
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');
   const root = path.resolve(cwd);
@@ -91,9 +93,17 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.sync(remote, noPush, ranks, hotLockDepth()));
     },
-    status(heldRanks) {
+    status(heldRanks, remote = 'origin') {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.status(ranks, hotLockDepth()));
+      return call(() => native.status(remote, ranks, hotLockDepth()));
+    },
+    exportJsonl({ streams, since = null, out }, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.exportJsonl(streams, since, out, ranks, hotLockDepth()));
+    },
+    exportLegacyLayout({ streams, since = null, out }, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.exportLegacyLayout(streams, since, out, ranks, hotLockDepth()));
     },
     unpublishedSummary(remote, heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -101,4 +111,27 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions) {
     },
   };
   return Object.freeze(facade);
+}
+
+/** Read facts without requiring a machine id or creating a store. */
+export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
+  outsideGate([]);
+  return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
+}
+export function ensureEventStoreRefspecs(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
+  outsideGate([]);
+  return call(() => loadNativeAddon(loaderOptions).ensureEventStoreRefspecs(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
+}
+export function eventStoreAddonAvailable(loaderOptions) {
+  outsideGate([]);
+  const native = call(() => loadNativeAddon(loaderOptions));
+  return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
+    && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
+    && typeof native.mintEventStoreMachineId === 'function'
+    && ['read', 'append', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+}
+
+export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {
+  outsideGate([]);
+  return call(() => loadNativeAddon(loaderOptions).mintEventStoreMachineId(stateRoot, hostname));
 }

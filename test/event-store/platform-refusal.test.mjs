@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-test('every facade entry refuses a non-Linux platform before resolving paths or loading the addon', () => {
-  const url = new URL('../../src/event-store/index.mjs', import.meta.url).href;
+test('every native facade entry refuses a non-Linux platform before resolving paths or loading the addon', () => {
+  const url = new URL('../../src/event-store/native.mjs', import.meta.url).href;
   const script = `
     import assert from 'node:assert/strict';
     import fs from 'node:fs';

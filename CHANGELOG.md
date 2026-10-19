@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Preserve historical Publication transfer WAL digests; classify transport config by Git scope across linked worktrees and symlinked paths. Doctor now explains refused repo-local CI credentials: use actions/checkout `persist-credentials: false` with a trusted global credential helper or `GIT_CONFIG_GLOBAL`-level setting.
+
+- Harden Git Remote against repository URL/transport redirects; make pushes atomic, settle forced remote-tracking fetches with exact-old checks, and tighten checkout and branch-use preflight with one shared transfer WAL shape.
+
+- Git adds dormant typed Refs and non-event Remote facades: checked-out branches are protected under worktree-admin, fast-forward checkout updates require custody, transfers use explicit mappings and preserve unknown outcomes without resending. Opaque one-shot native lock handover blocks release during calls and rejects forged handles; Windows handover remains unsupported.
+
+- Git adds a dormant typed Inspect facade with byte-safe status/diff/object/path/worktree reads, explicit trunk uncertainty and shallow ancestry errors, bounded streamed write snapshots on Unix, and transaction-local Rust lock scopes seeded only by verified holder handles. Diff hardening flags now precede the path delimiter. Linked-worktree cwd discovery validates reciprocal main registration; separate-git-dir remains unsupported.
 - Bind Event Store appends to prepared machine authority, remove raw store construction, require trusted-main preparation, and tighten gate/error/consumer validation.
 
 - Harden Git landing repairs: ignore reserved legacy mirror suffixes, diagnose their refs, migrate historical origin mappings alongside custom remotes, preserve symlinked state roots, and refuse unrelated-root chmod with actionable hooks diagnostics.

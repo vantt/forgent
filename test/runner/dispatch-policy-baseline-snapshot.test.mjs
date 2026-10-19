@@ -393,7 +393,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -430,7 +429,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -467,7 +465,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '<prompt>'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -500,7 +497,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -533,7 +529,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -566,7 +561,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -599,7 +593,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -632,7 +625,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -665,7 +657,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--auto-approve'
     ],
     envKeys: [
-      'PI_CODING_AGENT_DIR',
       'PI_CONFIG_DIR'
     ],
     credentialStore: {
@@ -851,9 +842,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
@@ -890,9 +879,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
@@ -929,9 +916,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
@@ -968,9 +953,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
@@ -1007,9 +990,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
@@ -1046,9 +1027,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>'
     ],
-    envKeys: [
-      'PI_CODING_AGENT_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',

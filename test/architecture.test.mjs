@@ -1284,6 +1284,16 @@ test('YAML bundle signature catches a pasted copy of the parser and ignores code
   }
 });
 
+
+test('native description handover has exactly one Git loader importer', () => {
+  const importsOf = target => onDisk.filter(file => extractImports(fs.readFileSync(path.join(root,file),'utf8')).some(specifier => specifier.startsWith('.') && path.relative(root,path.resolve(root,path.dirname(file),specifier)).split(path.sep).join('/') === target));
+  assert.deepEqual(importsOf('src/holder-lock/native-handover.mjs'), ['src/git/native.mjs']);
+  for (const file of onDisk) {
+    if (['src/holder-lock/index.mjs','src/holder-lock/native-handover.mjs'].includes(file)) continue;
+    assert.ok(!/\bregisterNativeHandover\b/.test(lexSource(fs.readFileSync(path.join(root,file),'utf8')).code), file);
+  }
+});
+
 test('Event Store keeps consumer boundaries and one native export importer', () => {
   const violations = [];
   for (const file of onDisk) {
@@ -1295,7 +1305,7 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
         if (target.startsWith('src/state/') || target.startsWith('src/runner/')) violations.push(`${file} -> ${target}`);
       }
     }
-    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore)\s*\()/.test(lexSource(source).code)) {
+    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts|ensureEventStoreRefspecs|mintEventStoreMachineId)\s*\()/.test(lexSource(source).code)) {
       violations.push(`${file}: imports native Event Store exports outside native.mjs`);
     }
   }

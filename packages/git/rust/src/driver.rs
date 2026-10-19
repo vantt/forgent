@@ -140,6 +140,7 @@ fn io(error: std::io::Error) -> OperationError {
 pub(crate) enum Policy {
     Inspect,
     Publication,
+    LocalMutation,
     Remote,
     HookContext,
 }
@@ -299,7 +300,7 @@ impl GitDriver {
         }
     }
 
-    fn require_floor(&self) -> Result<()> {
+    pub(crate) fn require_floor(&self) -> Result<()> {
         if self.git_floor_verdict()?.supported {
             Ok(())
         } else {
@@ -311,8 +312,42 @@ impl GitDriver {
     /// Linked gitdir authority is read from the main registration, never .git.
     pub fn resolve_repo(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         self.require_floor()?;
-        let main = fs::canonicalize(trusted_main).map_err(io)?;
+        let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
+        // Callers may supply a cwd beneath a checkout. Locate only on disk;
+        // never let Git or GIT_* environment select topology authority.
+        while !main.join(".git").exists()
+            && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
+        {
+            if !main.pop() {
+                return Ok(ResolveRepo::NotARepository);
+            }
+        }
+        // A linked cwd supplies only a discovery hint. Trust comes from the
+        // main .git directory and reciprocal registered gitdir/backlink.
+        let main = if main.join(".git").is_file() {
+            let hint = fs::read(main.join(".git")).map_err(io)?;
+            let hint = line(&hint)?
+                .strip_prefix("gitdir: ")
+                .ok_or_else(|| refusal("untrusted-worktree"))?;
+            let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
+            let common_hint = fs::read(admin.join("commondir"))
+                .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
+            let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
+            let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+            if common.file_name() != Some(std::ffi::OsStr::new(".git"))
+                || admin.parent() != Some(common.join("worktrees").as_path())
+                || Path::new(line(&backlink)?) != main.join(".git")
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
+            common
+                .parent()
+                .ok_or_else(|| refusal("untrusted-worktree"))?
+                .to_owned()
+        } else {
+            main
+        };
         let common = if main.join(".git").is_dir() {
             let dir = main.join(".git");
             if fs::symlink_metadata(&dir)
@@ -326,11 +361,17 @@ impl GitDriver {
         } else if main.join("HEAD").is_file() && main.join("objects").is_dir() {
             main.clone()
         } else {
+            if main.join(".git").is_file() {
+                // A worker-controlled gitfile is never topology authority. The
+                // caller must supply the trusted main checkout; separate-git-dir
+                // needs an explicit trusted common-dir contract before support.
+                return Err(refusal("trusted-main-gitfile-unsupported"));
+            }
             return Ok(ResolveRepo::NotARepository);
         };
         let mut git_dir = common.clone();
         let bare = common == main;
-        let work_tree = if bare { None } else { Some(path.clone()) };
+        let mut work_tree = if bare { None } else { Some(main.clone()) };
         if path != main {
             let mut found = None;
             if let Ok(entries) = fs::read_dir(common.join("worktrees")) {
@@ -338,18 +379,36 @@ impl GitDriver {
                     let admin = entry.map_err(io)?.path();
                     let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
                     let backlink = line(&backlink)?;
-                    if Path::new(backlink) == path.join(".git") {
+                    let checkout = Path::new(backlink)
+                        .parent()
+                        .ok_or_else(|| refusal("untrusted-worktree"))?;
+                    if path.starts_with(checkout)
+                        && (found.is_none()
+                            || work_tree.as_ref().is_none_or(|prior| {
+                                checkout.components().count() > prior.components().count()
+                            }))
+                    {
                         let registered_common = fs::read(admin.join("commondir")).map_err(io)?;
                         if fs::canonicalize(admin.join(line(&registered_common)?)).map_err(io)?
                             != common
                         {
                             return Err(refusal("untrusted-worktree"));
                         }
+                        work_tree = Some(fs::canonicalize(checkout).map_err(io)?);
                         found = Some(fs::canonicalize(admin).map_err(io)?);
                     }
                 }
             }
-            git_dir = found.ok_or_else(|| refusal("untrusted-worktree"))?;
+            if let Some(found) = found {
+                git_dir = found;
+            } else if !path.starts_with(&main)
+                || path
+                    .ancestors()
+                    .take_while(|p| *p != main)
+                    .any(|p| p.join(".git").exists())
+            {
+                return Err(refusal("untrusted-worktree"));
+            }
         }
         let mut repo = RepoHandle {
             common_dir: common.clone(),
@@ -522,7 +581,10 @@ impl GitDriver {
             return Err(config.error("git-config-failed"));
         }
         for (origin, key, _) in parse_config(&config.stdout)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
             if let Some(path) = origin.strip_prefix(b"file:") {
@@ -564,15 +626,54 @@ impl GitDriver {
         }
         parse_config(&out.stdout)
     }
-    fn preflight(&self, repo: &RepoHandle) -> Result<()> {
+    /// Read-only diagnostic shared with Remote admission. Scope, rather than
+    /// origin spelling, determines trust even for linked worktrees and symlinks.
+    pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        let mut keys = Vec::new();
+        // Transfers are rooted in the trusted main checkout; a linked handle
+        // also contributes its worktree-scoped policy. Refuse either source.
+        for context in [None, Some(repo)] {
+            if context.is_some() && repo.git_dir == repo.common_dir {
+                continue;
+            }
+            let out = self.invoke(
+                context,
+                &repo.trusted_main_root,
+                &["config", "--null", "--show-scope", "--list"],
+                Policy::Inspect,
+                None,
+                false,
+                PATH_LIMIT,
+                Duration::from_secs(30),
+            )?;
+            if !out.success {
+                return Err(out.error("git-config-failed"));
+            }
+            for (scope, key, _) in parse_config(&out.stdout)? {
+                if ![b"global".as_slice(), b"system", b"command"].contains(&scope.as_slice())
+                    && repository_transport_config(&key)
+                {
+                    keys.push(key);
+                }
+            }
+        }
+        keys.sort();
+        keys.dedup();
+        Ok(keys)
+    }
+
+    pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
         for (_, key, _) in self.config(repo)? {
-            if command_config(&key) {
+            if command_config(&key)
+                && (key != "credential.helper"
+                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
+            {
                 return Err(refusal(format!("repository-config-untrusted: {key}")));
             }
         }
         Ok(())
     }
-    fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
+    pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke(
@@ -605,7 +706,7 @@ impl GitDriver {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn invoke(
+    pub(crate) fn invoke(
         &self,
         repo: Option<&RepoHandle>,
         cwd: &Path,
@@ -671,10 +772,28 @@ impl GitDriver {
                 argv.push(format!("--work-tree={}", text_path(w)?));
             }
         }
+        if policy == Policy::Remote {
+            argv.extend(
+                [
+                    "-c",
+                    "http.proxy=",
+                    "-c",
+                    "http.sslVerify=true",
+                    "-c",
+                    "http.extraHeader=",
+                    "-c",
+                    "http.followRedirects=false",
+                ]
+                .map(str::to_owned),
+            );
+        }
         for (i, arg) in args.iter().enumerate() {
             argv.push((*arg).to_owned());
             if i == 0 && *arg == "update-ref" {
                 argv.push("--no-deref".into());
+            }
+            if i == 0 && *arg == "diff" {
+                argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
             }
         }
         if policy == Policy::Remote && args.contains(&"protocol.file.allow=always") {
@@ -705,8 +824,16 @@ impl GitDriver {
                 argv.insert(at, format!("{option}={command}"));
             }
         }
-        if args.first() == Some(&"diff") {
-            argv.extend(["--no-ext-diff", "--no-textconv", "--no-relative"].map(str::to_owned));
+        if policy == Policy::Remote {
+            if let Some(repo) = repo {
+                // Repository transport policy is untrusted, including URL-scoped
+                // values which outrank generic -c values. Refuse the whole family.
+                if let Some(key) = self.untrusted_transport_config(repo)?.first() {
+                    return Err(refusal(format!(
+                        "repository-transport-config-untrusted: {key}"
+                    )));
+                }
+            }
         }
         let mut env = Scrubbed::new();
         env.0.insert("LC_ALL".into(), "C".into());
@@ -1310,13 +1437,34 @@ fn command_config(key: &str) -> bool {
                 .any(|s| key.ends_with(s)))
         || (key.starts_with("diff.") && key.ends_with(".textconv"))
         || (key.starts_with("merge.") && key.ends_with(".driver"))
-        || (key.starts_with("url.") && key.ends_with(".insteadof"))
+        || key.starts_with("url.")
         || (key.starts_with("remote.")
             && [".uploadpack", ".receivepack"]
                 .iter()
                 .any(|s| key.ends_with(s)))
 }
-/// Config --null --show-origin emits alternating origin NUL key LF value NUL.
+// Generic HTTP settings below are forcibly overridden by Remote's -c policy.
+fn repository_transport_config(key: &str) -> bool {
+    ![
+        "http.proxy",
+        "http.sslverify",
+        "http.extraheader",
+        "http.followredirects",
+    ]
+    .contains(&key)
+        && (key.starts_with("http.")
+            || key.starts_with("https.")
+            || key.starts_with("ssh.")
+            || key.starts_with("protocol.")
+            || key.starts_with("credential.")
+            || key == "core.gitproxy"
+            || key == "remote.pushdefault"
+            || (key.starts_with("remote.")
+                && [".proxy", ".proxyauthmethod", ".vcs"]
+                    .iter()
+                    .any(|s| key.ends_with(s))))
+}
+/// Config --null with --show-origin or --show-scope emits metadata NUL key LF value NUL.
 fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
     let fields = nul_records(bytes)?;
     if fields.len() % 2 != 0 {
@@ -2379,6 +2527,7 @@ mod tests {
             "includeIf.gitdir:x.path",
             "credential.helper",
             "url.x.insteadOf",
+            "url.x.pushInsteadOf",
             "remote.x.uploadpack",
             "remote.x.receivepack",
             "core.sshCommand",
@@ -2484,10 +2633,8 @@ mod tests {
             driver.resolve_repo(&alien.0, &dir.0).unwrap_err().cause,
             "untrusted-worktree"
         );
-        assert!(matches!(
-            driver.resolve_repo(&linked.0, &linked.0).unwrap(),
-            ResolveRepo::NotARepository
-        ));
+        // The worker gitfile was poisoned above: inferred discovery refuses it.
+        assert!(driver.resolve_repo(&linked.0, &linked.0).is_err());
     }
     #[test]
     fn output_ceiling_and_borrow_gate() {
@@ -2673,7 +2820,7 @@ struct CommitCursor {
 }
 
 impl GitDriver {
-    fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
+    pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke_input(
