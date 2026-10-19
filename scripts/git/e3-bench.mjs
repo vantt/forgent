@@ -213,7 +213,7 @@ async function typedOperationRows(root, state, index, loader, samples) {
   const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
   const make = label => {
-    const repo = path.join(root, label); git(['init', '-q', '--initial-branch=trunk', repo]);
+    const repo = path.join(root, label); git(['init', '-q', '--initial-branch=main', repo]);
     git(['-C', repo, 'config', 'user.name', IDENTITY.name]); git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
     fs.writeFileSync(path.join(repo, 'payload'), 'base\n'); git(['-C', repo, 'add', 'payload']); git(['-C', repo, 'commit', '-qm', 'base']);
     prepareRepo(repo, path.join(repo, '.git'));
@@ -244,7 +244,7 @@ async function typedOperationRows(root, state, index, loader, samples) {
     const main = make(`typed-land-${mode}-${i}`);
     const target = git(['-C',main,'rev-parse','HEAD']);
     git(['-C',main,'checkout','-qb','source']); fs.writeFileSync(path.join(main,'payload'),'producer\n'); git(['-C',main,'commit','-qam','producer']);
-    const source = git(['-C',main,'rev-parse','HEAD']); git(['-C',main,'checkout','-q','trunk']);
+    const source = git(['-C',main,'rev-parse','HEAD']); git(['-C',main,'checkout','-q','main']);
     let elapsed;
     if (mode === 'legacy') {
       const start = performance.now();
@@ -266,7 +266,7 @@ async function typedOperationRows(root, state, index, loader, samples) {
     } else {
       const port = index.createGitLand({stateRoot:state,repoPath:main,trustedMain:main,writer:WRITER},loader);
       try {
-        const [prepareMs,prepared] = time(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/trunk',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
+        const [prepareMs,prepared] = time(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/main',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
         const candidate = prepared.candidate;
         if (!candidate) throw new Error("Land preparation returned no candidate");
         const evidence = {source:candidate.source,target:candidate.target,candidate:candidate.candidate,treeDigest:candidate.treeDigest,evidenceDigest:'e3-verified-fixture'};
