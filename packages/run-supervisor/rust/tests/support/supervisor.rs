@@ -144,6 +144,7 @@ impl SupRun {
             "steps": opts.steps,
             "sideFile": side_file,
         });
+        if opts.mutating { value["cwdLeaseFile"] = json!(dir.join("cwd.lease")); }
         patch(&mut value);
         let digest = envelope::digest(&value).unwrap();
         value["digest"] = Value::String(digest);

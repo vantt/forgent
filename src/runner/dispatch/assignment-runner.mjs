@@ -13,6 +13,7 @@
 // - Step 04: malformed agent-result.json produces failed/failed, not no-evidence.
 // - Step 04: prompt includes concrete runDir paths for worker result artifacts.
 
+import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
@@ -1273,6 +1274,19 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
   });
 }
 
+/**
+ * An extensible copy of a settled result that keeps its accessors (`status`, `confidence`) and
+ * non-enumerable links (`runResult`), which an object spread would drop.
+ */
+function unfrozenCopy(result) {
+  const descriptors = Object.getOwnPropertyDescriptors(result);
+  for (const descriptor of Object.values(descriptors)) {
+    descriptor.configurable = true;
+    if ('value' in descriptor) descriptor.writable = true;
+  }
+  return Object.create(Object.getPrototypeOf(result), descriptors);
+}
+
 export async function executeAssignment(assignment, opts = {}) {
   refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
@@ -1483,6 +1497,11 @@ export async function executeAssignment(assignment, opts = {}) {
   }
 
   let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  if (effectiveMutation === 'mutating' && opts.forceSharedCwd === true) {
+    throw new DispatchError('custody-required', '--force-shared-cwd cannot be used with writes', {
+      cwd: effectiveCwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
+    });
+  }
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
@@ -2055,6 +2074,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // over; it never settles, signals the agent or closes a pane.
   const terminalMode = resolvedAdapter === 'herdr-spawn';
   const supervised = resolvedAdapter === 'cli-spawn' || terminalMode;
+  if (effectiveMutation === 'mutating' && !supervised) {
+    throw new DispatchError('custody-domain-required', 'a mutating producer requires a supervised declared process domain', { adapter: resolvedAdapter, cwd: effectiveCwd, executorId, capability: compiledPlan.capability });
+  }
   // A supervised dispatch is an Assignment-owned recoverable one: a resume finds the same launchCommandId
   // identity a first attempt admitted, and the receipt lands under the same runDir.
   const needsAssignmentLaunchContext = supervised;
@@ -2062,22 +2084,13 @@ export async function executeAssignment(assignment, opts = {}) {
   let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
   let assignmentLaunchContext = null;
 
-  // The attempt lock and, for a writing agent, the per-cwd dispatch lease (cwd-lock.mjs) of a cli-spawn
-  // Assignment, taken before anything is prepared and handed to the supervisor. A
-  // herdr-spawn Assignment already holds the lease through its own executeExecutorCli()
-  // call for the whole of that call; taking it here too would refuse that inner
-  // acquire (two descriptions of one lock, even in one process, exclude each
-  // other), so this is scoped to cli-spawn only. Both shapes and a direct
-  // executeExecutorCli call contend on the same lock per directory.
-  // `opts.forceSharedCwd` (CLI: --force-shared-cwd) is a distinct axis from
-  // `forceNewAttempt` above (that overrides the same-assignment-retry check;
-  // this overrides a DIFFERENT assignment/process sharing this cwd) -- an
-  // operator who already knows concurrent mutation here is safe skips the
-  // acquisition entirely. Gated on `effectiveMutation === 'mutating'`:
-  // concurrent READ-ONLY dispatch to the SAME cwd is intentional, relied-upon
-  // behavior (assignment-cwd-mutex-concurrency.test.mjs proves both).
+  // The unit's cwd lease stays with its controller across attempts and commit.
+  // Standalone Assignments own the same lease until their settled handoff.
+  // Only the attempt copy closes at supervisor binding; errors retain its
+  // predecessor record for successor admission.
   let attemptLocks = null;
   let attemptSettled = false;
+  let handedOffResult;
   // Set once the supervisor owns the attempt: from then on the run control token belongs to its settle
   // step (side file) and this controller no longer releases it unless it saw the result.
   let attemptHandedOver = false;
@@ -2136,11 +2149,13 @@ export async function executeAssignment(assignment, opts = {}) {
     const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
     if (supervised) {
       attemptLocks = acquireAttemptLocks({
+        executorId, capability: compiledPlan.capability,
         fgosDir,
         assignmentDir,
         attemptStr,
         cwd,
-        mutating: effectiveMutation === 'mutating' && opts.forceSharedCwd !== true,
+        mutating: effectiveMutation === 'mutating',
+        custody: opts.custody,
       });
     }
     if (needsAssignmentLaunchContext) {
@@ -2430,8 +2445,8 @@ export async function executeAssignment(assignment, opts = {}) {
             extraSteps: ['cleanup-trust'],
           }
           : {}),
-        ...(process.platform === 'win32' && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true
-          ? { cwdLeaseFile: resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path }
+        ...(effectiveMutation === 'mutating'
+          ? { cwdLeaseFile: attemptLocks.cwdLease.path, ...(process.platform === 'win32' ? { cwdLeaseOwner: attemptLocks.cwdLease.domainEndpoint() } : {}) }
           : {}),
       });
       publishMutableProjection(path.join(path.resolve(runDir), 'assignment.json'), effectiveAssignment);
@@ -2461,16 +2476,16 @@ export async function executeAssignment(assignment, opts = {}) {
       });
 
       // 7. Hand the attempt to the supervisor and wait only for its binding (r6 9.4). Whatever the
-      // outcome, this process's copies of the locks close here: the supervisor holds its own.
+      // outcome, only the attempt copy closes here; the controller keeps cwd custody.
       let bound;
       let supervisor;
       try {
         supervisor = startSupervisor({ envelope: attemptEnvelope, locks: attemptLocks, stepEnv: attemptStepEnv, extraEnv: terminalPrep?.endpointEnv });
         attemptHandedOver = true;
+        if (process.platform === 'win32') attemptLocks.releaseAttempt();
         bound = await waitForBinding(path.resolve(runDir), supervisor.child);
       } finally {
-        attemptLocks.release();
-        attemptLocks = null;
+        attemptLocks.releaseAttempt();
       }
       const attemptRunDir = path.resolve(runDir);
       if (bound.state !== 'bound') {
@@ -2481,7 +2496,8 @@ export async function executeAssignment(assignment, opts = {}) {
           const early = readSettledResult(attemptRunDir, runId);
           if (early) {
             attemptSettled = true;
-            return early;
+            handedOffResult = unfrozenCopy(early);
+            return handedOffResult;
           }
         }
         throw new RunnerConfigError(
@@ -2526,7 +2542,8 @@ export async function executeAssignment(assignment, opts = {}) {
         );
       }
       attemptSettled = true;
-      return settledResult;
+      handedOffResult = unfrozenCopy(settledResult);
+      return handedOffResult;
     } else {
       // Legacy/non-supervisor adapters retain the existing pre-spawn write
       // guarantee. cli-spawn writes later, immediately after Authority
@@ -2649,7 +2666,12 @@ export async function executeAssignment(assignment, opts = {}) {
   } finally {
     // A supervised attempt that never produced its result is still the supervisor's (and, after it,
     // the adopt door's): its run control token stays, the settle step uses it.
-    if (attemptLocks) attemptLocks.release();
+    if (attemptLocks) {
+      try {
+        if (!opts.custody && attemptSettled) recordCustodyHandoff(attemptLocks.cwdLease, handedOffResult);
+        if (handedOffResult) Object.freeze(handedOffResult);
+      } finally { attemptLocks.release(); }
+    }
     if (terminalPrep && !attemptHandedOver) await terminalPrep.abandon();
     // An agent the supervisor still owns keeps the account it was given; the lease is reclaimed through
     // isSupervisedAttemptStillWorking once its attempt has really ended.

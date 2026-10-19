@@ -1,4 +1,4 @@
-// `executeExecutorCli(executorId, { for: <capability> })`: the work names its
+// `executeExecutorCli(executorId, { sharedCwd: true, for: <capability> })`: the work names its
 // capability and the capability owns the posture. An agent executor declares no
 // `for` of its own (it can do any kind of work), so its posture is never inferred
 // from the executor, and the invocation that runs is the one that can carry the
@@ -76,7 +76,7 @@ const written = (root) => fs.readFileSync(path.join(root, 'written.txt'), 'utf8'
 
 test('a "for" left on an agent executor is inert: the dispatch still runs under the capability it names, and doctor names the leftover', async () => {
   const { root } = fixtureRepo({ executorPatch: { for: ['code:review'] } });
-  const result = await executeExecutorCli('fake', { for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(written(root), 'first:hello');
   const warnings = collectExecutorProfileWarnings(loadRunnerConfigFromDir(root));
@@ -85,7 +85,7 @@ test('a "for" left on an agent executor is inert: the dispatch still runs under 
 
 test('execute <agent> --for <capability without confinement> runs unconfined on the first cli invocation', async () => {
   const { root } = fixtureRepo();
-  const result = await executeExecutorCli('fake', { for: 'execute', prompt: 'hello', tier: 'flagship', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', tier: 'flagship', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.model, 'fake-flagship');
   assert.equal(written(root), 'first:hello');
@@ -94,7 +94,7 @@ test('execute <agent> --for <capability without confinement> runs unconfined on 
 
 test('execute <agent> --for <capability> runs the invocation the capability prefers for that executor', async () => {
   const { root } = fixtureRepo();
-  const result = await executeExecutorCli('fake', { for: 'pinned-write', prompt: 'hello', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'pinned-write', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(written(root), 'second:hello');
 });
@@ -102,7 +102,7 @@ test('execute <agent> --for <capability> runs the invocation the capability pref
 test('execute <agent> --for <confined capability> refuses before spawning and names the two runUnit doors for read-only work', async () => {
   const { root } = fixtureRepo();
   await assert.rejects(
-    executeExecutorCli('fake', { for: 'code:review', prompt: 'hello', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { sharedCwd: true, for: 'code:review', prompt: 'hello', cwd: root, repoRoot: root }),
     (err) => {
       assert.equal(err.errorClass, 'posture-needs-assignment');
       assert.match(err.message, /fgos workflow start --units <file>/);
@@ -117,7 +117,7 @@ test('execute <agent> --for <confined capability> refuses before spawning and na
 test('execute <agent> --for refuses an unregistered capability', async () => {
   const { root } = fixtureRepo();
   await assert.rejects(
-    executeExecutorCli('fake', { for: 'no-such-capability', prompt: 'hello', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { sharedCwd: true, for: 'no-such-capability', prompt: 'hello', cwd: root, repoRoot: root }),
     (err) => {
       assert.equal(err.errorClass, 'capability-not-registered');
       assert.match(err.message, /not a registered capability/);

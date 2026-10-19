@@ -85,9 +85,9 @@ export function sweepStaleWorkDirs({ tmpdir = os.tmpdir(), now = Date.now() } = 
   return removed;
 }
 
-function holdArgv({ lockPath, mode = 'ex', wait, killWaitMs, work }) {
+function holdArgv({ lockPath, mode = 'ex', wait, killWaitMs, predecessorKinds, work }) {
   const waitArgs = wait.kind === 'ms' ? ['--wait-ms', String(wait.ms)] : ['--try'];
-  return ['internal', 'lock-hold', '--protocol', String(PROTOCOL), '--path', path.resolve(lockPath), '--mode', mode, ...waitArgs, '--kill-wait-ms', String(killWaitMs), '--work', work];
+  return ['internal', 'lock-hold', '--protocol', String(PROTOCOL), '--path', path.resolve(lockPath), '--mode', mode, ...waitArgs, '--kill-wait-ms', String(killWaitMs), ...(predecessorKinds ? ['--predecessor-kinds', predecessorKinds.join(',')] : []), '--work', work];
 }
 
 /** Remove a work directory; a failure leaves it for the next sweep. */
@@ -101,13 +101,13 @@ export function removeWorkDir(work) {
 
 /** Start one helper with a fresh work directory. `{ child, pid, work }`; the
  * work directory is removed again when the helper cannot start. */
-export function startHold({ bin, lockPath, wait, killWaitMs, env }) {
+export function startHold({ bin, lockPath, wait, killWaitMs, predecessorKinds, env }) {
   sweepStaleWorkDirs();
   sequence += 1;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), `${WORK_PREFIX}${process.pid}-${sequence}-`));
   let child;
   try {
-    child = spawn(bin, holdArgv({ lockPath, wait, killWaitMs, work }), { env, stdio: 'ignore', windowsHide: true });
+    child = spawn(bin, holdArgv({ lockPath, wait, killWaitMs, predecessorKinds, work }), { env, stdio: 'ignore', windowsHide: true });
   } catch (err) {
     removeWorkDir(work);
     throw new HolderLockError('lock-driver-unavailable', `cannot run ${bin}: ${err.message}`, { reason: 'no-host-binary', tried: [bin] });
@@ -267,16 +267,18 @@ function forget(hold, n, names) {
 
 const BORROW_FILES = ['req-<n>.json', 'started-<n>.json', 'out-<n>.log', 'err-<n>.log', 'result-<n>.json'];
 
-/** A log as text, at most `MAX_LOG_BYTES` of it, like the POSIX output cap. */
-function readLog(hold, name) {
+/** Capture a completed log, refusing overflow instead of returning a partial path list. */
+function readLog(hold, name, maxOutputBytes = MAX_LOG_BYTES) {
   let fd;
   try {
     fd = fs.openSync(path.join(hold.work, name), 'r');
-    const size = Math.min(fs.fstatSync(fd).size, MAX_LOG_BYTES);
+    const size = fs.fstatSync(fd).size;
+    if (size > maxOutputBytes) throw new HolderLockError('borrow-output-limit', `borrowed output exceeds ${maxOutputBytes} bytes`, { name, size, maxOutputBytes });
     const buffer = Buffer.alloc(size);
     fs.readSync(fd, buffer, 0, size, 0);
     return buffer.toString('utf8');
-  } catch {
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
     return '';
   } finally {
     if (fd !== undefined) fs.closeSync(fd);
@@ -310,9 +312,9 @@ export function borrowSync(hold, spec, { killWaitMs }) {
   for (;;) {
     const result = resultOf(hold, n);
     if (result) {
-      const answer = { result, stdout: readLog(hold, `out-${n}.log`), stderr: readLog(hold, `err-${n}.log`) };
-      forget(hold, n, BORROW_FILES);
-      return answer;
+      try {
+        return { result, stdout: readLog(hold, `out-${n}.log`, spec.maxOutputBytes), stderr: readLog(hold, `err-${n}.log`, spec.maxOutputBytes) };
+      } finally { forget(hold, n, BORROW_FILES); }
     }
     if (!helperAlive(hold)) {
       // It may have answered and ended between the two looks.
@@ -487,4 +489,19 @@ export function borrowAsync(hold, spec, { killWaitMs, onResult }) {
   }, TAIL_POLL_MS);
   process.nextTick(() => child.emit('spawn'));
   return child;
+}
+
+/** Clear under the helper's acquired handle, using its existing request channel. */
+export function clearDomainHold(hold, timeoutMs) {
+  const n = writeRequest(hold, { op: 'clear-domain' });
+  const deadline = Date.now() + timeoutMs;
+  try {
+    while (Date.now() < deadline) {
+      const answer = resultOf(hold, n);
+      if (answer) return answer;
+      if (!helperAlive(hold)) break;
+      sleepSync(RESULT_POLL_MS);
+    }
+    throw new HolderLockError('lock-route-error', 'clear-domain helper did not answer', {});
+  } finally { forget(hold, n, ['req-<n>.json', 'result-<n>.json']); }
 }

@@ -12,6 +12,7 @@
       ]
     },
     "optional": [
+      { "flag": "--predecessor-kinds <kind,kind>", "meaning": "reject other recorded kinds under the kernel lock before ordinary cleanup" },
       { "flag": "--kill-wait-ms K", "default": 2000, "meaning": "predecessor kill wait and the bound for emptying a borrow job on parent death; source lock.predecessorKillWaitMs" }
     ],
     "unknownFlag": "usage error, exit 2"
@@ -29,6 +30,8 @@
     },
     "n": "request number, an integer starting at 1; the helper handles one borrow at a time and answers a second with result { error: \"borrow-busy\" }"
   },
+  "declareDomain": "request {op: declare-domain, domain: predecessor.v1 record}: the idle helper validates its acquired exclusive handle and writes the domain before answering {result: declared}. The supervisor requires this acknowledgement before GO; helper death cannot authorize a late producer",
+  "clearDomain": "request {op: clear-domain}: the idle helper calls handle.clear_domain() and returns {result: cleared} or a named error; failure preserves the record",
   "stdio": "stdin ignored; stdout and stderr go to files, so a held lock never keeps the caller's event loop alive",
   "lifetime": {
     "poll": "the helper polls req-* every 5 ms and watches its parent's handle",

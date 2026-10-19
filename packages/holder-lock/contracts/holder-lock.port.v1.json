@@ -4,7 +4,8 @@
   "resource": {
     "fields": {
       "name": "registry lock name (packages/holder-lock/contracts/lock-registry.v1.json)",
-      "path": "absolute path of the lock file, created once and never removed while the resource lives"
+      "path": "absolute path of the lock file, created once and never removed while the resource lives",
+      "predecessorKinds": "optional nonempty string[]: reject other recorded kinds under the kernel lock before ordinary predecessor cleanup"
     },
     "fileRules": [
       "opened O_RDWR (NFSv4 and BSD refuse an exclusive lock on a read-only fd)",
@@ -39,6 +40,11 @@
       },
       "rule": "returns acquired only when BOTH hold: the kernel lock is held AND the predecessor domain recorded next to the lock file is empty (predecessor.v1.json). A free kernel lock alone is not proof.",
       "output": "acquire-result"
+    },
+    "clear_domain": {
+      "input": { "handle": "idle exclusive acquired handle" },
+      "rule": "While holding exclusion, observe the holder domain empty without killing, then remove only its unchanged predecessor record. Unknown or live domains and replaced resources refuse. Node handle.clearDomain() uses the inherited description or existing lock-hold request channel.",
+      "output": { "result": "cleared" }
     },
     "release": {
       "input": { "handle": "handle returned by acquire" },

@@ -2151,3 +2151,29 @@ test('workflow start --seats with an unknown persona through the real CLI exits 
   );
   assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0);
 });
+
+test('integration uses the recorded replacement branch and preserves the predecessor branch', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/custody-integration', steps: [
+    { id: 'write', units: [{ id: 'u1', template: { capability: 'docs:write', writes: ['out.txt'] } }] },
+    { id: 'land', kind: 'integrate', dependsOn: ['write'], units: [] },
+  ] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const original = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1` });
+  const replacement = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1-recovery-test` });
+  worktreeDirs.push(original.worktreePath, replacement.worktreePath);
+  fs.writeFileSync(path.join(original.worktreePath, 'keep.txt'), 'predecessor work');
+  fs.writeFileSync(path.join(replacement.worktreePath, 'out.txt'), 'replacement work');
+  execFileSync('git', ['add', 'out.txt'], { cwd: replacement.worktreePath });
+  execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-qm', 'replacement'], { cwd: replacement.worktreePath });
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload } });
+  append('step.start', { stepId: 'write' });
+  append('unit.scheduled', { stepId: 'write', unitId: 'u1', ...replacement });
+  append('unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' });
+  append('step.complete', { stepId: 'write', outcome: 'pass' });
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(state.status, 'completed');
+  assert.equal(fs.readFileSync(path.join(tmp, 'out.txt'), 'utf8'), 'replacement work');
+  assert.equal(fs.readFileSync(path.join(original.worktreePath, 'keep.txt'), 'utf8'), 'predecessor work');
+  assert.equal(execFileSync('git', ['show', `${original.branch}:README.md`], { cwd: tmp, encoding: 'utf8' }).length > 0, true);
+});

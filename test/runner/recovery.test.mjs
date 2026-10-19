@@ -127,3 +127,9 @@ test('src/runner/recovery.mjs never imports fs or child_process (pure lib prohib
   assert.doesNotMatch(source, /from\s+['"](node:)?child_process['"]/);
   assert.doesNotMatch(source, /require\(['"](node:)?(fs|child_process)['"]\)/);
 });
+
+for (const code of ['custody-required', 'custody-domain-required', 'custody-predecessor-unknown']) {
+  test(`${code}: preserve the worktree instead of retrying its producer`, () => {
+    assert.equal(resolveAction(code, 0).action, 'park');
+  });
+}

@@ -26,7 +26,7 @@ import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktr
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
-import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder, admitSuccessor, recordCustodyHandoff } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -38,6 +38,7 @@ import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
+import { createLockScope } from '../../holder-lock/index.mjs';
 import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -175,10 +176,10 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
  * paths outside the scope; a person has to take that commit off first.
  */
-function commitPending(attempt, worktree, mainRoot) {
+function commitPending(attempt, worktree, mainRoot, custody) {
   const commit = attempt?.commit;
   if (commit?.status !== 'failed') return false;
-  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot));
+  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot, custody));
 }
 
 /** A resume cannot go past a commit that landed holding paths outside the unit's write scope. */
@@ -377,13 +378,21 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
-  const scope = { control: null };
+  const scope = { control: null, custody: null, handedOff: false };
   const uninstall = holdCancelOnSignal(options);
+  let result;
   try {
-    return await runUnitBody(options, scope);
+    result = await runUnitBody(options, scope);
+    scope.handedOff = true;
+    return result;
   } finally {
-    try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
-    uninstall();
+    try {
+      try { if (scope.handedOff) recordCustodyHandoff(scope.custody, result); }
+      finally { scope.custody?.release(); }
+    } finally {
+      try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
+      uninstall();
+    }
   }
 }
 
@@ -512,6 +521,10 @@ async function runUnitBody(options, scope) {
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
+    if (unit.writes.length > 0 || sync) {
+      if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: worktreePath, executorId: null, capability: unit.capability });
+      scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
+    }
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -576,6 +589,11 @@ async function runUnitBody(options, scope) {
     options.onUnitRunCreated?.(unitRunId);
   }
 
+  if (!scope.custody && (unit.writes.length > 0 || unitRecord.sync)) {
+    if (options.forceSharedCwd === true) throw Object.assign(new RunnerConfigError('--force-shared-cwd cannot be used with writes', { code: 'custody-required' }), { cwd: unitRecord.worktree, executorId: null, capability: unit.capability });
+    scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
+  }
+
   const unitDir = path.join(assignmentsDir, unitRunId);
   if (options.resumeUnitRunId) {
     const summaryFile = path.join(unitDir, 'unit-summary.json');
@@ -607,7 +625,7 @@ async function runUnitBody(options, scope) {
   const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
     .filter(([, attempts]) => {
       const last = attempts[attempts.length - 1];
-      return commitPending(last, unitRecord.worktree, mainRoot) || leftByDeadController(last, assignmentsDir);
+      return commitPending(last, unitRecord.worktree, mainRoot, scope.custody) || leftByDeadController(last, assignmentsDir);
     })
     .map(([key]) => key));
   const history = () => {
@@ -716,6 +734,7 @@ async function runUnitBody(options, scope) {
     const runResult = await executeAssignment(assignment, {
       cwd: unitRecord.worktree,
       repoRoot: mainRoot,
+      custody: readOnly ? null : scope.custody,
       runnerConfig,
       // The admission identity of this dispatch: a resume of an attempt whose outcome was never read
       // finds that attempt again (and its settled result) instead of admitting a new one.
@@ -798,6 +817,7 @@ async function runUnitBody(options, scope) {
         worktree: unitRecord.worktree,
         // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
         repoRoot: mainRoot,
+        custody: scope.custody,
         unitId: summarySource.id,
         summary: runResult?.agentClaim?.summary,
         objective: summarySource.objective,
@@ -805,7 +825,7 @@ async function runUnitBody(options, scope) {
         changedFiles: runResult?.evidence?.changedFiles ?? null,
         excludePaths,
         needsWrites: runResult?.agentClaim?.needsWrites,
-      }), excludePaths);
+      }), excludePaths, scope.custody);
       persistUnitRecord();
       return commit;
     };
@@ -813,8 +833,8 @@ async function runUnitBody(options, scope) {
     // The agent already did this round's work and only the runner commit failed: commit again,
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
-    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot)) {
-      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync }));
+    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot, scope.custody)) {
+      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
       if (refusal) return refusal;
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
       const excludePaths = lastRecorded.preExistingInScope ?? [];
@@ -837,6 +857,7 @@ async function runUnitBody(options, scope) {
     }
 
     if (bound.mechanism === 'inline') {
+      if (!readOnly) return { outcome: 'policy-refusal', role, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain', cwd: unitRecord.worktree, executorId: bound.executor, capability: unit.capability } };
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
       }
@@ -863,7 +884,7 @@ async function runUnitBody(options, scope) {
     // runner never commits them. A resumed attempt keeps what its first launch saw.
     let preExistingInScope = [];
     if (!readOnly) {
-      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync });
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync });
       const refusal = preflightRefusal(role, round, preflight);
       if (refusal) return refusal;
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
@@ -1023,7 +1044,9 @@ async function runUnitBody(options, scope) {
     const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
     if (!verifyCmd) return { pass: true };
 
-    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs);
+    // The verify child borrows the Unit's custody lease, so a controller death cannot free the
+    // worktree while it still writes.
+    const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs, { custody: scope.custody });
     if (outcome.passed) return { pass: true };
     const how = outcome.timedOut
       ? `timed out after ${runnerConfig.timeoutMs}ms`
@@ -1048,7 +1071,7 @@ async function runUnitBody(options, scope) {
   // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose
   // merge needed no worker, ends the run here; a conflicted merge stays open for the producer.
   if (unitRecord.sync) {
-    const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord);
+    const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord, scope.custody);
     if (early) {
       executionSettled = true;
       settle(early.outcome);
