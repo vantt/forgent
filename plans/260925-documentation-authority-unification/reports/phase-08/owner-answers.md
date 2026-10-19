@@ -149,3 +149,9 @@ No supplied re-check finding is declined. The reporter-code alternative is inten
 - **L-4:** the input receipt is re-enumerated at `cf28815f6122b98986784385a31330a36d28bb71`: 30 pairs in both manifests, hence 131 Step 0 input entries and ≥3 parts. The execution brief must re-enumerate at its own input HEAD; later runner/report commits add pairs after their ids exist. Historical 21/29 counts remain valid only at their pinned heads.
 
 All seven new findings have text dispositions; implementation, actual accounting and fresh independent acceptance remain owed. No owner design is reversed and no out-of-scope board/backlog update is claimed.
+
+## L12-16 — Accept Step 0 (Lead, A42)
+
+- **Evidence:** author `a2e8634df` (85/85 drifted target bindings rebound, 0 parked), accounting `b1e7aec1a` (49 pairs per manifest = 37 input + 12 from the author commit; data-only diff). Batch-end acceptance by the Lead on clean committed bytes at `b1e7aec1a`: `audit-report.py` exit 0 (no failing rows, zero unaccounted pairs), three-file reproduction/ratchet/citation tests 67/67, ratchet exit 0. Independent reviews `review-a38-step-00-author-accounting-part-0{1,2,3,4}.md`: 35 + 38 + 9 + 56 = 138 ok, 0 rework.
+- **Non-blocking notes kept for Phase 9:** some rebound rows' rationale text still quotes old digests/anchors (`binding-071/072/073`); the authority string cites `a2e8634df` for all 49 pairs including the 37 earlier ones (commit/path fields exact); six previously reviewed rows lost `evidenceDigest`/`acceptanceScope` as intended (no approval carry). Rationale wording alone is never rework (L10-37).
+- **Decision:** Step 0 accepted; consumer edits may start. Lead record commits under `reports/phase-08/` create commit/path pairs; they are accounted by the next batch's accounting Unit, and batch-end acceptance is judged only after it.
