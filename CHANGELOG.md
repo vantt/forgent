@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Warn once per unreadable pid per Worktree removal or relocation, and allow clean tracked `.fgos` while preserving reappearing skip-worktree state and dirty bytes.
+
 - Warn with pid and comm when a same-user process cwd is unreadable during Worktree removal or relocation; readable checkout cwds still refuse.
 
 - Fix Worktree allocation under `.claude/worktrees`, multi-user cwd checks and terminal recovery of clean Git refusals; require reachable delivery before removal and report preserved dirty checkouts as advisory diagnostics.
