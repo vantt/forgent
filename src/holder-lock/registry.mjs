@@ -36,7 +36,7 @@ const PLACEHOLDER = /<([^<>]+)>/g;
 /** `<dev>-<ino>-<birthtimeNs>` of the directory `cwd` names after realpath: one key for
  * every spelling of the same directory, symlinked or not. A cwd that does
  * not exist has no key (strict resolution then names the missing param). */
-function cwdDevIno(cwd) {
+export function cwdDevIno(cwd) {
   if (typeof cwd !== 'string' || !cwd) return undefined;
   let stat;
   try {

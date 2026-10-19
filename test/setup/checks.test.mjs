@@ -105,6 +105,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'cli-version-visible',
       'worker-slots-ceiling-usable',
       'workflow-capabilities-configured',
+      'workflow-case-binding-sentinel',
+      'workflow-case-bindings',
       'gateway-token-configured',
       'readme-install-tag-exists',
       'iron-law-configured',

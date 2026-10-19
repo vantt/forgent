@@ -147,3 +147,14 @@ export function partitionPaths(paths, scope) {
   for (const relPath of paths) (matchesWriteScope(relPath, scope) ? inScope : outOfScope).push(relPath);
   return { inScope, outOfScope };
 }
+
+/**
+ * Whether two declared scopes can touch one path. Conservative on purpose: a glob entry is read by
+ * its literal leading segments, so two globs under one directory overlap even when no path would
+ * match both. A refusal built on this names that, and a scope that must run beside another narrows its entries.
+ */
+export function writeScopesOverlap(scopeA, scopeB) {
+  const a = canonicalizeWrites(scopeA);
+  const b = canonicalizeWrites(scopeB);
+  return a.some((x) => b.some((y) => literalsOverlap(literalPrefix(x), literalPrefix(y))));
+}

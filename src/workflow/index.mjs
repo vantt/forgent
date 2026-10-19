@@ -17,13 +17,14 @@ export {
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
 export { translateUnitsToWorkflow } from './units-source.mjs';
+export { preflightWorkflowSeats } from './case-start.mjs';
 export {
   startWorkflow,
   startWorkflowDetached,
-  preflightWorkflowSeats,
   answerWorkflowDetached,
   resumeWorkflowDetached,
   statusWorkflow,
   answerWorkflow,
   resumeWorkflow,
-} from './runner.mjs';
+  closeWorkflow,
+} from './case-verbs.mjs';

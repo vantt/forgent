@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
-import { startWorkflow, answerWorkflow } from '../../src/workflow/runner.mjs';
+import { startWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

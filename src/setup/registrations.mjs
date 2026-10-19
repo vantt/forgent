@@ -1,4 +1,5 @@
 import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
+import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -6637,6 +6638,19 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-tran
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each
+// case's ledger. Bodies live in workflow-case-checks.mjs.
+registerCheck({
+  id: 'workflow-case-binding-sentinel',
+  description: 'the worktree binding directory carries the host sentinel that tells a reader it is not a masked view',
+  check: (cwd) => checkWorkflowCaseBindingSentinel(cwd),
+});
+registerCheck({
+  id: 'workflow-case-bindings',
+  description: 'every worktree binding record matches the ledger of its case, and every bound open case has its record',
+  check: (cwd) => checkWorkflowCaseBindings(cwd),
+});
+registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });
