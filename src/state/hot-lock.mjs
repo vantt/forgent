@@ -21,11 +21,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import childProcess from 'node:child_process';
-import nodeModule from 'node:module';
 import { judge, getBootId, getPidNs, getProcessStartTime, observeProcess, pidExists } from '../runner/dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, runProcessObserveRoute } from '../holder-lock/index.mjs';
 import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
+import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
+export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { appendEventCore } from './event-log.mjs';
 
@@ -36,65 +36,6 @@ const RECLAIM_WAIT_MS = 1000;
 const WINDOWS_RETRYABLE = new Set(['EPERM', 'EBUSY']);
 /** How long a host reading of a live holder is reused while a waiter polls. */
 const HOST_OBSERVE_TTL_MS = 250;
-
-/** Error raised by this module. `code` is the contract name; `category` feeds
- * the CLI's exit-code table (a timeout is `lock-timeout`, the rest are
- * caller-correctable `precondition`s). */
-export class HotLockError extends Error {
-  constructor(code, message, details = {}) {
-    super(message);
-    this.name = 'HotLockError';
-    this.code = code;
-    this.category = code === 'hot-lock-timeout' ? 'lock-timeout' : 'precondition';
-    Object.assign(this, details);
-  }
-}
-
-// --- critical-section depth and the child-process guard ------------------
-
-let depth = 0;
-
-/** Whether this process is inside a hot critical section right now. */
-export function hotLockDepth() {
-  return depth;
-}
-
-function failIfInside(what) {
-  if (depth > 0) {
-    throw new HotLockError('exec-under-hot-lock', `${what} was called inside a hot-lock critical section; resolve it before taking the lock and pass it in`);
-  }
-}
-
-function guarded(name, original) {
-  const wrapper = function guardedChildProcessCall(...args) {
-    failIfInside(`child_process.${name}`);
-    return Reflect.apply(original, this, args);
-  };
-  // util.promisify.custom and friends live on the original as symbols.
-  for (const key of Reflect.ownKeys(original)) {
-    if (!(key in wrapper) || typeof key === 'symbol') {
-      Object.defineProperty(wrapper, key, Object.getOwnPropertyDescriptor(original, key));
-    }
-  }
-  wrapper.__hotLockGuard = true;
-  return wrapper;
-}
-
-/** Wrap every child-process entry once per process, then re-sync the ESM
- * namespace so `import { execFileSync } from 'node:child_process'` that was
- * linked before this module loaded sees the wrapper too. */
-function installChildProcessGuard() {
-  for (const name of ['spawn', 'spawnSync', 'exec', 'execSync', 'execFile', 'execFileSync', 'fork']) {
-    if (typeof childProcess[name] === 'function' && !childProcess[name].__hotLockGuard) {
-      childProcess[name] = guarded(name, childProcess[name]);
-    }
-  }
-  const proto = childProcess.ChildProcess?.prototype;
-  if (proto && !proto.spawn.__hotLockGuard) proto.spawn = guarded('ChildProcess.prototype.spawn', proto.spawn);
-  nodeModule.syncBuiltinESMExports();
-}
-
-installChildProcessGuard();
 
 // --- paths, record, judge ------------------------------------------------
 
@@ -335,7 +276,7 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [] } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [] } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
   const guard = (target) => {
@@ -347,6 +288,7 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, ext
   const tx = {
     fgosDir: path.resolve(fgosDir),
     mainFgosDir,
+    eventStore,
     head,
     writer,
     /** Append one event; same seq/hash derivation as the plain append. */
@@ -413,12 +355,12 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, ext
  */
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);
-  if (depth > 0) {
+  if (hotLockDepth() > 0) {
     throw new HotLockError('hot-lock-reentry', `${resource}: this process already holds a hot mutex; a transaction may not open another`);
   }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
-  depth += 1;
+  const leaveHotLock = enterHotLock();
   noteLockHeld();
   const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
@@ -426,7 +368,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     result = fn(tx);
   } finally {
     revoke();
-    depth -= 1;
+    leaveHotLock();
     try {
       releaseRecord(paths);
     } finally {

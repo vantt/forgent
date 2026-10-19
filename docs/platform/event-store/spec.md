@@ -824,3 +824,31 @@ Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank 
 
 1. **Section 14.** Authenticated reconciliation (exact prior and candidate authorized before the CAS), per-mirror verification (foreign failure is a typed warning, own-id failure refuses), certified sync positions, and the clone-wide tracked-fence authority resolved through the trusted main checkout.
 2. **Git.** The no-op fetch-mapping setup records the effect-free `configApproved` outcome (Git spec section 10 rule 4c).
+
+
+## Phase 06 facade review corrections (phase 07 handoff)
+
+Prepared stores are opened only from opaque `resolveEventStore` authority. Append
+uses the bound machine identity; no raw-directory constructor or caller machine
+parameter remains. `prepareStore(cwd, { trustedMain, stateRoot, loaderOptions })`
+requires an explicit trusted main checkout. Git resolution currently supports a
+linked worktree only with that trusted main path; arbitrary cwd discovery and
+separate-git-dir support remain Git work for the phase 07 handoff. Missing trust
+is `event-store-trusted-main-required`; Git operation failures retain their JSON
+`code` in the Node error. Error codes in ordinary native messages are recognized
+only at the start of `code: detail`.
+
+Preparation caches for the process lifetime by cwd, trusted main, state root and
+loader options. The loader validates the descriptor before cache reuse. Entries
+are not invalidated when a repository is removed; callers must end the process
+before replacing a repository at the same path. Consumer cache paths, contract
+paths and ids must each be unique.
+
+The shared exec guard and `hotLockDepth` now live in
+`src/holder-lock/hot-guard.mjs`; `src/state/hot-lock.mjs` re-exports the depth and
+error for existing consumers. Entering a hot section returns a one-shot release
+that cannot decrement the depth twice. Unpublished summary validates repository
+and layout before taking `event-seal`; this read-only operation waits behind an
+active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
+high-water mark plus a torn active tail. Holder reclaim additionally relies on
+the Rust structural no-port boundary and existing crate regression tests.

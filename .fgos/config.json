@@ -700,6 +700,14 @@
           "claude"
         ],
         "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "docs:write": {
+        "description": "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it.",
+        "serves": {
+          "outputKind": "change",
+          "domain": "docs",
+          "mutates": true
+        }
       }
     },
     "executors": {
@@ -1425,5 +1433,8 @@
       "minRows": 20,
       "maxPanesPerTab": 8
     }
+  },
+  "eventStore": {
+    "remote": "origin"
   }
 }

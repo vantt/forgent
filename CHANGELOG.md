@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Git adds dormant typed Refs and non-event Remote facades: checked-out branches are protected under worktree-admin, fast-forward checkout updates require custody, transfers use explicit mappings and preserve unknown outcomes without resending. Opaque one-shot native lock handover blocks release during calls and rejects forged handles; Windows handover remains unsupported.
 
 - Git adds a dormant typed Inspect facade with byte-safe status/diff/object/path/worktree reads, explicit trunk uncertainty and shallow ancestry errors, bounded streamed write snapshots on Unix, and transaction-local Rust lock scopes seeded only by verified holder handles. Diff hardening flags now precede the path delimiter. Linked-worktree cwd discovery validates reciprocal main registration; separate-git-dir remains unsupported.
+- Bind Event Store appends to prepared machine authority, remove raw store construction, require trusted-main preparation, and tighten gate/error/consumer validation.
+
 - Harden Git landing repairs: ignore reserved legacy mirror suffixes, diagnose their refs, migrate historical origin mappings alongside custom remotes, preserve symlinked state roots, and refuse unrelated-root chmod with actionable hooks diagnostics.
 
 - Fix Git setup so ordinary fetch/pull work before the legacy Event Store ref exists; repair previously installed exact refspecs, share Git’s mapping policy across setup and Event Store, and repair/diagnose unsafe Git driver directory modes on umask-002 hosts.

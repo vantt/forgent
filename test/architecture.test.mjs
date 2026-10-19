@@ -1293,3 +1293,21 @@ test('native description handover has exactly one Git loader importer', () => {
     assert.ok(!/\bregisterNativeHandover\b/.test(lexSource(fs.readFileSync(path.join(root,file),'utf8')).code), file);
   }
 });
+
+test('Event Store keeps consumer boundaries and one native export importer', () => {
+  const violations = [];
+  for (const file of onDisk) {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const imports = extractImports(source);
+    if (file.startsWith('src/event-store/')) {
+      for (const specifier of imports) {
+        const target = path.relative(root, path.resolve(root, path.dirname(file), specifier));
+        if (target.startsWith('src/state/') || target.startsWith('src/runner/')) violations.push(`${file} -> ${target}`);
+      }
+    }
+    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore)\s*\()/.test(lexSource(source).code)) {
+      violations.push(`${file}: imports native Event Store exports outside native.mjs`);
+    }
+  }
+  assert.deepEqual(violations, []);
+});
