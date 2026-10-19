@@ -1,5 +1,7 @@
 # Phase 05: spec, CHANGELOG, doctor and explain rows
 
+Status: done (2026-10-20). Report: [phase-lead-261020-0336-model-pool-b1-p05.md](../reports/phase-lead-261020-0336-model-pool-b1-p05.md).
+
 ## Context
 
 - [plan.md](plan.md); `docs/specs/runner.md` RUL80, RUL91, RUL102, RUL103, RUL105 (read each before editing); `docs/specs/reading-map.md` (no path change expected). Shared board files: small separate commits.
