@@ -2372,6 +2372,19 @@ mod tests {
         }
     }
     #[test]
+    fn read_only_hash_object_does_not_install_bytes() {
+        for format in ["sha1", "sha256"] {
+            let state = Temp::new();
+            let dir = Temp::new();
+            git(&dir.0, &["init", "-q", &format!("--object-format={format}")]);
+            let driver = GitDriver::new(&state.0).unwrap();
+            let repo = resolve(&driver, &dir.0);
+            let oid = driver.hash_object(&repo, ObjectType::Blob, b"unpublished bytes\0").unwrap();
+            assert!(!repo.common_dir().join("objects").join(&oid.as_str()[..2]).join(&oid.as_str()[2..]).exists());
+            assert!(driver.hash_object(&repo, ObjectType::Tag, b"bad").is_err());
+        }
+    }
+    #[test]
     #[cfg(unix)]
     fn publication_borrow_hash_object_binary_round_trip() {
         use fgos_holder_lock::{acquire, release, Acquire, Mode, Resource, Wait};
@@ -2820,6 +2833,18 @@ struct CommitCursor {
 }
 
 impl GitDriver {
+    /// Compute an object identity through Git without installing the object.
+    pub fn hash_object(&self, repo: &RepoHandle, kind: ObjectType, bytes: &[u8]) -> Result<Oid> {
+        let kind = match kind {
+            ObjectType::Blob => "blob",
+            ObjectType::Tree => "tree",
+            ObjectType::Commit => "commit",
+            _ => return Err(refusal("unsupported-hash-object-type")),
+        };
+        let out = self.inspect_input(repo, &["hash-object", "-t", kind, "--stdin"], bytes)?;
+        Oid::parse(std::str::from_utf8(&out).map_err(|_| refusal("invalid-object-id"))?.trim(), repo.object_format())
+            .map_err(|_| refusal("invalid-object-id"))
+    }
     pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;

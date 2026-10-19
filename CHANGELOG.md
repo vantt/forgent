@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.
+
 - Fix dormant Event Store migration retries and recovery ownership, pre-cutover doctor warnings, HEAD-only reads, and restorable nested porting rollback exports.
 
 - Add dormant Event Store migration/import and rollback parity support, HEAD-only legacy reads, migration-required write refusals, and legacy-layout diagnostics; CLI registration follows at cutover.

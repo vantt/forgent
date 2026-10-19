@@ -1028,3 +1028,5 @@ Source: framing candidate A, section 16 (unit run `unit-run-1792246479142-9f284c
 | G-232 | Carry §12/13/15 consumer migration | V-PARITY/V-PACK/V-GATE | Component không đổi cách các sự kiện git được ghi vào event log (tên trường, thời điểm) vì replay phụ thuộc chúng; mọi thay đổi định dạng sự kiện đi kèm cập nhật `replay`. |
 | G-233 | Carry §12/13/15 consumer migration | V-PARITY/V-PACK/V-GATE | Mọi thay đổi chạm cài đặt/doctor phải theo cổng 'Install/setup/doctor' của AGENTS.md: giá trị mặc định, biến env hay phụ thuộc mới phải đăng ký vào `fgos setup` và `fgos doctor`; component git không đứng riêng. |
 | G-234 | Override per §16 G-234; frozen text stays in the catalogue, superseded mechanics are not carried | V-LAND/V-VERIFY/V-CRASH | Effective rule: Consumer owns Iron Law/approval; Git binds OIDs/target/evidence. |
+
+The Inspect driver exposes `hash_object(repo, ObjectType, bytes)` for blob, tree and commit identities. It runs `git hash-object -t <type> --stdin` through the existing read-only command door, without `-w`, installing no object and borrowing no publication authority.

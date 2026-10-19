@@ -12,7 +12,8 @@ import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
 test('real import then fixture fence, v4 append and rollback export preserve Work and nested porting parity', t => {
   const f = fixture(t); const files = trackedLegacy(f);
   const before = f.store.readLegacyFromHead({ check: true }, []);
-  const pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+  const { operationId, ...pin } = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
+  assert.match(operationId, /^event-store-cutover-/);
   // Fixture-only cutover materialization; production uses the pending Git 05
   // ScopedCommit+real-hook gate in migrate-cutover-grant.test.mjs.
   for (const p of Object.keys(files).filter(p => p !== '.gitattributes')) fs.unlinkSync(path.join(f.repo, p));
