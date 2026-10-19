@@ -3,6 +3,7 @@
 // private store -- derived from a root the person already trusted in the real account store -- and the
 // real store is never edited. Everything here runs against fixture files.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

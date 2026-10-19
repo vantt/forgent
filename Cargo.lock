@@ -181,6 +181,7 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",
+ "libc",
  "semver",
  "serde",
  "serde_json",
@@ -221,6 +222,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-holder-lock",
  "fgos-process",
+ "fgos-write-scope",
  "libc",
  "serde",
  "serde_json",
@@ -256,6 +258,7 @@ dependencies = [
  "fgos-event-store",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-write-scope",
  "libc",
  "napi",
  "napi-build",
@@ -348,6 +351,10 @@ dependencies = [
  "serde_json",
  "tokio",
 ]
+
+[[package]]
+name = "fgos-write-scope"
+version = "0.2.0"
 
 [[package]]
 name = "filetime"

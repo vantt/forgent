@@ -451,6 +451,121 @@
                       "required": [
                         "WorktreeRemove"
                       ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ScopedCommit": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "worktree": {
+                              "type": "string"
+                            },
+                            "baseline": {
+                              "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
+                            },
+                            "paths": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "tree": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            },
+                            "cutoverGrant": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "exactPaths": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "legacyRefOid": {
+                                      "type": "string"
+                                    },
+                                    "sealDigest": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "exactPaths",
+                                    "legacyRefOid",
+                                    "sealDigest"
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "worktree",
+                            "baseline",
+                            "request",
+                            "paths",
+                            "tree",
+                            "cutoverGrant"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ScopedCommit"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "Sync": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "worktree": {
+                              "type": "string"
+                            },
+                            "head": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            },
+                            "target": {
+                              "type": "string",
+                              "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "reference": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "pattern": "^refs/heads/",
+                              "description": "Recorded symbolic HEAD at admission; absent legacy records cannot prove the recovery branch."
+                            }
+                          },
+                          "required": [
+                            "worktree",
+                            "head",
+                            "target",
+                            "message"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "Sync"
+                      ]
                     }
                   ]
                 },
@@ -467,8 +582,9 @@
                   "minItems": 1,
                   "items": {
                     "type": "string",
-                    "pattern": "^(?:refs/|config:local$)"
-                  }
+                    "pattern": "^(?:refs/|config:local$|worktree:)"
+                  },
+                  "description": "Lifecycle Remove and Move-source additionally bind the existing checkout custody resource; legacy path-only records remain readable."
                 },
                 "authorityBinding": {
                   "type": "string",
@@ -935,6 +1051,43 @@
                     "completed",
                     "details"
                   ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "commit"
+                    },
+                    "observed": {
+                      "type": "string",
+                      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                    },
+                    "contract_violation": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "observed",
+                    "contract_violation"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "commitRejected"
+                    },
+                    "cause": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "cause"
+                  ]
                 }
               ]
             }
@@ -1048,6 +1201,90 @@
           "required": [
             "phase"
           ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "sync-commit-attempt"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tree": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                }
+              },
+              "required": [
+                "tree"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "const": "sync-state"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "clean_modes": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                      }
+                    ]
+                  }
+                },
+                "conflicts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "staged": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "index_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "conflicts",
+                "staged",
+                "index_digest"
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "data"
+          ]
         }
       ]
     },
@@ -1067,5 +1304,5 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:fgos:git:wal-record:v1",
   "title": "Git WAL immutable envelope v1",
-  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig, Remote and Worktree. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority. Worktree records bind canonical paths, the exact registration identity, tip and consumer delivery digest; interrupted effects are never repeated."
+  "description": "Immutable Git WAL envelope for Publication, Refs, RepositoryConfig, Remote, Worktree, ScopedCommit and Sync. Sync records its prepared index state and a one-shot commit-attempt barrier before moving the checkout ref. RemoteFetch/RemotePush share explicit per-target old/new tips across Publication and non-event transfers. SHA-256 covers recursively key-sorted UTF-8 JSON with digest omitted. Semantic transitions, namespace grants, object-format checks and live authority remain Rust obligations; evidence never grants effect authority. Worktree records bind canonical paths, the exact registration identity, tip and consumer delivery digest; interrupted effects are never repeated."
 }

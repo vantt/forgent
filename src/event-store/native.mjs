@@ -40,30 +40,35 @@ function call(fn) {
     throw error;
   }
 }
+// serde_json's map representation does not preserve JavaScript insertion order.
+// Legacy view revisions depend on that order: parse the authenticated raw line.
+function historical(result, key) {
+  return { ...result, [key]: result[key].map(record => ({ ...record, event: JSON.parse(record.raw) })) };
+}
 const prepared = new Map();
 /** Resolve before acquiring a hot mutex; pass the result as prefetched.eventStore. */
 export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config } = {}) {
   available();
-  eventStoreConfig(config);
+  const settings = eventStoreConfig(config);
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');
   const root = path.resolve(cwd);
   const trusted = path.resolve(trustedMain);
   const state = stateRoot ?? resolveStateRoot().stateRoot;
   const native = loadNativeAddon(loaderOptions);
-  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null]);
+  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);
   if (prepared.has(key)) return prepared.get(key);
   const resolved = call(() => native.resolveEventStore(root, state, trusted));
-  const store = openStore(resolved, resolved.machineId, registryFiles(), loaderOptions);
+  const store = openStore(resolved, resolved.machineId, registryFiles(), loaderOptions, settings.remote);
   prepared.set(key, store);
   return store;
 }
 
 /** Open only an opaque root obtained from Git's resolver outside the gate. */
-export function openStore(resolvedRoot, machineId, files, loaderOptions) {
+export function openStore(resolvedRoot, machineId, files, loaderOptions, remote = 'origin') {
   available();
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
-  const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files));
+  const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
@@ -75,7 +80,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions) {
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
     read({ streams, cursor = null, folded = [], project = true }, heldRanks) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.read(streams, cursor, folded, project, ranks, hotLockDepth()));
+      return historical(call(() => native.read(streams, cursor, folded, project, ranks, hotLockDepth())), 'legacy');
     },
     seal(stream, heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -105,6 +110,18 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.exportLegacyLayout(streams, since, out, ranks, hotLockDepth()));
     },
+    readLegacyFromHead({ check = false } = {}, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return historical(call(() => native.readLegacyFromHead(check, ranks, hotLockDepth())), 'events');
+    },
+    importLegacy({ expectedHead }, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.importLegacy(expectedHead, ranks, hotLockDepth()));
+    },
+    legacyLayout(heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.legacyLayout(ranks, hotLockDepth()));
+    },
     unpublishedSummary(remote, heldRanks) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.unpublishedSummary(remote, ranks, hotLockDepth()));
@@ -128,7 +145,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
     && typeof native.mintEventStoreMachineId === 'function'
-    && ['read', 'append', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && ['read', 'append', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {

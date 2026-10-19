@@ -1,5 +1,6 @@
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
+import '../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -18,7 +19,6 @@ import {
   mergeWorkflowBranch,
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
-  translatePlanToWorkflow,
   startWorkflow,
   statusWorkflow,
   answerWorkflow,
@@ -27,7 +27,7 @@ import {
   resumeWorkflowDetached,
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
-import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
@@ -42,6 +42,7 @@ after(() => {
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -235,46 +236,6 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
   assert.equal(fs.existsSync(worktreePath), false);
 });
 
-test('translatePlanToWorkflow translates multi-phase plan into DAG Workflow', () => {
-  const tmp = makeFixtureDir('plan-trans-');
-  fs.writeFileSync(
-    path.join(tmp, 'plan.md'),
-    `---
-title: "My Feature Plan"
----
-# Overview
-`,
-  );
-  fs.writeFileSync(
-    path.join(tmp, 'phase-01-core.md'),
-    `---
-phase: 1
-title: "Core"
-dependencies: []
----
-`,
-  );
-  fs.writeFileSync(
-    path.join(tmp, 'phase-02-api.md'),
-    `---
-phase: 2
-title: "API"
-dependencies: [1]
-requiresReview: true
----
-`,
-  );
-
-  const wf = translatePlanToWorkflow(tmp);
-  assert.equal(wf.id.startsWith('plan/'), true);
-  assert.equal(wf.steps.length, 2);
-  assert.equal(wf.steps[0].id, 'phase-01');
-  assert.equal(wf.steps[1].id, 'phase-02');
-  assert.deepEqual(wf.steps[1].dependsOn, ['phase-01']);
-  assert.ok(wf.steps[1].gate);
-  assert.equal(wf.steps[1].gate.kind, 'human');
-});
-
 test('runner: executes workflow with parallel steps and parks at human gate', async () => {
   const tmp = setupTestRepo();
 
@@ -398,15 +359,12 @@ test('a gate answer that cannot be written is refused before the answer is recor
 
 test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'my-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "CLI Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
-  // 1. fgos workflow start --plan
+  // 1. fgos workflow start <id>
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp, '--foreground'],
+    [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(startOut.includes('wf-run-'));
@@ -434,14 +392,11 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
 
 test('CLI: fgos workflow start returns the run id at once and a detached process finishes the run', async () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'detached-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Detached Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp],
     { cwd: tmp, encoding: 'utf8' },
   );
   const wfRunId = /"workflowRunId":\s*"([^"]+)"/.exec(startOut)?.[1];
@@ -552,7 +507,7 @@ async function holdAdvanceInChild(tmp, id) {
   return { child, exited };
 }
 
-test('a run already being advanced by a live process refuses a second advance and records nothing', async () => {
+test('a run already being advanced by a live process refuses a second advance; an answer is kept for the live proposer and the ledger is left to it', async () => {
   const tmp = setupTestRepo();
   const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
   const id = parked.workflowRunId;
@@ -565,15 +520,24 @@ test('a run already being advanced by a live process refuses a second advance an
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
   assert.throws(() => resumeWorkflowDetached(id, opts), new RegExp(`already being advanced by process ${process.pid}`));
-  assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
   await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
-  await assert.rejects(answerWorkflow(id, answer), /already being advanced/);
-  assert.equal(eventCount(), before, 'a refused advance must not record the gate answer');
-  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'a refused advance leaves the holder lock alone');
+  assert.equal(eventCount(), before, 'a refused resume records nothing');
+
+  // An answer never writes the ledger itself: it is kept as a file and the live holder records it.
+  const kept = answerWorkflowDetached(id, answer);
+  assert.equal(kept.recorded, true);
+  assert.equal(kept.appliedBy, 'live proposer');
+  assert.equal(kept.detached, undefined, 'no second process is started');
+  assert.equal(eventCount(), before, 'the answer reached no ledger line while a holder lives');
+  await assert.rejects(answerWorkflow(id, answer), (err) => err.code === 'gate-already-answered', 'a second answer to the same gate is refused by name');
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'the holder lock is left alone');
   held.release();
 
-  const state = await answerWorkflow(id, answer);
+  // The next holder of advance folds the kept answer in before it acts on anything.
+  const state = await resumeWorkflow(id, opts);
   assert.equal(state.status, 'completed');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).map((e) => e.type);
+  assert.ok(types.indexOf('gate.answer') < types.lastIndexOf('step.complete'), 'gate.answer is on the ledger before the step it releases completes');
   assert.equal(probe('advance', advanceParams(tmp, id)).result, 'free');
 });
 
@@ -585,7 +549,7 @@ test('an advance holder killed right after it took the lock does not block the n
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, repoRoot: tmp, cwd: tmp };
 
   const { child, exited } = await holdAdvanceInChild(tmp, id);
-  await assert.rejects(answerWorkflow(id, answer), new RegExp(`already being advanced by process ${child.pid}`));
+  await assert.rejects(resumeWorkflow(id, { repoRoot: tmp, cwd: tmp }), new RegExp(`already being advanced by process ${child.pid}`));
   child.kill('SIGKILL');
   await exited;
 
@@ -795,13 +759,10 @@ test('status shows no log tail for a completed run', async () => {
 
 test('CLI: the detached child logs a line per step start and end, and workflow status prints the advance block', async () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'progress-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Progress Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
   const wfRunId = parseCliData(
-    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
+    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
   ).workflowRunId;
   assert.equal(await waitForStatus(wfRunId, tmp, 'completed'), 'completed');
   const stepId = Object.keys(statusWorkflow(wfRunId, { repoRoot: tmp, cwd: tmp }).steps)[0];

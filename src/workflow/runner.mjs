@@ -1,369 +1,48 @@
-// src/workflow/runner.mjs — Workflow execution runner, DAG sequencer, and gate manager
+// src/workflow/runner.mjs — the Playbook proposer: the harness's own proposer for a guide whose every decision point lists its routes
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
+//
+// It holds the case's `advance` for its whole life. Each cycle it drains the runtime inbox, reads the
+// case, takes the ready steps in the order the playbook declares them (the single SHOULD among the
+// eligible activities), and for each Unit asks admission whether it may run now. An admitted Unit gets
+// a `route` and a `reservation` on the ledger, runs through the Execution Core exactly as before, and
+// is settled with its receipts. Admission is asked, never bypassed: a refusal ends the step by name,
+// or, when the approval a later step stands on has gone stale, parks the gate again for a new answer.
 
-import fs from 'node:fs';
 import crypto from 'node:crypto';
-import path from 'node:path';
-import { execFileSync, spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
-import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
-import { normalizeContextRefs } from './definition.mjs';
-import { loadWorkflow } from './loader.mjs';
 import {
-  createAdvanceHold,
-  createWorkflowRun,
   appendWorkflowEvent,
   readWorkflowEvents,
-  recoverWorkflowLedgerTail,
   projectWorkflowState,
 } from './store.mjs';
+import { PROGRESS_LINE_LIMIT, ADVANCE_DETACHED_ENV } from './case-lock.mjs';
+import { drainCaseInbox, removeReservationFile, writeReservationFile } from './case-runtime.mjs';
+import { projectCase, receiptsFromResults } from './case-projection.mjs';
+import { admitProposal, newReservationId } from './case-admission.mjs';
+import { bindWorktree, readBinding, unbindWorktree } from './case-bindings.mjs';
+import { openCaseOnLedger, resolveFrame } from './case-start.mjs';
 import {
   createWorkflowWorktree,
   mergeWorkflowBranch,
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
-import { translatePlanToWorkflow } from './plan-source.mjs';
-import { translateUnitsToWorkflow } from './units-source.mjs';
-import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
+import {
+  buildUnitHandoff,
+  canResumeUnitRun,
+  gitOut,
+  outOfScopeWrites,
+  playbookSubjectDigests,
+  renderGateQuestion,
+  settleUnitWorktrees,
+  singleWriteBaseOf,
+  stepSubjectDigest,
+  unitOverridesOf,
+  unitPatternOf,
+} from './unit-handoff.mjs';
+import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
-import { digestContextRefs } from './ref-digests.mjs';
-import { seatProviders } from './seat-providers.mjs';
-import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
-import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
-import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
-import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
-import { nulPaths } from '../util/git-paths.mjs';
-import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
-import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
-import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
-
-const GATE_ANSWER_NOTE_CHARS = 200;
-
-/**
- * What a unit needs beyond its template objective: the owner's request the run was started
- * with, and what the steps it depends on (directly or not) produced.
- *
- * The objective carries only an index of the earlier units -- one summary line each, tagged with
- * its Unit run id. The reports themselves travel as `inputs`, one `unit-run:<id>/<role>` per role
- * of every earlier unit; the Execution Core turns them into absolute report paths in the
- * assignment's context refs, so nothing is truncated and no panelist is dropped.
- */
-function buildUnitHandoff({ template, state, step, workflow }) {
-  const parts = [template.objective || ''];
-  if (state.request) parts.push(`Owner request:\n${state.request}`);
-
-  const wanted = new Set();
-  const collect = (stepId) => {
-    for (const dep of workflow.steps.find((s) => s.id === stepId)?.dependsOn ?? []) {
-      if (!wanted.has(dep)) {
-        wanted.add(dep);
-        collect(dep);
-      }
-    }
-  };
-  collect(step.id);
-
-  // Which earlier steps the unit receives: every step it builds on, unless its template declares
-  // `inputs`, which then names the steps (and, per entry, whether it is the unit's own seat's
-  // result of that step only) in the order they are listed.
-  const picks = template.inputs
-    ? template.inputs.map((entry) => ({ prior: workflow.steps.find((s) => s.id === entry.step), sameSeat: entry.sameSeat === true, label: entry.label }))
-    : workflow.steps.filter((s) => wanted.has(s.id)).map((prior) => ({ prior }));
-
-  // With anonymizeInputs the Execution Core copies each role's report as seat-A, seat-B, ... in
-  // the order of `inputs`, so the index below names them that way and nothing else: no step,
-  // unit, unit run or role. A same-seat input is not part of that numbering: the role it is for
-  // gets it as its own earlier result, and the brief only says so.
-  const anonymize = template.anonymizeInputs === true;
-  const index = [];
-  const inputs = [...(template.contextRefs ?? []), ...(step.dependsOn.length === 0 ? state.contextRefs ?? [] : [])];
-  let anonymized = 0;
-  for (const { prior, sameSeat, label } of picks) {
-    for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
-      if (!unitState.unitRunId) continue;
-      const results = (unitState.results ?? []).filter((r) => r?.runResult);
-      if (sameSeat) {
-        inputs.push(`unit-run:${unitState.unitRunId}/${SEAT_PLACEHOLDER}`);
-        index.push(`### ${label ?? 'Your own earlier result'}\nIt is the file named "${OWN_PREVIOUS_NAME}" under Context refs: what you yourself produced in an earlier step.`);
-        continue;
-      }
-      if (anonymize) {
-        for (const role of new Set(results.map((r) => r.role))) {
-          const summary = results.filter((r) => r.role === role).at(-1)?.runResult.agentClaim?.summary;
-          index.push(`### ${anonymousInputName(anonymized++)}${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
-          inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
-        }
-        continue;
-      }
-      const summary = results.at(-1)?.runResult.agentClaim?.summary;
-      index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
-      for (const role of new Set(results.map((r) => r.role))) inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
-    }
-  }
-  if (index.length > 0) {
-    parts.push(
-      `Output of earlier steps${anonymize ? ', anonymized' : ''} (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
-    );
-  }
-
-  // The owner's answers to human gates -- the gated step's own and those of the steps it builds on.
-  // Each travels as a file ref; the objective keeps one line per answer, tagged as the owner's.
-  const answerNotes = [];
-  for (const gated of workflow.steps) {
-    const answer = state.steps[gated.id]?.answer;
-    if (answer === null || answer === undefined || (!wanted.has(gated.id) && gated.id !== step.id)) continue;
-    inputs.push(`gate-answer:${state.workflowRunId}/${gated.id}`);
-    const oneLine = String(answer).replace(/\s+/g, ' ').trim();
-    answerNotes.push(`- ${gated.id} (owner's answer at the "${gated.id}" gate): ${oneLine.slice(0, GATE_ANSWER_NOTE_CHARS)}`);
-  }
-  if (answerNotes.length > 0) {
-    parts.push(
-      `The owner's own answers at human gates of this run -- the owner's input, not another agent's output, and it decides what is open at that gate (the full text of each is listed under Context refs; read it before answering):\n${answerNotes.join('\n')}`,
-    );
-  }
-  return { objective: parts.filter(Boolean).join('\n\n'), inputs };
-}
-
-const EXPERTISE_KEYS = ['missing expertise', 'missing_expertise'];
-
-/**
- * The producer's packet is its settled report: raw JSON, never fenced or mixed into prose. Models
- * that keep the report as prose write the packet beside it as `packet-*.json`; that file counts
- * only when it is a JSON object that was not touched after the report settled, because it is not
- * covered by the report digest. Either key spelling is read.
- */
-function readMissingExpertise(reportFile, settledAt) {
-  const pick = (packet) => EXPERTISE_KEYS.map((key) => packet?.[key]).find((value) => value !== undefined);
-  let reportError;
-  try {
-    const found = pick(JSON.parse(fs.readFileSync(reportFile, 'utf8')));
-    if (found !== undefined) return found;
-  } catch (error) {
-    reportError = error;
-  }
-  const dir = path.dirname(reportFile);
-  const settledMs = Date.parse(settledAt);
-  const siblings = fs.readdirSync(dir).filter((name) => /^packet-[^/]*\.json$/.test(name)).sort().reverse();
-  for (const name of siblings) {
-    if (!(fs.statSync(path.join(dir, name)).mtimeMs <= settledMs)) continue;
-    try {
-      const found = pick(JSON.parse(fs.readFileSync(path.join(dir, name), 'utf8')));
-      if (found !== undefined) return found;
-    } catch { /* a malformed side file is not evidence; the report error below decides */ }
-  }
-  if (reportError) throw reportError;
-  return undefined;
-}
-
-function renderGateQuestion(step, state, mainRoot) {
-  return (step.gate.question || `Approve step "${step.id}"?`).replace(
-    /\{\{report:([^/{}:\s]+)\/([^{}:\s]+):missing expertise\}\}/g,
-    (_, stepId, unitId) => {
-      const unit = state.steps[stepId]?.units[unitId];
-      if (unit?.status !== 'completed' || !unit.unitRunId) throw new RunnerConfigError('gate report producer is not settled');
-      const producer = unit.results?.filter((record) => record.role === 'producer').at(-1);
-      if (!producer?.runResult?.settleReports?.length) throw new RunnerConfigError('gate requires a settled producer report');
-      const [file] = resolveUnitInputs([`unit-run:${unit.unitRunId}/producer`], mainRoot).refs;
-      const expertise = readMissingExpertise(file, producer.runResult.settledAt);
-      if (!Array.isArray(expertise) || expertise.some((entry) => typeof entry !== 'string' || !entry.trim())) {
-        throw new RunnerConfigError('gate report requires "missing expertise" as an array of non-empty strings');
-      }
-      return JSON.stringify(expertise);
-    },
-  );
-}
-
-/**
- * The pattern a template runs: its name, or the name with the template's `params` when it has
- * any -- the same `{ pattern, params }` shape the Execution Core accepts from a CLI caller.
- */
-function unitPatternOf(template) {
-  const name = template.pattern || 'solo';
-  return template.params ? { pattern: name, params: template.params } : name;
-}
-
-/**
- * The overrides a unit implies. A template's `persona` is not one of them: it travels on the Unit
- * itself (unitData.persona), which bind() ranks below an override and above the capability's.
- *
- * A `--seats` run binds each named persona to its own seat of every panel unit, scoped by role,
- * with the persona text pinned at start: the named seat keeps its persona, every other role (the
- * synthesizer included) has no matching override and falls through to the unit's own persona.
- *
- * A run started with `--effort` asks every role for that reasoning effort, the way `fgos run --effort`
- * does: on every entry above, and as a trailing unscoped `human-cli` override that a role no entry
- * names falls through to.
- */
-function unitOverridesOf(unit, seatPersonas = [], options = {}) {
-  const { effort = null, timeoutMs = null, account = null } = options ?? {};
-  const unitTimeoutMs = unit.timeoutMs ?? unit.template?.timeoutMs;
-  const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
-
-  const seatScoped = unit.template?.pattern === 'panel'
-    ? seatPersonas.map(({ seat, name, digest, text }) => ({
-      scope: { unit: unit.id, role: seat },
-      persona: name,
-      personaPin: { name, digest, text },
-      origin: 'workflow',
-      ...(effort !== null ? { reasoningEffort: effort } : {}),
-      ...(applyTimeout ? { timeoutMs } : {}),
-      ...(account !== null ? { account } : {}),
-    }))
-    : [];
-
-  const hasFallback = effort !== null || applyTimeout || account !== null;
-  if (!hasFallback) return seatScoped;
-
-  const fallback = {
-    origin: 'human-cli',
-    ...(effort !== null ? { reasoningEffort: effort } : {}),
-    ...(applyTimeout ? { timeoutMs } : {}),
-    ...(account !== null ? { account } : {}),
-  };
-
-  return [...seatScoped, fallback];
-}
-
-/**
- * The writing unit whose branch a writing unit of `stepId` starts from: the nearest writing unit
- * among the steps it builds on, directly or through read-only steps. An integrate step ends the
- * walk -- what came before it is on the integration target. Null when it builds on none.
- * Building on two or more writing units (none built on the other) is refused: nothing here merges.
- */
-function writeBaseOf(workflow, stepId) {
-  const byId = new Map(workflow.steps.map((s) => [s.id, s]));
-  const ancestorsOf = (id) => {
-    const seen = new Set();
-    const walk = (cur) => {
-      for (const dep of byId.get(cur)?.dependsOn ?? []) {
-        if (seen.has(dep)) continue;
-        seen.add(dep);
-        if (byId.get(dep)?.kind !== 'integrate') walk(dep);
-      }
-    };
-    walk(id);
-    return seen;
-  };
-  const writers = [];
-  for (const id of ancestorsOf(stepId)) {
-    const step = byId.get(id);
-    if (step.kind === 'integrate') continue;
-    for (const unit of step.units) if (unit.template.writes?.length) writers.push({ stepId: id, unitId: unit.id });
-  }
-  // Drop a writer some other writer already builds on: its work is on that writer's branch.
-  const nearest = writers.filter((w) => !writers.some((o) => o.stepId !== w.stepId && ancestorsOf(o.stepId).has(w.stepId)));
-  if (nearest.length > 1) {
-    return { refused: nearest.map((w) => w.unitId) };
-  }
-  return nearest[0] ?? null;
-}
-
-/**
- * Refuse a units file where a writing unit builds on more than one writing unit, before any run
- * exists. A preset or plan with that shape keeps starting such a unit from HEAD, as before.
- */
-function assertWriteChains(workflow) {
-  for (const step of workflow.steps) {
-    if (!step.units.some((u) => u.template.writes?.length)) continue;
-    const base = writeBaseOf(workflow, step.id);
-    if (base?.refused) {
-      const writer = step.units.find((u) => u.template.writes?.length).id;
-      throw new RunnerConfigError(
-        `Workflow "${workflow.id}" unit "${writer}" writes and builds on more than one writing unit (${base.refused.join(', ')}); merge these units into one, or make one depend on the other so they form a chain`,
-      );
-    }
-  }
-}
-
-/**
- * Paths a unit's producer changed outside the unit's write scope: those its commits report as out
- * of scope, and any path the unit's branch changed since its base outside the scope -- every
- * commit on it, a resumed round's or one the producer made itself included. Paths come from
- * `git diff -z`, so a name git would quote (non-ASCII, spaces) is matched as it is. The scope is
- * the one the Unit run recorded (its `writes` widened to generated render targets).
- */
-function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSha }) {
-  let scope = writes;
-  try {
-    scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
-  } catch { /* the template's writes are the scope the run started from */ }
-  const changed = branch && baseSha
-    ? nulPaths(gitOut(mainRoot, ['diff', '-z', '--no-renames', '--no-relative', '--name-only', baseSha, branch, '--']) ?? '')
-    : results.flatMap((result) => result?.commit?.files ?? []);
-  // What the branch itself carries outside the scope: the part a writer built on it inherits.
-  const onBranch = changed.filter((file) => !matchesWriteScope(file, scope));
-  const reported = results.flatMap((result) => result?.commit?.outOfScope ?? []);
-  return { all: [...new Set([...reported, ...onBranch])].sort(), onBranch: [...new Set(onBranch)].sort() };
-}
-
-/** The writing unit a writer starts from, or null; a definition with more than one gets none (HEAD). */
-function singleWriteBaseOf(workflow, stepId) {
-  const base = writeBaseOf(workflow, stepId);
-  return base && !base.refused ? base : null;
-}
-
-function gitOk(cwd, args) {
-  try {
-    execFileSync('git', args, { cwd, stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function gitOut(cwd, args) {
-  try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Remove the worktrees of Units whose work reached the main line; keep the rest and say where
- * they are. A passed Unit counts as integrated only when its branch is already part of the integration target (the integrate step's `target`, else the repository trunk) and
- * its worktree holds nothing uncommitted -- removing a worktree forgets anything left in it. A
- * Unit that failed, was refused, or never finished keeps its worktree for investigation.
- */
-function settleUnitWorktrees({ mainRoot, state, workflow }) {
-  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
-  const removed = [];
-  const kept = [];
-  for (const step of Object.values(state.steps)) {
-    for (const unit of Object.values(step.units)) {
-      if (!unit.worktreePath) continue;
-      const entry = { stepId: step.id, unitId: unit.unitId, worktreePath: unit.worktreePath, branch: unit.branch };
-      let reason = null;
-      if (unit.status !== 'completed' || unit.outcome !== 'pass') {
-        reason = `unit ended ${unit.outcome ?? 'unfinished'}`;
-      } else if (!fs.existsSync(unit.worktreePath)) {
-        removed.push(entry);
-        continue;
-      } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, integrationTarget])) {
-        reason = 'branch not integrated';
-      } else if ((gitOut(unit.worktreePath, ['status', '--porcelain', '--untracked-files=normal']) ?? 'unknown').trim() !== '') {
-        reason = 'worktree has uncommitted changes';
-      }
-      if (reason) {
-        kept.push({ ...entry, reason });
-        continue;
-      }
-      cleanupWorkflowWorktree({
-        repoRoot: mainRoot,
-        worktreePath: unit.worktreePath,
-        branch: unit.branch,
-        deleteBranch: Boolean(unit.branch),
-      });
-      removed.push(entry);
-    }
-  }
-  return { removed, kept };
-}
-
-const PROGRESS_LINE_LIMIT = 300;
+import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -380,13 +59,21 @@ function progressLine({ ts, type, payload }) {
 
 // The detached advance process is the only one whose output is a log nobody is watching live, so
 // it alone prints progress; a foreground advance keeps its stdout for the result.
-const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
 const detachedChildLog = process.env[ADVANCE_DETACHED_ENV] === '1' ? (line) => process.stderr.write(`${line}\n`) : null;
 
+/** A refusal that means "the approval this step stands on is not valid for what is there now". */
+const APPROVAL_REFUSALS = new Set(['consent-stale', 'consent-missing', 'consent-subject-unknown', 'entry-milestone-stale']);
+
+const worktreeFacts = (worktree) => ({
+  commonDir: gitOut(worktree, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
+  ref: gitOut(worktree, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
+});
+
 /**
- * Run loop to advance ready steps in a Workflow run.
+ * Run loop of the Playbook proposer: advance the ready steps of a Workflow run until it completes,
+ * fails, or parks, under the `advance` hold the caller took.
  */
-async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
+export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
   // Every event is recorded in the event log under the run's advance hold; a step's start, end or
   // park also reaches onLog as one line.
   const recordEvent = (args) => {
@@ -395,413 +82,535 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
     if (line && onLog) onLog(line);
     return stored;
   };
-  let events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  let state = projectWorkflowState(events);
 
-  while (state.status === 'running') {
-    const steps = workflow.steps;
-    const completedStepIds = new Set(
-      Object.values(state.steps)
-        .filter((s) => s.status === 'completed')
-        .map((s) => s.id),
-    );
+  // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
+  {
+    const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
+    const guide = projectCase(events).guide;
+    openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide, frame: resolveFrame(guide, undefined), request: projectWorkflowState(events).request, hold, worktreePath, legacy: true });
+  }
 
-    // Find ready steps that haven't started or are running
-    const readySteps = steps.filter((step) => {
-      const stepState = state.steps[step.id];
-      if (!stepState || stepState.status === 'completed' || stepState.status === 'parked' || stepState.status === 'failed') {
-        return false;
-      }
-      return step.dependsOn.every((dep) => completedStepIds.has(dep));
-    });
+  // Everything a cycle reads: the inbox is folded into the ledger first, so a gate answer that arrived
+  // while a Unit ran is on the ledger before anything acts on it.
+  const reread = () => {
+    const drained = drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
+    const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
+    const state = projectWorkflowState(events);
+    const guide = projectCase(events).guide;
+    const projection = projectCase(events, { currentDigests: playbookSubjectDigests({ state, workflow, guide, mainRoot }) });
+    return { events, state, projection, drained };
+  };
+  let { state } = reread();
 
-    if (readySteps.length === 0) {
-      // Check if all steps completed
-      const allDone = steps.every((s) => state.steps[s.id]?.status === 'completed');
-      if (allDone) {
-        recordEvent({
-          repoRoot: mainRoot,
-          workflowRunId,
-          event: {
-            type: 'workflow.complete',
-            payload: { outcome: 'pass', completedAt: new Date().toISOString() },
-          },
-        });
-        state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
-      }
-      break;
-    }
+  while (true) {
+    while (state.status === 'running') {
+      const steps = workflow.steps;
+      const completedStepIds = new Set(
+        Object.values(state.steps)
+          .filter((s) => s.status === 'completed')
+          .map((s) => s.id),
+      );
 
-    // Process ready steps
-    let stateChanged = false;
-    for (const step of readySteps) {
-      const stepState = state.steps[step.id];
-
-      // 1. Human gate check
-      if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
-        let question;
-        try {
-          question = renderGateQuestion(step, state, mainRoot);
-        } catch (error) {
-          const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
-          question = `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
+      // Find ready steps that haven't started or are running
+      const readySteps = steps.filter((step) => {
+        const stepState = state.steps[step.id];
+        if (!stepState || stepState.status === 'completed' || stepState.status === 'parked' || stepState.status === 'failed') {
+          return false;
         }
-        recordEvent({
-          repoRoot: mainRoot,
-          workflowRunId,
-          event: {
-            type: 'gate.park',
-            payload: {
-              stepId: step.id,
-              question,
-              header: step.gate.header,
-              parkedAt: new Date().toISOString(),
+        return step.dependsOn.every((dep) => completedStepIds.has(dep));
+      });
+
+      if (readySteps.length === 0) {
+        // Check if all steps completed
+        const allDone = steps.every((s) => state.steps[s.id]?.status === 'completed');
+        if (allDone) {
+          recordEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'workflow.complete',
+              payload: { outcome: 'pass', completedAt: new Date().toISOString() },
             },
-          },
-        });
-        stateChanged = true;
-        continue;
+          });
+          state = reread().state;
+        }
+        break;
       }
 
-      // Mark step start if pending
-      if (stepState.status === 'pending' || stepState.status === 'answered') {
+      // Process ready steps
+      let stateChanged = false;
+      const completeStep = (stepId) => {
+        // What the step's milestones stand for, as the Units' reports are now.
+        const subjectDigest = stepSubjectDigest({ state: reread().state, workflow, stepId, mainRoot });
         recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
-          event: {
-            type: 'step.start',
-            payload: { stepId: step.id, startedAt: new Date().toISOString() },
-          },
+          event: { type: 'step.complete', payload: { stepId, outcome: 'pass', subjectDigest, completedAt: new Date().toISOString() } },
         });
-        stateChanged = true;
-      }
+      };
+      for (const step of readySteps) {
+        const stepState = state.steps[step.id];
 
-      // 2. Integration step
-      if (step.kind === 'integrate') {
-        const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
-        // A unit that wrote outside its scope never reaches the target: the step fails, saying which,
-        // and merges nothing, rather than landing the rest and reporting a pass.
-        const flagged = step.dependsOn.flatMap((depId) => Object.values(state.steps[depId]?.units ?? {})
-          .filter((unit) => unit.outOfScope?.length)
-          .map((unit) => `${unit.unitId} (out-of-scope-writes: ${unit.outOfScope.join(', ')})`));
-        if (flagged.length > 0) {
-          const reason = `integrate refused, nothing merged: ${flagged.join('; ')}`;
-          const failedAt = new Date().toISOString();
-          recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.fail', payload: { stepId: step.id, outcome: 'findings', reason, failedAt } } });
-          recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'workflow.fail', payload: { outcome: 'findings', stepId: step.id, reason, failedAt } } });
+        // 1. Human gate check
+        if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
+          let question;
+          try {
+            question = renderGateQuestion(step, state, mainRoot);
+          } catch (error) {
+            const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
+            question = `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
+          }
+          recordEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'gate.park',
+              payload: {
+                stepId: step.id,
+                question,
+                header: step.gate.header,
+                parkedAt: new Date().toISOString(),
+              },
+            },
+          });
           stateChanged = true;
           continue;
         }
-        // Collect branches from predecessor units
-        for (const depId of step.dependsOn) {
-          const depStep = workflow.steps.find((s) => s.id === depId);
-          if (depStep?.units) {
-            for (const u of depStep.units) {
-              const uBranch = state.steps[depId]?.units[u.id]?.branch ?? `wf/${workflowRunId}/${u.id}`;
-              try {
-                mergeWorkflowBranch({
-                  repoRoot: mainRoot,
-                  sourceBranch: uBranch,
-                  targetBranch: integrationTarget,
-                  commitMessage: `integrate: merge step ${depId} unit ${u.id}`,
-                });
-              } catch {
-                // If branch didn't have commits or already merged, ignore
-              }
-            }
-          }
+
+        // Mark step start if pending
+        if (stepState.status === 'pending' || stepState.status === 'answered') {
+          recordEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'step.start',
+              payload: { stepId: step.id, startedAt: new Date().toISOString() },
+            },
+          });
+          stateChanged = true;
         }
 
-        recordEvent({
-          repoRoot: mainRoot,
-          workflowRunId,
-          event: {
-            type: 'step.complete',
-            payload: { stepId: step.id, outcome: 'pass', completedAt: new Date().toISOString() },
-          },
-        });
-        stateChanged = true;
-        continue;
-      }
-
-      // 3. Standard step with units
-      if (step.units && step.units.length > 0) {
-        let failedUnit = null;
-        for (const u of step.units) {
-          const uState = stepState.units[u.id];
-          if (uState && uState.status === 'completed') {
+        // 2. Integration step
+        if (step.kind === 'integrate') {
+          const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
+          // A unit that wrote outside its scope never reaches the target: the step fails, saying which,
+          // and merges nothing, rather than landing the rest and reporting a pass.
+          const flagged = step.dependsOn.flatMap((depId) => Object.values(state.steps[depId]?.units ?? {})
+            .filter((unit) => unit.outOfScope?.length)
+            .map((unit) => `${unit.unitId} (out-of-scope-writes: ${unit.outOfScope.join(', ')})`));
+          if (flagged.length > 0) {
+            const reason = `integrate refused, nothing merged: ${flagged.join('; ')}`;
+            const failedAt = new Date().toISOString();
+            recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.fail', payload: { stepId: step.id, outcome: 'findings', reason, failedAt } } });
+            recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'workflow.fail', payload: { outcome: 'findings', stepId: step.id, reason, failedAt } } });
+            stateChanged = true;
             continue;
           }
-
-          // Build unit object
-          const handoff = buildUnitHandoff({ template: u.template, state, step, workflow });
-          const unitData = {
-            id: u.id,
-            objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
-            capability: u.template.capability,
-            pattern: u.template.pattern || 'solo',
-            rigor: u.template.rigor,
-            writes: u.template.writes || [],
-            dependsOn: u.dependsOn || [],
-            inputs: handoff.inputs,
-            stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
-            ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
-            ...(u.template.blind ? { blind: true } : {}),
-            ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
-            ...(u.template.persona ? { persona: u.template.persona } : {}),
-            ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
-            ...(u.template.verify !== undefined ? { verify: u.template.verify } : {}),
-            ...(u.template.skills !== undefined ? { skills: u.template.skills } : {}),
-          };
-
-          // A unit left `running` with a recorded Unit run id was started by a controller that died:
-          // continue that run (settled seats are kept) and reuse the worktree it already has.
-          // Only when what it needs is still there: after a reboot or a temp-dir cleanup the run's
-          // worktree is gone and resuming would fail for good, where a fresh run can still work.
-          let resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
-          let startedUnitRunId = null;
-
-          // If unit has writes, prepare worktree
-          let unitWorktree = worktreePath;
-          let uBranch = null;
-          let ownsWorktree = false;
-          let baseRef = null;
-          let baseSha = null;
-          // Why a writing unit cannot get its own worktree; it then fails without running.
-          let prepError = null;
-          const base = unitData.writes.length > 0 ? singleWriteBaseOf(workflow, step.id) : null;
-          if (resumeUnitRunId) {
-            // The seats run in the worktree recorded in the Unit run; never make another one here.
-            unitWorktree = uState.worktreePath ?? worktreePath;
-            uBranch = uState.branch ?? null;
-            baseSha = uState.baseSha ?? null;
-            baseRef = uState.baseRef ?? null;
-          } else if (unitData.writes.length > 0) {
-            uBranch = `wf/${workflowRunId}/${u.id}`;
-            // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
-            baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-            baseSha = baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
-            if (!baseSha) {
-              prepError = base
-                ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
-                : `cannot resolve ${baseRef} to start the unit's worktree from`;
-            } else {
-              try {
-                unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
-                ownsWorktree = true;
-              } catch (err) {
-                // Never fall back to the shared checkout: a writer there would commit onto the caller's branch.
-                prepError = `could not create the unit's worktree on ${uBranch}: ${err.message}`;
+          // Collect branches from predecessor units
+          for (const depId of step.dependsOn) {
+            const depStep = workflow.steps.find((s) => s.id === depId);
+            if (depStep?.units) {
+              for (const u of depStep.units) {
+                const uBranch = state.steps[depId]?.units[u.id]?.branch ?? `wf/${workflowRunId}/${u.id}`;
+                try {
+                  mergeWorkflowBranch({
+                    repoRoot: mainRoot,
+                    sourceBranch: uBranch,
+                    targetBranch: integrationTarget,
+                    commitMessage: `integrate: merge step ${depId} unit ${u.id}`,
+                  });
+                } catch {
+                  // If branch didn't have commits or already merged, ignore
+                }
               }
             }
           }
 
-          // Recording it again would reset the unit and lose the run id it already carries.
-          if (!resumeUnitRunId) {
-            recordEvent({
-              repoRoot: mainRoot,
-              workflowRunId,
-              event: {
-                type: 'unit.scheduled',
-                payload: {
-                  stepId: step.id,
-                  unitId: u.id,
-                  ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha } : {}),
-                },
-              },
-            });
-          }
+          completeStep(step.id);
+          stateChanged = true;
+          continue;
+        }
 
-          // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
-          // config) is a failed unit like any other: left uncaught it would end the advance with
-          // the run still `running` and no event saying why.
-          let unitRunResult;
-          try {
-            if (prepError) throw new RunnerConfigError(prepError);
-            const runOptions = {
-              unitData,
-              repoRoot: mainRoot,
-              cwd: unitWorktree,
-              worktree: unitWorktree,
-              pattern: unitPatternOf(u.template),
-              overrides: await (async () => {
-                let unitAccount = state.account ?? null;
-                if (unitAccount !== null) {
-                  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
-                  const testOverrides = unitOverridesOf(u, state.seats?.personas, {
+        // 3. Standard step with units
+        if (step.units && step.units.length > 0) {
+          let failedUnit = null;
+          let reparked = false;
+          for (const u of step.units) {
+            const uState = stepState.units[u.id];
+            if (uState && uState.status === 'completed') {
+              continue;
+            }
+
+            // Build unit object
+            const handoff = buildUnitHandoff({ template: u.template, state, step, workflow });
+            const unitData = {
+              id: u.id,
+              objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
+              capability: u.template.capability,
+              pattern: u.template.pattern || 'solo',
+              rigor: u.template.rigor,
+              writes: u.template.writes || [],
+              dependsOn: u.dependsOn || [],
+              inputs: handoff.inputs,
+              stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
+              ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
+              ...(u.template.blind ? { blind: true } : {}),
+              ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
+              ...(u.template.persona ? { persona: u.template.persona } : {}),
+              ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
+              ...(u.template.verify !== undefined ? { verify: u.template.verify } : {}),
+              ...(u.template.skills !== undefined ? { skills: u.template.skills } : {}),
+            };
+
+            // A unit left `running` with a recorded Unit run id was started by a controller that died:
+            // continue that run (settled seats are kept) and reuse the worktree it already has.
+            // Only when what it needs is still there: after a reboot or a temp-dir cleanup the run's
+            // worktree is gone and resuming would fail for good, where a fresh run can still work.
+            let resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
+            let startedUnitRunId = null;
+
+            // If unit has writes, prepare worktree
+            let unitWorktree = worktreePath;
+            let uBranch = null;
+            let ownsWorktree = false;
+            let baseRef = null;
+            let baseSha = null;
+            // Why a writing unit cannot get its own worktree; it then fails without running.
+            let prepError = null;
+            const base = unitData.writes.length > 0 ? singleWriteBaseOf(workflow, step.id) : null;
+            if (resumeUnitRunId) {
+              // The seats run in the worktree recorded in the Unit run; never make another one here.
+              unitWorktree = uState.worktreePath ?? worktreePath;
+              uBranch = uState.branch ?? null;
+              baseSha = uState.baseSha ?? null;
+              baseRef = uState.baseRef ?? null;
+            } else if (unitData.writes.length > 0) {
+              uBranch = `wf/${workflowRunId}/${u.id}`;
+              // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
+              baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
+              baseSha = baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+              if (!baseSha) {
+                prepError = base
+                  ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
+                  : `cannot resolve ${baseRef} to start the unit's worktree from`;
+              } else {
+                try {
+                  unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
+                  ownsWorktree = true;
+                } catch (err) {
+                  // Never fall back to the shared checkout: a writer there would commit onto the caller's branch.
+                  prepError = `could not create the unit's worktree on ${uBranch}: ${err.message}`;
+                }
+              }
+            }
+
+            // Admission: may this Unit run now? Asked with the case as it is after every earlier Unit
+            // settled. A Unit whose earlier attempt left a live reservation (its controller died) is the
+            // same dispatch and keeps it.
+            let reservation = null;
+            let bound = null;
+            const writing = unitData.writes.length > 0;
+            const bindWritingWorktree = () => bindWorktree({ mainRoot, hold, caseId: workflowRunId, worktree: unitWorktree, ...worktreeFacts(unitWorktree) });
+            if (!prepError) {
+              const current = reread().projection;
+              const live = current.liveReservations.find((r) => r.activity === step.id && r.unitId === u.id);
+              if (live) {
+                reservation = live;
+                if (writing) {
+                  const made = bindWritingWorktree();
+                  if (made.ok) bound = made;
+                  else prepError = `worktree ${unitWorktree} cannot be bound to the case: ${made.answer}`;
+                }
+                if (!prepError) writeReservationFile({ mainRoot, caseId: workflowRunId, reservation: { ...live, worktree: writing ? unitWorktree : null } });
+              } else {
+                const verdict = admitProposal({
+                  projection: current,
+                  proposal: {
+                    activity: step.id,
+                    unitId: u.id,
+                    writes: unitData.writes,
+                    worktree: writing ? unitWorktree : undefined,
+                    blind: u.template.blind === true,
+                    handoffRefs: handoff.inputs,
+                    rigor: u.template.rigor,
+                    seatLaunchCeiling: null,
+                    proposer: 'playbook',
+                  },
+                  bindingAnswers: writing ? { [unitWorktree]: readBinding({ mainRoot, worktree: unitWorktree, caseId: workflowRunId }) } : {},
+                  reservationId: newReservationId(),
+                });
+                if (verdict.refused) {
+                  if (ownsWorktree) cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: unitWorktree, branch: uBranch, deleteBranch: true });
+                  const approval = verdict.refused.violations.find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
+                  const gated = approval && workflow.steps.find((s) => s.gate && current.guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
+                  if (gated) {
+                    // What was approved is not what is there now: the gate asks again, for the current version.
+                    recordEvent({
+                      repoRoot: mainRoot,
+                      workflowRunId,
+                      event: {
+                        type: 'gate.park',
+                        payload: {
+                          stepId: gated.id,
+                          question: `${gated.gate.question || `Approve step "${gated.id}"?`}\n\n(Asked again: ${approval.condition})`,
+                          header: gated.gate.header,
+                          parkedAt: new Date().toISOString(),
+                          reason: approval.code,
+                        },
+                      },
+                    });
+                    reparked = true;
+                  } else {
+                    failedUnit = { unitId: u.id, outcome: 'refused', results: [], error: `admission refused ${verdict.refused.code}: ${verdict.refused.condition}`, outOfScope: [] };
+                  }
+                  stateChanged = true;
+                  break;
+                }
+                if (writing) {
+                  const made = bindWritingWorktree();
+                  if (made.ok) bound = made;
+                  else prepError = `worktree ${unitWorktree} cannot be bound to the case: ${made.answer}`;
+                }
+                if (!prepError) {
+                  for (const event of verdict.events) recordEvent({ repoRoot: mainRoot, workflowRunId, event });
+                  reservation = verdict.reservation;
+                  writeReservationFile({ mainRoot, caseId: workflowRunId, reservation });
+                }
+              }
+            }
+
+            // Recording it again would reset the unit and lose the run id it already carries.
+            if (!resumeUnitRunId) {
+              recordEvent({
+                repoRoot: mainRoot,
+                workflowRunId,
+                event: {
+                  type: 'unit.scheduled',
+                  payload: {
+                    stepId: step.id,
+                    unitId: u.id,
+                    ...(reservation ? { reservationId: reservation.reservationId } : {}),
+                    ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha } : {}),
+                  },
+                },
+              });
+            }
+
+            // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
+            // config) is a failed unit like any other: left uncaught it would end the advance with
+            // the run still `running` and no event saying why.
+            let unitRunResult;
+            try {
+              if (prepError) throw new RunnerConfigError(prepError);
+              const runOptions = {
+                unitData,
+                repoRoot: mainRoot,
+                cwd: unitWorktree,
+                worktree: unitWorktree,
+                pattern: unitPatternOf(u.template),
+                overrides: await (async () => {
+                  let unitAccount = state.account ?? null;
+                  if (unitAccount !== null) {
+                    const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+                    const testOverrides = unitOverridesOf(u, state.seats?.personas, {
+                      effort: state.effort,
+                      timeoutMs: state.timeoutMs,
+                      account: unitAccount,
+                    });
+                    const dry = await simulateUnitBindings(
+                      { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
+                      runnerConfig,
+                      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
+                    );
+                    if (!dry.roles.some((r) => r.account)) {
+                      // No seat of this unit runs on the account's provider: the unit runs unpinned,
+                      // and the run says so instead of dropping the pin silently.
+                      recordEvent({
+                        repoRoot: mainRoot,
+                        workflowRunId,
+                        event: { type: 'unit.account-unpinned', payload: { stepId: step.id, unitId: u.id, account: unitAccount } },
+                      });
+                      unitAccount = null;
+                    }
+                  }
+                  return unitOverridesOf(u, state.seats?.personas, {
                     effort: state.effort,
                     timeoutMs: state.timeoutMs,
                     account: unitAccount,
                   });
-                  const dry = await simulateUnitBindings(
-                    { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
-                    runnerConfig,
-                    { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
-                  );
-                  if (!dry.roles.some((r) => r.account)) {
-                    // No seat of this unit runs on the account's provider: the unit runs unpinned,
-                    // and the run says so instead of dropping the pin silently.
+                })(),
+                workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
+                ...(resumeUnitRunId ? { resumeUnitRunId } : {
+                  onUnitRunCreated: (unitRunId) => {
+                    startedUnitRunId = unitRunId;
                     recordEvent({
                       repoRoot: mainRoot,
                       workflowRunId,
-                      event: { type: 'unit.account-unpinned', payload: { stepId: step.id, unitId: u.id, account: unitAccount } },
+                      event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
                     });
-                    unitAccount = null;
-                  }
-                }
-                return unitOverridesOf(u, state.seats?.personas, {
-                  effort: state.effort,
-                  timeoutMs: state.timeoutMs,
-                  account: unitAccount,
+                  },
+                }),
+              };
+              try {
+                unitRunResult = await runUnit(runOptions);
+              } catch (err) {
+                if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
+                // Preserve the unknown predecessor's checkout and branch. Start from the trusted
+                // base, never from commits an unproven predecessor may still be changing.
+                const preservedWorktree = unitWorktree;
+                const preservedBranch = uBranch;
+                baseRef ??= base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
+                baseSha ??= baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+                if (!baseSha) throw err;
+                uBranch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
+                unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
+                ownsWorktree = true;
+                resumeUnitRunId = null;
+                startedUnitRunId = null;
+                // The recovery checkout is the case's worktree from here on.
+                const rebound = bindWritingWorktree();
+                if (!rebound.ok) throw new RunnerConfigError(`recovery worktree ${unitWorktree} cannot be bound to the case: ${rebound.answer}`);
+                bound = rebound;
+                recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
+                  type: 'unit.scheduled', payload: { stepId: step.id, unitId: u.id,
+                    worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha,
+                    recovery: { reason: err.errorClass, preservedWorktree, preservedBranch } },
+                } });
+                unitRunResult = await runUnit({ ...runOptions, cwd: unitWorktree, worktree: unitWorktree,
+                  resumeUnitRunId: undefined,
+                  onUnitRunCreated: (unitRunId) => {
+                    startedUnitRunId = unitRunId;
+                    recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
+                      type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId },
+                    } });
+                  },
                 });
-              })(),
-              workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
-              ...(resumeUnitRunId ? { resumeUnitRunId } : {
-                onUnitRunCreated: (unitRunId) => {
-                  startedUnitRunId = unitRunId;
-                  recordEvent({
-                    repoRoot: mainRoot,
-                    workflowRunId,
-                    event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
-                  });
-                },
-              }),
-            };
-            try {
-              unitRunResult = await runUnit(runOptions);
+              }
             } catch (err) {
-              if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
-              // Preserve the unknown predecessor's checkout and branch. Start from the trusted
-              // base, never from commits an unproven predecessor may still be changing.
-              const preservedWorktree = unitWorktree;
-              const preservedBranch = uBranch;
-              baseRef ??= base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-              baseSha ??= baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
-              if (!baseSha) throw err;
-              uBranch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
-              unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
-              ownsWorktree = true;
-              resumeUnitRunId = null;
-              startedUnitRunId = null;
-              recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
-                type: 'unit.scheduled', payload: { stepId: step.id, unitId: u.id,
-                  worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha,
-                  recovery: { reason: err.errorClass, preservedWorktree, preservedBranch } },
-              } });
-              unitRunResult = await runUnit({ ...runOptions, cwd: unitWorktree, worktree: unitWorktree,
-                resumeUnitRunId: undefined,
-                onUnitRunCreated: (unitRunId) => {
-                  startedUnitRunId = unitRunId;
-                  recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
-                    type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId },
-                  } });
+              unitRunResult = {
+                unitRunId: resumeUnitRunId ?? startedUnitRunId,
+                outcome: 'execution-failure',
+                results: [],
+                error: String(err?.message ?? err),
+              };
+            }
+
+            // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not
+            // integrated. A writer standing on a branch that itself carries such paths carries them too,
+            // so they never reach the target through it; a path left uncommitted on the base is not on
+            // its branch and holds nothing back.
+            const own = unitData.writes.length > 0 && unitRunResult.unitRunId
+              ? outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha })
+              : { all: [], onBranch: [] };
+            const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
+            const outOfScope = [...new Set([...own.all, ...inherited])].sort();
+            const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
+            if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
+
+            recordEvent({
+              repoRoot: mainRoot,
+              workflowRunId,
+              event: {
+                type: 'unit.complete',
+                payload: {
+                  stepId: step.id,
+                  unitId: u.id,
+                  unitRunId: unitRunResult.unitRunId,
+                  outcome: unitRunResult.outcome,
+                  results: unitRunResult.results || [],
+                  ...(outOfScope.length > 0 ? { outOfScope } : {}),
+                  ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
+                },
+              },
+            });
+
+            // Settle: the receipts the harness itself produced, the launches the run recorded, and the
+            // reservation released. The attempt is over, so its worktree binding goes too (generation
+            // checked; a lease still held keeps it for the doctor to report).
+            if (reservation) {
+              recordEvent({
+                repoRoot: mainRoot,
+                workflowRunId,
+                event: {
+                  type: 'settle',
+                  payload: {
+                    reservationId: reservation.reservationId,
+                    activity: step.id,
+                    unitId: u.id,
+                    unitRunId: unitRunResult.unitRunId ?? null,
+                    outcome: unitRunResult.outcome,
+                    receipts: receiptsFromResults({ unitRunId: unitRunResult.unitRunId, results: unitRunResult.results ?? [] }),
+                    achieved: [],
+                    seatLaunchesUsed: (unitRunResult.results ?? []).filter((r) => r?.role && !/^verif/.test(r.role)).length,
+                    blind: u.template.blind === true,
+                    settledAt: new Date().toISOString(),
+                  },
                 },
               });
+              removeReservationFile({ mainRoot, caseId: workflowRunId, reservationId: reservation.reservationId });
+              if (bound?.ok) {
+                unbindWorktree({ mainRoot, hold, caseId: workflowRunId, generation: bound.generation, key: bound.key, worktree: unitWorktree });
+              }
+              reread();
             }
-          } catch (err) {
-            unitRunResult = {
-              unitRunId: resumeUnitRunId ?? startedUnitRunId,
-              outcome: 'execution-failure',
-              results: [],
-              error: String(err?.message ?? err),
-            };
+
+            stateChanged = true;
+            // Only explicitly accepted semantic outcomes proceed; execution failures never do.
+            if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
+              failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error, outOfScope };
+              break;
+            }
           }
 
-          // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not
-          // integrated. A writer standing on a branch that itself carries such paths carries them too,
-          // so they never reach the target through it; a path left uncommitted on the base is not on
-          // its branch and holds nothing back.
-          const own = unitData.writes.length > 0 && unitRunResult.unitRunId
-            ? outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha })
-            : { all: [], onBranch: [] };
-          const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
-          const outOfScope = [...new Set([...own.all, ...inherited])].sort();
-          const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
-          if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
-
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'unit.complete',
-              payload: {
-                stepId: step.id,
-                unitId: u.id,
-                unitRunId: unitRunResult.unitRunId,
-                outcome: unitRunResult.outcome,
-                results: unitRunResult.results || [],
-                ...(outOfScope.length > 0 ? { outOfScope } : {}),
-                ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
+          if (reparked) continue;
+          if (failedUnit) {
+            const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
+            const reason = refusal
+              ? `${refusal.reason}: ${refusal.detail}`
+              : failedUnit.outOfScope.length > 0
+                ? `unit ${failedUnit.unitId} ended ${failedUnit.outcome}: out-of-scope-writes: ${failedUnit.outOfScope.join(', ')}`
+                : failedUnit.error
+                ? `unit ${failedUnit.unitId} could not run: ${failedUnit.error}`
+                : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
+            recordEvent({
+              repoRoot: mainRoot,
+              workflowRunId,
+              event: {
+                type: 'step.fail',
+                payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
               },
-            },
-          });
-
-          stateChanged = true;
-          // Only explicitly accepted semantic outcomes proceed; execution failures never do.
-          if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
-            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error, outOfScope };
+            });
+            recordEvent({
+              repoRoot: mainRoot,
+              workflowRunId,
+              event: {
+                type: 'workflow.fail',
+                payload: { outcome: failedUnit.outcome, stepId: step.id, reason, failedAt: new Date().toISOString() },
+              },
+            });
             break;
           }
-        }
 
-        if (failedUnit) {
-          const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
-          const reason = refusal
-            ? `${refusal.reason}: ${refusal.detail}`
-            : failedUnit.outOfScope.length > 0
-              ? `unit ${failedUnit.unitId} ended ${failedUnit.outcome}: out-of-scope-writes: ${failedUnit.outOfScope.join(', ')}`
-              : failedUnit.error
-              ? `unit ${failedUnit.unitId} could not run: ${failedUnit.error}`
-              : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'step.fail',
-              payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
-            },
-          });
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'workflow.fail',
-              payload: { outcome: failedUnit.outcome, stepId: step.id, reason, failedAt: new Date().toISOString() },
-            },
-          });
-          break;
+          completeStep(step.id);
+        } else {
+          // Step with no units
+          completeStep(step.id);
+          stateChanged = true;
         }
+      }
 
-        {
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'step.complete',
-              payload: { stepId: step.id, outcome: 'pass', completedAt: new Date().toISOString() },
-            },
-          });
-        }
-      } else {
-        // Step with no units
-        recordEvent({
-          repoRoot: mainRoot,
-          workflowRunId,
-          event: {
-            type: 'step.complete',
-            payload: { stepId: step.id, outcome: 'pass', completedAt: new Date().toISOString() },
-          },
-        });
-        stateChanged = true;
+      state = reread().state;
+
+      if (!stateChanged) {
+        break;
       }
     }
 
-    events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-    state = projectWorkflowState(events);
-
-    if (!stateChanged) {
-      break;
-    }
+    // One last look before leaving, bounded to a single read: an answer that arrived while this
+    // proposer was finishing is on the ledger now, and if it releases a gate the run goes on.
+    const last = reread();
+    state = last.state;
+    if (last.drained.answers === 0 || state.status !== 'running') break;
   }
 
   if ((state.status === 'completed' || state.status === 'failed') && !state.worktrees) {
@@ -817,620 +626,4 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
   }
 
   return state;
-}
-
-// The advance lock is a kernel mutex on `<runDir>/locks/advance.lock` (src/holder-lock): the kernel
-// lets one process advance a run at a time and releases it the moment that process dies, so a holder
-// killed mid-advance never leaves the run stuck.
-function workflowRunDirOf(mainRoot, workflowRunId) {
-  return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId);
-}
-
-function advanceLockParams(mainRoot, workflowRunId) {
-  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: workflowRunDirOf(mainRoot, workflowRunId) };
-}
-
-/** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
-function advanceHolderPid(params) {
-  const holders = lockHolders('advance', params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
-}
-
-/** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */
-function liveAdvanceHolder(mainRoot, workflowRunId) {
-  const params = advanceLockParams(mainRoot, workflowRunId);
-  // A run whose lock file was never created was never advanced under this lock: nothing to probe.
-  if (!fs.existsSync(resolveLock('advance', params).v3Path)) return null;
-  // The kernel's holder list takes no lock, so a status read never makes a concurrent advance see
-  // the lock held; the probe, which does, is only for a platform that cannot list holders.
-  const holders = lockHolders('advance', params);
-  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0] } : null;
-  return probe('advance', params).result === 'free' ? null : { pid: null };
-}
-
-function advanceRefusal(workflowRunId, pid) {
-  const holder = pid ? `process ${pid}` : 'another process';
-  return new RunnerConfigError(
-    `Workflow run "${workflowRunId}" is already being advanced by ${holder}; read progress with "fgos workflow status ${workflowRunId}" and retry once it parks or finishes`,
-  );
-}
-
-/**
- * Hold the run for this process while it advances, so two processes never advance one run at
- * once. Returns the hold the ledger demands for every append; `hold.release()` frees the run. A
- * ledger that ends in an unfinished line (an append cut short by a crash) is repaired here, by the
- * one process allowed to, before anything reads or appends.
- */
-export function acquireAdvanceLock(mainRoot, workflowRunId) {
-  const params = advanceLockParams(mainRoot, workflowRunId);
-  // Taking the lock creates its directory; never bring back a run that was deleted.
-  if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  const res = acquireSync(createLockScope('advance'), 'advance', params);
-  if (res.result !== 'acquired') throw advanceRefusal(workflowRunId, advanceHolderPid(params));
-  const hold = createAdvanceHold({ workflowRunId, release: () => res.handle.release() });
-  try {
-    recoverWorkflowLedgerTail({ repoRoot: mainRoot, workflowRunId, hold });
-  } catch (err) {
-    hold.release();
-    throw err;
-  }
-  return hold;
-}
-
-const ADVANCE_TAIL_LINES = 20;
-const ADVANCE_TAIL_READ_BYTES = 64 * 1024;
-// A recorded run whose advance has not taken the lock yet is still starting; past this age with no
-// live holder it is a dead child.
-const ADVANCE_STALE_MS = 30 * 1000;
-
-function tailAdvanceLog(logPath) {
-  let fd;
-  try {
-    fd = fs.openSync(logPath, 'r');
-    const { size } = fs.fstatSync(fd);
-    const length = Math.min(size, ADVANCE_TAIL_READ_BYTES);
-    const buffer = Buffer.alloc(length);
-    fs.readSync(fd, buffer, 0, length, size - length);
-    return buffer
-      .toString('utf8')
-      .split('\n')
-      .filter((line) => line.length > 0)
-      .slice(-ADVANCE_TAIL_LINES)
-      .map((line) => line.slice(0, PROGRESS_LINE_LIMIT));
-  } catch {
-    return [];
-  } finally {
-    if (fd !== undefined) fs.closeSync(fd);
-  }
-}
-
-/** What the detached advance of a run is doing: liveness from the lock holder, plus its log tail. */
-function advanceReport(mainRoot, workflowRunId, state, events) {
-  const runDir = workflowRunDirOf(mainRoot, workflowRunId);
-  const holder = liveAdvanceHolder(mainRoot, workflowRunId);
-  const logPath = path.join(runDir, 'advance.log');
-  const advance = { running: holder !== null, pid: holder?.pid ?? null, logPath };
-  if (state.status !== 'completed') {
-    const lastLines = tailAdvanceLog(logPath);
-    if (lastLines.length > 0) advance.lastLines = lastLines;
-  }
-  const lastTs = Date.parse(events[events.length - 1].ts);
-  if (state.status === 'running' && holder === null && Date.now() - lastTs > ADVANCE_STALE_MS) {
-    advance.hint = `The advance of this run is not running and nothing was recorded for a while; continue it with: fgos workflow resume ${workflowRunId}`;
-  }
-  return advance;
-}
-
-/** Run `advance(hold)` while this process holds the run's advance lock. */
-async function withAdvanceLock(mainRoot, workflowRunId, advance) {
-  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
-  try {
-    return await advance(hold);
-  } finally {
-    hold.release();
-  }
-}
-
-/** Run `action(hold)` while this process holds the run's advance lock; for a caller that does not advance. */
-function withAdvanceLockSync(mainRoot, workflowRunId, action) {
-  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
-  try {
-    return action(hold);
-  } finally {
-    hold.release();
-  }
-}
-
-/**
- * Spawn `fgos workflow resume <id> --foreground` as a detached process whose output goes to
- * advance.log beside the event log. `--foreground` is what keeps the child from detaching again.
- */
-function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, cliPath }) {
-  const cli = cliPath ?? fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
-  const args = [cli, 'workflow', 'resume', workflowRunId, '--dir', mainRoot];
-  if (worktree) args.push('--worktree', worktree);
-  args.push('--foreground');
-
-  const logPath = path.join(runDir, 'advance.log');
-  const logFd = fs.openSync(logPath, 'a');
-  let child;
-  try {
-    child = spawn(process.execPath, args, {
-      cwd: cwd ?? process.cwd(),
-      detached: true,
-      env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' },
-      stdio: ['ignore', logFd, logFd],
-    });
-  } finally {
-    fs.closeSync(logFd);
-  }
-  child.on('error', () => {});
-  child.unref();
-  return { pid: child.pid ?? null, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
-}
-
-function detachedResult({ mainRoot, workflowRunId, detached }) {
-  const state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
-  return { ...state, detached };
-}
-
-/**
- * Resolve everything a start needs without touching the store: the roots, the definition to run
- * (the registered one, or that one rebuilt with `params.seats`), and the shared context refs.
- * A refused request throws here, so it creates no run.
- */
-function resolveStart(params) {
-  const cwd = params.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
-  const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
-
-  let workflow;
-  let workflowId;
-
-  if (params.workflow) {
-    workflow = validateWorkflow(params.workflow);
-    workflowId = workflow.id;
-  } else if (params.planPath) {
-    workflow = translatePlanToWorkflow(params.planPath);
-    workflowId = workflow.id;
-  } else if (params.unitsPath) {
-    workflow = translateUnitsToWorkflow(params.unitsPath);
-    workflowId = workflow.id;
-  } else if (params.workflowId) {
-    workflow = loadWorkflow(params.workflowId, { packageRoot: mainRoot, cwd });
-    workflowId = workflow.id;
-  } else {
-    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, planPath, or unitsPath');
-  }
-  if (params.unitsPath) {
-    if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
-    assertWriteChains(workflow);
-  }
-  const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
-
-  let timeoutMs = null;
-  if (params.timeout !== undefined && params.timeout !== null) {
-    timeoutMs = typeof params.timeout === 'number'
-      ? assertRunTimeoutMs(params.timeout, '--timeout')
-      : parseRunTimeout(params.timeout);
-  } else if (params.timeoutMs !== undefined && params.timeoutMs !== null) {
-    timeoutMs = assertRunTimeoutMs(params.timeoutMs, '--timeout');
-  }
-
-  let account = null;
-  if (params.account !== undefined && params.account !== null) {
-    if (typeof params.account !== 'string' || !params.account.trim()) {
-      throw new RunnerConfigError('--account requires a non-empty account id');
-    }
-    account = params.account.trim();
-  }
-
-  const contextRefs = normalizeContextRefs(params.contextRefs);
-  let seats;
-  if (params.seats !== undefined) {
-    // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
-    // text found now is what the run pins, so a later edit of the file never reaches it.
-    const personas = {};
-    for (const entry of normalizeSeats(params.seats)) {
-      const name = personaNameOf(entry);
-      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
-    }
-    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
-    seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
-  }
-  const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
-  if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
-      && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
-    throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
-  }
-  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account };
-}
-
-/**
- * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
- * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
- * Seats that would share a provider family are only reported (a preference, bind() spreads what it
- * can); a role no candidate can serve refuses the start. Without `params.seats` it does nothing.
- *
- * @param {object} params the same params as startWorkflow
- * @returns {Promise<{ warnings: string[] }>}
- */
-export async function preflightWorkflowSeats(params = {}) {
-  if (params.seats === undefined) return { warnings: [] };
-  const { mainRoot, workflow } = resolveStart(params);
-  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
-  const session = { headless: true, herdrPresent: detectHerdrPresent() };
-  const warnings = [];
-  const refused = [];
-  for (const unit of seatedPanelUnits(workflow)) {
-    const { roles } = await simulateUnitBindings(unit, runnerConfig, { session });
-    for (const role of roles) {
-      if (role.refused) refused.push(`${unit.id}/${role.role}: ${role.refused.reason}: ${role.refused.detail}`);
-      else if (role.sharesFamilyWith?.length) warnings.push(`${unit.id}/${role.role}=${role.executor} shares a provider family with ${role.sharesFamilyWith.join(', ')}`);
-    }
-  }
-  if (refused.length > 0) {
-    throw new RunnerConfigError(`--seats cannot be served by the current pools, no run was created: ${refused.join('; ')}`);
-  }
-  return { warnings };
-}
-
-/**
- * Resolve the Workflow definition and record a new run, without advancing it. The run exists
- * in the store (status `running`, nothing started) as soon as this returns, so its id can be
- * handed to a caller before any step executes.
- */
-function prepareWorkflowRun(params) {
-  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
-  const configSnapshot = snapshotRunnerConfig(mainRoot);
-  if (account !== null) {
-    const inventory = providerAccountInventory(configSnapshot.runner);
-    const exists = Object.values(inventory).some(
-      (entry) => entry?.accounts && Object.hasOwn(entry.accounts, account),
-    );
-    if (!exists) {
-      throw new RunnerConfigError(`account "${account}" is not configured in runner.providers.*.accounts`);
-    }
-  }
-  const { workflowRunId, runDir } = createWorkflowRun({
-    repoRoot: mainRoot,
-    workflowId,
-    workflow,
-    configSnapshot,
-    request: params.request,
-    stanceOptions: normalizeStanceOptions(params.stanceOptions),
-    contextRefs,
-    seats,
-    effort,
-    timeoutMs,
-    account,
-  });
-
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
-}
-
-/**
- * Start a new Workflow run and hand its advancing to a detached process, returning as soon as
- * the run is recorded. The caller gets the run id and where to read progress
- * (`fgos workflow status <id>`); the detached process is `fgos workflow resume <id>`, so it
- * survives the caller exiting or being killed and stays readable through the same event log.
- *
- * Same params as startWorkflow, plus `params.cliPath` to override the CLI entry that is spawned.
- *
- * @returns {object} Projected state of the just-recorded run plus `detached: { pid, logPath, statusCommand }`
- */
-export function startWorkflowDetached(params = {}) {
-  const { workflowRunId, runDir, mainRoot, worktreePath } = prepareWorkflowRun(params);
-  const detached = spawnDetachedAdvance({
-    mainRoot,
-    workflowRunId,
-    runDir,
-    worktree: params.worktree ? worktreePath : undefined,
-    cwd: params.cwd,
-    cliPath: params.cliPath,
-  });
-  return detachedResult({ mainRoot, workflowRunId, detached });
-}
-
-/**
- * Start a new Workflow run and advance it in this process until it completes, fails, or parks.
- *
- * @param {object} params
- * @param {string} [params.workflowId] Id of registered workflow
- * @param {object} [params.workflow] In-memory workflow object
- * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
- * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
- * @param {string} [params.effort] Reasoning effort every unit asks for (low, medium, high, max)
- * @param {string} [params.request] The owner's request this run serves; given to every unit
- * @param {string[]} [params.seats] Ordered entries (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
- * @param {string} [params.repoRoot]
- * @param {string} [params.cwd]
- * @param {string} [params.worktree]
- * @param {Function} [params.onLog]
- * @returns {Promise<object>} Projected workflow state
- */
-/** Whether a running unit's recorded Unit run can still be continued: its record is on disk and the
- * worktrees it ran in still exist. */
-function canResumeUnitRun(mainRoot, uState) {
-  if (!uState.unitRunId) return false;
-  if (uState.worktreePath && !fs.existsSync(uState.worktreePath)) return false;
-  try {
-    const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', uState.unitRunId, 'unit.json'), 'utf8'));
-    return typeof record.worktree === 'string' && fs.existsSync(record.worktree);
-  } catch {
-    return false;
-  }
-}
-
-export async function startWorkflow(params = {}) {
-  const { workflowRunId, workflow, mainRoot, worktreePath } = prepareWorkflowRun(params);
-
-  return await withAdvanceLock(mainRoot, workflowRunId, (hold) =>
-    advanceWorkflowRun({
-      repoRoot: mainRoot,
-      workflowRunId,
-      workflow,
-      mainRoot,
-      worktreePath,
-      hold,
-      onLog: params.onLog,
-    }),
-  );
-}
-
-/**
- * Get current projected status of a Workflow run, plus `advance: { running, pid, logPath, lastLines?, hint? }`
- * describing its detached advance.
- *
- * @param {string} workflowRunId
- * @param {object} [options]
- * @param {string} [options.repoRoot]
- * @param {string} [options.cwd]
- * @returns {object} Projected state
- */
-export function statusWorkflow(workflowRunId, options = {}) {
-  if (!workflowRunId) throw new RunnerConfigError('statusWorkflow requires workflowRunId');
-  const cwd = options.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
-
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  if (events.length === 0) {
-    throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  }
-  const state = projectWorkflowState(events);
-  // A seated run also says who actually served each seat; an unseated run's status is unchanged.
-  const served = state.seats ? { seatProviders: seatProviders(state) } : {};
-  return { ...state, ...served, advance: advanceReport(mainRoot, workflowRunId, state, events) };
-}
-
-/**
- * Answer a parked human gate in a Workflow run.
- *
- * @param {string} workflowRunId
- * @param {object} params
- * @param {string} params.stepId
- * @param {string} params.answer
- * @param {string} [params.repoRoot]
- * @param {string} [params.cwd]
- * @returns {Promise<object>} Projected state after advancing
- */
-export async function answerWorkflow(workflowRunId, params = {}) {
-  const { mainRoot, worktreePath } = resolveAnswerTarget(workflowRunId, params);
-  return await withAdvanceLock(mainRoot, workflowRunId, (hold) => {
-    const state = recordGateAnswer(workflowRunId, params, mainRoot, hold);
-    return advanceWorkflowRun({
-      repoRoot: mainRoot,
-      workflowRunId,
-      workflow: state.workflow,
-      mainRoot,
-      worktreePath,
-      hold,
-    });
-  });
-}
-
-function resolveAnswerTarget(workflowRunId, params) {
-  if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
-  if (!params.stepId) throw new RunnerConfigError('answerWorkflow requires stepId');
-  if (params.answer === undefined) throw new RunnerConfigError('answerWorkflow requires answer');
-
-  const cwd = params.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
-  const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
-  return { mainRoot, worktreePath };
-}
-
-/** Append the gate answer to the run's event log; returns the run state as it was before the answer. */
-function recordGateAnswer(workflowRunId, params, mainRoot, hold) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  if (events.length === 0) {
-    throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  }
-  const state = projectWorkflowState(events);
-
-  // The file comes first: an answer that cannot be kept where later units read it is refused,
-  // not recorded.
-  const approved = params.approved === true || params.approved === 'true';
-  const answeredAt = new Date().toISOString();
-  const question = state.questions.find((q) => q.stepId === params.stepId)?.question ?? state.steps[params.stepId]?.gate?.question ?? '';
-  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt, approved });
-
-  appendWorkflowEvent({
-    repoRoot: mainRoot,
-    workflowRunId,
-    hold,
-    event: {
-      type: 'gate.answer',
-      payload: {
-        stepId: params.stepId,
-        answer: params.answer,
-        approved,
-        answeredAt,
-      },
-    },
-  });
-  return state;
-}
-
-/**
- * Keep the owner's answer to a human gate as a file in the run directory, the one place later
- * units are handed it from (`gate-answer:<workflowRunId>/<stepId>`). A second answer to the same
- * gate replaces the first.
- */
-function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt, approved }) {
-  const file = gateAnswerFile(mainRoot, workflowRunId, stepId);
-  if (!file) {
-    throw new RunnerConfigError(`gate answer refused: "${stepId}" is not a step id that can name an answer file`);
-  }
-  let baseHeader = '';
-  let priorRounds = '';
-  if (fs.existsSync(file)) {
-    const existing = fs.readFileSync(file, 'utf8');
-    const roundsIndex = existing.indexOf('## Rounds');
-    if (roundsIndex !== -1) {
-      baseHeader = existing.slice(0, roundsIndex).trim();
-      priorRounds = existing.slice(roundsIndex).trim();
-    } else {
-      baseHeader = existing.trim();
-    }
-  }
-
-  const roundEntry = [
-    `### Round at ${answeredAt} (${approved ? 'Approved' : 'Clarification'})`,
-    '',
-    `- Approved: ${approved ? 'yes' : 'no'}`,
-    '',
-    '#### Answer',
-    '',
-    answer,
-    '',
-  ].join('\n');
-
-  let text;
-  if (!baseHeader) {
-    text = [
-      `# Owner's answer at the "${stepId}" gate`,
-      '',
-      `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
-      '',
-      `- Workflow run: ${workflowRunId}`,
-      `- Step: ${stepId}`,
-      `- Answered by: the owner, through "fgos workflow answer"`,
-      '',
-      '## Question',
-      '',
-      question,
-      '',
-      '## Rounds',
-      '',
-      roundEntry,
-    ].join('\n');
-  } else if (priorRounds) {
-    text = `${baseHeader}\n\n${priorRounds}\n\n${roundEntry}\n`;
-  } else {
-    text = `${baseHeader}\n\n## Rounds\n\n${roundEntry}\n`;
-  }
-
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, text);
-  fs.renameSync(tmp, file);
-}
-
-/**
- * Record a gate answer and hand advancing the run to a detached process, returning as soon as
- * the answer is stored. Refuses, without recording anything, while a live process is advancing
- * the run. Same params as answerWorkflow, plus `params.cliPath`.
- *
- * @returns {object} Projected state with the answer recorded plus `detached: { pid, logPath, statusCommand }`
- */
-export function answerWorkflowDetached(workflowRunId, params = {}) {
-  const { mainRoot, worktreePath } = resolveAnswerTarget(workflowRunId, params);
-  // Holding the run while the answer is recorded refuses, without recording anything, when a live
-  // process is advancing it; the hold is released before the detached advance takes it.
-  withAdvanceLockSync(mainRoot, workflowRunId, (hold) => recordGateAnswer(workflowRunId, params, mainRoot, hold));
-  const detached = spawnDetachedAdvance({
-    mainRoot,
-    workflowRunId,
-    runDir: workflowRunDirOf(mainRoot, workflowRunId),
-    worktree: params.worktree ? worktreePath : undefined,
-    cwd: params.cwd,
-    cliPath: params.cliPath,
-  });
-  return detachedResult({ mainRoot, workflowRunId, detached });
-}
-
-/**
- * Resume execution of an existing Workflow run.
- *
- * @param {string} workflowRunId
- * @param {object} [options]
- * @param {string} [options.repoRoot]
- * @param {string} [options.cwd]
- * @returns {Promise<object>} Projected state
- */
-export async function resumeWorkflow(workflowRunId, options = {}) {
-  const { mainRoot, worktreePath } = resolveResumeRoots(workflowRunId, options);
-  return await withAdvanceLock(mainRoot, workflowRunId, (hold) => {
-    const state = readResumeState(workflowRunId, mainRoot, options);
-    return advanceWorkflowRun({
-      repoRoot: mainRoot,
-      workflowRunId,
-      workflow: state.workflow,
-      mainRoot,
-      worktreePath,
-      hold,
-    });
-  });
-}
-
-function resolveResumeRoots(workflowRunId, options) {
-  if (!workflowRunId) throw new RunnerConfigError('resumeWorkflow requires workflowRunId');
-  const cwd = options.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
-  const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
-  return { mainRoot, worktreePath };
-}
-
-/** The run's state, refusing a resume that asks for seats the run did not start with. Read under the advance lock. */
-function readResumeState(workflowRunId, mainRoot, options) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  if (events.length === 0) {
-    throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
-  }
-  const state = projectWorkflowState(events);
-  if (options.seats !== undefined) {
-    const given = normalizeSeats(options.seats);
-    const stored = state.seats?.seats ?? [];
-    if (JSON.stringify(given) !== JSON.stringify(stored)) {
-      throw new RunnerConfigError(`Workflow run "${workflowRunId}" started with ${stored.length > 0 ? `seats "${stored.join('|')}"` : 'no --seats'}; resume refuses different --seats (given "${given.join('|')}")`);
-    }
-  }
-  return state;
-}
-
-/**
- * Hand advancing an existing run to a detached process, returning at once. Refuses while a live
- * process is already advancing the run. Same options as resumeWorkflow, plus `options.cliPath`.
- *
- * @returns {object} Projected state plus `detached: { pid, logPath, statusCommand }`
- */
-export function resumeWorkflowDetached(workflowRunId, options = {}) {
-  const { mainRoot, worktreePath } = resolveResumeRoots(workflowRunId, options);
-  // Holding the run while it is checked refuses when a live process is advancing it, and repairs an
-  // unfinished last ledger line; the hold is released before the detached advance takes it.
-  withAdvanceLockSync(mainRoot, workflowRunId, () => readResumeState(workflowRunId, mainRoot, options));
-  const detached = spawnDetachedAdvance({
-    mainRoot,
-    workflowRunId,
-    runDir: workflowRunDirOf(mainRoot, workflowRunId),
-    worktree: options.worktree ? worktreePath : undefined,
-    cwd: options.cwd,
-    cliPath: options.cliPath,
-  });
-  return detachedResult({ mainRoot, workflowRunId, detached });
 }

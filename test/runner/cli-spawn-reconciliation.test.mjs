@@ -1,6 +1,7 @@
 // The parts of the cli-spawn door that do not depend on a run supervisor: argv/env/cwd parity of the
 // short-call adapter with the ad-hoc spawn, the launch-context contract, and idempotent finalization of
 // a confined home. Attempts of the run supervisor are covered by test/run-supervisor.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

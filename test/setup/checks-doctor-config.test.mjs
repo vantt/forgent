@@ -3,6 +3,7 @@
 // mà tsk-3um/tsk-67g đã lập: mỗi file test/setup/*.test.mjs dưới ~30s để
 // `node --test` trải suite ra các core. Thân test bê nguyên văn; chỉ
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -493,7 +494,7 @@ test('workflow-capabilities-configured warns, naming each Workflow capability wi
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
   assert.match(message, /^warning: .*no "prefer" pool/);
-  assert.match(message, /coding:plan/);
+  assert.doesNotMatch(message, /coding:/, 'the coding workflow declares no runner units, so it names no capability');
   assert.match(message, /delphi:propose/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });

@@ -1,5 +1,6 @@
 // test/runner/execution/run.test.mjs — Tests for fgos run door, mutating gate, and inline record (Phase 5)
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -17,6 +17,7 @@
 // suites staying green, not duplicated here), and a genuine `fgos session
 // start` worktree (unaffected -- `isSessionWorktree` admits it).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

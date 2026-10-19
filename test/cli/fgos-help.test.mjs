@@ -5,6 +5,7 @@
 // the centralized `flags.help` check in main() (bin/fgos.mjs, reusing
 // renderHelpText scoped to one COMMAND_REGISTRY entry) fixes both failure
 // modes for every verb, uniformly, with no side effects.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

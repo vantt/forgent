@@ -3,6 +3,7 @@
 // against a literal view object — no fs, no store round-trip needed (same
 // style as frontier.mjs's own test file, which this module mirrors).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { computeAwaitingContext } from '../../src/state/awaiting-context.mjs';

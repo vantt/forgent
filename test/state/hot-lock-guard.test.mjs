@@ -2,6 +2,7 @@
 // critical section, including a named ESM import linked before hot-lock.mjs
 // loaded, and nothing throws outside it.
 
+import '../helpers/process-tmp-root.mjs';
 import { execFileSync, spawnSync, fork, exec } from 'node:child_process';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

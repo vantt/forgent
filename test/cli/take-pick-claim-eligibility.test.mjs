@@ -11,6 +11,7 @@
 // while still refusing a genuinely-blocked item (unmet dep, or anchored by
 // an open decomposed child) exactly as before. This file locks that in so
 // the two verbs cannot silently re-diverge.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';

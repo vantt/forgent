@@ -3,6 +3,7 @@
 // event names the run, and runUnit's own outcomes (a refused launch, a provider limit, a
 // governance refusal) reach the loop's recovery matrix. Workers are real confined processes.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

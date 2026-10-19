@@ -46,6 +46,7 @@
 //   defined in another file;
 // - a self-descending walker over `.fgos` that neither recurses by name, nor
 //   lists recursively, nor pops a worklist.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

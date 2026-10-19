@@ -10,6 +10,7 @@
 // spy outside the guard records every execFileSync made at critical-section
 // depth, with its stack.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';

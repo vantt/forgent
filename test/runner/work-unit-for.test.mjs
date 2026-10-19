@@ -1,4 +1,5 @@
 // test/runner/work-unit-for.test.mjs — workUnitFor: the one place a Work item becomes Unit data.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,5 +1,6 @@
 // capability-plan-lint.test.mjs — every check runs against plain text,
 // writes nothing, and never touches Work/.fgos state.
+import '../helpers/process-tmp-root.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';

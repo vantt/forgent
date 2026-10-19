@@ -4,6 +4,7 @@
 // fgos-coding-exploring/fgos-coding-validating now call instead of
 // reimplementing their own cwd-relative module resolver.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
+import '../helpers/process-tmp-root.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';

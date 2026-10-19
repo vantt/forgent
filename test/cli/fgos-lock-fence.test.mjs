@@ -1,6 +1,7 @@
 // `fgos lock fence`, `fgos lock-status`' view of a fenced lock, and
 // `main-checkout-reset` under the main checkout mutex. Every holder here is a
 // real process holding a real kernel lock; the verbs run as real CLI children.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

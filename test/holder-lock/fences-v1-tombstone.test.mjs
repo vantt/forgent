@@ -2,6 +2,7 @@
 // commit, because the cutover deletes it): after placeFences, every old
 // file-lock acquire of this workspace fails loudly, a present old lock
 // stops the placement, and placing twice is a no-op.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

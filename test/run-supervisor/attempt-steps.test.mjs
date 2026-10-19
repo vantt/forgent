@@ -2,6 +2,7 @@
 // receipt into result.json through the Execution Core door, finalize-home returns the credential and
 // removes the homes. Every fixture is a real attempt directory; the payload check runs for real
 // against a fixture release whose manifest declares this checkout as its Node payload.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

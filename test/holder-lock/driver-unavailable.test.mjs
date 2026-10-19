@@ -2,6 +2,7 @@
 // named `lock-driver-unavailable` and opens nothing; on a network filesystem
 // the driver's guarantee is `none` and the same error names the filesystem.
 // Neither branch falls back to a lock implemented in Node.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

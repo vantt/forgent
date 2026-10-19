@@ -1,6 +1,7 @@
 // fgos-read.test.mjs -- phần "list, show, ready, triage, graph, rollup, stale, conflicts, goal, check" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,

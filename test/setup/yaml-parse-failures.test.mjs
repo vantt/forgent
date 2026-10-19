@@ -1,6 +1,7 @@
 // test/setup/yaml-parse-failures.test.mjs — a YAML file doctor reads that cannot be parsed is named
 // as a problem with its line and column; it is never skipped silently and never crashes doctor.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

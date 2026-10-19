@@ -1,6 +1,7 @@
 // test/runner/dispatch-i08b-remediation.test.mjs
 // Dedicated regression test suite for Unit I08b remediation: F4, F5, F6, F7, F10.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

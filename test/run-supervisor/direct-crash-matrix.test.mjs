@@ -1,5 +1,6 @@
 // The direct launch under real crashes: `fgos run` as a real process, the sandbox real (bwrap), the
 // supervisor, gate and settle steps real. The agent is fixtures/direct-agent.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

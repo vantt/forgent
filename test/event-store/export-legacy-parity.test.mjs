@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -87,7 +88,6 @@ test('real legacy subtrees export with exact production Work and porting reader 
     { name: 'events/a.jsonl', bytes: event('work.add', { id: 'one', title: 'A' }) },
     { name: 'events/b.jsonl', bytes: event('work.edit', { id: 'one', patch: { title: 'B' } }) },
     { name: 'porting/events.jsonl', bytes: historical },
-    { name: 'porting/workspace/events.jsonl', bytes: event('porting.add', { id: 'nested' }) },
   ]);
   append(f.store, [{ type: 'work.edit', payload: { id: 'one', patch: { title: 'C' } } }]);
   f.store.append('project:porting', [{ eventType: 'porting.move', schemaVersion: 1, payload: { id: 'p', to: 'accepted' }, ts: '2026-10-19T01:00:00.000Z' }], {}, 'fixture', []);
@@ -102,7 +102,7 @@ test('real legacy subtrees export with exact production Work and porting reader 
   assert.equal(listPorting(out).porting.p.status, 'accepted');
   assert.equal(fs.readFileSync(path.join(out, 'porting/events.jsonl'), 'utf8').startsWith(historical), true);
   assert.equal(fs.existsSync(path.join(out, 'events/v4-project-porting.jsonl')), false);
-  assert.ok(fs.existsSync(path.join(out, 'porting/workspace/events.jsonl')));
+  assert.equal(fs.existsSync(path.join(out, 'porting/workspace/events.jsonl')), false);
 });
 test('legacy export excludes private streams by default and rejects explicit private streams', t => {
   const f = fixture(t);
@@ -120,7 +120,7 @@ test('legacy export excludes private streams by default and rejects explicit pri
   }
 });
 
-test('porting parity reports a historical log-order difference using its own reducer', t => {
+test('porting legacy import and rollback retain physical log order across clock rollback', t => {
   const f = fixture(t);
   const lines = [
     { seq: 1, ts: '2020-01-02T00:00:00.000Z', type: 'porting.add', payload: { id: 'p', status: 'candidate' } },
@@ -130,6 +130,17 @@ test('porting parity reports a historical log-order difference using its own red
   const out = path.join(f.temp, 'porting-difference');
   const result = exportUseCase(f.ctx, { out, format: 'legacy-layout' });
   assert.equal(listPorting(out).porting.p.status, 'accepted');
-  assert.equal(result.parity.equal, false);
-  assert.ok(result.parity.differences.some(d => d.collection === 'porting' && d.id === 'p' && d.v4.status === 'candidate'));
+  assert.equal(result.parity.equal, true);
+  assert.deepEqual(result.parity.differences, []);
+});
+
+test('rollback refuses ambiguous multiple historical porting destinations', t => {
+  const f = fixture(t);
+  pin(f, [
+    { name: 'porting/events.jsonl', bytes: '' },
+    { name: 'porting/workspace/events.jsonl', bytes: '' },
+  ]);
+  const out = path.join(f.temp, 'ambiguous');
+  assert.throws(() => exportUseCase(f.ctx, { out, format: 'legacy-layout' }), /multiple historical porting logs/);
+  assert.equal(fs.existsSync(out), false);
 });

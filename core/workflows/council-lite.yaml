@@ -1,6 +1,17 @@
 id: council-lite
 title: Council Lens Discussion
 description: One independent panel with three task postures and an evidence-led verdict.
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Three independent postures deliberate on a question, then one synthesizer states the verdict.
+must:
+  - id: independent-positions
+    guard: independence-blind
+    subject: discussion.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+frameDefaults: { dispatches: 1, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [discussion.settled]
+
 steps:
   - id: discussion
     title: Independent positions and synthesis

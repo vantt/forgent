@@ -2199,17 +2199,16 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'workflow',
-    invoke: 'fgos workflow <start|status|answer|resume|operations> [id]',
-    description: 'Door for planned work: a registered Workflow preset, an AgentKit plan, or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status".',
+    invoke: 'fgos workflow <start|status|answer|resume|close|operations> [id]',
+    description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
     subcommands: {
       start: {
-        description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition), --plan <AgentKit plan>, or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
+        description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition) or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
         parameters: {
           type: 'object',
           properties: {
             'workflow-id': { type: 'string', description: 'Positional (or --id): a registered Workflow id / preset.' },
             id: { type: 'string', description: 'Same as the positional workflow id.' },
-            plan: { type: 'string', description: 'Path to an AgentKit plan.md or plan directory.' },
             units: { type: 'string', description: 'A YAML or JSON units file, { id?, title?, units: [Unit...] } or a list of Units, run as a one-off Workflow with one step per Unit; a Unit\'s dependsOn orders the steps and hands it the earlier reports. A Unit may carry a soft "prefer" executor list and a "persona". A writing Unit that builds on exactly one writing Unit starts from that Unit\'s branch; building on two or more is refused (merge them into one unit, or make one depend on the other). Nothing is merged for you: the result lists every writing Unit\'s branch and worktree (writeBranches). Not combinable with --seats.' },
             effort: { type: 'string', description: 'Reasoning effort every unit of the run asks for (low, medium, high, max), checked against each chosen executor; kept for resume.' },
             timeout: {
@@ -2224,6 +2223,7 @@ export const COMMAND_REGISTRY = [
             'stance-options': { type: 'string', description: 'Pipe-separated option labels a measured panelist picks a stance from ("a|b|c"); refused on resume with different options.' },
             'context-ref': { type: 'array', items: { type: 'string' }, description: 'Repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
             seats: { type: 'string', description: 'Pipe-separated entries, at least 2; a lens is 3-160 characters on one line without braces, distinct case-insensitively; rebuilds a base whose panel is generic (group-cognition, business-discussion, nominal-group, delphi) with one panel seat per lens, in order. Topology, gates, checkers and the synthesizer stay as registered; there is no seat maximum, seats beyond the provider families share one (reported as seatsPreflight). An entry "@name" (lowercase letters, digits and "-") seats a named persona on that seat only: looked up in fgos/agents of the project, then domains/*/agents, then the installed core/agents, pinned at start, never silently replaced; an unknown or duplicated name refuses the start. Bases with curated seats (council-lite, architecture-advisory) are refused. Context refs are also copied to the later steps so every seat and checker receives them.' },
+            frame: { type: 'string', description: 'Comma-separated key=value pairs that narrow the guide\'s frame defaults for this case, never widen them: dispatches, mutatingDispatches, fallbackPerSeat, deviationsBeforeAsk, seatLaunchesPerDispatch (counts), rigorFloor (low, standard, high, critical). A count the guide leaves to the approver takes the value given.' },
             foreground: { type: 'boolean', description: 'Advance the run in this process and return when it completes, fails, or parks. Without it the run is handed to a detached process (log: .fgos/workflow-runs/<id>/advance.log); a run already being advanced by a live process refuses a second advance.' },
             worktree: { type: 'string', description: 'Target worktree directory.' },
           },
@@ -2233,12 +2233,11 @@ export const COMMAND_REGISTRY = [
         examples: [
           'fgos workflow start delphi --request "Should we split the billing service?"',
           'fgos workflow start --units units.yaml --effort high --foreground',
-          'fgos workflow start --plan plans/my-plan',
           'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
         ],
       },
       status: {
-        description: 'Read-only: run state plus advance: { running, pid, logPath, lastLines, hint }.',
+        description: 'Read-only: run state plus advance: { running, pid, logPath, lastLines, hint } and case: { milestones with digests, eligible activities, listed routes and the unlisted path, frame left, open gates, live reservations, closable }. A playbook case is running while a proposer holds advance; a conductor case while an attempt of its is alive.',
         parameters: {
           type: 'object',
           properties: {
@@ -2251,7 +2250,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos workflow status wf-run-1234'],
       },
       answer: {
-        description: 'Answer a parked gate step. Consent gates (default mode) release only with --approve; without it the answer is a clarification note and the gate stays parked. Input gates release on the answer alone.',
+        description: 'Answer a parked gate step. Consent gates (default mode) release only with --approve; without it the answer is a clarification note and the gate stays parked. Input gates release on the answer alone. The answer is kept as a file made once; while a proposer is alive it records the answer before it acts (nothing else is started), and a gate that is already answered refuses (gate-already-answered).',
         parameters: {
           type: 'object',
           properties: {
@@ -2291,6 +2290,20 @@ export const COMMAND_REGISTRY = [
           required: ['run-id'],
         },
         examples: ['fgos workflow resume wf-run-1234', 'fgos workflow resume wf-run-1234 --foreground'],
+      },
+      close: {
+        description: 'Close a case. Refused while a closure milestone is stale or a consent gate is parked, and while a proposer holds advance. Closing with an attempt still alive keeps its worktree binding.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
+            id: { type: 'string', description: 'Same as the positional run id.' },
+            reason: { type: 'string', description: 'Why the case is closed, recorded on the ledger.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: ['fgos workflow close wf-run-1234'],
       },
       operations: {
         description: 'Read-only: the operations a stage step offers, read from the Workflow definition.',

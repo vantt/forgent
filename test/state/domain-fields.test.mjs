@@ -17,6 +17,7 @@
 // fieldSchema is added to the real `coding` domain — coding has no need for
 // one today, this is purely infrastructure for a future domain.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

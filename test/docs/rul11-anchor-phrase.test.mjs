@@ -6,6 +6,7 @@
 // not have an equivalent test yet; this file opens the pattern rather than
 // retrofitting them (item's own boundary, not a silent gap against RUL9).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

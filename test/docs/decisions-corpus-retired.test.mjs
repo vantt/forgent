@@ -20,6 +20,7 @@
 // test/report/decision-index.test.mjs -- this file only re-verifies the
 // structural/narrative side that IS portable.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -15,6 +15,7 @@
 // `!work[parent]` bail), while `sync-root` still targets `fgw/<parent>`.
 // The last sync-root test below pins exactly that divergence.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   assert,

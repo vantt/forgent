@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -5,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import os from 'node:os';
 import { spawnSync, execFileSync } from 'node:child_process';
+import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -95,8 +97,8 @@ test('workflow start --units refuses a second definition source, --seats and a b
   const invoke = (args) => spawnSync(process.execPath, [FGOS, 'workflow', 'start', ...args, '--foreground', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
 
   const cases = [
-    [['delphi', '--units', units], /exactly one of <workflowId>, --plan <path> or --units <file>/],
-    [['--plan', 'plans/x', '--units', units], /exactly one of/],
+    [['delphi', '--units', units], /exactly one of <workflowId> or --units <file>/],
+    [['--plan', 'plans/x'], /unknown flag "--plan"/],
     [[], /exactly one of/],
     [['--units', units, '--seats', 'a|b|c'], /cannot be used with --units/],
     [['--units', units, '--effort', 'turbo'], /reasoningEffort "turbo"/],
@@ -108,4 +110,36 @@ test('workflow start --units refuses a second definition source, --seats and a b
     assert.match(refused.stderr, expected, args.join(' '));
   }
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false, 'no run was created');
+});
+
+test('workflow status carries the case block, close ends a finished case once, and --frame only narrows', (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-close-cli-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+  const workflowId = writeTrivialWorkflow(tmp);
+  const invoke = (...args) => spawnSync(process.execPath, [FGOS, 'workflow', ...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+
+  const started = invoke('start', workflowId, '--foreground');
+  assert.equal(started.status, 0, started.stderr);
+  const id = JSON.parse(started.stdout).data.workflowRunId;
+
+  const status = JSON.parse(invoke('status', id).stdout).data;
+  assert.equal(status.case.kind, 'playbook');
+  assert.equal(status.case.open, true);
+  assert.equal(status.case.milestones['only-step.settled'].state, 'achieved');
+  assert.deepEqual(Object.keys(status.case.routes), ['points', 'unlisted']);
+  assert.deepEqual(status.case.closable, { ok: true, reasons: [] });
+
+  const closed = invoke('close', id, '--reason', 'finished');
+  assert.equal(closed.status, 0, closed.stderr);
+  assert.equal(JSON.parse(closed.stdout).data.closed, true);
+  const again = invoke('close', id);
+  assert.notEqual(again.status, 0);
+  assert.match(again.stderr, /already closed/);
+  assert.equal(JSON.parse(invoke('status', id).stdout).data.case.open, false);
+
+  const widened = invoke('start', workflowId, '--frame', 'dispatches=1', '--foreground');
+  assert.notEqual(widened.status, 0);
+  assert.match(widened.stderr, /states none/, 'a guide with no frame defaults has nothing to narrow');
 });

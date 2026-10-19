@@ -52,6 +52,11 @@ export function checkEventStore(cwd, kind, options = {}) {
       return pass('Git fetch mapping and pinned URL match');
     }
     if (kind === 'event-store-machine-id' && facts.machineError) return fail(facts.machineError);
+    if (kind === 'event-store-legacy-layout') {
+      const result = prepareStore(cwd, { ...context.base, trustedMain: facts.trustedMain, config: { eventStore: config } }).legacyLayout([]);
+      if (result.warning) return warn(result.warning);
+      return result.passed ? pass('legacy fence, ref and sealed tree match; no retired paths') : fail(result.problems.join('; '));
+    }
     const status = context.status();
     switch (kind) {
       case 'event-store-machine-id': return status.machineRefShared ? warn(`event-store-machine-ref-shared: ${facts.machineId}; set git config fgos.machineId <other-id> in one clone`) : pass(facts.machineId);

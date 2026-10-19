@@ -2,6 +2,7 @@
 // OpenRouter headless only (the claude CLI behind an OpenRouter gateway stopped at a /login prompt
 // with a 401, and GLM loops on one tool call in a pane). What must be true of them is pinned here.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

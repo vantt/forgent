@@ -2,6 +2,7 @@
 // per held lock. Real processes and real LockFileEx locks through the real
 // host binary (FGOS_HOST_BIN). The stale work-directory sweep is platform
 // neutral and always runs; everything else needs win32.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -9,6 +9,9 @@ import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
 
+// A checkout kept for its owner (dirty) or locked by a still-running process is not a broken registration.
+const advisoryWorktreeReasons = new Set(['dirty-or-stale-checkout-preserved', 'locked-by-live-process']);
+
 function context(cwd, loaderOptions) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const config = mergeWithGlobalConfig(readSharedConfig(root));
@@ -22,7 +25,7 @@ export function checkGit(cwd, kind, loaderOptions) {
       if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
       // Each producer owns its diagnostic row; custody adds its own facts here
       // in phase 04. This check never repairs or clears predecessor evidence.
-      return { passed: facts.issues.every(issue => issue.reason === 'dirty-or-stale-checkout-preserved') && facts.pendingOperations.length === 0, message: JSON.stringify(facts) };
+      return { passed: facts.issues.every(issue => advisoryWorktreeReasons.has(issue.reason)) && facts.pendingOperations.length === 0, message: JSON.stringify(facts) };
     }
     const versions = native.versions();
     const facts = native.inspectGit(stateRoot, cwd, root, remote);

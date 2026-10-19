@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { green, red, yellow, bold, formatCheck } from '../../src/setup/ansi.mjs';

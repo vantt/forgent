@@ -2288,19 +2288,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'start') {
         const { startWorkflow, startWorkflowDetached, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
-        const planPath = flags.plan;
         // --units <file>: a list of Units run as a one-off Workflow, one step per Unit.
         const unitsPath = flags.units === undefined ? undefined : requireField(flags.units, '--units requires a file path (YAML or JSON list of units)');
-        const sources = [workflowId, planPath, unitsPath].filter((value) => value !== undefined);
+        const sources = [workflowId, unitsPath].filter((value) => value !== undefined);
         if (sources.length !== 1) {
-          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId>, --plan <path> or --units <file>');
+          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId> or --units <file>');
         }
         if (unitsPath !== undefined && flags.seats !== undefined) {
           throw new StoreError('validation', '--seats rebuilds a registered panel preset; it cannot be used with --units (give each unit its own persona or prefer instead)');
         }
         const startParams = {
           workflowId,
-          planPath,
           unitsPath,
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
@@ -2309,6 +2307,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
+          // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.
+          frame: flags.frame === undefined ? undefined : Object.fromEntries(requireField(flags.frame, '--frame requires key=value pairs, e.g. dispatches=3,rigorFloor=high').split(',').map((pair) => {
+            const [key, ...value] = pair.split('=');
+            return [key.trim(), value.join('=').trim()];
+          })),
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
@@ -2338,6 +2341,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
+      }
+      if (sub === 'close') {
+        const { closeWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
+        return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
       }
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');

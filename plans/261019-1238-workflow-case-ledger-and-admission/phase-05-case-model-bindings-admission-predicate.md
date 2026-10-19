@@ -1,5 +1,7 @@
 # Phase 05 — Case model: events, projection, bindings, admission predicate
 
+Status: done (report: plans/reports/phase-lead-261019-1814-workflow-case-p05-p06.md)
+
 Infra only (rank infra or lower, spec §5.3). No door, no proposer change: this phase ships the functions phases 06–08 call, each driven by tests with fixture guides.
 
 ## Context

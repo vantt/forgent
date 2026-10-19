@@ -21,6 +21,11 @@ fn candidate(root: &Path, wal: bool) {
     fs::set_permissions(root.join("bin/fgos"), fs::Permissions::from_mode(0o755)).unwrap();
     fs::write(root.join("libexec/legacy-node/bin/fgos.mjs"), legacy).unwrap();
     let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":"bin/fgos"},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":"linux","arch":"x64"},"files":[{"path":"bin/fgos","kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"},{"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"}]});
+    let addon = b"fixture native addon";
+    fs::create_dir_all(root.join("native")).unwrap();
+    fs::write(root.join("native/fgos.node"), addon).unwrap();
+    m["components"]["nativeAddon"] = serde_json::json!({"path":"native/fgos.node","digest":format!("{:x}",Sha256::digest(addon)),"target":"linux-x64","napiVersion":8,"capabilities":["git-wal-v1"],"crateChecksums":fgos_distribution::manifest::native_addon_crate_checksums()});
+    m["files"].as_array_mut().unwrap().push(serde_json::json!({"path":"native/fgos.node","kind":"file","digest":hash(addon),"mode":"644","class":"immutable-runtime"}));
     let path = root.join("manifest.json");
     fs::write(&path, serde_json::to_vec(&m).unwrap()).unwrap();
     m["artifactDigest"] = fgos_distribution::verify::recompute_artifact_digest(&path)
@@ -231,5 +236,100 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
         "activation",
         "fgos git"
     ));
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn addon_admission_names_missing_payload_or_capability_and_preserves_activation() {
+    let root = std::env::temp_dir().join(format!("fgctl-addon-m10-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let ws = root.join("ws");
+    fs::create_dir_all(&ws).unwrap();
+    assert!(Command::new("git")
+        .args(["init", "-q"])
+        .arg(&ws)
+        .status()
+        .unwrap()
+        .success());
+    let state = root.join("state");
+    fs::create_dir_all(&state).unwrap();
+    let good = root.join("good");
+    candidate(&good, false);
+    success(controller(&ws, &state, "init", &good));
+    let activation = ws.join(".fgos/installation/activation.json");
+    let before = fs::read(&activation).unwrap();
+    for missing in [true, false] {
+        let bad = root.join(if missing { "missing" } else { "capability" });
+        candidate(&bad, false);
+        let manifest = bad.join("manifest.json");
+        let mut m: serde_json::Value =
+            serde_json::from_slice(&fs::read(&manifest).unwrap()).unwrap();
+        if missing {
+            m["components"]
+                .as_object_mut()
+                .unwrap()
+                .remove("nativeAddon");
+        } else {
+            m["components"]["nativeAddon"]["capabilities"] = serde_json::json!([]);
+        }
+        m.as_object_mut().unwrap().remove("artifactDigest");
+        fs::write(&manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+        m["artifactDigest"] = fgos_distribution::verify::recompute_artifact_digest(&manifest)
+            .unwrap()
+            .into();
+        fs::write(&manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+        for verb in ["init", "upgrade"] {
+            let fresh = root.join(if missing {
+                "fresh-missing"
+            } else {
+                "fresh-capability"
+            });
+            fs::create_dir_all(&fresh).unwrap();
+            assert!(Command::new("git")
+                .args(["init", "-q"])
+                .arg(&fresh)
+                .status()
+                .unwrap()
+                .success());
+            let out = controller(
+                if verb == "init" { &fresh } else { &ws },
+                &state,
+                verb,
+                &bad,
+            );
+            assert!(!out.status.success());
+            assert!(
+                String::from_utf8_lossy(&out.stderr).contains("git-addon-missing"),
+                "{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            assert_eq!(fs::read(&activation).unwrap(), before);
+        }
+        success(controller(&ws, &state, "stage", &bad));
+        let mut rollback_binding: serde_json::Value = serde_json::from_slice(&before).unwrap();
+        rollback_binding["previousArtifactDigest"] = m["artifactDigest"].clone();
+        fs::write(&activation, serde_json::to_vec(&rollback_binding).unwrap()).unwrap();
+        let rollback_before = fs::read(&activation).unwrap();
+        let repair = Command::new(env!("CARGO_BIN_EXE_fgctl"))
+            .arg("repair")
+            .current_dir(&ws)
+            .env("FGOS_STATE_ROOT", &state)
+            .output()
+            .unwrap();
+        assert!(!repair.status.success());
+        assert!(
+            String::from_utf8_lossy(&repair.stderr).contains("git-addon-missing"),
+            "{}",
+            String::from_utf8_lossy(&repair.stderr)
+        );
+        assert_eq!(fs::read(&activation).unwrap(), rollback_before);
+        fs::write(&activation, &before).unwrap();
+        let mut parsed: fgos_distribution::manifest::ReleaseManifest =
+            serde_json::from_value(m).unwrap();
+        parsed.target.os = "windows".into();
+        parsed.target.arch = "x64".into();
+        parsed.components.native_addon = None;
+        assert!(fgos_distribution::verify::require_git_addon(&parsed).is_ok());
+    }
     fs::remove_dir_all(root).unwrap();
 }

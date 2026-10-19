@@ -3,6 +3,7 @@
 // the mode a caller requested. It is backend provenance only; it says nothing
 // about which writes belong to the run.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

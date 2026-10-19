@@ -4,6 +4,7 @@
 // old code sees a holder it can never disprove (pid 1, no start time, no
 // boot id) and refuses; before, it acquires. Also run inside a fresh PID
 // namespace when bwrap is available, because pid 1 exists in every one.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

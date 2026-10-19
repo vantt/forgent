@@ -2,6 +2,7 @@
 // of the batch is allocated never surfaces an error: the new seat splits from a pane that is still there or
 // opens a new tab with the same label. The controller half is `prepareTerminalAttempt`; the supervisor's
 // `release` is the host route called from another process, with no queue of this one in front of it.
+import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

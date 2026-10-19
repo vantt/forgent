@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` row `git-worktree-recovery` no longer fails on a worktree whose `git worktree lock` reason names a process that is still running (pid and start time checked, a reused pid does not count); a lock naming a dead or unparseable owner stays a finding.
+
+- Event Store migration refuses published mirror conflicts before changing the local legacy ref, restores pre-commit filesystem failures, and computes dry-run identities through Rust and the read-only Git port.
+
+- Fix dormant Event Store migration retries and recovery ownership, pre-cutover doctor warnings, HEAD-only reads, and restorable nested porting rollback exports.
+
+- Add dormant Event Store migration/import and rollback parity support, HEAD-only legacy reads, migration-required write refusals, and legacy-layout diagnostics; CLI registration follows at cutover.
+
+- `fgos workflow` plays by the case model. The playbook runner is now the Playbook proposer: it asks admission for every Unit (entry milestones, consent bound to the approved artifact, independent seats, disjoint writes, worktree binding, the approved frame), records a route and a reservation before the Unit runs and a settle with its receipts after, and parks the gate again when an approval no longer matches the artifact it approved; the order the playbooks run in does not change. `workflow answer` keeps the answer as a file and, while a proposer is alive, leaves it to record the answer before it acts (nothing else is started); `status` adds a `case` block (milestones with digests, listed routes and the unlisted path, frame left, open gates, live reservations); new `fgos workflow close <id>` (refused while a closure milestone is stale or a consent gate is parked); `start` takes `--frame key=value,...` to narrow the guide's frame, never widen it. A guide with its own activities opens a conductor case: a case id and no driving process. `src/workflow/runner.mjs` is split by role into `unit-handoff`, `case-lock`, `case-start`, `case-verbs`, with the proposer loop left in `runner.mjs`.
+- A Workflow case now has a model behind its ledger: milestones bound to the digest of their subject, reservations, the approved frame with its counters, routes and deviations, receipts from named evaluators only, and an admission check that answers whether a proposed activity may run now (entry milestones, consent bound to the approved artifact, independent seats, disjoint write scopes, binding, frame). A worktree is bound to one case through one record file per worktree identity. A gate answer is now one file per round that is never rewritten, and a second answer to an answered gate is refused (`gate-already-answered`). `fgos doctor` gains `workflow-case-binding-sentinel` and `workflow-case-bindings` (and `--fix` for the latter).
+- Git: defer foreign-checkout cleanup failures after durable closure, preserve Sync receipt replay across branch changes, name detached-HEAD refusal, and document reflog-only recovery.
+
+- Restore WAL exclusion between checkout and worktree lifecycle operations; refuse reflog-only commit attribution, bind Sync recovery to its recorded branch, close foreign attempted chains honestly, and retain sync warnings in runner results.
+
+- Bind checkout WAL to directory identity, recover hook-modified and reflog-visible commits, preserve terminal causes and landed receipts across compaction failures, protect async siblings during native Git loans, and retain clean-file permissions during rollback. Add an aged-floor Node-loan E3 row for host acceptance.
+
+- Git: recover interrupted scoped commits without replay, unblock pre-attempt/rejected Sync transactions, bound terminal WAL history, preserve concurrent sibling borrows, and restore clean merge paths on abort. E3 now measures Node-loaned checkout custody.
+
+- Restore declared producer bytes, modes and move paths after rejecting ScopedCommit hooks; drain adopted setsid lock borrowers without harming unrelated pre-exec children.
+
+- Preserve acquisition reach provenance in native holder-lock handover and emit Git WAL addon capabilities from the shared release/dev/test producer. Prevent uncertain Sync commit retries after a controller crash and preserve actual hook-modified file sets on receipt replay. Phase 05 remains unreleased pending its remaining acceptance proofs.
+
+- Add dormant native ScopedCommit, Sync and non-event Checkpoint ports, a Rust write-scope leaf, and an activated-host cutover grant check. Linux-x64 activation refuses a missing addon or missing `git-wal-v1` addon capability. Production adapter migration remains phase 07.
+
+- Workflow definitions load into one guide model (milestones, activities, decision points, MUST rows that each name an existing check, unenforced rules, frame defaults). Playbooks keep their steps and gain a short guide head; a MUST naming a check outside the catalog, an expression field, `listedRoutesOnly` outside a decision point, or `rigorCeiling` is a load error. A run's start event records the normalised guide.
+
+- `fgos workflow start --plan` is removed (an unknown flag now): the AgentKit plan is read as an artifact and its phases run as Units through `fgos run` or `fgos workflow start --units <file>`. The coding workflow file drops its dead runner fields (`units`, `dependsOn`, `gate` and the `integrate` and `approval` steps); its lifecycle part is unchanged.
 - End terminal rounds with `terminal:result-unreadable` when an invalid result stays unchanged for 30 seconds and the agent is idle, releasing custody through normal settlement.
 - Preserve committed decision-index rows missing from local state during setup and doctor fixes; exclude git-ignored setup output consistently from release payloads and checkout drift checks.
 - Warn once per unreadable pid per Worktree removal or relocation, and allow clean tracked `.fgos` while preserving reappearing skip-worktree state and dirty bytes.

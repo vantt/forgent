@@ -3,6 +3,7 @@
 // find how to run any verb from the manifest alone. These run the Node payload
 // directly; test/rust-host/help-routes.test.mjs runs the same doors through
 // the real Rust host.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

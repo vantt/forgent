@@ -177,33 +177,6 @@ impl Scrubbed {
         )
     }
 }
-/// Constructed only from validated Git-supplied hook authority, never an env bag.
-#[allow(dead_code)]
-struct HookContext {
-    git_dir: PathBuf,
-    work_tree: PathBuf,
-    index: PathBuf,
-}
-#[allow(dead_code)]
-impl HookContext {
-    fn environment(&self) -> Result<Scrubbed> {
-        let mut env = Scrubbed::new();
-        for (key, path) in [
-            ("GIT_DIR", &self.git_dir),
-            ("GIT_WORK_TREE", &self.work_tree),
-            ("GIT_INDEX_FILE", &self.index),
-        ] {
-            env.0.insert(
-                key.into(),
-                path.to_str()
-                    .ok_or_else(|| refusal("non-utf8-hook-authority"))?
-                    .into(),
-            );
-        }
-        Ok(env)
-    }
-}
-
 pub struct GitDriver {
     state_root: PathBuf,
     hooks: PathBuf,
@@ -300,6 +273,37 @@ impl GitDriver {
         }
     }
 
+    /// Only the grant-check host calls this after proving its inherited borrower.
+    pub(crate) fn hook_deletions(&self, repo: &RepoHandle, index: &Path) -> Result<Vec<String>> {
+        let out = self.invoke_context(
+            Some(repo),
+            repo.work_tree
+                .as_deref()
+                .ok_or_else(|| refusal("checkout-required"))?,
+            &[
+                "diff",
+                "--cached",
+                "--name-only",
+                "--no-renames",
+                "--diff-filter=D",
+                "-z",
+            ],
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            &[],
+            Some(index),
+        )?;
+        if !out.success {
+            return Err(out.error("hook-index-unreadable"));
+        }
+        Ok(crate::scoped_commit::paths(&out.stdout)?
+            .into_iter()
+            .filter(|p| p == ".fgos" || p.starts_with(".fgos/"))
+            .collect())
+    }
     pub(crate) fn require_floor(&self) -> Result<()> {
         if self.git_floor_verdict()?.supported {
             Ok(())
@@ -721,7 +725,7 @@ impl GitDriver {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn invoke_input(
+    pub(crate) fn invoke_input(
         &self,
         repo: Option<&RepoHandle>,
         cwd: &Path,
@@ -732,6 +736,24 @@ impl GitDriver {
         limit: usize,
         timeout: Duration,
         input: &[u8],
+    ) -> Result<Output> {
+        self.invoke_context(
+            repo, cwd, args, policy, loan, hardened, limit, timeout, input, None,
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn invoke_context(
+        &self,
+        repo: Option<&RepoHandle>,
+        cwd: &Path,
+        args: &[&str],
+        policy: Policy,
+        loan: Option<&dyn BorrowedSpawn>,
+        hardened: bool,
+        limit: usize,
+        timeout: Duration,
+        input: &[u8],
+        hook_index: Option<&Path>,
     ) -> Result<Output> {
         check_hooks(&self.hooks)?;
         let mut argv = vec![text_path(&self.git)?];
@@ -751,7 +773,32 @@ impl GitDriver {
             ]
             .map(str::to_owned),
         );
-        if policy != Policy::HookContext {
+        if policy == Policy::HookContext {
+            let repo = repo.ok_or_else(|| refusal("hook-repository-required"))?;
+            let configured = self
+                .config(repo)?
+                .into_iter()
+                .rev()
+                .find(|(_, k, v)| {
+                    k == "core.hookspath" && v.as_slice() != self.hooks.to_string_lossy().as_bytes()
+                })
+                .map(|(_, _, v)| v);
+            let hooks = match configured {
+                Some(bytes) => {
+                    let value =
+                        std::str::from_utf8(&bytes).map_err(|_| refusal("non-utf8-hook-path"))?;
+                    if value.starts_with('~') {
+                        return Err(refusal("unresolved-hook-path"));
+                    }
+                    repo.trusted_main_root.join(value)
+                }
+                None => repo.common_dir.join("hooks"),
+            };
+            argv.extend([
+                "-c".into(),
+                format!("core.hooksPath={}", text_path(&hooks)?),
+            ]);
+        } else {
             argv.extend([
                 "-c".into(),
                 format!("core.hooksPath={}", text_path(&self.hooks)?),
@@ -836,13 +883,32 @@ impl GitDriver {
             }
         }
         let mut env = Scrubbed::new();
+        if let Some(index) = hook_index {
+            env.0.insert("GIT_INDEX_FILE".into(), text_path(index)?);
+        }
         env.0.insert("LC_ALL".into(), "C".into());
         env.0.insert("LANGUAGE".into(), String::new());
         if policy != Policy::Remote {
             env.0.insert("GIT_NO_LAZY_FETCH".into(), "1".into());
         }
         env.0.insert("GIT_TERMINAL_PROMPT".into(), "0".into());
-        if policy == Policy::Publication || (policy == Policy::Remote && loan.is_some()) {
+        if policy == Policy::HookContext {
+            for key in [
+                "GIT_AUTHOR_NAME",
+                "GIT_AUTHOR_EMAIL",
+                "GIT_AUTHOR_DATE",
+                "GIT_COMMITTER_NAME",
+                "GIT_COMMITTER_EMAIL",
+                "GIT_COMMITTER_DATE",
+            ] {
+                if let Ok(value) = std::env::var(key) {
+                    env.0.insert(key.into(), value);
+                }
+            }
+        }
+        if policy == Policy::Publication
+            || ((policy == Policy::Remote || policy == Policy::HookContext) && loan.is_some())
+        {
             let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
             let result = loan.run_borrowed(
                 &fgos_holder_lock::BorrowSpec {
@@ -2372,6 +2438,19 @@ mod tests {
         }
     }
     #[test]
+    fn read_only_hash_object_does_not_install_bytes() {
+        for format in ["sha1", "sha256"] {
+            let state = Temp::new();
+            let dir = Temp::new();
+            git(&dir.0, &["init", "-q", &format!("--object-format={format}")]);
+            let driver = GitDriver::new(&state.0).unwrap();
+            let repo = resolve(&driver, &dir.0);
+            let oid = driver.hash_object(&repo, ObjectType::Blob, b"unpublished bytes\0").unwrap();
+            assert!(!repo.common_dir().join("objects").join(&oid.as_str()[..2]).join(&oid.as_str()[2..]).exists());
+            assert!(driver.hash_object(&repo, ObjectType::Tag, b"bad").is_err());
+        }
+    }
+    #[test]
     #[cfg(unix)]
     fn publication_borrow_hash_object_binary_round_trip() {
         use fgos_holder_lock::{acquire, release, Acquire, Mode, Resource, Wait};
@@ -2820,6 +2899,18 @@ struct CommitCursor {
 }
 
 impl GitDriver {
+    /// Compute an object identity through Git without installing the object.
+    pub fn hash_object(&self, repo: &RepoHandle, kind: ObjectType, bytes: &[u8]) -> Result<Oid> {
+        let kind = match kind {
+            ObjectType::Blob => "blob",
+            ObjectType::Tree => "tree",
+            ObjectType::Commit => "commit",
+            _ => return Err(refusal("unsupported-hash-object-type")),
+        };
+        let out = self.inspect_input(repo, &["hash-object", "-t", kind, "--stdin"], bytes)?;
+        Oid::parse(std::str::from_utf8(&out).map_err(|_| refusal("invalid-object-id"))?.trim(), repo.object_format())
+            .map_err(|_| refusal("invalid-object-id"))
+    }
     pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;

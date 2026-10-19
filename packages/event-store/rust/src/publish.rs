@@ -92,24 +92,30 @@ pub(crate) fn event_commit(
     seconds: i64,
     message: Vec<u8>,
 ) -> Result<Oid, Error> {
+    port.write_commit(repo, &event_commit_input(tree, parents, seconds, message))
+        .map_err(git_error)
+}
+
+pub(crate) fn event_commit_input(
+    tree: Oid,
+    parents: Vec<Oid>,
+    seconds: i64,
+    message: Vec<u8>,
+) -> CommitInput {
     let identity = || Identity {
         name: "fgOS Event Store".into(),
         email: "event-store@fgos.invalid".into(),
     };
     let date = format!("{} +0000", seconds.max(0));
-    port.write_commit(
-        repo,
-        &CommitInput {
-            tree,
-            parents,
-            author: identity(),
-            committer: identity(),
-            author_date: date.clone(),
-            committer_date: date,
-            message,
-        },
-    )
-    .map_err(git_error)
+    CommitInput {
+        tree,
+        parents,
+        author: identity(),
+        committer: identity(),
+        author_date: date.clone(),
+        committer_date: date,
+        message,
+    }
 }
 
 /// Whole Unix seconds; callers clamp only when constructing a Git commit date.

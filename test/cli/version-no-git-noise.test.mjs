@@ -1,6 +1,7 @@
 // A release install is not a git checkout: resolving its version must report no
 // commit and print nothing, so `fgos version` and `fgos doctor` do not show
 // git's "fatal: not a git repository" to the person running them.
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

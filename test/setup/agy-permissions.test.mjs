@@ -4,6 +4,7 @@
 // harness style (a mocked fs write would never prove the CLI wiring itself
 // works). Every case overrides HOME so this never touches the real machine's
 // ~/.gemini/antigravity-cli/settings.json.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   FGOS,

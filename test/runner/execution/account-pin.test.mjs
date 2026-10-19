@@ -2,6 +2,7 @@
 // runs on. bind() pins it on a seat whose bound executor's provider lists it and records where the
 // pin came from; any other seat binds unpinned, with the reason recorded. A malformed id is refused.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

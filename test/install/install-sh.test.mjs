@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 import { execFileSync, spawn } from 'node:child_process';
 import http from 'node:http';
 import fs from 'node:fs';

@@ -1,12 +1,13 @@
 // test/workflow/business-discussion-workflow.test.mjs — Acceptance tests for business-discussion workflow (P4 Phase 4)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
-import { startWorkflow, answerWorkflow } from '../../src/workflow/runner.mjs';
+import { startWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

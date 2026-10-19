@@ -1,5 +1,6 @@
 // test/cli/execution-outcome-exit-codes.test.mjs — exit codes for execution outcomes (RUL99)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

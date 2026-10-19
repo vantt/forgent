@@ -31,6 +31,7 @@ pub struct EventStore {
     registry: Registry,
     machine: String,
     resolved: (Arc<GitDriver>, Arc<RepoHandle>),
+    write_refusal: Option<String>,
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -52,6 +53,9 @@ impl EventStore {
         held_ranks: Vec<u32>,
     ) -> Result<Value> {
         available()?;
+        if let Some(reason) = &self.write_refusal {
+            return Err(error(reason));
+        }
         let stream = StreamId::parse(&stream).map_err(error)?;
         let events: Vec<Input> = serde_json::from_value(events).map_err(error)?;
         let events: Vec<_> = events
@@ -155,6 +159,7 @@ pub fn open_store(
     resolved_root: &EventStoreRoot,
     machine_id: String,
     registry_files: Vec<String>,
+    publication_remote: Option<String>,
 ) -> Result<EventStore> {
     available()?;
     if machine_id != resolved_root.machine {
@@ -162,7 +167,15 @@ pub fn open_store(
     }
     let mut registry = Registry::default();
     registry.load_files(&registry_files).map_err(error)?;
+    let write_refusal = fgos_event_store::legacy_import::write_readiness(
+        &resolved_root.driver,
+        &resolved_root.repo,
+        publication_remote.as_deref().unwrap_or("origin"),
+    )
+    .err()
+    .map(|e| e.to_string());
     Ok(EventStore {
+        write_refusal,
         layout: Layout::from_common_dir(Some(resolved_root.repo.common_dir())).map_err(error)?,
         registry,
         machine: machine_id,
@@ -486,4 +499,79 @@ pub fn mint_event_store_machine_id(state_root: String, hostname: String) -> Resu
     Ok(
         json!({"changed":changed,"machineId":machine,"message":if changed {"machine id minted once"} else {"machine id already exists"}}),
     )
+}
+
+#[napi]
+impl EventStore {
+    /// Pure HEAD reads; `check` also refuses dirty/untracked migration inputs.
+    #[napi]
+    pub fn read_legacy_from_head(
+        &self,
+        check: bool,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
+        if check && repo.git_dir() != repo.common_dir() {
+            return Err(error("event-store-migration-main-required"));
+        }
+        let main = match driver
+            .resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())
+            .map_err(operation)?
+        {
+            ResolveRepo::Repository(main) => main,
+            _ => return Err(error("event-store-no-repository")),
+        };
+        let repo = &main;
+        let inv = fgos_event_store::legacy_import::inventory(driver, repo).map_err(error)?;
+        if check {
+            fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
+        }
+        let (data_tree, legacy_oid) = fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
+        let existing_legacy = match driver
+            .resolve_ref(
+                repo,
+                &fgos_git::RefName::parse("refs/fgos/legacy").map_err(error)?,
+            )
+            .map_err(operation)?
+        {
+            fgos_git::RefValue::Absent => None,
+            fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()),
+            _ => return Err(error("event-store-legacy-mismatch: symbolic legacy ref")),
+        };
+        let events = fgos_event_store::legacy_import::events(
+            &inv,
+            &stream_ids(&["project".into(), "project:porting".into()])?,
+        )
+        .map_err(error)?;
+        Ok(
+            json!({"dataTree":data_tree.as_str(),"legacyRefOid":legacy_oid.as_str(),"existingLegacyOid":existing_legacy,"legacyMirrors":fgos_event_store::legacy_import::legacy_mirrors(driver, repo).map_err(error)?.into_iter().map(|r| json!({"name":r.name,"oid": match r.value { fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()), _ => None }})).collect::<Vec<_>>(),"inventory":inv,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
+        )
+    }
+    #[napi]
+    pub fn import_legacy(
+        &self,
+        expected_head: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
+        if repo.git_dir() != repo.common_dir() {
+            return Err(error("event-store-migration-main-required"));
+        }
+        fgos_event_store::legacy_import::import_legacy(
+            driver,
+            repo,
+            &self.layout,
+            &expected_head,
+            &held_ranks,
+            hot_lock_depth,
+        )
+        .map_err(error)
+    }
+    #[napi]
+    pub fn legacy_layout(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
+        let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
+        fgos_event_store::legacy_import::legacy_layout(driver, repo).map_err(error)
+    }
 }

@@ -1,6 +1,7 @@
 // test/workflow/workflow-store-ledger.test.mjs — the run ledger is written through one door that holds
 // `advance`, is read fail-closed, and is shortened only by an explicit recovery of an unfinished tail.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,7 +17,7 @@ import {
   statusWorkflow,
   answerWorkflow,
 } from '../../src/workflow/index.mjs';
-import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';

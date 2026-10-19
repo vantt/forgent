@@ -5,6 +5,7 @@
 // unrecorded, and nothing here may create a `.fgos/` that was not already
 // there (ADR0020 — a linked worktree never carries one).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -3,6 +3,7 @@
 // when both are used up. Everything goes through runUnit; the workers are real confined processes
 // whose behaviour depends on the account login they were given (a marker file in the account home).
 
+import '../../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -12,6 +12,7 @@
 // explicitly, so requiring it outright removes the whole failure class with
 // no behavior change for any real caller.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   assert,

@@ -8,6 +8,7 @@
 // stay dirty on nearly every command. Proves the retirement is real, same
 // pattern as events-legacy-absence.test.mjs.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

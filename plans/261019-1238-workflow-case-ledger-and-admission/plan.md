@@ -26,10 +26,10 @@ created: 2026-10-19
 | 00 | [Facts and prior art](phase-00-facts-and-prior-art.md) (read-only) | no | 3h | done (main `78b0921d2`) |
 | 01 | [Playbook order regression guard](phase-01-playbook-order-regression-guard.md) | no | 3h | done (main `78b0921d2`) |
 | 02 | [Harden the JSONL ledger in place](phase-02-harden-jsonl-ledger.md) (F11) | no | 4h | done (main `78b0921d2`) |
-| 03 | [Retire `--plan` and dead `feature.yaml` runner fields](phase-03-retire-plan-source-and-dead-runner-fields.md) (F9) | no | 5h | pending |
-| 04 | [Guide schema](phase-04-guide-schema.md) (F5, part of F1) | no | 8h | pending |
-| 05 | [Case model: events, projection, bindings, admission predicate](phase-05-case-model-bindings-admission-predicate.md) (F1, F2 counters, F4, F7 predicate) | no | 12h | pending |
-| 06 | [Playbook proposer on admission, Shape C, case verbs](phase-06-playbook-proposer-shape-c-case-verbs.md) (F6, F12) | no (Workflow door only) | 12h | pending |
+| 03 | [Retire `--plan` and dead `feature.yaml` runner fields](phase-03-retire-plan-source-and-dead-runner-fields.md) (F9) | no | 5h | done (main `c3f2567ab`) |
+| 04 | [Guide schema](phase-04-guide-schema.md) (F5, part of F1) | no | 8h | done (main `c3f2567ab`) |
+| 05 | [Case model: events, projection, bindings, admission predicate](phase-05-case-model-bindings-admission-predicate.md) (F1, F2 counters, F4, F7 predicate) | no | 12h | done (main `b2017d58b`) |
+| 06 | [Playbook proposer on admission, Shape C, case verbs](phase-06-playbook-proposer-shape-c-case-verbs.md) (F6, F12) | no (Workflow door only) | 12h | done (main `b2017d58b`) |
 | 07 | [AdmissionPort at every `runUnit` writer](phase-07-admission-port-every-rununit-writer.md) (F2 ceiling, F3 port, B3′) | yes | 12h | pending |
 | 08 | [N1 authority context at both doors, conductor case](phase-08-n1-authority-context-conductor-case.md) (F3, F7) | yes | 12h | pending |
 | 09 | [Doctrine, docs, closeout](phase-09-doctrine-docs-closeout.md) (`coordination-driver.md` rewrite) | no | 5h | pending |

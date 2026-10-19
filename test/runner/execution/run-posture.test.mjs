@@ -2,6 +2,7 @@
 // confinement backend through the one confinement path (runUnit -> executeAssignment
 // -> Confinement Authority -> bwrap driver), and an unavailable backend refuses.
 
+import '../../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
