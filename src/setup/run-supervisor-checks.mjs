@@ -254,6 +254,26 @@ export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.(
 const STUCK_STATES = new Set(['needs-adopt', 'open']);
 
 /**
+ * Why adopt cannot finish an attempt whose envelope names a host binary that no longer exists, or `null`.
+ * The envelope binds the attempt's steps to the release that wrote it (the step refuses any other host), so
+ * there is no fallback to the active release; the remedy is to bring that release directory back.
+ */
+function releaseGoneReason(attemptDir) {
+  try {
+    const { hostBin } = JSON.parse(fs.readFileSync(path.join(attemptDir, 'envelope.json'), 'utf8'));
+    if (typeof hostBin === 'string' && hostBin !== '' && !fs.existsSync(hostBin)) {
+      return `the release that wrote it was removed (${hostBin} is gone) and the envelope binds its steps to that host, so adopt cannot run them: restore that release directory, then run "fgos doctor --fix" again`;
+    }
+  } catch { /* an envelope that cannot be read is judged by adopt itself */ }
+  return null;
+}
+
+const stuckEntry = (verdict) => {
+  const reason = releaseGoneReason(verdict.attemptDir) ?? verdict.reason;
+  return `${verdict.attemptDir}${reason ? ` (${reason})` : ''}`;
+};
+
+/**
  * Attempts with a v3 envelope and no `closed.json` whose lock nobody holds, found through the adopt
  * route's `--probe-only` (nothing is written). A held lock is a running attempt, not a finding.
  */
@@ -273,7 +293,7 @@ export function checkRunAttemptsStuck(repoRoot) {
     const running = verdicts.filter((verdict) => verdict.state === 'running' || verdict.state === 'being-adopted').length;
     return { passed: true, message: `${verdicts.length} open attempt(s), none stuck${running > 0 ? ` (${running} running)` : ''}` };
   }
-  const named = stuck.map((verdict) => `${verdict.attemptDir}${verdict.reason ? ` (${verdict.reason})` : ''}`);
+  const named = stuck.map(stuckEntry);
   return { passed: false, message: `${stuck.length} attempt(s) have no holder and no closed.json: ${listed(named)} -- run "fgos doctor --fix"` };
 }
 
@@ -285,7 +305,7 @@ export function fixRunAttemptsStuck(repoRoot) {
   if (result.adoptError) return { changed: false, message: `adopt could not run: ${result.adoptError}${error ? ` (${error})` : ''}` };
   const adopted = (result.adopt ?? []).filter((verdict) => verdict.state === 'adopted');
   const left = (result.adopt ?? []).filter((verdict) => STUCK_STATES.has(verdict.state));
-  const message = `adopted ${adopted.length} attempt(s)${left.length > 0 ? `; ${left.length} still open: ${listed(left.map((verdict) => `${verdict.attemptDir}${verdict.reason ? ` (${verdict.reason})` : ''}`))}` : ''}`;
+  const message = `adopted ${adopted.length} attempt(s)${left.length > 0 ? `; ${left.length} still open: ${listed(left.map(stuckEntry))}` : ''}`;
   return { changed: adopted.length > 0, message };
 }
 

@@ -406,9 +406,6 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
  * exact `:!.fgos` pathspec exclusion from `isCheckoutDirty`). Read through
  * `statusPaths`: byte for byte, a rename as both halves, untracked files one
  * by one. Fails open (returns empty array) on git error.
- *
- * Exported (tsk-3bh): `executeExecutorCli` (src/runner/dispatch/cli.mjs)
- * uses this to detect uncommitted paths lost across an out-of-process dispatch.
  */
 export function checkoutDirtyPaths(repoRoot, worktreePath) {
   let statusOutput;

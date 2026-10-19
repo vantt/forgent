@@ -1,6 +1,7 @@
 // test/runner/provider-auth-failure.test.mjs -- the dead-credential wordings shared by the pane
 // liveness ladder, the provider capacity classifier and the run settlement.
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

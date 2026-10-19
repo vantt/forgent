@@ -283,12 +283,6 @@ impl EventStore {
         Ok(json!({"mirrorsChanged":result.mirrors_changed,"warnings":result.warnings}))
     }
     #[napi]
-    pub fn status(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
-        self.context(&held_ranks, hot_lock_depth)?;
-        serde_json::to_value(fgos_event_store::sync::sync_status(&self.layout).map_err(error)?)
-            .map_err(error)
-    }
-    #[napi]
     pub fn unpublished_summary(
         &self,
         remote: String,
@@ -365,4 +359,131 @@ impl EventStore {
 
 fn operation(e: fgos_git::OperationError) -> Error {
     error(json!({"code": e.code, "cause":e.cause}))
+}
+
+#[napi]
+pub fn event_store_facts(
+    cwd: String,
+    state_root: String,
+    trusted_main: String,
+    remote: String,
+) -> Result<Value> {
+    available()?;
+    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    let repo = match driver
+        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
+        .map_err(operation)?
+    {
+        ResolveRepo::Repository(repo) => repo,
+        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
+    };
+    fgos_event_store::diagnostics::facts(&driver, &repo, Path::new(&state_root), &remote)
+        .map_err(error)
+}
+#[napi]
+pub fn ensure_event_store_refspecs(
+    cwd: String,
+    state_root: String,
+    trusted_main: String,
+    remote: String,
+) -> Result<()> {
+    available()?;
+    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    let repo = match driver
+        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
+        .map_err(operation)?
+    {
+        ResolveRepo::Repository(repo) => repo,
+        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
+    };
+    fgos_event_store::refspec::ensure_refspecs(&driver, &repo, &remote).map_err(error)
+}
+#[napi]
+impl EventStore {
+    #[napi]
+    pub fn status(
+        &self,
+        remote: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
+        fgos_event_store::diagnostics::status(driver, repo, &self.layout, machine, &remote)
+            .map_err(error)
+    }
+    #[napi]
+    pub fn export_jsonl(
+        &self,
+        streams: Vec<String>,
+        since: Value,
+        out: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        self.export(streams, since, out, held_ranks, hot_lock_depth, false)
+    }
+    #[napi]
+    pub fn export_legacy_layout(
+        &self,
+        streams: Vec<String>,
+        since: Value,
+        out: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        self.export(streams, since, out, held_ranks, hot_lock_depth, true)
+    }
+}
+impl EventStore {
+    fn export(
+        &self,
+        streams: Vec<String>,
+        since: Value,
+        out: String,
+        ranks: Vec<u32>,
+        depth: u32,
+        legacy: bool,
+    ) -> Result<Value> {
+        let (driver, repo, machine) = self.context(&ranks, depth)?;
+        let origin = if self.layout.store().exists() {
+            StoreIdentity::open(&self.layout, machine)
+                .map_err(error)?
+                .store_id
+        } else {
+            String::new()
+        };
+        let streams = stream_ids(&streams)?;
+        let since = if since.is_null() {
+            Default::default()
+        } else {
+            fgos_event_store::cursor::Cursor::parse(
+                &fgos_event_store::envelope::line(&since).map_err(error)?,
+            )
+            .map_err(error)?
+        };
+        let request = fgos_event_store::export::ExportRequest {
+            layout: &self.layout,
+            origin: &origin,
+            streams: &streams,
+            since: &since,
+            out: Path::new(&out),
+        };
+        if legacy {
+            fgos_event_store::export::export_legacy_layout(driver, repo, request)
+        } else {
+            fgos_event_store::export::export_jsonl(driver, repo, request)
+        }
+        .map_err(error)
+    }
+}
+
+#[napi]
+pub fn mint_event_store_machine_id(state_root: String, hostname: String) -> Result<Value> {
+    available()?;
+    let (changed, machine) =
+        fgos_event_store::identity::mint_machine_id(Path::new(&state_root), &hostname)
+            .map_err(error)?;
+    Ok(
+        json!({"changed":changed,"machineId":machine,"message":if changed {"machine id minted once"} else {"machine id already exists"}}),
+    )
 }

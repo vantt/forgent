@@ -3,6 +3,7 @@
 // a structured reason. Never an invocation that would be wrapped in a sandbox with no
 // writable home for an agent that needs one.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

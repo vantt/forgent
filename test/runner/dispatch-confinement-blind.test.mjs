@@ -2,6 +2,7 @@
 // except other dispatches' run state, homes, processes and the herdr socket; a blind dispatch is
 // refused, never run unblind, when it cannot be enforced.
 
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import cp from 'node:child_process';

@@ -1,6 +1,7 @@
 // test/runner/operation-prompt-templates.test.mjs — comprehensive tests for
 // operation prompt template registry, resolver, bounded rendering, and provenance (Unit I04 / Phase 3)
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

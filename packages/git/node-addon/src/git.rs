@@ -3,6 +3,8 @@ mod inspect;
 mod handover;
 pub use handover::{take_git_handover, mint_git_loan, close_git_loan};
 mod refs;
+mod worktree;
+pub use worktree::inspect_git_worktree_recovery;
 mod remote;
 use crate::{check, error};
 use fgos_git::{HolderAuthority, *};

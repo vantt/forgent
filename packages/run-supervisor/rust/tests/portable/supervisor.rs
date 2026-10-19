@@ -124,7 +124,7 @@ impl Run {
             "steps": opts.steps,
             "sideFile": side_file,
         });
-        if opts.mutating && cfg!(windows) {
+        if opts.mutating {
             value["cwdLeaseFile"] = json!(lease_path);
         }
         let digest = envelope::digest(&value).unwrap();
@@ -157,6 +157,12 @@ impl Run {
             #[cfg(unix)]
             lease,
         }
+    }
+
+    /// Keep the controller's copy, as the execution core does through commit.
+    #[cfg(unix)]
+    pub fn retain_lease(&self) -> fs::File {
+        self.lease.as_ref().expect("mutating lease").try_clone().unwrap()
     }
 
     /// Start the supervisor. Unix: the lock description at slot 3, then the

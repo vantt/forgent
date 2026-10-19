@@ -138,6 +138,41 @@ pub(crate) fn remove_record(path: &Path) {
     let _ = std::fs::remove_file(path);
 }
 
+/// Reject an unprovable predecessor before ordinary admission can erase it.
+/// Called under the kernel lock, closing the contender's pre-read/acquire race.
+pub fn disallowed_kind(path: &Path, allowed: &[String]) -> Option<Value> {
+    if allowed.is_empty() { return None; }
+    let raw = match std::fs::read_to_string(path) {
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return None,
+        Err(err) => return Some(json!({ "unreadable": err.to_string() })),
+        Ok(text) => serde_json::from_str::<Value>(&text).unwrap_or(json!({ "raw": text })),
+    };
+    if raw["domainKind"].as_str().is_some_and(|kind| allowed.iter().any(|a| a == kind)) {
+        None
+    } else { Some(raw) }
+}
+
+/// Recorded handoff under an exclusive held description. Never kills a domain.
+/// The acquired holder owns all records written since admission; unknown or
+/// nonempty records remain available to successor admission.
+pub fn clear(path: &Path, wait: Duration) -> io::Result<()> {
+    let text = match std::fs::read_to_string(path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(()),
+        Err(err) => return Err(err),
+    };
+    let raw: Value = serde_json::from_str(&text).map_err(io::Error::other)?;
+    let domain = parse_record(&raw).ok_or_else(|| io::Error::other("domain-unknown"))?;
+    let mut watch = domain_watch(&domain);
+    let until = Instant::now() + wait;
+    while watch.is_empty() != DomainState::Empty {
+        if Instant::now() >= until { return Err(io::Error::other("domain-not-empty")); }
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    if std::fs::read_to_string(path)? != text { return Err(io::Error::other("domain-record-changed")); }
+    std::fs::remove_file(path)
+}
+
 /// Run the rule for the record at `path`, after the kernel lock is held.
 pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
     admit_with_trace(path, kill_wait).0

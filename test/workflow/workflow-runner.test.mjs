@@ -1,5 +1,6 @@
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
+import '../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -18,7 +19,6 @@ import {
   mergeWorkflowBranch,
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
-  translatePlanToWorkflow,
   startWorkflow,
   statusWorkflow,
   answerWorkflow,
@@ -27,6 +27,7 @@ import {
   resumeWorkflowDetached,
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
@@ -41,6 +42,7 @@ after(() => {
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -169,16 +171,15 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.status, 'running');
   assert.equal(state.steps.s1.status, 'pending');
 
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (event) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event, hold });
+
   // Step 1 starts and completes
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'step.start', payload: { stepId: 's1' } } });
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'step.complete', payload: { stepId: 's1', outcome: 'pass' } } });
+  append({ type: 'step.start', payload: { stepId: 's1' } });
+  append({ type: 'step.complete', payload: { stepId: 's1', outcome: 'pass' } });
 
   // Gate parks step 2
-  appendWorkflowEvent({
-    repoRoot: tmp,
-    workflowRunId,
-    event: { type: 'gate.park', payload: { stepId: 's2', question: 'Continue?' } },
-  });
+  append({ type: 'gate.park', payload: { stepId: 's2', question: 'Continue?' } });
 
   state = projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId }));
   assert.equal(state.status, 'parked');
@@ -186,11 +187,8 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.questions[0].question, 'Continue?');
 
   // Answer gate with approval
-  appendWorkflowEvent({
-    repoRoot: tmp,
-    workflowRunId,
-    event: { type: 'gate.answer', payload: { stepId: 's2', answer: 'yes', approved: true } },
-  });
+  append({ type: 'gate.answer', payload: { stepId: 's2', answer: 'yes', approved: true } });
+  hold.release();
 
   state = projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId }));
   assert.equal(state.status, 'running');
@@ -236,46 +234,6 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
     deleteBranch: true,
   });
   assert.equal(fs.existsSync(worktreePath), false);
-});
-
-test('translatePlanToWorkflow translates multi-phase plan into DAG Workflow', () => {
-  const tmp = makeFixtureDir('plan-trans-');
-  fs.writeFileSync(
-    path.join(tmp, 'plan.md'),
-    `---
-title: "My Feature Plan"
----
-# Overview
-`,
-  );
-  fs.writeFileSync(
-    path.join(tmp, 'phase-01-core.md'),
-    `---
-phase: 1
-title: "Core"
-dependencies: []
----
-`,
-  );
-  fs.writeFileSync(
-    path.join(tmp, 'phase-02-api.md'),
-    `---
-phase: 2
-title: "API"
-dependencies: [1]
-requiresReview: true
----
-`,
-  );
-
-  const wf = translatePlanToWorkflow(tmp);
-  assert.equal(wf.id.startsWith('plan/'), true);
-  assert.equal(wf.steps.length, 2);
-  assert.equal(wf.steps[0].id, 'phase-01');
-  assert.equal(wf.steps[1].id, 'phase-02');
-  assert.deepEqual(wf.steps[1].dependsOn, ['phase-01']);
-  assert.ok(wf.steps[1].gate);
-  assert.equal(wf.steps[1].gate.kind, 'human');
 });
 
 test('runner: executes workflow with parallel steps and parks at human gate', async () => {
@@ -401,15 +359,12 @@ test('a gate answer that cannot be written is refused before the answer is recor
 
 test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'my-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "CLI Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
-  // 1. fgos workflow start --plan
+  // 1. fgos workflow start <id>
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp, '--foreground'],
+    [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(startOut.includes('wf-run-'));
@@ -437,14 +392,11 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
 
 test('CLI: fgos workflow start returns the run id at once and a detached process finishes the run', async () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'detached-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Detached Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp],
     { cwd: tmp, encoding: 'utf8' },
   );
   const wfRunId = /"workflowRunId":\s*"([^"]+)"/.exec(startOut)?.[1];
@@ -798,13 +750,10 @@ test('status shows no log tail for a completed run', async () => {
 
 test('CLI: the detached child logs a line per step start and end, and workflow status prints the advance block', async () => {
   const tmp = setupTestRepo();
-  const planDir = path.join(tmp, 'progress-plan');
-  fs.mkdirSync(planDir);
-  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Progress Plan"\n---\n');
-  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+  const workflowId = writeTrivialWorkflow(tmp);
 
   const wfRunId = parseCliData(
-    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
+    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
   ).workflowRunId;
   assert.equal(await waitForStatus(wfRunId, tmp, 'completed'), 'completed');
   const stepId = Object.keys(statusWorkflow(wfRunId, { repoRoot: tmp, cwd: tmp }).steps)[0];
@@ -1175,7 +1124,8 @@ test('a completed unit keeps the id of the Unit run that produced it', () => {
     steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', objective: 'x' } }] }],
   });
   const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
-  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload } });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
   const unitOf = () => projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId })).steps.s1.units.u1;
 
   append('unit.scheduled', { stepId: 's1', unitId: 'u1' });
@@ -1201,6 +1151,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
     ],
   });
   const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
   const units = {};
   for (const id of ['merged', 'unmerged', 'dirty', 'broken']) {
     const branch = `wf/${workflowRunId}/${id}`;
@@ -1210,6 +1161,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
     appendWorkflowEvent({
       repoRoot: tmp,
       workflowRunId,
+      hold,
       event: { type: 'unit.scheduled', payload: { stepId: 's1', unitId: id, worktreePath: wt.worktreePath, branch } },
     });
   }
@@ -1223,10 +1175,11 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
   commitIn('unmerged', 'b.txt');
   fs.writeFileSync(path.join(units.dirty.worktreePath, 'scratch.txt'), 'uncommitted\n');
   for (const id of ['merged', 'unmerged', 'dirty']) {
-    appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: id, outcome: 'pass' } } });
+    appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: id, outcome: 'pass' } } });
   }
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: 'broken', outcome: 'execution-failure' } } });
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: terminal, payload: { outcome: terminal === 'workflow.fail' ? 'execution-failure' : 'pass' } } });
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: 'broken', outcome: 'execution-failure' } } });
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: terminal, payload: { outcome: terminal === 'workflow.fail' ? 'execution-failure' : 'pass' } } });
+  hold.release();
   return { workflowRunId, units };
 }
 
@@ -2150,4 +2103,32 @@ test('workflow start --seats with an unknown persona through the real CLI exits 
     (error) => error.status !== 0 && /persona "finance-controller" not found; searched fgos\/agents/.test(`${error.stdout}${error.stderr}`),
   );
   assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0);
+});
+
+test('integration uses the recorded replacement branch and preserves the predecessor branch', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/custody-integration', steps: [
+    { id: 'write', units: [{ id: 'u1', template: { capability: 'docs:write', writes: ['out.txt'] } }] },
+    { id: 'land', kind: 'integrate', dependsOn: ['write'], units: [] },
+  ] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const original = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1` });
+  const replacement = createWorkflowWorktree({ repoRoot: tmp, branch: `wf/${workflowRunId}/u1-recovery-test` });
+  worktreeDirs.push(original.worktreePath, replacement.worktreePath);
+  fs.writeFileSync(path.join(original.worktreePath, 'keep.txt'), 'predecessor work');
+  fs.writeFileSync(path.join(replacement.worktreePath, 'out.txt'), 'replacement work');
+  execFileSync('git', ['add', 'out.txt'], { cwd: replacement.worktreePath });
+  execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-qm', 'replacement'], { cwd: replacement.worktreePath });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
+  append('step.start', { stepId: 'write' });
+  append('unit.scheduled', { stepId: 'write', unitId: 'u1', ...replacement });
+  append('unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' });
+  append('step.complete', { stepId: 'write', outcome: 'pass' });
+  hold.release();
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(state.status, 'completed');
+  assert.equal(fs.readFileSync(path.join(tmp, 'out.txt'), 'utf8'), 'replacement work');
+  assert.equal(fs.readFileSync(path.join(original.worktreePath, 'keep.txt'), 'utf8'), 'predecessor work');
+  assert.equal(execFileSync('git', ['show', `${original.branch}:README.md`], { cwd: tmp, encoding: 'utf8' }).length > 0, true);
 });

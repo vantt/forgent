@@ -4,6 +4,7 @@
 // runBorrowed returns, gc.auto=1 with loose objects does not start a gc
 // daemon, a sibling that opened the file itself is refused, and no
 // ordinary child of the holder ever sees the lock's inode.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

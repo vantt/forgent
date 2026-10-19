@@ -5,6 +5,7 @@
 // integration (`fgos retrospective` logs advisory friction, never blocks
 // the delivered -> retrospective transition).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

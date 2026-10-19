@@ -457,6 +457,8 @@ pub struct ScanFilter {
 /// silently.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcView {
+    /// Effective uid on platforms that expose it; unknown remains explicit.
+    pub effective_uid: Option<u32>,
     /// The pid the process was found under.
     pub pid: ProcId,
     /// The process's identity; `None` when its start time could not be read

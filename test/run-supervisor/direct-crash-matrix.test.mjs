@@ -1,5 +1,6 @@
 // The direct launch under real crashes: `fgos run` as a real process, the sandbox real (bwrap), the
 // supervisor, gate and settle steps real. The agent is fixtures/direct-agent.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -271,7 +272,7 @@ test('8. no descriptor of the attempt or cwd lock reaches the agent or its grand
   assert.deepEqual(pidsWithToken(tok), []);
 });
 
-test('9. read-only attempts on one cwd share it without a lease; a writing attempt holds the lease until its gate is gone', { skip, timeout: 180_000 }, async () => {
+test('9. read-only attempts on one cwd share it without a lease; a writing attempt holds the lease until the run exits', { skip, timeout: 180_000 }, async () => {
   const project = createProject({ agent: { runMs: 3000 } });
   const fgosDir = path.join(project.repoDir, '.fgos');
   const runs = ['ro-a', 'ro-b', 'ro-c'].map((id) => startRun(project, project.unitFile(id)));
@@ -285,20 +286,14 @@ test('9. read-only attempts on one cwd share it without a lease; a writing attem
   const run = writingRun(writer, worktree, 'writer');
   const dir = await attemptWhere(writer, (d) => exists(d, 'supervisor-binding.json'), { what: 'the writing attempt to bind' });
   const { supervisor, gate } = readJson(here(dir, 'supervisor-binding.json'));
-  // The controller lets go of its copy right after it saw the binding; what remains are processes of the attempt.
   const holders = await waitUntil(() => {
     const listed = lockHolders('dispatch-cwd', { fgosDir: writerFgos, cwd: worktree });
-    return listed.kind === 'list' && listed.pids.length > 0 && !listed.pids.includes(run.child.pid) ? listed.pids : null;
-  }, { timeoutMs: 10_000, what: 'the controller to let go of the cwd lease' });
-  for (const pid of holders) {
+    return listed.kind === 'list' && listed.pids.includes(run.child.pid) && listed.pids.length > 1 ? listed.pids : null;
+  }, { timeoutMs: 10_000, what: 'the controller and attempt to hold the cwd lease together' });
+  for (const pid of holders.filter((pid) => pid !== run.child.pid)) {
     assert.ok(ancestry(pid).some((p) => p === supervisor.pid || p === gate.pid), `lease holder ${pid} is not part of the attempt of supervisor ${supervisor.pid}`);
   }
-  let freedBeforeClosed = null;
-  await waitUntil(() => {
-    if (freedBeforeClosed === null && exists(dir, 'gate-exit.json') && dispatchCwdHolder(writerFgos, worktree) === null) freedBeforeClosed = !exists(dir, 'closed.json') || 'at-close';
-    return exists(dir, 'closed.json');
-  }, { timeoutMs: 60_000, intervalMs: 2, what: 'the writing attempt to close' });
-  assert.ok(freedBeforeClosed, 'the lease was free by the time the attempt closed');
-  await run.exited;
+  const outcome = await run.exited;
+  assert.equal(outcome.code, 0, run.output().stderr);
   assert.equal(dispatchCwdHolder(writerFgos, worktree), null);
 });

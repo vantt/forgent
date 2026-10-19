@@ -8,6 +8,7 @@
 // parties: one forked holder plus the test process. Synchronisation is on
 // marker files (a condition), never a sleep or a wall-clock barrier, and every
 // assertion is on an outcome, never on timing.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,4 +1,5 @@
 // instruction-registry.test.mjs — tests for instruction source registry and discovery (P3)
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

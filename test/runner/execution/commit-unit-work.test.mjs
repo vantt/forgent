@@ -1,5 +1,6 @@
 // The runner commits only what lies in a unit's write scope, refuses an index it did not stage,
 // and proves after the commit that the commit holds exactly what it staged.
+import '../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

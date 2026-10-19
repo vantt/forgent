@@ -61,6 +61,16 @@ pub fn run(args: &GateArgs) -> i32 {
         report("not-pid-1", "the envelope names linux-gate but this process is not pid 1 of its namespace");
         return EXIT_INTERNAL;
     }
+    // Own PDEATHSIG in the terminal gate rather than relying on bwrap's
+    // --die-with-parent surviving setup and exec with --as-pid-1.
+    // Direct gates deliberately survive their monitor for later adoption.
+    #[cfg(target_os = "linux")]
+    if config.terminal && is_init {
+        if let Err(err) = fgos_process::control::arm_parent_death_signal() {
+            report("parent-death-setup-failed", &err.to_string());
+            return EXIT_INTERNAL;
+        }
+    }
     // `kill(-1)` is armed only for the driver whose domain is the namespace.
     let pid1 = is_init && config.preferred == "linux-gate";
     #[cfg(target_os = "linux")]

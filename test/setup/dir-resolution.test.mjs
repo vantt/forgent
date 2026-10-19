@@ -8,6 +8,7 @@
 // unconditional, docs/history/setup-doctor-uninstall-dir-resolution/
 // RESEARCH.md round 1). These prove the fix: bare invocation from a linked
 // worktree now resolves to the same main checkout an explicit --dir would.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

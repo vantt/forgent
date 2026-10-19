@@ -3,6 +3,7 @@
 // (FGOS_HOST_BIN), and the ChildProcess-shaped async result as the credential
 // probe uses it. Everything needs win32; the file protocol itself is covered
 // on every platform by hold-transport-borrow.test.mjs.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,5 +1,6 @@
 // test/runner/execution/run.test.mjs — Tests for fgos run door, mutating gate, and inline record (Phase 5)
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -11,6 +12,7 @@ import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detect
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
@@ -1767,6 +1769,47 @@ test('a unit persona whose file cannot be parsed or has the wrong shape refuses 
   assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
 });
 
+test('custody admission refusal creates and announces no Unit run', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
+  let announced = false;
+  try {
+    await assert.rejects(() => runUnit({
+      unitData: { id: 'busy-admission', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+      onUnitRunCreated: () => { announced = true; },
+    }), { code: 'dispatch-in-flight' });
+    assert.equal(announced, false);
+    const assignments = path.join(repoRoot, '.fgos', 'assignments');
+    assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], []);
+  } finally { child.kill('SIGKILL'); await exited; }
+});
+
+test('a committed Unit result survives a failed custody handoff with a warning', async (t) => {
+  const { resolveLock } = await import('../../../src/holder-lock/index.mjs');
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(repoRoot, 'docs'));
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'in.md'), 'completed\n');
+  gitIn(repoRoot, 'add', 'docs/in.md');
+  gitIn(repoRoot, 'commit', '-qm', 'feat(docs): upstream change');
+  const record = `${resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path}.predecessor.json`;
+  const hook = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, `#!/bin/sh\nprintf 'broken record' > '${record.replaceAll("'", "'\\''")}'\n`, { mode: 0o755 });
+  const result = await runUnit({
+    unitData: { id: 'handoff-warning', capability: 'docs:write', writes: ['docs'], syncBase: 'main' },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results[0].commit.status, 'committed');
+  assert.equal(result.results[0].commit.sha, headOf(worktreeDir));
+  assert.equal(result.warnings[0].code, 'custody-handoff-not-recorded');
+  assert.equal(fs.readFileSync(record, 'utf8'), 'broken record');
+});
+
 // Gives each named executor family its own model for every tier a rigor may ask for.
 function withModelPolicies(repoRoot, families, patch = {}) {
   const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
@@ -1822,6 +1865,31 @@ test('a unit verify command runs in the worktree after the producing round and a
   assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
 });
 
+test('a writing unit\'s verify child borrows the custody lease while it runs', { skip: process.platform === 'win32' && 'the hold transport keeps the description in its helper' }, async (t) => {
+  const { resolveLock } = await import('../../../src/holder-lock/index.mjs');
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' } });
+  // Only the producer writes; the checker keeps the read-only settling worker.
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const settling = [path.join(repoRoot, 'settling-worker.mjs'), '{prompt}'];
+  cfg.runner.executors.beta.args = settling;
+  for (const invocation of cfg.runner.executors.beta.invocations) invocation.args = settling;
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  const probe = path.join(repoRoot, 'verify-probe.json');
+  const script = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(probe)}, JSON.stringify({ name: process.env.FGOS_LOCK_FD, ino: String(fs.fstatSync(3, { bigint: true }).ino) }))`;
+  const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-custody', writes: ['docs'], verify: `node -e ${JSON.stringify(script)}` });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res));
+  assert.equal(res.results.find((r) => r.role === 'producer').commit.status, 'committed');
+  const seen = JSON.parse(fs.readFileSync(probe, 'utf8'));
+  const lock = resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path;
+  assert.equal(seen.name, 'dispatch-cwd:3');
+  assert.equal(seen.ino, String(fs.statSync(lock, { bigint: true }).ino), 'the verify child holds a copy of the lease description');
+});
+
 test('a failing unit verify becomes findings that carry its exit status and output', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
@@ -1874,4 +1942,63 @@ test('a solo run needs no verify and does not claim to have skipped one', async 
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-solo-no-verify', pattern: 'solo' }, 'solo');
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify, undefined);
+});
+
+// A signal handled the way the CLI does it, with a stand-in exit so the test process survives.
+async function withCancelHandlers(fn) {
+  const exits = [];
+  const uninstall = installCancelOnSignal({ cancelWaitMs: 1000, exit: (code) => exits.push(code), stderr: { write() {} } });
+  try { await fn(exits); } finally { uninstall(); resetCancelRequest(); }
+}
+
+test('a signal that lands while the unit is set up stops it before any seat starts and leaves the run resumable', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const unitData = { id: 'cancelled-midway', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  await withCancelHandlers(async () => {
+    await assert.rejects(
+      runUnit({ unitData, repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { process.emit('SIGINT'); } }),
+      { name: 'RunCancelledError', code: 'run-cancelled' },
+    );
+    const assignments = path.join(repoRoot, '.fgos', 'assignments');
+    const [unitRunId] = fs.readdirSync(assignments);
+    const record = JSON.parse(fs.readFileSync(path.join(assignments, unitRunId, 'unit.json'), 'utf8'));
+    assert.equal(record.settlement, undefined, 'a cancel is not a failed settlement');
+    assert.deepEqual(record.execution, { status: 'running' });
+    assert.equal(fs.existsSync(path.join(assignments, unitRunId, 'unit-summary.json')), false);
+    assert.deepEqual(record.bindings ?? {}, {}, 'no seat was bound');
+  });
+});
+
+test('after a signal a new unit is refused before anything is created', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  await withCancelHandlers(async (exits) => {
+    process.emit('SIGTERM');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert.deepEqual(exits, [143]);
+    await assert.rejects(
+      runUnit({ unitData: { id: 'late', capability: 'not-configured:answer', objective: 'x', writes: [] }, repoRoot, cwd: worktreeDir }),
+      { code: 'run-cancelled', signal: 'SIGTERM' },
+    );
+    assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
+  });
+});
+
+test('an in-process caller keeps its own signal handling: runUnit installs no SIGINT or SIGTERM handler unless the process asked', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const counts = () => [process.listenerCount('SIGINT'), process.listenerCount('SIGTERM')];
+  const before = counts();
+  let during = null;
+  const res = await runUnit({
+    unitData: { id: 'own-handlers', capability: 'not-configured:answer', objective: 'x', writes: [] },
+    repoRoot, cwd: worktreeDir, onUnitRunCreated: () => { during = counts(); },
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.deepEqual(during, before);
+  assert.deepEqual(counts(), before);
 });

@@ -110,7 +110,8 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
         for (const entry of entries) {
           if (!entry.isDirectory()) continue;
           const child = path.join(dir, entry.name);
-          if (path.basename(dir) === 'runs') found.push(child); else walk(child);
+          // A dot name under runs/ is a run directory still being staged; it is renamed into place, never run from.
+          if (path.basename(dir) === 'runs') { if (!entry.name.startsWith('.')) found.push(child); } else walk(child);
         }
       };
       walk(root);

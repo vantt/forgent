@@ -597,10 +597,10 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 | `event-store-git-version` | git older than the floor of the chosen publication driver (2.31 for path resolution; 2.36 for `core.fsync` when plumbing runs as subprocess) |
 | `event-store-open-root` | root does not resolve, not a git repository, or guarantee `none`; prints the guarantee level |
 | `event-store-machine-id` | missing or malformed; warns `event-store-machine-ref-shared` (section 14) |
-| `event-store-refspec` | remote configured but fetch refspec missing; any push refspec or any refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` |
+| `event-store-refspec` | remote configured but fetch refspec missing; a positive push refspec whose source can match `refs/fgos/`; a positive fetch refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` (negative exclusions are safe) |
 | `event-store-unsealed` | section 16 thresholds |
 | `event-store-integrity` | a seal blob whose hash differs from `seal.json`, an event `h` that does not verify, a batch commit marker that does not verify inside a closed segment or a sealed blob, a sequence gap in an own stream, `event-store-seq-conflict`, `event-store-seq-recovery-conflict` that a seal did not resolve, `event-store-order-cycle`, `event-store-ref-moved` or `seal-mismatch` recorded |
-| `event-store-sync` | warns when the last push failed or is older than 24 h with a remote configured; reports ahead/behind |
+| `event-store-sync` | warns when the last push failed or is older than 24 h with unpublished events and a remote configured; reports ahead/behind |
 | `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
 | `event-store-orphan-branches` | warns per orphan branch stream |
@@ -831,9 +831,10 @@ Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank 
 Prepared stores are opened only from opaque `resolveEventStore` authority. Append
 uses the bound machine identity; no raw-directory constructor or caller machine
 parameter remains. `prepareStore(cwd, { trustedMain, stateRoot, loaderOptions })`
-requires an explicit trusted main checkout. Git resolution currently supports a
-linked worktree only with that trusted main path; arbitrary cwd discovery and
-separate-git-dir support remain Git work for the phase 07 handoff. Missing trust
+requires an explicit trusted main checkout. Git phase 02 now authenticates main-checkout discovery from a linked worktree
+or a checkout subdirectory. Phase 07 verb/setup adapters pass the discovered
+trusted main into preparation; direct callers still supply it explicitly.
+Separate-git-dir remains unsupported. Missing trust
 is `event-store-trusted-main-required`; Git operation failures retain their JSON
 `code` in the Node error. Error codes in ordinary native messages are recognized
 only at the start of `code: detail`.
@@ -852,3 +853,88 @@ and layout before taking `event-seal`; this read-only operation waits behind an
 active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
 high-water mark plus a torn active tail. Holder reclaim additionally relies on
 the Rust structural no-port boundary and existing crate regression tests.
+
+
+## Phase 07 dormant implementation contracts
+
+Phase 07 provides callable use cases in `src/verbs/events/` and setup/doctor
+bodies in `src/setup/event-store-{checks,fixes}.mjs`. CLI rows, routes, checks,
+fixes and the rebuild verb switch remain phase 09's cutover. Its one existing
+`eventStore` config registration must use `EVENT_STORE_DEFAULTS` from
+`src/event-store/config.mjs` as the whole shape, rather than registering another
+row for the same key. The facade validates integers (seal ≥ 1, sync/rebuild ≥ 0)
+and Git's publication remote-name alphabet; project config overrides global.
+
+Export is implemented by `fgos_event_store::export::{export_jsonl,
+export_legacy_layout}`, marshaled by the combined addon. Both use the verified
+reader. The latter authenticates the D18 pin, validates every tree entry before
+creating output, preserves original bytes, and emits v4 records with legacy
+fields and without their incompatible v4 hashes. A nonempty pre-cutover legacy
+history requires a pin for rollback export. Destinations are exclusively created;
+existing files/directories/symlinks and symlink parents are refused. Files use the
+shared durable-file no-overwrite installer. `--since` is a serialized store cursor;
+it filters v4 records by coverage. Historical bytes remain intact (the porting
+log remains an unchanged prefix), including with `--stream` or `--since`.
+
+Rollback accepts only project scope; local and branch streams are refused even
+when explicitly selected, and the default excludes them. Work v4 records go to
+`events/v4-project.jsonl`; porting v4 records append to `porting/events.jsonl`
+after its unchanged historical prefix (inserting a separator LF when needed).
+Tree entries emitted by `ls-tree -t` are accepted only as mode 040000 directories
+on allowed paths; symlinks, gitlinks and unrelated trees remain forbidden.
+Converted records carry `eventStoreId` (origin, stream, sequence), an ignored
+legacy extension that preserves distinct identities without incompatible `h`.
+
+Rust returns the frozen legacy Work order (baseline tag empty, shard tag basename)
+and v4 Work order. Porting keeps its separate log discovery directory and reducer:
+the adapter uses the production `listPorting` reader on the exported log and a
+scratch log containing the v4 porting order. Nested historical porting directories
+are preserved unchanged; new porting records target the root porting store only.
+The verb adapter applies Work's existing `foldEvents` and porting's existing
+reducer separately, then writes `parity-report.json` with differences for each
+changed keyed entity or array position. A partial rollback export is compared with the selected
+stream's full v4 view, so intentional omissions can appear in that report.
+Deferred events and missing predecessors are reported and never exported as
+ready events. A write or reducer failure can leave a partial output directory:
+never use an export without a successfully returned result and completed
+`parity-report.json`; remove the failed destination and retry at a fresh path.
+Import and readLegacyFromHead stay phase 08 work.
+
+Status reports commit counts ahead/behind the own mirror, typed missing
+predecessors `{origin, stream, seq}`, receipt/unsealed/closed-stream facts,
+orphan branch streams, persisted integrity diagnostics and holder-lock's
+filesystem guarantee. Mirror classification reuses the reader's exact namespace
+parser. Sync records the actual fetch and push attempts separately in optional
+`lastFetch`/`lastPush` fields of `sync.json`; old records remain readable, and a
+`--no-push` sync never advances lastPush. Doctor reads these observations and
+Git's existing floor, RepositoryConfig mapping, machine-id and pinned URL facts;
+it does not repair the store. Phase 09 must create one `eventStoreDoctor(cwd,
+options)` per doctor invocation and use that checker for all Event Store rows;
+its lazy context/status snapshot is shared only within that run. Standalone
+`checkEventStore` remains a fresh single-check invocation. Ahead/behind counts
+share two paginated reachability walks (one per distinct tip) across both counts.
+Git Inspect stops include the stop commits and do not exclude their ancestry,
+so treating that port as `rev-list A ^B` would miscount shared history.
+Export stream discovery uses the configured remote and skips status entirely
+when `--stream` is explicit. Only warning-capable checks emit
+`warning:`; sync passes when no unpublished events and no push error exist.
+
+The machine-id setup fix uses the crate's atomic durable-file install-once door;
+concurrent mints expose exactly one complete identity. The state root is
+canonicalized so symlinked ancestors are supported; the machine-id leaf remains
+protected by the atomic installer. Refspec setup calls the
+crate's existing `ensure_refspecs`, hence Git's journaled `ensure_fetch_mapping`.
+It never writes push mappings. Doctor additionally refuses fetch wildcards that
+could include local/branch event namespaces. Lock-directory setup refuses symlink
+ancestors and ensures mode 0700.
+
+The callable store part of rebuild loads every consumer module before deleting
+any cache. Each registered module exports `rebuildFromStore(ctx)`, receives the
+prepared `store`, `heldRanks` and validated `maxAttempts`, and owns its reducer,
+gate and bounded current-view installation. The adapter removes only the cache
+path declared by the manifest. The shipped registry remains empty until cutover;
+fixture payloads prove two registered consumers refold real events. There is no
+second rebuild verb or new consumer registration mechanism.
+
+Evidence and reproduction commands:
+`plans/reports/phase-lead-261019-0929-es-p07-verbs-setup-doctor.md`.

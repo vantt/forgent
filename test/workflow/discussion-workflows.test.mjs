@@ -1,12 +1,11 @@
 // test/workflow/discussion-workflows.test.mjs — Integration tests for discussion Workflows (P4 Wave B Phase 5)
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { parseYaml } from '../../src/util/yaml.mjs';
 
 import {
@@ -19,80 +18,27 @@ import {
   discoverWorkflows,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 
 seedFileLocalBwrapRegistry();
-// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = makeFixtureDir('fgos-disc-wf-test-');
-  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
-
-  fs.writeFileSync(path.join(tmp, 'README.md'), '# Discussion Workflows Test\n');
-  execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: tmp, stdio: 'ignore' });
-
-  // Create fake echo worker that writes valid agent-result.json and agent-report.md
-  const echoScript = path.join(tmp, 'echo-worker.mjs');
-  fs.writeFileSync(
-    echoScript,
-    `
-    import fs from 'node:fs';
-    import path from 'node:path';
-    const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
-      const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
-      fs.mkdirSync(runDir, { recursive: true });
+  return setupWorkflowFixtureRepo({
+    prefix: 'fgos-disc-wf-test-',
+    readme: '# Discussion Workflows Test',
+    gitName: 'Workflow Test',
+    capabilities: [
+      'delphi:propose', 'delphi:synthesize',
+      'nominal-group:generate', 'nominal-group:share', 'nominal-group:vote', 'nominal-group:rank',
+      'group-cognition:explore', 'group-cognition:critique', 'group-cognition:synthesize',
+    ],
+    workerBody: `
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Discussion Report\\nCompleted finding.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
-    }
     `,
-  );
-
-  const fgosDir = path.join(tmp, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-
-  const cfg = {
-    runner: {
-      defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: { node: { standard: 'node-std' } },
-      executors: {
-        'test-node': {
-          kind: 'agent',
-          description: 'Test node executor',
-          allowCrossProvider: true,
-          command: process.execPath,
-          args: [echoScript, '{prompt}'],
-          providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
-        },
-      },
-      capabilities: {
-        'delphi:propose': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'delphi:synthesize': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'nominal-group:generate': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'nominal-group:share': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'nominal-group:vote': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'nominal-group:rank': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'group-cognition:explore': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'group-cognition:critique': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-        'group-cognition:synthesize': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
-      },
-      patterns: {
-        defaultRule: { mutatingMinRigor: 'standard' },
-        reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } },
-      },
-    },
-  };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(withProviderFamilies(cfg), null, 2));
-
-  return tmp;
+  });
 }
 
 test('delphi.yaml schema validation & discovery', () => {

@@ -1,6 +1,7 @@
 // `lock-record-unreadable` on a real workspace directory: garbage records
 // warn with the path and the fence command, a record of a live process (or a
 // young unjudgeable one) passes.
+import '../helpers/process-tmp-root.mjs';
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

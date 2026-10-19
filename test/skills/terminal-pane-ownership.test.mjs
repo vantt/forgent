@@ -3,6 +3,7 @@
 // its children the pane id of the pane that started the daemon, which may be
 // closed or may belong to another session. Both scripts must act only on a
 // pane that herdr still knows AND whose shell is an ancestor of the caller.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

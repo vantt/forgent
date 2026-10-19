@@ -31,6 +31,7 @@
 // provider-capacity), required-ness and types are not checked; a flag read through a computed key (`flags[name]`), or by code that
 // only receives an object already built from flags, is invisible to this
 // scan; regex literals containing braces would confuse the brace matcher.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -196,7 +197,7 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && !entry.nat
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nativeOnly);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'gateway', 'goal', 'lock', 'merge', 'session', 'tool', 'workflow']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'gateway', 'goal', 'lock', 'merge', 'session', 'tool', 'workflow', 'worktree']);
   assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['convention', 'friction', 'metrics']);
 });
 

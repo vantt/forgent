@@ -22,7 +22,7 @@ When the user gives a natural language task or ad-hoc request:
    fgos run "<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]
    fgos run "<prompt>" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify "<cmd>"]
    ```
-   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `git worktree add`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).
+   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).
 3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):
    - `id`: descriptive kebab-case identifier (a safe branch-name segment)
    - `objective`: concise semantic description of what must be done
@@ -40,20 +40,22 @@ When the user gives a natural language task or ad-hoc request:
    A writing Unit that depends on exactly one writing Unit starts from that Unit's branch; nothing is merged automatically (`fgos workflow status` lists `writeBranches`).
 
 ### Mode B: AgentKit Plan Execution
-When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("run phase 1..3"):
-1. Verify phase units via plan-lint:
+When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("run phase 1..3"), the plan is an input you read, not something the runner translates:
+1. Read the plan and the phase files as artifacts. Verify the phase's units with plan-lint:
    ```sh
    fgos plan-lint <planPath> --phase <N> --json
    ```
-2. Launch execution via the Workflow runner:
+2. Choose a bounded wave of Units for the phase yourself (what can run now, in what order, what each one may write) and run them through one of the two doors:
    ```sh
-   fgos workflow start --plan <planPath>
+   fgos run "<objective>" --writes <paths> --worktree <linked-worktree>
+   fgos workflow start --units <file> [--foreground]
    ```
+   `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.
    `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a
    detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`
    to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat
    the output of `start`, `answer` or `resume` as the final state.
-3. The Workflow runner automatically translates phases into DAG steps, schedules units according to `dependsOn`, executes each unit via `fgos run` in its own isolated worktree, and integrates changes cleanly using pure git.
+3. Each Unit runs via `fgos run` in its own isolated worktree and integrates changes cleanly using pure git. `fgos workflow start --plan` no longer exists; a later conductor skill (`fgos-cook`) will own whole-plan execution on a case.
 
 ---
 

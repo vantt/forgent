@@ -621,6 +621,16 @@ export async function settleRunOutcome({
     resolvedDirtyAfter,
   );
 
+  // A disappeared dirty path with unchanged HEAD is lost work, not a producer commit.
+  // Settlement owns this observation for supervised producers, including adoption.
+  const dirtyAfterSet = new Set(resolvedDirtyAfter);
+  const lostUncommittedPaths = !isReadOnly && gitBefore === resolvedGitAfter
+    ? dirtyBefore.filter((file) => !dirtyAfterSet.has(file))
+    : [];
+  if (lostUncommittedPaths.length > 0) {
+    process.stderr.write(`fgos: warning: uncommitted path(s) lost across Assignment: ${lostUncommittedPaths.join(', ')}\n`);
+  }
+
   const mutatedDirtyBeforeFiles = isReadOnly && dirtyBeforeSnapshots
     ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots)
     : [];
@@ -778,6 +788,7 @@ export async function settleRunOutcome({
     adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
     confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
     warnings: [
+      ...(lostUncommittedPaths.length > 0 ? [{ code: 'uncommitted-paths-lost', paths: lostUncommittedPaths }] : []),
       ...(Array.isArray(attributionPolicy.warnings) ? attributionPolicy.warnings : []),
       ...(Array.isArray(dispatchWarnings) ? dispatchWarnings : []),
     ],

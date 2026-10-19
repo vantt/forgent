@@ -6,6 +6,7 @@
 // directly rather than mocking /proc, since real PID liveness/bootId are
 // the only fs state this depends on).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -10,6 +10,7 @@
 // into a hard exit-4 refusal on that same idle turn — which breaks the
 // pool-empty shape merge-loop's own stop rule reads (SKILL.md step 4), so
 // an unattended driver stops on an error instead of stopping cleanly.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { assert, initGitCwdMain, run } from './helpers/fgos-cli-harness.mjs';
 

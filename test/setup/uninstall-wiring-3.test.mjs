@@ -2,6 +2,7 @@
 // (tsk-25b D5): the real `fgos uninstall` CLI round-trip tests each run a
 // full `fgos setup` first, ~17s apiece — kept apart so no single file
 // carries two of them and crosses the ~30s per-file ceiling.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,5 +1,6 @@
 // test/workflow/seats.test.mjs — rebuilding a registered base with one panel seat per lens
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';

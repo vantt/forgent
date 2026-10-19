@@ -3,6 +3,7 @@
 // the expected status + gates[id] shape. There is no store.test.mjs; store
 // is otherwise tested through the CLI (see plan.md Slice — Cell 2).
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

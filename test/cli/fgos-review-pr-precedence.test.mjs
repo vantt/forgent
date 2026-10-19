@@ -8,6 +8,7 @@
 // stray `--pr` without `--github` (silently ignored before) into a new
 // refusal. `approve` keeps its own `--pr` check inside its use case for the
 // same reason.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { assert, initGitCwdMain, makeRunnerProposedItem, run } from './helpers/fgos-cli-harness.mjs';
 

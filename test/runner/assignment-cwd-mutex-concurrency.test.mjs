@@ -17,6 +17,7 @@
 // time contention: each call opens its own description of the kernel lock
 // file, and two descriptions exclude each other even inside one process.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -101,7 +102,7 @@ function supervisorBindingPids(runDir) {
   }
 }
 
-test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd is refused while the first cli-spawn Run is still live, and --force-shared-cwd (opts.forceSharedCwd) lets it proceed anyway', { timeout: 30000 }, async () => {
+test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd is refused while the first cli-spawn Run is still live, and --force-shared-cwd refuses a writer', { timeout: 30000 }, async () => {
   const tempDir = mkTempDir();
   const executorScript = writeStallingExecutor(tempDir);
   const runnerConfig = admissionRunnerConfig(executorScript);
@@ -146,33 +147,31 @@ test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd i
     await assert.rejects(
       () => executeAssignment(assignmentB, { cwd: tempDir, repoRoot: tempDir, runnerConfig }),
       (err) => {
-        assert.equal(err.errorClass, 'dispatch-in-flight', `expected dispatch-in-flight, got ${err.errorClass}: ${err.message}`);
+        assert.equal(err.errorClass, 'dispatch-in-flight', err.message);
         assert.equal(err.cwd, tempDir);
-        // After the hand-over the lease belongs to A's supervisor and its gate, no longer to this process.
-        assert.ok(supervisorBindingPids(runDirA).includes(err.holderPid), `the refusal must name a process holding the lock (got ${err.holderPid}, attempt holds ${supervisorBindingPids(runDirA)})`);
+        if (process.platform === 'linux') {
+          assert.ok([process.pid, ...supervisorBindingPids(runDirA)].includes(err.holderPid), 'refusal names the controller or a holder inside this attempt');
+        }
         assert.ok(err.message.includes(tempDir), 'refusal message must name the contended cwd');
         return true;
       },
     );
 
-    // 3. The explicit override lets a caller who knows this is safe proceed
-    // anyway -- fire Assignment C with forceSharedCwd:true and prove it
-    // reaches its OWN real supervisor spawn (never refused), even though
-    // Assignment A's lock is still held for the exact same cwd.
-    pendingC = executeAssignment(assignmentC, { cwd: tempDir, repoRoot: tempDir, runnerConfig, forceSharedCwd: true }).catch((err) => ({ __rejected: err }));
-    await waitFor(() => fs.existsSync(markerC) && fs.readFileSync(markerC, 'utf8'));
-    const workerPidC = Number(fs.readFileSync(markerC, 'utf8'));
-    assert.ok(isPidAliveForTest(workerPidC), 'forceSharedCwd must let Assignment C reach a real worker spawn, not be refused');
-
-    // Neither A nor C must have already settled as a rejection at this point
-    // (both are deliberately still in flight, stalled by their own
-    // never-settling executor) -- a same-tick resolution to __rejected would
-    // mean something else refused/failed them for an unrelated reason.
+    // A mutating caller cannot opt out of custody, even while another writer runs.
+    await assert.rejects(
+      () => executeAssignment(assignmentC, { cwd: tempDir, repoRoot: tempDir, runnerConfig, forceSharedCwd: true }),
+      (err) => {
+        assert.equal(err.code, 'custody-required');
+        assert.equal(err.cwd, tempDir);
+        assert.equal(typeof err.executorId, 'string');
+        assert.equal(typeof err.capability, 'string');
+        return true;
+      },
+    );
+    assert.equal(fs.existsSync(markerC), false, 'refusal starts no producer');
     const raceTimeout = Symbol('pending');
     const aState = await Promise.race([pendingA, new Promise((r) => setTimeout(() => r(raceTimeout), 50))]);
-    const cState = await Promise.race([pendingC, new Promise((r) => setTimeout(() => r(raceTimeout), 50))]);
-    assert.equal(aState, raceTimeout, `Assignment A must still be in flight, not settled: ${JSON.stringify(aState)}`);
-    assert.equal(cState, raceTimeout, `Assignment C must still be in flight (forceSharedCwd), not settled/refused: ${JSON.stringify(cState)}`);
+    assert.equal(aState, raceTimeout, `Assignment A must still be in flight: ${JSON.stringify(aState)}`);
   } finally {
     // Process hygiene: kill every real detached supervisor/worker this test
     // spawned (for both A and C), then let the two pending executeAssignment
@@ -235,4 +234,46 @@ test('executeAssignment: two DIFFERENT read-only Assignments on the same cwd run
     }
     await Promise.allSettled(pending);
   }
+});
+
+test('a settled standalone Assignment survives a failed custody handoff with a warning', { timeout: 30000 }, async (t) => {
+  const { resolveLock } = await import('../../src/holder-lock/index.mjs');
+  const tempDir = mkTempDir();
+  t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+  const script = path.join(tempDir, 'settling-worker.mjs');
+  const go = path.join(tempDir, 'handoff-test-go');
+  fs.writeFileSync(script, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+    if (!match) throw new Error('result path missing');
+    process.stdout.write('handoff barrier\\n');
+    const until = Date.now() + 15000;
+    while (!fs.existsSync(${JSON.stringify(go)})) {
+      if (Date.now() > until) throw new Error('controller did not release barrier');
+      await new Promise(r => setTimeout(r, 10));
+    }
+    fs.writeFileSync(path.join(path.dirname(match[1]), 'agent-report.md'), 'Successfully completed the handoff failure fixture with real supervisor settlement.');
+    fs.writeFileSync(match[1], JSON.stringify({ status: 'done', summary: 'Completed fixture' }));
+  `);
+  const assignment = buildAssignment({
+    work: { id: 'tsk-cwd-handoff-warning', status: 'doing', domain: 'coding' },
+    stage: 'executing', operation: 'implement-item',
+  });
+  const record = `${resolveLock('dispatch-cwd', { fgosDir: path.join(tempDir, '.fgos'), cwd: tempDir }).v3Path}.predecessor.json`;
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir, repoRoot: tempDir, runnerConfig: admissionRunnerConfig(script),
+    onChunk: (_stream, text) => {
+      if (text.includes('handoff barrier')) {
+        fs.writeFileSync(record, 'broken record');
+        fs.writeFileSync(go, 'continue');
+      }
+    },
+  });
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.execution.exitCode, 0);
+  assert.equal(result.agentClaim.status, 'done');
+  assert.ok(Object.isFrozen(result));
+  assert.equal(result.warnings[0].code, 'custody-handoff-not-recorded');
+  assert.equal(fs.readFileSync(record, 'utf8'), 'broken record');
 });

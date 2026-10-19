@@ -3,6 +3,7 @@
 // descriptions in one process exclude each other, a SIGKILLed holder frees
 // the lock, a bounded wait ends as `timeout` with nothing held, and the
 // predecessor rule runs through the facade (kill at once, bounded wait).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

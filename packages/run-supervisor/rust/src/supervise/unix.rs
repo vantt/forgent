@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
 use std::os::fd::{AsRawFd, OwnedFd};
-use std::os::unix::fs::OpenOptionsExt;
+use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::process::Child;
@@ -30,18 +30,20 @@ const GO_SLOT: u32 = 5;
 pub(super) struct Locks {
     attempt: Option<File>,
     cwd_lease: Option<File>,
+    lease_path: Option<PathBuf>,
 }
 
 impl Locks {
     /// The attempt lock, close-on-exec first: nothing this process spawns may inherit it.
     pub(super) fn early() -> Result<Locks, Refusal> {
         let attempt = take_inherited(FdSlot(ATTEMPT_LOCK_SLOT)).map_err(|_| Refusal { exit: EXIT_INTERNAL, code: "fd-invalid", why: "descriptor 3 (the attempt lock) was not handed over".into() })?;
-        Ok(Locks { attempt: Some(attempt), cwd_lease: None })
+        Ok(Locks { attempt: Some(attempt), cwd_lease: None, lease_path: None })
     }
 
     /// Slot 4 is a lease only for a mutating attempt; anything else there is not ours.
     pub(super) fn complete(&mut self, envelope: &Value, _run_dir: &Path) -> Result<(), Refusal> {
         if envelope["mutation"] == "mutating" {
+            self.lease_path = Some(envelope["cwdLeaseFile"].as_str().ok_or_else(|| Refusal { exit: EXIT_INTERNAL, code: "envelope-invalid", why: "a mutating attempt needs cwdLeaseFile".into() })?.into());
             self.cwd_lease = take_inherited(FdSlot(CWD_LEASE_SLOT)).ok();
             if self.cwd_lease.is_none() {
                 return Err(Refusal { exit: EXIT_INTERNAL, code: "fd-invalid", why: "a mutating attempt needs descriptor 4 (the cwd lease)".into() });
@@ -51,8 +53,18 @@ impl Locks {
     }
 
     /// The gate carries the lease description, so a dead supervisor leaves the lease held until the gate is gone.
-    pub(super) fn declare_on_lease(&self, _record: &Domain) -> io::Result<()> {
-        Ok(())
+    pub(super) fn declare_on_lease(&self, record: &Domain) -> io::Result<()> {
+        match &self.lease_path {
+            Some(path) => {
+                let held = self.cwd_lease.as_ref().ok_or_else(|| io::Error::other("cwd lease missing"))?.metadata()?;
+                let named = std::fs::metadata(path)?;
+                if held.dev() != named.dev() || held.ino() != named.ino() {
+                    return Err(io::Error::other("cwd lease path does not match descriptor 4"));
+                }
+                fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record)
+            },
+            None => Ok(()),
+        }
     }
 
     /// The lock descriptions a terminal gate receives over `SCM_RIGHTS`, in contract order:

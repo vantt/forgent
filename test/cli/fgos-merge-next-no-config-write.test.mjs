@@ -9,6 +9,7 @@
 // one by actually reaching `approve`/`sync-root` — so a refusal, or a
 // nothing-ready turn, wrote nothing. Building the options object eagerly
 // moved that write ahead of every guard; these cases pin the old ordering.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { assert, fs, path, initGitCwdMain, run } from './helpers/fgos-cli-harness.mjs';
 

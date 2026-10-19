@@ -9,6 +9,7 @@
 //       giờ được quét vào manifest) không phải câu hỏi về tầng.
 //   (c) domain-siloing (D12) — core (src/, bin/, core/) không import domain cụ thể
 //       (domains/<name>/); domain A không import domain B (cross-domain siloing).
+import './helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -1305,7 +1306,7 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
         if (target.startsWith('src/state/') || target.startsWith('src/runner/')) violations.push(`${file} -> ${target}`);
       }
     }
-    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore)\s*\()/.test(lexSource(source).code)) {
+    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts|ensureEventStoreRefspecs|mintEventStoreMachineId)\s*\()/.test(lexSource(source).code)) {
       violations.push(`${file}: imports native Event Store exports outside native.mjs`);
     }
   }

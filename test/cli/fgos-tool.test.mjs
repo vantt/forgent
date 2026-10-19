@@ -6,6 +6,7 @@
 // self-contained harness shape (own tmpCwd/run/envelopeData) rather than
 // growing the already-large fgos.test.mjs, the same topic-scoped split
 // fgos-manifest.test.mjs/fgos-help.test.mjs already use in this directory.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

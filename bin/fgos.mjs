@@ -54,6 +54,7 @@ import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
+import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -111,6 +112,8 @@ import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
+import { createWorktreeUseCase } from '../src/verbs/worktree/create.mjs';
+import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -2285,19 +2288,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'start') {
         const { startWorkflow, startWorkflowDetached, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
-        const planPath = flags.plan;
         // --units <file>: a list of Units run as a one-off Workflow, one step per Unit.
         const unitsPath = flags.units === undefined ? undefined : requireField(flags.units, '--units requires a file path (YAML or JSON list of units)');
-        const sources = [workflowId, planPath, unitsPath].filter((value) => value !== undefined);
+        const sources = [workflowId, unitsPath].filter((value) => value !== undefined);
         if (sources.length !== 1) {
-          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId>, --plan <path> or --units <file>');
+          throw new StoreError('validation', 'workflow start requires exactly one of <workflowId> or --units <file>');
         }
         if (unitsPath !== undefined && flags.seats !== undefined) {
           throw new StoreError('validation', '--seats rebuilds a registered panel preset; it cannot be used with --units (give each unit its own persona or prefer instead)');
         }
         const startParams = {
           workflowId,
-          planPath,
           unitsPath,
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
@@ -3782,6 +3783,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');
     }
 
+    case 'worktree': {
+      const sub = requireField(positional[0], 'worktree requires create <path>');
+      if (sub === 'create') {
+        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
+        const cwd = process.cwd();
+        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+          path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
+          detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
+        });
+      }
+      throw new Error(`unknown worktree sub-verb: ${sub}`);
+    }
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
     // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`
@@ -4978,6 +4994,8 @@ async function handleHook(rest) {
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
+  // This process is a controller: Ctrl-C and SIGTERM cancel the attempts it started (the library asks for it, never assumes it).
+  enableCancelOnSignal();
   // `hook` keeps the agent's raw argv, but its help is still the manifest door.
   if (verb === 'hook' && (rest.includes('--help') || rest.includes('-h'))) {
     handleVerbHelp(verb, { help: true, ...(rest.includes('--json') ? { json: true } : {}) }, []);

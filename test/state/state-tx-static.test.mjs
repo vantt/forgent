@@ -1,6 +1,7 @@
 // Static check of the critical-section rule: a callback handed to a state
 // transaction is synchronous, so nothing in it can await.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

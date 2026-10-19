@@ -131,7 +131,9 @@ libexec/legacy-node/
 manifest.json
 ```
 
-The release tree builder refuses unsafe payload shapes such as source entries escaping the checkout, symlinks in release payloads, and non-empty arbitrary output directories. The manifest carries `artifactDigest`, computed from canonical manifest content rather than archive bytes.
+The release tree builder refuses unsafe payload shapes such as source entries escaping the checkout, symlinks in release payloads, and non-empty arbitrary output directories. In Git checkouts the shared source walker selects tracked and non-ignored untracked files, so ignored setup output never enters the payload; unpacked tarballs retain filesystem selection. This changes a release digest once when the previous builder included ignored output. The manifest carries `artifactDigest`, computed from canonical manifest content rather than archive bytes.
+
+The decision index unions committed rows with local state (state wins by scope and decision ID, otherwise scope and timestamp); generator and doctor share this computation. Until cross-machine event history is complete, explicit removal requires removing a row from both state and the committed index.
 
 Repository, workspace, worker-capsule, release-store, and projection layout boundaries belong to `contracts/repository-runtime-layout.md`. The spec should not inline the full tree; the contract is the source for layout details.
 

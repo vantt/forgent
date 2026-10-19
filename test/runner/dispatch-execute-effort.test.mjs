@@ -5,6 +5,7 @@
 // vocabulary, then the executor's own declared `supports.reasoningEffort`),
 // and is rendered into the flag the spawned CLI actually reads.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -113,7 +114,7 @@ const spawnedArgv = (root) => JSON.parse(fs.readFileSync(path.join(root, 'argv.j
 
 test('execute --effort renders the level into the spawned CLI and reports what it applied', async () => {
   const root = fixtureRepo();
-  const result = await executeExecutorCli('fake', { for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(spawnedArgv(root), ['exec', '-c', 'model_reasoning_effort=high', '--model', 'fake-standard', 'hello']);
   assert.deepEqual(result.reasoningEffort, { requested: 'high', command: 'codex', flag: '-c model_reasoning_effort', native: 'high' });
@@ -121,7 +122,7 @@ test('execute --effort renders the level into the spawned CLI and reports what i
 
 test('execute without --effort leaves the argv exactly as the template renders it', async () => {
   const root = fixtureRepo();
-  const result = await executeExecutorCli('fake', { for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(spawnedArgv(root), ['exec', '--model', 'fake-standard', 'hello']);
   assert.equal(result.reasoningEffort, undefined);
@@ -130,7 +131,7 @@ test('execute without --effort leaves the argv exactly as the template renders i
 test('execute --effort refuses an invalid level before spawning', async () => {
   const root = fixtureRepo();
   await assert.rejects(
-    executeExecutorCli('fake', { for: 'execute', prompt: 'hello', reasoningEffort: 'turbo', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'turbo', cwd: root, repoRoot: root }),
     /invalid reasoningEffort "turbo"/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -139,7 +140,7 @@ test('execute --effort refuses an invalid level before spawning', async () => {
 test('execute --effort refuses a level the executor does not declare', async () => {
   const root = fixtureRepo({ executorPatch: { supports: { reasoningEffort: ['low', 'medium'] } } });
   await assert.rejects(
-    executeExecutorCli('fake', { for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
     /executor "fake" supports reasoningEffort \[low, medium\], not "high"/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -148,7 +149,7 @@ test('execute --effort refuses a level the executor does not declare', async () 
 test('execute --effort refuses an invocation whose CLI has no effort control', async () => {
   const root = fixtureRepo({ commandName: 'some-agent' });
   await assert.rejects(
-    executeExecutorCli('fake', { for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
     /runs "some-agent", which has no reasoning-effort control fgOS can set/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -182,7 +183,7 @@ test('execute surfaces a model the CLI reports running instead of the launched o
   const prev = process.env.FAKE_REPORTED_MODEL;
   process.env.FAKE_REPORTED_MODEL = 'some-other-model';
   try {
-    const result = await executeExecutorCli('fake', { for: 'execute', prompt: 'hello', model: 'asked-model', cwd: root, repoRoot: root });
+    const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', model: 'asked-model', cwd: root, repoRoot: root });
     assert.equal(result.status, 0, result.stderr);
     assert.deepEqual(result.modelWarnings.map((w) => [w.code, w.launched, w.reported]), [['model-reported-different', 'asked-model', 'some-other-model']]);
   } finally {

@@ -6,6 +6,17 @@ id: nominal-group
 title: Nominal Group Technique Workflow
 description: Nominal group deliberation with silent generation, round-robin sharing, voting/ranking, and final ranking synthesis.
 
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Silent idea generation, consolidation, a person's ranking input, then one final ranking.
+must:
+  - id: independent-ideas
+    guard: independence-blind
+    subject: silent-generation.settled
+    reason: a seat that has read another seat's output is no longer an independent lens
+frameDefaults: { dispatches: 4, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [final-ranking.settled]
+
 steps:
   - id: silent-generation
     title: Silent Idea Generation

@@ -4,6 +4,7 @@
 // suite runs on, so the composition is proven before the Windows job runs it
 // with a Windows creation time.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';

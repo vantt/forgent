@@ -165,16 +165,24 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child", "--clear-domain", "--predecessor-kinds"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--drain-child"].into_iter().filter(|m| flags.has(m)).collect();
+    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--drain-child", "--clear-domain"].into_iter().filter(|m| flags.has(m)).collect();
     if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
         return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>, --predecessor-state <lockFile>");
     }
     let mode = modes[0];
-    if mode != "--try" && mode != "--wait-ms" && mode != "--drain-child" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
+    if flags.has("--predecessor-kinds") && mode != "--try" && mode != "--wait-ms" {
+        return usage("--predecessor-kinds applies only to acquisition");
+    }
+    let kinds = match flags.one("--predecessor-kinds") {
+        Ok(Some(raw)) if raw.split(',').all(|kind| !kind.is_empty()) => raw.split(',').map(str::to_string).collect::<Vec<_>>(),
+        Ok(None) => Vec::new(),
+        _ => return usage("--predecessor-kinds needs one nonempty comma-separated list"),
+    };
+    if mode != "--try" && mode != "--wait-ms" && mode != "--drain-child" && mode != "--clear-domain" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
         return usage("--kill-wait-ms and --predecessor apply only to --try and --wait-ms");
     }
     let parsed = (|| -> Result<(Option<u64>, u64, Option<PathBuf>), String> {
@@ -240,6 +248,16 @@ fn lock_fd(args: &[String]) -> i32 {
         Ok(file) => file,
         Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
     };
+    if mode == "--clear-domain" {
+        let path = Path::new(flags.values("--clear-domain")[0]);
+        if port::borrowed_check(&file, path, Some("lease:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
+            return error("lock-handle-invalid", "clear requires the held exclusive description", EXIT_NEGATIVE);
+        }
+        return match crate::predecessor::clear(&crate::predecessor::record_path(path), std::time::Duration::from_millis(kill_wait_ms)) {
+            Ok(()) => emit(Some("cleared"), json!({}), EXIT_OK),
+            Err(err) => error("lock-domain-not-empty", &err.to_string(), EXIT_NEGATIVE),
+        };
+    }
     #[cfg(target_os = "linux")]
     if mode == "--drain-child" {
         let child = match flags.values("--drain-child")[0].parse::<u32>() {
@@ -297,6 +315,9 @@ fn lock_fd(args: &[String]) -> i32 {
             Err(err) => return error("io", &format!("cannot name the lock file behind fd 3: {err}"), EXIT_INTERNAL),
         },
     };
+    if let Some(domain) = crate::predecessor::disallowed_kind(&lock_path, &kinds) {
+        return emit(Some("held"), json!({ "reason": "predecessor-domain-not-empty", "domain": domain }), EXIT_NEGATIVE);
+    }
     match crate::predecessor::admit(&lock_path, std::time::Duration::from_millis(kill_wait_ms)) {
         crate::predecessor::Admit::Proceed => emit(Some("acquired"), json!({}), EXIT_OK),
         crate::predecessor::Admit::NotEmpty { domain } => {
@@ -349,7 +370,7 @@ fn predecessor_state(lock_file: &Path) -> i32 {
 /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
 /// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
 fn lock_hold(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--path", "--mode", "--work", "--wait-ms", "--kill-wait-ms"], &["--try"]) {
+    let flags = match Flags::parse(args, &["--path", "--mode", "--work", "--wait-ms", "--kill-wait-ms", "--predecessor-kinds"], &["--try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
@@ -370,7 +391,8 @@ fn lock_hold(args: &[String]) -> i32 {
             return Err("--try given more than once".to_string());
         }
         let kill_wait_ms = flags.one("--kill-wait-ms")?.map(|raw| positive_ms(raw, "--kill-wait-ms", 0)).transpose()?.unwrap_or(DEFAULT_KILL_WAIT_MS);
-        Ok(hold::HoldArgs { path: PathBuf::from(path), mode, wait, kill_wait_ms, work: PathBuf::from(work) })
+        let predecessor_kinds = flags.one("--predecessor-kinds")?.map(|s| s.split(',').map(str::to_string).collect()).unwrap_or_default();
+        Ok(hold::HoldArgs { predecessor_kinds, path: PathBuf::from(path), mode, wait, kill_wait_ms, work: PathBuf::from(work) })
     })();
     #[cfg_attr(not(windows), allow(unused_variables))]
     let parsed = match parsed {

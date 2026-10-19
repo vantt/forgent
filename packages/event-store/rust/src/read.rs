@@ -43,7 +43,7 @@ struct Tip {
     scope: Scope,
     mirror: bool,
 }
-fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
+pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
     let (remote, suffix) = rest
         .split_once('/')
         .ok_or_else(|| invalid("invalid mirror ref"))?;

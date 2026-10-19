@@ -1,5 +1,6 @@
 // test/runner/agent-roster.test.mjs — the agent roster reads files as YAML and names what it cannot read
 
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

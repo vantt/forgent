@@ -1,6 +1,7 @@
 // writer-identity-doctor-check.test.mjs -- doctor asks each door's host
 // binary for the writer identity directly: the running host
 // (FGOS_HOST_BIN) and the activation a plain `git commit` hook would use.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

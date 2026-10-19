@@ -4,6 +4,7 @@
 // found while researching the global-install stage/verb skew. Same
 // lightweight tmpCwd()/run() harness as fgos-help.test.mjs -- this verb
 // needs no `.fgos/` store (requiresExistingStore: false).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

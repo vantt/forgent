@@ -2,6 +2,7 @@
 // real host binary (FGOS_HOST_BIN): the guarantee reads lockfileex/kernel, the
 // two-process probe runs over the lock-hold transport, and the borrow vectors
 // run. Needs win32.
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

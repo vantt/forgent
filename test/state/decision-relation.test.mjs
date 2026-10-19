@@ -14,6 +14,7 @@
 // `decision` verb's own enforcement + sweep wiring, which live only in
 // bin/fgos.mjs, never in `addDecision` itself.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

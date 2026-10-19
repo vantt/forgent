@@ -2,6 +2,13 @@
 id: architecture-advisory-reopen
 title: Architecture Advisory Reopen
 description: Revisit a final recommendation from parent evidence without rerunning blind seats.
+# --- Guide head: what the playbook promises, beside the steps below (the steps are unchanged) ---
+kind: playbook
+purpose: Revisit a closed recommendation with new input, explain the change, and close with the owner.
+must: []
+frameDefaults: { dispatches: 2, mutatingDispatches: 0, fallbackPerSeat: 2, deviationsBeforeAsk: 0, rigorFloor: standard }
+closure: [close.settled]
+
 steps:
   - id: synthesis
     title: Revisit Final Recommendation

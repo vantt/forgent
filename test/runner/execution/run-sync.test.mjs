@@ -5,6 +5,7 @@
 // paths for the worker (added to the write scope), and the runner finishes the merge commit after a
 // passing round, refusing while a conflict marker is left.
 
+import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

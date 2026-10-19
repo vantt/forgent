@@ -4,6 +4,7 @@
 // real (the selector resolves, folds unknowns, and a domain with no
 // `workflows` field degrades cleanly) without asserting anything about a
 // second workflow shape, which does not exist yet by design (D7a).
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DOMAINS, resolveWorkflow } from '../../src/state/domain-registry.mjs';

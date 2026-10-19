@@ -14,6 +14,7 @@
 // `kind: 'engine'` directly to `addDecision` and is unaffected here -- this
 // only wires the same field through the general-purpose CLI verb.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   assert,

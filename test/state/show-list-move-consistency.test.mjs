@@ -3,6 +3,7 @@
 // Asserts that listWork (used by show and list) and rebuildViewFromDir (used by moveWork's precondition)
 // report identical stage and status for an item during and immediately following an approve-like state transition.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

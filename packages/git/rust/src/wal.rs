@@ -77,9 +77,35 @@ pub struct ConfigChange {
     pub old_config_digest: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct WorktreeDeliveryBinding {
+    pub delivered_to: String,
+    pub evidence_digest: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
     PublicationCas,
-    RefUpdate { worktree: Option<String> },
+    WorktreeCreate {
+        path: Box<str>,
+        registration: Box<str>,
+        branch: Option<Box<str>>,
+        session_id: Option<Box<str>>,
+    },
+    WorktreeMove {
+        source: Box<str>,
+        destination: Box<str>,
+        registration: Box<str>,
+        registration_identity: Box<str>,
+    },
+    WorktreeRemove {
+        path: Box<str>,
+        registration: Box<str>,
+        registration_identity: Box<str>,
+        delivery: Box<WorktreeDeliveryBinding>,
+    },
+    RefUpdate {
+        worktree: Option<String>,
+    },
     RefDelete,
     ConfigChange(Box<ConfigChange>),
     RemoteFetch {
@@ -128,6 +154,10 @@ pub enum Attribution {
 pub enum Outcome {
     /// Effect-free approval; URL and mappings live in the ConfigChange intent.
     ConfigApproved,
+    Worktree {
+        completed: bool,
+        details: Vec<String>,
+    },
     AbandonedBeforeAttempt,
     Transfer {
         acknowledged: bool,
@@ -223,7 +253,7 @@ fn record_digest(record: &Record) -> WalResult<String> {
         .remove("digest");
     canonical_digest(&v)
 }
-fn valid_id(s: &str) -> bool {
+pub(crate) fn valid_id(s: &str) -> bool {
     !s.is_empty()
         && s.len() <= 80
         && s.bytes()
@@ -240,6 +270,34 @@ fn validate_tip(tip: &Tip, format: ObjectFormat) -> WalResult<()> {
     }
     Ok(())
 }
+
+pub(crate) fn worktree_resources(kind: &OperationKind) -> WalResult<Vec<String>> {
+    let mut paths = match kind {
+        OperationKind::WorktreeCreate { path, .. } | OperationKind::WorktreeRemove { path, .. } => {
+            vec![format!("worktree:{path}")]
+        }
+        OperationKind::WorktreeMove {
+            source,
+            destination,
+            ..
+        } => vec![
+            format!("worktree:{source}"),
+            format!("worktree:{destination}"),
+        ],
+        _ => return Err(corrupt("not-a-worktree-operation")),
+    };
+    if let OperationKind::WorktreeCreate {
+        branch: Some(branch),
+        ..
+    } = kind
+    {
+        paths.push(branch.to_string());
+    }
+    paths.sort();
+    paths.dedup();
+    Ok(paths)
+}
+
 impl Intent {
     /// Delete keeps the old object reachable until its terminal receipt.
     pub fn candidate(&self) -> &Tip {
@@ -257,6 +315,89 @@ impl Intent {
             || self.resource_set.is_empty()
         {
             return Err(corrupt("intent binding"));
+        }
+        let paths = match &self.kind {
+            OperationKind::WorktreeCreate {
+                path, registration, ..
+            }
+            | OperationKind::WorktreeRemove {
+                path, registration, ..
+            } => Some((vec![path], registration)),
+            OperationKind::WorktreeMove {
+                source,
+                destination,
+                registration,
+                ..
+            } => Some((vec![source, destination], registration)),
+            _ => None,
+        };
+        if let Some((paths, registration)) = paths {
+            let resources = worktree_resources(&self.kind)?;
+            if paths.iter().any(|p| {
+                !Path::new(&***p).is_absolute()
+                    || Path::new(&***p).components().any(|c| {
+                        matches!(
+                            c,
+                            std::path::Component::ParentDir | std::path::Component::CurDir
+                        )
+                    })
+            }) || registration.is_empty()
+                || registration.contains(['/', '\\'])
+                || registration.as_ref() == "."
+                || registration.as_ref() == ".."
+                || self.resource_set != resources
+            {
+                return Err(corrupt("worktree binding"));
+            }
+            match &self.kind {
+                OperationKind::WorktreeCreate {
+                    branch, session_id, ..
+                } => {
+                    if self.expected != Tip::Absent
+                        || self.next == Tip::Absent
+                        || session_id.as_ref().is_some_and(|s| !valid_id(s))
+                    {
+                        return Err(corrupt("worktree create binding"));
+                    }
+                    if let Some(branch) = branch {
+                        RefName::parse(branch).map_err(|_| corrupt("worktree branch"))?;
+                        if !branch.starts_with("refs/heads/") {
+                            return Err(corrupt("worktree branch"));
+                        }
+                    }
+                }
+                OperationKind::WorktreeMove {
+                    source,
+                    destination,
+                    registration_identity,
+                    ..
+                } => {
+                    if source == destination
+                        || self.expected == Tip::Absent
+                        || self.next != self.expected
+                        || registration_identity.is_empty()
+                    {
+                        return Err(corrupt("worktree move binding"));
+                    }
+                }
+                OperationKind::WorktreeRemove {
+                    registration_identity,
+                    delivery,
+                    ..
+                } => {
+                    if self.expected == Tip::Absent
+                        || self.next != Tip::Absent
+                        || registration_identity.is_empty()
+                        || !digest_valid(&delivery.evidence_digest)
+                        || Oid::parse(&delivery.delivered_to, self.object_format).is_err()
+                    {
+                        return Err(corrupt("worktree remove binding"));
+                    }
+                }
+                _ => unreachable!(),
+            }
+            validate_tip(&self.expected, self.object_format)?;
+            return validate_tip(&self.next, self.object_format);
         }
         if let OperationKind::ConfigChange(change) = &self.kind {
             let ConfigChange {
@@ -319,7 +460,9 @@ impl Intent {
                     return Err(corrupt("remote targets"));
                 }
                 for spec in refspecs {
-                    let (source, destination) = spec.split_once(':').ok_or_else(|| corrupt("remote mapping"))?;
+                    let (source, destination) = spec
+                        .split_once(':')
+                        .ok_or_else(|| corrupt("remote mapping"))?;
                     RefName::parse(source).map_err(|_| corrupt("remote source"))?;
                     RefName::parse(destination).map_err(|_| corrupt("remote destination"))?;
                     if source.starts_with("refs/fgos/") || !seen.contains(&destination.to_owned()) {
@@ -329,7 +472,13 @@ impl Intent {
                 for resource in &self.resource_set {
                     RefName::parse(resource).map_err(|_| corrupt("resource ref"))?;
                 }
-                if self.resource_set.iter().collect::<std::collections::BTreeSet<_>>().len() != self.resource_set.len() {
+                if self
+                    .resource_set
+                    .iter()
+                    .collect::<std::collections::BTreeSet<_>>()
+                    .len()
+                    != self.resource_set.len()
+                {
                     return Err(corrupt("duplicate remote resource"));
                 }
                 return Ok(());
@@ -469,6 +618,14 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == &i.expected && next == &i.next,
         (Phase::TargetAttempt { .. }, Phase::Outcome(o)) => match o {
+            Outcome::Worktree { details, .. } => {
+                matches!(
+                    i.kind,
+                    OperationKind::WorktreeCreate { .. }
+                        | OperationKind::WorktreeMove { .. }
+                        | OperationKind::WorktreeRemove { .. }
+                ) && details.len() <= 64
+            }
             Outcome::AbandonedBeforeAttempt | Outcome::ConfigApproved => false,
             Outcome::Transfer {
                 acknowledged,
@@ -476,8 +633,12 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 observations,
                 details,
             } => {
-                if matches!(i.kind,OperationKind::PublicationCas|OperationKind::RefUpdate {..}|OperationKind::RefDelete)
-                    || details.len() > 1024
+                if matches!(
+                    i.kind,
+                    OperationKind::PublicationCas
+                        | OperationKind::RefUpdate { .. }
+                        | OperationKind::RefDelete
+                ) || details.len() > 1024
                     || (*acknowledged && *unknown)
                 {
                     return Err(corrupt("transfer outcome"));
@@ -495,13 +656,22 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 attribution,
             } => {
                 validate_tip(observed, i.object_format)?;
-                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
-                    && observed == &i.next
+                matches!(
+                    i.kind,
+                    OperationKind::PublicationCas
+                        | OperationKind::RefUpdate { .. }
+                        | OperationKind::RefDelete
+                ) && observed == &i.next
                     && *attribution != Attribution::Uncertain
             }
             Outcome::Loss { observed } => {
                 validate_tip(observed, i.object_format)?;
-                matches!(i.kind, OperationKind::PublicationCas | OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
+                matches!(
+                    i.kind,
+                    OperationKind::PublicationCas
+                        | OperationKind::RefUpdate { .. }
+                        | OperationKind::RefDelete
+                )
             }
             Outcome::Superseded {
                 later_operation_id,
@@ -609,7 +779,11 @@ impl Directory {
         // device, inode and birth time) needs no second fsync.
         if sync {
             let key = durable_key(&child.file);
-            if key.is_none() || !DURABLE_DIRECTORIES.lock().is_ok_and(|seen| seen.contains(&key)) {
+            if key.is_none()
+                || !DURABLE_DIRECTORIES
+                    .lock()
+                    .is_ok_and(|seen| seen.contains(&key))
+            {
                 child.file.sync_all()?;
                 fsys.checkpoint("directory-fsync")?;
                 self.file.sync_all()?;
@@ -640,7 +814,12 @@ pub(crate) fn durable_identity(m: &fs::Metadata) -> Option<(u64, u64, u128)> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
-        let born = m.created().ok()?.duration_since(std::time::UNIX_EPOCH).ok()?.as_nanos();
+        let born = m
+            .created()
+            .ok()?
+            .duration_since(std::time::UNIX_EPOCH)
+            .ok()?
+            .as_nanos();
         Some((m.dev(), m.ino(), born))
     }
     #[cfg(not(unix))]
@@ -924,8 +1103,14 @@ impl<F: FileSystem> Wal<F> {
             phase,
         )?;
         let dir = self.operation(id, false)?;
-        if self.install_ordered(&dir, &record_name(r.sequence), &r, false, alongside, before_install)?
-            != Installed::Created
+        if self.install_ordered(
+            &dir,
+            &record_name(r.sequence),
+            &r,
+            false,
+            alongside,
+            before_install,
+        )? != Installed::Created
         {
             return Err(WalError::Busy);
         }
@@ -1034,6 +1219,7 @@ fn compaction_suffix(dir: &Directory, id: &str) -> WalResult<Vec<Record>> {
         !matches!(
             r.phase,
             Phase::PinReleased
+                | Phase::Outcome(Outcome::Worktree { .. })
                 | Phase::Outcome(Outcome::Transfer { .. })
                 | Phase::Outcome(Outcome::ConfigApproved)
                 | Phase::Outcome(Outcome::AbandonedBeforeAttempt)
@@ -1208,7 +1394,11 @@ mod ledger_hex {
     use serde::{Deserialize, Deserializer, Serializer};
     const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     pub(super) fn encode(s: &str) -> String {
-        if !matches!(s.len(), 40 | 64) || !s.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+        if !matches!(s.len(), 40 | 64)
+            || !s
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        {
             return s.into();
         }
         let mut out = String::from("~");
@@ -1223,16 +1413,23 @@ mod ledger_hex {
                 out.push(ALPHABET[((bits >> n) & 63) as usize] as char);
             }
         }
-        if n > 0 { out.push(ALPHABET[((bits << (6 - n)) & 63) as usize] as char); }
+        if n > 0 {
+            out.push(ALPHABET[((bits << (6 - n)) & 63) as usize] as char);
+        }
         out
     }
     pub(super) fn decode(s: String) -> Result<String, String> {
-        let Some(encoded) = s.strip_prefix('~') else { return Ok(s) };
+        let Some(encoded) = s.strip_prefix('~') else {
+            return Ok(s);
+        };
         let mut out = String::new();
         let mut bits = 0u32;
         let mut n = 0;
         for c in encoded.bytes() {
-            let v = ALPHABET.iter().position(|b| *b == c).ok_or("invalid ledger hash")?;
+            let v = ALPHABET
+                .iter()
+                .position(|b| *b == c)
+                .ok_or("invalid ledger hash")?;
             bits = (bits << 6) | v as u32;
             n += 6;
             if n >= 8 {
@@ -1242,23 +1439,37 @@ mod ledger_hex {
                 write!(out, "{b:02x}").unwrap();
             }
         }
-        if encode(&out) != s { return Err("noncanonical ledger hash".into()); }
+        if encode(&out) != s {
+            return Err("noncanonical ledger hash".into());
+        }
         Ok(out)
     }
-    pub fn serialize<S: Serializer>(s: &str, serializer: S) -> Result<S::Ok, S::Error> { serializer.serialize_str(&encode(s)) }
-    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> { decode(String::deserialize(d)?).map_err(serde::de::Error::custom) }
+    pub fn serialize<S: Serializer>(s: &str, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&encode(s))
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> {
+        decode(String::deserialize(d)?).map_err(serde::de::Error::custom)
+    }
 }
 mod ledger_hex_vec {
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
     pub fn serialize<S: Serializer>(values: &[String], serializer: S) -> Result<S::Ok, S::Error> {
-        values.iter().map(|s| super::ledger_hex::encode(s)).collect::<Vec<_>>().serialize(serializer)
+        values
+            .iter()
+            .map(|s| super::ledger_hex::encode(s))
+            .collect::<Vec<_>>()
+            .serialize(serializer)
     }
     pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<String>, D::Error> {
-        Vec::<String>::deserialize(d)?.into_iter().map(|s| super::ledger_hex::decode(s).map_err(serde::de::Error::custom)).collect()
+        Vec::<String>::deserialize(d)?
+            .into_iter()
+            .map(|s| super::ledger_hex::decode(s).map_err(serde::de::Error::custom))
+            .collect()
     }
 }
 fn compact_outcome(o: &Outcome) -> Vec<String> {
     match o {
+        Outcome::Worktree { completed, .. } => vec!["w".into(), completed.to_string()],
         Outcome::ConfigApproved => vec!["c".into()],
         Outcome::AbandonedBeforeAttempt => vec!["a".into()],
         Outcome::Transfer {
@@ -1315,6 +1526,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
+        Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),
         Some("a" | "c") => o.len() == 1,
         Some("t") => {
             o.len() == 4
@@ -1350,6 +1562,10 @@ impl CompactReceipt {
             }
         };
         Ok(match r[0].as_str() {
+            "w" => Outcome::Worktree {
+                completed: r[1] == "true",
+                details: vec![],
+            },
             "c" => Outcome::ConfigApproved,
             "a" => Outcome::AbandonedBeforeAttempt,
             "t" => Outcome::Transfer {
@@ -1451,12 +1667,22 @@ impl<F: FileSystem> Wal<F> {
         let d = if c.v == 1 {
             canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
         } else {
-            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?
+            canonical_digest(&(
+                c.v,
+                &c.id,
+                &c.request,
+                &c.binding,
+                &c.receipt,
+                &c.expected,
+                &c.next,
+            ))?
         };
         let tips_valid = if c.v == 1 {
             c.expected.is_empty() && c.next.is_empty()
         } else {
-            [&c.expected, &c.next].iter().all(|s| *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            [&c.expected, &c.next].iter().all(|s| {
+                *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit())
+            })
         };
         if !matches!(c.v, 1 | 2)
             || c.id != id
@@ -1516,7 +1742,15 @@ impl<F: FileSystem> Wal<F> {
             receipt: compact_outcome(actual.outcome().ok_or(WalError::RecoveryRequired)?),
             digest: String::new(),
         };
-        c.digest = canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next))?;
+        c.digest = canonical_digest(&(
+            c.v,
+            &c.id,
+            &c.request,
+            &c.binding,
+            &c.receipt,
+            &c.expected,
+            &c.next,
+        ))?;
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -1573,7 +1807,10 @@ impl<F: FileSystem> Wal<F> {
     /// When the operation's directory last changed (its last record was
     /// installed). Scheduling only: it never decides a protocol outcome.
     pub(crate) fn last_change(&self, id: &str) -> Option<std::time::SystemTime> {
-        fs::metadata(self.root.path().join(id)).ok()?.modified().ok()
+        fs::metadata(self.root.path().join(id))
+            .ok()?
+            .modified()
+            .ok()
     }
     pub(crate) fn known_id(&self, id: &str) -> WalResult<bool> {
         if self.compacted(id)?.is_some() {
@@ -1648,7 +1885,9 @@ impl<F: FileSystem> Wal<F> {
             for entry in fs::read_dir(dir.path())? {
                 let entry = entry?;
                 let id = entry.file_name().to_string_lossy().into_owned();
-                if is_durable_temporary(&id) { continue; }
+                if is_durable_temporary(&id) {
+                    continue;
+                }
                 if seen == bound {
                     result.complete = false;
                     return Ok(result);
@@ -1656,37 +1895,50 @@ impl<F: FileSystem> Wal<F> {
                 seen += 1;
                 // The ledger is installed durably before any chain deletion.
                 // Re-read it after every failed observation of a root entry.
-                let inspect_entry = || -> WalResult<(bool, u64, Option<std::time::SystemTime>, bool)> {
-                    let metadata = entry.metadata()?;
-                    if ledger {
-                        self.compacted(&id)?.ok_or_else(|| corrupt("missing ledger"))?;
-                        return Ok((true, metadata.len(), metadata.modified().ok(), false));
-                    }
-                    if self.compacted(&id)?.is_some() {
-                        return Ok((true, 0, None, false));
-                    }
-                    let operation = self.operation(&id, false)?;
-                    let terminal = !self.has_intent(&operation)? || self.inspect(&id)?.outcome().is_some();
-                    let mut bytes = metadata.len();
-                    let mut incomplete = false;
-                    for (n, file) in fs::read_dir(operation.path())?.enumerate() {
-                        if n >= MAX_RECORDS * 2 { incomplete = true; break; }
-                        bytes += file?.metadata()?.len();
-                    }
-                    Ok((terminal, bytes, metadata.modified().ok(), incomplete))
-                };
+                let inspect_entry =
+                    || -> WalResult<(bool, u64, Option<std::time::SystemTime>, bool)> {
+                        let metadata = entry.metadata()?;
+                        if ledger {
+                            self.compacted(&id)?
+                                .ok_or_else(|| corrupt("missing ledger"))?;
+                            return Ok((true, metadata.len(), metadata.modified().ok(), false));
+                        }
+                        if self.compacted(&id)?.is_some() {
+                            return Ok((true, 0, None, false));
+                        }
+                        let operation = self.operation(&id, false)?;
+                        let terminal =
+                            !self.has_intent(&operation)? || self.inspect(&id)?.outcome().is_some();
+                        let mut bytes = metadata.len();
+                        let mut incomplete = false;
+                        for (n, file) in fs::read_dir(operation.path())?.enumerate() {
+                            if n >= MAX_RECORDS * 2 {
+                                incomplete = true;
+                                break;
+                            }
+                            bytes += file?.metadata()?.len();
+                        }
+                        Ok((terminal, bytes, metadata.modified().ok(), incomplete))
+                    };
                 let (terminal, bytes, modified, incomplete, error) = match inspect_entry() {
                     Ok((t, bytes, modified, incomplete)) => (t, bytes, modified, incomplete, None),
                     Err(e) if !ledger => match self.compacted(&id) {
                         Ok(Some(_)) => (true, 0, None, false, None),
                         _ => (false, 0, None, false, Some(e.to_string())),
                     },
-                    Err(e) => (false, entry.metadata().map(|m| m.len()).unwrap_or(0), None, false, Some(e.to_string())),
+                    Err(e) => (
+                        false,
+                        entry.metadata().map(|m| m.len()).unwrap_or(0),
+                        None,
+                        false,
+                        Some(e.to_string()),
+                    ),
                 };
                 if ledger {
                     result.ledger_bytes += bytes;
                     result.ledger_entries += 1;
-                    result.ledger_capacity_warning = result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
+                    result.ledger_capacity_warning =
+                        result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
                     result.retained_bytes += bytes;
                 }
@@ -1694,7 +1946,11 @@ impl<F: FileSystem> Wal<F> {
                 if !terminal {
                     result.unresolved += 1;
                     if let Some(time) = modified {
-                        if result.oldest_unresolved.as_ref().is_none_or(|(_, old)| time < *old) {
+                        if result
+                            .oldest_unresolved
+                            .as_ref()
+                            .is_none_or(|(_, old)| time < *old)
+                        {
                             result.oldest_unresolved = Some((id.clone(), time));
                         }
                     }
@@ -2022,27 +2278,49 @@ mod tests {
         struct StopBeforeSync;
         impl FileSystem for StopBeforeSync {
             fn checkpoint(&self, step: &'static str) -> io::Result<()> {
-                if step == "temp-removed" { Err(io::Error::other("creator stopped before directory sync")) } else { Ok(()) }
+                if step == "temp-removed" {
+                    Err(io::Error::other("creator stopped before directory sync"))
+                } else {
+                    Ok(())
+                }
             }
         }
         let t = Temp::new();
         let creator = Wal::with_filesystem(&t.0, StopBeforeSync).unwrap();
-        assert!(creator.begin("replay", intent(&creator), &Authority).is_err());
-        assert!(creator.inspect("replay").is_ok(), "record zero exists despite failed begin");
+        assert!(creator
+            .begin("replay", intent(&creator), &Authority)
+            .is_err());
+        assert!(
+            creator.inspect("replay").is_ok(),
+            "record zero exists despite failed begin"
+        );
         let replay = Wal::with_filesystem(&t.0, Steps(Default::default())).unwrap();
         replay.fs.0.lock().unwrap().clear();
-        assert!(matches!(replay.begin("replay", intent(&replay), &Authority).unwrap(), Begin::Existing(_)));
-        assert_eq!(&*replay.fs.0.lock().unwrap(), &["existing-intent-parent-fsync"]);
+        assert!(matches!(
+            replay.begin("replay", intent(&replay), &Authority).unwrap(),
+            Begin::Existing(_)
+        ));
+        assert_eq!(
+            &*replay.fs.0.lock().unwrap(),
+            &["existing-intent-parent-fsync"]
+        );
         let mut different = intent(&replay);
         different.request_digest = "f".repeat(64);
-        assert!(matches!(replay.begin("replay", different, &Authority), Err(WalError::OperationIdConflict)));
+        assert!(matches!(
+            replay.begin("replay", different, &Authority),
+            Err(WalError::OperationIdConflict)
+        ));
     }
 
     #[test]
     fn scan_ignores_compaction_temporaries_before_counting_the_bound() {
         let t = Temp::new();
         let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
-        fs::write(wal.ledger.path().join(".durable-file-123-0.tmp"), b"partial ledger").unwrap();
+        fs::write(
+            wal.ledger.path().join(".durable-file-123-0.tmp"),
+            b"partial ledger",
+        )
+        .unwrap();
         let scan = wal.scan(0).unwrap();
         assert!(scan.complete);
         assert_eq!(scan.unresolved, 0);
@@ -2059,7 +2337,9 @@ mod tests {
         struct SlowRemoval;
         impl FileSystem for SlowRemoval {
             fn checkpoint(&self, step: &'static str) -> io::Result<()> {
-                if step == "remove-record" { std::thread::sleep(std::time::Duration::from_millis(1)); }
+                if step == "remove-record" {
+                    std::thread::sleep(std::time::Duration::from_millis(1));
+                }
                 Ok(())
             }
         }
@@ -2068,7 +2348,16 @@ mod tests {
         let mut terminal = Vec::new();
         for n in 0..16 {
             let c = success(&wal, &attempted(&wal, &format!("race-{n}")));
-            let c = wal.append(&c, Phase::PinReleaseAttempt { prior_target_attempt: None, expected: c.intent().next.clone(), next: Tip::Absent }).unwrap();
+            let c = wal
+                .append(
+                    &c,
+                    Phase::PinReleaseAttempt {
+                        prior_target_attempt: None,
+                        expected: c.intent().next.clone(),
+                        next: Tip::Absent,
+                    },
+                )
+                .unwrap();
             terminal.push(wal.append(&c, Phase::PinReleased).unwrap());
         }
         let done = std::sync::atomic::AtomicBool::new(false);
@@ -2172,15 +2461,26 @@ mod tests {
         let t = Temp::new();
         let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
         let i = intent(&wal);
-        let receipt = compact_outcome(&Outcome::Success { observed: i.next.clone(), attribution: Attribution::ThisInvocationWonCas });
+        let receipt = compact_outcome(&Outcome::Success {
+            observed: i.next.clone(),
+            attribution: Attribution::ThisInvocationWonCas,
+        });
         let binding = binding_digest(&i).unwrap();
-        let digest = canonical_digest(&(1u8, "legacy", &i.request_digest, &binding, &receipt)).unwrap();
+        let digest =
+            canonical_digest(&(1u8, "legacy", &i.request_digest, &binding, &receipt)).unwrap();
         let old = serde_json::json!({"v": 1, "id": "legacy", "q": i.request_digest, "b": binding, "r": receipt, "digest": digest});
-        fgos_durable_file::install_once(&wal.ledger.path(), "legacy", old.to_string().as_bytes()).unwrap();
-        assert!(matches!(wal.begin("legacy", i.clone(), &Authority).unwrap(), Begin::Compacted(_)));
+        fgos_durable_file::install_once(&wal.ledger.path(), "legacy", old.to_string().as_bytes())
+            .unwrap();
+        assert!(matches!(
+            wal.begin("legacy", i.clone(), &Authority).unwrap(),
+            Begin::Compacted(_)
+        ));
         let mut other = i;
         other.expected = Tip::Oid("c".repeat(40));
-        assert!(matches!(wal.begin("legacy", other, &Authority), Err(WalError::OperationIdConflict)));
+        assert!(matches!(
+            wal.begin("legacy", other, &Authority),
+            Err(WalError::OperationIdConflict)
+        ));
         assert_eq!(wal.scan(10).unwrap().unresolved, 0);
     }
 

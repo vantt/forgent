@@ -34,6 +34,7 @@
 // D7b's default-injection (src/state/replay.mjs) has to handle, alone and
 // mixed with new (v-carrying) events on the same log.
 
+import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

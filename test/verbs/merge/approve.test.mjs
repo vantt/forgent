@@ -1,5 +1,6 @@
 // test/verbs/merge/approve.test.mjs
 // Tests for mergedSha diagnostic logging in approve (tsk-64o).
+import '../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
