@@ -7,6 +7,7 @@ export {
   createWorkflowRun,
   appendWorkflowEvent,
   readWorkflowEvents,
+  recoverWorkflowLedgerTail,
   projectWorkflowState,
 } from './store.mjs';
 export {

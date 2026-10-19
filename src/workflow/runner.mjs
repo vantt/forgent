@@ -11,9 +11,11 @@ import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow } from './loader.mjs';
 import {
+  createAdvanceHold,
   createWorkflowRun,
   appendWorkflowEvent,
   readWorkflowEvents,
+  recoverWorkflowLedgerTail,
   projectWorkflowState,
 } from './store.mjs';
 import {
@@ -384,10 +386,11 @@ const detachedChildLog = process.env[ADVANCE_DETACHED_ENV] === '1' ? (line) => p
 /**
  * Run loop to advance ready steps in a Workflow run.
  */
-async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, onLog = detachedChildLog }) {
-  // Every event is recorded in the event log; a step's start, end or park also reaches onLog as one line.
+async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
+  // Every event is recorded in the event log under the run's advance hold; a step's start, end or
+  // park also reaches onLog as one line.
   const recordEvent = (args) => {
-    const stored = appendWorkflowEvent(args);
+    const stored = appendWorkflowEvent({ ...args, hold });
     const line = progressLine(stored);
     if (line && onLog) onLog(line);
     return stored;
@@ -852,23 +855,26 @@ function advanceRefusal(workflowRunId, pid) {
   );
 }
 
-/** Refuse when a live process is already advancing the run. */
-function assertNoLiveAdvance(mainRoot, workflowRunId) {
-  const holder = liveAdvanceHolder(mainRoot, workflowRunId);
-  if (holder !== null) throw advanceRefusal(workflowRunId, holder.pid);
-}
-
 /**
  * Hold the run for this process while it advances, so two processes never advance one run at
- * once. Returns the function that releases it.
+ * once. Returns the hold the ledger demands for every append; `hold.release()` frees the run. A
+ * ledger that ends in an unfinished line (an append cut short by a crash) is repaired here, by the
+ * one process allowed to, before anything reads or appends.
  */
-function acquireAdvanceLock(mainRoot, workflowRunId) {
+export function acquireAdvanceLock(mainRoot, workflowRunId) {
   const params = advanceLockParams(mainRoot, workflowRunId);
   // Taking the lock creates its directory; never bring back a run that was deleted.
   if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
   const res = acquireSync(createLockScope('advance'), 'advance', params);
-  if (res.result === 'acquired') return () => res.handle.release();
-  throw advanceRefusal(workflowRunId, advanceHolderPid(params));
+  if (res.result !== 'acquired') throw advanceRefusal(workflowRunId, advanceHolderPid(params));
+  const hold = createAdvanceHold({ workflowRunId, release: () => res.handle.release() });
+  try {
+    recoverWorkflowLedgerTail({ repoRoot: mainRoot, workflowRunId, hold });
+  } catch (err) {
+    hold.release();
+    throw err;
+  }
+  return hold;
 }
 
 const ADVANCE_TAIL_LINES = 20;
@@ -915,13 +921,23 @@ function advanceReport(mainRoot, workflowRunId, state, events) {
   return advance;
 }
 
-/** Run `advance` while this process holds the run's advance lock. */
+/** Run `advance(hold)` while this process holds the run's advance lock. */
 async function withAdvanceLock(mainRoot, workflowRunId, advance) {
-  const release = acquireAdvanceLock(mainRoot, workflowRunId);
+  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
   try {
-    return await advance();
+    return await advance(hold);
   } finally {
-    release();
+    hold.release();
+  }
+}
+
+/** Run `action(hold)` while this process holds the run's advance lock; for a caller that does not advance. */
+function withAdvanceLockSync(mainRoot, workflowRunId, action) {
+  const hold = acquireAdvanceLock(mainRoot, workflowRunId);
+  try {
+    return action(hold);
+  } finally {
+    hold.release();
   }
 }
 
@@ -1150,13 +1166,14 @@ function canResumeUnitRun(mainRoot, uState) {
 export async function startWorkflow(params = {}) {
   const { workflowRunId, workflow, mainRoot, worktreePath } = prepareWorkflowRun(params);
 
-  return await withAdvanceLock(mainRoot, workflowRunId, () =>
+  return await withAdvanceLock(mainRoot, workflowRunId, (hold) =>
     advanceWorkflowRun({
       repoRoot: mainRoot,
       workflowRunId,
       workflow,
       mainRoot,
       worktreePath,
+      hold,
       onLog: params.onLog,
     }),
   );
@@ -1201,14 +1218,15 @@ export function statusWorkflow(workflowRunId, options = {}) {
  */
 export async function answerWorkflow(workflowRunId, params = {}) {
   const { mainRoot, worktreePath } = resolveAnswerTarget(workflowRunId, params);
-  return await withAdvanceLock(mainRoot, workflowRunId, () => {
-    const state = recordGateAnswer(workflowRunId, params, mainRoot);
+  return await withAdvanceLock(mainRoot, workflowRunId, (hold) => {
+    const state = recordGateAnswer(workflowRunId, params, mainRoot, hold);
     return advanceWorkflowRun({
       repoRoot: mainRoot,
       workflowRunId,
       workflow: state.workflow,
       mainRoot,
       worktreePath,
+      hold,
     });
   });
 }
@@ -1226,7 +1244,7 @@ function resolveAnswerTarget(workflowRunId, params) {
 }
 
 /** Append the gate answer to the run's event log; returns the run state as it was before the answer. */
-function recordGateAnswer(workflowRunId, params, mainRoot) {
+function recordGateAnswer(workflowRunId, params, mainRoot, hold) {
   const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   if (events.length === 0) {
     throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
@@ -1243,6 +1261,7 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
   appendWorkflowEvent({
     repoRoot: mainRoot,
     workflowRunId,
+    hold,
     event: {
       type: 'gate.answer',
       payload: {
@@ -1330,8 +1349,9 @@ function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer
  */
 export function answerWorkflowDetached(workflowRunId, params = {}) {
   const { mainRoot, worktreePath } = resolveAnswerTarget(workflowRunId, params);
-  assertNoLiveAdvance(mainRoot, workflowRunId);
-  recordGateAnswer(workflowRunId, params, mainRoot);
+  // Holding the run while the answer is recorded refuses, without recording anything, when a live
+  // process is advancing it; the hold is released before the detached advance takes it.
+  withAdvanceLockSync(mainRoot, workflowRunId, (hold) => recordGateAnswer(workflowRunId, params, mainRoot, hold));
   const detached = spawnDetachedAdvance({
     mainRoot,
     workflowRunId,
@@ -1353,25 +1373,31 @@ export function answerWorkflowDetached(workflowRunId, params = {}) {
  * @returns {Promise<object>} Projected state
  */
 export async function resumeWorkflow(workflowRunId, options = {}) {
-  const { mainRoot, worktreePath, state } = resolveResumeTarget(workflowRunId, options);
-  return await withAdvanceLock(mainRoot, workflowRunId, () =>
-    advanceWorkflowRun({
+  const { mainRoot, worktreePath } = resolveResumeRoots(workflowRunId, options);
+  return await withAdvanceLock(mainRoot, workflowRunId, (hold) => {
+    const state = readResumeState(workflowRunId, mainRoot, options);
+    return advanceWorkflowRun({
       repoRoot: mainRoot,
       workflowRunId,
       workflow: state.workflow,
       mainRoot,
       worktreePath,
-    }),
-  );
+      hold,
+    });
+  });
 }
 
-function resolveResumeTarget(workflowRunId, options) {
+function resolveResumeRoots(workflowRunId, options) {
   if (!workflowRunId) throw new RunnerConfigError('resumeWorkflow requires workflowRunId');
   const cwd = options.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
+  return { mainRoot, worktreePath };
+}
 
+/** The run's state, refusing a resume that asks for seats the run did not start with. Read under the advance lock. */
+function readResumeState(workflowRunId, mainRoot, options) {
   const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   if (events.length === 0) {
     throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
@@ -1384,7 +1410,7 @@ function resolveResumeTarget(workflowRunId, options) {
       throw new RunnerConfigError(`Workflow run "${workflowRunId}" started with ${stored.length > 0 ? `seats "${stored.join('|')}"` : 'no --seats'}; resume refuses different --seats (given "${given.join('|')}")`);
     }
   }
-  return { mainRoot, worktreePath, state };
+  return state;
 }
 
 /**
@@ -1394,8 +1420,10 @@ function resolveResumeTarget(workflowRunId, options) {
  * @returns {object} Projected state plus `detached: { pid, logPath, statusCommand }`
  */
 export function resumeWorkflowDetached(workflowRunId, options = {}) {
-  const { mainRoot, worktreePath } = resolveResumeTarget(workflowRunId, options);
-  assertNoLiveAdvance(mainRoot, workflowRunId);
+  const { mainRoot, worktreePath } = resolveResumeRoots(workflowRunId, options);
+  // Holding the run while it is checked refuses when a live process is advancing it, and repairs an
+  // unfinished last ledger line; the hold is released before the detached advance takes it.
+  withAdvanceLockSync(mainRoot, workflowRunId, () => readResumeState(workflowRunId, mainRoot, options));
   const detached = spawnDetachedAdvance({
     mainRoot,
     workflowRunId,

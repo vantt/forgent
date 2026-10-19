@@ -27,6 +27,7 @@ import {
   resumeWorkflowDetached,
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
@@ -169,16 +170,15 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.status, 'running');
   assert.equal(state.steps.s1.status, 'pending');
 
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (event) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event, hold });
+
   // Step 1 starts and completes
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'step.start', payload: { stepId: 's1' } } });
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'step.complete', payload: { stepId: 's1', outcome: 'pass' } } });
+  append({ type: 'step.start', payload: { stepId: 's1' } });
+  append({ type: 'step.complete', payload: { stepId: 's1', outcome: 'pass' } });
 
   // Gate parks step 2
-  appendWorkflowEvent({
-    repoRoot: tmp,
-    workflowRunId,
-    event: { type: 'gate.park', payload: { stepId: 's2', question: 'Continue?' } },
-  });
+  append({ type: 'gate.park', payload: { stepId: 's2', question: 'Continue?' } });
 
   state = projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId }));
   assert.equal(state.status, 'parked');
@@ -186,11 +186,8 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.questions[0].question, 'Continue?');
 
   // Answer gate with approval
-  appendWorkflowEvent({
-    repoRoot: tmp,
-    workflowRunId,
-    event: { type: 'gate.answer', payload: { stepId: 's2', answer: 'yes', approved: true } },
-  });
+  append({ type: 'gate.answer', payload: { stepId: 's2', answer: 'yes', approved: true } });
+  hold.release();
 
   state = projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId }));
   assert.equal(state.status, 'running');
@@ -1175,7 +1172,8 @@ test('a completed unit keeps the id of the Unit run that produced it', () => {
     steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', objective: 'x' } }] }],
   });
   const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
-  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload } });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
   const unitOf = () => projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId })).steps.s1.units.u1;
 
   append('unit.scheduled', { stepId: 's1', unitId: 'u1' });
@@ -1201,6 +1199,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
     ],
   });
   const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
   const units = {};
   for (const id of ['merged', 'unmerged', 'dirty', 'broken']) {
     const branch = `wf/${workflowRunId}/${id}`;
@@ -1210,6 +1209,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
     appendWorkflowEvent({
       repoRoot: tmp,
       workflowRunId,
+      hold,
       event: { type: 'unit.scheduled', payload: { stepId: 's1', unitId: id, worktreePath: wt.worktreePath, branch } },
     });
   }
@@ -1223,10 +1223,11 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
   commitIn('unmerged', 'b.txt');
   fs.writeFileSync(path.join(units.dirty.worktreePath, 'scratch.txt'), 'uncommitted\n');
   for (const id of ['merged', 'unmerged', 'dirty']) {
-    appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: id, outcome: 'pass' } } });
+    appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: id, outcome: 'pass' } } });
   }
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: 'broken', outcome: 'execution-failure' } } });
-  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: terminal, payload: { outcome: terminal === 'workflow.fail' ? 'execution-failure' : 'pass' } } });
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: 'broken', outcome: 'execution-failure' } } });
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, hold, event: { type: terminal, payload: { outcome: terminal === 'workflow.fail' ? 'execution-failure' : 'pass' } } });
+  hold.release();
   return { workflowRunId, units };
 }
 
@@ -2166,11 +2167,13 @@ test('integration uses the recorded replacement branch and preserves the predece
   fs.writeFileSync(path.join(replacement.worktreePath, 'out.txt'), 'replacement work');
   execFileSync('git', ['add', 'out.txt'], { cwd: replacement.worktreePath });
   execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-qm', 'replacement'], { cwd: replacement.worktreePath });
-  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload } });
+  const hold = acquireAdvanceLock(tmp, workflowRunId);
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload }, hold });
   append('step.start', { stepId: 'write' });
   append('unit.scheduled', { stepId: 'write', unitId: 'u1', ...replacement });
   append('unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' });
   append('step.complete', { stepId: 'write', outcome: 'pass' });
+  hold.release();
   const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
   assert.equal(state.status, 'completed');
   assert.equal(fs.readFileSync(path.join(tmp, 'out.txt'), 'utf8'), 'replacement work');
