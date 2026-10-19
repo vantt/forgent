@@ -26,10 +26,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 
-import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir } from './provider-capacity.mjs';
+import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir, expandCredentialHome } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
-  expandCredentialHome,
   runCredentialProbe,
   withKillTimeout,
   DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS,

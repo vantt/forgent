@@ -4,16 +4,17 @@
 // `disabled`. A pool is the service provider that bills the call; it carries the family name when
 // the family's own vendor serves it, and its own name otherwise (`openrouter`).
 //
-// This reader only reports. It never throws: what is wrong is listed in `problems` for doctor and
-// `fgos dispatch explain`. The lease still reads `runner.providers.<provider>.accounts` until it
-// moves to this inventory.
+// `readLlmAccounts` only reports. It never throws: what is wrong is listed in `problems` for doctor and
+// `fgos dispatch explain`. `deriveLegacyInventory` turns the accounts it accepts into the per-CLI
+// credential source shape the lease, probe and renewal read; a pool declared here replaces the same
+// pool of `runner.providers.<provider>.accounts`, which stays the source for every pool not declared.
 
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { expandCredentialHome } from './provider-credential-probe.mjs';
-import { providerAccountInventory } from './provider-capacity.mjs';
+import { credentialStoreOf, expandCredentialHome, validateProviderAccountInventory } from './provider-capacity.mjs';
 
 const ACCOUNT_KEYS = Object.freeze(['credentialStore', 'label', 'disabled']);
-const ACCOUNT_ID = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
+// Not digits only: a JS object lists such a key before every other, which would reorder the declared account order.
+const ACCOUNT_ID = /^(?!\d+$)[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
 
 function isPlainObject(value) {
@@ -86,7 +87,7 @@ export function readLlmAccounts(runnerConfig, { projectConfig } = {}) {
     for (const [accountId, account] of Object.entries(accounts)) {
       const where = `${at}.${accountId}`;
       if (!ACCOUNT_ID.test(accountId)) {
-        problem('account-id', where, 'an account id is letters, digits, ".", "_" or "-", starting with a letter or digit');
+        problem('account-id', where, 'an account id is letters, digits, ".", "_" or "-", starting with a letter or digit, and not digits only (a digits-only key sorts before the others and would break the declared account order)');
         continue;
       }
       if (!isPlainObject(account)) {
@@ -166,7 +167,7 @@ export function compareWithLegacyInventory(runnerConfig, options = {}) {
   const { pools, problems } = readLlmAccounts(runnerConfig, options);
   let legacy = {};
   try {
-    legacy = providerAccountInventory(runnerConfig);
+    legacy = validateProviderAccountInventory(runnerConfig, 'runner config');
   } catch (err) {
     problems.push({ code: 'legacy-inventory-invalid', at: 'runner.providers', detail: err.message });
   }
@@ -196,4 +197,66 @@ export function compareWithLegacyInventory(runnerConfig, options = {}) {
   }
   const onlyNew = [...newByKey.entries()].filter(([key]) => !seen.has(key)).map(([, v]) => ({ pool: v.pool, account: v.account }));
   return { onlyLegacy, onlyNew, storeMismatch, problems };
+}
+
+/** Login files per CLI, from the stores the invocations declare, those of the pool's own family first. */
+function declaredStoreFiles(runnerConfig, poolKey) {
+  const own = new Map();
+  const all = new Map();
+  const add = (map, use, files) => {
+    const list = map.get(use) ?? [];
+    for (const file of files) if (!list.includes(file)) list.push(file);
+    map.set(use, list);
+  };
+  for (const executor of Object.values(runnerConfig?.executors ?? {})) {
+    const family = normalizeProviderFamily(executor?.providerModel ?? executor?.provider ?? '');
+    for (const invocation of Array.isArray(executor?.invocations) ? executor.invocations : []) {
+      const store = credentialStoreOf({ ...invocation, command: invocation.command ?? executor.command });
+      if (!store?.files) continue;
+      add(all, store.use, store.files);
+      if (family === poolKey) add(own, store.use, store.files);
+    }
+  }
+  return (use) => own.get(use) ?? all.get(use) ?? null;
+}
+
+/**
+ * The accounts of `runner.llmAccounts` in the shape the lease reads: per state key, each account with one
+ * credential source per CLI (`credentialSources`), in declared order. A `codex` store is a `codex-home`;
+ * any other store is `home-files` with the files the invocations of that store declare. A store no
+ * invocation declares files for cannot be copied into a private home, so that CLI is left out of the account
+ * and named in `unusableFor`; the account never runs with an empty home.
+ *
+ * @returns {{inventory: Record<string, {accounts: Record<string, object>}>, unusable: {pool: string, account: string, cli: string, reason: string}[]}}
+ */
+export function deriveLegacyInventory(runnerConfig) {
+  const inventory = {};
+  const unusable = [];
+  const { pools } = readLlmAccounts(runnerConfig);
+  for (const [pool, entry] of Object.entries(pools)) {
+    const stateKey = legacyStateKey(pool);
+    const filesFor = declaredStoreFiles(runnerConfig, stateKey);
+    const accounts = {};
+    for (const [id, account] of Object.entries(entry.accounts)) {
+      const credentialSources = {};
+      const unusableFor = [];
+      for (const [cli, home] of Object.entries(account.stores)) {
+        if (cli === 'codex') {
+          credentialSources[cli] = { kind: 'codex-home', home, cli };
+          continue;
+        }
+        const files = filesFor(cli);
+        if (!files) {
+          const reason = `no invocation declares the login files of store "${cli}", so nothing can be copied into a private home`;
+          unusableFor.push({ cli, reason });
+          unusable.push({ pool, account: id, cli, reason });
+          continue;
+        }
+        credentialSources[cli] = { kind: 'home-files', home, files: [...files], cli };
+      }
+      accounts[id] = { id, label: account.label, disabled: account.disabled, credentialSources, ...(unusableFor.length > 0 ? { unusableFor } : {}) };
+    }
+    inventory[stateKey] = { accounts };
+  }
+  return { inventory, unusable };
 }

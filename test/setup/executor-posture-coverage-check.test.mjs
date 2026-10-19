@@ -8,6 +8,10 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 
 seedFileLocalBwrapRegistry();
 
+// Every family the fixtures use has a model at every tier, so a binding is never refused for a missing cell.
+const TIERS = Object.fromEntries(['nano', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, `${tier}-model`]));
+const MODEL_POLICIES = Object.fromEntries(['claude', 'gemini', 'openai', 'xai', 'z-ai', 'deepseek'].map((family) => [family, TIERS]));
+
 const cliBwrap = (id, command) => ({
   id,
   via: 'cli',
@@ -25,6 +29,7 @@ test('executor-posture-coverage doctor check is registered and visible in DOCTOR
 
 test('executor-posture-coverage passes when all core capabilities have bwrap-capable executors', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       claude: {
         kind: 'agent',
@@ -55,6 +60,7 @@ test('executor-posture-coverage passes when all core capabilities have bwrap-cap
 test('executor-posture-coverage fails and suggests remediation when an executor lacks bwrap sandbox', async () => {
   // mcp-skill-hub failure mode: legacy agent executor has no bwrap invocation or confinement
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       openai: {
         kind: 'agent',
@@ -86,6 +92,7 @@ test('executor-posture-coverage fails and suggests remediation when an executor 
 
 test('executor-posture-coverage passes when executors are native agents (in-process exemption)', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       nativeClaude: {
         agentType: 'claude',
@@ -120,6 +127,7 @@ test('executor-posture-coverage handles runner config loading failure gracefully
 
 test('executor-posture-coverage only inspects core capabilities and capabilities declaring a pool', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       claude: {
         kind: 'agent',
@@ -148,6 +156,7 @@ test('executor-posture-coverage only inspects core capabilities and capabilities
 
 test('executor-posture-coverage skips tool-only capabilities that do not use agent postures', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       claude: {
         kind: 'agent',
@@ -177,6 +186,7 @@ test('executor-posture-coverage skips tool-only capabilities that do not use age
 
 test('executor-posture-coverage passes with real bind() on bwrap config fixture', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       sandboxed: {
         kind: 'agent',
@@ -201,6 +211,7 @@ test('executor-posture-coverage passes with real bind() on bwrap config fixture'
 
 test('executor-posture-coverage fails posture-unavailable with real bind() on unconfined invocation config fixture', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       unconfined: {
         kind: 'agent',
@@ -231,6 +242,7 @@ test('executor-posture-coverage fails posture-unavailable with real bind() on un
 
 test('executor-posture-coverage warns and provides pool configuration guidance on headless-no-executor / no-candidate', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       claude: {
         kind: 'agent',
@@ -257,6 +269,7 @@ test('executor-posture-coverage warns and provides pool configuration guidance o
 
 test('executor-posture-coverage groups failures by reason when both posture and candidate failures occur', async () => {
   const runnerConfig = {
+    modelPolicies: MODEL_POLICIES,
     executors: {
       unconfinedExec: {
         kind: 'agent',

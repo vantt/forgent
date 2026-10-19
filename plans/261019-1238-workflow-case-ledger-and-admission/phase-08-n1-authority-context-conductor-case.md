@@ -1,5 +1,7 @@
 # Phase 08 — N1 authority context at both doors; conductor case (F3, F7)
 
+Status: done (report: plans/reports/phase-lead-261019-2239-workflow-case-p07-p08.md)
+
 ## Context
 
 - Spec RUL-WF-10, RUL-WF-11 (1–8; owner 08:46 N1, 12:20 protocol + confined nested refusal), RUL-WF-12 (nested/fallback consume parent frame), RUL-WF-28, §1.3 (honest limits: in-session Edit/Write/Agent stay outside; read-only without case ref is not blockable), §5.4 (Shape C refusal `playbook-case-admits-via-proposer-only`), §7.2–7.4, §8 (whole table), R1, R8, R9; battery 1 (door), 5 (nested wave), 7, 9 (conductor), 11, 18, 19, 20, 23; §11.2 "port at `fgos run` observed at the write gate in a nested dispatch", "case env in the controller never reaches a worker the door did not admit".

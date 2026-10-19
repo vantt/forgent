@@ -24,6 +24,8 @@ function confinedEntry(entry) {
   return {
     kind: 'agent',
     allowCrossProvider: true,
+    // An executor that names no family would be filed under its command path, which has no model cell.
+    ...(entry.providerModel || entry.provider ? {} : { providerModel: 'claude' }),
     ...entry,
     invocations: [{
       id: CONFINED_INVOCATION_ID,

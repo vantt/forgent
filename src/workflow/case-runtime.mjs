@@ -13,6 +13,7 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../runner/dispatch/cwd-lock.mjs';
 import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
+import { unbindWorktree } from './case-bindings.mjs';
 
 const caseDir = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
 
@@ -51,6 +52,10 @@ export function removeReservationFile({ mainRoot, caseId, reservationId }) {
   fs.rmSync(path.join(reservationsDir(mainRoot, caseId), `${reservationId}.json`), { force: true });
 }
 
+export function readReservationFile(mainRoot, caseId, reservationId) {
+  return readJson(path.join(reservationsDir(mainRoot, caseId), `${reservationId}.json`));
+}
+
 export function readReservationFiles(mainRoot, caseId) {
   return listJson(reservationsDir(mainRoot, caseId)).map((name) => readJson(path.join(reservationsDir(mainRoot, caseId), name))).filter(Boolean);
 }
@@ -70,6 +75,25 @@ const settlePendingDir = (mainRoot, caseId) => path.join(caseDir(mainRoot, caseI
 /** A settle that could not take `advance`: kept as a file the next holder of `advance` appends first. */
 export function writeSettlePending({ mainRoot, caseId, settle }) {
   writeJsonAtomic(path.join(settlePendingDir(mainRoot, caseId), `${settle.reservationId}.json`), settle);
+}
+
+/**
+ * Record a settle on the ledger under the hold, once, and let go of what the reservation held: the
+ * binding the admission created (only when its attempt is quiet) and the reservation file. A settle
+ * already on the ledger is not appended again.
+ *
+ * @returns {boolean} whether the settle was appended now
+ */
+export function applySettle({ mainRoot, caseId, hold, settle, events = null }) {
+  const known = events ?? readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
+  const fresh = !known.some((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
+  if (fresh) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event: { type: 'settle', payload: settle }, hold });
+  const file = readReservationFile(mainRoot, caseId, settle.reservationId);
+  if (file?.binding?.created) {
+    unbindWorktree({ mainRoot, hold, caseId, generation: file.binding.generation, key: file.binding.key, worktree: file.worktree });
+  }
+  removeReservationFile({ mainRoot, caseId, reservationId: settle.reservationId });
+  return fresh;
 }
 
 // --- gate-answer rounds -------------------------------------------------------------------------
@@ -220,11 +244,8 @@ export function drainCaseInbox({ mainRoot, caseId, hold }) {
   for (const name of listJson(pendingDir)) {
     const settle = readJson(path.join(pendingDir, name));
     if (!settle) continue;
-    if (!events.some((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId)) {
-      append({ type: 'settle', payload: settle });
-      settles += 1;
-    }
-    removeReservationFile({ mainRoot, caseId, reservationId: settle.reservationId });
+    if (applySettle({ mainRoot, caseId, hold, settle, events })) settles += 1;
+    events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
     fs.rmSync(path.join(pendingDir, name), { force: true });
   }
 

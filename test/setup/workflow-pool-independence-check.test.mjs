@@ -16,6 +16,7 @@ const FAMILIES = { alpha: 'claude', beta: 'xai', gamma: 'z-ai', delta: 'deepseek
 function runnerConfig(capabilities) {
   return {
     executors: Object.fromEntries(Object.entries(FAMILIES).map(([id, family]) => [id, { agentType: id, providerModel: family }])),
+    modelPolicies: Object.fromEntries(Object.values(FAMILIES).map((family) => [family, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
     capabilities,
   };
 }

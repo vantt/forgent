@@ -15,9 +15,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
-import { expandCredentialHome } from './provider-credential-probe.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { accountCredentialSources, commandCli, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
+import { legacyStateKey } from './llm-accounts.mjs';
+import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
@@ -90,7 +90,13 @@ export function configPinnedToAccount(cfg, { provider, accountId }) {
     if (normalizeProviderFamily(key) !== family) providers[key] = entry;
     else if (entry?.accounts?.[accountId]) providers[key] = { ...entry, accounts: { [accountId]: entry.accounts[accountId] } };
   }
-  return { ...cfg, providers };
+  // A pool declared in llmAccounts is the lease's source for that provider, so the pin narrows it too.
+  const llmAccounts = {};
+  for (const [pool, accounts] of Object.entries(cfg?.llmAccounts ?? {})) {
+    if (legacyStateKey(pool) !== family) llmAccounts[pool] = accounts;
+    else if (accounts?.[accountId]) llmAccounts[pool] = { [accountId]: accounts[accountId] };
+  }
+  return { ...cfg, providers, ...(cfg?.llmAccounts !== undefined ? { llmAccounts } : {}) };
 }
 
 function readJson(file) {

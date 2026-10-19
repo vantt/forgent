@@ -1,5 +1,7 @@
 # Phase 03: `bind()` walks cell entries and the tier order; pool-based rotation
 
+Status: done. Contract change landed with the caller move of phase 04 (one unit, separate commits); report: [phase-lead-261020-0121-model-pool-b1-p03-p04.md](../reports/phase-lead-261020-0121-model-pool-b1-p03-p04.md).
+
 Lands together with phase 04 (this phase changes the contract, 04 moves its callers; one merge).
 
 ## Context

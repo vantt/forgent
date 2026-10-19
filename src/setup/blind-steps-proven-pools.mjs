@@ -6,10 +6,11 @@
 // run state was measured once, live; a pool that can bind any other pair fails at run time. This check
 // finds that per project before any run.
 //
-// Candidates are never resolved here: each blind unit's roles are walked through the runner's own
-// bind() (the same candidate walk a quota fallback takes), so nothing is dispatched, written or paid for.
+// Candidates are never resolved here: each blind unit's roles list the runner's own bind() candidates
+// (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
+// or paid for.
 
-import { bind } from '../runner/execution/bind.mjs';
+import { listCandidates } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots } from './workflow-pool-independence.mjs';
@@ -63,20 +64,16 @@ function describeCandidate(runnerConfig, bound) {
   };
 }
 
-/** Every executor/invocation a role could bind, in pool order: bind() again after each pick, skipping it. */
+// A candidate left out only because its model or pool is not configured yet would bind once the config
+// is completed, so the proof counts it; every other filter (governance, posture, skills) is a real exclusion.
+const CONFIG_GAPS = new Set(['tier-cell-missing', 'pool-unusable']);
+
+/** Every executor/invocation a role could bind (a primary or a fallback), in pool order. */
 function candidatesForRole(unit, role, runnerConfig, session) {
-  const found = [];
-  let skip = -1;
-  for (;;) {
-    const bound = bind(
-      { unit, role, independentOf: [], overrides: [], blind: true },
-      { runnerConfig, session: { headless: true, ...session } },
-      { skipCandidateIndex: skip },
-    );
-    if (bound.refused || !Number.isInteger(bound.candidateIndex) || bound.candidateIndex <= skip) return found;
-    found.push(describeCandidate(runnerConfig, bound));
-    skip = bound.candidateIndex;
-  }
+  return listCandidates(
+    { unit, role, independentOf: [], overrides: [], blind: true },
+    { runnerConfig, session: { headless: true, ...session } },
+  ).candidates.filter((candidate) => !candidate.out || CONFIG_GAPS.has(candidate.out.reason)).map((candidate) => describeCandidate(runnerConfig, candidate));
 }
 
 /**

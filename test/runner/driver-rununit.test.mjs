@@ -10,7 +10,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 import { chooseStageOperation, executeDriverOperationChoice } from '../../src/runner/operation-choice.mjs';
-import { runUnit } from '../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { digestPinnedInputs } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';

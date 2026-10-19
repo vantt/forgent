@@ -64,6 +64,7 @@ import {
 } from './workflow-pool-independence.mjs';
 import {
   checkExecutorFamilyUnique,
+  checkTierFallback,
   checkModelPolicyPools,
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
@@ -91,6 +92,7 @@ import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
+import { walkStateOf } from '../runner/execution/account-rotation.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -666,6 +668,9 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
               runnerConfig: unitRecord.configSnapshot?.runner,
               session: {},
             },
+            // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
+            // `<role>/<round>` chain exactly as the write gate reads it.
+            walkStateOf(unitRecord, { role, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
           );
           if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
             problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
@@ -1470,8 +1475,14 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'tier-fallback',
+  description: 'every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise',
+  check: (cwd) => checkTierFallback(cwd),
+});
+
+registerCheck({
   id: 'model-policy-pools',
-  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts; warns otherwise',
+  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise',
   check: (cwd) => checkModelPolicyPools(cwd),
 });
 
@@ -1483,7 +1494,7 @@ registerCheck({
 
 registerCheck({
   id: 'llm-accounts-vs-legacy',
-  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads; warns otherwise',
+  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise',
   check: (cwd) => checkLlmAccountsVsLegacy(cwd),
 });
 

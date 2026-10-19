@@ -91,7 +91,7 @@ test('a fallback runs along a chain of three candidates, one pane each', { skip:
   const answer = answerOf(run);
   const attempts = unitRecord(project, answer).bindings['producer/1'];
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'provider-limit'], ['gamma', 'pass']]);
-  assert.deepEqual(attempts.map((a) => [a.skipCandidateIndex, a.candidateIndex]), [[-1, 0], [0, 1], [1, 2]]);
+  assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'next-candidate', 'next-candidate']);
   assert.equal(tabsOpened(project).length, 3);
   assert.equal(project.callsStarting('pane close').length, 1);
 });
@@ -123,7 +123,7 @@ test('a writing unit whose first candidate hits a limit is committed through the
   const answer = answerOf(run);
   const attempts = unitRecord(project, answer).bindings['producer/1'];
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']]);
-  assert.deepEqual(attempts.map((a) => [a.skipCandidateIndex, a.candidateIndex]), [[-1, 0], [0, 1]]);
+  assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'next-candidate']);
   assert.equal(attempts[1].commit.status, 'committed');
   const subject = execFileSync('git', ['log', '-1', '--format=%H', '--', 'probe-worktree.txt'], { cwd: project.worktreeDir, encoding: 'utf8' }).trim();
   assert.ok(subject, 'the fallback attempt\'s file is in a commit of the worktree branch');

@@ -57,13 +57,21 @@ export function normalizeStanceOptions(value = []) {
   return Object.freeze(options);
 }
 
+/**
+ * The link from a Unit run to the case that admitted it: `{ caseId, activity, reservationId }`. The
+ * shape recorded before cases existed, `{ runId, stepId, unitId }`, reads as the same link without a
+ * reservation, so an old unit.json keeps reading through this one function.
+ */
 export function normalizeWorkflowLink(value) {
   if (value === undefined || value === null) return null;
-  if (typeof value !== 'object' || Array.isArray(value)
-    || ['runId', 'stepId', 'unitId'].some((key) => typeof value[key] !== 'string' || !value[key].trim())) {
-    throw new RunnerConfigError('workflow link requires non-empty runId, stepId, and unitId.');
+  const text = (key) => (typeof value?.[key] === 'string' && value[key].trim() ? value[key].trim() : null);
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new RunnerConfigError('workflow link requires non-empty caseId and activity.');
   }
-  return Object.freeze(Object.fromEntries(['runId', 'stepId', 'unitId'].map((key) => [key, value[key].trim()])));
+  const caseId = text('caseId') ?? text('runId');
+  const activity = text('activity') ?? text('stepId');
+  if (!caseId || !activity) throw new RunnerConfigError('workflow link requires non-empty caseId and activity.');
+  return Object.freeze({ caseId, activity, reservationId: text('reservationId') });
 }
 
 /**

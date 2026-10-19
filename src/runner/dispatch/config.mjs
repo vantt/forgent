@@ -1495,6 +1495,37 @@ function validateModelPoliciesShape(modelPolicies, label) {
   }
 }
 
+/**
+ * Shape-check `cfg.tierFallback`: a tier -> ordered list of families (`modelPolicies` keys) a seat walks
+ * after a failure. The shape is checked at load; whether a listed family has a cell at that tier, or an
+ * executor, is a doctor warning, because the walk skips such a family and records it.
+ */
+function validateTierFallbackShape(tierFallback, label) {
+  if (!tierFallback || typeof tierFallback !== 'object' || Array.isArray(tierFallback)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping tier -> list of families when present.`);
+  }
+  for (const [tier, families] of Object.entries(tierFallback)) {
+    if (!MODEL_POLICY_TIERS.includes(tier)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) tier key must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(tier)}.`,
+      );
+    }
+    if (!Array.isArray(families) || families.length === 0) {
+      throw new RunnerConfigError(`runner config (${label}.${tier}) must be a non-empty list of family names.`);
+    }
+    const seen = new Set();
+    for (const family of families) {
+      if (typeof family !== 'string' || !family.trim()) {
+        throw new RunnerConfigError(`runner config (${label}.${tier}) holds ${JSON.stringify(family)}; each entry must be a non-empty family name.`);
+      }
+      if (seen.has(family)) {
+        throw new RunnerConfigError(`runner config (${label}.${tier}) lists family "${family}" more than once.`);
+      }
+      seen.add(family);
+    }
+  }
+}
+
 function validateRigorToTierShape(rigorToTier, label) {
   const missingRigors = RIGOR_VALUES.filter((rigor) => rigorToTier[rigor] === undefined);
   if (missingRigors.length > 0) {
@@ -1676,6 +1707,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     );
   }
   validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
+  if (cfg.tierFallback !== undefined) validateTierFallbackShape(cfg.tierFallback, `${sourceLabel} tierFallback`);
   if (!cfg.rigorToTier || typeof cfg.rigorToTier !== 'object' || Array.isArray(cfg.rigorToTier)) {
     throw new RunnerConfigError(
       `runner config (${sourceLabel}) must declare a "rigorToTier" object mapping rigor -> tier.`,

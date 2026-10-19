@@ -56,7 +56,7 @@ function setupTestRepo() {
     runner: {
       defaultExecutor: 'test-node',
       rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: { node: { standard: 'node-std' } },
+      modelPolicies: { node: { nano: 'node-nano', standard: 'node-std', advanced: 'node-adv', flagship: 'node-flagship', frontier: 'node-frontier' } },
       executors: {
         'test-node': {
           kind: 'agent',
@@ -322,7 +322,7 @@ test('fgos run refuses one-liner flags without a prompt, an unquoted multi-word 
   assert.deepEqual(unitRunsOf(tmp), []);
 });
 
-// `--account <id>` pins the provider account through the same override field `--override` carries.
+// `--account <pool/account>` pins the account through the same override field `--override` carries.
 // The fixture's executor has no account list, so a pin on it is refused before any unit run exists.
 const accountHome = () => {
   const home = makeFixtureDir('fgos-cli-run-home-');
@@ -341,14 +341,14 @@ const failCliHome = (args, cwd, home) => {
 
 test('fgos run "<prompt>" --account on an executor without an account list is refused before any unit run exists', () => {
   const tmp = setupTestRepo();
-  const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', 'acct1', '--dir', tmp], tmp, accountHome());
-  assert.match(out, /account "acct1" cannot be pinned: executor "test-node" \(provider "node"\) has no account list/);
+  const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', 'node/acct1', '--dir', tmp], tmp, accountHome());
+  assert.match(out, /account "node\/acct1" cannot be pinned: pool "node" has no account list/);
   assert.deepEqual(unitRunsOf(tmp), []);
 });
 
 test('fgos run --override with an "account" key is checked the same way', () => {
   const tmp = setupTestRepo();
-  const out = failCliHome(['Check it', '--capability', 'docs:write', '--override', '{"account":"acct1"}', '--dir', tmp], tmp, accountHome());
+  const out = failCliHome(['Check it', '--capability', 'docs:write', '--override', '{"account":"node/acct1"}', '--dir', tmp], tmp, accountHome());
   assert.match(out, /has no account list/);
   assert.deepEqual(unitRunsOf(tmp), []);
 });
@@ -362,7 +362,7 @@ test('fgos run --resume refuses --account: a resumed run keeps the account it st
 test('fgos run --account needs an account id', () => {
   const tmp = setupTestRepo();
   const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', '--dir', tmp], tmp, accountHome());
-  assert.match(out, /--account requires an account id/);
+  assert.match(out, /--account requires pool\/account/);
 });
 
 test('fgos run --sync <ref> without a prompt makes a sync-only unit; with --unit, --resume or no --writes it is refused', () => {

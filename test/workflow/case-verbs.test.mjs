@@ -126,20 +126,23 @@ test('close: refused while a consent gate is parked or a closure milestone went 
   assert.equal(gated.status, 'parked');
   assert.throws(() => closeWorkflow(gated.workflowRunId, { repoRoot: tmp }), (err) => err.code === 'close-refused' && /consent-gate-parked:ok/.test(err.message));
 
-  // A completed playbook whose closure milestone no longer matches its subject cannot close.
-  const done = await startWorkflow({ workflow: validateWorkflow({ id: 'close-stale', closure: ['a.settled'], steps: [{ id: 'a', units: [unit('ua')] }] }), ...opts(tmp) });
-  assert.equal(done.status, 'completed');
-  const [report] = resolveUnitInputs([`unit-run:${done.steps.a.units.ua.unitRunId}/producer`], tmp).refs;
-  const original = fs.readFileSync(report, 'utf8');
+  // An open playbook whose closure milestone no longer matches its subject cannot close.
+  const stalled = await startWorkflow({
+    workflow: validateWorkflow({ id: 'close-stale', closure: ['a.settled'], steps: [{ id: 'a', units: [unit('ua')] }, { id: 'ok', dependsOn: ['a'], gate: { kind: 'human', question: 'Approve?' } }] }),
+    ...opts(tmp),
+  });
+  assert.equal(stalled.status, 'parked');
+  const [report] = resolveUnitInputs([`unit-run:${stalled.steps.a.units.ua.unitRunId}/producer`], tmp).refs;
   fs.appendFileSync(report, '\nchanged\n');
-  const stale = statusWorkflow(done.workflowRunId, opts(tmp));
+  const stale = statusWorkflow(stalled.workflowRunId, opts(tmp));
   assert.equal(stale.case.milestones['a.settled'].state, 'stale');
-  assert.deepEqual(stale.case.closable, { ok: false, reasons: ['closure-milestone-stale:a.settled'] });
-  assert.throws(() => closeWorkflow(done.workflowRunId, { repoRoot: tmp }), (err) => /closure-milestone-stale:a\.settled/.test(err.message));
-  fs.writeFileSync(report, original);
-  const closed = closeWorkflow(done.workflowRunId, { repoRoot: tmp, reason: 'delivered' });
-  assert.equal(closed.closed, true);
-  assert.equal(eventsOf(tmp, done.workflowRunId).at(-1).payload.reason, 'delivered');
+  assert.ok(stale.case.closable.reasons.includes('closure-milestone-stale:a.settled'));
+  assert.throws(() => closeWorkflow(stalled.workflowRunId, { repoRoot: tmp }), (err) => /closure-milestone-stale:a\.settled/.test(err.message));
+
+  // A Playbook case that ran to a pass has closed itself, so the verb finds it closed.
+  const done = await startWorkflow({ workflow: validateWorkflow({ id: 'close-done', steps: [{ id: 'a', units: [unit('ua')] }] }), ...opts(tmp) });
+  assert.equal(done.status, 'completed');
+  assert.equal(eventsOf(tmp, done.workflowRunId).some((e) => e.type === 'case.closed' && e.payload.reason === 'completed'), true);
   assert.throws(() => closeWorkflow(done.workflowRunId, { repoRoot: tmp }), (err) => err.code === 'case-closed');
   assert.equal(statusWorkflow(done.workflowRunId, opts(tmp)).case.open, false);
 
