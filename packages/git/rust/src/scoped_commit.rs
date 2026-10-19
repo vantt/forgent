@@ -192,13 +192,15 @@ impl GitDriver {
                 // Current custody proves that this directory is a different
                 // checkout. Close only its old WAL, never touch its index or
                 // replay an effect. Existing terminal causes stay unchanged.
-                let _ = (|| -> Result<()> {
+                (|| -> Result<()> {
                     if chain.outcome().is_none() {
                         chain = wal
                             .append(
                                 &chain,
                                 Phase::Outcome(Outcome::CommitRejected {
-                                    cause: "foreign-checkout-abandoned".into(),
+                                    cause: if matches!(chain.last().phase, Phase::Intent(_) | Phase::Prepared) {
+                                        "foreign-checkout-abandoned"
+                                    } else { "foreign-checkout-effect-unknown" }.into(),
                                 }),
                             )
                             .map_err(failure)?;
@@ -217,7 +219,7 @@ impl GitDriver {
                     )
                     .map_err(failure)?;
                     Ok(())
-                })();
+                })()?;
                 continue;
             }
             if chain.last().operation_id == id {
@@ -330,7 +332,7 @@ impl GitDriver {
                     return Err(recovery("sync-state-recovery-required"));
                 };
                 (
-                    self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?,
+                    payload.reference.clone().ok_or_else(|| recovery("sync-reference-unrecorded"))?,
                     vec![payload.head.clone(), payload.target.clone()],
                     tree.clone(),
                     payload.message.clone(),
@@ -377,45 +379,41 @@ impl GitDriver {
                 break;
             }
         }
-        let reflog =
-            self.checkout_bytes(repo, scope, &["reflog", "show", "--format=%H", &reference])?;
-        let mut candidates = vec![now];
-        candidates.extend(
-            std::str::from_utf8(&reflog)
-                .map_err(failure)?
-                .lines()
-                .map(str::to_owned),
-        );
+        if self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])? != reference {
+            return Err(recovery("checkout-reference-changed"));
+        }
+        // One bounded walk returns immutable headers and full verbatim messages.
+        // Reflog-only evidence is never proof of an effect on the current ref.
+        let raw = self.checkout_bytes(repo, scope, &["log", "-g", "-n", "1024",
+            "--format=%H%x00%P%x00%T%x00%B%x00", &reference])?;
+        let mut candidates = Vec::new();
+        let fields: Vec<_> = raw.split(|b| *b == 0).collect();
         let mut seen = BTreeSet::new();
-        for oid in candidates {
-            if !seen.insert(oid.clone()) {
+        let mut passed_tip = false;
+        for row in fields.chunks_exact(4) {
+            let oid = std::str::from_utf8(row[0]).map_err(failure)?.trim_start_matches('\n').to_owned();
+            if oid == parents[0] {
+                if passed_tip { break; }
                 continue;
             }
-            let raw = self.checkout_bytes(repo, scope, &["cat-file", "commit", &oid])?;
-            let Some(split) = raw.windows(2).position(|w| w == b"\n\n") else {
-                return Err(recovery("commit-object-invalid"));
-            };
-            let headers = std::str::from_utf8(&raw[..split]).map_err(failure)?;
-            let actual_parents: Vec<_> = headers
-                .lines()
-                .filter_map(|l| l.strip_prefix("parent "))
-                .map(str::to_owned)
-                .collect();
-            if actual_parents != parents {
-                continue;
+            passed_tip = true;
+            if !seen.insert(oid.clone()) { continue; }
+            let actual_parents: Vec<_> = std::str::from_utf8(row[1]).map_err(failure)?.split_whitespace().map(str::to_owned).collect();
+            if actual_parents == parents {
+                candidates.push((oid, std::str::from_utf8(row[2]).map_err(failure)?.to_owned(), row[3].to_vec()));
             }
-            let actual_tree = headers
-                .lines()
-                .find_map(|l| l.strip_prefix("tree "))
-                .ok_or_else(|| recovery("commit-object-invalid"))?;
-            // Git terminates a nonempty verbatim message with one LF.
-            let expected_message = if message.ends_with('\n') {
-                message.to_owned()
-            } else {
-                format!("{message}\n")
-            };
-            if actual_tree == tree || newest && raw[split + 2..] == *expected_message.as_bytes() {
-                return Ok(Some((oid, actual_tree != tree)));
+        }
+        let expected_message = if message.ends_with('\n') { message } else { format!("{message}\n") };
+        // Exhaust exact tree evidence before trying the weaker message proof.
+        for exact in [true, false] {
+            for (oid, actual_tree, actual_message) in &candidates {
+                if if exact { actual_tree == &tree } else { newest && actual_message == expected_message.as_bytes() } {
+                    if !self.ancestry(repo, &Oid::parse(oid, repo.object_format()).map_err(failure)?,
+                        &Oid::parse(&now, repo.object_format()).map_err(failure)?)? {
+                        return Err(recovery(format!("commit-effect-unknown: reflog-only-candidate:{oid}")));
+                    }
+                    return Ok(Some((oid.clone(), actual_tree != &tree)));
+                }
             }
         }
         Ok(None)

@@ -95,6 +95,8 @@ pub struct ScopedCommitIntent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct SyncIntent {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
     pub worktree: String,
     pub head: String,
     pub target: String,
@@ -379,11 +381,13 @@ impl Intent {
                 head,
                 target,
                 message,
+                reference,
             } = payload.as_ref();
             if !Path::new(worktree).is_absolute()
                 || !checkout_resource_valid(&self.resource_set, worktree)
                 || message.is_empty()
                 || message.contains('\0')
+                || reference.as_ref().is_some_and(|r| RefName::parse(r).is_err())
             {
                 return Err(corrupt("sync binding"));
             }
@@ -408,6 +412,17 @@ impl Intent {
             _ => None,
         };
         if let Some((paths, registration)) = paths {
+            let mut actual = self.resource_set.clone();
+            let existing = match &self.kind {
+                OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+                OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+                _ => None,
+            };
+            if let Some(path) = existing {
+                actual.retain(|r| !r.strip_prefix(&format!("worktree:{path}:custody:"))
+                    .is_some_and(|lock| Path::new(lock).is_absolute()));
+                if self.resource_set.len() > actual.len() + 1 { return Err(corrupt("worktree custody binding")); }
+            }
             let resources = worktree_resources(&self.kind)?;
             if paths.iter().any(|p| {
                 !Path::new(&***p).is_absolute()
@@ -421,7 +436,7 @@ impl Intent {
                 || registration.contains(['/', '\\'])
                 || registration.as_ref() == "."
                 || registration.as_ref() == ".."
-                || self.resource_set != resources
+                || actual != resources
             {
                 return Err(corrupt("worktree binding"));
             }
@@ -682,6 +697,8 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::CommitRejected { cause })) => {
             cause == "foreign-checkout-abandoned" && matches!(i.kind, OperationKind::ScopedCommit(_) | OperationKind::Sync(_))
         }
+        (Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. }, Phase::Outcome(Outcome::CommitRejected { cause }))
+            if cause == "foreign-checkout-effect-unknown" => matches!(i.kind, OperationKind::ScopedCommit(_) | OperationKind::Sync(_)),
         (Phase::Intent(_), Phase::Prepared) => true,
         (Phase::Intent(_) | Phase::Prepared, Phase::Outcome(Outcome::AbandonedBeforeAttempt)) => {
             true

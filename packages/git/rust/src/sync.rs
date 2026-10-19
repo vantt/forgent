@@ -57,6 +57,7 @@ impl GitDriver {
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
+                reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
                 worktree: root(repo)?.to_string_lossy().into(),
                 head: compact.expected.clone(),
                 target: target.as_str().into(),
@@ -104,6 +105,7 @@ impl GitDriver {
         crate::refs::admission(&wal, id, &resources)?;
         let binding = binding(handle(&scope, repo)?)?;
         let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
+            reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
             worktree: root(repo)?.to_string_lossy().into_owned(),
             head: head.clone(),
             target: target.as_str().into(),
@@ -329,6 +331,7 @@ impl GitDriver {
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
             let intent = Intent {
                 kind: OperationKind::Sync(Box::new(wal::SyncIntent {
+                    reference: Some(self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?),
                     worktree: root(repo)?.to_string_lossy().into(),
                     head: compact.expected.clone(),
                     target: compact.next.clone(),
@@ -409,6 +412,10 @@ impl GitDriver {
             || chain.intent().authority_binding != binding(handle(scope, repo)?)?
         {
             return Err(failure("sync-authority-mismatch"));
+        }
+        let current_reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+        if payload.reference.as_ref() != Some(&current_reference) {
+            return Err(recovery("sync-reference-unproven-or-changed"));
         }
         let now = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
         let merge = self.merge_head(repo, scope)?;

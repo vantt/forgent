@@ -545,6 +545,14 @@
                             },
                             "message": {
                               "type": "string"
+                            },
+                            "reference": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "pattern": "^refs/heads/",
+                              "description": "Recorded symbolic HEAD at admission; absent legacy records cannot prove the recovery branch."
                             }
                           },
                           "required": [
@@ -575,7 +583,8 @@
                   "items": {
                     "type": "string",
                     "pattern": "^(?:refs/|config:local$|worktree:)"
-                  }
+                  },
+                  "description": "Lifecycle Remove and Move-source additionally bind the existing checkout custody resource; legacy path-only records remain readable."
                 },
                 "authorityBinding": {
                   "type": "string",
@@ -1230,13 +1239,24 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                  "clean_modes": {
+                "clean_modes": {
+                  "type": "array",
+                  "items": {
                     "type": "array",
-                    "items": {
-                      "type": "array", "minItems": 2, "maxItems": 2,
-                      "prefixItems": [{"type": "string"}, {"type": "integer", "minimum": 0, "maximum": 65535}]
-                    }
-                  },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                      }
+                    ]
+                  }
+                },
                 "conflicts": {
                   "type": "array",
                   "items": {
