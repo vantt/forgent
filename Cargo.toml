@@ -21,6 +21,7 @@ members = [
     "packages/terminal-control/rust",
     "packages/git/rust",
     "packages/durable-file/rust",
+    "packages/secrets/rust",
 ]
 exclude = [
     "herdr-dashboard",
