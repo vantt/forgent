@@ -32,6 +32,10 @@ pub struct SyncRequest<'a> {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SyncRecord {
+    #[serde(default)]
+    pub last_fetch: Option<TransferRecord>,
+    #[serde(default)]
+    pub last_push: Option<TransferRecord>,
     #[serde(default = "record_version")]
     pub v: u8,
     pub time: u64,
@@ -44,12 +48,35 @@ pub struct SyncRecord {
     pub warnings: Vec<String>,
     pub unpublished_since: Option<u64>,
 }
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct TransferRecord {
+    pub time: u64,
+    pub remote: String,
+    pub error: Option<String>,
+}
+fn transfer<T>(
+    record: &mut Option<TransferRecord>,
+    remote: &str,
+    run: impl FnOnce() -> Result<T, Error>,
+) -> Result<T, Error> {
+    let time = now()?;
+    let result = run();
+    *record = Some(TransferRecord {
+        time,
+        remote: remote.into(),
+        error: result.as_ref().err().map(ToString::to_string),
+    });
+    result
+}
 fn record_version() -> u8 {
     1
 }
 impl Default for SyncRecord {
     fn default() -> Self {
         Self {
+            last_fetch: None,
+            last_push: None,
             v: 1,
             time: 0,
             remote: String::new(),
@@ -317,8 +344,10 @@ pub fn sync_with_fs(
             )
             .with_remote(grant.clone());
             port.recover_publications(repo).map_err(git_error)?;
-            port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
-                .map_err(git_error)?;
+            transfer(&mut state.last_fetch, req.remote, || {
+                port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
+                    .map_err(git_error)
+            })?;
             fetched = mirrors(&port, repo, req.remote)?;
             verify_mirrors(
                 &port,
@@ -394,7 +423,9 @@ pub fn sync_with_fs(
             }
             if !req.no_push && identity.is_some() && tip(&port, repo, reference.as_str())?.is_some()
             {
-                push(&port, repo, req.remote, reference.clone())?;
+                transfer(&mut state.last_push, req.remote, || {
+                    push(&port, repo, req.remote, reference.clone())
+                })?;
             }
             if req.no_push {
                 if let Some(own) = tip(&port, repo, reference.as_str())? {
@@ -425,16 +456,20 @@ pub fn sync_with_fs(
                 &format!("refs/fgos/remotes/{}/legacy", req.remote),
             )?;
             if local.is_some() && mirror.is_none() {
-                push(
-                    &port,
-                    repo,
-                    req.remote,
-                    RefName::parse("refs/fgos/legacy").unwrap(),
-                )?;
+                transfer(&mut state.last_push, req.remote, || {
+                    push(
+                        &port,
+                        repo,
+                        req.remote,
+                        RefName::parse("refs/fgos/legacy").unwrap(),
+                    )
+                })?;
             }
             // Confirm publication in mirrors for retirement/status and consumer notification.
-            port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
-                .map_err(git_error)?;
+            transfer(&mut state.last_fetch, req.remote, || {
+                port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
+                    .map_err(git_error)
+            })?;
             let fetched = mirrors(&port, repo, req.remote)?;
             verify_mirrors(
                 &port,

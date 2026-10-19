@@ -831,9 +831,10 @@ Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank 
 Prepared stores are opened only from opaque `resolveEventStore` authority. Append
 uses the bound machine identity; no raw-directory constructor or caller machine
 parameter remains. `prepareStore(cwd, { trustedMain, stateRoot, loaderOptions })`
-requires an explicit trusted main checkout. Git resolution currently supports a
-linked worktree only with that trusted main path; arbitrary cwd discovery and
-separate-git-dir support remain Git work for the phase 07 handoff. Missing trust
+requires an explicit trusted main checkout. Git phase 02 now authenticates main-checkout discovery from a linked worktree
+or a checkout subdirectory. Phase 07 verb/setup adapters pass the discovered
+trusted main into preparation; direct callers still supply it explicitly.
+Separate-git-dir remains unsupported. Missing trust
 is `event-store-trusted-main-required`; Git operation failures retain their JSON
 `code` in the Node error. Error codes in ordinary native messages are recognized
 only at the start of `code: detail`.
@@ -852,3 +853,61 @@ and layout before taking `event-seal`; this read-only operation waits behind an
 active seal or sync. The strace gate proof covers ordinary append/readInGate and recovery of a lost
 high-water mark plus a torn active tail. Holder reclaim additionally relies on
 the Rust structural no-port boundary and existing crate regression tests.
+
+
+## Phase 07 dormant implementation contracts
+
+Phase 07 provides callable use cases in `src/verbs/events/` and setup/doctor
+bodies in `src/setup/event-store-{checks,fixes}.mjs`. CLI rows, routes, checks,
+fixes and the rebuild verb switch remain phase 09's cutover. Its one existing
+`eventStore` config registration must use `EVENT_STORE_DEFAULTS` from
+`src/event-store/config.mjs` as the whole shape, rather than registering another
+row for the same key. The facade validates integers (seal ≥ 1, sync/rebuild ≥ 0)
+and Git's publication remote-name alphabet; project config overrides global.
+
+Export is implemented by `fgos_event_store::export::{export_jsonl,
+export_legacy_layout}`, marshaled by the combined addon. Both use the verified
+reader. The latter authenticates the D18 pin, validates every tree entry before
+creating output, preserves original bytes, and emits v4 records with legacy
+fields and without their incompatible v4 hashes. A nonempty pre-cutover legacy
+history requires a pin for rollback export. Destinations are exclusively created;
+existing files/directories/symlinks and symlink parents are refused. Files use the
+shared durable-file no-overwrite installer. `--since` is a serialized store cursor;
+it filters v4 records by coverage. Historical files in legacy-layout remain
+byte-for-byte intact, including with `--stream` or `--since`.
+
+Rust returns the frozen legacy order of the written rollback files and the v4
+reader order. The verb adapter alone applies Work's existing `foldEvents` to
+both, then writes `parity-report.json` with differences for each changed keyed
+entity or array position. A partial rollback export is compared with the selected
+stream's full v4 view, so intentional omissions can appear in that report.
+Deferred events and missing predecessors are reported and never exported as
+ready events. Import and readLegacyFromHead stay phase 08 work.
+
+Status reports commit counts ahead/behind the own mirror, typed missing
+predecessors `{origin, stream, seq}`, receipt/unsealed/closed-stream facts,
+orphan branch streams, persisted integrity diagnostics and holder-lock's
+filesystem guarantee. Mirror classification reuses the reader's exact namespace
+parser. Sync records the actual fetch and push attempts separately in optional
+`lastFetch`/`lastPush` fields of `sync.json`; old records remain readable, and a
+`--no-push` sync never advances lastPush. Doctor reads these observations and
+Git's existing floor, RepositoryConfig mapping, machine-id and pinned URL facts;
+it does not repair the store. Only warning-capable checks emit `warning:`.
+
+The machine-id setup fix uses the crate's atomic durable-file install-once door;
+concurrent mints expose exactly one complete identity. Refspec setup calls the
+crate's existing `ensure_refspecs`, hence Git's journaled `ensure_fetch_mapping`.
+It never writes push mappings. Doctor additionally refuses fetch wildcards that
+could include local/branch event namespaces. Lock-directory setup refuses symlink
+ancestors and ensures mode 0700.
+
+The callable store part of rebuild loads every consumer module before deleting
+any cache. Each registered module exports `rebuildFromStore(ctx)`, receives the
+prepared `store`, `heldRanks` and validated `maxAttempts`, and owns its reducer,
+gate and bounded current-view installation. The adapter removes only the cache
+path declared by the manifest. The shipped registry remains empty until cutover;
+fixture payloads prove two registered consumers refold real events. There is no
+second rebuild verb or new consumer registration mechanism.
+
+Evidence and reproduction commands:
+`plans/reports/phase-lead-261019-0929-es-p07-verbs-setup-doctor.md`.
