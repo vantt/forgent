@@ -312,6 +312,16 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
                 serde_json::to_value(replay.receipt.unwrap()).unwrap(),
                 receipt
             );
+            let candidate = match &chain.intent().kind {
+                wal::OperationKind::Land(p) => p.candidate.worktree.clone(),
+                _ => panic!(),
+            };
+            assert!(f
+                .driver
+                .acknowledge_land(&f.repo, "fixture", "cas", "durable-loss")
+                .unwrap()
+                .is_empty());
+            assert!(!candidate.exists());
         } else {
             assert_eq!(error.cause, "ref-write-failed-recovery-required");
             assert!(chain.outcome().is_none());

@@ -111,23 +111,58 @@ pub(crate) fn admission_land<F: wal::FileSystem>(
     id: &str,
     resources: &[String],
     binding: &str,
+    driver: &GitDriver,
+    repo: &RepoHandle,
 ) -> Result<()> {
-    admission_with_land(wal, id, resources, Some(binding))
+    admission_with_land(wal, id, resources, Some((binding, driver, repo)))
 }
 fn admission_with_land<F: wal::FileSystem>(
     wal: &Wal<F>,
     id: &str,
     resources: &[String],
-    land_binding: Option<&str>,
+    land_binding: Option<(&str, &GitDriver, &RepoHandle)>,
 ) -> Result<()> {
     let scan = wal.scan(100_000).map_err(failure)?;
     if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
         return Err(recovery("git-wal-unreadable"));
     }
     for chain in wal.active(100_000).map_err(failure)? {
+        let exempt = if let Some((binding, driver, repo)) = land_binding {
+            if binding == chain.intent().authority_binding
+                && matches!(&chain.intent().kind, OperationKind::Land(_))
+            {
+                let attempted = chain
+                    .records()
+                    .iter()
+                    .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
+                if !attempted {
+                    true
+                } else {
+                    let OperationKind::Land(p) = &chain.intent().kind else {
+                        unreachable!()
+                    };
+                    let current = direct(
+                        driver,
+                        repo,
+                        &RefName::parse(&p.request.destination).map_err(failure)?,
+                    )?;
+                    match (&chain.intent().next, current) {
+                        (Tip::Oid(next), ExpectedTip::Oid(current)) => {
+                            let next = Oid::parse(next, repo.object_format()).map_err(failure)?;
+                            current != next && !driver.ancestry(repo, &next, &current)?
+                        }
+                        _ => true,
+                    }
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        };
         if chain.last().operation_id != id
             && chain.intent().resource_set.iter().any(|r| {
-                (resources.contains(r) && !(land_binding == Some(chain.intent().authority_binding.as_str())
+                (resources.contains(r) && !(exempt
                     && matches!(&chain.intent().kind, OperationKind::Land(p) if &p.request.destination == r)))
                     || matches!(
                         chain.intent().kind,
@@ -141,7 +176,7 @@ fn admission_with_land<F: wal::FileSystem>(
                     })
             })
         {
-            return Err(recovery("resource-recovery-required"));
+            return Err(pending(recovery("resource-recovery-required"), &chain.last().operation_id));
         }
     }
     Ok(())

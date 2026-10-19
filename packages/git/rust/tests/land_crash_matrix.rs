@@ -29,6 +29,12 @@ fn crash_child() {
     let config: (usize, bool) = serde_json::from_str(&input).unwrap();
     let (stop, cleanup) = config;
     let f = Fixture::new();
+    if !cleanup {
+        fs::write(f.main.join("c"), "staged dirt\n").unwrap();
+        fs::write(f.main.join("addition"), "staged addition\n").unwrap();
+        git(&f.main, &["add", "c", "addition"]);
+        fs::write(f.main.join("d"), "unstaged dirt\n").unwrap();
+    }
     println!(
         "FIXTURE {}",
         serde_json::json!({"temp":f.temp,"request":f.request})
@@ -135,8 +141,21 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
                 .iter()
                 .any(|r| matches!(r.phase, wal::Phase::TargetAttempt { .. }))
         });
+        let staged = git(&main, &["ls-files", "--stage", "--", "c", "addition"]);
         let before = git(&main, &["rev-parse", "HEAD"]);
-        let result = driver.recover_land(&repo, vec![], "fixture", "crash");
+        if !attempted && chain.is_ok() {
+            let refused = driver
+                .prepare_land(&repo, vec![], &req, "successor", "successor-blocked")
+                .err()
+                .unwrap();
+            assert_eq!(refused.cause, "land-abandoned-writer-mismatch");
+        }
+        let result = driver.recover_land(
+            &repo,
+            vec![],
+            if attempted { "fixture" } else { "successor" },
+            "crash",
+        );
         if !attempted {
             if chain.is_ok() {
                 assert!(result.is_ok(), "{}: {result:?}", boundaries[stop - 1]);
@@ -148,7 +167,10 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
             assert_eq!(git(&main, &["rev-parse", "HEAD"]), before);
         } else {
             let receipt = result.unwrap_or_else(|e| panic!("{}: {e:?}", boundaries[stop - 1]));
-            assert!(matches!(receipt.checkout, Checkout::Reconciled));
+            assert!(matches!(
+                receipt.checkout,
+                Checkout::Reconciled | Checkout::Pending
+            ));
             let terminal_before = chain.as_ref().unwrap().outcome().is_some();
             assert_eq!(
                 matches!(receipt.attribution, Attribution::ThisInvocationWonCas),
@@ -156,6 +178,18 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
             );
             assert_eq!(fs::read_to_string(main.join("a")).unwrap(), "incoming\n");
         }
+        assert_eq!(fs::read(main.join("c")).unwrap(), b"staged dirt\n");
+        assert_eq!(
+            fs::read(main.join("addition")).unwrap(),
+            b"staged addition\n"
+        );
+        assert_eq!(fs::read(main.join("d")).unwrap(), b"unstaged dirt\n");
+        assert_eq!(git(&main, &["show", ":c"]), "staged dirt");
+        assert_eq!(git(&main, &["show", ":addition"]), "staged addition");
+        assert_eq!(
+            git(&main, &["ls-files", "--stage", "--", "c", "addition"]),
+            staged
+        );
         // A crash cannot permanently poison either destination or checkout.
         // A new identity still passes the real gate and uses a fresh source.
         req.target = git(&main, &["rev-parse", "HEAD"]);
@@ -165,7 +199,7 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
         req.source = git(&main, &["rev-parse", "HEAD"]);
         git(&main, &["checkout", "-q", "trunk"]);
         let mut s = driver
-            .prepare_land(&repo, vec![], &req, "fixture", "fresh")
+            .prepare_land(&repo, vec![], &req, "successor", "fresh")
             .unwrap_or_else(|e| panic!("{} fresh: {e:?}", boundaries[stop - 1]));
         let e = evidence(&s);
         driver.publish_land(&repo, &mut s, &e).unwrap();
@@ -436,7 +470,7 @@ fn sigkill_at_every_cleanup_pin_and_compaction_boundary_preserves_replay() {
             .unwrap();
         assert_eq!(receipt.local_effect.published_oid.unwrap().as_str(), before);
         let warnings = driver
-            .acknowledge_land(&repo, "fixture", "crash", "queried-durable-entry")
+            .acknowledge_land(&repo, "fixture", "crash", "durable-consumer-entry")
             .unwrap();
         let wal = wal::Wal::open(&repo).unwrap();
         if warnings.is_empty() {
@@ -679,7 +713,10 @@ fn native_trace_controller() {
     }
     let recovered = driver.recover_land(&repo, vec![], "fixture", "crash");
     if boundary == "index-installed" {
-        assert!(matches!(recovered.unwrap().checkout, Checkout::Reconciled));
+        assert!(matches!(
+            recovered.unwrap().checkout,
+            Checkout::Reconciled | Checkout::Pending
+        ));
         let mut request: LandRequest = serde_json::from_value(fixture["request"].clone()).unwrap();
         request.target = git(&main, &["rev-parse", "HEAD"]);
         git(&main, &["checkout", "-qb", "after-native-kill"]);
@@ -757,5 +794,212 @@ fn native_read_tree_syscall_crashes() {
             String::from_utf8_lossy(&output.stderr)
         );
         println!("verified native read-tree SIGKILL: {boundary}");
+    }
+}
+
+#[test]
+fn fresh_land_waits_for_observed_predecessor_and_stat_refresh_is_safe() {
+    let f = Fixture::new();
+    // Create Y's source before X leaves its checkout unreconciled.
+    git(&f.main, &["checkout", "-qb", "second", "source"]);
+    fs::write(f.main.join("b"), "second\n").unwrap();
+    git(&f.main, &["commit", "-qam", "second"]);
+    let source = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-q", "trunk"]);
+    let mut x = f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "x")
+        .unwrap();
+    let e = evidence(&x);
+    assert!(f
+        .driver
+        .publish_land_with_filesystem(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"))
+        .is_err());
+    drop(x);
+    let mut y = f.request.clone();
+    y.target = git(&f.main, &["rev-parse", "HEAD"]);
+    y.source = source;
+    let err = f
+        .driver
+        .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+        .err()
+        .unwrap();
+    assert_eq!(err.cause, "resource-recovery-required");
+    assert_eq!(err.operation_id.as_deref(), Some("x"));
+    let tree = git(&f.main, &["rev-parse", "HEAD^{tree}"]);
+    let descendant = git(
+        &f.main,
+        &[
+            "commit-tree",
+            &tree,
+            "-p",
+            &y.target,
+            "-m",
+            "external descendant",
+        ],
+    );
+    git(&f.main, &["update-ref", "refs/heads/trunk", &descendant]);
+    let mut descendant_request = y.clone();
+    descendant_request.target = descendant;
+    let err = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &descendant_request,
+            "fixture",
+            "descendant",
+        )
+        .err()
+        .unwrap();
+    assert_eq!(err.cause, "resource-recovery-required");
+    assert_eq!(err.operation_id.as_deref(), Some("x"));
+    git(&f.main, &["update-ref", "refs/heads/trunk", &y.target]);
+    let before_refresh = fs::read(f.main.join(".git/index")).unwrap();
+    fs::write(f.main.join("b"), "base\n").unwrap();
+    git(&f.main, &["status", "--porcelain"]);
+    assert_ne!(fs::read(f.main.join(".git/index")).unwrap(), before_refresh);
+    f.driver
+        .recover_land(&f.repo, vec![], "fixture", "x")
+        .unwrap();
+    let mut session = f
+        .driver
+        .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+        .unwrap();
+    let e = evidence(&session);
+    f.driver.publish_land(&f.repo, &mut session, &e).unwrap();
+    assert_eq!(fs::read(f.main.join("a")).unwrap(), b"incoming\n");
+    assert_eq!(fs::read(f.main.join("b")).unwrap(), b"second\n");
+}
+
+#[test]
+fn another_writer_abandons_pre_attempt_but_only_owner_cleans_candidate() {
+    let f = Fixture::new();
+    let session = f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "a", "abandoned")
+        .unwrap();
+    let candidate = session.candidate().unwrap().worktree.clone();
+    drop(session);
+    assert!(f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "b", "new")
+        .is_err());
+    f.driver
+        .recover_land(&f.repo, vec![], "b", "abandoned")
+        .unwrap();
+    assert!(f
+        .driver
+        .acknowledge_land(&f.repo, "b", "abandoned", "ack")
+        .is_err());
+    fs::write(candidate.join("a"), "retained user edit\n").unwrap();
+    let warnings = f
+        .driver
+        .acknowledge_land(&f.repo, "a", "abandoned", "ack")
+        .unwrap();
+    assert!(!warnings.is_empty());
+    assert_eq!(
+        fs::read(candidate.join("a")).unwrap(),
+        b"retained user edit\n"
+    );
+    fs::write(candidate.join("a"), "incoming\n").unwrap();
+    let warnings = f
+        .driver
+        .acknowledge_land(&f.repo, "a", "abandoned", "ack")
+        .unwrap();
+    assert!(warnings.is_empty(), "{warnings:?}");
+    assert!(!candidate.exists());
+    let removal_id = format!(
+        "lr-{}",
+        wal::canonical_digest(&("land-cleanup", "abandoned")).unwrap()
+    );
+    let store = wal::Wal::open(&f.repo).unwrap();
+    let cleanup = store.inspect(&removal_id).unwrap();
+    assert_eq!(cleanup.intent().writer_identity, "a");
+    match &cleanup.intent().kind {
+        wal::OperationKind::WorktreeRemove { delivery, .. } => assert_eq!(
+            delivery.evidence_digest,
+            wal::canonical_digest(&(
+                store.repository_identity(),
+                "abandoned",
+                "consumer-acknowledged",
+                "ack",
+                "a"
+            ))
+            .unwrap()
+        ),
+        _ => panic!("cleanup authorization must be journaled"),
+    }
+    let mut session = f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "b", "new")
+        .unwrap();
+    let e = evidence(&session);
+    f.driver.publish_land(&f.repo, &mut session, &e).unwrap();
+}
+
+#[test]
+fn ignored_store_collision_is_terminal_after_post_cas_crash() {
+    let mut f = Fixture::new();
+    git(&f.main, &["checkout", "-q", "source"]);
+    fs::create_dir_all(f.main.join(".fgos/store")).unwrap();
+    fs::write(f.main.join(".fgos/store/x"), "incoming store\n").unwrap();
+    git(&f.main, &["add", "-f", ".fgos/store/x"]);
+    git(&f.main, &["commit", "-qm", "store"]);
+    f.request.source = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-q", "trunk"]);
+    fs::write(f.main.join(".git/info/exclude"), ".fgos/\n").unwrap();
+    fs::create_dir_all(f.main.join(".fgos/store")).unwrap();
+    fs::write(f.main.join(".fgos/store/x"), "local store\n").unwrap();
+    let mut s = f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "collision")
+        .unwrap();
+    let e = evidence(&s);
+    assert!(f
+        .driver
+        .publish_land_with_filesystem(&f.repo, &mut s, &e, &StopAt("land-after-cas"))
+        .is_err());
+    drop(s);
+    let index = fs::read(f.main.join(".git/index")).unwrap();
+    let r = f
+        .driver
+        .recover_land(&f.repo, vec![], "fixture", "collision")
+        .unwrap();
+    assert!(matches!(r.checkout, Checkout::Pending));
+    assert!(matches!(r.attribution, Attribution::EffectObservedOnly));
+    assert_eq!(fs::read(f.main.join(".git/index")).unwrap(), index);
+    assert_eq!(
+        fs::read(f.main.join(".fgos/store/x")).unwrap(),
+        b"local store\n"
+    );
+    assert!(
+        matches!(wal::Wal::open(&f.repo).unwrap().inspect("collision").unwrap().outcome(), Some(wal::Outcome::Land { checkout, observed_only: true }) if checkout == "pendingStoreCollision")
+    );
+}
+
+#[test]
+fn recovery_checks_native_state_even_before_attempt_and_off_destination() {
+    for marker in ["index.lock", "MERGE_HEAD"] {
+        let f = Fixture::new();
+        let s = f
+            .driver
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "native")
+            .unwrap();
+        drop(s);
+        git(&f.main, &["checkout", "-q", "source"]);
+        let path = f.main.join(".git").join(marker);
+        fs::write(&path, "foreign evidence").unwrap();
+        assert!(f
+            .driver
+            .recover_land(&f.repo, vec![], "other", "native")
+            .is_err());
+        assert_eq!(fs::read(&path).unwrap(), b"foreign evidence");
+        assert!(wal::Wal::open(&f.repo)
+            .unwrap()
+            .inspect("native")
+            .unwrap()
+            .outcome()
+            .is_none());
     }
 }

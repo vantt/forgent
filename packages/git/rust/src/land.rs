@@ -149,7 +149,7 @@ impl GitDriver {
                 main = true;
             }
         }
-        if main {
+        {
             for name in [
                 "MERGE_HEAD",
                 "rebase-merge",
@@ -406,6 +406,8 @@ impl GitDriver {
             id,
             std::slice::from_ref(&req.destination),
             &land_binding,
+            self,
+            repo,
         )?;
         if self.land_target_checkout(repo, &session.slot, &destination)? {
             self.land_gate(repo, &session.slot, req, &req.source)?;
@@ -553,7 +555,7 @@ impl GitDriver {
             };
             let mut resources = vec![req.destination.clone()];
             resources.extend(checkout_resources(&candidate_repo)?);
-            crate::refs::admission_land(&wal, id, &resources, &land_binding)?;
+            crate::refs::admission_land(&wal, id, &resources, &land_binding, self, repo)?;
             let kind = OperationKind::Land(Box::new(wal::LandIntent {
                 request: req.clone(),
                 candidate: view.clone(),
@@ -737,6 +739,8 @@ impl GitDriver {
                     evidence: evidence.clone(),
                     checkout: if main && !store_collision {
                         Some(self.land_checkout_proof(repo, &candidate_repo, &scope, c)?)
+                    } else if store_collision {
+                        Some(r#"{"storeCollision":true}"#.into())
                     } else {
                         None
                     },
@@ -948,6 +952,8 @@ struct CheckoutProof {
     next_index_digest: Option<String>,
     #[serde(default)]
     old_index: Option<PathFingerprint>,
+    #[serde(default)]
+    old_index_digest: Option<String>,
 }
 fn fingerprints(root: &std::path::Path, paths: &[Vec<u8>]) -> Result<Vec<PathFingerprint>> {
     if paths.len() > 4096 {
@@ -1082,9 +1088,14 @@ impl GitDriver {
                 e
             })
             .collect();
+        let old_entries = self.land_call(repo, scope, &["ls-files", "--stage", "-z"], &[])?;
+        if !old_entries.success {
+            return Err(old_entries.error("land-index-entries-failed"));
+        }
         let proof = CheckoutProof {
             next_index_digest: Some(wal::canonical_digest(&next_entries).map_err(failure)?),
-            old_index: Some(fingerprints(repo.git_dir(), &[b"index".to_vec()])?.remove(0)),
+            old_index: None,
+            old_index_digest: Some(wal::canonical_digest(&old_entries.stdout).map_err(failure)?),
             old: fingerprints(repo.trusted_main_root(), &paths)?,
             next: fingerprints(
                 candidate
@@ -1143,7 +1154,12 @@ impl GitDriver {
         let req = &payload.request;
         let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
             .map_err(failure)?;
-        if intent.writer_identity != writer
+        let pre_attempt = initial.as_ref().is_some_and(|c| {
+            !c.records()
+                .iter()
+                .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
+        });
+        if (!pre_attempt && intent.writer_identity != writer)
             || intent.authority_binding != binding
             || intent.repo_identity != wal.repository_identity()
         {
@@ -1169,6 +1185,18 @@ impl GitDriver {
         scope
             .acquire("recovery", &recovery_params, Wait::Ms(0))
             .map_err(failure)?;
+        self.land_target_checkout(
+            repo,
+            &scope,
+            &RefName::parse(&req.destination).map_err(failure)?,
+        )
+        .map_err(|e| {
+            if e.cause == "foreign-main-checkout-state" {
+                recovery("land-native-state-preserved")
+            } else {
+                e
+            }
+        })?;
         if let Some(c) = compact {
             return land_outcome_receipt(id, &intent, &c.outcome().map_err(failure)?, repo);
         }
@@ -1285,7 +1313,10 @@ impl GitDriver {
                     e
                 }
             })?;
-        let checkout = if !main {
+        let store_collision = chain.records().iter().any(|r| matches!(&r.phase, Phase::LandVerified { checkout: Some(p), .. } if p == r#"{"storeCollision":true}"#));
+        let checkout = if store_collision {
+            "pendingStoreCollision"
+        } else if !main {
             "notApplicable"
         } else {
             let index = self.land_text(repo, &scope, &["write-tree"], &[])?;
@@ -1321,13 +1352,15 @@ impl GitDriver {
                     Ok(driver.land_text(repo, &scope, &["write-tree"], &[])? == c.tree)
                 }
             };
+            let old_entries = self.land_call(repo, &scope, &["ls-files", "--stage", "-z"], &[])?;
+            if !old_entries.success {
+                return Err(old_entries.error("land-index-entries-failed"));
+            }
+            let old_index_matches = proof.old_index_digest.as_ref()
+                == Some(&wal::canonical_digest(&old_entries.stdout).map_err(failure)?);
             if next_index_matches(self)? && actual == proof.next {
                 "reconciled"
-            } else if index == proof.old_index_tree
-                && actual == proof.old
-                && proof.old_index.as_ref()
-                    == fingerprints(repo.git_dir(), &[b"index".to_vec()])?.first()
-            {
+            } else if index == proof.old_index_tree && actual == proof.old && old_index_matches {
                 // Finish only an exactly captured old checkout. A native lock,
                 // mixed files or user edits never reach this command.
                 let out = self.land_call(
@@ -1441,21 +1474,27 @@ impl GitDriver {
         if chain.intent().writer_identity != writer {
             return Err(failure("land-authority-mismatch"));
         }
-        let Some(Outcome::Land { checkout, .. }) = chain.outcome() else {
-            return Ok(vec![
-                "land-cleanup-deferred: no delivered candidate proof".into()
-            ]);
-        };
-        if !["reconciled", "notApplicable"].contains(&checkout.as_str()) {
-            return Ok(vec![
-                "land-cleanup-deferred: checkout reconciliation pending".into(),
-            ]);
+        let discarded = matches!(
+            chain.outcome(),
+            Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })
+        );
+        match chain.outcome() {
+            Some(Outcome::Land { checkout, .. })
+                if ["reconciled", "notApplicable"].contains(&checkout.as_str()) => {}
+            _ if discarded => (),
+            _ => {
+                return Ok(vec![
+                    "land-cleanup-deferred: checkout reconciliation pending".into(),
+                ])
+            }
         }
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
         let mut p = params(repo);
         p.insert("ref".into(), slot_key(&payload.request.destination));
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
+        // The removal Intent retains this authorization digest and caller writer
+        // even after the Land chain itself has been compacted.
         let proof = WorktreeDelivery {
             expected_tip: Oid::parse(&payload.candidate.candidate, repo.object_format())
                 .map_err(failure)?,
@@ -1465,6 +1504,8 @@ impl GitDriver {
                 wal.repository_identity(),
                 id,
                 "consumer-acknowledged",
+                acknowledgement,
+                writer,
             ))
             .map_err(failure)?,
         };
@@ -1472,13 +1513,14 @@ impl GitDriver {
             "lr-{}",
             wal::canonical_digest(&("land-cleanup", id)).map_err(failure)?
         );
-        if let Err(e) = self.remove_worktree(
+        if let Err(e) = self.remove_land_candidate(
             repo,
             held(&slot)?,
             &payload.candidate.worktree,
             &proof,
             writer,
             &removal_id,
+            if discarded { Some(id) } else { None },
         ) {
             return Ok(vec![format!("land-cleanup-deferred: {}", e.cause)]);
         }

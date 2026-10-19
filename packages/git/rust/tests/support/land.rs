@@ -44,6 +44,8 @@ impl Fixture {
         git(&main, &["config", "user.email", "fixture@example.invalid"]);
         fs::write(main.join("a"), "base\n").unwrap();
         fs::write(main.join("b"), "base\n").unwrap();
+        fs::write(main.join("c"), "base\n").unwrap();
+        fs::write(main.join("d"), "base\n").unwrap();
         git(&main, &["add", "."]);
         git(&main, &["commit", "-qm", "base"]);
         let target = git(&main, &["rev-parse", "HEAD"]);

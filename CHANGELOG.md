@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git Land recovery blocks unreconciled predecessor effects, tolerates index stat refresh, preserves ignored store collisions and permits acknowledged cleanup of abandoned/lost candidates.
+
 - Add dormant SafeRestore preview/apply/recover ports with durable binary/index/untracked/mode snapshots, verified checkout custody, local delta reapplication and observe-only crash recovery.
 
 - Git Land preserves unrelated staged changes, closes abandoned prepares at admission, and reports attempted retries and CAS failures consistently with recovery.
