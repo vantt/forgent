@@ -250,6 +250,7 @@ test('config-not-stale passes when the existing config already has every default
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
+      eventStore: { remote: 'origin' },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

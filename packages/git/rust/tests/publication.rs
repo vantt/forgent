@@ -1704,10 +1704,7 @@ fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
     git(&root, &["config", "unrelated.keep", "value"]);
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
-    let maps = vec![
-        "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into(),
-        "+refs/fgos/legacy:refs/fgos/remotes/origin/legacy".into(),
-    ];
+    let maps = publication_fetch_mappings("origin").unwrap();
     driver
         .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
         .unwrap();
@@ -2070,4 +2067,85 @@ fn recreated_loose_object_gets_directory_durability_again() {
     fs::remove_file(repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..])).unwrap();
     assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
     assert!(syncs.0.load(Ordering::SeqCst) >= 2);
+}
+
+#[test]
+fn ordinary_fetch_and_pull_survive_absent_legacy_and_repair_exact_mapping() {
+    let t = Temp::new();
+    let remote = t.0.join("remote.git");
+    init(&remote, "sha1", "files");
+    let root = t.0.join("checkout");
+    git(
+        &t.0,
+        &["clone", remote.to_str().unwrap(), root.to_str().unwrap()],
+    );
+    git(
+        &root,
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "initial",
+        ],
+    );
+    git(&root, &["push", "-u", "origin", "HEAD"]);
+    git(&root, &["remote", "rename", "origin", "upstream"]);
+    git(&root, &["config", "unrelated.keep", "preserved"]);
+    let old = "+refs/fgos/legacy:refs/fgos/remotes/upstream/legacy";
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    let failed = Command::new("git")
+        .arg("-C")
+        .arg(&root)
+        .arg("fetch")
+        .output()
+        .unwrap();
+    assert!(!failed.status.success());
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = publication_fetch_mappings("upstream").unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-exact")
+        .unwrap();
+    let config = git(&root, &["config", "--get-all", "remote.upstream.fetch"]);
+    assert!(!String::from_utf8_lossy(&config).lines().any(|r| r == old));
+    assert_eq!(git(&root, &["config", "unrelated.keep"]), b"preserved\n");
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    let head = String::from_utf8(git(&root, &["rev-parse", "HEAD"])).unwrap();
+    git(&remote, &["update-ref", "refs/fgos/legacy", head.trim()]);
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    assert_eq!(
+        git(&root, &["rev-parse", "refs/fgos/remotes/upstream/legacy"]),
+        head.as_bytes()
+    );
+    assert_eq!(
+        driver
+            .fetch_mapping_provenance(&repo, "upstream")
+            .unwrap()
+            .unwrap()
+            .refspecs,
+        maps
+    );
+    // Both forms installed is still a broken configuration: remove the exact
+    // form even when the desired wildcard was already present.
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-both")
+        .unwrap();
+    assert!(!String::from_utf8_lossy(&git(
+        &root,
+        &["config", "--get-all", "remote.upstream.fetch"]
+    ))
+    .lines()
+    .any(|r| r == old));
+    let bytes = fs::read(repo.common_dir().join("config")).unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-idempotent")
+        .unwrap();
+    assert_eq!(fs::read(repo.common_dir().join("config")).unwrap(), bytes);
 }

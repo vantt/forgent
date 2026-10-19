@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Harden Git landing repairs: ignore reserved legacy mirror suffixes, diagnose their refs, migrate historical origin mappings alongside custom remotes, preserve symlinked state roots, and refuse unrelated-root chmod with actionable hooks diagnostics.
+
+- Fix Git setup so ordinary fetch/pull work before the legacy Event Store ref exists; repair previously installed exact refspecs, share Git’s mapping policy across setup and Event Store, and repair/diagnose unsafe Git driver directory modes on umask-002 hosts.
+
 - Git rollback WAL scans ignore durable-file temporaries in the compaction ledger using the same rule as other WAL readers; incomplete or corrupt installed entries still refuse.
 - Git Publication now checks changing candidates through the successful connectivity fast path, makes replayed Intent directories durable, preserves full recoverable receipts through compaction, and tolerates scans racing terminal compaction. Recreated loose objects get fresh directory durability; deferred compaction failures are reported.
 - The optional `git-floor-verdict.json` cache binds Git/config/PATH and host/probe identities and requires the exact probe set; include directives disable persistent reuse. Holder-lock uses one lagged scan for borrow cleanup and quiescent admission, then settles exclusive Linux release (including dropped guards) using positive kernel-table evidence plus an inode-checked shared probe (brief Try contention), killing escaped descriptor recipients at release; Publication close returns the cleanup outcome. Holder-lock also fixes its Windows time imports. Mapped process spawning resolves relative PATH entries in the child directory and runs executable scripts without a shebang.
