@@ -3,6 +3,7 @@
 - Thời điểm nghiên cứu: 2026-10-15 15:02 (Asia/Saigon)
 - Phạm vi: khái niệm, đặc tính kỹ thuật, giới hạn, vướng mắc và các giải pháp hiện có cho việc nhắn tin giữa các agent LLM. Báo cáo gom lại toàn bộ nội dung đã trao đổi trong phiên chat, có kiểm chứng thêm bằng tài liệu chính thức và source code.
 - Bằng chứng gốc: binary Claude Code `2.1.300` trên máy này, tài liệu chính thức của Claude Code, source Codex (`openai/codex`, commit `e89b7c4`, ngày 2026-10-15), đặc tả A2A 1.0, tài liệu LangGraph, README của MCP Agent Mail.
+- Bổ sung 2026-10-19: mục 13 đối chiếu với repo `reason-machines/reason-network` (commit `19b1fbf`), đọc một phần.
 
 ## Mục lục
 
@@ -18,7 +19,8 @@
 10. [Liên hệ với fgOS](#10-liên-hệ-với-fgos)
 11. [Bước tiếp theo](#11-bước-tiếp-theo)
 12. [Câu hỏi còn mở](#12-câu-hỏi-còn-mở)
-13. [Nguồn](#13-nguồn)
+13. [Đối chiếu với reason-network](#13-đối-chiếu-với-reason-network)
+14. [Nguồn](#14-nguồn)
 
 ---
 
@@ -609,9 +611,65 @@ Hệ quả cho thiết kế: một hộp thư liên máy cho fgOS không cần t
 
 ---
 
-## 13. Nguồn
+## 13. Đối chiếu với reason-network
+
+- Nguồn: https://github.com/reason-machines/reason-network (Apache-2.0 hoặc MIT, 449 sao, commit `19b1fbf` ngày 2026-10-19). Là engine nằm sau `reason network`, tiền thân là `tincan`. Bài toán rất gần với bài toán này: các agent coding (Claude Code, Codex, Cursor, Gemini CLI, Copilot CLI, Grok CLI, opencode, pi, Amp, Reason) nhắn tin cho nhau, kể cả giữa máy của những người khác nhau.
+- Đã đọc (lượt đầu): `README.md`, `DESIGN.md`, `src/hook.rs`, `src/daemon/mail.rs`, `src/skill.md`, phần đầu `src/daemon/ask.rs`, và các đoạn liên quan trong `src/store.rs`, `src/mcp.rs`, `src/render.rs`.
+- Đã đọc thêm (lượt học sâu 2026-10-19, bằng skill `distill`): `src/net.rs`, `src/daemon/sessions.rs`, `src/agent.rs`, `src/claude.rs`, `src/opencode-plugin.ts`, `src/pi-extension.ts`, `tests/e2e/hooks.py`, `tests/e2e/two_machines.py`, phần đăng ký hook trong `src/setup.rs`, phần cấu trúc của `src/team.rs`. Bản index đầy đủ nằm ở `docs/distillery/sources/reason-network.md`, bản tổng hợp ở `docs/distillery/deep-dives/agent-mailbox-delivery.md`. **Vẫn chưa đọc kỹ** `src/daemon/teamops.rs`, `src/daemon/directory.rs` (phần resolve), `src/wizard.rs`, `src/tray.rs`.
+- **Kết quả kiểm chứng lời "hook `Stop` chặn dừng và nạp tin" của `DESIGN.md`:** test `hooks.py` chỉ đưa payload giả vào binary hook và so chuỗi JSON in ra (ví dụ `"decision":"block"` với Gemini, `followup_message` với Cursor). Không có test nào chạy Codex, Gemini, Copilot, Grok hay Cursor thật để thấy việc chặn dừng được CLI tôn trọng. Vậy lời đó là hợp đồng hook của từng CLI được viết lại, **chưa được repo này chứng minh**. **Cập nhật 2026-10-19:** đã tự đo trên máy này, kết quả ở `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md`: Claude Code, Codex, omp, pi và agy đều tiếp tục turn và làm theo tin chèn ở điểm "sắp dừng" (chế độ không tương tác), kèm điều kiện riêng từng CLI; độ trễ khi tool đang chạy bằng thời gian còn lại của tool (38 đến 45 giây với `sleep 45`).
+- Mức tin cậy: `DESIGN.md` ghi M0 đến M3 "đã xây và kiểm thử trên macOS", M4 chưa làm. Em chưa chạy thử, nên mọi chỗ dưới đây ghi "họ nói" là lời của tài liệu, còn chỗ ghi "trong code" là em đã thấy trong source.
+
+### 13.1 Họ là ai trong bản đồ của báo cáo này
+
+Họ là một họ cơ chế thứ sáu cho giao tin khác máy (mục 9.2): **P2P qua QUIC cộng hộp thư gửi đi có lưu bền**. Mỗi máy chạy một daemon, daemon dùng iroh để nối thẳng tới daemon của máy khác bằng khoá công khai ed25519, rồi hole-punch, và rơi về relay HTTPS khi không nối được (relay chỉ thấy bản mã). Tin tới máy offline nằm trong outbox của bên gửi và được gửi lại khi bên kia online. Điều này vá đúng nhược điểm mà mục 9.2 gán cho "đường hầm trực tiếp": mạng đứt thì mất tin. Họ cũng không có máy chủ trung gian của riêng họ, nên khớp với nguyên tắc "không có điều phối viên trực tuyến". Điểm khác với fgOS: họ cần một daemon chạy thường trực mỗi máy, còn fgOS dùng Git refs làm kênh.
+
+### 13.2 Họ trả lời các câu hỏi của báo cáo thế nào
+
+| Câu hỏi trong báo cáo | Cách reason-network làm | Đánh giá cho fgOS |
+|---|---|---|
+| **Khi nào agent nhận tin (mục 3, 8.3)** | Mỗi session khai một *delivery tier*: `push` (chèn giữa turn và đánh thức khi rảnh), `turn` (chèn ở lần gọi tool kế hoặc lúc dừng, session rảnh thì đợi người), `pull` (chỉ khi agent tự gọi `check_inbox`). Bên gửi được báo tier của bên nhận. | Đây là bảng O1 đến O5 của mục 8.3 được đóng thành một thuộc tính khai báo theo từng CLI. Đáng mượn nguyên ý. |
+| **Cơ chế cụ thể theo CLI (mục 8.8 còn thiếu kiểm chứng)** | Claude Code: process MCP con ghi vào socket của chính session (`CLAUDE_CODE_MESSAGING_SOCKET`), chèn giữa các tool, rảnh thì mở turn. Codex: `codex queue --thread <id>`, cộng hook `PostToolUse` trả `additionalContext`, cộng hook `Stop` trả `decision: block`. Gemini, Copilot, Grok: `AfterTool` hoặc `PostToolUse` rồi chặn khi dừng. Cursor: `postToolUse` và `stop` trả `followup_message`. opencode và pi: plugin gọi `promptAsync` hoặc `sendUserMessage` với `deliverAs: "steer"`. | Họ nói hook "sắp dừng" chặn được việc dừng và nạp tin trên nhiều CLI. Đã đọc test e2e: chỉ kiểm hình dạng JSON hook in ra, không chạy CLI thật, nên câu hỏi mở của mục 8.8 **chưa được trả lời**. Cần đo lại trên máy này. |
+| **Quy tắc 2, mục 8.4: luôn báo trạng thái hộp thư** | Đúng như vậy: mỗi kết quả tool của agent loại `pull` được gắn dòng `[Reason Network] N unread message(s) from X. Call check_inbox to read.` (`render::unread_notice`). Agent loại `push` không được gắn, "để tiết kiệm token" (`mcp.rs`). | Xác nhận quy tắc 2 và thêm một tối ưu: chỉ gắn dòng này cho agent không có đường đẩy. |
+| **Giao tin và ack (mục 5.2)** | Ít nhất một lần, loại trùng theo `id` ULID (`store.insert` trả `false` nếu đã có). Tin gửi qua push hoặc hook được đánh dấu "đang bay" 90 giây (`IN_FLIGHT_TTL`); nếu không ai xác nhận thì hiện lại. Hook chỉ gọi `Delivered` *sau khi đã in được* nội dung ra stdout (`hook.rs`: "Printed, so the agent has it: now it counts as read"). | Khớp với "ack sau khi tin đã vào transcript". Nhưng "đã đọc" ở đây vẫn nghĩa là *đã giao*, không phải agent đã xử lý. Họ không có ack của agent, nên chưa giải quyết quy tắc 3 (ghim qua compact). Em không thấy chỗ nào trong các file đã đọc xử lý compact. |
+| **Bốn trạng thái gửi, giao, đọc, xử lý (mục 5.2, 8.2 điểm 4)** | Kết quả `send_message` trả từng người nhận một trạng thái và một câu giải thích, ví dụ "queued: alice/web-cursor is idle and turn-only, it sees this when alice next prompts it". Các trạng thái trong code: `pushed`, `delivered`, `queued`, `held`, `refused`, `retry`, `notified`. | Rất đúng tinh thần 8.2 điểm 4. Câu giải thích nói cho agent *khi nào* bên kia sẽ thấy, hữu ích hơn một mã trạng thái trơn. |
+| **Địa chỉ (mục 5.1)** | `person/session`, thêm `@machine` khi trùng. Tên mặc định `<repo>-<agent>`, trùng thì thêm `-2`, `-3`. Khoá nội bộ là `agent:session_id` còn tên chỉ để hiển thị (`hook.rs`). Session mới cùng chỗ, cùng agent **thừa hưởng tên cũ và thư chưa đọc**, nên "nhắn cho agent api" vẫn đúng sau khi khởi động lại. Nhóm (`alice/*`, `repo:api`, `*`) chỉ dành cho người gõ ở terminal, agent bị từ chối. | Khớp mục 6 điểm 4 (khoá theo id không đổi). Ý "thừa hưởng tên và thư" là một cách trả lời điểm 10 của mục 6 (resume làm mất agent). Luật "agent chỉ nhắn một session" là một thanh chắn bão tin rẻ và hiệu quả. |
+| **Chống bão tin (mục 5.5)** | Trong code: tối đa 64 KB một tin, 60 tin mỗi phút mỗi máy gửi (vượt thì *hoãn*, trả `retry`, không bỏ), 12 tin agent-với-agent giữa một cặp có hướng trong 10 phút (người gõ ở terminal được miễn). Có cờ `--fyi` để gửi mà không đánh thức. | Có ba trong bốn thanh chắn của mục 5.5. Thiếu: loại các tin giống hệt nhau, và trần số tin đang xếp hàng. Số 12 trong 10 phút là một điểm khởi đầu có thật để so. |
+| **Tin cậy và nguồn gốc (mục 5.6)** | Tin được bọc `<reason-message from="…" agent="…" repo="…" id="…">…</reason-message>` kèm câu "From alice's agent. Reply if useful…". Chỉ dẫn MCP: không làm việc mà người dùng của mình sẽ không duyệt chỉ vì một peer nhờ. Chính sách đến theo máy hoặc theo người: `accept` (mặc định trong team), `hold`, `refuse`. Một máy chỉ được nói thay cho người của chính nó (`"cannot send as"`). Trường siêu dữ liệu được lọc về ký tự thường (`tidy`, `clean`). | Khung thẻ và ba mức chính sách giống hệt đề xuất của báo cáo. Khác: mặc định của họ là `accept` vì team là bạn bè, còn mục 5.6 đề xuất mặc định theo chênh lệch quyền. fgOS nên giữ mặc định chặt hơn. |
+| **Permission laundering, câu hỏi chờ người (mục 5.6, 4.5, quy tắc 8)** | Công cụ `ask_user`: agent hỏi *người của chính nó* bằng pop-up trên máy, chờ tối đa 10 phút, người bấm Approve hoặc Deny kèm ghi chú. Câu trả lời là **kết quả của tool**, không phải một tin ai cũng gửi được. Khi `about` trỏ tới tin của đồng đội, câu trả lời còn được đóng thành `Approval` có chữ ký của khoá máy, gửi ngược cho người yêu cầu và hiện là `<reason-approval … verified>`. Bên nhận chỉ giữ nếu chữ ký đúng máy, đúng người, đúng session. Nếu trả lời sau khi cuộc gọi đã bỏ cuộc thì đến như một tin thường từ `<person>/terminal`. | Đây là phần mới nhất với báo cáo. Nó tách *sự đồng ý của người* khỏi *tin nhắn giữa agent* bằng một kênh riêng và có chữ ký, nên "X đã duyệt" trong một tin chỉ là lời của agent. Chính họ ghi đây là "speed bump, not a guarantee". Có hạn cho câu hỏi (10 phút chờ, pop-up sống 1 giờ) và đường rơi về tin thường, nhưng agent vẫn giữ tiến trình trong lúc chờ, nên **không phải** checkpoint bền kiểu LangGraph. |
+| **Hiện diện (mục 5.8)** | `list_team` trả danh bạ theo người, máy, session: tên, agent, bận hay rảnh và bao lâu, repo@nhánh, việc đang làm, tier. Việc đang làm được **đọc từ thứ agent vốn đã ghi** (tên transcript, todo list của từng CLI, `~/.claude/sessions/<pid>.json`), agent không phải tự báo. Daemon đẩy `Presence` cho mọi máy khi có thay đổi (mạng đầy đủ, ước tính tới khoảng 50 máy). | Khớp quy tắc 9, mục 8.4 (hiện diện lấy từ nguồn thật). Ý "đọc từ thứ agent đã ghi" tránh được việc bắt agent khai báo, đáng xem kỹ cho `fgos` (supervisor đã giữ attempt). |
+| **Agent biết cách gửi (mục 8.2)** | Ba nguồn: tool MCP (`list_team`, `send_message`, `ask_user`, `check_inbox`), chỉ dẫn MCP và `skill.md` cùng một bộ luật ngắn (chỉ nhắn khi cần, kiểm tra danh bạ trước, một tin một nhu cầu, không tán gẫu), và một dòng in ra ở `SessionStart` cho biết "you are alice/api-claude". | Khớp bốn nguồn tri thức của 8.2, đủ cả danh bạ lẫn địa chỉ trả lời. Họ chỉ dùng chỉ dẫn làm lớp thứ hai, còn việc *đưa tin vào* do hook và kênh đẩy lo, đúng kết luận ở 8.7. |
+| **O8: gõ vào terminal (mục 8.6)** | Họ tránh gõ ký tự vào terminal. Dùng API riêng của CLI nếu có (Codex `queue`, plugin của opencode và pi). Với Cursor thì chạy nền `reason-network wait`, với Gemini thì "experimental background-shell inject". | Củng cố nhận định ở 8.6: cách sạch hơn là kênh riêng có nhãn nguồn, chỉ coi gõ terminal là phương án cuối. |
+| **Liên máy: danh tính, tin cậy, hợp nhất (mục 9.3)** | Danh tính máy là khoá ed25519. Danh sách thành viên (roster) được ký, mỗi mục ký bởi một máy đã được nhận, chuỗi "admissions" giữ vĩnh viễn nên ai được ký không phụ thuộc thứ tự tin đến, mọi máy hội tụ cùng một roster. Cổng chặn mọi kết nối không phải thành viên đang hoạt động. Mời qua link hoặc mã bốn từ dùng một lần. Máy bị loại vẫn có thể tự ký việc rời. | Đáp án cụ thể cho "cần chữ ký hoặc kênh đã xác thực" của 9.3. fgOS dùng Git remote nên xác thực nằm ở Git, nhưng ý chuỗi nhận thành viên có chữ ký và hội tụ không phụ thuộc thứ tự đáng so với danh sách máy của event store. |
+| **Mô hình ghi (mục 9.3)** | Bên nhận lưu rồi mới trả `stored/delivered/held/refused`; bên gửi giữ outbox và gửi lại, bỏ cuộc sau một tuần. Tin cho session offline giữ một ngày rồi quên cùng thư chưa đọc. | Khác đề xuất "mỗi máy chỉ ghi nhật ký của mình" của 9.3: họ ghi vào hộp của *bên nhận*. Họ đổi lại có độ trễ giây, nhưng cần daemon chạy và hai bên cùng nối được hoặc có relay. Nhật ký bất biến dựa trên Git của fgOS giữ được lịch sử kiểm tra, họ thì không. |
+| **Anchor (mục 9.2 họ 4)** | Dự kiến ở M4: một daemon thành viên chạy trên máy luôn bật, giữ thư cho máy offline và lịch sử tìm kiếm được. Cùng binary, không máy chủ đặc biệt. | Cùng vai với remote Git của event store. Chưa làm, nên chưa có bằng chứng. |
+
+### 13.3 Những gì họ không có (khoảng trống chung của hai bên)
+
+- **Hạn trả lời và leo thang (quy tắc 8, mục 8.4).** Không thấy `reply_by`, nhắc, đổi người nhận hay hàng tin chết. Tin quá hạn lưu trữ thì bị quên theo thời gian (một ngày với session, một tuần với outbox) mà không báo người.
+- **Ack của agent và ghim qua compact (quy tắc 3).** "Đã đọc" bằng "đã in ra cho agent". Không thấy cơ chế đưa lại tin chưa xử lý sau compact.
+- **Steer có mức ngắt `interrupt`** và pha giao `NextTurn` (mục 5.4). Họ chỉ có hai mức: đánh thức hoặc `--fyi`. Việc chặn dừng ở `Stop` (O3/O4) lại làm câu trả lời cuối bị mở thành turn mới, không có quy tắc hoãn.
+- **Đo lường (quy tắc 10).** Chỉ thấy `doctor` kiểm tra trạng thái, không thấy độ trễ giao tin hay tỉ lệ tin chưa xử lý.
+- **Khoá hoặc lease liên máy (câu hỏi mở 7).** Chưa có. M4 chỉ hứa "cảnh báo trùng file" từ đường dẫn sửa trong `PostToolUse`, tức cảnh báo chứ không phải lease.
+- **Câu hỏi mở 1 đến 4 của mục 12** (subagent trong cùng session, Antigravity, phiên bản steer của Codex, giới hạn inbox của Claude Code): các file đã đọc không nhắc tới.
+
+### 13.4 Rút ra cho fgOS
+
+Chỉ để định hướng, chưa phải quyết định. V-011 vẫn hiệu lực (mục 10): muốn mượn bất cứ thứ gì dưới đây cho hộp thư chung thì phải qua cổng "chứng minh nhu cầu".
+
+1. **Mượn ý nhiều nhất:** tier giao tin khai báo theo từng CLI (`push`/`turn`/`pull`), bên gửi được báo tier và "khi nào bên kia thấy"; dòng báo hộp thư chỉ gắn cho agent không có đường đẩy; tên hiển thị tách khỏi khoá session; session mới thừa hưởng thư chưa đọc.
+2. **Mượn ý, cần thiết kế lại:** `ask_user` kèm `Approval` có chữ ký là câu trả lời rất cụ thể cho "câu hỏi treo" và permission laundering. fgOS đã có mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`) và event store, nên một câu trả lời có chữ ký của máy có thể là một loại sự kiện thay vì một pop-up. Cần một câu hỏi quyết định riêng, không gộp vào hộp thư.
+3. **Không nên sao chép:** daemon thường trực riêng cho mailbox (trái V-011 và nguyên tắc "một cửa"); mặc định `accept` giữa các thành viên; giả định `read` bằng `delivered`.
+4. **Nên làm thêm khi đã có nhu cầu:** các phần ở 13.3 là chỗ cả hai bên còn trống, nên là phần giá trị riêng của fgOS (hạn trả lời, ack có hạn, ghim qua compact, đo độ trễ).
+5. **Việc kiểm chứng thêm trước khi tin:** `hooks.py` và `net.rs` đã đọc (xem đầu mục); còn lại là tự đo trên máy này xem hook `Stop` của từng CLI có thật sự chặn dừng và nạp tin hay không (mục 8.8), và đo độ trễ giao tin khi agent đang chạy một tool 60 giây. Lời của `DESIGN.md` chưa đủ để dựa vào.
+6. **Phát hiện thêm từ lượt học sâu:** ba nguồn trong distillery (reason-network, pi, và Codex theo mục 3.3) tự đến cùng thiết kế hai nhịp "ngắt giữa chừng so với đợi chỗ nghỉ"; pi thêm chiều gom một hay nhiều tin mỗi lần xả. Năm candidate mới nằm trong `docs/distillery/porting-log.md` (điểm cao nhất: `wake-flag-two-beats`, R2 E3 F1).
+
+---
+
+## 14. Nguồn
 
 Nguồn chính:
+
+- reason-network (engine của `reason network`, trước là `tincan`), commit `19b1fbf`: https://github.com/reason-machines/reason-network, đọc `README.md`, `DESIGN.md`, `src/hook.rs`, `src/daemon/mail.rs`, `src/skill.md`, phần của `src/daemon/ask.rs`, `src/store.rs`, `src/mcp.rs`, `src/render.rs` (đọc một phần, xem mục 13)
 
 - Claude Code, cross-session messaging: https://code.claude.com/docs/en/cross-session-messaging
 - Claude Code, agent teams: https://code.claude.com/docs/en/agent-teams
