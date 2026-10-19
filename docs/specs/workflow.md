@@ -139,7 +139,7 @@ Phép tách authority: **chọn / cho phép / thi hành / chấp nhận.**
 
 ## 4. Shared Entities
 
-Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `caseId` (hoặc `workflowRunId`), `unitRunId`, `assignmentId`, `attemptId`. Hôm nay `unit.json` mang `workflow: {runId, stepId, unitId}` chỉ để truy vết; liên kết mới là `{caseId, activity, reservationId}`, do harness ghi lúc admission.
+Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `caseId` (hoặc `workflowRunId`), `unitRunId`, `assignmentId`, `attemptId`. Trước đây `unit.json` mang `workflow: {runId, stepId, unitId}` chỉ để truy vết; liên kết nay là `{caseId, activity, reservationId}`, do harness ghi lúc admission (bản ghi cũ vẫn đọc được qua cùng một hàm chuẩn hoá).
 
 | Entity | Nghĩa | Chủ | Ai chạm |
 |---|---|---|---|
@@ -318,6 +318,8 @@ Conductor case: hai activity eligible có reservation rời nhau (path, worktree
 ### 7.5 Đóng case
 
 `close` từ chối khi milestone kết thúc `stale` hoặc gate consent còn đậu. Đóng khi còn attempt sống không gỡ binding (RUL-WF-27).
+
+**Playbook case tự đóng khi xong (owner 2026-10-19).** Khi một Playbook case chạy tới `workflow.complete` với kết cục `pass`, chính proposer đang giữ `advance` append `case.closed` theo đúng luật của `close` (cùng một hàm: từ chối khi milestone kết thúc `stale`, gỡ binding của attempt đã im lặng, giữ và nêu tên phần còn lại); một case không đóng được vì luật đó vẫn mở. Case fail, blocked hoặc đậu ở gate giữ mở, để `resume` và `answer` còn hoạt động. **Conductor case chỉ đóng bằng `fgos workflow close`**: không có tiến trình nào biết khi nào nó xong.
 
 ### 7.6 Khởi động lại không cần chat
 

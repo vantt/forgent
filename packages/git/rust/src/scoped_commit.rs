@@ -478,6 +478,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Outcome> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let wal = Wal::open(repo).map_err(failure)?;
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
@@ -585,11 +587,12 @@ impl GitDriver {
         self.require_floor()?;
         self.preflight(repo)?;
         // Re-resolve topology, including reciprocal registration, before every child.
-        let current = match self.resolve_repo(root(repo)?, repo.trusted_main_root())? {
+        let current = match self.resolve_topology(root(repo)?, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             _ => return Err(failure("untrusted-worktree")),
         };
-        if current.git_dir != repo.git_dir || current.work_tree != repo.work_tree {
+        if current.git_dir != repo.git_dir || current.common_dir != repo.common_dir
+            || current.work_tree != repo.work_tree {
             return Err(failure("untrusted-worktree"));
         }
         let h = handle(scope, repo)?;
@@ -599,7 +602,7 @@ impl GitDriver {
         {
             return Err(failure("checkout-custody-stale"));
         }
-        self.invoke_input(
+        let out = self.invoke_input(
             Some(repo),
             root(repo)?,
             args,
@@ -613,7 +616,13 @@ impl GitDriver {
             64 * 1024 * 1024,
             Duration::from_secs(120),
             input,
-        )
+        );
+        // Hooks can rewrite config/topology even on rejection or timeout. Check
+        // before any subsequent Git command (including cleanup/recovery reads).
+        if hooks {
+            self.refresh_checkout_facts(repo)?;
+        }
+        out
     }
     pub(crate) fn checkout_bytes(
         &self,
@@ -730,6 +739,8 @@ impl GitDriver {
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
     ) -> Result<CommitBaseline> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         if self.merge_head(repo, &scope)?.is_some() {
             return Err(failure("foreign-merge-head"));
@@ -761,6 +772,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         self.commit_scoped(repo, &scope, baseline, request, writer, id)
     }
@@ -1353,6 +1366,8 @@ impl GitDriver {
         {
             return Err(failure("checkpoint-non-event-main-required"));
         }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
         let scope = scope(repo, held)?;
         let tracked = paths(&self.checkout_bytes(repo, &scope, &["ls-files", "-z"])?)?;
         if files

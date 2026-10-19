@@ -231,3 +231,66 @@ test('a clean-path restore failure still restores producer bytes on independent 
   assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
  }finally{if(fs.existsSync(dir))fs.chmodSync(dir,0o700);f.close();}
 });
+
+test('ScopedCommit probes config and formats once per loan and once after hooks', {skip:process.platform!=='linux'}, () => {
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-scoped-census-'));
+  try {
+    const descriptor=path.join(temp,'descriptor.json');
+    fs.writeFileSync(descriptor,JSON.stringify(loader.descriptor));
+    const census=JSON.parse(execFileSync(process.execPath,[path.join(root,'scripts/git/e3-bench.mjs'),'scoped-census',
+      '--root',temp,'--descriptor',descriptor],{encoding:'utf8'}));
+    const probes=(calls,probe)=>calls.filter(call=>call.includes(probe)).length;
+    for(const probe of ['config --null --show-origin --list','rev-parse --show-object-format','rev-parse --show-ref-format']) {
+      assert.equal(probes(census.preflight,probe),1,`preflight ${probe}`);
+      assert.equal(probes(census.commit,probe),2,`commit entry + post-hook ${probe}`);
+    }
+    assert.equal(census.total,37,`unexpected Git exec growth: ${census.total}`);
+    console.log(`ScopedCommit Git exec census: preflight=${census.preflight.length}, commit=${census.commit.length}, total=${census.total}`);
+  } finally {fs.rmSync(temp,{recursive:true,force:true});}
+});
+
+test('ScopedCommit refreshes config between calls on the same port',()=>{
+  const f=fixture();try {
+    const baseline=f.port.preflight({},f.held);
+    f.git('config','filter.evil.clean','touch /unreachable');
+    fs.writeFileSync(path.join(f.linked,'a'),'producer');
+    assert.throws(()=>f.port.commit({operationId:'config-changed',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held),/repository-config-untrusted/);
+    f.git('config','--unset','filter.evil.clean');
+    assert.equal(f.port.commit({operationId:'config-repaired',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held).status,'committed');
+  } finally {f.close();}
+});
+
+for(const rejected of [false,true]) test(`ScopedCommit fences post-hook config changes on ${rejected?'rejection':'success'}`,()=>{
+  const f=fixture();try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\ngit config filter.evil.clean 'touch /unreachable'\nexit ${rejected?1:0}\n`,{mode:0o755});
+    f.git('config','core.hooksPath','hooks');
+    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
+    assert.throws(()=>f.port.commit({operationId:'hook-config',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held),/repository-config-untrusted/);
+    assert.throws(()=>f.port.preflight({},f.held),/repository-config-untrusted/);
+    f.git('config','--unset','filter.evil.clean');
+    assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),rejected?'base':'producer');
+  } finally {f.close();}
+});
+
+test('ScopedCommit checks object format again on an existing port',()=>{
+  const f=fixture();const config=path.join(f.repo,'.git/config');const original=fs.readFileSync(config);
+  try {
+    fs.appendFileSync(config,'\n[core]\nrepositoryFormatVersion = 1\n[extensions]\nobjectFormat = sha256\n');
+    assert.throws(()=>f.port.preflight({},f.held),/repository-format-changed/);
+    fs.writeFileSync(config,original);
+    assert.ok(f.port.preflight({},f.held).head);
+  } finally {fs.writeFileSync(config,original);f.close();}
+});
+
+for(const rejected of [false,true]) test(`ScopedCommit refuses post-hook promisor changes on ${rejected?'rejection':'success'}`,()=>{
+  const f=fixture();try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\ngit config remote.origin.promisor true\nexit ${rejected?1:0}\n`,{mode:0o755});
+    f.git('config','core.hooksPath','hooks');
+    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
+    assert.throws(()=>f.port.commit({operationId:'hook-promisor',baseline,request:{writes:['a'],message:'promisor',cutoverGrant:null}},f.held),/repository-promisor-changed/);
+    f.git('config','--unset','remote.origin.promisor');
+    assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),rejected?'base':'producer');
+  } finally {f.close();}
+});

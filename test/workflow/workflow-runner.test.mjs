@@ -1443,7 +1443,8 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
   const unitRecord = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const summary = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
-  const expectedLink = { runId: state.workflowRunId, stepId: 'opinions', unitId: 'question' };
+  const expectedLink = { caseId: state.workflowRunId, activity: 'opinions', reservationId: unitRecord.workflow.reservationId };
+  assert.match(expectedLink.reservationId, /^rsv-/, 'the Unit run names the reservation that admitted it');
   assert.deepEqual(unitRecord.workflow, expectedLink);
   assert.deepEqual(summary.workflow, expectedLink);
   assert.deepEqual(summary.stanceOptions, ['incremental', 'full']);

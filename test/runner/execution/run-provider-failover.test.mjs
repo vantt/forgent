@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { inspectProviderCapacity } from '../../../src/runner/dispatch/provider-capacity.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';

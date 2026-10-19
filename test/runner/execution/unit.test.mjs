@@ -218,10 +218,12 @@ test('stanceOptions are frozen question-local labels; omitted options keep the p
   }
 });
 
-test('workflow link is owner-provided normalized metadata, never guessed from unit ids', () => {
+test('workflow link is owner-provided normalized metadata, never guessed from unit ids; a record from before cases reads as the same link', () => {
   assert.equal(normalizeWorkflowLink(undefined), null);
-  assert.deepEqual(normalizeWorkflowLink({ runId: ' wf ', stepId: ' s ', unitId: ' u ', ignored: true }), { runId: 'wf', stepId: 's', unitId: 'u' });
-  for (const value of ['wf', {}, { runId: 'wf', stepId: 's', unitId: '' }]) assert.throws(() => normalizeWorkflowLink(value), /workflow link/);
+  assert.deepEqual(normalizeWorkflowLink({ caseId: ' wf ', activity: ' s ', reservationId: ' rsv-1 ', ignored: true }), { caseId: 'wf', activity: 's', reservationId: 'rsv-1' });
+  assert.deepEqual(normalizeWorkflowLink({ caseId: 'wf', activity: 's' }), { caseId: 'wf', activity: 's', reservationId: null });
+  assert.deepEqual(normalizeWorkflowLink({ runId: ' wf ', stepId: ' s ', unitId: ' u ' }), { caseId: 'wf', activity: 's', reservationId: null });
+  for (const value of ['wf', {}, { caseId: 'wf', activity: '' }, { runId: 'wf', unitId: 'u' }]) assert.throws(() => normalizeWorkflowLink(value), /workflow link/);
 });
 
 test('validateUnit: writes come back canonical, de-duplicated, in first-seen order', () => {

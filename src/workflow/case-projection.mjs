@@ -163,7 +163,8 @@ export function projectCase(events, { currentDigests = {} } = {}) {
   }
 
   const all = [...reservations.values()];
-  const counting = all.filter((r) => !(r.settled && r.outcome === 'refunded'));
+  // A reservation given back (refunded, or its run never started) spends nothing of the frame.
+  const counting = all.filter((r) => !(r.settled && (r.outcome === 'refunded' || r.outcome === 'not-started')));
   const used = {
     dispatches: counting.reduce((sum, r) => sum + (r.counters?.dispatches ?? 1), 0),
     mutatingDispatches: counting.reduce((sum, r) => sum + (r.counters?.mutatingDispatches ?? 0), 0),
@@ -174,6 +175,7 @@ export function projectCase(events, { currentDigests = {} } = {}) {
     mutatingDispatches: remaining(frame?.mutatingDispatches, used.mutatingDispatches),
     deviationsBeforeAsk: remaining(frame?.deviationsBeforeAsk, deviations),
     seatLaunchesPerDispatch: isCount(frame?.seatLaunchesPerDispatch) ? frame.seatLaunchesPerDispatch : null,
+    fallbackPerSeat: isCount(frame?.fallbackPerSeat) ? frame.fallbackPerSeat : null,
     rigorFloor: frame?.rigorFloor ?? null,
   };
 
@@ -211,7 +213,8 @@ export function projectCase(events, { currentDigests = {} } = {}) {
     milestones,
     refusedAchievements,
     reservations: all,
-    liveReservations: all.filter((r) => !r.settled),
+    // A nested case's charge spends frame but is no attempt that may still be running.
+    liveReservations: all.filter((r) => !r.settled && !r.nested),
     blindUnitRuns,
     frameUsed: used,
     frameRemaining,

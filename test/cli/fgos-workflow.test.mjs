@@ -112,7 +112,7 @@ test('workflow start --units refuses a second definition source, --seats and a b
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false, 'no run was created');
 });
 
-test('workflow status carries the case block, close ends a finished case once, and --frame only narrows', (t) => {
+test('workflow status carries the case block, a finished Playbook case has closed itself, and --frame only narrows', (t) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-close-cli-'));
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
@@ -126,18 +126,13 @@ test('workflow status carries the case block, close ends a finished case once, a
 
   const status = JSON.parse(invoke('status', id).stdout).data;
   assert.equal(status.case.kind, 'playbook');
-  assert.equal(status.case.open, true);
+  // A Playbook case that ran to a pass closed itself; the close verb agrees and says so.
+  assert.equal(status.case.open, false);
   assert.equal(status.case.milestones['only-step.settled'].state, 'achieved');
   assert.deepEqual(Object.keys(status.case.routes), ['points', 'unlisted']);
-  assert.deepEqual(status.case.closable, { ok: true, reasons: [] });
-
   const closed = invoke('close', id, '--reason', 'finished');
-  assert.equal(closed.status, 0, closed.stderr);
-  assert.equal(JSON.parse(closed.stdout).data.closed, true);
-  const again = invoke('close', id);
-  assert.notEqual(again.status, 0);
-  assert.match(again.stderr, /already closed/);
-  assert.equal(JSON.parse(invoke('status', id).stdout).data.case.open, false);
+  assert.notEqual(closed.status, 0);
+  assert.match(closed.stderr, /already closed/);
 
   const widened = invoke('start', workflowId, '--frame', 'dispatches=1', '--foreground');
   assert.notEqual(widened.status, 0);

@@ -86,14 +86,29 @@ impl std::fmt::Display for InvalidInput {
 impl std::error::Error for InvalidInput {}
 
 /// Only the validated driver may construct a repository handle.
-#[derive(Debug)]
 pub struct RepoHandle {
+    // Present only on an operation-local checkout handle; inner None fences
+    // all later commands if the post-hook refresh fails.
+    checkout_config: Option<std::sync::Mutex<Option<driver::ConfigCache>>>,
     common_dir: PathBuf,
     trusted_main_root: PathBuf,
     object_format: ObjectFormat,
     git_dir: PathBuf,
     work_tree: Option<PathBuf>,
     layout: RepoLayout,
+}
+// Effective config can contain credentials; never include it in diagnostics.
+impl std::fmt::Debug for RepoHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RepoHandle")
+            .field("common_dir", &self.common_dir)
+            .field("trusted_main_root", &self.trusted_main_root)
+            .field("object_format", &self.object_format)
+            .field("git_dir", &self.git_dir)
+            .field("work_tree", &self.work_tree)
+            .field("layout", &self.layout)
+            .finish_non_exhaustive()
+    }
 }
 impl RepoHandle {
     pub fn layout(&self) -> &RepoLayout {
