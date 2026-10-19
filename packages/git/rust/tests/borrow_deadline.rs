@@ -63,8 +63,6 @@ fn git_deadline_removes_index_lock(namespaced: bool) {
     if namespaced {
         let mut prefix: Vec<String> = [
             "bwrap",
-            "--preserve-fds",
-            "1",
             "--unshare-pid",
             "--as-pid-1",
             "--dev-bind",
