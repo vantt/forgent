@@ -236,6 +236,7 @@
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",
     "src/run-supervisor/attempt-step.mjs": "infra",
+    "src/run-supervisor/cancel-opt-in.mjs": "infra",
     "src/run-supervisor/cancel-registry.mjs": "infra",
     "src/run-supervisor/client.mjs": "infra",
     "src/run-supervisor/direct-launch.mjs": "infra",

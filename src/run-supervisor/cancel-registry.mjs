@@ -1,8 +1,13 @@
 // What a controller does when a person presses Ctrl-C (r6 §16): ask the supervisor of every attempt it
 // handed over to stop that attempt, wait a bounded time for the receipt, say how to continue, and leave.
 // The controller never signals an agent itself; it only publishes `cancel-requested.json`, which the
-// supervisor polls. An attempt that has no binding yet is not in the registry: the controller still holds
-// its attempt lock there, so dying is enough (adopt judges it `abandoned-not-started`).
+// supervisor polls. An attempt that is being handed over (`beginLaunch` until its binding is known, or the
+// launch fails) is waited for: once it binds it is asked to cancel too, so a signal that lands before the
+// binding never leaves an attempt running uncancelled. After the first signal no new launch and no new
+// step starts (`assertNotCancelled`): the controller only waits for the receipts and leaves.
+//
+// Handlers are installed only by a process that asked for it (`enableCancelOnSignal`, the CLI entry);
+// an in-process caller of the runner keeps its own signal handling.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -17,6 +22,41 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Attempt directories this process delivered to a supervisor and has not yet read the answer of. */
 const delivered = new Set();
+/** Attempt directories handed to a supervisor whose binding is not known yet. */
+const launching = new Set();
+
+// Set by the first signal and never cleared by a running process: the controller is on its way out.
+let cancelSignal = null;
+
+/** Forget a cancel request (a host that outlives its controller, such as a test). */
+export function resetCancelRequest() {
+  cancelSignal = null;
+}
+
+export class RunCancelledError extends Error {
+  constructor(signal) {
+    super(`cancelled by ${signal}: no new step starts; the attempts in flight are stopped and the unit can be resumed`);
+    this.name = 'RunCancelledError';
+    this.code = 'run-cancelled';
+    this.signal = signal;
+  }
+}
+
+/** Throws `RunCancelledError` once a signal asked this process to cancel; called before every new step. */
+export function assertNotCancelled() {
+  if (cancelSignal) throw new RunCancelledError(cancelSignal);
+}
+
+/** Mark `runDir` as handed to a supervisor; refuses once a cancel was requested (nothing starts after it). */
+export function beginLaunch(runDir) {
+  assertNotCancelled();
+  launching.add(path.resolve(runDir));
+}
+
+/** The binding of `runDir` is known (or the launch failed): it is registered or gone. */
+export function endLaunch(runDir) {
+  launching.delete(path.resolve(runDir));
+}
 
 /** Remember `runDir` once its supervisor has bound the attempt. */
 export function register(runDir) {
@@ -66,19 +106,10 @@ export function requestCancel(runDir, signal) {
   return true;
 }
 
-/** Wait until every run in `runDirs` has a receipt, or `waitMs` passes. */
-async function waitForReceipts(runDirs, waitMs) {
-  const deadline = Date.now() + waitMs;
-  while (Date.now() < deadline) {
-    if (runDirs.every((dir) => fs.existsSync(path.join(dir, 'receipt.json')))) return;
-    await sleep(POLL_MS);
-  }
-}
-
 /**
- * Handle SIGINT and SIGTERM: the first one cancels every registered attempt, waits for the receipts
- * (at most `cancelWaitMs`), prints the resume line and exits 130 or 143; the second exits at once (the
- * cancel files are already written, the supervisors still stop their attempts).
+ * Handle SIGINT and SIGTERM: the first one cancels every attempt this process delivered or is still handing
+ * over, waits for the receipts (at most `cancelWaitMs`), prints the resume line and exits 130 or 143; the
+ * second exits at once (the cancel files are already written, the supervisors still stop their attempts).
  * @returns {() => void} removes the handlers
  */
 export function installCancelOnSignal({ cancelWaitMs, exit = (code) => process.exit(code), stderr = process.stderr } = {}) {
@@ -87,11 +118,26 @@ export function installCancelOnSignal({ cancelWaitMs, exit = (code) => process.e
     const code = EXIT_CODES[signal];
     if (first) { exit(first.code); return; }
     first = { code };
-    const runDirs = registeredRuns();
-    const asked = runDirs.filter((dir) => requestCancel(dir, signal));
+    cancelSignal = signal;
     (async () => {
-      try { await waitForReceipts(asked, cancelWaitMs); } finally {
-        const units = new Set(runDirs.map((dir) => readEnvelope(dir)?.unitRunId).filter(Boolean));
+      const seen = new Set();
+      const asked = new Set();
+      const sweep = () => {
+        for (const dir of [...delivered, ...launching]) {
+          seen.add(dir);
+          if (delivered.has(dir) && !asked.has(dir)) requestCancel(dir, signal) && asked.add(dir);
+        }
+      };
+      const deadline = Date.now() + cancelWaitMs;
+      try {
+        for (;;) {
+          sweep();
+          const answered = [...asked].every((dir) => fs.existsSync(path.join(dir, 'receipt.json')));
+          if ((launching.size === 0 && answered) || Date.now() >= deadline) break;
+          await sleep(POLL_MS);
+        }
+      } finally {
+        const units = new Set([...seen].map((dir) => readEnvelope(dir)?.unitRunId).filter(Boolean));
         for (const unit of units) stderr.write(`unit ${unit} chờ resume: fgos run --resume ${unit}\n`);
         exit(code);
       }

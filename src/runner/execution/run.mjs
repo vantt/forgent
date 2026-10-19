@@ -33,7 +33,8 @@ import { writeUnitSummary } from './unit-summary.mjs';
 import { createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
 import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { installCancelOnSignal } from '../../run-supervisor/cancel-registry.mjs';
+import { installCancelOnSignal, assertNotCancelled, RunCancelledError } from '../../run-supervisor/cancel-registry.mjs';
+import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
@@ -378,6 +379,7 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
+  assertNotCancelled();
   const scope = { control: null, custody: null, handedOff: false };
   const uninstall = holdCancelOnSignal(options);
   let result;
@@ -396,11 +398,13 @@ export async function runUnit(options = {}) {
   }
 }
 
-// Ctrl-C of this process asks every attempt it delivered to stop (cancel-registry.mjs). One handler
-// serves all units running in the process: installed with the first, removed with the last.
+// A process that asked for it (the CLI entry, `enableCancelOnSignal`) has Ctrl-C and SIGTERM cancel every
+// attempt it delivered (cancel-registry.mjs). One handler serves all units running in the process:
+// installed with the first, removed with the last. Any other caller keeps its own signal handling.
 let cancelHolders = 0;
 let removeCancelHandlers = null;
 function holdCancelOnSignal(options) {
+  if (!cancelOnSignalEnabled()) return () => {};
   if (cancelHolders === 0) {
     const projectRoot = options.repoRoot ?? (() => { try { return resolveGitRoots(options.cwd ?? process.cwd()).mainCheckoutRoot; } catch { return undefined; } })();
     removeCancelHandlers = installCancelOnSignal({ cancelWaitMs: readCancelWaitMs({ projectRoot }) });
@@ -772,6 +776,7 @@ async function runUnitBody(options, scope) {
 
   // Helper to run a role
   const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], preferIndependentOf = [], inputs = [] }) => {
+    assertNotCancelled();
     const runnerConfig = unitRecord.configSnapshot.runner;
     const session = {
       provider: options.session?.provider,
@@ -836,6 +841,7 @@ async function runUnitBody(options, scope) {
     if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot, scope.custody)) {
       const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
       if (refusal) return refusal;
+      assertNotCancelled();
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
       const excludePaths = lastRecorded.preExistingInScope ?? [];
       let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
@@ -940,12 +946,15 @@ async function runUnitBody(options, scope) {
       attempts[attemptNo].dispatchRetryId = admission.retryId;
       delete attempts[attemptNo].outcome;
       persistUnitRecord();
+      assertNotCancelled();
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
 
       // The worker only writes files; this trusted code, outside the confinement, commits the
       // ones inside the write scope. No change is recorded as such, and a commit that cannot be
       // made fails the round. Paths changed outside the scope are reported, never committed.
       if (!readOnly && result.outcome === 'pass') {
+        // A pass whose commit never started is picked up by the resume: the work is on disk, the commit is pending.
+        assertNotCancelled();
         const commit = commitWork(rUnit || unit, result.runResult, attempts[attemptNo].preExistingInScope ?? preExistingInScope);
         result.commit = commit;
         attempts[attemptNo].commit = commit;
@@ -1040,6 +1049,7 @@ async function runUnitBody(options, scope) {
   // runs through the one bounded command runner (goal-check.mjs), for at most `runner.timeoutMs`;
   // running past that is a failed verify that says so, never a hang.
   const verify = async (targetUnit) => {
+    assertNotCancelled();
     const runnerConfig = unitRecord.configSnapshot.runner;
     const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
     if (!verifyCmd) return { pass: true };
@@ -1071,6 +1081,7 @@ async function runUnitBody(options, scope) {
   // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose
   // merge needed no worker, ends the run here; a conflicted merge stays open for the producer.
   if (unitRecord.sync) {
+    assertNotCancelled();
     const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord, scope.custody);
     if (early) {
       executionSettled = true;
@@ -1104,7 +1115,8 @@ async function runUnitBody(options, scope) {
     ...(unverified ? { verify: { ran: false, reason: 'no verify command: set unit.verify, pass --verify, or declare capabilities.<capability>.verify' } } : {}),
   };
   } catch (error) {
-    if (!executionSettled) {
+    // A cancelled run is not a failed one: it stays as a dead controller leaves it, and the resume carries on.
+    if (!executionSettled && !(error instanceof RunCancelledError)) {
       // The execution error is what the caller must see; failing to record the settlement is
       // reported beside it, never instead of it.
       try { settle('execution-failure'); }
