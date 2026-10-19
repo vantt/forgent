@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
@@ -209,11 +210,11 @@ function hookRunsAtHome(repoRoot, actualToplevel) {
 function stagedFgosDeletions(committingToplevel) {
   const output = execFileSync(
     'git',
-    ['diff', '--cached', '--name-only', '--diff-filter=D'],
+    ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=D', '-z'],
     { cwd: committingToplevel, encoding: 'utf8' },
   );
   return output
-    .split('\n')
+    .split('\0')
     .filter((p) => p !== '')
     .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
@@ -442,6 +443,18 @@ async function warnOnConventionViolations(committingToplevel) {
   }
 }
 
+// The config value only selects an operation. Rust proves the lock, WAL and index.
+function cutoverGrantAllows(committingToplevel) {
+  try {
+    const operation = execFileSync('git', ['config', '--get', 'fgos.operationId'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+    if (!operation) return false;
+    const { bin } = resolveActiveHostBin({ fgosDir: path.join(committingToplevel, '.fgos'), cwd: committingToplevel });
+    if (!bin) return false;
+    const verdict = JSON.parse(execFileSync(bin, ['internal', 'git-grant-check', '--protocol', '1', '--operation', operation], { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe', 3] }));
+    return verdict.protocol === 1 && verdict.result === 'allowed';
+  } catch { return false; }
+}
+
 async function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const committingToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();
@@ -453,7 +466,7 @@ async function main() {
   }
 
   const fgosDeletions = stagedFgosDeletions(committingToplevel);
-  if (fgosDeletions.length > 0) {
+  if (fgosDeletions.length > 0 && !cutoverGrantAllows(committingToplevel)) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }

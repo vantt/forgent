@@ -437,6 +437,35 @@ console.log('ready'); setInterval(() => {}, 1000);`;
   fs.rmSync(base, { recursive: true, force: true });
 });
 
+test('a SIGTERM kill keeps its signal status: the helper cleans up and re-raises instead of exiting with a code', async () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import ${JSON.stringify(helper)};
+console.log('ready'); setInterval(() => {}, 1000);`;
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, FGOS_KEEP_TEST_FIXTURES: '' }, stdio: ['ignore', 'pipe', 'inherit'] });
+  await new Promise((resolve) => child.stdout.once('data', resolve));
+  const closed = new Promise((resolve) => child.once('close', (code, signal) => resolve({ code, signal })));
+  child.kill('SIGTERM');
+  assert.deepEqual(await closed, { code: null, signal: 'SIGTERM' });
+});
+
+test('a test process that installs its own SIGINT handler keeps full ownership of the signal and carries on', () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};
+import fs from 'node:fs';
+let seen = 0;
+process.on('SIGINT', () => { seen += 1; });
+process.emit('SIGINT');
+process.kill(process.pid, 'SIGINT');
+await new Promise((resolve) => setTimeout(resolve, 100));
+console.log(JSON.stringify({ seen, rootExists: fs.existsSync(PROCESS_TEMP_ROOT) }));`;
+  const base = tempBase();
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });
+  assert.equal(run.status, 0, run.stderr);
+  assert.deepEqual(JSON.parse(run.stdout), { seen: 2, rootExists: true });
+  assert.deepEqual(fs.readdirSync(base), [], 'the private dir is still removed at normal exit');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 test('runSelectedTests removes the per-run temp dir even when spawning the suite throws', () => {
   const base = tempBase();
   let runTemp;

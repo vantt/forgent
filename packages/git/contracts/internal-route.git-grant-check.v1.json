@@ -1,0 +1,11 @@
+{
+  "id": "internal-route.git-grant-check",
+  "version": 1,
+  "argv": ["internal", "git-grant-check", "--protocol", "1", "--operation", "<operationId>"],
+  "authority": "inherited slot 3 must pass holder-lock borrower verification for the trusted main-checkout lock; operationId is a selector only",
+  "input": "Git-supplied checkout/gitdir/index; temporary indexes must be regular files in the registered gitdir",
+  "success": {"protocol": 1, "result": "allowed"},
+  "refusalExitCode": 10,
+  "checks": ["main checkout", "active ScopedCommit TargetAttempt without outcome", "record-zero dev:ino matches the borrowed description", "exact staged .fgos deletion byte paths", "current refs/fgos/legacy", "seal.json SHA-256 digest"],
+  "effects": "read-only"
+}

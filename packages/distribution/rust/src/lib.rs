@@ -418,7 +418,10 @@ mod tests {
             serde_json::from_str(COMMAND_ROUTES_JSON)
                 .expect("embedded command-routes.json must be valid JSON");
         let verbs = resolve_verbs();
-        assert_eq!(verbs.len(), routes.keys().filter(|k| !k.starts_with('-')).count());
+        assert_eq!(
+            verbs.len(),
+            routes.keys().filter(|k| !k.starts_with('-')).count()
+        );
         assert!(!verbs.iter().any(|v| v.starts_with('-')));
         let mut sorted = verbs.clone();
         sorted.sort();
@@ -498,3 +501,5 @@ mod tests {
         assert_eq!(compact, vector["compact_hash_input"].as_str().unwrap());
     }
 }
+
+pub mod git_grant;

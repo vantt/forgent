@@ -336,6 +336,8 @@
     "src/verbs/events/rebuild.mjs": "use-case",
     "src/setup/event-store-checks.mjs": "use-case",
     "src/setup/event-store-fixes.mjs": "use-case",
-    "src/event-store/config.mjs": "infra"
+    "src/event-store/config.mjs": "infra",
+    "src/git/scoped-commit.mjs": "infra",
+    "src/git/sync.mjs": "infra"
   }
 }
