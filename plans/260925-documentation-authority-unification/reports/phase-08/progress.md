@@ -1,3 +1,25 @@
+# Step 02l handoff — escaped-literal inventory rework
+
+State: **author mechanical rework complete; independent recheck pending** under A51/L12-28. Input remains `42edba2b08d26ab8dcabe4859a301e1589fa8e6b`. **Step-02k is SUPERSEDED as an acceptance packet**; all its files and its independent review remain unchanged historical evidence. Step-02j remains accepted as inventory, with advisory semantics; no consumer edits or Step 3 patch authoring in this turn.
+
+| Class | Edges before → after | Files before → after | Edge files before → after | Cause |
+| --- | ---: | ---: | ---: | --- |
+| 4 | 3,330 → 3,334 | 225 → 225 | 122 → 122 | +4 escaped-root literals |
+| 5 | 1,367 → 1,379 | 712 → 712 | 149 → 149 | +12 escaped-root literals |
+| 6 | 492 → 494 | 489 → 490 | 117 → 118 | +1 escaped-root literal; +1 `.gitignore:1` config consumer |
+
+- **Escaped coverage:** lexer recognizes arbitrary backslash depth before separators for every legacy root and ROOTFILES authority, escaped dots, regex delimiters, escaped-newline prefixes and the reviewed `(?:architect|platform)` root expression. All named review lines are asserted by replay, including both knowledge-bootstrap:115 occurrences. Extra escaped hits: check-doc-inventory-gates:794 and dead-vocabulary-guard:560. Separate grep grammar now accepts escaped separators: zero uncovered matching lines (classes 4/5/6: 3,254 / 1,193 / 469 matching lines).
+- **Four rulings:** class-4 ALLOWED_ROOTS bare `'docs'` at generate-shipped-path-inventory:41 is an explicit untraced config/default-root construction: 3,541 → 3,542 dynamic sites; other classes unchanged. `.gitignore` contributes one class-6 edge/file. [Exclusions](step-02l-exclusions.json) mechanically enumerate exactly 13 non-Markdown archived-plan root-hit files with paths, byte counts and digests; archive history stays outside classes 4–6. Shell/TOML comments no longer act as Markdown headings: **11 flags fixed (7 class 4, 4 class 6), historyHeading 24 → 13**, carriageRegion remains 1 → 1. [Full per-cause reconciliation](step-02l-reconciliation.json): zero removed edges/files, all deltas reconcile.
+- **Historical class 3:** read-only scan of all **1,037 step-02j population files** at `1a0f61ac53433292e08fb378ebbb6c1c72fd3b74`: **0 escaped edges found / 0 absent**. Count, source inventory digest, command and replay proof in [verification](step-02l-verification.json). No addendum emitted because count is zero; step-02j untouched.
+- **Proof:** both explicit-input replays **PASS, byte-identical**, 77,095 bytes, SHA-256 `deb7261a71c5c9dfec38e3750bee6a5c3ff2d5aa3fa081f3f623d83da44096b8`. Review view 60,455 bytes, SHA-256 `e97492ca4a64901e2247d0171a5e1802ee6b752db56cf86dc87fecd7c85a8ce5`; human bundle 165,304 bytes ≤400,000. All census bytes/digests/spans/Git-tree existence, supplemental reconciliation and archive exclusions replayed. **222 inherited regressions + 24 prior inventory probes retained + 97 new differential probes**, nine record mutations rejected. New witness is demonstrated to fail the actual step-02k extractor and pass step-02l; every root/ROOTFILES authority tested at 1–3 escaped separator depths. Frozen checkpoint/dependency pins independently rehashed, no drift.
+- **ONE bounded recheck request:** [step-02l-inventory-review-request.md](step-02l-inventory-review-request.md), reserved independent report **review-a38-step-02l-inventory-01.md**. Scope: replay/hashes; independent escaped grep; four rulings; differential probe; **10 fresh random edges per class**, seed `A51-step02l-recheck-20261019-escaped-73c8`. No reviewer launched; Lead owns dispatch/acceptance and actual runner-commit accounting.
+
+**Blockers / boundary:** no blocker to this author assignment. Independent recheck remains pending; untraced writers continue to block only their later rewrite batches. Both protected reproduction manifests and every consumer/gate/checker/vocabulary/extractor/comparator/test/baseline/docs/instruction/skill/switchboard remain untouched. No fgOS CLI, git writes, state/secrets reads, full/heavy suite, services or native/global sync. Replay/probes run with session env unset, one heavy job at a time; scratch only `/tmp/fgos-work/`, plus the explicitly required atomic assignment outbox. Long-document preview stays with the Lead's authorized environment.
+
+Earlier checkpoints below are historical; this handoff supersedes step-02k acceptance claims only.
+
+---
+
 # Step 02k handoff — A51 inventory gate, classes 4–6 and per-file authoring request
 
 State: **author inventory/replay complete; mechanical independent review pending. step-02j class 3 CLOSED (inventory)** under owner A51 and supplied Lead L12-28. Input for this census is committed HEAD `42edba2b08d26ab8dcabe4859a301e1589fa8e6b`. No consumer patch authored or applied.
