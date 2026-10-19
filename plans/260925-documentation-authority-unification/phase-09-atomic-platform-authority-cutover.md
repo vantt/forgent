@@ -26,7 +26,7 @@ Phase 7 cutover note (L11-23/L11-25): refresh the main-authored Holder-lock main
 
 ### First obligation — final changed-candidate accounting (A47/A48, L12-1)
 
-Before promotion, account every changed candidate file per unit. Retain A47's original 35-file set (6 main-touched, 29 plan-only; 2,436 claims, 233 gaps at the recorded pin); do not replace it with only main imports. The final set is recomputed from B0 and includes every subsequent candidate edit. This is deferred accounting, not a waiver of conservation or current-truth review. No carry or rebind occurred in the Phase 8 detailing turn.
+Before promotion, account every changed candidate file per unit. Retain A47's original 35-file set (6 main-touched, 29 plan-only; 2,436 claims, 233 gaps at the recorded pin); do not replace it with only main imports. The final set is recomputed from B0 and includes every subsequent candidate edit. This is deferred accounting, not a waiver of conservation or current-truth review. No carry or rebind occurred in the Phase 8 detailing turns. L12-3 assigns the imported 85 binding repairs to Phase 8 Step 0, and every subsequent target-edit batch carries/rebinds its own changed units; this final accounting is not a deferred repair waiver.
 
 Merge `49ad04648` imports main `708ea6608` and adds the following exact incoming `docs/platform/**` changed-file list to that obligation (union/deduplicate with the original set; thirteen paths is not a claim of thirteen additional unique files):
 
@@ -44,13 +44,15 @@ Merge `49ad04648` imports main `708ea6608` and adds the following exact incoming
 - `docs/platform/session-identity/spec.md`
 - `docs/platform/terminal-control/spec.md`
 
-[Phase 8 merge accounting](reports/phase-08/merge-accounting.json) preserves merge/base/digest/main-commit provenance. Native identity transitions, content/context rebindings, approvals and per-unit review are still owed against final bytes. Also include legacy main edits, architecture-manifest changes and any later full identity-scope drift as their existing obligations require.
+[Phase 8 merge accounting](reports/phase-08/merge-accounting.json) preserves merge/base/digest/main-commit provenance. Final native identity transitions, content/context validation, approvals and per-unit review remain owed against final bytes; incorporate the Phase 8 Step 0 and subsequent N1 receipts rather than deferring those binding repairs. Also include legacy main edits, architecture-manifest changes and any later full identity-scope drift as their existing obligations require.
 
 At landing, reconcile main's only references to its new PF-I011/PF-I012 rows in `plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md` with their candidate PF-I022/PF-I023 identities; do not alter the plan's existing PF-I011/PF-I012. This is an intent-ledger collision account, not contract renumbering authority.
 
 Keep these cutover seams explicit: A45 legacy CTR010 lines in `docs/architecture-map.md` (Gateway retains CTR010, confinement candidate CTR011; no new shipped-contract renumbering); `apps/fgos-gateway/src/gateway.rs:1187` runtime OpenAPI read; P7-DOC-GAP-05 dead-vocabulary pre-landing blocker and P7-DOC-GAP-06 stale citations; L11-23 Holder-lock header and L11-25 accepted reading-map divergence. L12-1 supersedes L11-20 only where main now registers event-seal/event-append and uses `withStateTx` instead of events/claims locks; preserve the distinct Event Store implementation status.
 
-Phase 8's reproduction diagnostics currently enumerate 85 stale target bindings across nine targets. They do not authorize rebinding early or changing ownership-checker logic; the Lead must settle the requested all-pass test target versus A47's deferral before treating that preparation baseline as green.
+L12-3 supersedes L12-2: the 85 imported stale target bindings across all nine files are Phase 8 Step 0 package work, not a pending Phase 9 rebind decision. Require its reviewed green receipts and both manifests' ownership audits/checks.mjs green again against final bytes; any cutover edit to a target carries/rebinds changed units in its own package. Include every Phase 8-edited docs/platform path in A47's final union. No checker weakening or expected-red allowance.
+
+L12-4 reserves the literal repository-wide reader/writer legacy-authority search for post-flip step 10; Phase 8 supplies switchboard routing or exact cutover patches for every row. L12-7's docs/specs/** and docs/architect/** consumer edits are exact packet patches here, never early Phase 8 target edits. The AGENTS.md packet must pin Plan A/B phase 06 landing status. L12-6 makes custody/ref protection dependent on Git phase 04 (`git/p04-custody`) landing and integration on that door; the Lead coordinates with the Git lead/program board. Phase 8's read-only compatibility check is not proof a lease has been built or acquired. Decision F revisit (L12-9): the legacy-root ratchet remains deferred from main and retires with those roots; no --record mode.
 
 **Cutover sequence:**
 

@@ -112,5 +112,49 @@
     "docs/platform/terminal-control/spec.md"
   ],
   "unitAccounting": "Deferred to Phase 9 under A47; no unit carry/rebind performed",
-  "reproductionUnaccountedPairsAtInputHEAD": []
+  "reproductionUnaccountedPairsAtInputHEAD": [],
+  "conflictResolutions": [
+    {
+      "path": "docs/platform/component-boundary.md",
+      "resolution": "Main platform rows and Holder-lock/session text; retain plan Event Store row after Git and carriage sections after main route rows.",
+      "postMergeSha256": "9bb538737044b8ab8146cb8a2f098ea99aaf4d80388808ec6686f25af20b5ee1",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "resolution": "Main wins; event-seal/event-append registry and withStateTx facts supersede old L11-20 wording only.",
+      "postMergeSha256": "72223e1528842280083af278a8c3cf15db24ab1494f364dbb65d9bf94d70571a",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "resolution": "Main numbered sections before retained-source appendices.",
+      "postMergeSha256": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "resolution": "Main numbered sections before retained-source appendices.",
+      "postMergeSha256": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "resolution": "Main numbered sections before retained-source appendices.",
+      "postMergeSha256": "ede11887fd3ceddc0b3bcb371d8322eb1efbe55cd258fca1e268392140935adf",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "docs/platform/intent-preservation-ledger.md",
+      "resolution": "Main new rows become candidate PF-I022/PF-I023; retain plan PF-I011/PF-I012 and reconcile incoming main reference at landing.",
+      "postMergeSha256": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+      "authority": "L12-1 supplied seven conflict paths"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "resolution": "Accept main removal of deleted unlock-skill entry; retain plan two docs/specs entries.",
+      "postMergeSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "authority": "L12-1 supplied seven conflict paths"
+    }
+  ]
 }

@@ -1,0 +1,221 @@
+{
+  "status": "revision-authored-not-independent-acceptance",
+  "sourceCommit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+  "requirementsUnchanged": true,
+  "successCriteriaUnchanged": true,
+  "scriptSyntax": "AST parse passed",
+  "ratchet": {
+    "exit": 0,
+    "legacyFiles": 995,
+    "accountedEdits": 26,
+    "accountedNewFiles": 1
+  },
+  "auditReplay": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+    "exit": 1,
+    "scratch": "/tmp/fgos-work/p8-audit-brf4gkql",
+    "manifests": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 1
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "driftRows": 85,
+        "targetFiles": [
+          "docs/architecture-manifest.json",
+          "docs/platform/component-boundary.md",
+          "docs/platform/holder-lock/spec.md",
+          "docs/platform/packaging-distribution/contracts/activation-binding.md",
+          "docs/platform/packaging-distribution/contracts/release-manifest.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/specs/confinement-authority.md",
+          "docs/specs/distribution.md",
+          "docs/specs/runner.md"
+        ],
+        "unaccountedPairs": [
+          {
+            "commit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json"
+          }
+        ],
+        "Hfindings": []
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 1
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "driftRows": 85,
+        "targetFiles": [
+          "docs/architecture-manifest.json",
+          "docs/platform/component-boundary.md",
+          "docs/platform/holder-lock/spec.md",
+          "docs/platform/packaging-distribution/contracts/activation-binding.md",
+          "docs/platform/packaging-distribution/contracts/release-manifest.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/specs/confinement-authority.md",
+          "docs/specs/distribution.md",
+          "docs/specs/runner.md"
+        ],
+        "unaccountedPairs": [
+          {
+            "commit": "bd779d548a0f2c08e12900a9d42d1e42b3a753d1",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json"
+          },
+          {
+            "commit": "fc2076ece06bc7e36d2ebed5f47c4a88cc33bc14",
+            "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json"
+          }
+        ],
+        "Hfindings": []
+      }
+    ]
+  },
+  "scan": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py",
+    "exit": 0,
+    "scannedFiles": 8805,
+    "anyPatternFiles": 2487,
+    "legacyFiles": 2276,
+    "legacyMissing": [],
+    "legacyExtra": [],
+    "dogfoodHitFiles": [
+      "dogfood-fixture/scenarios/expr-eval-chain.md"
+    ]
+  },
+  "findings": {
+    "P8-1": "Step 0 repairs all targets; Step 2 targetOwner/anchor intersection; same-batch N1 rule; Step 7 A47 union.",
+    "P8-2": "Committed reporter replays both manifests independently with keyed rows, current digests and checks A; no red waiver.",
+    "P8-3": "L12-4 reading now recorded; literal search is Phase 9 step 10; original criterion unchanged.",
+    "P8-4": "L12-5 drift scope includes every written path class/render; nonempty drift carried at boundary with per-file review.",
+    "P8-5": "6b read-only Git 04 custody/ref door check; Lead coordination; build waits for Git 04 landing.",
+    "P8-6": "L12-3 green Step 0 and every N1 batch replaces Phase 9 deferral; Phase 9 consumes final receipts.",
+    "P8-7": "No Phase 8 docs/specs or docs/architect edits; exact Phase 9 patch specs.",
+    "P8-8": "L12-8 Purpose reading: one flip, no early landing authorization; no automatic harvest.",
+    "P8-9": "Step 5 workflows classifier/inventory; Step 7 A/B landing pins; Decision F defers ratchet landing, retires with roots, no --record.",
+    "P8-10": "L12-10 leaves 13 shipped writer conventions and siblings unchanged; nine historical references preserved.",
+    "P8-11": "Class partition minimum 40 parts before byte splits, minimum 400 sampled reads plus exceptions; per-step counts/budget stop.",
+    "P8-12": "Serial sum 6.75\u201312 days plus one fix day = 7.75\u201313; 4\u20136 reviewer days separately; re-estimate after census.",
+    "P8-13": "Steps 0/1/2 logically independent; 6 after 2; 6b can check read-only Step 0 inputs; one writer.",
+    "P8-14": "Tuple row identity/content relocation; explicit ten queue indexes; preserve proof versus parity-backed cutover patch.",
+    "P8-15": "Seven exact supplied conflict paths in Step 0 and merge-accounting with resolutions and merge-byte SHA-256.",
+    "P8-16": "Committed scanner runs JSON patterns over all tracked paths including dogfood; legacy seed path set reproduced exactly.",
+    "P8-17": "Requirement-to-step scorecard includes verifier and inherited lease obligation narrowed to read-only dependency check.",
+    "P8-18": "Lead runs gateway Rust/cargo heavy job alone under host rule."
+  },
+  "notRun": [
+    "independent review",
+    "binding repair",
+    "full npm suite",
+    "cargo",
+    "native carry/sync",
+    "global D/E"
+  ],
+  "needsWrites": []
+}
