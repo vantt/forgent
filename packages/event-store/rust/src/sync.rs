@@ -541,11 +541,11 @@ pub fn guarded_unpublished_summary(
     repo: &RepoHandle,
     req: SyncRequest<'_>,
 ) -> Result<Vec<Unpublished>, Error> {
-    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?
-        .ok_or_else(|| invalid("explicit seal acquisition returned busy"))?;
     if repo.common_dir() != req.layout.common_dir {
         return Err(invalid("repository/layout mismatch"));
     }
+    let mut guard = acquire_seal(req.layout, req.held_ranks, req.hot_lock_depth, false)?
+        .ok_or_else(|| invalid("explicit seal acquisition returned busy"))?;
     let reference = own_ref(req.machine, &StreamId::parse("project")?)?;
     let identity = match fs::symlink_metadata(req.layout.store()) {
         Ok(_) => Some(StoreIdentity::open(req.layout, req.machine)?),

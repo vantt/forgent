@@ -24,11 +24,20 @@ try {
   const contract = path.join(temp, 'contract.json');
   fs.writeFileSync(contract, JSON.stringify({ v: 1, types: [{ type: 'example.created', domain: 'example', schemaVersion: 1, scope: 'project', sealOnWrite: false }] }));
   const store = openStore(resolved, resolved.machineId, [contract], loaderOptions);
+  const event = { eventType: 'example.created', schemaVersion: 1, payload: {}, ts: '2026-10-19T00:00:00.000Z' };
+  const recovering = process.argv.includes('--recover');
+  if (recovering) {
+    store.append('project', [event], {}, 'gate-writer', []);
+    const stream = path.join(repo, '.git/fgos/events/project');
+    fs.unlinkSync(path.join(stream, 'hwm.json'));
+    fs.appendFileSync(path.join(stream, 'active.jsonl'), '{torn');
+  }
   withStateTx(hot, () => {
     assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
     fs.writeSync(2, 'ES_GATE_BEGIN\n');
-    const result = store.append('project', [{ eventType: 'example.created', schemaVersion: 1, payload: {}, ts: '2026-10-19T00:00:00.000Z' }], {}, 'gate-writer', [60]);
-    assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, 1);
+    const result = store.append('project', [event], {}, 'gate-writer', [60]);
+    assert.equal(result.ack.lastSeq, recovering ? 2 : 1);
+    assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, recovering ? 2 : 1);
     fs.writeSync(2, 'ES_GATE_END\n');
   }, { prefetched: { writer: 'gate-writer', eventStore: store } });
 } finally { fs.rmSync(temp, { recursive: true, force: true }); }

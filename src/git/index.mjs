@@ -14,5 +14,4 @@ export function createGitPublication(options, loaderOptions) {
   }
   return Object.freeze(facade);
 }
-export { createEventStore } from '../event-store/native.mjs';
 export function versions(loaderOptions) { return loadNativeAddon(loaderOptions).versions(); }

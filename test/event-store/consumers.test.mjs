@@ -36,7 +36,7 @@ test('the manifest is the authority for contracts and lazy rebuilds, and rejects
     assert.equal((await api.loadRebuildModule('example')).rebuild, 42);
     assert.equal(globalThis.consumerLoaded, true);
   `]);
-  for (const consumers of [[entry, entry], [{ ...entry, contractFile: '../escape.json' }], [{ ...entry, rebuildModule: '/absolute.mjs' }], [{ ...entry, cachePath: 'a/../b' }]]) {
+  for (const consumers of [[entry, entry], [entry, { ...entry, id: 'other', contractFile: 'other.json' }], [{ ...entry, contractFile: '../escape.json' }], [{ ...entry, rebuildModule: '/absolute.mjs' }], [{ ...entry, cachePath: 'a/../b' }]]) {
     fs.writeFileSync(file, JSON.stringify({ v: 1, consumers }));
     execFileSync(process.execPath, ['--input-type=module', '-e', `
       import assert from 'node:assert/strict';

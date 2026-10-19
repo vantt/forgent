@@ -2,7 +2,7 @@
 import childProcess from 'node:child_process';
 import nodeModule from 'node:module';
 
-/** Error raised by this module. `code` is the contract name; `category` feeds
+/** Error raised by hot-lock operations. `code` is the contract name; `category` feeds
  * the CLI's exit-code table (a timeout is `lock-timeout`, the rest are
  * caller-correctable `precondition`s). */
 export class HotLockError extends Error {
@@ -18,8 +18,15 @@ export class HotLockError extends Error {
 // --- critical-section depth and the child-process guard ------------------
 
 let depth = 0;
-export function enterHotLock() { depth += 1; }
-export function leaveHotLock() { depth -= 1; }
+export function enterHotLock() {
+  depth += 1;
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    depth = Math.max(0, depth - 1);
+  };
+}
 
 /** Whether this process is inside a hot critical section right now. */
 export function hotLockDepth() {

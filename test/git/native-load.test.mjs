@@ -8,7 +8,8 @@ import { execFileSync } from 'node:child_process';
 import { Worker } from 'node:worker_threads';
 import { ensureGitAddon, root } from '../helpers/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
-import { createGitPublication, createEventStore } from '../../src/git/index.mjs';
+import { createGitPublication } from '../../src/git/index.mjs';
+import { openStore } from '../../src/event-store/index.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
 const require = createRequire(import.meta.url);
 const built = ensureGitAddon();
@@ -44,21 +45,27 @@ test('resolver refuses absent, unsafe, wrong-target and changed bytes before exp
 });
 test('real append and read run in a hot section without a child process; Git refuses there', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-store-'));
-  const common = path.join(temp, 'common');
+  const repo = path.join(temp, 'repo');
+  execFileSync('git', ['init', '-q', repo]);
+  execFileSync('git', ['-C', repo, 'config', 'fgos.machineId', 'fixture-machine']);
+  const common = path.join(repo, '.git');
   fs.mkdirSync(path.join(common, 'fgos/events/locks'), { recursive: true, mode: 0o700 });
-  const store = createEventStore(common, [{ v: 1, types: [{ type: 'example.created', domain: 'example', schemaVersion: 1, scope: 'project', sealOnWrite: false }] }], options);
+  const contract = path.join(temp, 'contract.json');
+  fs.writeFileSync(contract, JSON.stringify({ v: 1, types: [{ type: 'example.created', domain: 'example', schemaVersion: 1, scope: 'project', sealOnWrite: false }] }));
+  const resolved = addon.resolveEventStore(repo, temp, repo);
+  const store = openStore(resolved, resolved.machineId, [contract], options);
   const hot = path.join(temp, '.fgos');
   fs.mkdirSync(hot);
   try {
     withStateTx(hot, () => {
       assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
       assert.throws(() => createGitPublication({}, options), /exec-under-hot-lock/);
-      const appended = store.append('project', [{ eventType: 'example.created', schemaVersion: 1, payload: { n: 1 }, ts: '2026-10-18T07:00:00.000Z' }], {}, 'fixture-writer', 'fixture-machine', [60]);
+      const appended = store.append('project', [{ eventType: 'example.created', schemaVersion: 1, payload: { n: 1 }, ts: '2026-10-18T07:00:00.000Z' }], {}, 'fixture-writer', [60]);
       assert.equal(appended.ack.lastSeq, 1);
       const read = store.readInGate(appended.ack.origin, 'project', 0);
       assert.equal(read.events.length, 1);
       assert.equal(read.events[0].payload.n, 1);
-    });
+    }, { prefetched: { writer: 'fixture-writer' } });
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 

@@ -24,9 +24,8 @@ import path from 'node:path';
 import { judge, getBootId, getPidNs, getProcessStartTime, observeProcess, pidExists } from '../runner/dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, runProcessObserveRoute } from '../holder-lock/index.mjs';
 import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
-import { HotLockError, hotLockDepth, enterHotLock, leaveHotLock } from '../holder-lock/hot-guard.mjs';
+import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
-
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { appendEventCore } from './event-log.mjs';
 
@@ -361,7 +360,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
-  enterHotLock();
+  const leaveHotLock = enterHotLock();
   noteLockHeld();
   const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;

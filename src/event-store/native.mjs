@@ -27,29 +27,30 @@ function outsideGate(heldRanks) {
 function call(fn) {
   available();
   try { return fn(); } catch (error) {
-    const code = error.message.match(/\b(event-store-[a-z-]+|lock-order-violation)\b/)?.[1];
+    let code = error.message.match(/^([a-z][a-z-]*)(?::|$)/)?.[1];
+    if (!code) {
+      try {
+        const operation = JSON.parse(error.message);
+        code = operation.code;
+        if (operation.cause) error.cause = operation.cause;
+      } catch { /* Plain native error. */ }
+    }
     if (code) error.code = code;
     throw error;
   }
 }
-/** Compatibility entry used by the combined-addon tests; no repository resolution. */
-export function createEventStore(commonDir, contracts = [], loaderOptions) {
-  available();
-  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
-  return call(() => new (loadNativeAddon(loaderOptions).EventStore)(commonDir, contracts));
-}
-
 const prepared = new Map();
 /** Resolve before acquiring a hot mutex; pass the result as prefetched.eventStore. */
-export function prepareStore(cwd, { stateRoot, trustedMain = cwd, loaderOptions } = {}) {
+export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions } = {}) {
   available();
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
+  if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');
   const root = path.resolve(cwd);
   const trusted = path.resolve(trustedMain);
   const state = stateRoot ?? resolveStateRoot().stateRoot;
-  const key = JSON.stringify([root, trusted, state]);
-  if (prepared.has(key)) return prepared.get(key);
   const native = loadNativeAddon(loaderOptions);
+  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null]);
+  if (prepared.has(key)) return prepared.get(key);
   const resolved = call(() => native.resolveEventStore(root, state, trusted));
   const store = openStore(resolved, resolved.machineId, registryFiles(), loaderOptions);
   prepared.set(key, store);
@@ -67,7 +68,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions) {
     append(stream, events, cursor, writer, heldRanks) {
       available();
       const ranks = ranksOf(heldRanks);
-      return call(() => native.append(stream, events, cursor, writer, machineId, ranks));
+      return call(() => native.append(stream, events, cursor, writer, ranks));
     },
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
     read({ streams, cursor = null, folded = [], project = true }, heldRanks) {

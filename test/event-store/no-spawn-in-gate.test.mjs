@@ -15,14 +15,14 @@ test('real append/readInGate run under the hot-lock process guard', { skip: proc
   assert.match(result.stderr, /ES_GATE_BEGIN\nES_GATE_END/);
 });
 
-test('strace observes zero process creation calls in the append/readInGate window', { skip: process.platform !== 'linux' }, t => {
+for (const mode of [[], ['--recover']]) test(`strace observes zero process creation calls in the append/readInGate window ${mode.join(' ')}`, { skip: process.platform !== 'linux' }, t => {
   const version = spawnSync('strace', ['-V'], { encoding: 'utf8' });
   if (version.error?.code === 'ENOENT') { t.skip('strace unavailable'); return; }
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-es-strace-'));
   try {
     const log = path.join(temp, 'trace');
-    const result = spawnSync('strace', ['-f', '-e', 'trace=process,write', '-s', '256', '-o', log, process.execPath, probe, built.manifest], { encoding: 'utf8' });
-    if (/ptrace.*(not permitted|denied)|Operation not permitted/.test(result.stderr)) { t.skip('sandbox denies strace/ptrace'); return; }
+    const result = spawnSync('strace', ['-f', '-e', 'trace=process,write', '-s', '256', '-o', log, process.execPath, probe, built.manifest, ...mode], { encoding: 'utf8' });
+    if (/^strace: .*ptrace.*(?:not permitted|denied)/mi.test(result.stderr)) { t.skip('sandbox denies strace/ptrace'); return; }
     assert.equal(result.status, 0, result.stderr);
     const trace = fs.readFileSync(log, 'utf8');
     const begin = trace.indexOf('ES_GATE_BEGIN');

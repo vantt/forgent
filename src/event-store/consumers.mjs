@@ -26,12 +26,14 @@ export function consumers() {
   if (manifest.v !== 1 || !Array.isArray(manifest.consumers)) throw invalid('unsupported manifest');
   const ids = new Set();
   const files = new Set();
+  const caches = new Set();
   const entries = manifest.consumers.map(entry => {
     if (!entry || typeof entry.id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(entry.id)
       || ids.has(entry.id) || !relativePath(entry.contractFile) || files.has(entry.contractFile)
-      || !relativePath(entry.cachePath) || !relativePath(entry.rebuildModule)) throw invalid('invalid or duplicate consumer');
+      || !relativePath(entry.cachePath) || caches.has(entry.cachePath) || !relativePath(entry.rebuildModule)) throw invalid('invalid or duplicate consumer');
     ids.add(entry.id);
     files.add(entry.contractFile);
+    caches.add(entry.cachePath);
     return Object.freeze({ id: entry.id, contractFile: entry.contractFile, cachePath: entry.cachePath, rebuildModule: entry.rebuildModule });
   });
   cached = Object.freeze(entries);

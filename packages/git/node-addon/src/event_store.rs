@@ -5,7 +5,7 @@ use fgos_event_store::{
     identity::StoreIdentity,
     layout::{Layout, StreamId},
     open_read,
-    registry::{ConsumerContract, Registry},
+    registry::Registry,
 };
 use fgos_git::{GitDriver, Inspect, RepoHandle, ResolveRepo};
 use napi::{Error, Result};
@@ -29,8 +29,8 @@ fn guarantee(g: &fgos_holder_lock::Guarantee) -> Value {
 pub struct EventStore {
     layout: Layout,
     registry: Registry,
-    machine: Option<String>,
-    resolved: Option<(Arc<GitDriver>, Arc<RepoHandle>)>,
+    machine: String,
+    resolved: (Arc<GitDriver>, Arc<RepoHandle>),
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -42,20 +42,6 @@ struct Input {
 }
 #[napi]
 impl EventStore {
-    #[napi(constructor)]
-    pub fn new(common_dir: String, contracts: Value) -> Result<Self> {
-        available()?;
-        let mut registry = Registry::default();
-        for contract in serde_json::from_value::<Vec<ConsumerContract>>(contracts).map_err(error)? {
-            registry.register(contract).map_err(error)?;
-        }
-        Ok(Self {
-            layout: Layout::from_common_dir(Some(Path::new(&common_dir))).map_err(error)?,
-            registry,
-            machine: None,
-            resolved: None,
-        })
-    }
     #[napi]
     pub fn append(
         &self,
@@ -63,7 +49,6 @@ impl EventStore {
         events: Value,
         cursor: Value,
         writer: String,
-        machine: String,
         held_ranks: Vec<u32>,
     ) -> Result<Value> {
         available()?;
@@ -87,7 +72,7 @@ impl EventStore {
                 events: &events,
                 cursor: &cursor,
                 writer: &writer,
-                machine: &machine,
+                machine: &self.machine,
                 held_ranks: &held_ranks,
             },
         )
@@ -180,11 +165,11 @@ pub fn open_store(
     Ok(EventStore {
         layout: Layout::from_common_dir(Some(resolved_root.repo.common_dir())).map_err(error)?,
         registry,
-        machine: Some(machine_id),
-        resolved: Some((
+        machine: machine_id,
+        resolved: (
             Arc::clone(&resolved_root.driver),
             Arc::clone(&resolved_root.repo),
-        )),
+        ),
     })
 }
 fn sealed(result: fgos_event_store::seal::Sealed) -> Value {
@@ -200,17 +185,8 @@ impl EventStore {
     fn context(&self, ranks: &[u32], depth: u32) -> Result<(&GitDriver, &RepoHandle, &str)> {
         available()?;
         fgos_event_store::locks::validate_seal_context(ranks, depth).map_err(error)?;
-        let (driver, repo) = self
-            .resolved
-            .as_ref()
-            .ok_or_else(|| error("event-store-not-prepared"))?;
-        Ok((
-            driver,
-            repo,
-            self.machine
-                .as_deref()
-                .ok_or_else(|| error("event-store-not-prepared"))?,
-        ))
+        let (driver, repo) = &self.resolved;
+        Ok((driver, repo, &self.machine))
     }
 }
 #[napi]
