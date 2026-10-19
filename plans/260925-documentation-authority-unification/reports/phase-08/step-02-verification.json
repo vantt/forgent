@@ -1,0 +1,523 @@
+{
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "main": "51c61af6479d2e077640d713173c7f489695c9fa",
+  "timestamp": "2026-10-19T04:02:17.680699+00:00",
+  "authorStatus": "bounded partial census authoring complete; Step 2 open, no independent acceptance",
+  "mechanicalReplay": {
+    "exit": 0,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-mechanical-proof.log",
+    "edges": 110,
+    "historyFileDispositions": 22,
+    "evidenceConsumerFiles": 212,
+    "ledgerOwners": 291,
+    "ledgerBindings": 12579,
+    "reviewEntries": 307
+  },
+  "lightTests": {
+    "exit": 0,
+    "passed": 95,
+    "failed": 0,
+    "skipped": 0,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-light-tests.log"
+  },
+  "ratchet": {
+    "exit": 0,
+    "files": 995,
+    "accountedEdits": 26,
+    "accountedNew": 1,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ratchet.log"
+  },
+  "diffCheckExit": 0,
+  "mainDrift": {
+    "identityScope": [],
+    "exactAuthoredPathsScope": []
+  },
+  "protectedFiles": [
+    {
+      "path": ".agents/skills/_shared/capability-catalog.md",
+      "sha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "inputHEADSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "sha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "inputHEADSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/_shared/planning-capability-awareness.md",
+      "sha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "inputHEADSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "sha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "inputHEADSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "inputHEADSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "sha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "inputHEADSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "equal": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "inputHEADSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "equal": true
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "inputHEADSha256": "f6582e14f5fd4e3a616eebbd5d6af1187ff0276e456cfc460d96b74f8a3c568b",
+      "equal": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "inputHEADSha256": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "equal": true
+    },
+    {
+      "path": "README.md",
+      "sha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "inputHEADSha256": "b5cb1938a264c4a6ffdf7693d5c518428a98b90f88381d9c4c9eb4f7fd29f5a5",
+      "equal": true
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "sha256": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "inputHEADSha256": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "equal": true
+    },
+    {
+      "path": "core/skills/_shared/capability-catalog.md",
+      "sha256": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "inputHEADSha256": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "equal": true
+    },
+    {
+      "path": "core/skills/_shared/executor-dispatch-fallback.md",
+      "sha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "inputHEADSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "equal": true
+    },
+    {
+      "path": "core/skills/_shared/planning-capability-awareness.md",
+      "sha256": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "inputHEADSha256": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "equal": true
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "sha256": "4d0ab3736c7767ca62993d8097ee19cef3f9100421eae4385fc53ba3b57e4bca",
+      "inputHEADSha256": "4d0ab3736c7767ca62993d8097ee19cef3f9100421eae4385fc53ba3b57e4bca",
+      "equal": true
+    },
+    {
+      "path": "docs/decisions/index.md",
+      "sha256": "4d0b187fc7998c65fc63f04e2dcc9117b3eb90916864a69bf8df8e5638bdf802",
+      "inputHEADSha256": "4d0b187fc7998c65fc63f04e2dcc9117b3eb90916864a69bf8df8e5638bdf802",
+      "equal": true
+    },
+    {
+      "path": "docs/doc-registry.json",
+      "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "inputHEADSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "equal": true
+    },
+    {
+      "path": "docs/doc-registry.md",
+      "sha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+      "inputHEADSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+      "equal": true
+    },
+    {
+      "path": "docs/history/agent-coordination-foundation/plan.md",
+      "sha256": "b8662bc6bc148bfbc5390d4785903cd339c9f15f8afea919960421d41738f59a",
+      "inputHEADSha256": "b8662bc6bc148bfbc5390d4785903cd339c9f15f8afea919960421d41738f59a",
+      "equal": true
+    },
+    {
+      "path": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+      "sha256": "ff5c8fa78f76ee678e34fe65b1ac279afd68b77ea9d54697ace90a710b00cb6e",
+      "inputHEADSha256": "ff5c8fa78f76ee678e34fe65b1ac279afd68b77ea9d54697ace90a710b00cb6e",
+      "equal": true
+    },
+    {
+      "path": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+      "sha256": "936a01c9d7c53d4c870f0db2a0760c7294f616a43d65a4911514895d89301025",
+      "inputHEADSha256": "936a01c9d7c53d4c870f0db2a0760c7294f616a43d65a4911514895d89301025",
+      "equal": true
+    },
+    {
+      "path": "docs/history/gate-bypass/CONTEXT.md",
+      "sha256": "af94f9e1db327f47ba49c9b4b805fc8fed26b9aebbab44c6daa130e1932af419",
+      "inputHEADSha256": "af94f9e1db327f47ba49c9b4b805fc8fed26b9aebbab44c6daa130e1932af419",
+      "equal": true
+    },
+    {
+      "path": "docs/history/orchestrator-worker-slots/plan.md",
+      "sha256": "f8fb9c368c28e7c90408e0b87a56c49ecc8b2e212aa7adc73402dfe65911d4ac",
+      "inputHEADSha256": "f8fb9c368c28e7c90408e0b87a56c49ecc8b2e212aa7adc73402dfe65911d4ac",
+      "equal": true
+    },
+    {
+      "path": "docs/history/setup-doctor-config-registry/plan.md",
+      "sha256": "32f961285ab0f21cb3bd7467794054cadb757ffd8c0c700343a640cd5b4133ae",
+      "inputHEADSha256": "32f961285ab0f21cb3bd7467794054cadb757ffd8c0c700343a640cd5b4133ae",
+      "equal": true
+    },
+    {
+      "path": "docs/history/two-layer-dispatch/DISCUSSION.md",
+      "sha256": "c80a94186c88ae554488d3a983590be99a9d4301ddd66cd5b2bfbe8ce4a395cc",
+      "inputHEADSha256": "c80a94186c88ae554488d3a983590be99a9d4301ddd66cd5b2bfbe8ce4a395cc",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "sha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "inputHEADSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "sha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "inputHEADSha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sha256": "1c97d8358f6b4369dbae1f9be6d381de28c8b83ff8abb46453b463dcea910100",
+      "inputHEADSha256": "1c97d8358f6b4369dbae1f9be6d381de28c8b83ff8abb46453b463dcea910100",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "sha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "inputHEADSha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "sha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "inputHEADSha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "equal": true
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "sha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+      "inputHEADSha256": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+      "equal": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "sha256": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "inputHEADSha256": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "equal": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "inputHEADSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "equal": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "sha256": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "inputHEADSha256": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "equal": true
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "inputHEADSha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "equal": true
+    },
+    {
+      "path": "domains/coding/task-specs/shape-plan.md",
+      "sha256": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+      "inputHEADSha256": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/alias-table.json",
+      "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+      "inputHEADSha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "sha256": "3b2dde55bded3b48408a741eb451bd59da94f66c830cb090fc1a831986a3479f",
+      "inputHEADSha256": "3b2dde55bded3b48408a741eb451bd59da94f66c830cb090fc1a831986a3479f",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+      "sha256": "2fd4944f0003f38d5048d7d2a623792c6cabc8631a5e0e042f6707331660d1ef",
+      "inputHEADSha256": "2fd4944f0003f38d5048d7d2a623792c6cabc8631a5e0e042f6707331660d1ef",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "9860869d74b630776e520aa604af9032c0d0b0ff7e60cb53a15425f23863e8f7",
+      "inputHEADSha256": "9860869d74b630776e520aa604af9032c0d0b0ff7e60cb53a15425f23863e8f7",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "8949e8cb29a1b3eb5cca7194ebf5ca8fdbf6f1715422897451f761f8db9d94bd",
+      "inputHEADSha256": "8949e8cb29a1b3eb5cca7194ebf5ca8fdbf6f1715422897451f761f8db9d94bd",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json",
+      "sha256": "a9bf46c5f1b1f2896bf4afbd868f21d788526205b1920ea7452da749e32cb29d",
+      "inputHEADSha256": "a9bf46c5f1b1f2896bf4afbd868f21d788526205b1920ea7452da749e32cb29d",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py",
+      "sha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac",
+      "inputHEADSha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "sha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "inputHEADSha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "sha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "inputHEADSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "sha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "inputHEADSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "sha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "inputHEADSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "sha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "inputHEADSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "sha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "inputHEADSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "sha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "inputHEADSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "equal": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "sha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "inputHEADSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "inputHEADSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "inputHEADSha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "sha256": "74097c9864d1c74e840b0deced0645ed4dc249d0e9923fee9f3d379358f9c38a",
+      "inputHEADSha256": "74097c9864d1c74e840b0deced0645ed4dc249d0e9923fee9f3d379358f9c38a",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "inputHEADSha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "equal": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "sha256": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
+      "inputHEADSha256": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "inputHEADSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "inputHEADSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "equal": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "sha256": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
+      "inputHEADSha256": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
+      "equal": true
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "sha256": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "inputHEADSha256": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "equal": true
+    },
+    {
+      "path": "src/setup/git-hooks.mjs",
+      "sha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "inputHEADSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "equal": true
+    },
+    {
+      "path": "src/setup/instruction-registry.mjs",
+      "sha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "inputHEADSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "equal": true
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "sha256": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "inputHEADSha256": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/check-doc-candidate-status.test.mjs",
+      "sha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+      "inputHEADSha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/check-doc-constitution.test.mjs",
+      "sha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+      "inputHEADSha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/doc-link-pass.test.mjs",
+      "sha256": "479cc0c5b5ecaf27bafbf81a056cd3035e0fbaa8c8b61a33b7aefa23342de437",
+      "inputHEADSha256": "479cc0c5b5ecaf27bafbf81a056cd3035e0fbaa8c8b61a33b7aefa23342de437",
+      "equal": true
+    }
+  ],
+  "frozenB": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "verifiedActual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "verifiedActual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "verifiedActual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "verifiedActual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48",
+      "verifiedActual": "680570946fa1381474900c9192795514b5b88f48"
+    }
+  ],
+  "changedTrackedPaths": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+  ],
+  "newPathsAtReceipt": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-cli-help.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-history-plan.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-setup-doctor.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-dynamic-unresolved.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-evidence-consumers.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-light-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-mechanical-proof.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-merge-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ratchet.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-03.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-04.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-05.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-06.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-07.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-08.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-09.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json"
+  ],
+  "reviewRequest": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+    "bytes": 20782,
+    "parts": 9,
+    "payloadBytes": 1730654,
+    "maxPartBytes": 366716,
+    "reviewed": 0,
+    "budget": "Lead assignment pending; reviewer elapsed 0"
+  },
+  "remaining": "See step-02-census.md and step-02-dynamic-unresolved.json; bounded export or separately authorized workload for 2.61 GB inventory API load; no state/secrets access",
+  "A47Carry": [
+    "Merged setup-doctor-registry.md candidate content changed by Lead-resolved main merge; six current target bindings in N1 journal; Phase 9 final changed-candidate union must retain it. No target content edited by this worker."
+  ],
+  "accounting": "Not run. Lead must enumerate exact pairs after real runner author commit; separate two-manifest Unit then clean committed-byte acceptance. No guessed id, raw-green claim or new B allowance.",
+  "notRun": [
+    "full npm suite",
+    "batch-end reproduction audits/checks/tests",
+    "inventory API full load/regeneration",
+    "independent review",
+    "fgos CLI",
+    "git writes",
+    "native/global sync",
+    "services or markdown preview",
+    "state/secrets/external/ignored reads"
+  ],
+  "authorElapsedSecondsSinceEarlyProgress": 812,
+  "remainingReviewerBudget": "unassigned; reviewer elapsed 0; Lead must size 9 bounded parts before dispatch"
+}

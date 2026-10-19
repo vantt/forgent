@@ -1,0 +1,266 @@
+{
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "entries": [
+    {
+      "id": "cli-015",
+      "path": "bin/fgos.mjs",
+      "line": 1530,
+      "expression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-016",
+      "path": "bin/fgos.mjs",
+      "line": 1604,
+      "expression": "if (docPath && targetDoc.currentPath !== docPath",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-017",
+      "path": "bin/fgos.mjs",
+      "line": 1624,
+      "expression": "execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`]",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-018",
+      "path": "bin/fgos.mjs",
+      "line": 1576,
+      "expression": "const resolved = resolveDocPath(view, docPath)",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-019",
+      "path": "bin/fgos.mjs",
+      "line": 1723,
+      "expression": "if (resolved.currentPath !== docPath)",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-020",
+      "path": "bin/fgos.mjs",
+      "line": 1819,
+      "expression": "if (match.currentPath !== docPath)",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-021",
+      "path": "bin/fgos.mjs",
+      "line": 2099,
+      "expression": "fs.readFileSync(contextPath, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-022",
+      "path": "bin/fgos.mjs",
+      "line": 2146,
+      "expression": "fs.writeFileSync(contextPath, after, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-023",
+      "path": "bin/fgos.mjs",
+      "line": 2376,
+      "expression": "fs.readFileSync(artifactPath, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-024",
+      "path": "bin/fgos.mjs",
+      "line": 2381,
+      "expression": "fs.readFileSync(planPath, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-025",
+      "path": "bin/fgos.mjs",
+      "line": 2553,
+      "expression": "fs.readFileSync(targetPath, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-026",
+      "path": "bin/fgos.mjs",
+      "line": 3048,
+      "expression": "fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-027",
+      "path": "bin/fgos.mjs",
+      "line": 1542,
+      "expression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Concrete caller destinations unproven; require bounded export; no alias destination adopted.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "cli-028",
+      "path": "bin/fgos.mjs",
+      "line": 2560,
+      "expression": "fs.readFileSync(targetPath, 'utf8')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Concrete caller file targets unproven; require bounded export.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-032",
+      "path": "src/setup/registrations.mjs",
+      "line": 3969,
+      "expression": "for (const alias of doc.aliases || [])",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "No concrete aliases enumerated: separately authorized read-only export required.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-033",
+      "path": "src/setup/registrations.mjs",
+      "line": 3974,
+      "expression": "const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]))",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Concrete document paths require authorized export; no state read.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-034",
+      "path": "src/setup/registrations.mjs",
+      "line": 4016,
+      "expression": "const docsDir = path.join(root, 'docs')",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Recursive frontmatter scan includes old/new roots; classification/parity after deletion remains Step 5.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-035",
+      "path": "src/setup/registrations.mjs",
+      "line": 4096,
+      "expression": "execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`]",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Exact target population depends on live registry; separately authorized read-only export required.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-036",
+      "path": "src/setup/registrations.mjs",
+      "line": 4128,
+      "expression": "const resolved = resolveDocPath(view, captureId)",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Concrete capture paths require authorized export; do not write to alias destination.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "setup-038",
+      "path": "src/setup/registrations.mjs",
+      "line": 4202,
+      "expression": "if (resolveDocPath(view, oldPath)) continue",
+      "status": "call site traced; concrete target population unresolved",
+      "reason": "Concrete inventory/registry population not read; separately authorized bounded export required.",
+      "owner": "Lead bounded read-only export / Step 5 parity"
+    },
+    {
+      "id": "survey-test-readers",
+      "path": "test/docs/rul11-anchor-phrase.test.mjs",
+      "expression": "real-file read of law text",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining tests class: current authority owner and exact assertions must be traced",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "survey-retired-corpus",
+      "path": "test/docs/decisions-corpus-retired.test.mjs",
+      "expression": "real-file narrative reads",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining tests class; use accepted Pilot B exact cutover conditions",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "survey-dead-vocabulary",
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "expression": "path.join(..., docs, specs) + contracts roots",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining tests class; known P7-DOC-GAP-05 retained",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "survey-default-root",
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "expression": "default --specs-dir docs/specs",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining generators/checks class; baseline stays frozen",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "survey-ui-spec",
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "expression": "docs/ui-spec configuration root",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining tracked UI tool/skill class; trace compiler config + verify-runtime",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "survey-wrapped-comments",
+      "path": "src/report/knowledge-resolver.mjs; apps/fgos-gateway/web/src/lib/network.ts",
+      "expression": "wrapped legacy path comments",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining runtime/comments class; join wrapped path and source ancestry",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "gateway-runtime",
+      "path": "apps/fgos-gateway/src/gateway.rs",
+      "expression": "GET /v1/contract reads docs/contracts/fgos-gateway-api-v1.yaml",
+      "status": "unresolved / remaining class",
+      "reason": "Remaining runtime class; byte/schema/error parity + A45 prerequisite",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "external-state",
+      "path": ".fgos/**; ignored/external instructions",
+      "expression": "live writer/read destinations",
+      "status": "unresolved / remaining class",
+      "reason": "Not read; separately authorized read-only export required",
+      "owner": "Lead / next bounded census slice"
+    },
+    {
+      "id": "inventory-dynamic",
+      "path": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+      "expression": "loadInventory -> loadShardedJsonArtifact",
+      "status": "unresolved / remaining class",
+      "reason": "Manifest declares 2,610,715,988 bytes / 125 parts. Full existing API load/regeneration exceeds light-only slice; Lead must supply bounded consumerEdges export or authorize separate serial workload",
+      "owner": "Lead / next bounded census slice"
+    }
+  ],
+  "existingInventoryManifest": {
+    "path": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+    "fileDigest": "2555189c4d792e53fc8f058e9cad4cc7e6e7628f7c2cc41d190c3594aa04c588",
+    "declaredBytes": 2610715988,
+    "partCount": 125,
+    "api": "scripts/check-doc-inventory-gates.mjs loadInventory; read source only, not invoked"
+  },
+  "noStateSecretsRead": true,
+  "readiness": "Open dynamic populations block only dependent rewrite batches; Step 2 not complete"
+}

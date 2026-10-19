@@ -1,0 +1,439 @@
+{
+  "requestId": "step-02-merged-census-587c2a791",
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "surface": "cli-help-and-setup-doctor",
+  "reviewStatus": "pending Lead-started independent review",
+  "entries": [
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-033",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 3974,
+        "columnStart": 3,
+        "columnEndExclusive": 74,
+        "pattern": "manual",
+        "matchedExpression": "const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]))",
+        "callSite": "  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));",
+        "context": [
+          {
+            "line": 3972,
+            "text": "    }"
+          },
+          {
+            "line": 3973,
+            "text": "  }"
+          },
+          {
+            "line": 3974,
+            "text": "  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));"
+          },
+          {
+            "line": 3975,
+            "text": "  const broken = [];"
+          },
+          {
+            "line": 3976,
+            "text": "  for (const [alias, owners] of aliasOwners) {"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "current-owner-collision-check",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "doc.currentPath",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+        },
+        "desiredOwner": "doc.currentPath",
+        "desiredAnchor": "dynamic target set",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+        "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete document paths require authorized export; no state read.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "none in this IO call"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+        "resolution": "call site traced; concrete target population unresolved"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-034",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 4016,
+        "columnStart": 3,
+        "columnEndExclusive": 42,
+        "pattern": "manual",
+        "matchedExpression": "const docsDir = path.join(root, 'docs')",
+        "callSite": "  const docsDir = path.join(root, 'docs');",
+        "context": [
+          {
+            "line": 4014,
+            "text": "function checkDocNearDuplicate(cwd) {"
+          },
+          {
+            "line": 4015,
+            "text": "  const root = resolveMainCheckout(cwd) ?? cwd;"
+          },
+          {
+            "line": 4016,
+            "text": "  const docsDir = path.join(root, 'docs');"
+          },
+          {
+            "line": 4017,
+            "text": "  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };"
+          },
+          {
+            "line": 4018,
+            "text": "  const candidates = [];"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "recursive-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "docs/**",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+        },
+        "desiredOwner": "docs/**",
+        "desiredAnchor": "dynamic target set",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+        "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Recursive frontmatter scan includes old/new roots; classification/parity after deletion remains Step 5.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "none in this IO call"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+        "resolution": "call site traced; concrete target population unresolved"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-035",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 4096,
+        "columnStart": 7,
+        "columnEndExclusive": 72,
+        "pattern": "manual",
+        "matchedExpression": "execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`]",
+        "callSite": "      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });",
+        "context": [
+          {
+            "line": 4094,
+            "text": "    if (!isLiveDocLifecycle(doc.docLifecycle)) continue;"
+          },
+          {
+            "line": 4095,
+            "text": "    try {"
+          },
+          {
+            "line": 4096,
+            "text": "      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });"
+          },
+          {
+            "line": 4097,
+            "text": "    } catch {"
+          },
+          {
+            "line": 4098,
+            "text": "      missing.push(`${doc.docId} (${doc.currentPath})`);"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "dynamic-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "doc.currentPath",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+        },
+        "desiredOwner": "doc.currentPath",
+        "desiredAnchor": "dynamic target set",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+        "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Exact target population depends on live registry; separately authorized read-only export required.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "none in this IO call"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+        "resolution": "call site traced; concrete target population unresolved"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-036",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 4128,
+        "columnStart": 7,
+        "columnEndExclusive": 55,
+        "pattern": "manual",
+        "matchedExpression": "const resolved = resolveDocPath(view, captureId)",
+        "callSite": "      const resolved = resolveDocPath(view, captureId);",
+        "context": [
+          {
+            "line": 4126,
+            "text": "      const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);"
+          },
+          {
+            "line": 4127,
+            "text": "      if (isOwnPath) continue;"
+          },
+          {
+            "line": 4128,
+            "text": "      const resolved = resolveDocPath(view, captureId);"
+          },
+          {
+            "line": 4129,
+            "text": "      const resolvesToSameDoc = resolved && !Array.isArray(resolved) && resolved.docId === doc.docId;"
+          },
+          {
+            "line": 4130,
+            "text": "      if (!resolvesToSameDoc) {"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "lookup-only-alias",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "doc.sourceCaptureIds[] -> resolveDocPath",
+          "rootDocuments": [],
+          "areas": [],
+          "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+          "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+        },
+        "desiredOwner": "doc.sourceCaptureIds[] -> resolveDocPath",
+        "desiredAnchor": "dynamic target set",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+        "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete capture paths require authorized export; do not write to alias destination.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup only; checks collisions/reachability; no alias file existence required"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+        "resolution": "call site traced; concrete target population unresolved"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-037",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 4174,
+        "columnStart": 25,
+        "columnEndExclusive": 117,
+        "pattern": "manual",
+        "matchedExpression": "path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json')",
+        "callSite": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');",
+        "context": [
+          {
+            "line": 4172,
+            "text": "  }"
+          },
+          {
+            "line": 4173,
+            "text": ""
+          },
+          {
+            "line": 4174,
+            "text": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+          },
+          {
+            "line": 4175,
+            "text": "  if (fs.existsSync(inventoryPath)) {"
+          },
+          {
+            "line": 4176,
+            "text": "    let inventory = [];"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "historical-inventory-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+          "rootDocuments": [],
+          "areas": [],
+          "fallback": "Caller/state-derived path; concrete target set unproven"
+        },
+        "desiredOwner": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+        "desiredAnchor": "explicit unchanged path",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "no alias resolution in this call"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+        "resolution": "explicit path traced"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-038",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/registrations.mjs",
+        "line": 4202,
+        "columnStart": 7,
+        "columnEndExclusive": 50,
+        "pattern": "manual",
+        "matchedExpression": "if (resolveDocPath(view, oldPath)) continue",
+        "callSite": "      if (resolveDocPath(view, oldPath)) continue; // migrated, still traceable via alias/currentPath",
+        "context": [
+          {
+            "line": 4200,
+            "text": "    for (const oldPath of sourceCounts.keys()) {"
+          },
+          {
+            "line": 4201,
+            "text": "      if (fs.existsSync(path.join(root, oldPath))) continue; // not migrated yet -- still where the inventory says"
+          },
+          {
+            "line": 4202,
+            "text": "      if (resolveDocPath(view, oldPath)) continue; // migrated, still traceable via alias/currentPath"
+          },
+          {
+            "line": 4203,
+            "text": "      lost.push(oldPath);"
+          },
+          {
+            "line": 4204,
+            "text": "    }"
+          }
+        ],
+        "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+        "edgeKind": "lookup-only-alias",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "inventory oldPath -> registry currentPath",
+          "rootDocuments": [],
+          "areas": [],
+          "fallback": "Caller/state-derived path; concrete target set unproven"
+        },
+        "desiredOwner": "inventory oldPath -> registry currentPath",
+        "desiredAnchor": "dynamic concrete target set",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/registrations.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+        "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "Concrete inventory/registry population not read; separately authorized bounded export required.",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "lookup only; alias input explicitly refused for current-path mutation"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+        "resolution": "call site traced; concrete target population unresolved"
+      }
+    },
+    {
+      "kind": "census-edge",
+      "data": {
+        "edgeId": "setup-039",
+        "surfaceClass": "setup-doctor",
+        "consumerPath": "src/setup/instruction-registry.mjs",
+        "line": 99,
+        "columnStart": 21,
+        "columnEndExclusive": 76,
+        "pattern": "manual",
+        "matchedExpression": "path.join(projectRoot, 'docs', 'decisions', 'index.md')",
+        "callSite": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');",
+        "context": [
+          {
+            "line": 97,
+            "text": ""
+          },
+          {
+            "line": 98,
+            "text": "function readDecisionIds(projectRoot, fgosDir = path.join(projectRoot, '.fgos')) {"
+          },
+          {
+            "line": 99,
+            "text": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');"
+          },
+          {
+            "line": 100,
+            "text": "  if (!fs.existsSync(indexPath)) return new Set();"
+          },
+          {
+            "line": 101,
+            "text": "  const content = fs.readFileSync(indexPath, 'utf8');"
+          }
+        ],
+        "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+        "edgeKind": "projection-reader",
+        "currentAuthorityRoute": {
+          "referenceAsWritten": "docs/decisions/index.md",
+          "rootDocuments": [],
+          "areas": [],
+          "fallback": "Caller/state-derived path; concrete target set unproven"
+        },
+        "desiredOwner": "docs/decisions/index.md",
+        "desiredAnchor": "explicit unchanged path",
+        "sourceVsRender": "source",
+        "sourcePath": "src/setup/instruction-registry.mjs",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+        "parkedReason": "",
+        "aliasLookup": {
+          "activeTableEntries": 0,
+          "draftCandidates": [],
+          "use": "no alias resolution in this call"
+        },
+        "writeDestination": null,
+        "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+        "resolution": "explicit path traced"
+      }
+    }
+  ]
+}

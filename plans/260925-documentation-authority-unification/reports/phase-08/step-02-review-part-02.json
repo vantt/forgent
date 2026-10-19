@@ -1,0 +1,3135 @@
+{
+  "requestId": "step-02-merged-census-587c2a791",
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "surface": "history-plan-contracts",
+  "reviewStatus": "pending Lead-started independent review",
+  "entries": [
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/_shared/capability-catalog.md",
+        "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/capability-catalog.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-001",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/capability-catalog.md",
+          "line": 6,
+          "columnStart": 46,
+          "columnEndExclusive": 96,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 4,
+              "text": "Canonical dispatch-capability vocabulary for the whole repo, not just the"
+            },
+            {
+              "line": 5,
+              "text": "coding domain. Read this fragment alongside its siblings, which"
+            },
+            {
+              "line": 6,
+              "text": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 7,
+              "text": ""
+            },
+            {
+              "line": 8,
+              "text": "- [`capability-matching.md`](./capability-matching.md) — how an agent"
+            }
+          ],
+          "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/capability-catalog.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            13
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": [
+            152,
+            225
+          ]
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-002",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "line": 13,
+          "columnStart": 2,
+          "columnEndExclusive": 68,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "callSite": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
+          "context": [
+            {
+              "line": 11,
+              "text": "its own `SKILL.md` (DRY — independent copies drift the next time this"
+            },
+            {
+              "line": 12,
+              "text": "logic changes,"
+            },
+            {
+              "line": 13,
+              "text": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2)."
+            },
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "Point at this file from a consumer `SKILL.md` by relative path (e.g."
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-003",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "line": 34,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 32,
+              "text": ""
+            },
+            {
+              "line": 33,
+              "text": "This is the dispatch component of a four-fragment shared awareness cluster"
+            },
+            {
+              "line": 34,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 35,
+              "text": "[`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;"
+            },
+            {
+              "line": 36,
+              "text": "[`capability-matching.md`](./capability-matching.md) governs understanding intent, writing Units, and invoking Workflow runner (Q1);"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-004",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "line": 152,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+          "context": [
+            {
+              "line": 150,
+              "text": "## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`"
+            },
+            {
+              "line": 151,
+              "text": ""
+            },
+            {
+              "line": 152,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor"
+            },
+            {
+              "line": 153,
+              "text": "whose consuming skill has no single fixed question to ask — the parent"
+            },
+            {
+              "line": 154,
+              "text": "composes a different command each time, depending on what it just decided"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-005",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/executor-dispatch-fallback.md",
+          "line": 225,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+          "context": [
+            {
+              "line": 223,
+              "text": "## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)"
+            },
+            {
+              "line": 224,
+              "text": ""
+            },
+            {
+              "line": 225,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,"
+            },
+            {
+              "line": 226,
+              "text": "per-dispatch REFINEMENT on top of everything above — it never adds a"
+            },
+            {
+              "line": 227,
+              "text": "second dispatch mechanism, and it never requires splitting `work.tier`"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/_shared/planning-capability-awareness.md",
+        "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-006",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/_shared/planning-capability-awareness.md",
+          "line": 8,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside",
+          "context": [
+            {
+              "line": 6,
+              "text": "steering counterpart [`capability-matching.md`](./capability-matching.md) as one"
+            },
+            {
+              "line": 7,
+              "text": "coherent shared instruction cluster"
+            },
+            {
+              "line": 8,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside"
+            },
+            {
+              "line": 9,
+              "text": "one domain's own planner. All fragments share the same vocabulary,"
+            },
+            {
+              "line": 10,
+              "text": "defined in [`capability-catalog.md`](./capability-catalog.md)."
+            }
+          ],
+          "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+        "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            16,
+            56,
+            73,
+            88,
+            99,
+            131,
+            132,
+            152,
+            159,
+            177,
+            179,
+            194,
+            225
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-007",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-planning/SKILL.md",
+          "line": 16,
+          "columnStart": 32,
+          "columnEndExclusive": 65,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+          "callSite": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into",
+          "context": [
+            {
+              "line": 14,
+              "text": "# fgos-coding-planning"
+            },
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 17,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 18,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            }
+          ],
+          "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/CONTEXT.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-008",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-planning/SKILL.md",
+          "line": 17,
+          "columnStart": 2,
+          "columnEndExclusive": 32,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a",
+          "context": [
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 17,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 18,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            },
+            {
+              "line": 19,
+              "text": "claimed item's `planning` stage, after `fgos-coding-exploring`'s decisions"
+            }
+          ],
+          "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+          "edgeKind": "writer-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            5,
+            73,
+            123,
+            125,
+            132,
+            141,
+            157,
+            162
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-009",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 65,
+          "columnStart": 48,
+          "columnEndExclusive": 78,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`",
+          "context": [
+            {
+              "line": 63,
+              "text": ""
+            },
+            {
+              "line": 64,
+              "text": "- **Footprint**: If `footprint` is empty or undefined, sync it with the"
+            },
+            {
+              "line": 65,
+              "text": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+            },
+            {
+              "line": 66,
+              "text": "  plus the files listed in Approach):"
+            },
+            {
+              "line": 67,
+              "text": ""
+            }
+          ],
+          "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-010",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 69,
+          "columnStart": 38,
+          "columnEndExclusive": 68,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"",
+          "context": [
+            {
+              "line": 67,
+              "text": ""
+            },
+            {
+              "line": 68,
+              "text": "  ```bash"
+            },
+            {
+              "line": 69,
+              "text": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+            },
+            {
+              "line": 70,
+              "text": "  ```"
+            },
+            {
+              "line": 71,
+              "text": ""
+            }
+          ],
+          "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+        "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            41,
+            90,
+            104,
+            200
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-011",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-validating/SKILL.md",
+          "line": 16,
+          "columnStart": 9,
+          "columnEndExclusive": 39,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "Proves `docs/history/<feature>/plan.md` against repo reality before an item",
+          "context": [
+            {
+              "line": 14,
+              "text": "# fgos-coding-validating"
+            },
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Proves `docs/history/<feature>/plan.md` against repo reality before an item"
+            },
+            {
+              "line": 17,
+              "text": "is allowed to take the `planning`→`executing` edge. This skill runs at the"
+            },
+            {
+              "line": 18,
+              "text": "tail of a claimed item's `planning` stage, after `fgos-coding-planning`'s"
+            }
+          ],
+          "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            66
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-012",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 15,
+          "columnStart": 60,
+          "columnEndExclusive": 90,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\"",
+          "context": [
+            {
+              "line": 13,
+              "text": ""
+            },
+            {
+              "line": 14,
+              "text": "```bash"
+            },
+            {
+              "line": 15,
+              "text": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\""
+            },
+            {
+              "line": 16,
+              "text": "```"
+            },
+            {
+              "line": 17,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-013",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 66,
+          "columnStart": 224,
+          "columnEndExclusive": 259,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 64,
+              "text": ""
+            },
+            {
+              "line": 65,
+              "text": "```bash"
+            },
+            {
+              "line": 66,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 67,
+              "text": "```"
+            },
+            {
+              "line": 68,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-014",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 66,
+          "columnStart": 333,
+          "columnEndExclusive": 368,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 64,
+              "text": ""
+            },
+            {
+              "line": 65,
+              "text": "```bash"
+            },
+            {
+              "line": 66,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 67,
+              "text": "```"
+            },
+            {
+              "line": 68,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "core/skills/_shared/capability-catalog.md",
+        "fileDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": false,
+        "sourcePath": "core/skills/_shared/capability-catalog.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-015",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/capability-catalog.md",
+          "line": 5,
+          "columnStart": 46,
+          "columnEndExclusive": 96,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 3,
+              "text": "Canonical dispatch-capability vocabulary for the whole repo, not just the"
+            },
+            {
+              "line": 4,
+              "text": "coding domain. Read this fragment alongside its siblings, which"
+            },
+            {
+              "line": 5,
+              "text": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 6,
+              "text": ""
+            },
+            {
+              "line": 7,
+              "text": "- [`capability-matching.md`](./capability-matching.md) — how an agent"
+            }
+          ],
+          "fileDigest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/capability-catalog.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "core/skills/_shared/executor-dispatch-fallback.md",
+        "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": false,
+        "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            12
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": [
+            151,
+            224
+          ]
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-016",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "line": 12,
+          "columnStart": 2,
+          "columnEndExclusive": 68,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "callSite": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
+          "context": [
+            {
+              "line": 10,
+              "text": "its own `SKILL.md` (DRY — independent copies drift the next time this"
+            },
+            {
+              "line": 11,
+              "text": "logic changes,"
+            },
+            {
+              "line": 12,
+              "text": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2)."
+            },
+            {
+              "line": 13,
+              "text": ""
+            },
+            {
+              "line": 14,
+              "text": "Point at this file from a consumer `SKILL.md` by relative path (e.g."
+            }
+          ],
+          "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-017",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "line": 33,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 31,
+              "text": ""
+            },
+            {
+              "line": 32,
+              "text": "This is the dispatch component of a four-fragment shared awareness cluster"
+            },
+            {
+              "line": 33,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 34,
+              "text": "[`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;"
+            },
+            {
+              "line": 35,
+              "text": "[`capability-matching.md`](./capability-matching.md) governs understanding intent, writing Units, and invoking Workflow runner (Q1);"
+            }
+          ],
+          "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-018",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "line": 151,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+          "context": [
+            {
+              "line": 149,
+              "text": "## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`"
+            },
+            {
+              "line": 150,
+              "text": ""
+            },
+            {
+              "line": 151,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor"
+            },
+            {
+              "line": 152,
+              "text": "whose consuming skill has no single fixed question to ask — the parent"
+            },
+            {
+              "line": 153,
+              "text": "composes a different command each time, depending on what it just decided"
+            }
+          ],
+          "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-019",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "line": 224,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+          "context": [
+            {
+              "line": 222,
+              "text": "## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)"
+            },
+            {
+              "line": 223,
+              "text": ""
+            },
+            {
+              "line": 224,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,"
+            },
+            {
+              "line": 225,
+              "text": "per-dispatch REFINEMENT on top of everything above — it never adds a"
+            },
+            {
+              "line": 226,
+              "text": "second dispatch mechanism, and it never requires splitting `work.tier`"
+            }
+          ],
+          "fileDigest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "core/skills/_shared/planning-capability-awareness.md",
+        "fileDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": false,
+        "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-020",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "core/skills/_shared/planning-capability-awareness.md",
+          "line": 7,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside",
+          "context": [
+            {
+              "line": 5,
+              "text": "steering counterpart [`capability-matching.md`](./capability-matching.md) as one"
+            },
+            {
+              "line": 6,
+              "text": "coherent shared instruction cluster"
+            },
+            {
+              "line": 7,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside"
+            },
+            {
+              "line": 8,
+              "text": "one domain's own planner. All fragments share the same vocabulary,"
+            },
+            {
+              "line": 9,
+              "text": "defined in [`capability-catalog.md`](./capability-catalog.md)."
+            }
+          ],
+          "fileDigest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "fileDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+        "seedClassification": "literal-plan-convention",
+        "generated": false,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            15,
+            55,
+            72,
+            87,
+            98,
+            130,
+            131,
+            151,
+            158,
+            176,
+            178,
+            193,
+            224
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-021",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "line": 15,
+          "columnStart": 32,
+          "columnEndExclusive": 65,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+          "callSite": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into",
+          "context": [
+            {
+              "line": 13,
+              "text": "# fgos-coding-planning"
+            },
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 16,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 17,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            }
+          ],
+          "fileDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/CONTEXT.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-022",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "line": 16,
+          "columnStart": 2,
+          "columnEndExclusive": 32,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a",
+          "context": [
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 16,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 17,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            },
+            {
+              "line": 18,
+              "text": "claimed item's `planning` stage, after `fgos-coding-exploring`'s decisions"
+            }
+          ],
+          "fileDigest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+          "edgeKind": "writer-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "fileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+        "seedClassification": "literal-plan-convention",
+        "generated": false,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            4,
+            72,
+            122,
+            124,
+            131,
+            140,
+            156,
+            161
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-023",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 64,
+          "columnStart": 48,
+          "columnEndExclusive": 78,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`",
+          "context": [
+            {
+              "line": 62,
+              "text": ""
+            },
+            {
+              "line": 63,
+              "text": "- **Footprint**: If `footprint` is empty or undefined, sync it with the"
+            },
+            {
+              "line": 64,
+              "text": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+            },
+            {
+              "line": 65,
+              "text": "  plus the files listed in Approach):"
+            },
+            {
+              "line": 66,
+              "text": ""
+            }
+          ],
+          "fileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-024",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 68,
+          "columnStart": 38,
+          "columnEndExclusive": 68,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"",
+          "context": [
+            {
+              "line": 66,
+              "text": ""
+            },
+            {
+              "line": 67,
+              "text": "  ```bash"
+            },
+            {
+              "line": 68,
+              "text": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+            },
+            {
+              "line": 69,
+              "text": "  ```"
+            },
+            {
+              "line": 70,
+              "text": ""
+            }
+          ],
+          "fileDigest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "fileDigest": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+        "seedClassification": "literal-plan-convention",
+        "generated": false,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            40,
+            89,
+            103,
+            199
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-025",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+          "line": 15,
+          "columnStart": 9,
+          "columnEndExclusive": 39,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "Proves `docs/history/<feature>/plan.md` against repo reality before an item",
+          "context": [
+            {
+              "line": 13,
+              "text": "# fgos-coding-validating"
+            },
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "Proves `docs/history/<feature>/plan.md` against repo reality before an item"
+            },
+            {
+              "line": 16,
+              "text": "is allowed to take the `planning`→`executing` edge. This skill runs at the"
+            },
+            {
+              "line": 17,
+              "text": "tail of a claimed item's `planning` stage, after `fgos-coding-planning`'s"
+            }
+          ],
+          "fileDigest": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "fileDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+        "seedClassification": "literal-plan-convention",
+        "generated": false,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            65
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-026",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 14,
+          "columnStart": 60,
+          "columnEndExclusive": 90,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\"",
+          "context": [
+            {
+              "line": 12,
+              "text": ""
+            },
+            {
+              "line": 13,
+              "text": "```bash"
+            },
+            {
+              "line": 14,
+              "text": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\""
+            },
+            {
+              "line": 15,
+              "text": "```"
+            },
+            {
+              "line": 16,
+              "text": ""
+            }
+          ],
+          "fileDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-027",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 65,
+          "columnStart": 224,
+          "columnEndExclusive": 259,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 63,
+              "text": ""
+            },
+            {
+              "line": 64,
+              "text": "```bash"
+            },
+            {
+              "line": 65,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 66,
+              "text": "```"
+            },
+            {
+              "line": 67,
+              "text": ""
+            }
+          ],
+          "fileDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-028",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 65,
+          "columnStart": 333,
+          "columnEndExclusive": 368,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 63,
+              "text": ""
+            },
+            {
+              "line": 64,
+              "text": "```bash"
+            },
+            {
+              "line": 65,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 66,
+              "text": "```"
+            },
+            {
+              "line": 67,
+              "text": ""
+            }
+          ],
+          "fileDigest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "domains/coding/task-specs/shape-plan.md",
+        "fileDigest": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+        "seedClassification": "literal-plan-convention",
+        "generated": false,
+        "sourcePath": "domains/coding/task-specs/shape-plan.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            6,
+            20,
+            38
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-029",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "domains/coding/task-specs/shape-plan.md",
+          "line": 12,
+          "columnStart": 4,
+          "columnEndExclusive": 34,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "- `docs/history/<feature>/plan.md`: the literal token `Mode: <lane>` —",
+          "context": [
+            {
+              "line": 10,
+              "text": ""
+            },
+            {
+              "line": 11,
+              "text": "## Output"
+            },
+            {
+              "line": 12,
+              "text": "- `docs/history/<feature>/plan.md`: the literal token `Mode: <lane>` —"
+            },
+            {
+              "line": 13,
+              "text": "  `src/intake/plan.mjs`'s `passThroughModeMatch` regexes this exact string"
+            },
+            {
+              "line": 14,
+              "text": "  to skip a real model call on a tiny/small item, so it must never be"
+            }
+          ],
+          "fileDigest": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+          "edgeKind": "writer-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "source",
+          "sourcePath": "domains/coding/task-specs/shape-plan.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/capability-catalog.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-030",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/capability-catalog.md",
+          "line": 6,
+          "columnStart": 46,
+          "columnEndExclusive": 96,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 4,
+              "text": "Canonical dispatch-capability vocabulary for the whole repo, not just the"
+            },
+            {
+              "line": 5,
+              "text": "coding domain. Read this fragment alongside its siblings, which"
+            },
+            {
+              "line": 6,
+              "text": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 7,
+              "text": ""
+            },
+            {
+              "line": 8,
+              "text": "- [`capability-matching.md`](./capability-matching.md) — how an agent"
+            }
+          ],
+          "fileDigest": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/capability-catalog.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            13
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": [
+            152,
+            225
+          ]
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-031",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "line": 13,
+          "columnStart": 2,
+          "columnEndExclusive": 68,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "callSite": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
+          "context": [
+            {
+              "line": 11,
+              "text": "its own `SKILL.md` (DRY — independent copies drift the next time this"
+            },
+            {
+              "line": 12,
+              "text": "logic changes,"
+            },
+            {
+              "line": 13,
+              "text": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2)."
+            },
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "Point at this file from a consumer `SKILL.md` by relative path (e.g."
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-032",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "line": 34,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`):",
+          "context": [
+            {
+              "line": 32,
+              "text": ""
+            },
+            {
+              "line": 33,
+              "text": "This is the dispatch component of a four-fragment shared awareness cluster"
+            },
+            {
+              "line": 34,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`):"
+            },
+            {
+              "line": 35,
+              "text": "[`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;"
+            },
+            {
+              "line": 36,
+              "text": "[`capability-matching.md`](./capability-matching.md) governs understanding intent, writing Units, and invoking Workflow runner (Q1);"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-033",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "line": 152,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+          "context": [
+            {
+              "line": 150,
+              "text": "## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`"
+            },
+            {
+              "line": 151,
+              "text": ""
+            },
+            {
+              "line": 152,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor"
+            },
+            {
+              "line": 153,
+              "text": "whose consuming skill has no single fixed question to ask — the parent"
+            },
+            {
+              "line": 154,
+              "text": "composes a different command each time, depending on what it just decided"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-034",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "line": 225,
+          "columnStart": 2,
+          "columnEndExclusive": 47,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "callSite": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+          "context": [
+            {
+              "line": 223,
+              "text": "## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)"
+            },
+            {
+              "line": 224,
+              "text": ""
+            },
+            {
+              "line": 225,
+              "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,"
+            },
+            {
+              "line": 226,
+              "text": "per-dispatch REFINEMENT on top of everything above — it never adds a"
+            },
+            {
+              "line": 227,
+              "text": "second dispatch mechanism, and it never requires splitting `work.tier`"
+            }
+          ],
+          "fileDigest": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/two-layer-dispatch/DISCUSSION.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/two-layer-dispatch/DISCUSSION.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/executor-dispatch-fallback.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+        "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+        "seedClassification": "named-historical-plan-reference",
+        "generated": true,
+        "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 historical reference; preserve provenance",
+        "companionBareNames": {
+          "CONTEXT.md": [],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-035",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+          "line": 8,
+          "columnStart": 3,
+          "columnEndExclusive": 53,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+          "callSite": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside",
+          "context": [
+            {
+              "line": 6,
+              "text": "steering counterpart [`capability-matching.md`](./capability-matching.md) as one"
+            },
+            {
+              "line": 7,
+              "text": "coherent shared instruction cluster"
+            },
+            {
+              "line": 8,
+              "text": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside"
+            },
+            {
+              "line": 9,
+              "text": "one domain's own planner. All fragments share the same vocabulary,"
+            },
+            {
+              "line": 10,
+              "text": "defined in [`capability-catalog.md`](./capability-catalog.md)."
+            }
+          ],
+          "fileDigest": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "core/skills/_shared/planning-capability-awareness.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+        "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            16,
+            56,
+            73,
+            88,
+            99,
+            131,
+            132,
+            152,
+            159,
+            177,
+            179,
+            194,
+            225
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-036",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+          "line": 16,
+          "columnStart": 32,
+          "columnEndExclusive": 65,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+          "callSite": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into",
+          "context": [
+            {
+              "line": 14,
+              "text": "# fgos-coding-planning"
+            },
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 17,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 18,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            }
+          ],
+          "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/CONTEXT.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-037",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+          "line": 17,
+          "columnStart": 2,
+          "columnEndExclusive": 32,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a",
+          "context": [
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+            },
+            {
+              "line": 17,
+              "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+            },
+            {
+              "line": 18,
+              "text": "stranger could pick up cold. This skill runs during the early part of a"
+            },
+            {
+              "line": 19,
+              "text": "claimed item's `planning` stage, after `fgos-coding-exploring`'s decisions"
+            }
+          ],
+          "fileDigest": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+          "edgeKind": "writer-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            5,
+            73,
+            123,
+            125,
+            132,
+            141,
+            157,
+            162
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-038",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 65,
+          "columnStart": 48,
+          "columnEndExclusive": 78,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`",
+          "context": [
+            {
+              "line": 63,
+              "text": ""
+            },
+            {
+              "line": 64,
+              "text": "- **Footprint**: If `footprint` is empty or undefined, sync it with the"
+            },
+            {
+              "line": 65,
+              "text": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+            },
+            {
+              "line": 66,
+              "text": "  plus the files listed in Approach):"
+            },
+            {
+              "line": 67,
+              "text": ""
+            }
+          ],
+          "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-039",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "line": 69,
+          "columnStart": 38,
+          "columnEndExclusive": 68,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\"",
+          "context": [
+            {
+              "line": 67,
+              "text": ""
+            },
+            {
+              "line": 68,
+              "text": "  ```bash"
+            },
+            {
+              "line": 69,
+              "text": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+            },
+            {
+              "line": 70,
+              "text": "  ```"
+            },
+            {
+              "line": 71,
+              "text": ""
+            }
+          ],
+          "fileDigest": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+          "edgeKind": "reader-writer-footprint-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": {
+            "path": "docs/history/<feature>/plan.md",
+            "kind": "explicit external-project convention; not alias",
+            "activeAlias": false
+          },
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+        "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            41,
+            90,
+            104,
+            200
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-040",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+          "line": 16,
+          "columnStart": 9,
+          "columnEndExclusive": 39,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "Proves `docs/history/<feature>/plan.md` against repo reality before an item",
+          "context": [
+            {
+              "line": 14,
+              "text": "# fgos-coding-validating"
+            },
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "Proves `docs/history/<feature>/plan.md` against repo reality before an item"
+            },
+            {
+              "line": 17,
+              "text": "is allowed to take the `planning`→`executing` edge. This skill runs at the"
+            },
+            {
+              "line": 18,
+              "text": "tail of a claimed item's `planning` stage, after `fgos-coding-planning`'s"
+            }
+          ],
+          "fileDigest": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        }
+      ]
+    },
+    {
+      "kind": "history-file-disposition",
+      "data": {
+        "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+        "seedClassification": "literal-plan-convention",
+        "generated": true,
+        "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "preCutoverAction": "preserve",
+        "cutoverAction": "preserve",
+        "reason": "L12-10 external-project topology; preserve all four sibling document conventions",
+        "companionBareNames": {
+          "CONTEXT.md": [
+            66
+          ],
+          "RESEARCH.md": [],
+          "DISCUSSION.md": []
+        },
+        "reviewStatus": "pending independent review",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      },
+      "edges": [
+        {
+          "edgeId": "history-041",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 15,
+          "columnStart": 60,
+          "columnEndExclusive": 90,
+          "pattern": "planning",
+          "matchedExpression": "docs/history/<feature>/plan.md",
+          "callSite": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\"",
+          "context": [
+            {
+              "line": 13,
+              "text": ""
+            },
+            {
+              "line": 14,
+              "text": "```bash"
+            },
+            {
+              "line": 15,
+              "text": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\""
+            },
+            {
+              "line": 16,
+              "text": "```"
+            },
+            {
+              "line": 17,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "reader-convention",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/<feature>/plan.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/<feature>/plan.md",
+          "desiredAnchor": "document-topology (external project)",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: external-project history topology is the shipped contract; plan/CONTEXT/RESEARCH/DISCUSSION conventions remain unchanged. No migration to this repo plans/."
+        },
+        {
+          "edgeId": "history-042",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 66,
+          "columnStart": 224,
+          "columnEndExclusive": 259,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 64,
+              "text": ""
+            },
+            {
+              "line": 65,
+              "text": "```bash"
+            },
+            {
+              "line": 66,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 67,
+              "text": "```"
+            },
+            {
+              "line": 68,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        },
+        {
+          "edgeId": "history-043",
+          "surfaceClass": "history-plan-contracts",
+          "consumerPath": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "line": 66,
+          "columnStart": 333,
+          "columnEndExclusive": 368,
+          "pattern": "companion-history-path",
+          "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+          "callSite": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine",
+          "context": [
+            {
+              "line": 64,
+              "text": ""
+            },
+            {
+              "line": 65,
+              "text": "```bash"
+            },
+            {
+              "line": 66,
+              "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+            },
+            {
+              "line": 67,
+              "text": "```"
+            },
+            {
+              "line": 68,
+              "text": ""
+            }
+          ],
+          "fileDigest": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+          "edgeKind": "historical-citation",
+          "currentAuthorityRoute": {
+            "referenceAsWritten": "docs/history/gate-bypass/CONTEXT.md",
+            "rootDocuments": [],
+            "areas": [],
+            "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+            "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+          },
+          "desiredOwner": "docs/history/gate-bypass/CONTEXT.md",
+          "desiredAnchor": "historical document; no new authority",
+          "sourceVsRender": "render",
+          "sourcePath": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "preCutoverAction": "preserve",
+          "cutoverAction": "preserve",
+          "test": "L12-10: compare exact source/render passages and all 22 dispositions; no topology rewrite",
+          "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+          "parkedReason": "",
+          "aliasLookup": {
+            "activeTableEntries": 0,
+            "draftCandidates": [],
+            "use": "lookup-only; draft is not activated"
+          },
+          "writeDestination": null,
+          "dispositionReason": "L12-10: historical design provenance, not a destination/default for new platform authority."
+        }
+      ]
+    }
+  ]
+}

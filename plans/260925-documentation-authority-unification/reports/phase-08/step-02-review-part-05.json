@@ -1,0 +1,1916 @@
+{
+  "requestId": "step-02-merged-census-587c2a791",
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "surface": "evidence-lexical-refresh",
+  "reviewStatus": "pending Lead-started independent review",
+  "entries": [
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-001",
+        "path": "CHANGELOG.md",
+        "fileDigest": "2d6b8914070caaee205433924bdf0bc63c44579166e51e0fe4b16c5e17c5446a",
+        "sourceVsRender": "source",
+        "sourcePath": "CHANGELOG.md",
+        "occurrences": [
+          {
+            "line": 928,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          915
+        ],
+        "seedCategory": "runtime-and-comments",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-002",
+        "path": "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+        "fileDigest": "94b15cc5d528ffae5a98cd5c76c5fdecce3b119f518296e5a96e3af8fdbd32d3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+        "occurrences": [
+          {
+            "line": 38,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md`:"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          38
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-003",
+        "path": "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+        "fileDigest": "5cb334851823367dd91272d367b982d970d05cd6178ae13351e72b51d2f42f41",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+        "occurrences": [
+          {
+            "line": 61,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- TRACK: `step-07-mvp` -> `docs/architect/agent-coordination/verification/step-07-mvp/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          61
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-004",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "fileDigest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "live under `docs/architect/agent-coordination/verification/step-08-standalone-coordination/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-005",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+        "fileDigest": "878e0d55164eacd831ac3ffee326f64cf4cd8e1b269731155b4eb6ef90a27313",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+        "occurrences": [
+          {
+            "line": 210,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          210
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-006",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+        "fileDigest": "c80f1a7d69fef91affce16c5e9398e151d1568e6a4a1b142c3254c25a70facd8",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+        "occurrences": [
+          {
+            "line": 44,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Full command transcripts, RunResult JSON, and dispatch-plan excerpts: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/{codex-cli,glm-cli}-live-proof.log`."
+          },
+          {
+            "line": 56,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` (Proof Matrix, Commands only)"
+          },
+          {
+            "line": 57,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/{codex-cli,glm-cli}-live-proof.log` (new)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          44,
+          56,
+          57
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-007",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+        "fileDigest": "e9cfa826f8e05483f067b1f356f21edd654ad0d74eb0af405c007d91991e7f92",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+        "occurrences": [
+          {
+            "line": 47,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.4.md`'s Proof Matrix and Commands sections updated with this evidence."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          47
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-008",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "fileDigest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "occurrences": [
+          {
+            "line": 86,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          86
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-009",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+        "fileDigest": "75b1ce0cc526d7256caf26f967d8120811d7e1725fe1bc12af27cbdb4cf397c4",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 54,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          54
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-010",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+        "fileDigest": "7804171dce4043e3038d6ccc06f2622997c3a1ad5e63261e4fd8c1213246ccce",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 73,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md`,"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          73
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-011",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+        "fileDigest": "ca6ee58cddfa1be705e2ca60cf8cad619e481bc4325d32b01731aea3d75f3d4d",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 78,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          78
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-012",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+        "fileDigest": "365ae40fc95e2840b16f8a70620e6f669ee5e2dd3d6dedb7ec6a6111459c6504",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 7,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          7
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-013",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+        "fileDigest": "579dcf3aef872ae804ce25df83cbf61d65425457a79f3ca0b767d726106be3dc",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 4,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`'s"
+          },
+          {
+            "line": 68,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md` (`## Red-Team` section only)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          4,
+          68
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-014",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+        "fileDigest": "83495625e48d977e7aeccda8451f863e8971b966dc615e3bb48bc4adcf5f41bb",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 84,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          84
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-015",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+        "fileDigest": "e2552cc29918fc23ab8f8c93956651e72cf63fad0088c4126f49768496bfa882",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+        "occurrences": [
+          {
+            "line": 98,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          98
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-016",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+        "fileDigest": "d712d0c2fc1c82bd263994909c8d29e08611a382947246de26b223eb351912ea",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+        "occurrences": [
+          {
+            "line": 19,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "in `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          19
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-017",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+        "fileDigest": "ba76fb16a3a433f7169529d538f2ef9392c563aeb3e0a5e5dbbc219f61ac1681",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+        "occurrences": [
+          {
+            "line": 6,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md`'s"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          6
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-018",
+        "path": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+        "fileDigest": "974cd1f1c82fd33afd1d758696428af63a446f3e8363b0c29c390778b4102fc8",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+        "occurrences": [
+          {
+            "line": 17,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          17
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-019",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+        "fileDigest": "ddaffbdee71bca0bc5221af7b29101e2eca9caa8c53a5a368db378476d0d6422",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+        "occurrences": [
+          {
+            "line": 46,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          46
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-020",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+        "fileDigest": "a61cad35d7b84940dcb7ee7f90aa3ec4d176e319ab9e7a58358caab47d01662c",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+        "occurrences": [
+          {
+            "line": 62,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          62
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-021",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "fileDigest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "occurrences": [
+          {
+            "line": 159,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          159
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-022",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+        "fileDigest": "7e7473b96122fec0ed0887e6b98698dfec259687807ece4a7881b7e5c8ca16e6",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+        "occurrences": [
+          {
+            "line": 98,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          98
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-023",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+        "fileDigest": "904f71dc16f7a7ca35be03c1cf8774bb553152c492599f4c82a176e63a7a5939",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+        "occurrences": [
+          {
+            "line": 8,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md`;"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          8
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-024",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+        "fileDigest": "1d12d268146b402f62bc15e26af470a7c52b49712760dd246971ae7b5f8b37a3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+        "occurrences": [
+          {
+            "line": 8,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          8
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-025",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+        "fileDigest": "d546a1229620dfecd4548b19ffd8c479c52a6931e99d7578a4df412ec1a1b6df",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-026",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "fileDigest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "occurrences": [
+          {
+            "line": 6,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          6
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-027",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "fileDigest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "occurrences": [
+          {
+            "line": 6,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "in `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+          },
+          {
+            "line": 72,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          6,
+          72
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-028",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+        "fileDigest": "8a0c94da649fa0b1196440afe17c8aba3f0107d4e9eba53930b8460d83b18669",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-029",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+        "fileDigest": "9983f55cd61b0fe8bd2553892cc891f832051663c230a7c6343c4a6fee013406",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-030",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+        "fileDigest": "22b204d358b9fba82a454fe125c547680aa47fbe8033cd81a1652b1170b79a9a",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 4,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          4
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-031",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+        "fileDigest": "e174a0c49565143c9bd4baa970938c54e8697b945e8a7fb11cbd4e11f32a295d",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 4,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          4
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-032",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+        "fileDigest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-033",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+        "fileDigest": "d0a4da5f5379a7b022c6de126665237bf43e102f2737a7208a5b6d664af894f6",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-034",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+        "fileDigest": "6ae3e9575e2eb91f172728785f3e43790fb6fe536b4a2fd46d120b1398a4664a",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+        "occurrences": [
+          {
+            "line": 22,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Full findings, evidence, and line citations are in the `## Review` section of `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          22
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-035",
+        "path": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+        "fileDigest": "8b63dc157a34751c44e684e19caca058f5496e81f73969480d0579ae34ab0d83",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+        "occurrences": [
+          {
+            "line": 8,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          8
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-036",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+        "fileDigest": "532c642481d741994847ad11e34e4552f39b31747ea145dbf4b6ed4e59cd8f09",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+        "occurrences": [
+          {
+            "line": 31,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md`"
+          },
+          {
+            "line": 34,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`"
+          },
+          {
+            "line": 35,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md`"
+          },
+          {
+            "line": 46,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          31,
+          34,
+          35,
+          46
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-037",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+        "fileDigest": "e04d4d637b4ba870a1ad826c9395f2ae317b28017d24fdfee08326beaf4bc599",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+        "occurrences": [
+          {
+            "line": 47,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`"
+          },
+          {
+            "line": 48,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md`"
+          },
+          {
+            "line": 49,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/proofs/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          47,
+          48,
+          49
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-038",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+        "fileDigest": "cc2f90870a8a18c024bed056c76d1882c3622f70a2685c100f12677a2d038665",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-039",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+        "fileDigest": "a7a19a8ed2e53f9e38835f945fa4c4e8c4dbb36b5f491ca0a6431e43df851034",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+        "occurrences": [
+          {
+            "line": 6,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Deliverable: `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md`"
+          },
+          {
+            "line": 41,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Test command run (docs-only cell): `git diff --check -- plans/260903-1049-step09-mvp3-to-mvp5 docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5` — exit 0, no whitespace/format errors."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          6,
+          41
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-040",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "fileDigest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "occurrences": [
+          {
+            "line": 8,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`."
+          },
+          {
+            "line": 86,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          8,
+          86
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-041",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+        "fileDigest": "44526bd85abcca1496876c47092a4b8334ebb16dfacacc7958b8da2fed59ea80",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+        "occurrences": [
+          {
+            "line": 28,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          28
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-042",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "fileDigest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "occurrences": [
+          {
+            "line": 67,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          67
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-043",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+        "fileDigest": "7d2496160b0425b2b3ee23fa295e44ecd97c287b18bc4bb1d81998b1b6b10461",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+        "occurrences": [
+          {
+            "line": 46,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          46
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-044",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+        "fileDigest": "ab37bc6219ebdad391abb7aeb4a1cc97c7482477b224734d07a99e8e28e59fc8",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+        "occurrences": [
+          {
+            "line": 52,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md`."
+          },
+          {
+            "line": 69,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          52,
+          69
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-045",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md",
+        "fileDigest": "45f9534b8f10392bd2456ae290b3abd5ae61feb041b4d9b79b6a772d54d8ef39",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md",
+        "occurrences": [
+          {
+            "line": 26,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "5. Wrote `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`"
+          },
+          {
+            "line": 39,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md` (new)"
+          },
+          {
+            "line": 51,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          26,
+          39,
+          51
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-046",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+        "fileDigest": "3e49d66d4f9c3f88192d039c8cc86df707ad87576d8e86fb96811112ddcc029a",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+        "occurrences": [
+          {
+            "line": 3,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Cell: P00.1. File fixed: `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md` (sections 1-6 only; Review/Red-Team sections left untouched as the historical record)."
+          },
+          {
+            "line": 15,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "**After:** reworded to state findings were either fixed-and-confirmed-resolved or deliberately deferred as named, scoped-out forward notes (never silently dropped), and explicitly names the two deferred items — Phase 01's Red-Team HIGH (`cohort-planner.mjs` actor disambiguation, \"recorded as a Gap instead\", index.md:150) and Phase 02's P02.1 Reviewer MED-2 (`resolveDeclaredOperationActor` node-selection gap, \"correctly deferred as a forward gap, not fixed here\") — cross-referencing §4 items #1 and #2. Bottom-line verdict (Entry Condition 5 satisfied) unchanged; only the justification text was corrected. Verified against `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` lines 145-165, 371-405."
+          },
+          {
+            "line": 39,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "**After:** \"10/11/7 double-consumptions out of 20/20/12 trials before the fix, across three batches, 0/46 after\". Verified against `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md:182-183` (\"TWO Assignments (10/11/7 double-consumptions out of 20/20/12 trials)\")."
+          },
+          {
+            "line": 44,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `git diff --check -- docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5`: exit 0, no whitespace errors."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          3,
+          15,
+          39,
+          44
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-047",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+        "fileDigest": "8c014dee715a00cd26a6dc70b3ac8e27b3ea4469e189beba66ac9a2df0549329",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Red-Team's accepted MEDIUM in `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-048",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "fileDigest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "occurrences": [
+          {
+            "line": 15,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, \"Plan-Level Acceptance\" table, row \"Existing Step 08 and MVP1/MVP2 behavior remains compatible\"."
+          },
+          {
+            "line": 25,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, sentence immediately below the Plan-Level Acceptance table."
+          },
+          {
+            "line": 36,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "git diff --check -- docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          15,
+          25,
+          36
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-049",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+        "fileDigest": "4e94a9147a8d4cd7981de4d0d4a8ca69096948faad3a4fa62e2d8f1736486abc",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 52,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          52
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-050",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+        "fileDigest": "4c3624d84aedc7703515add208ac60e8902e34653ef2763aa33865903e34687f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 47,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          47
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-051",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+        "fileDigest": "ae6a68291eadd560ca3f5ecd84a8ab9bb4384829af6cef30b5c7d8ee4cce889b",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 17,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          17
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-052",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+        "fileDigest": "937da692c59997d0cf37ad067ca78c09826b8c5c56ef7539b07c1fa34fc6673e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 88,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md`,"
+          },
+          {
+            "line": 89,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`,"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          88,
+          89
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-053",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+        "fileDigest": "ac0ac07d40937491a5592185ebdf82a74cb7516cac8e926699cc52cad0c78adc",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 5,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "in `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          5
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-054",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+        "fileDigest": "99ae90816a65be4d2e15648e3c21fc81784c0ef794fbd1a6c9a3918017d5be56",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 47,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          47
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-055",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+        "fileDigest": "f345f714031a81c019958e4bc2612cbd93dcc4ccda06fa3b7878efac1d1e9623",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 16,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md`."
+          },
+          {
+            "line": 81,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          16,
+          81
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-056",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+        "fileDigest": "1cba3820c6c7b3288a95661afb6e5ce3580d54697679486b59a1f5df43cfe667",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-057",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+        "fileDigest": "7b708cdf3aa7749a4ccbd3f6e4e5112614669d791345f1101258ceb8baaef879",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+        "occurrences": [
+          {
+            "line": 6,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          6
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-058",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+        "fileDigest": "f1e39b9ad2d6dfb54bd64f4c2a7f4bfad0ca3ac801ba7fbdf78aeb90d769928f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+        "occurrences": [
+          {
+            "line": 45,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          45
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-059",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "fileDigest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 34,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          34
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-060",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "fileDigest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "occurrences": [
+          {
+            "line": 56,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          56
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    }
+  ]
+}

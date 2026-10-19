@@ -1,0 +1,123 @@
+{
+  "requestId": "step-02-merged-census-587c2a791",
+  "reviewed": 0,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-01.json",
+      "entries": 6,
+      "bytes": 149525,
+      "sha256": "b4d2681cdcfa49745d3848c4f4ad8a1797472ddfb03ee81973ee0661b38b7aad",
+      "surface": "merge-bindings",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-01.md",
+      "minimumDeepReads": 6,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-02.json",
+      "entries": 22,
+      "bytes": 140670,
+      "sha256": "e13d001d361a6d721b1def55a28ffbb0a2e72fbefbd426980a83ff16622d0620",
+      "surface": "history-plan-contracts",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-02.md",
+      "minimumDeepReads": 22,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-03.json",
+      "entries": 60,
+      "bytes": 240545,
+      "sha256": "108d6ec2095467089bb9fdd6fe204dd5aa29474db4411fd97872fd0f0dba836d",
+      "surface": "cli-help-and-setup-doctor",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-03.md",
+      "minimumDeepReads": 10,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-04.json",
+      "entries": 7,
+      "bytes": 18537,
+      "sha256": "8ed3fd633df196a1c23ebbf2f5d6c0008f02c4b162c33505d6c094d468b4c09c",
+      "surface": "cli-help-and-setup-doctor",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-04.md",
+      "minimumDeepReads": 7,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-05.json",
+      "entries": 60,
+      "bytes": 86619,
+      "sha256": "509828bec45306c0672dd88e7dbbe206a680f363a381a2321042d5e7844c9bf4",
+      "surface": "evidence-lexical-refresh",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-05.md",
+      "minimumDeepReads": 10,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-06.json",
+      "entries": 60,
+      "bytes": 163393,
+      "sha256": "813f3f3d90eb8ad39dae12ad65ce6718ad8002602889c25941c99ee946264a9a",
+      "surface": "evidence-lexical-refresh",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-06.md",
+      "minimumDeepReads": 10,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-07.json",
+      "entries": 60,
+      "bytes": 252818,
+      "sha256": "dae4581a5f7c0b76d0d58e09a78461e39ec4e1409008360b6037d4284670a3e8",
+      "surface": "evidence-lexical-refresh",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-07.md",
+      "minimumDeepReads": 10,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-08.json",
+      "entries": 24,
+      "bytes": 366716,
+      "sha256": "ff882e42976ec572dde238b9ddfd7fe4c2cbc12f81f85eb3b8f40219dee11d96",
+      "surface": "evidence-lexical-refresh",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-08.md",
+      "minimumDeepReads": 10,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-09.json",
+      "entries": 8,
+      "bytes": 311831,
+      "sha256": "52d111558d3d0bfaaf1effe971136bf880653524d553f3c9c21aad2a7ccbd0f4",
+      "surface": "evidence-lexical-refresh",
+      "uniqueReportName": "review-a38-step-02-merged-census-part-09.md",
+      "minimumDeepReads": 8,
+      "mandatory": "All IO/default-root/alias/dynamic/drift/mismatch cases; evidence exceptions and absolute/fixture/history cases regardless of minimum sample"
+    }
+  ],
+  "totalEntries": 307,
+  "totalPayloadBytes": 1730654,
+  "censusEdges": 110,
+  "surfaceCounts": {
+    "history-plan-contracts": 43,
+    "cli-help": 28,
+    "setup-doctor": 39
+  },
+  "actionCounts": {
+    "cli-help": {
+      "preserve / preserve": 9,
+      "preserve-now / exact-cutover-patch": 5,
+      "preserve / preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover": 14
+    },
+    "history-plan-contracts": {
+      "preserve / preserve": 43
+    },
+    "setup-doctor": {
+      "preserve-now / exact-cutover-patch": 2,
+      "preserve / preserve": 31,
+      "preserve / preserve implementation; require concrete-set export/parity before declaring cutover readiness": 5,
+      "preserve / preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover": 1
+    }
+  },
+  "parkedConcretePopulationEdges": 20,
+  "budget": "Lead must assign bounded reviewer time at dispatch; no reviewer launched by author",
+  "naming": "Unique report names reserved here; Lead resolves convention placement in its authorized environment before dispatch. Worker never calls fgos CLI."
+}

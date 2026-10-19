@@ -1,0 +1,2599 @@
+{
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "scope": "All current scanner hits in named files plus manually traced IO/default-root/alias seams. Concrete state-derived sets remain explicitly parked.",
+  "files": [
+    "bin/fgos.mjs",
+    "src/cli/command-registry.mjs"
+  ],
+  "entries": [
+    {
+      "edgeId": "cli-001",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1733,
+      "columnStart": 12,
+      "columnEndExclusive": 57,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+      "callSite": "        // docs/architect/knowledge-registry-redesign.md §7.4: an",
+      "context": [
+        {
+          "line": 1731,
+          "text": "        }"
+        },
+        {
+          "line": 1732,
+          "text": ""
+        },
+        {
+          "line": 1733,
+          "text": "        // docs/architect/knowledge-registry-redesign.md §7.4: an"
+        },
+        {
+          "line": 1734,
+          "text": "        // attestation links a real capture (a work item id) to this doc"
+        },
+        {
+          "line": 1735,
+          "text": "        // slot -- \"the precise replacement for the old 'compound stores"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/knowledge-registry-redesign.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-whole-system-1085",
+            "fromPath": "docs/architect/knowledge-registry-redesign.md",
+            "toOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-proposals-redesigns.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/knowledge-registry-redesign.md"
+    },
+    {
+      "edgeId": "cli-002",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1754,
+      "columnStart": 39,
+      "columnEndExclusive": 59,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "      const mdPath = path.join(root, 'docs/doc-registry.md');",
+      "context": [
+        {
+          "line": 1752,
+          "text": "      const { jsonContent, mdContent } = computeKnowledgeProjection(view);"
+        },
+        {
+          "line": 1753,
+          "text": "      const root = path.dirname(dir);"
+        },
+        {
+          "line": 1754,
+          "text": "      const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 1755,
+          "text": "      const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 1756,
+          "text": "      fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "write-destination-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.md",
+        "kind": "explicit generated projection path",
+        "activeAlias": false
+      },
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "cli-003",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1799,
+      "columnStart": 12,
+      "columnEndExclusive": 57,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+      "callSite": "        // docs/architect/knowledge-registry-redesign.md §8: \"The new",
+      "context": [
+        {
+          "line": 1797,
+          "text": "          throw new StoreError('validation', `compound: --doc-path \"${docPath}\" is not committed at the main checkout's HEAD (\"${repoRoot}\") — write and commit the document there before tagging it.`);"
+        },
+        {
+          "line": 1798,
+          "text": "        }"
+        },
+        {
+          "line": 1799,
+          "text": "        // docs/architect/knowledge-registry-redesign.md §8: \"The new"
+        },
+        {
+          "line": 1800,
+          "text": "        // producer gate extends [the HEAD-commit rule]: require registry"
+        },
+        {
+          "line": 1801,
+          "text": "        // enforcement active, require path equals a registered document"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/knowledge-registry-redesign.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-whole-system-1085",
+            "fromPath": "docs/architect/knowledge-registry-redesign.md",
+            "toOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-proposals-redesigns.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/knowledge-registry-redesign.md"
+    },
+    {
+      "edgeId": "cli-004",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1953,
+      "columnStart": 29,
+      "columnEndExclusive": 40,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/",
+      "callSite": "      // area name matching docs/specs/<area>.md) so `fgos decision-index`",
+      "context": [
+        {
+          "line": 1951,
+          "text": "      // tsk-1lv-2 D4: a platform/repo-wide decision (no --id) carries"
+        },
+        {
+          "line": 1952,
+          "text": "      // --scope <area-slug> (e.g. \"repo\" for the whole codebase, or an"
+        },
+        {
+          "line": 1953,
+          "text": "      // area name matching docs/specs/<area>.md) so `fgos decision-index`"
+        },
+        {
+          "line": 1954,
+          "text": "      // can project it into docs/decisions/index.md. Purely optional and"
+        },
+        {
+          "line": 1955,
+          "text": "      // additive -- an item-scoped decision (--id set) has no use for it,"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "comment",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/<area>.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/<area>/README.md",
+      "desiredAnchor": "area-slug metadata (not a file read)",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/cli/command-registry.test.mjs; test/report/decision-index.test.mjs (planned scope/help compatibility)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Scope remains an area slug, never a filesystem path. Remove the retiring layout example without changing scope key or projection writer.",
+      "normalizedReference": "docs/specs/<area>.md",
+      "cutoverPatch": {
+        "old": "docs/specs/<area>.md",
+        "new": "the current platform area",
+        "operation": "literal prose substitution only; retain scope parameter and area slug values"
+      }
+    },
+    {
+      "edgeId": "cli-005",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 3515,
+      "columnStart": 30,
+      "columnEndExclusive": 51,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/runner.md:",
+      "callSite": "      // registered session (docs/specs/runner.md: \"a session worktree is",
+      "context": [
+        {
+          "line": 3513,
+          "text": "      // A REGISTERED session worktree (`fgos session start`) is deliberately"
+        },
+        {
+          "line": 3514,
+          "text": "      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a"
+        },
+        {
+          "line": 3515,
+          "text": "      // registered session (docs/specs/runner.md: \"a session worktree is"
+        },
+        {
+          "line": 3516,
+          "text": "      // structurally the wrong place for a merge-into-main to happen\"),"
+        },
+        {
+          "line": 3517,
+          "text": "      // `return`'s own progress check (aheadCount + verify) is spike-proven"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "comment",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/runner.md",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "Runner / dispatch / merge lifecycle",
+            "canonicalRoutes": [
+              "docs/specs/runner.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "runner-and-dispatch-lifecycle",
+                "route": "docs/specs/runner.md",
+                "authorityStatus": "legacy-current",
+                "role": "Owns runner loop, dispatch, merge gate, and worker log"
+              },
+              {
+                "scope": "agent-handoff-contract",
+                "route": "docs/routing-handoff-contract.md",
+                "authorityStatus": "legacy-current",
+                "role": "Canonical agent-to-agent handoff contract and trust boundary"
+              },
+              {
+                "route": "docs/platform/runner/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          },
+          {
+            "area": "Agent coordination",
+            "canonicalRoutes": [
+              "docs/platform/agent-coordination/README.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "promoted-portal-navigation-and-status",
+                "route": "docs/platform/agent-coordination/README.md",
+                "authorityStatus": "promoted",
+                "role": "Target portal owns navigation and status summary"
+              },
+              {
+                "scope": "retained-contracts-schemas-and-proofs",
+                "route": "docs/architect/agent-coordination/**",
+                "authorityStatus": "legacy-current",
+                "role": "Exact accepted contracts, schemas, ADRs, and verification remain in docs/architect/agent-coordination/** until explicitly superseded"
+              },
+              {
+                "scope": "runner-coordination-integration",
+                "route": "docs/specs/runner.md",
+                "authorityStatus": "legacy-current",
+                "role": "Runner integration and dispatch lifecycle"
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/protocol-model.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/run-handle.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/runtime-model.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/system-context.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/architecture/work-integration.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/contracts/coordination-session.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/contracts/flow-definition.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/contracts/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/decisions/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/history/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/playbooks/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/spec.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/subcomponents/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/verification/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vision.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vocabulary/README.md",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              },
+              {
+                "route": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          },
+          {
+            "area": "Herdr gateway and web dashboard",
+            "canonicalRoutes": [
+              "docs/specs/herdr-web-dashboard.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "web-dashboard-client",
+                "route": "docs/specs/herdr-web-dashboard.md",
+                "authorityStatus": "legacy-current",
+                "role": "Spec owns web dashboard client behavior"
+              },
+              {
+                "scope": "cockpit-operations",
+                "route": "docs/operator-runbook-herdr-cockpit.md",
+                "authorityStatus": "legacy-current",
+                "role": "Runbook owns supported operator procedures for cockpit"
+              },
+              {
+                "scope": "runner-gateway-integration",
+                "route": "docs/specs/runner.md",
+                "authorityStatus": "legacy-current",
+                "role": "Runner/gateway integration behavior"
+              },
+              {
+                "route": "docs/platform/herdr-web-dashboard/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "desiredAnchor": "bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "Planned: env -u CLAUDE_CODE_SESSION_ID node --test test/cli/fgos-return.test.mjs test/cli/fgos-return-quoted-paths.test.mjs test/runner/session.test.mjs; candidate section 723–773 correspondence",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-runner-0001",
+            "fromPath": "docs/specs/runner.md",
+            "toOwner": "docs/platform/runner/README.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-runner.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Maintained return-vs-approve comment cites a current invariant. Preserve quoted wording and rebind navigation at cutover after exact clause location. Exact candidate session-nesting section located; this is quote navigation, not runtime parity proof.",
+      "normalizedReference": "docs/specs/runner.md",
+      "cutoverPatch": {
+        "old": "docs/specs/runner.md",
+        "new": "docs/platform/runner/operations/h-51f5cd7279fd.md#bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2",
+        "operation": "literal citation substitution; preserve surrounding behavior/quote; validate target before application"
+      }
+    },
+    {
+      "edgeId": "cli-006",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 4150,
+      "columnStart": 35,
+      "columnEndExclusive": 61,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/distribution.md",
+      "callSite": "    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every",
+      "context": [
+        {
+          "line": 4148,
+          "text": "    }"
+        },
+        {
+          "line": 4149,
+          "text": ""
+        },
+        {
+          "line": 4150,
+          "text": "    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every"
+        },
+        {
+          "line": 4151,
+          "text": "    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc"
+        },
+        {
+          "line": 4152,
+          "text": "    // file insertion, no config write — unless `--fix` is given."
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "comment",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/distribution.md",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "Packaging-distribution",
+            "canonicalRoutes": [
+              "docs/platform/packaging-distribution/README.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "promoted-portal-and-alignment",
+                "route": "docs/platform/packaging-distribution/README.md",
+                "authorityStatus": "promoted",
+                "role": "Portal owns active navigation and implementation-alignment"
+              },
+              {
+                "scope": "retained-specs",
+                "route": "docs/specs/distribution.md",
+                "authorityStatus": "legacy-current",
+                "role": "Legacy distribution spec consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-vision",
+                "route": "docs/distribution-vision.md",
+                "authorityStatus": "non-authority",
+                "role": "Historical vision consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-architecture",
+                "route": "docs/architect/packaging-distribution/**",
+                "authorityStatus": "legacy-current",
+                "role": "Detailed architecture sources consulted only in roles assigned by portal"
+              },
+              {
+                "route": "docs/platform/packaging-distribution/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "desiredAnchor": "3-doctor-contract",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/cli/command-registry.test.mjs; test/setup/registrations.test.mjs; test/scripts/install-git-hooks.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-specs-0245",
+            "fromPath": "docs/specs/distribution.md",
+            "toOwner": "docs/platform/packaging-distribution/README.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-packaging-distribution.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Maintained help/comment navigation: preserve doctor/check/fix and dependency-install behavior; only path changes after reviewed target correspondence.",
+      "normalizedReference": "docs/specs/distribution.md",
+      "cutoverPatch": {
+        "old": "docs/specs/distribution.md",
+        "new": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#3-doctor-contract",
+        "operation": "literal citation substitution; preserve surrounding behavior/quote; validate target before application"
+      }
+    },
+    {
+      "edgeId": "cli-007",
+      "surfaceClass": "cli-help",
+      "consumerPath": "src/cli/command-registry.mjs",
+      "line": 7,
+      "columnStart": 46,
+      "columnEndExclusive": 60,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect",
+      "callSite": "// this module sits at the `kernel` layer in docs/architecture-manifest.json:",
+      "context": [
+        {
+          "line": 5,
+          "text": "//"
+        },
+        {
+          "line": 6,
+          "text": "// Pure data only — no imports of verb logic (src/state, src/runner, etc.), so"
+        },
+        {
+          "line": 7,
+          "text": "// this module sits at the `kernel` layer in docs/architecture-manifest.json:"
+        },
+        {
+          "line": 8,
+          "text": "// `bin/fgos.mjs` (entry) importing it is a downward import, and this file can"
+        },
+        {
+          "line": 9,
+          "text": "// never import back up into anything that would create a cycle."
+        }
+      ],
+      "fileDigest": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architecture-manifest.json",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "Machine architecture manifest contract retained; scanner prefix false positive, not legacy directory membership."
+      },
+      "desiredOwner": "docs/architecture-manifest.json",
+      "desiredAnchor": "file-block",
+      "sourceVsRender": "source",
+      "sourcePath": "src/cli/command-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0001",
+            "fromPath": "docs/architecture-manifest.json",
+            "toOwner": "docs/platform/contracts/architecture-manifest.json",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Regex legacy prefix false positive: docs/architect is a prefix of docs/architecture-manifest.json. Actual machine architecture contract stays; not a retiring architect document.",
+      "normalizedReference": "docs/architecture-manifest.json"
+    },
+    {
+      "edgeId": "cli-008",
+      "surfaceClass": "cli-help",
+      "consumerPath": "src/cli/command-registry.mjs",
+      "line": 831,
+      "columnStart": 91,
+      "columnEndExclusive": 102,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/",
+      "callSite": "        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },",
+      "context": [
+        {
+          "line": 829,
+          "text": "        id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },"
+        },
+        {
+          "line": 830,
+          "text": "        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },"
+        },
+        {
+          "line": 831,
+          "text": "        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },"
+        },
+        {
+          "line": 832,
+          "text": "      },"
+        },
+        {
+          "line": 833,
+          "text": "      positional: ['text'],"
+        }
+      ],
+      "fileDigest": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "edgeKind": "help-string",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/<area>.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/<area>/README.md",
+      "desiredAnchor": "area-slug metadata (not a file read)",
+      "sourceVsRender": "source",
+      "sourcePath": "src/cli/command-registry.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/cli/command-registry.test.mjs; test/report/decision-index.test.mjs (planned scope/help compatibility)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Scope remains an area slug, never a filesystem path. Remove the retiring layout example without changing scope key or projection writer.",
+      "normalizedReference": "docs/specs/<area>.md",
+      "cutoverPatch": {
+        "old": "docs/specs/<area>.md",
+        "new": "the current platform area",
+        "operation": "literal prose substitution only; retain scope parameter and area slug values"
+      }
+    },
+    {
+      "edgeId": "cli-009",
+      "surfaceClass": "cli-help",
+      "consumerPath": "src/cli/command-registry.mjs",
+      "line": 1020,
+      "columnStart": 62,
+      "columnEndExclusive": 90,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/tsk-19j/plan.md",
+      "callSite": "      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',",
+      "context": [
+        {
+          "line": 1018,
+          "text": "    examples: ["
+        },
+        {
+          "line": 1019,
+          "text": "      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',"
+        },
+        {
+          "line": 1020,
+          "text": "      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children \"[]\" --cost REVERSIBLE',"
+        },
+        {
+          "line": 1021,
+          "text": "    ],"
+        },
+        {
+          "line": 1022,
+          "text": "    touchesState: false,"
+        }
+      ],
+      "fileDigest": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/tsk-19j/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/tsk-19j/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/cli/command-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/tsk-19j/plan.md"
+    },
+    {
+      "edgeId": "cli-010",
+      "surfaceClass": "cli-help",
+      "consumerPath": "src/cli/command-registry.mjs",
+      "line": 1845,
+      "columnStart": 72,
+      "columnEndExclusive": 92,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',",
+      "context": [
+        {
+          "line": 1843,
+          "text": "    name: 'doc-registry',"
+        },
+        {
+          "line": 1844,
+          "text": "    invoke: 'fgos doc-registry',"
+        },
+        {
+          "line": 1845,
+          "text": "    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',"
+        },
+        {
+          "line": 1846,
+          "text": "    parameters: { type: 'object', properties: {}, required: [] },"
+        },
+        {
+          "line": 1847,
+          "text": "    examples: ['fgos doc-registry'],"
+        }
+      ],
+      "fileDigest": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "edgeKind": "projection-reference",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/cli/command-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "cli-011",
+      "surfaceClass": "cli-help",
+      "consumerPath": "src/cli/command-registry.mjs",
+      "line": 2056,
+      "columnStart": 383,
+      "columnEndExclusive": 409,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/distribution.md",
+      "callSite": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+      "context": [
+        {
+          "line": 2054,
+          "text": "    name: 'doctor',"
+        },
+        {
+          "line": 2055,
+          "text": "    invoke: 'fgos doctor',"
+        },
+        {
+          "line": 2056,
+          "text": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',"
+        },
+        {
+          "line": 2057,
+          "text": "    parameters: {"
+        },
+        {
+          "line": 2058,
+          "text": "      type: 'object',"
+        }
+      ],
+      "fileDigest": "b02602a0ed6b9782a7c77c51ad30904f1d63817be09143852005ac7cdc59df79",
+      "edgeKind": "help-string",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/distribution.md",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "Packaging-distribution",
+            "canonicalRoutes": [
+              "docs/platform/packaging-distribution/README.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "promoted-portal-and-alignment",
+                "route": "docs/platform/packaging-distribution/README.md",
+                "authorityStatus": "promoted",
+                "role": "Portal owns active navigation and implementation-alignment"
+              },
+              {
+                "scope": "retained-specs",
+                "route": "docs/specs/distribution.md",
+                "authorityStatus": "legacy-current",
+                "role": "Legacy distribution spec consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-vision",
+                "route": "docs/distribution-vision.md",
+                "authorityStatus": "non-authority",
+                "role": "Historical vision consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-architecture",
+                "route": "docs/architect/packaging-distribution/**",
+                "authorityStatus": "legacy-current",
+                "role": "Detailed architecture sources consulted only in roles assigned by portal"
+              },
+              {
+                "route": "docs/platform/packaging-distribution/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "desiredAnchor": "3-doctor-contract",
+      "sourceVsRender": "source",
+      "sourcePath": "src/cli/command-registry.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/cli/command-registry.test.mjs; test/setup/registrations.test.mjs; test/scripts/install-git-hooks.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-specs-0245",
+            "fromPath": "docs/specs/distribution.md",
+            "toOwner": "docs/platform/packaging-distribution/README.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-packaging-distribution.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Maintained help/comment navigation: preserve doctor/check/fix and dependency-install behavior; only path changes after reviewed target correspondence.",
+      "normalizedReference": "docs/specs/distribution.md",
+      "cutoverPatch": {
+        "old": "docs/specs/distribution.md",
+        "new": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#3-doctor-contract",
+        "operation": "literal citation substitution; preserve surrounding behavior/quote; validate target before application"
+      }
+    },
+    {
+      "edgeId": "cli-012",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1755,
+      "columnStart": 24,
+      "columnEndExclusive": 65,
+      "pattern": "manual",
+      "matchedExpression": "path.join(root, 'docs/doc-registry.json')",
+      "callSite": "      const jsonPath = path.join(root, 'docs/doc-registry.json');",
+      "context": [
+        {
+          "line": 1753,
+          "text": "      const root = path.dirname(dir);"
+        },
+        {
+          "line": 1754,
+          "text": "      const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 1755,
+          "text": "      const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 1756,
+          "text": "      fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        },
+        {
+          "line": 1757,
+          "text": "      fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "paired-projection-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.json",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "cli-013",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1757,
+      "columnStart": 7,
+      "columnEndExclusive": 50,
+      "pattern": "manual",
+      "matchedExpression": "fs.writeFileSync(mdPath, mdContent, 'utf8')",
+      "callSite": "      fs.writeFileSync(mdPath, mdContent, 'utf8');",
+      "context": [
+        {
+          "line": 1755,
+          "text": "      const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 1756,
+          "text": "      fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        },
+        {
+          "line": 1757,
+          "text": "      fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        },
+        {
+          "line": 1758,
+          "text": "      fs.writeFileSync(jsonPath, jsonContent, 'utf8');"
+        },
+        {
+          "line": 1759,
+          "text": "      return { mdPath, jsonPath, topics: Object.keys(view.topics || {}).length, docs: Object.keys(view.docs || {}).length };"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.md",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "cli-014",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1758,
+      "columnStart": 7,
+      "columnEndExclusive": 54,
+      "pattern": "manual",
+      "matchedExpression": "fs.writeFileSync(jsonPath, jsonContent, 'utf8')",
+      "callSite": "      fs.writeFileSync(jsonPath, jsonContent, 'utf8');",
+      "context": [
+        {
+          "line": 1756,
+          "text": "      fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        },
+        {
+          "line": 1757,
+          "text": "      fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        },
+        {
+          "line": 1758,
+          "text": "      fs.writeFileSync(jsonPath, jsonContent, 'utf8');"
+        },
+        {
+          "line": 1759,
+          "text": "      return { mdPath, jsonPath, topics: Object.keys(view.topics || {}).length, docs: Object.keys(view.docs || {}).length };"
+        },
+        {
+          "line": 1760,
+          "text": "    }"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.json",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "cli-015",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1530,
+      "columnStart": 9,
+      "columnEndExclusive": 76,
+      "pattern": "manual",
+      "matchedExpression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+      "callSite": "        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc reserve requires currentPath');",
+      "context": [
+        {
+          "line": 1528,
+          "text": "        const topicId = requireField(positional[1] ?? flags['topic-id'], 'doc reserve requires topicId');"
+        },
+        {
+          "line": 1529,
+          "text": "        const role = requireField(positional[2] ?? flags.role, 'doc reserve requires role');"
+        },
+        {
+          "line": 1530,
+          "text": "        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc reserve requires currentPath');"
+        },
+        {
+          "line": 1531,
+          "text": "        return reserveDocStore(dir, {"
+        },
+        {
+          "line": 1532,
+          "text": "          topicId,"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "metadata-writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "caller currentPath for doc reserve/register",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "caller currentPath for doc reserve/register",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": {
+        "path": "caller currentPath for doc reserve/register",
+        "kind": "explicit input/current owner; alias refusal required",
+        "activeAlias": false
+      },
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-016",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1604,
+      "columnStart": 9,
+      "columnEndExclusive": 57,
+      "pattern": "manual",
+      "matchedExpression": "if (docPath && targetDoc.currentPath !== docPath",
+      "callSite": "        if (docPath && targetDoc.currentPath !== docPath && Array.isArray(targetDoc.aliases) && targetDoc.aliases.includes(docPath)) {",
+      "context": [
+        {
+          "line": 1602,
+          "text": "        }"
+        },
+        {
+          "line": 1603,
+          "text": ""
+        },
+        {
+          "line": 1604,
+          "text": "        if (docPath && targetDoc.currentPath !== docPath && Array.isArray(targetDoc.aliases) && targetDoc.aliases.includes(docPath)) {"
+        },
+        {
+          "line": 1605,
+          "text": "          throw new StoreError("
+        },
+        {
+          "line": 1606,
+          "text": "            'validation',"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "alias-refusal",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "doc promote: registered currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "doc promote: registered currentPath",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; alias input explicitly refused for current-path mutation"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-017",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1624,
+      "columnStart": 11,
+      "columnEndExclusive": 82,
+      "pattern": "manual",
+      "matchedExpression": "execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`]",
+      "callSite": "          execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`], { cwd: repoRoot, stdio: 'ignore' });",
+      "context": [
+        {
+          "line": 1622,
+          "text": "        let existsAtHead = false;"
+        },
+        {
+          "line": 1623,
+          "text": "        try {"
+        },
+        {
+          "line": 1624,
+          "text": "          execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`], { cwd: repoRoot, stdio: 'ignore' });"
+        },
+        {
+          "line": 1625,
+          "text": "          existsAtHead = true;"
+        },
+        {
+          "line": 1626,
+          "text": "        } catch {"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "targetDoc.currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "targetDoc.currentPath",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-018",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1576,
+      "columnStart": 11,
+      "columnEndExclusive": 57,
+      "pattern": "manual",
+      "matchedExpression": "const resolved = resolveDocPath(view, docPath)",
+      "callSite": "          const resolved = resolveDocPath(view, docPath);",
+      "context": [
+        {
+          "line": 1574,
+          "text": "          targetDoc = docId ? (view.docs?.[docId] ?? null) : null;"
+        },
+        {
+          "line": 1575,
+          "text": "        } else if (docPath) {"
+        },
+        {
+          "line": 1576,
+          "text": "          const resolved = resolveDocPath(view, docPath);"
+        },
+        {
+          "line": 1577,
+          "text": "          if (Array.isArray(resolved)) {"
+        },
+        {
+          "line": 1578,
+          "text": "            throw new StoreError('validation', `doc promote: --doc-path \"${docPath}\" resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) — use --topic-id/--role to name the exact doc instead.`);"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "lookup-only-alias",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docPath -> current registry owner",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "docPath -> current registry owner",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; alias input explicitly refused for current-path mutation"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-019",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1723,
+      "columnStart": 11,
+      "columnEndExclusive": 48,
+      "pattern": "manual",
+      "matchedExpression": "if (resolved.currentPath !== docPath)",
+      "callSite": "          if (resolved.currentPath !== docPath) {",
+      "context": [
+        {
+          "line": 1721,
+          "text": "            throw new StoreError('validation', `knowledge attest: path '${docPath}' is not registered in knowledge registry. Remedy: run 'fgos doc reserve' or 'fgos doc register' first.`);"
+        },
+        {
+          "line": 1722,
+          "text": "          }"
+        },
+        {
+          "line": 1723,
+          "text": "          if (resolved.currentPath !== docPath) {"
+        },
+        {
+          "line": 1724,
+          "text": "            throw new StoreError('validation', `knowledge attest: path '${docPath}' is an ALIAS, not currentPath '${resolved.currentPath}'. Remedy: use official currentPath '${resolved.currentPath}'.`);"
+        },
+        {
+          "line": 1725,
+          "text": "          }"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "alias-refusal",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "knowledge attest currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "knowledge attest currentPath",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; alias input explicitly refused for current-path mutation"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-020",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1819,
+      "columnStart": 11,
+      "columnEndExclusive": 45,
+      "pattern": "manual",
+      "matchedExpression": "if (match.currentPath !== docPath)",
+      "callSite": "          if (match.currentPath !== docPath) {",
+      "context": [
+        {
+          "line": 1817,
+          "text": "            throw new StoreError('validation', `compound: --doc-path \"${docPath}\" is not registered in the knowledge registry (docRegistry.enforce is on) — run \"fgos doc reserve\"/\"fgos doc register\" first, or use \"fgos knowledge attest\" instead of this deprecated verb.`);"
+        },
+        {
+          "line": 1818,
+          "text": "          }"
+        },
+        {
+          "line": 1819,
+          "text": "          if (match.currentPath !== docPath) {"
+        },
+        {
+          "line": 1820,
+          "text": "            throw new StoreError('validation', `compound: --doc-path \"${docPath}\" is an ALIAS, not the registered currentPath \"${match.currentPath}\" (docRegistry.enforce is on) — use the currentPath.`);"
+        },
+        {
+          "line": 1821,
+          "text": "          }"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "alias-refusal",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "deprecated compound currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "deprecated compound currentPath",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; alias input explicitly refused for current-path mutation"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-021",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2099,
+      "columnStart": 22,
+      "columnEndExclusive": 58,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(contextPath, 'utf8')",
+      "callSite": "      const before = fs.readFileSync(contextPath, 'utf8');",
+      "context": [
+        {
+          "line": 2097,
+          "text": "      const decisions = (view.decisions ?? []).filter((d) => d.id === id);"
+        },
+        {
+          "line": 2098,
+          "text": "      const table = renderLockedDecisionsTable(decisions);"
+        },
+        {
+          "line": 2099,
+          "text": "      const before = fs.readFileSync(contextPath, 'utf8');"
+        },
+        {
+          "line": 2100,
+          "text": "      // tsk-1lv review-fix F6 (fixed again after round-2 review found a"
+        },
+        {
+          "line": 2101,
+          "text": "      // real regression, B2): a render with zero rows (no state.decisions"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "contextRelPath from locked-decision caller",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "contextRelPath from locked-decision caller",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-022",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2146,
+      "columnStart": 9,
+      "columnEndExclusive": 53,
+      "pattern": "manual",
+      "matchedExpression": "fs.writeFileSync(contextPath, after, 'utf8')",
+      "callSite": "        fs.writeFileSync(contextPath, after, 'utf8');",
+      "context": [
+        {
+          "line": 2144,
+          "text": "      const changed = before !== after;"
+        },
+        {
+          "line": 2145,
+          "text": "      if (changed) {"
+        },
+        {
+          "line": 2146,
+          "text": "        fs.writeFileSync(contextPath, after, 'utf8');"
+        },
+        {
+          "line": 2147,
+          "text": "      }"
+        },
+        {
+          "line": 2148,
+          "text": "      return {"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "contextRelPath (existing locked-decisions table only)",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "contextRelPath (existing locked-decisions table only)",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": {
+        "path": "contextRelPath (existing locked-decisions table only)",
+        "kind": "explicit input/current owner; alias refusal required",
+        "activeAlias": false
+      },
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-023",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2376,
+      "columnStart": 30,
+      "columnEndExclusive": 67,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(artifactPath, 'utf8')",
+      "callSite": "        const artifactText = fs.readFileSync(artifactPath, 'utf8');",
+      "context": [
+        {
+          "line": 2374,
+          "text": "      if (gate === 'contextApprove') {"
+        },
+        {
+          "line": 2375,
+          "text": "        const artifactPath = requireField(flags.artifact, 'gate-check --gate contextApprove requires --artifact <path>');"
+        },
+        {
+          "line": 2376,
+          "text": "        const artifactText = fs.readFileSync(artifactPath, 'utf8');"
+        },
+        {
+          "line": 2377,
+          "text": "        return gateCheckUseCase({ dir }, { id, gate, artifactText });"
+        },
+        {
+          "line": 2378,
+          "text": "      }"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "--artifact",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "--artifact",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned: test/cli/fgos-gate-approve.test.mjs and test/cli/fgos-decision-kind.test.mjs; verify artifact/plan-path cases cover this CLI read before declaring parity",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-024",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2381,
+      "columnStart": 26,
+      "columnEndExclusive": 59,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(planPath, 'utf8')",
+      "callSite": "        const planText = fs.readFileSync(planPath, 'utf8');",
+      "context": [
+        {
+          "line": 2379,
+          "text": "      if (gate === 'validateApprove') {"
+        },
+        {
+          "line": 2380,
+          "text": "        const planPath = requireField(flags.plan, 'gate-check --gate validateApprove requires --plan <path>');"
+        },
+        {
+          "line": 2381,
+          "text": "        const planText = fs.readFileSync(planPath, 'utf8');"
+        },
+        {
+          "line": 2382,
+          "text": "        const childSpecs = flags.children !== undefined ? JSON.parse(flags.children) : [];"
+        },
+        {
+          "line": 2383,
+          "text": "        const cost = requireField(flags.cost, 'gate-check --gate validateApprove requires --cost <REVERSIBLE|EXPENSIVE>');"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "--plan (L12-10 external-project topology)",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "--plan (L12-10 external-project topology)",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned: test/cli/fgos-gate-approve.test.mjs and test/cli/fgos-decision-kind.test.mjs; verify artifact/plan-path cases cover this CLI read before declaring parity",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-025",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2553,
+      "columnStart": 22,
+      "columnEndExclusive": 57,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(targetPath, 'utf8')",
+      "callSite": "        const text = fs.readFileSync(targetPath, 'utf8');",
+      "context": [
+        {
+          "line": 2551,
+          "text": "        }"
+        },
+        {
+          "line": 2552,
+          "text": "        targetPath = planMd;"
+        },
+        {
+          "line": 2553,
+          "text": "        const text = fs.readFileSync(targetPath, 'utf8');"
+        },
+        {
+          "line": 2554,
+          "text": "        result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});"
+        },
+        {
+          "line": 2555,
+          "text": "      } else {"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "plan-lint caller path / plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "plan-lint caller path / plan.md",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/plan-lint.test.mjs, test/report/capability-plan-lint.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-026",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 3048,
+      "columnStart": 25,
+      "columnEndExclusive": 87,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8')",
+      "callSite": "        const content = fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8');",
+      "context": [
+        {
+          "line": 3046,
+          "text": "        if (!entry.isFile() || !entry.name.endsWith('.md')) continue;"
+        },
+        {
+          "line": 3047,
+          "text": "        const relPath = path.posix.join(quadrantDir, entry.name);"
+        },
+        {
+          "line": 3048,
+          "text": "        const content = fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8');"
+        },
+        {
+          "line": 3049,
+          "text": "        const { meta } = parseFrontmatter(content);"
+        },
+        {
+          "line": 3050,
+          "text": "        candidates.push({ path: relPath, authoritativeFor: meta.authoritative_for });"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "--quadrant/*.md",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "--quadrant/*.md",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/report/authoritative-match.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-027",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 1542,
+      "columnStart": 9,
+      "columnEndExclusive": 76,
+      "pattern": "manual",
+      "matchedExpression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+      "callSite": "        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc register requires currentPath');",
+      "context": [
+        {
+          "line": 1540,
+          "text": "        const topicId = requireField(positional[1] ?? flags['topic-id'], 'doc register requires topicId');"
+        },
+        {
+          "line": 1541,
+          "text": "        const role = requireField(positional[2] ?? flags.role, 'doc register requires role');"
+        },
+        {
+          "line": 1542,
+          "text": "        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc register requires currentPath');"
+        },
+        {
+          "line": 1543,
+          "text": "        return registerDocStore(dir, {"
+        },
+        {
+          "line": 1544,
+          "text": "          topicId,"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "metadata-writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "caller currentPath for doc register",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "caller currentPath for doc register",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/knowledge-verbs.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Concrete caller destinations unproven; require bounded export; no alias destination adopted.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": {
+        "path": "caller currentPath for doc register",
+        "kind": "explicit input/current owner; alias refusal required",
+        "activeAlias": false
+      },
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "cli-028",
+      "surfaceClass": "cli-help",
+      "consumerPath": "bin/fgos.mjs",
+      "line": 2560,
+      "columnStart": 24,
+      "columnEndExclusive": 59,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(targetPath, 'utf8')",
+      "callSite": "          const text = fs.readFileSync(targetPath, 'utf8');",
+      "context": [
+        {
+          "line": 2558,
+          "text": "          result = lintPhaseUnits(targetPath, { config: cfg, cellId });"
+        },
+        {
+          "line": 2559,
+          "text": "        } else {"
+        },
+        {
+          "line": 2560,
+          "text": "          const text = fs.readFileSync(targetPath, 'utf8');"
+        },
+        {
+          "line": 2561,
+          "text": "          result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});"
+        },
+        {
+          "line": 2562,
+          "text": "        }"
+        }
+      ],
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "plan-lint explicit file input",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "plan-lint explicit file input",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "bin/fgos.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Planned existing checks: test/cli/plan-lint.test.mjs, test/report/capability-plan-lint.test.mjs",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Concrete caller file targets unproven; require bounded export.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    }
+  ],
+  "reviewStatus": "pending independent review"
+}

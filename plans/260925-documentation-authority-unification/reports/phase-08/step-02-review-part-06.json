@@ -1,0 +1,2533 @@
+{
+  "requestId": "step-02-merged-census-587c2a791",
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "surface": "evidence-lexical-refresh",
+  "reviewStatus": "pending Lead-started independent review",
+  "entries": [
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-061",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+        "fileDigest": "7357ee70a444ddd4f8fc989ab3f8221a910a763cf8c4891481c2e657b994019d",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 53,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          53
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-062",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+        "fileDigest": "42e57d96edf6988cf7c3bfb5a225bc5b24b94e0f998e8867828db0688cb84104",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+        "occurrences": [
+          {
+            "line": 72,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          72
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-063",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+        "fileDigest": "607ffb27be8c7fb800a72d1c9196c3e7fd69ebb956ba0073681252ecff563640",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+        "occurrences": [
+          {
+            "line": 70,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          70
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-064",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+        "fileDigest": "b1d55eed70a607be6c95bb314a564b8f9b76e6002c87104d3ca247ece4ad86b0",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-065",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+        "fileDigest": "84abba7d7f34b0088862dab4e1a60007b994f1efa217a62a1ddc3990f871ecb3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+        "occurrences": [
+          {
+            "line": 9,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          9
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-066",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+        "fileDigest": "b52c4ee6a89f2e988e1d3d7e89232f2e28bbb835238b75586b40720bf46728e1",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+        "occurrences": [
+          {
+            "line": 61,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          61
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-067",
+        "path": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+        "fileDigest": "862390ff6275a36f9f9e78b0402ed9a3e7453014babc7ebf5a9874d08e64414f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+        "occurrences": [
+          {
+            "line": 73,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          73
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-068",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+        "fileDigest": "1369c41194a4679d490956d23e8a396c77ca68037994d160a785741b4f7980a3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+        "occurrences": [
+          {
+            "line": 205,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          205
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-069",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "fileDigest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "occurrences": [
+          {
+            "line": 117,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          117
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-070",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+        "fileDigest": "8014be04e689068e752c684ab3ba15cf86e11527fc10fbee89ae44698b3c85d5",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+        "occurrences": [
+          {
+            "line": 142,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          142
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-071",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+        "fileDigest": "ef539ade3f7530a53071f19905c1dd66cfa949239cdc4b55f71ed74db303c531",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+        "occurrences": [
+          {
+            "line": 7,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Status: COMPLETE — all phases (01, 02, 03 incl. R5-R7 live proof) closed and merged (see `docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md`'s own \"Track status\") | Created: 2026-09-04 | Owner: maintainer"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          7
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-072",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+        "fileDigest": "1d6710b6924e8bebd5ba2715609c21c6d61cff45b5fe0779381e91631980c7ba",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+        "occurrences": [
+          {
+            "line": 29,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` — Proof Matrix/Commands/Gaps only (never Review/Red-Team/index.md/current-cell-P02.1.md)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          29
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-073",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+        "fileDigest": "0694c00741255cc4e284b8c290c0d400b0973b06335d435fea9b7ba26b103f41",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+        "occurrences": [
+          {
+            "line": 26,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/`"
+          },
+          {
+            "line": 183,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "M  docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          26,
+          183
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-074",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+        "fileDigest": "75af8065f2eaf76eadfac652a15bfd0078b8a29d03866bfbb70ff563ea6e0fbf",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+        "occurrences": [
+          {
+            "line": 10,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Red-Team (`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md`)."
+          },
+          {
+            "line": 81,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md` (Proof Matrix/Commands/Gaps only)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          10,
+          81
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-075",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+        "fileDigest": "10d7cf2f018e31563c9e7f3a4282dedf5d5bc592f68750a8848c653e046231be",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+        "occurrences": [
+          {
+            "line": 8,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Red-Team HIGH (accepted, `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`"
+          },
+          {
+            "line": 59,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`:"
+          },
+          {
+            "line": 120,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` (Proof Matrix row, Commands update, Gaps bullet — only these 3 sections)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          8,
+          59,
+          120
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-076",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+        "fileDigest": "1c4fc86c308be69d8d0fc9e9124c373fb0bb846327a2186980006154872adaa0",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+        "occurrences": [
+          {
+            "line": 158,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "### `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md`"
+          },
+          {
+            "line": 213,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          158,
+          213
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-077",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+        "fileDigest": "ef56d78c2ab6452473d4e91490b6d95ef1c8f31d7cf161e4c6f8e7f5a7bf640e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+        "occurrences": [
+          {
+            "line": 44,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Updated `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`:"
+          },
+          {
+            "line": 64,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          44,
+          64
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-078",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+        "fileDigest": "3c192e286e8b6eb7b93b37ad3a51c9fa0ac3c658f350040615d057ea4129f325",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+        "occurrences": [
+          {
+            "line": 17,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          17
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-079",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+        "fileDigest": "69945a84b810a3ca7241a00760f3a81841ab0facded8211bbcfa96816d6c5c88",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+        "occurrences": [
+          {
+            "line": 22,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`"
+          },
+          {
+            "line": 79,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`'s"
+          },
+          {
+            "line": 134,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          22,
+          79,
+          134
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-080",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+        "fileDigest": "5fa747e12829b3453ac190020c4b47a8361ec9c91a3ea7c03c7bf28a4f10639f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+        "occurrences": [
+          {
+            "line": 14,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Findings written to: `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md` (`## Red-Team` section only — no other section touched)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          14
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-081",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+        "fileDigest": "cecb4f02a715087b947aba7c1e07ebcd3cc9dea5199347b9a32f28de7726332f",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+        "occurrences": [
+          {
+            "line": 35,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "(`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md`)."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          35
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-082",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+        "fileDigest": "fd47d3c9492cadc6e7c4d9c3a03f13b570a7bc992a806048e5de75f99a8d1341",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+        "occurrences": [
+          {
+            "line": 71,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          71
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-083",
+        "path": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "fileDigest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "occurrences": [
+          {
+            "line": 12,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          12
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-084",
+        "path": "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+        "fileDigest": "f00a77818c16fa9cea16a068be6c668dcca4885a773017f40d11331a2b0b468c",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+        "occurrences": [
+          {
+            "line": 19,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          19
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-085",
+        "path": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+        "fileDigest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+        "occurrences": [
+          {
+            "line": 61,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/README.md`, and the track"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          61
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-086",
+        "path": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "fileDigest": "9088f5478c70ee3cbc44908e09335eda70ef33b3489f8f4b8f94d8eaebfa7a83",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "occurrences": [
+          {
+            "line": 161,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md"
+          },
+          {
+            "line": 162,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md"
+          },
+          {
+            "line": 163,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/architecture-advisory-panel/P*.md"
+          },
+          {
+            "line": 164,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/<cell-id>/"
+          },
+          {
+            "line": 335,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| `track-state` | `docs/architect/agent-coordination/verification/architecture-advisory-panel/{index.md,current-cell.md}` | All cells, serially |"
+          },
+          {
+            "line": 336,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| `readonly-dispatch` | `docs/architect/agent-coordination/verification/architecture-advisory-panel/{P00.1.md,proofs/P00.1/**}`; `.fgos/config.json`, `src/setup/checks.mjs`, the exact existing config-default owner proved by P00.1, matching dispatch/setup tests, and `CHANGELOG.md` only when the selected product mechanism requires them | P00.1 |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          161,
+          162,
+          163,
+          164,
+          335,
+          336
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-087",
+        "path": "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+        "fileDigest": "33921c02383b7ae6613649b4ec9167d4f285220f19832d29179583b7fe4c2817",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+        "occurrences": [
+          {
+            "line": 13,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/`:"
+          },
+          {
+            "line": 14,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  [env và socket](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md) ·"
+          },
+          {
+            "line": 15,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  [session cô lập](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md) ·"
+          },
+          {
+            "line": 16,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  [agent trong session cô lập](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md) ·"
+          },
+          {
+            "line": 17,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  [permission posture](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-088",
+        "path": "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+        "fileDigest": "b945368d11534594eb8ca96dca5df112be4fe462acd2f093cc78a695ffdb18b3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+        "occurrences": [
+          {
+            "line": 45,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "R5. Mọi log thật lưu dưới `docs/architect/agent-coordination/verification/visibility-herdr/proofs/`,"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          45
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-089",
+        "path": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "fileDigest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "occurrences": [
+          {
+            "line": 72,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "**Đối chiếu 2026-09-07** (bằng chứng: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`):"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          72
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-090",
+        "path": "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+        "fileDigest": "c0d9cabaf5243d1f7b7792c30862f98c74bf65b295006bbf719c468f9e9c268b",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+        "occurrences": [
+          {
+            "line": 11,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "below and `docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md`"
+          },
+          {
+            "line": 266,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P00 | `ce886620` | 3 sessions (`--p00` dead/no partialPolicy, `--p00b`/`--p00c` real rounds); reviewer 2 HIGH + several MEDIUM/LOW across rounds, red-team 1 HIGH (session-engine.mjs), all applied; final pass clean | `http`/`httpAdapter` scope (P02 open); `dispatch.mjs` adapter-symbol re-export (P02 open); `src/runner/loop.mjs` lease gap (P02 open); two lease-glob overlaps (inert under MAX_PARALLEL_CELLS:1); phase-00 file's own Verification grep (5 terms, misses 2 symbols); spec §2's stale 0/17 denominator (P07); `codex-readonly`'s retired sandbox (P04) — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md` |"
+          },
+          {
+            "line": 267,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 | `9939e0ef` | 6 sessions across 2 fix rounds (`--p01` maxRounds-exhausted, `--p01c`/`--p01d`/`--p01e`/`--p01f` real/dead-end mix); round 1: 5 HIGH+7 MEDIUM+6 LOW applied; round 2 recheck found 2 NEW HIGH regressions the round-1 fix itself introduced, both fixed; final: 0 HIGH/MEDIUM, 6 LOW deferred. Session could never formally quorum-close — 3 separate rounds hit a herdr pane-reuse bug writing into the shared main checkout, twice colliding with another active session's real uncommitted work (left untouched). Content-verified independently by the Lead (1777/1777 tests, do-not-touch clean, N1/N2 live-reproduced) and merged on that evidence per explicit user decision, not a closed session | M7-residual/M7-cache (bwrap smoke-test dedup key mismatch, module-level memo never invalidated); N2-residual (`runFixes` still has no structural try/catch, only fixed per-callsite; CLI-level behavior untested); L4-residual/L4-mutation (IPv6 CIDR not canonicalized; validator mutates mutable input, throws on frozen); N3-residual (override destination match is exact-string, narrower CIDR wrongly refused, unreachable today — no production call site) — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md`. Structural gaps found for future Leads: `authorize` steps need `grantedContextRefs` (SKILL.md template omits it); re-authorizing a poisoned (actor,operation,node) slot under a new `authorizationId` in the same session does not take effect, needs a fresh `coordinationId`; herdr pane cwd reuse is a real platform gap, unresolved. |"
+          },
+          {
+            "line": 268,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02 | `bb58eb4a` | 4 sessions, 3 fix rounds (the cap): round 1 found 1 HIGH (adapter lookup bypass risk) + real overclaim; round 1 recheck found 1 NEW HIGH (spec §6.9 status/contract tokens clobbered) + real \"No overclaim\" violation (name-heuristic bwrap attestation) + 5 MEDIUM; round 2 (fresh session, extended wall-time budget, zero workspace collisions) fixed both HIGHs and the headline overclaim, found the SAME overclaim shape one layer deeper (2 residual MEDIUM); round 3 (scoped, cap) fixed that layer too — verified against a REAL bwrap 0.6.1 invocation, not just argv parsing — and found the shape yet one more layer deeper (2 more residual MEDIUM + 3 LOW). Round cap reached; diminishing severity each round (never regressed to HIGH). 1820/1820 tests, independently re-run by the Lead | MED-B (capability identity captured by an unrelated capability sharing an executor — fail-closed, latent until P04 strict mode); MED-1/MED-2 (round 3: inherited-fd channel still claims 'covered' from an unrelated flag; \"scoped\" writable exception isn't actually scoped by destination); LOW-1/2/3 (writable-exception grant dropped on basename collision; argv without `--` separator trusts payload tokens as options; `--tmpfs`/`--dev`/`--proc` writable mounts not recorded as grants); R8 static-scan gaps carried from P00/P01 (src/** only, naive comment-stripping, hardcoded site count) — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md`. New structural finding: `aggregateBounds.wallTimeMs` defaults to 1hr, not enough for a 3-4-dispatch fix round — set it explicitly (e.g. 7200000) in future multi-dispatch fix-round requests. Suggestive (not proven) that driving dispatch from a Lead session moved into its own worktree via `EnterWorktree` reduces the workspace-collision class documented in P01: zero collisions across P02's 5 dispatches once adopted, vs. 3 before. |"
+          },
+          {
+            "line": 269,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P03 | `435ff58a` | Most consequential cell to date, 3 fix rounds (the cap). Round 1 found+fixed 3 HIGH: a dispatched agent could forge its own attestation record from inside the sandbox (live-proven); `assess` accepted unknown/missing required controls and still executed; the prepared bwrap sandbox was silently discarded by `herdr-spawn` for every roster executor while Authority still claimed it satisfied. Round 2 found the round-1 fix introduced 2 new HIGH (the `http` adapter inherited the same silent-discard gap; an over-correction made both built-in policies refuse unconditionally in required mode on any machine with no credentials file — broke the phase's own headline capability) — fixed both, red-team's first clean pass (0 findings). Round 3 (cap) found the deepest layer of the same overclaim pattern: the execute/refuse decision ignored `unverified` coverage on non-optional controls, and `enforced` was stamped from structural observation alone rather than a real-time probe run — fixed both, verified live. 0 HIGH remaining. 1851/1851 tests, independently re-run by the Lead. Real infra friction this cell: `agy-herdr` failed its own handshake 5 consecutive times (fixed by swapping the fixer role to `codex-herdr`, not by retrying); `--p03` hit its `maxRounds:10` default cap from the retries (same class as P01); one dispatch's orchestrating CLI was killed by real system memory pressure from unrelated concurrent sessions on this machine, but its herdr pane kept running detached and finished — its output was read directly from `outbox/result-1.json` rather than redispatched | NEW-1b/NEW-1c (MEDIUM: `enforced` attestation body still thin/unverified against the actual executed invocation; prepared claims never compared to what ran); M-1/M-2 (MEDIUM: probe gate has no cache/single-flight/timeout per spec §6.6, ~180ms/9-spawn cost per required dispatch; probe binary can diverge from spawn binary when a registry entry omits `executable`); M-3/M-4 (MEDIUM: neither round 2 nor round 3's fix shipped a regression test; round 1 deleted a pre-existing test rather than updating it); L-1 through L-4 (LOW: probe error code missing from spec's taxonomy; `verifyRequiredProbe` hardcodes `bwrap`, no gate for a future driver; probe fingerprint is a fixed profile not bound to the specific policy; CHANGELOG filed under the wrong heading); R4 carried over (MEDIUM: success-path temp-dir leak still growing, reaper still has no production caller); R6/NEW-2 residuals (LOW: test-only store-path override not in the request's own context whitelist, no retention; the store-overlap refusal's own error path skips the normal refused-attestation contract) — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md`. Two new structural findings: an executor can fail its own herdr handshake persistently and independent of system load — swap it for a different roster executor rather than retrying the same one repeatedly; a detached herdr pane can finish real work after its orchestrating CLI dies — check `herdr pane list` and read `outbox/result-1.json` directly before redispatching. |"
+          },
+          {
+            "line": 270,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P04 | `ad822c84` | Doer (`07bd5329`) + reviewer 5 HIGH + red-team 1 HIGH, 3 fix rounds (the cap). Round 1 (superseded by round 2) fixed H-1/H-2/H-5/H-6/red-team's HIGH; H-3 (capability-fallback anchor) was reported fixed but was a no-op (same capability passed as its own anchor). Mid-round the Lead separately fixed a LIVE infra regression outside this diff: the global `~/.fgos/config.json` shipped `required`+`host-write-denied` with no backend for `advise`/`code:review`/`code:debug`, breaking those capabilities on this machine — corrected out-of-band, verified live. Round 2 (`f47f5b8a`) fixed the REAL H-3 (resolve.mjs now exposes the discarded fallback anchor) + N-1 (`ownWorktree` alone no longer earns `confined:true`); recheck found 3 NEW findings: M-1 (CHANGELOG still overclaims 4/7 capabilities), M-2 (2 of the \"known pre-existing unrelated\" test failures — waved off across 3 prior review rounds — are actually the operator's live global config leaking into the test fixture via `mergeWithGlobalConfig`, a real bug, not noise), M-3 (anchor-inheritance still overclaims an inherited-unconfined capability as a clean explicit opt-out, same no-overclaim class as N-1/H-2, now reachable in production). Round 3 needed 3 dispatch attempts: attempt 1 failed on a Lead process error (wrong `--cwd`, both fixer and reviewer self-detected and correctly reported `blocked`, no code at risk); attempts 2 and 3 (narrowed to M-1+M-3 only) each had the fixer (`codex-herdr`) burn its full 35-minute dispatch ceiling with zero commits (`exit 124`, `gitBefore==gitAfter`, empty `changedFiles`) — a new structural finding, distinct from P03's fail-fast handshake pattern. Both times the reviewer used the leftover budget productively: independently re-verified M-1/M-2/M-3 live, and corrected op_058's own failure count (a 3rd reported failure was a load flake, not stable — 2 stable failures, not 3). Cap reached; M-1/M-2/M-3 deferred, none HIGH, none regressing. 1871 tests / 1868 pass / 2 fail (M-2, known) / 1 skip, independently reproduced twice | M-1 (MEDIUM: CHANGELOG's R7 bullet still claims 7/7 capabilities got explicit `unconfined`; only 3 do); M-2 (MEDIUM: test fixture leaks the operator's live global config via `mergeWithGlobalConfig`, causing 2 stable failures on this machine — a test-isolation gap, not a production security gap; naive `HOME` isolation alone breaks 3 other confinement tests since the bwrap backend registry also reads `HOME`, so the real fix needs both halves together); M-3 (MEDIUM, real production gap: an inherited-unconfined anchor's attestation is indistinguishable from a genuine self-declared opt-out; REQUIRED/PREFERRED inheritance is unaffected) — full detail + exact specified fixes for all three (never landed only due to executor timeout, not task complexity): `docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md`. New structural finding: `codex-herdr` can burn its full per-dispatch ceiling twice in a row with zero output on two different (one deliberately small) task scopes — unlike P03's fail-fast handshake pattern, this fails silently at the time limit; swap the fixer executor or raise the ceiling before a third same-executor retry. |"
+          },
+          {
+            "line": 271,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05 | `852579e8` | Herdr and legacy confinement convergence (R1-R6), 3 fix rounds (the cap). Produce (op_065, `agy-herdr`, `c54c1888`) survived an orchestrating-CLI kill from system memory pressure (its detached pane finished, result read directly from `outbox/`) — recovered without redispatch, matching P03's own recovery pattern. Reviewer (op_066) found 2 HIGH (a new `confinement-herdr-maturity` doctor check never fired on the real `invocations[]`-shaped executor configs; the Doer's own commit introduced a Data Dictionary #7 doctor-registry drift regression, a real test-suite break) + 4 MEDIUM + 3 LOW, verified live with checkout-swap attribution. Red-team found no bypass. Fix round 1's fixer (`agy-herdr`) failed on a herdr re-brief handshake timeout with zero commit — a SECOND confirmed instance of P03's documented handshake-failure signature, this time mid-task; swapped fixer to `claude-reviewer-herdr` for round 2, which landed all 6 fixes cleanly (`dd0fc246`), independently re-verified live (0 HIGH/MEDIUM, 1 informational LOW). That same fix, however, had removed a duplicate bypass-pairing check that turned out to be the only hard-refusal backstop for a DIRECT (non-Authority) `establishConfinement` call — red-team caught this as a new MEDIUM. Round 3 (final) fixed it by extracting a shared `evaluateBypassPairing()` used by both Authority and `herdr-round.mjs` (`adf1c0da`), verified live by both reviewer and red-team in a fresh coordinationId (the original session's 2-hour wall-time budget had expired across the multiple recovery dispatches). 0 HIGH, 0 unresolved new MEDIUM. 1885 tests / 1878-1882 pass depending on load / 2 stable known-pre-existing fails, independently reproduced | LOW: the newly-closed direct-bypass gap has no regression test of its own yet (deferred to P06, which added exactly this test). Carried from P04 (M-2 global-config test leakage, M-3 inherited-unconfined-anchor attestation) and P03 (reaper never called, thin `enforced` attestation body) — unaffected by this cell, tracked in their own docs. Full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md`. Structural findings: `agy-herdr` can fail its own herdr handshake mid-task (a re-brief), not just at initial dispatch — same remedy (swap executor); a `coordinationId`'s `aggregateBounds.wallTimeMs` is measured from session-open time, so a cell surviving multiple CLI deaths/recovery dispatches can exhaust its whole budget on overhead alone — open a fresh coordinationId scoped to the remaining steps when this happens. |"
+          },
+          {
+            "line": 272,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P06 | `19f18ac5` | Dogfood proof, not a code-change cell -- proved the coordination mechanism end-to-end with real cross-provider dispatch (agy-herdr/Gemini doer, claude-reviewer-herdr/Claude reviewer+fixer, codex-herdr/OpenAI Codex red-team) and REAL confinement enforcement, satisfying the operator's own standing instruction (live-dispatch confinement compliance verification, not mocked tests). Doer (`a93539a9`) added a real regression test (closing P05's own deferred LOW), then live-demonstrated REQUIRED workspace-write and REQUIRED host-write-denied policies both producing genuine `enforced` attestations via the real bwrap backend, reverted the live `.fgos/config.json` to its exact original state afterward. Reviewer independently recovered both attestation records from the machine's own attestation store (not relayed), reproduced one dispatch itself, and independently sha256-verified the config revert; found 0 HIGH, 2 MEDIUM (evidence artifacts not actually delivered as files; a pre-existing thin-attestation-body gap carried to P07), 4 LOW. Red-team independently reproduced everything again and found 1 new MEDIUM (new test didn't cover a v1-shaped bypass input, though the code already correctly refused it). One clean fix round (`277bf650`) delivered the real evidence files (sha256-verified byte-identical to what the reviewer itself had captured) and added the missing v1-shaped test case, verified via mutation testing (16/17 broken / 17/17 restored). 0 HIGH throughout the whole cell. 1888/1885 pass/2 known pre-existing fail/1 skip, independently reproduced 3 times (Doer, reviewer, red-team) | 2 trivial LOW (report-vs-evidence prose mismatch, ~12s timestamp discrepancy); M2 carried from reviewer (pre-existing: `enforced` attestations' `channels[]` still carry observe-mode `unverified`/`unknown` detail even when the top-level outcome is correctly `enforced` -- same shape as P03's own NEW-1b/NEW-1c, left for P07) — full detail + the real evidence artifacts themselves: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md` and `plans/260910-1243-confinement-authority-implementation/reports/phase-06-group-thinking-coding-dogfood-proof-report.md`. Structural finding: the orchestrating CLI was killed by system memory pressure 3 separate times across P05/P06 (once per major dispatch phase) -- the detached-pane recovery pattern (read `outbox/result-1.json` directly, continue the same `coordinationId` with just the missing steps) handled every instance without losing any real work. |"
+          },
+          {
+            "line": 273,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P07 | `5010dff7` | FINAL PHASE. R1 decision: `runner.confinement.strict` stays `false` -- correctly justified (only 3/7 canonical capabilities ship explicit confinement by default; enabling strict today would throw at config load) and, after red-team caught an inverted secondary justification, corrected without changing the decision itself (P04's M-3 anchor-inheritance gap is actually an argument FOR eventually enabling strict, not against it -- strict has zero runtime effect beyond the load-time throw, so it would make M-3's overclaim path unreachable, not enable it). Doer (`fbff7630`) updated specs/how-to/changelog and ran the FULL suite (not the focused subset) for the first time this track: 6076/6065 pass/3 known fail/8 skip. Reviewer found 2 real HIGH (the closeout report's own deferral register was fabricated, reusing already-CLOSED finding IDs and omitting ~20 real deferrals; `confinement-authority.md` overclaimed the 3 bwrap executors migrated to LIVE backend references when P04.md says that was fixture-only) + 5 MEDIUM (2 how-to code samples that fail against the real shipped validators) + 6 LOW. Red-team's first attempt (`codex-herdr`) timed out at the ceiling with zero output -- the 3rd confirmed instance of this exact failure this session; swapped to `claude-reviewer-herdr`, confirmed both HIGH, and found its own new HIGH-3 (the inverted justification above) plus MEDIUM-A (closeout/doctor/runtime gave 3 mutually inconsistent answers about which capabilities declare confinement). Fix round 1 (`5abebd45`) closed all 3 HIGH + MEDIUM-1/2, documented MEDIUM-A honestly; recheck found 3 small new MEDIUM residuals (a stale contradicting row, an unsynced CHANGELOG line, a schema bug in the fix's OWN rewritten attestation sample). Fix round 2 (`c9315e5f`, fresh coordinationId after wall-time exhaustion, same pattern as P05) closed all 3 -- both reviewer and red-team gave an explicit READY TO CLOSE verdict, independently re-running the full suite 2 more times with 0 unmapped failures each time. This closes the entire confinement-authority-implementation track: P00-P07 all merged | 1 narrow MEDIUM (closeout §8 cites 3 nonexistent test file paths, though the underlying 145/144-pass claim for the real 8 confinement test files is true -- a 1-line citation fix); several LOW precision nits (a \"canonical\" mislabel, a CHANGELOG line accurate only on this specific machine's config, not a clean install); MEDIUM-A (doctor's confinement-readiness checks still read project-only config with no global merge, while the actual strict validator reads the merged config -- documented as a known divergence, not unified in this cell); a recurring test-suite side effect that re-adds a 3-line default to the live `.fgos/config.json`, always reverted cleanly, root cause not chased — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md` and the track's own final closeout report at `plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md`. Structural finding: `claude-reviewer-herdr` proved reliable as a substitute not just for `fixer` (established P05/P06) but for `red-team` too, after `codex-herdr`'s third zero-output ceiling timeout this session -- it can now serve any of reviewer/fixer/red-team within the same coordination session without incident. |"
+          },
+          {
+            "line": 274,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P08 | `ed9486bc` | **Post-close, user-authorized follow-up cell** (not part of the original P00-P07 scope): migrated `claude-bwrap`/`agy-bwrap`/`codex-bwrap` from hardcoded bwrap argv to the Confinement Authority policy/backend system (`confinement.backend:'bwrap'` + required `host-write-denied`), closing the fixture-only gap P04's own R4 deliberately deferred. Doer (`agy-herdr`, `5a42bc37`) migrated all 3 executors to the proven fixture shape and live-falsification-tested each; reviewer independently reproduced the falsification (writes BLOCKED, writable scope actually narrowed vs the old argv, `CapEff:0`/`NoNewPrivs:1`), found 0 HIGH + 1 real MEDIUM (an undocumented `FGOS_DISPATCH_NO_LOCK` env var bundled into the commit). Red-team's first attempt (`codex-herdr`) timed out with zero output -- the 4th such instance this session -- compounded by a Lead process mistake (closed the still-running red-team pane based on title text alone, without checking `run.json` first; recorded as a standing structural lesson: always verify `run.json` before closing any pane, no exceptions). Retried with `claude-reviewer-herdr` and found a real, live-proven **HIGH**: the migration's new credential-provisioning logic copied the host's OpenAI Codex credential into every `private-home` sandbox regardless of executor, so `claude-bwrap`/`agy-bwrap` (unrelated to Codex) gained a readable, network-exfiltratable copy of a credential the OLD hardcoded argv never granted them -- a real security regression, caught by exactly the review discipline this track exists to enforce. Fixed (`569f72d3`): the credential copy is now gated on an executor-id allowlist scoped to `codex-bwrap` only, with a mutation-tested regression test; independently re-verified twice more via real live dispatches (reviewer, then a red-team recheck under a fresh `coordinationId` after wall-time exhaustion), each confirming the exploit chain now fails while `codex-bwrap` itself still works. Explicit final verdict: \"Safe to merge.\" 1165 tests / 1162 pass / 2 known pre-existing fail / 1 skip, reproduced 3 times. **Scope note: this cell and its merge are confined to the `confinement-authority-implementation` branch only -- NOT merged into `main`; the whole track (P00-P08) remains on its own branch, `main` has diverged separately (6 commits since the track branched), and merging into `main` is a separate decision the user has not yet made** | 3 LOW/pre-existing residuals unrelated to the credential fix (R-1: whole-filesystem read via `--ro-bind / /` predates this migration; R-2: a credential-file candidate-order inversion with no live effect today; R-3: 3 pre-fix leaked-credential temp directories on disk -- the Lead manually deleted these directly once flagged, since they held real residual secret material) plus known carryovers (L-1/L-2 from P04/P06, reaper hygiene from P03) — full detail including the credential-leak finding's complete writeup: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md`. |"
+          },
+          {
+            "line": 275,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| merge-to-main | `0f501a77` | **Post-close, user-authorized follow-up (not a numbered P-phase cell)**: merged the ENTIRE track (P00-P08) into `main`, via an isolated worktree/branch `confinement-authority-implementation--merge-to-main` based on `main`'s own tip `c256a284` (which had independently gained confinement-policy commits `ddaf4c64`/`9ddf5901` and the batch-tab pane-sharing feature `c256a284`/`2e1a2951`). Of 5 files with real merge-tree conflicts (`.fgos/config.json`, `CHANGELOG.md`, `cli.mjs`, `herdr-round.mjs`, `transport.mjs`), only `cli.mjs` needed manual conflict-marker resolution; the other 4 auto-merged cleanly but were still hand-verified. Doer's own self-directed extra fix: `dispatchBatchKey` was being silently dropped at the `executeThroughConfinement` seam once `cli.mjs` started routing everything through the confinement door (not visible to git's conflict markers) -- fixed by threading it through `authority.mjs`/`request.mjs`'s context and adapterOpts whitelists. Reviewer (`agy-herdr`) independently reran the full suite, found 1 additional pre-existing flaky test (`fgos-intake-4.test.mjs:318`, root-caused as unrelated via git history), reproduced the `claude-bwrap` live confinement test. Red-team (`claude-reviewer-herdr`, after `codex-herdr` failed to even start -- the 5th distinct `codex-herdr` failure mode this track has seen): re-confirmed the P08 H-1 credential-leak fix still holds; ran a real bwrap exploit attempt and found host-read is NOT confined (existing, non-regressed v1 driver limitation, already documented in `docs/specs/confinement-authority.md`); confirmed every required-capability executor has a working bwrap backend and fails closed; found no cross-dispatch batch-tab/confinement resource confusion; deleted 2 tiny leftover debug artifacts (verified non-credential before deletion); root-caused a 344-failure full-suite run as ~339 pre-existing protocol-pack/`CoordinationProtocol` test-discovery failures unrelated to this branch (flagged as a separate follow-up, not a merge blocker). The known recurring `.fgos/config.json` `confinement.strict:false` artifact appeared twice (once in the merge worktree, handled via housekeeping commit `87ae3d65`; once in the `main` checkout just before the fast-forward, handled via `git checkout -- .fgos/config.json`) -- both already-documented instances of P07's own recorded artifact, not new. Final action: `git merge --ff-only` in the `main` checkout, advancing `main` from `c256a2846c622f6f712a0901caeb73d6b1f1ddfa` to `0f501a77a4c9db7f6c44f96b717ca8752e1b815d`. Not pushed to any remote | The pre-existing protocol-pack/`CoordinationProtocol` test-discovery gap (~339 unrelated failures) is worth its own work item -- not this track's scope. `fgos-intake-4.test.mjs:318` flaky, unrelated. Host-read not confined by the v1 bwrap driver, pre-existing and documented. All P00-P08 findings not touched by this cell remain as previously documented — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md`. |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          11,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-091",
+        "path": "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+        "fileDigest": "abac59d5dfb986c565a07c7b80f6bb4a2dd455059676d342702290f3f13ecdd8",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+        "occurrences": [
+          {
+            "line": 180,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "     `docs/architect/agent-coordination/verification/step-07-mvp/index.md:25` (\"known flake, ask/answer"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          180
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-092",
+        "path": "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+        "fileDigest": "6bbc53aca6d6e6952090aee80f05a7b04ac213e61da03231a5047c5f2d226e1e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+        "occurrences": [
+          {
+            "line": 387,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P00 | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 findings fixed; red-team: 2+1 findings fixed) | 1 class deferred to P10: active skill-doc prose (`domains/coding/skills/**` etc.) invoking `bin/fgos.mjs` directly, outside R3's named 9-site scope — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md` |"
+          },
+          {
+            "line": 388,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P04 | `26c2b261` | Clean after 2 fix rounds across 3 sessions (1 lost to a stale-review coordination race); reviewer: 6 LOW (3 fixed); red-team: 1 MEDIUM fixed | LOW-1/LOW-4 no-action (false alarm / pre-existing); LOW-6 (dev manifest fields, spawnSync vs real exec) deferred to P07 — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md` |"
+          },
+          {
+            "line": 389,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 | `7dddcb4e` | Clean, 0 findings of any severity on final round, after 2 fix rounds across 4 sessions (1 lost to the same stale-review race); reviewer: 1 HIGH+2 MEDIUM+4 LOW then 1 MEDIUM+3 LOW, all fixed; red-team: 1 LOW then 1 HIGH+1 MEDIUM, all fixed | None — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md` |"
+          },
+          {
+            "line": 390,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02 | `fb09ecb2` | Clean after 3 fix rounds across 4 sessions (Lead caught 1 real bug independently before any review ran; reviewer/red-team then found 1 HIGH + 2 corroborating HIGH, then 3 MEDIUM + 1 MEDIUM, all fixed) | LOW nits only, all explicitly latent (no current call site triggers them) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md` |"
+          },
+          {
+            "line": 391,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05 | `0121dbc3` | Clean after 3 fix rounds across 3 sessions; reviewer: 5 MEDIUM+5 LOW then a rationale-correction MEDIUM+4 LOW; red-team: 1 HIGH (investigated+rejected, doc'd) then re-confirmed M2 | M2 (replacement declared-but-unresolved by select()) deferred to Phase 06+; 3 more LOW deferred (plan-corpus ownership, from_static validation reach, link-time catalog check) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md` |"
+          },
+          {
+            "line": 392,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P03 | `afa3c7cf` | Clean (0 HIGH, 0 open MEDIUM) after 2 fix rounds across 2 sessions (1 lost to a real worktree-isolation guard refusal — real commit valid regardless); reviewer/red-team found 1 HIGH+1 MEDIUM then 2 MEDIUM, all fixed except 1 MEDIUM the reviewer itself called duplicated-elsewhere | 1 MEDIUM (2 of 8 R5 assertions test a mock) deferred, real coverage exists in P02's harness.test.mjs; 5 more LOW deferred (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md` |"
+          },
+          {
+            "line": 393,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P06 | `4565b897` | Clean after 2 fix rounds across 2 sessions (1 lost to the same worktree-isolation-guard produce refusal as P03/P05, real commit valid regardless); reviewer: 1 HIGH+several lifecycle MEDIUM, all fixed, then 1 MEDIUM-residual+4 LOW; red-team: same MEDIUM-residual + 1 more MEDIUM (concurrent-duplicate-invocation-id cancellation collision), fixed with a Lead-authored regression test that also caught a second, worse variant of the same bug mid-fix | MEDIUM-1-residual-on-HIGH-1 (catalog-policy admission is tautological in the only composition this crate offers) deferred to Phase 08 as a named composition-root obligation, per the reviewer's own explicit recommendation; 3 more LOW deferred (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md` |"
+          },
+          {
+            "line": 394,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P07 | `37d4c1b3` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions (2 lost to real infra: an OOM-killed doer + orphaned dispatch claim, a stuck herdr pane blocking new dispatch, and a high-load briefing-timeout flake); the Lead confirmed all 4 red-team findings (2 HIGH, 2 MEDIUM) by direct code inspection before any review completed and fixed them, then reversed one of its own fixes after empirical evidence showed it broke R9's own required verification; round-3 reviewer found 3 MEDIUM (doc/proof-strength) + 5 LOW, all fixed or empirically ratified; round-3 red-team clean | 1 MEDIUM accepted (unknown-verb stderr text differs from Node's, same exit code; recorded in CHANGELOG.md); 1 LOW deferred to P09/P11 (fallback probe order); recursion-guard's inherent env-var-clearing limitation accepted per its documented threat model — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md` |"
+          },
+          {
+            "line": 395,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P08 | `9fcf975d` | Clean after 1 Lead fix round across 5 sessions (doer + first reviewer both hit the 35-min ceiling with zero output; red-team needed 3 attempts, 2 hitting the same zero-output ceiling, before landing content); the Lead took over the doer's real, substantial uncommitted work directly, reverted one out-of-scope edit, wrote the missing R9 performance report, and committed; reviewer found 1 HIGH (wrong Hinnant civil-date constants — `generated_at` occasionally rendered impossible dates) + 2 MEDIUM, all fixed; red-team (round 2, first real attempt) clean | LOW-1 (single-native-route projector shortcut) deferred as debt for the next native route; LOW-2/3/5 accepted as documented caveats — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md` |"
+          },
+          {
+            "line": 396,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P09 | `330e5c85` | Clean, full-suite gate green, after 3 Lead fix rounds (the fix-round cap) across 5 sessions; a 343-failure full-suite run looked like a massive regression but traced to a missing `node_modules` symlink in the worktree, not code (documented as a durable memory so future worktrees check proactively); reviewer round 1 found 3 HIGH+6 MEDIUM+6 LOW, red-team round 1 found 2 more HIGH (payload `../` traversal, unconfined doctor manifest paths); round 2 reviewer confirmed clean (LOW-only), round 2 red-team found 1 more HIGH (symlink-confinement bypass) + 1 MEDIUM (in-root dot-segment payload broadening) — 5 total HIGH across the cell, all fixed and each verified by the Lead's own direct adversarial reproduction | MEDIUM-4 (manifest missing releaseVersion) and MEDIUM-6 (two P07-introduced env vars never registered with `fgos setup`) flagged for P11+; several LOW accepted as documented caveats (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md` |"
+          },
+          {
+            "line": 397,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P10 | `db099242` | Clean after 2 Lead fix rounds + 1 narrowly-scoped clean red-team check across 4 sessions (1 briefly blocked by an unrelated transient shared-config error from another concurrent session, cleared on its own); doer landed a real commit on the first try covering both the phase's own R1-R8 and the P00-deferred doc-prose caller-class sweep (13+ sites); round 1 found 2 HIGH (Node tier-0 accepted a non-executable entry; accepted a symlink escaping the release root) + 4 MEDIUM + 7 LOW, all HIGH and 2 LOW fixed; round 2 reviewer clean (LOW-only), round 2 red-team found 1 more HIGH (shell and Herdr both still missing the same symlink confinement Node just gained — all 3 runtimes now agree); round 3 (red-team only) clean | MEDIUM (worktree-topology limitation for cli.mjs's tier-0 resolution) ratified as a Lead decision, deferred to the cutover track; pre-existing cohort-planner flake and a few LOW accepted as documented caveats (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md` |"
+          },
+          {
+            "line": 398,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P11 | `d226fc5b` | Clean after 2 Lead fix rounds + 1 narrowly-scoped clean red-team check across 6 sessions (2 recheck sessions delayed by real infra: a dispatch briefing-observation-window race under a 34x host-load spike, and the red-team executor's own usage quota, both confirmed transient); doer landed a real, complete commit on the first try (new `apps/fgctl` crate, manifest types, canonical release-tree walk, digest verify, release store with lock+quarantine, pure-Rust tar extraction); round 1 found 2 MEDIUM (M1 stale-lock-after-crash, out of scope per R6; M2 test-only lock-delay hook in the production binary, fixed) + 8 LOW (2 fixed) from the reviewer, and 1 MEDIUM (archive traversal silently sanitized instead of refused) from red-team, fixed; round 2 reviewer clean (2 non-blocking LOW), round 2 red-team found 1 more MEDIUM (backslash-traversal/drive-letter archive paths accepted as literal filenames), fixed; round 3 (red-team only) clean | M1 (stale-lock ownership after a crash) flagged for P12/P13's lock format; L3–L8 (status sort/cross-check, mode not applied, no-op copy-before-digest, wrong lock-error variant, undeclared-extras-by-design, verify/canonical duplication) and 2 new LOW (pax-global-header format regression; same-trust-domain archive-reopen TOCTOU) accepted as documented caveats — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md` |"
+          },
+          {
+            "line": 399,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P12 | `42c5b1cb` | Clean after 3 Lead fix rounds (the fix-round cap) across 6 sessions, dispatched partly in parallel with P14 (disjoint leases); doer landed a real, complete commit on the first try; round 1: reviewer found 0 HIGH + 2 MEDIUM (pin silently overridden by `--from`; re-run staged before the idempotent check) + 10 LOW, red-team found 3 HIGH all tracing to one root cause (no workspace activation lock at all, permitting dual concurrent publish and refusing a reconcilable pinned-not-staged digest), all fixed; round 2 reviewer-only recheck found 1 more HIGH (a crash-orphaned lock wedged the workspace forever, since SIGKILL never runs its RAII Drop) + 2 MEDIUM, fixed, then the session hit its own 1-hour wall-time budget before red-team could recheck; round 3 (fresh session) reviewer found 1 more HIGH (the lock file was briefly empty between create and content-write, letting a concurrent process reclaim a genuinely live lock) independently confirmed by red-team's own repro (H1), fixed with an atomic write-then-hard_link; round 4 (fresh session, final) reviewer confirmed clean of all prior HIGH (~20M-read + 34-race-run empirical proof) with one new narrow MEDIUM, red-team clean with 0 findings | MEDIUM F2 (a 2-syscall reclaim-path race, injection-only, never spontaneous, identical to the same residual window already present in the reference `main-checkout-lock.mjs` module this phase mirrors) deferred — needs a structurally different mechanism (flock or tombstone-rename), not a further patch; several LOW accepted as documented caveats (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md` |"
+          },
+          {
+            "line": 400,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P14 | `da99a000` | Clean after 3 Lead fix rounds (the fix-round cap) across 4 sessions, dispatched and closed in parallel with P13 (disjoint leases); the doer's own assignment hit the 35-minute dispatch ceiling with real uncommitted work (install.sh + its test) and no README update, and its own test was independently found deadlocked by both the Lead and the session's own reviewer (spawnSync froze the event loop the in-process fixture http server needed to answer install.sh's own curl calls back to it) — Lead took over directly, fixed the deadlock (async spawn) and finished R8's README rewrite; round 1 reviewer clean, red-team's first pass (never dispatched in session 1) found 2 MEDIUM (unbounded curl/wget hang; a symlinked fgctl archive entry installs its external target's bytes), both fixed; round 2 reviewer found 1 more MEDIUM (the wget fallback path's idle-only timeout plus default 20 retries stayed effectively unbounded even with --timeout set), fixed with --tries=1 plus an external `timeout`-command wall-clock backstop; round 3 (reviewer only, final) clean | a few LOW/INFO accepted as documented caveats — a static source-regex test can't catch a semantically-equivalent timeout gap; tar's own symlinked-dir/hardlink escape refusal is environment behavior, not install.sh's own; a byte-drip server without coreutils `timeout` on PATH could still defeat wget's own idle timeout (not applicable to the only shipped target) (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md` |"
+          },
+          {
+            "line": 401,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P13 | `bafce71d` | Clean, full-suite gate green, after 2 Lead fix rounds (one short of the cap) across 4 sessions, dispatched and closed partly in parallel with P14 (disjoint leases); doer landed a real, complete commit on the first try (`upgrade`/`repair`/`verify` extending `status`, reusing P12's preflight/publish/tail pipeline); round 1 reviewer found 0 HIGH + 2 MEDIUM (quarantine recovery dead end; upgrade-away-from-quarantine rollback pointing at a gone release) + 9 LOW, red-team independently found 1 HIGH (`verify_workspace` publishing a stale pre-lock activation snapshot, a TOCTOU letting a concurrent upgrade be silently overwritten) + 1 MEDIUM (tampered-release repair refusing but never quarantining) + 1 LOW, all fixed; round 2 recheck (fresh session, wall-time budget exhausted) reviewer found a genuine regression — the round-1 MEDIUM fix reintroduced the exact TOCTOU red-team's HIGH had just closed, in `repair_workspace`'s own new quarantine branch — plus a second missed call site for the rollback-chaining rule, and red-team independently found a distinct crash-window MEDIUM (a release moved to quarantine but `activation.json` still reading `status: ready`, unrecoverable through any door); round 3 (fresh session, final) both reviewer and red-team confirmed the round-2 fix clean, red-team reproducing the crash window with a real gdb-driven SIGKILL and confirming `fgctl init --from` self-heals it | LOW (missing dedicated regression test for the init-door chain-past rule, though its upgrade-door twin has one); 2 INFO (a previousArtifactDigest that itself later gets quarantined — refused cleanly by design; a sub-ms same-digest lock-guard comparison window, not reproduced even under SIGSTOP injection); several LOW/L2-L9 DRY/duplication notes carried from round 1 (see doc) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md` |"
+          },
+          {
+            "line": 402,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P15 | `5694a746` | Clean, full-suite gate green, after 1 Lead fix round (two short of the cap) across 2 sessions; doer landed a real, complete commit on the first try (`scripts/ci-external-consumer.sh`, `.github/workflows/release.yml`, `ci.yml`'s new `external-consumer` job) covering R1-R4, before its own assignment hit the dispatch ceiling and was marked failed (real committed work, no loss, same pattern as earlier cells); round 1 reviewer found 0 HIGH + 1 MEDIUM (R1's digest assertion passed only via an undocumented manifest fallback — the real `SHA256SUMS` comparison was dead code), red-team independently found the same root cause as 1 HIGH (a run with the fgos `SHA256SUMS` entry replaced by 64 zeroes still exited 0) + 1 MEDIUM (the local asset server followed symlinks), both fixed by splitting the digest check into two non-substitutable sequential gates (archive-bytes-vs-`SHA256SUMS` first, tree-content-vs-verified-manifest second — the two hash spaces are architecturally distinct and the doer's fallback had conflated them) plus switching the server to `lstatSync`; round 2 (fresh session, final) both reviewer and red-team confirmed the fix clean, red-team rebuilding a fresh distribution and replaying checksum/symlink/traversal attacks with none reproduced | 4 LOW carried (Gate 1's checksum recompute runs after `fgctl init` already staged the archive rather than before; the phase file's own R1 prose still describes the pre-fix impossible single-gate design; `gh release create`'s line continuations collapsed cosmetically; `build-rust-distribution.mjs`'s new distribution-output-dir exemption has no dedicated unit test); no `CHANGELOG.md [Unreleased]` entry yet (deferred to P16, the track's own docs/changelog closeout cell); INFO — R5's real prerelease tag cut will hit GitHub's `/releases/latest` never resolving to a prerelease, needing `FGCTL_VERSION` explicitly (noted for when R5 is cut, CI's local server can't surface it) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md` |"
+          },
+          {
+            "line": 403,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P16 | `817ac7f3` | Clean, full-suite gate green (track-closing cell), after 3 Lead fix rounds (the fix-round cap) across 5 sessions (4 lost to pure infra — a dispatch-briefing race, a stale string-identity per-cwd dispatch lock that can only clear via TTL not pid-liveness reclaim, two host-OOM kills of the coordination wrapper under real shared-machine memory pressure, and a codex agent-startup timeout — none related to content); doer landed a real, complete commit on the first try (`CHANGELOG.md`, `docs/specs/reading-map.md`, `track-closeout.md`) before its own assignment was likewise falsely marked failed by the same dispatch-briefing race, real work preserved; round 1 reviewer found 0 HIGH + 1 MEDIUM (closeout's P05 deferred-findings entry omitted M1 and misattributed its disposition to M2) + 5 LOW (P11's INFO not carried forward; uncommitted \"re-measurement\" perf numbers cited; `cargo fmt` row overclaiming `herdr-plugin` coverage it doesn't have; wrong line citation), the Lead also independently caught and fixed a 6th issue (closeout's FULL_TEST table cited a narrower 88-test glob instead of the real whole-repo 6038-test one) before review even ran; round 2 reviewer found a more substantive MEDIUM in the round-1 fix itself (the `herdr-plugin` fmt-gap description undersold its real scope, 276 hunks across 12 files, and wrongly called all of it \"unrelated to any cell this track shipped\") + 1 LOW (self-contradictory perf sentence), fixed after the Lead verified precisely which 6 of 276 hunks were genuinely new (introduced by this track's own Phase 10 commits, since `herdr-plugin` is workspace-excluded from every `cargo fmt --all` this track ever ran) vs. the 270 reproducing identically on unmodified `main`; round 3 (final, first real red-team dispatch across 5 attempts) both reviewer and red-team confirmed clean, red-team independently reproducing the 270/6 hunk split and finding nothing across provenance/trace/reproduction/registry/documentation attacks | 1 LOW (informational naming nit — a deferred-finding sentence names a non-existent module path, file names in the same sentence still locate it correctly); 1 LOW (`herdr-plugin`'s 6 new formatting hunks from this track's own Phase 10 work, outside this docs-only cell's lease to fix, flagged for whoever next touches `herdr-plugin`) — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p16.md` |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          387,
+          388,
+          389,
+          390,
+          391,
+          392,
+          393,
+          394,
+          395,
+          396,
+          397,
+          398,
+          399,
+          400,
+          401,
+          402,
+          403
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-093",
+        "path": "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+        "fileDigest": "e8b27bd3302a8342ef4a5be0672045db9b4af1bb7e940417a314b589d79acc7e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+        "occurrences": [
+          {
+            "line": 408,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          408
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-094",
+        "path": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+        "fileDigest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+        "occurrences": [
+          {
+            "line": 35,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P00 | [Phase 00](../phase-00-inventory-and-inputs-freeze.md) | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 fixed; red-team: 2+1 fixed) | [p00.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md) |"
+          },
+          {
+            "line": 36,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P04 | [Phase 04](../phase-04-cargo-workspace-skeleton.md) | `26c2b261` | Clean after 2 fix rounds across 3 sessions; reviewer: 6 LOW (3 fixed); red-team: 1 MEDIUM fixed | [p04.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md) |"
+          },
+          {
+            "line": 37,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 | [Phase 01](../phase-01-command-route-descriptor.md) | `7dddcb4e` | Clean, 0 findings on final round, after 2 fix rounds across 4 sessions | [p01.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md) |"
+          },
+          {
+            "line": 38,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02 | [Phase 02](../phase-02-parity-harness.md) | `fb09ecb2` | Clean after 3 fix rounds across 4 sessions; reviewer/red-team found 1 HIGH + 2 corroborating HIGH, 4 MEDIUM, all fixed | [p02.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md) |"
+          },
+          {
+            "line": 39,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05 | [Phase 05](../phase-05-kernel-contracts-and-router.md) | `0121dbc3` | Clean after 3 fix rounds across 3 sessions; reviewer: 6 MEDIUM + 9 LOW; red-team: 1 HIGH documented/rejected then re-confirmed M2 | [p05.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md) |"
+          },
+          {
+            "line": 40,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P03 | [Phase 03](../phase-03-envelope-vectors-and-corpus.md) | `afa3c7cf` | Clean (0 HIGH, 0 open MEDIUM) after 2 fix rounds across 2 sessions; reviewer/red-team found 1 HIGH + 3 MEDIUM, all fixed | [p03.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md) |"
+          },
+          {
+            "line": 41,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P06 | [Phase 06](../phase-06-invocation-service-and-authority.md) | `4565b897` | Clean after 2 fix rounds across 2 sessions; 1 HIGH + lifecycle MEDIUMs + duplicate invocation ID collision fixed | [p06.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md) |"
+          },
+          {
+            "line": 42,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P07 | [Phase 07](../phase-07-cli-adapter-legacy-exec.md) | `37d4c1b3` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; 4 red-team findings (2 HIGH, 2 MEDIUM) + 3 reviewer MEDIUM fixed | [p07.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md) |"
+          },
+          {
+            "line": 43,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P08 | [Phase 08](../phase-08-native-version.md) | `9fcf975d` | Clean after 1 Lead fix round across 5 sessions; reviewer found 1 HIGH (civil-date constants) + 2 MEDIUM, fixed | [p08.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md) |"
+          },
+          {
+            "line": 44,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P09 | [Phase 09](../phase-09-release-tree-builder-and-doctor.md) | `330e5c85` | Clean, full-suite gate green, after 3 Lead fix rounds across 5 sessions; 5 total HIGH fixed (path traversal, confinement bypasses) | [p09.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md) |"
+          },
+          {
+            "line": 45,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P10 | [Phase 10](../phase-10-tier-zero-resolver.md) | `db099242` | Clean after 2 Lead fix rounds + 1 clean red-team check across 4 sessions; 3 HIGH fixed (executable entry, symlink escape, cross-runtime parity) | [p10.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md) |"
+          },
+          {
+            "line": 46,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P11 | [Phase 11](../phase-11-fgctl-crate-and-release-store.md) | `d226fc5b` | Clean after 2 Lead fix rounds + 1 clean red-team check across 6 sessions; reviewer 2 MEDIUM (test hook dropped), red-team 2 MEDIUM (archive traversal, drive letter) fixed | [p11.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md) |"
+          },
+          {
+            "line": 47,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P12 | [Phase 12](../phase-12-fgctl-init-and-activation.md) | `42c5b1cb` | Clean after 3 Lead fix rounds across 6 sessions; 5 total HIGH fixed (activation lock, crash-orphaned lock reclamation, atomic hard_link creation) | [p12.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md) |"
+          },
+          {
+            "line": 48,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P14 | [Phase 14](../phase-14-install-script.md) | `da99a000` | Clean after 3 Lead fix rounds across 4 sessions; fixed spawnSync deadlock, unbounded network timeouts, symlinked fgctl refusal | [p14.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md) |"
+          },
+          {
+            "line": 49,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P13 | [Phase 13](../phase-13-fgctl-upgrade-repair-rollback.md) | `bafce71d` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; red-team 1 HIGH (activation TOCTOU), crash-window self-heal verified | [p13.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md) |"
+          },
+          {
+            "line": 50,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P15 | [Phase 15](../phase-15-ci-release-and-external-consumer.md) | `5694a746` | Clean, full-suite gate green, after 1 Lead fix round across 2 sessions; 1 HIGH / 1 MEDIUM fixed by two-gate sequential digest verification | [p15.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md) |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-095",
+        "path": "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+        "fileDigest": "72c152a4be707185f9e7308bbbcc1eb400b8c3776e7843a78ada6a00fd757e3c",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+        "occurrences": [
+          {
+            "line": 5,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "[p02h-reopen.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md)"
+          },
+          {
+            "line": 61,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "first — falsified — attempt, see [p02h.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h.md));"
+          },
+          {
+            "line": 69,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "[p02h-reopen.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md)."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          5,
+          61,
+          69
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-096",
+        "path": "archive/plans/260911-2305-runtime-recovery/plan.md",
+        "fileDigest": "898b0ab3771ce00962f0ec9e7e4972bdbd64fc633e07ce0448bf80ade98ecdc0",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260911-2305-runtime-recovery/plan.md",
+        "occurrences": [
+          {
+            "line": 344,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/runtime-recovery/`."
+          },
+          {
+            "line": 371,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P00 | `bb64e945` (direct to `main`) | PASS (2 fix rounds) | PASS on substantive finding (fix-1); final 2-line recheck not dispatched, `maxRounds` cap hit — reviewer's independent source-verified recheck accepted in its place | Citation-swap suggestion (cosmetic) | [p00.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p00.md) |"
+          },
+          {
+            "line": 372,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P04 | `6bb50205` (into `runtime-recovery`) | PASS (2 fix rounds) | PASS (2 fix rounds, adversarial re-probe with new literals) | 3 cosmetic/edge-case notes | [p04.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p04.md) |"
+          },
+          {
+            "line": 373,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 | `05ef76db` (into `runtime-recovery`) | PASS (4 fix rounds, 2 sessions) | PASS (4 fix rounds, 2 sessions) | 2 LOW double-fault race residuals, fix shapes recorded | [p01.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p01.md) |"
+          },
+          {
+            "line": 374,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02L | `469f4544` (into `runtime-recovery`) | PASS (2 fix rounds, 3 sessions) | PASS (2 fix rounds, 3 sessions) | 1 unreproduced transient test flake; 2 cosmetic notes | [p02l.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02l.md) |"
+          },
+          {
+            "line": 375,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02H | `171a6510` (into `runtime-recovery`) | PASS (3 fix rounds, 1 session) | PASS (3 fix rounds, 1 session) | 1 MEDIUM crash-window edge case; 1 MEDIUM unrelated trust-store race; 1 LOW-MEDIUM self-healing digest gap; cosmetic notes | [p02h.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02h.md) |"
+          },
+          {
+            "line": 376,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P03 | `d61c8bea` (direct to `main`) | PASS (2 fix rounds) | PASS (1 fix round; folded into fix-1) | 1 LOW provenance-label cosmetic; 1 LOW unreachable-fallback residual | [p03.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p03.md) |"
+          },
+          {
+            "line": 377,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05 | `fed6301f` (direct to `main`) | PASS (3 fix rounds) | PASS (2 fix rounds) | 1 LOW settle-ledger residual (architectural, outside lease); 2 LOW liveness/lock-window notes | [p05.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05.md) |"
+          },
+          {
+            "line": 378,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05S | `main` tip (direct to `main`) | PASS (1 fix round) | PASS (folded into fix-1) | 1 LOW actionKey-reminting (by-design); 1 LOW reason-wording gap; 2 INFO notes | [p05s.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05s.md) |"
+          },
+          {
+            "line": 379,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P08 | `main` tip (direct to `main`) | N/A (direct audit closeout) | N/A | 41 pre-existing/environmental npm test failures, all triaged; broader architecture-manifest completeness gap (75+ unrelated files) left as-is | [p08.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p08.md) |"
+          },
+          {
+            "line": 380,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02H reopen | `main` tip (direct to `main`) | PASS (8 fix rounds) | PASS (folded into rounds 1-2, 5) | 1 MEDIUM unlisted-env-var timing race (documented follow-up shape); 1 unreproduced INFO note | [p02h-reopen.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md) |"
+          },
+          {
+            "line": 390,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "sweep: [p08.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p08.md)."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          344,
+          371,
+          372,
+          373,
+          374,
+          375,
+          376,
+          377,
+          378,
+          379,
+          380,
+          390
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-097",
+        "path": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "fileDigest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "occurrences": [
+          {
+            "line": 32,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| S0-6 | BL1 premature partial close | **Different track, same kernel mechanism**, tracked as **tsk-5qj**. BL1 (`session-engine.mjs`'s `partialPolicy`-declared auto-close-after-first-required-pass) is documented and reproduced in `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` (Table 1/Table 4). Corrected evidence sentence: `git log --all -S partialPolicy -- src/runner/coordination/session-engine.mjs` returns **two introduction commits** (`a9613222`, `35a266b7`), both predating the 2026-09-06 BL1 audit record — the earlier sentence wrongly implied this `git log` came back empty; the conclusion is unchanged, since neither commit is a post-audit fix: **BL1 remains open/unfixed** at the kernel level today. `coordination-recovery-and-quorum.test.mjs:463` (\"closeSessionByQuorum closes to 'partial' ... under an explicit partialPolicy naming the missing actor\") is the closest existing kernel fixture, though it exercises correct explicit-`partialPolicy` behavior rather than BL1's auto-close defect itself. **This runtime-recovery track is not exposed to it**: none of `fgos-plan-loop`'s own `open.json`/`fix-N.json`/`close.json` templates declare `partialPolicy` (confirmed by reading `.agents/skills/fgos-plan-loop/SKILL.md` section 1-4), and the architecture-advisory-panel's own `test/verbs/coordination-run-live-proof.test.mjs` proves a full produce→review→red-team→revise→recheck→close cycle works in ONE continuous session precisely when `partialPolicy` is omitted. The Lead accepts re-running the named suites above as sufficient S0 fixture evidence for every scenario in this table **except BL1**, which relies on the `:463` citation above instead. Recorded as a known, separately-owned kernel gap — out of this track's fix authority, tracked here only so no runtime-recovery cell rediscovers it as new. |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          32
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-098",
+        "path": "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+        "fileDigest": "7d418b0f3b9b019bc359b6ed0133d8b8c70653f11ccc8a955c2c859888896080",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+        "occurrences": [
+          {
+            "line": 63,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Verification state: `docs/architect/agent-coordination/verification/test-suite-feedback-cost/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          63
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-099",
+        "path": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "fileDigest": "5e101cf7db67d14fc16a85086df488461b9368ad187a7ef9d3305a09fdf4cb7e",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "occurrences": [
+          {
+            "line": 112,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  (`docs/architect/agent-coordination/verification/<track>/<cell>.md`) captures:"
+          },
+          {
+            "line": 174,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md)."
+          },
+          {
+            "line": 196,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt."
+          },
+          {
+            "line": 214,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block — now added above), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |"
+          },
+          {
+            "line": 215,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02 | `ddb9e78e` | 1 fix round; reviewer: 3 HIGH (1 root cause: projections not regenerated)+1 MEDIUM+2 LOW; red-team: 1 HIGH (same root cause); HIGH root cause + MEDIUM fixed by Lead (build:skills regen + npm test) and fixer respectively; full-suite gate: 51/51 unique failures match the newly-recorded baseline exactly (corrected at P03 from a \"103\" double-count — see plan.md's own BASELINE note), 0 new | LOW-1/LOW-2 (pre-existing, not regressions); how-to gap: no documented tree-equality shortcut for the non-inference rule (fixed at P03) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |"
+          },
+          {
+            "line": 216,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P03 | `945e6026` | 1 fix round; reviewer: 7 MEDIUM+6 LOW (no HIGH); red-team: 2 HIGH+2 MEDIUM succeeded (env-fingerprint gap; precondition-mislabeling risk; FULL_TRIGGERS mismatch; unenforced close rationale)+1 MEDIUM failed, all accepted findings fixed in one commit; also caught and corrected a real baseline-count bug mid-cell (103→51, double-counted); full-suite gate: 51/51 unique failures match corrected baseline, 0 new; 167/167 targeted pass; `treeIdentical: true` certifies `integratedSha` | tsk-1bh (engine-level authorization/quorum bugs) and dogfooding-over-real-runs both explicitly deferred by the user — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md) |"
+          },
+          {
+            "line": 217,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P04 | `37248760` (cell branch `code-implementation-track-policy--p04`, `testedSha` `70eb4485` — trace originally mislabeled this as \"no cell branch,\" corrected at P05) | 3 fix rounds (at this track's own cap): reviewer 1 HIGH+1 MEDIUM+4 LOW then 3 MEDIUM+2 LOW on recheck; red-team 2 HIGH+2 MEDIUM succeeded (unenforced-gate disclosure; TOCTOU cleanup race; gitignored-trace correctness bug, fixed via `git notes` at P04 then superseded by plain tracked commits at P05; residual once-wording) then 2 MEDIUM failed on final recheck; all fixed; reviewer independently re-executed targeted suite twice (167/167 both times); coordination session could not auto-close (`tsk-1bh` recurrence on the `fixer` driver-authorized position — new evidence, same engine bug; fixed directly at P05 per reversed scope decision) | dogfooding-over-real-runs still deferred by the user — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md) |"
+          },
+          {
+            "line": 218,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P05 | `99fb5632` (cell branch `code-implementation-track-policy--p05`, `testedSha` `7b0af304`; `treeIdentical: true` vs `trackIntegratedSha`) | 2 review rounds: round 1 reviewer 1 HIGH (proof gap)+1 MEDIUM (`resolveTaskKeyAuthorization` still oldest-wins)+1 MEDIUM (SKILL.md contradiction)+3 LOW, red-team 1 HIGH (same root cause as reviewer's MEDIUM, found independently), all fixed; round 1 recheck reviewer confirmed by real mutation-testing + filed 1 NEW MEDIUM (orphaned authorization never retired, deferred), red-team filed 1 NEW HIGH (raw `createSessionAssignment` door could launder an unrelated task via a copied `(nodeId, operationId)` payload, since the fallback trusted raw payload fields instead of the reserved contract stamp `assignmentServesOperation` already checks) — fixed; round 2 recheck could not dispatch live (session `aggregateBounds.wallTimeMs` exhausted, partly from a Lead-side wrong-binary mistake and a repeated missing-`grantedContextRefs` mistake, both documented) — mitigated by Lead mutation-testing the fix directly; coordination session could not auto-close (`doer`/`fixer` Bash-restricted, no retroactive `partialPolicy`) — merged on Lead's own re-verification, same precedent as P01/P04 | 1 MEDIUM (orphaned authorization never retired — pre-existing, not introduced here) explicitly deferred to a future engine cell — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md) |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          112,
+          174,
+          196,
+          214,
+          215,
+          216,
+          217,
+          218
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-100",
+        "path": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "fileDigest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "occurrences": [
+          {
+            "line": 19,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| No checkpoint concept exists | `plans/260910-1700-rust-host-r1-kernel/plan.md:148-168` Product Gates marks P07/P09/P13/P15/P16 **\"Full-suite gate.\"** and cell traces under `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07,p09,p13,p15.md` record it. This convention is dogfooded across a 17-cell track. |"
+          },
+          {
+            "line": 163,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  (`docs/architect/agent-coordination/verification/<track>/<cell>.md`) must"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          19,
+          163
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-101",
+        "path": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "fileDigest": "d507b429e79f317a64ebf08a8e0fa75238c0129170a602c8d69ba51060f95e88",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "occurrences": [
+          {
+            "line": 22,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P01 — Authoring template and coding verification fragment | `06e73303` | [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |"
+          },
+          {
+            "line": 23,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| P02 — Plan-loop wording, baseline step, and routing (+ R10 bug fix) | `ddb9e78e` | [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |"
+          },
+          {
+            "line": 53,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/",
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `tsk-1bh` — coordination-engine bug: `resolveBindingAuthorization` always resolves the oldest unconsumed authorization for a `(nodeId, operationId, targetActorId)` binding (blocking a corrected retry once a bad one exists), and a first-pass-actor-genuinely-failed session that's fixed only via recheck can never satisfy quorum to close. Engine-only fix, explicitly out of this track's scope. **Superseded at P05:** the user explicitly reversed this exclusion and asked for `tsk-1bh` fixed directly in this same track. Fixed across two review rounds (`src/runner/coordination/session-engine.mjs`'s `resolveBindingAuthorization`/`resolveTaskKeyAuthorization`, and `classifySessionQuorum`'s ungated-actor fallback, hardened against a raw-provenance-forgery gap red-team found on recheck); confirmed live by retroactively closing this track's own `--p04` session, the exact session that exposed the bug (`status: \"completed\"`, `closed: true`). Full trace: [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md)."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          22,
+          23,
+          53
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-102",
+        "path": "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+        "fileDigest": "8e6d347540750d351b7c9a583ad61a8af4e5a1c90c2f151f0de409409004a436",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+        "occurrences": [
+          {
+            "line": 31,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md`"
+          },
+          {
+            "line": 32,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md`"
+          },
+          {
+            "line": 33,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md`"
+          },
+          {
+            "line": 34,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/**`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          31,
+          32,
+          33,
+          34
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-103",
+        "path": "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+        "fileDigest": "67c61b5ba055c82e697493b4b2b1fd93a25ea280b2cc2333fd5b1026e3085ef1",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+        "occurrences": [
+          {
+            "line": 31,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/p03/**`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          31
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-104",
+        "path": "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+        "fileDigest": "d5562cbaaefab73e2fedfd221a787b18f7983f623c2aff1c914bc59834282bd0",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+        "occurrences": [
+          {
+            "line": 29,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`):"
+          },
+          {
+            "line": 79,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p04.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          29,
+          79
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-105",
+        "path": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "fileDigest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "occurrences": [
+          {
+            "line": 41,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/p04/**`"
+          },
+          {
+            "line": 42,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- Add/Edit: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/{index.md,current-cell.md,p04.md}`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          41,
+          42
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-106",
+        "path": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "fileDigest": "f140451a4829cab0f353b7ca4cabfa4805ed930db097ced83f36d814df7008c5",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "occurrences": [
+          {
+            "line": 102,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  + the 52 titles: docs/architect/agent-coordination/verification/"
+          },
+          {
+            "line": 250,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/code-panel-multicell-facade/`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          102,
+          250
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-107",
+        "path": "archive/plans/260915-dispatch-operability-implementation/plan.md",
+        "fileDigest": "b6e1256f71114873c207674d381118405b60f2b06bce78b16bea1d25401f8ff3",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-dispatch-operability-implementation/plan.md",
+        "occurrences": [
+          {
+            "line": 96,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| I01 | `agent-result-claim.v2` single source for prompt and validation | `phase-01-agent-result-claim-v2.md` | merged `94d3d6fa` (2 fix rounds; reviewer/red-team clean after round 2; both rounds' contested findings independently re-verified and rejected — see [I01 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md)) |"
+          },
+          {
+            "line": 97,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| I02 | Effective execution contract persisted pre-launch and inspectable | `phase-02-effective-execution-contract.md` | merged `f718d78b` (1 fix round; reviewer/red-team clean after fix — see [I02 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md)) |"
+          },
+          {
+            "line": 98,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| I03 | RunResult v2, legacy-v1 interpretation, attribution dimensions | `phase-03-runresult-v2-and-attribution.md` | merged `8e8e7f65` (3 fix rounds, cap reached; production fixes independently proven, 2 documented non-blocking test-coverage residuals — see [I03 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md)) |"
+          },
+          {
+            "line": 99,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| I04 | `dispatch.runtime.inspect` read model and CLI projection | `phase-04-dispatch-runtime-inspect.md` | merged `97c183cc` (3 fix rounds, cap reached; reviewer clean except 1 deferred label-consistency residual, red-team clean after round 3; Lead rejected a repeated host-routing/operation-catalog proof-gap escalation as out of this phase's declared scope — see [I04 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md)) |"
+          },
+          {
+            "line": 100,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| I05 | `dispatch.runtime.reconcile` CAS guard/projection repair | `phase-05-dispatch-runtime-reconcile.md` | merged `36b97235` (2 full review/red-team cycles; cycle 1 fixed 5 HIGH incl. a fixture-only wrong-field bug and an unsafe liveness parser; cycle 2 (probe-based red-team) fixed a HIGH production-shape mismatch for the default action plus a path-traversal elevated to HIGH, resolved via architecture-advisor consult twice (TOCTOU design + wall-clock incarnation proof); 5 LOW/MEDIUM residuals documented, none blocking — see [I05 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md)) |"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          96,
+          97,
+          98,
+          99,
+          100
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-108",
+        "path": "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+        "fileDigest": "03d9cc95c6b32e4769700f698cbe22d8e72a3e0b8221b9e18d31c6d374f653af",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+        "occurrences": [
+          {
+            "line": 90,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "| 00 | executor-policy-dispatch-seams--cell-00 | `282fd62e` (integrated), tree-identical to tested `c6a2a57c` | Reviewer + red-team: ready to merge as-is (2 rounds; provider-quota retry substituted claude-bwrap for codex-bwrap) | 4 executors outside declared matrix (claude-bwrap/agy-bwrap/claude-herdr/codex-herdr); several cosmetic LOW items | `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` |"
+          },
+          {
+            "line": 167,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          90,
+          167
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-109",
+        "path": "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+        "fileDigest": "bd80d475c2329d045d11e9f506417a3f235380120a1118569ca84741e5dd5f35",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+        "occurrences": [
+          {
+            "line": 35,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "- `docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p00.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          35
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-110",
+        "path": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "fileDigest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "occurrences": [
+          {
+            "line": 23,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "  `docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/`."
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          23
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-111",
+        "path": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "fileDigest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "occurrences": [
+          {
+            "line": 132,
+            "matchedExpressions": [
+              "agent-coordination/verification/"
+            ],
+            "callSite": "| Core: the two herdr-gateway cases from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` (one \"clear\", one \"unclear\") | Yes | Yes | Yes, against the ground-truth facts only |"
+          }
+        ],
+        "legacyForm": false,
+        "seedLines": [
+          132
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-112",
+        "path": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "fileDigest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "occurrences": [
+          {
+            "line": 3,
+            "matchedExpressions": [
+              "agent-coordination/verification/"
+            ],
+            "callSite": "Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~129-139 and ~209-211, 228."
+          }
+        ],
+        "legacyForm": false,
+        "seedLines": [
+          3
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-113",
+        "path": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+        "fileDigest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+        "occurrences": [
+          {
+            "line": 3,
+            "matchedExpressions": [
+              "agent-coordination/verification/"
+            ],
+            "callSite": "Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~140-152 and ~193-207."
+          }
+        ],
+        "legacyForm": false,
+        "seedLines": [
+          3
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-114",
+        "path": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "fileDigest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "occurrences": [
+          {
+            "line": 2328,
+            "matchedExpressions": [
+              "agent-coordination/verification/"
+            ],
+            "callSite": "    review MEDIUM-4): use `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`'s"
+          }
+        ],
+        "legacyForm": false,
+        "seedLines": [
+          2328
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-115",
+        "path": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
+        "fileDigest": "90e7a0c444258438ad5b994de4ee8e22b39787e37e3740030cf5e50252ac5d29",
+        "sourceVsRender": "source",
+        "sourcePath": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
+        "occurrences": [
+          {
+            "line": 43,
+            "matchedExpressions": [
+              "agent-coordination/verification/"
+            ],
+            "callSite": "- **Core cases** (P05.2 clear + unclear, `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`):"
+          }
+        ],
+        "legacyForm": false,
+        "seedLines": [
+          43
+        ],
+        "seedCategory": "historical-review-before-rewrite",
+        "lexicalBucket": "historical-record",
+        "preCutoverAction": "preserve bytes",
+        "cutoverAction": "lookup-only alias for repo-relative mentions; machine absolute paths unresolvable",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-116",
+        "path": "docs/architect/agent-coordination/architecture/run-handle.md",
+        "fileDigest": "8bef4d787adfd8ba1212facbb68062c16cd6f3436effa826ee7d468876469cc5",
+        "sourceVsRender": "source",
+        "sourcePath": "docs/architect/agent-coordination/architecture/run-handle.md",
+        "occurrences": [
+          {
+            "line": 21,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/runtime-recovery/` are the"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          21
+        ],
+        "seedCategory": "reading-maps-portals-and-docs",
+        "lexicalBucket": "legacy-root-cutover-only",
+        "preCutoverAction": "patch specification only (L12-7)",
+        "cutoverAction": "candidate mirror navigation after digest/mode manifest and reviewed target mapping",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-117",
+        "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+        "fileDigest": "d707faa742077635663d62a800aad7a0df5b5ceae6cd1e57eb1be14462fd342d",
+        "sourceVsRender": "source",
+        "sourcePath": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+        "occurrences": [
+          {
+            "line": 17,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/runtime-recovery/` for what"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          17
+        ],
+        "seedCategory": "reading-maps-portals-and-docs",
+        "lexicalBucket": "legacy-root-cutover-only",
+        "preCutoverAction": "patch specification only (L12-7)",
+        "cutoverAction": "candidate mirror navigation after digest/mode manifest and reviewed target mapping",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-118",
+        "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+        "fileDigest": "5fb487cca0a93df82f800fc3d18ed3d8d3a59ed81aa8c178559aa240cd72d668",
+        "sourceVsRender": "source",
+        "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+        "occurrences": [
+          {
+            "line": 22,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`."
+          },
+          {
+            "line": 31,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`."
+          },
+          {
+            "line": 76,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`."
+          },
+          {
+            "line": 86,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/doer-report.md`.)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          22,
+          31,
+          76,
+          86
+        ],
+        "seedCategory": "reading-maps-portals-and-docs",
+        "lexicalBucket": "legacy-root-cutover-only",
+        "preCutoverAction": "patch specification only (L12-7)",
+        "cutoverAction": "candidate mirror navigation after digest/mode manifest and reviewed target mapping",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-119",
+        "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "fileDigest": "834724378ab76a15883687990dc90162b0920abb94fb15482982ca9feff84ac6",
+        "sourceVsRender": "source",
+        "sourcePath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "occurrences": [
+          {
+            "line": 14,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`."
+          },
+          {
+            "line": 22,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`."
+          },
+          {
+            "line": 74,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          14,
+          22,
+          74
+        ],
+        "seedCategory": "reading-maps-portals-and-docs",
+        "lexicalBucket": "legacy-root-cutover-only",
+        "preCutoverAction": "patch specification only (L12-7)",
+        "cutoverAction": "candidate mirror navigation after digest/mode manifest and reviewed target mapping",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    },
+    {
+      "kind": "evidence-lexical-row",
+      "data": {
+        "id": "evidence-120",
+        "path": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "fileDigest": "922bf7f357f6a69e8cf33a17295b2891aaf4fdc52e62e5b744dba921834d7605",
+        "sourceVsRender": "source",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "occurrences": [
+          {
+            "line": 10,
+            "matchedExpressions": [
+              "docs/architect/agent-coordination/verification/"
+            ],
+            "callSite": "Step 08 Phases 01-07; see `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`"
+          }
+        ],
+        "legacyForm": true,
+        "seedLines": [
+          10
+        ],
+        "seedCategory": "reading-maps-portals-and-docs",
+        "lexicalBucket": "legacy-root-cutover-only",
+        "preCutoverAction": "patch specification only (L12-7)",
+        "cutoverAction": "candidate mirror navigation after digest/mode manifest and reviewed target mapping",
+        "semanticReview": "pending; bucket is lexical triage, never approval",
+        "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)"
+      }
+    }
+  ]
+}

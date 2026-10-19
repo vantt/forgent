@@ -1,0 +1,3025 @@
+{
+  "inputHEAD": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+  "scope": "All current scanner hits in named files plus manually traced IO/default-root/alias seams. Concrete state-derived sets remain explicitly parked.",
+  "files": [
+    "src/setup/git-hooks.mjs",
+    "src/setup/instruction-registry.mjs",
+    "src/setup/registrations.mjs"
+  ],
+  "entries": [
+    {
+      "edgeId": "setup-001",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/git-hooks.mjs",
+      "line": 85,
+      "columnStart": 18,
+      "columnEndExclusive": 44,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/distribution.md",
+      "callSite": " * retained, per docs/specs/distribution.md) -- never throws.",
+      "context": [
+        {
+          "line": 83,
+          "text": " * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos"
+        },
+        {
+          "line": 84,
+          "text": " * setup`). No-ops silently when installed as a dependency (no `.git`"
+        },
+        {
+          "line": 85,
+          "text": " * retained, per docs/specs/distribution.md) -- never throws."
+        },
+        {
+          "line": 86,
+          "text": " *"
+        },
+        {
+          "line": 87,
+          "text": " * FILL-ONLY, never overwrite (matches this verb's other two side effects --"
+        }
+      ],
+      "fileDigest": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "edgeKind": "comment",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/distribution.md",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "Packaging-distribution",
+            "canonicalRoutes": [
+              "docs/platform/packaging-distribution/README.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "promoted-portal-and-alignment",
+                "route": "docs/platform/packaging-distribution/README.md",
+                "authorityStatus": "promoted",
+                "role": "Portal owns active navigation and implementation-alignment"
+              },
+              {
+                "scope": "retained-specs",
+                "route": "docs/specs/distribution.md",
+                "authorityStatus": "legacy-current",
+                "role": "Legacy distribution spec consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-vision",
+                "route": "docs/distribution-vision.md",
+                "authorityStatus": "non-authority",
+                "role": "Historical vision consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-architecture",
+                "route": "docs/architect/packaging-distribution/**",
+                "authorityStatus": "legacy-current",
+                "role": "Detailed architecture sources consulted only in roles assigned by portal"
+              },
+              {
+                "route": "docs/platform/packaging-distribution/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "desiredAnchor": "4-legacy-setup-compatibility",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/git-hooks.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/cli/command-registry.test.mjs; test/setup/registrations.test.mjs; test/scripts/install-git-hooks.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-specs-0245",
+            "fromPath": "docs/specs/distribution.md",
+            "toOwner": "docs/platform/packaging-distribution/README.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-packaging-distribution.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Maintained help/comment navigation: preserve doctor/check/fix and dependency-install behavior; only path changes after reviewed target correspondence.",
+      "normalizedReference": "docs/specs/distribution.md",
+      "cutoverPatch": {
+        "old": "docs/specs/distribution.md",
+        "new": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#4-legacy-setup-compatibility",
+        "operation": "literal citation substitution; preserve surrounding behavior/quote; validate target before application"
+      }
+    },
+    {
+      "edgeId": "setup-002",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 450,
+      "columnStart": 32,
+      "columnEndExclusive": 46,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect",
+      "callSite": " * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.",
+      "context": [
+        {
+          "line": 448,
+          "text": "/**"
+        },
+        {
+          "line": 449,
+          "text": " * Discover allowed components and domains under project root from the authoritative"
+        },
+        {
+          "line": 450,
+          "text": " * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots."
+        },
+        {
+          "line": 451,
+          "text": " *"
+        },
+        {
+          "line": 452,
+          "text": " * Options:"
+        }
+      ],
+      "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architecture-manifest.json",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "Machine architecture manifest contract retained; scanner prefix false positive, not legacy directory membership."
+      },
+      "desiredOwner": "docs/architecture-manifest.json",
+      "desiredAnchor": "file-block",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/instruction-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0001",
+            "fromPath": "docs/architecture-manifest.json",
+            "toOwner": "docs/platform/contracts/architecture-manifest.json",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Regex legacy prefix false positive: docs/architect is a prefix of docs/architecture-manifest.json. Actual machine architecture contract stays; not a retiring architect document.",
+      "normalizedReference": "docs/architecture-manifest.json"
+    },
+    {
+      "edgeId": "setup-003",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 583,
+      "columnStart": 18,
+      "columnEndExclusive": 32,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect",
+      "callSite": " * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.",
+      "context": [
+        {
+          "line": 581,
+          "text": " * In production default discovery, instruction sources are strictly discovered"
+        },
+        {
+          "line": 582,
+          "text": " * from within projectRoot. Allowed component and domain owners are authoritatively"
+        },
+        {
+          "line": 583,
+          "text": " * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected."
+        },
+        {
+          "line": 584,
+          "text": " *"
+        },
+        {
+          "line": 585,
+          "text": " * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options"
+        }
+      ],
+      "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architecture-manifest.json",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "Machine architecture manifest contract retained; scanner prefix false positive, not legacy directory membership."
+      },
+      "desiredOwner": "docs/architecture-manifest.json",
+      "desiredAnchor": "file-block",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/instruction-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0001",
+            "fromPath": "docs/architecture-manifest.json",
+            "toOwner": "docs/platform/contracts/architecture-manifest.json",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Regex legacy prefix false positive: docs/architect is a prefix of docs/architecture-manifest.json. Actual machine architecture contract stays; not a retiring architect document.",
+      "normalizedReference": "docs/architecture-manifest.json"
+    },
+    {
+      "edgeId": "setup-004",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 480,
+      "columnStart": 5,
+      "columnEndExclusive": 54,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/setup-doctor-config-registry/plan.md",
+      "callSite": "// `docs/history/setup-doctor-config-registry/plan.md`'s \"Real blast radius\"",
+      "context": [
+        {
+          "line": 478,
+          "text": "// D1: the legacy runner config file was retired, no fallback), made generic over every"
+        },
+        {
+          "line": 479,
+          "text": "// registered entry (tsk-5vf D4/D5) — the `registerConfigDefault` follow-up"
+        },
+        {
+          "line": 480,
+          "text": "// `docs/history/setup-doctor-config-registry/plan.md`'s \"Real blast radius\""
+        },
+        {
+          "line": 481,
+          "text": "// note deferred to once the shared file was real."
+        },
+        {
+          "line": 482,
+          "text": "function checkConfigNotStale(cwd) {"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/setup-doctor-config-registry/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/setup-doctor-config-registry/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/setup-doctor-config-registry/plan.md"
+    },
+    {
+      "edgeId": "setup-005",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2434,
+      "columnStart": 18,
+      "columnEndExclusive": 68,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):",
+      "context": [
+        {
+          "line": 2432,
+          "text": "    serves: { outputKind: 'change', domain: 'code', mutates: true },"
+        },
+        {
+          "line": 2433,
+          "text": "  },"
+        },
+        {
+          "line": 2434,
+          "text": "  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):"
+        },
+        {
+          "line": 2435,
+          "text": "  // extended by observed frequency, in this priority order. Deliberately"
+        },
+        {
+          "line": 2436,
+          "text": "  // no `prefer`/`overrides` here either, same reasoning as `code:implement`"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-006",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2440,
+      "columnStart": 123,
+      "columnEndExclusive": 173,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',",
+      "context": [
+        {
+          "line": 2438,
+          "text": "  'code:review': {"
+        },
+        {
+          "line": 2439,
+          "text": "    description:"
+        },
+        {
+          "line": 2440,
+          "text": "      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',"
+        },
+        {
+          "line": 2441,
+          "text": "    confinement: { mode: 'unconfined' },"
+        },
+        {
+          "line": 2442,
+          "text": "    serves: { outputKind: 'finding', domain: 'code', mutates: false },"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-007",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2446,
+      "columnStart": 110,
+      "columnEndExclusive": 160,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',",
+      "context": [
+        {
+          "line": 2444,
+          "text": "  'code:test': {"
+        },
+        {
+          "line": 2445,
+          "text": "    description:"
+        },
+        {
+          "line": 2446,
+          "text": "      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',"
+        },
+        {
+          "line": 2447,
+          "text": "    serves: { outputKind: 'verification', domain: 'code' },"
+        },
+        {
+          "line": 2448,
+          "text": "  },"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-008",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2451,
+      "columnStart": 102,
+      "columnEndExclusive": 152,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',",
+      "context": [
+        {
+          "line": 2449,
+          "text": "  'code:debug': {"
+        },
+        {
+          "line": 2450,
+          "text": "    description:"
+        },
+        {
+          "line": 2451,
+          "text": "      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',"
+        },
+        {
+          "line": 2452,
+          "text": "    confinement: { mode: 'unconfined' },"
+        },
+        {
+          "line": 2453,
+          "text": "    serves: { outputKind: 'finding', domain: 'code' },"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-009",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2457,
+      "columnStart": 116,
+      "columnEndExclusive": 166,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',",
+      "context": [
+        {
+          "line": 2455,
+          "text": "  'code:refactor': {"
+        },
+        {
+          "line": 2456,
+          "text": "    description:"
+        },
+        {
+          "line": 2457,
+          "text": "      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',"
+        },
+        {
+          "line": 2458,
+          "text": "    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },"
+        },
+        {
+          "line": 2459,
+          "text": "  },"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-010",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2544,
+      "columnStart": 9,
+      "columnEndExclusive": 59,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/agent-coordination-foundation/plan.md",
+      "callSite": "// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --",
+      "context": [
+        {
+          "line": 2542,
+          "text": "// with no doctor signal pointing at why."
+        },
+        {
+          "line": 2543,
+          "text": "// Checked names are every curated slot `DEFAULT_CAPABILITY_SLOTS` declares"
+        },
+        {
+          "line": 2544,
+          "text": "// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --"
+        },
+        {
+          "line": 2545,
+          "text": "// generalized from the original fixed ['advise', 'execute', 'code:implement']"
+        },
+        {
+          "line": 2546,
+          "text": "// list so a future curated addition is covered by this SAME check without a"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/agent-coordination-foundation/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/agent-coordination-foundation/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/agent-coordination-foundation/plan.md"
+    },
+    {
+      "edgeId": "setup-011",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 2860,
+      "columnStart": 4,
+      "columnEndExclusive": 50,
+      "pattern": "planning",
+      "matchedExpression": "docs/history/orchestrator-worker-slots/plan.md",
+      "callSite": "// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot",
+      "context": [
+        {
+          "line": 2858,
+          "text": "});"
+        },
+        {
+          "line": 2859,
+          "text": ""
+        },
+        {
+          "line": 2860,
+          "text": "// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot"
+        },
+        {
+          "line": 2861,
+          "text": "// ceiling is project config, not a runner constant -- registered here so"
+        },
+        {
+          "line": 2862,
+          "text": "// `fgos setup` writes the section and `fgos doctor` can see it at all, per"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/orchestrator-worker-slots/plan.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/history/orchestrator-worker-slots/plan.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/history/orchestrator-worker-slots/plan.md"
+    },
+    {
+      "edgeId": "setup-012",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3190,
+      "columnStart": 4,
+      "columnEndExclusive": 31,
+      "pattern": "legacy",
+      "matchedExpression": "docs/distribution-vision.md",
+      "callSite": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a",
+      "context": [
+        {
+          "line": 3188,
+          "text": "// (github, directory, or otherwise) -- a dev-checkout's own directory-"
+        },
+        {
+          "line": 3189,
+          "text": "// sourced entry (this exact repo's own self-hosting case, per"
+        },
+        {
+          "line": 3190,
+          "text": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a"
+        },
+        {
+          "line": 3191,
+          "text": "// github-sourced one; only the FIX, which only ever runs on a genuinely"
+        },
+        {
+          "line": 3192,
+          "text": "// missing entry, needs to pick one source to add."
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/distribution-vision.md",
+        "rootDocuments": [
+          {
+            "path": "docs/distribution-vision.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "retained-source",
+            "role": "Historical vision; superseded for active navigation by Packaging-Distribution portal."
+          }
+        ],
+        "areas": [
+          {
+            "area": "Packaging-distribution",
+            "canonicalRoutes": [
+              "docs/platform/packaging-distribution/README.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "promoted-portal-and-alignment",
+                "route": "docs/platform/packaging-distribution/README.md",
+                "authorityStatus": "promoted",
+                "role": "Portal owns active navigation and implementation-alignment"
+              },
+              {
+                "scope": "retained-specs",
+                "route": "docs/specs/distribution.md",
+                "authorityStatus": "legacy-current",
+                "role": "Legacy distribution spec consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-vision",
+                "route": "docs/distribution-vision.md",
+                "authorityStatus": "non-authority",
+                "role": "Historical vision consulted only in roles assigned by portal"
+              },
+              {
+                "scope": "retained-architecture",
+                "route": "docs/architect/packaging-distribution/**",
+                "authorityStatus": "legacy-current",
+                "role": "Detailed architecture sources consulted only in roles assigned by portal"
+              },
+              {
+                "route": "docs/platform/packaging-distribution/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0317",
+            "fromPath": "docs/distribution-vision.md",
+            "toOwner": "docs/platform/packaging-distribution/history/distribution-vision.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/distribution-vision.md"
+    },
+    {
+      "edgeId": "setup-013",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3896,
+      "columnStart": 41,
+      "columnEndExclusive": 61,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));",
+      "context": [
+        {
+          "line": 3894,
+          "text": "// The doc registry is opt-in per project: doctor --fix only refreshes it."
+        },
+        {
+          "line": 3895,
+          "text": "function docRegistryAdopted(root) {"
+        },
+        {
+          "line": 3896,
+          "text": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));"
+        },
+        {
+          "line": 3897,
+          "text": "}"
+        },
+        {
+          "line": 3898,
+          "text": ""
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "adoption-probe",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-014",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3911,
+      "columnStart": 35,
+      "columnEndExclusive": 55,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "  const mdPath = path.join(root, 'docs/doc-registry.md');",
+      "context": [
+        {
+          "line": 3909,
+          "text": "  const view = rebuild(fgosDir);"
+        },
+        {
+          "line": 3910,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);"
+        },
+        {
+          "line": 3911,
+          "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 3912,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3913,
+          "text": "  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "read-destination-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-015",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3919,
+      "columnStart": 37,
+      "columnEndExclusive": 57,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };",
+      "context": [
+        {
+          "line": 3917,
+          "text": "    return { passed: true, message: 'doc-registry projections up to date' };"
+        },
+        {
+          "line": 3918,
+          "text": "  }"
+        },
+        {
+          "line": 3919,
+          "text": "  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };"
+        },
+        {
+          "line": 3920,
+          "text": "}"
+        },
+        {
+          "line": 3921,
+          "text": ""
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "projection-reference",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-016",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3942,
+      "columnStart": 35,
+      "columnEndExclusive": 55,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "  const mdPath = path.join(root, 'docs/doc-registry.md');",
+      "context": [
+        {
+          "line": 3940,
+          "text": "  }"
+        },
+        {
+          "line": 3941,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);"
+        },
+        {
+          "line": 3942,
+          "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 3943,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3944,
+          "text": ""
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "write-destination-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.md",
+        "kind": "explicit generated projection path",
+        "activeAlias": false
+      },
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-017",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3948,
+      "columnStart": 49,
+      "columnEndExclusive": 69,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };",
+      "context": [
+        {
+          "line": 3946,
+          "text": "  fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        },
+        {
+          "line": 3947,
+          "text": "  fs.writeFileSync(jsonPath, jsonContent, 'utf8');"
+        },
+        {
+          "line": 3948,
+          "text": "  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };"
+        },
+        {
+          "line": 3949,
+          "text": "}"
+        },
+        {
+          "line": 3950,
+          "text": ""
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "projection-reference",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-018",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4081,
+      "columnStart": 4,
+      "columnEndExclusive": 49,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+      "callSite": "// docs/architect/knowledge-registry-redesign.md §14.6: \"current path absent",
+      "context": [
+        {
+          "line": 4079,
+          "text": "}"
+        },
+        {
+          "line": 4080,
+          "text": ""
+        },
+        {
+          "line": 4081,
+          "text": "// docs/architect/knowledge-registry-redesign.md §14.6: \"current path absent"
+        },
+        {
+          "line": 4082,
+          "text": "// at HEAD\" -- a doc's own currentPath is the thing every other check"
+        },
+        {
+          "line": 4083,
+          "text": "// (resolver, migration, doc-alias-broken) treats as ground truth; if the"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/knowledge-registry-redesign.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-whole-system-1085",
+            "fromPath": "docs/architect/knowledge-registry-redesign.md",
+            "toOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-proposals-redesigns.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/knowledge-registry-redesign.md"
+    },
+    {
+      "edgeId": "setup-019",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4105,
+      "columnStart": 4,
+      "columnEndExclusive": 49,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+      "callSite": "// docs/architect/knowledge-registry-redesign.md §14.6: \"source capture",
+      "context": [
+        {
+          "line": 4103,
+          "text": "}"
+        },
+        {
+          "line": 4104,
+          "text": ""
+        },
+        {
+          "line": 4105,
+          "text": "// docs/architect/knowledge-registry-redesign.md §14.6: \"source capture"
+        },
+        {
+          "line": 4106,
+          "text": "// linkage cannot be reached through current or alias paths.\" Only checks"
+        },
+        {
+          "line": 4107,
+          "text": "// sourceCaptureIds entries that are themselves a repo-relative doc path"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/knowledge-registry-redesign.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-whole-system-1085",
+            "fromPath": "docs/architect/knowledge-registry-redesign.md",
+            "toOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-proposals-redesigns.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/knowledge-registry-redesign.md"
+    },
+    {
+      "edgeId": "setup-020",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4139,
+      "columnStart": 4,
+      "columnEndExclusive": 49,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+      "callSite": "// docs/architect/knowledge-registry-redesign.md §13.4/§14.6: \"migration",
+      "context": [
+        {
+          "line": 4137,
+          "text": "}"
+        },
+        {
+          "line": 4138,
+          "text": ""
+        },
+        {
+          "line": 4139,
+          "text": "// docs/architect/knowledge-registry-redesign.md §13.4/§14.6: \"migration"
+        },
+        {
+          "line": 4140,
+          "text": "// inventory or apply loses a source.\" Four real conservation properties,"
+        },
+        {
+          "line": 4141,
+          "text": "// not just the original outcome-reachability check:"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/knowledge-registry-redesign.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-whole-system-1085",
+            "fromPath": "docs/architect/knowledge-registry-redesign.md",
+            "toOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-proposals-redesigns.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/knowledge-registry-redesign.md"
+    },
+    {
+      "edgeId": "setup-021",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4212,
+      "columnStart": 57,
+      "columnEndExclusive": 77,
+      "pattern": "legacy",
+      "matchedExpression": "docs/doc-registry.md",
+      "callSite": "registerCheck({ id: 'doc-registry-stale', description: 'docs/doc-registry.md and doc-registry.json up to date', check: checkDocRegistryStale });",
+      "context": [
+        {
+          "line": 4210,
+          "text": "}"
+        },
+        {
+          "line": 4211,
+          "text": ""
+        },
+        {
+          "line": 4212,
+          "text": "registerCheck({ id: 'doc-registry-stale', description: 'docs/doc-registry.md and doc-registry.json up to date', check: checkDocRegistryStale });"
+        },
+        {
+          "line": 4213,
+          "text": "registerFix({ id: 'doc-registry-stale', fix: fixDocRegistryStale });"
+        },
+        {
+          "line": 4214,
+          "text": "registerCheck({ id: 'doc-alias-broken', description: 'doc aliases point to valid paths', check: checkDocAliasBroken });"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "projection-reference",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "generated projection",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs; test/cli/knowledge-verbs.test.mjs (planned parity; not executed here)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Switchboard rootDocuments marks generated, non-authority. Preserve emitted projection name, adoption probe, exact-byte stale check, fix writer and user-visible path together; no relocation authorized.",
+      "normalizedReference": "docs/doc-registry.md"
+    },
+    {
+      "edgeId": "setup-022",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4282,
+      "columnStart": 17,
+      "columnEndExclusive": 79,
+      "pattern": "legacy",
+      "matchedExpression": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "callSite": "// Phase 02 R8 (docs/architect/agent-coordination/contracts/flow-definition.md,",
+      "context": [
+        {
+          "line": 4280,
+          "text": "});"
+        },
+        {
+          "line": 4281,
+          "text": ""
+        },
+        {
+          "line": 4282,
+          "text": "// Phase 02 R8 (docs/architect/agent-coordination/contracts/flow-definition.md,"
+        },
+        {
+          "line": 4283,
+          "text": "// ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition"
+        },
+        {
+          "line": 4284,
+          "text": "// definition surface (Workflow projection adapter + CoordinationProtocol"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-citation",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Exact source/context preservation; independent semantic review",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-agent-coordination-0625",
+            "fromPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+            "toOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-agent-coordination.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Historical design or decision citation describes origin of existing behavior; no file read/write and no authoring destination.",
+      "normalizedReference": "docs/architect/agent-coordination/contracts/flow-definition.md"
+    },
+    {
+      "edgeId": "setup-023",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 5270,
+      "columnStart": 44,
+      "columnEndExclusive": 79,
+      "pattern": "legacy",
+      "matchedExpression": "docs/specs/confinement-authority.md",
+      "callSite": "// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─",
+      "context": [
+        {
+          "line": 5268,
+          "text": "});"
+        },
+        {
+          "line": 5269,
+          "text": ""
+        },
+        {
+          "line": 5270,
+          "text": "// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─"
+        },
+        {
+          "line": 5271,
+          "text": ""
+        },
+        {
+          "line": 5272,
+          "text": "export function checkConfinementPoliciesDeclared(cwd) {"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "comment",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/specs/confinement-authority.md",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "Agent confinement",
+            "canonicalRoutes": [
+              "docs/specs/confinement-authority.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "runtime-confinement-spec",
+                "route": "docs/specs/confinement-authority.md",
+                "authorityStatus": "legacy-current",
+                "role": "Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite"
+              },
+              {
+                "scope": "implementation-evidence",
+                "route": "src/runner/dispatch/confinement/**",
+                "authorityStatus": "legacy-current",
+                "role": "Runtime confinement implementations and tests"
+              },
+              {
+                "route": "docs/platform/agent-confinement/**",
+                "authorityStatus": "candidate",
+                "scope": "candidate-transformation",
+                "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/platform/agent-confinement/spec.md",
+      "desiredAnchor": "11-proof-và-definition-of-done",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve-now",
+      "cutoverAction": "exact-cutover-patch",
+      "test": "test/setup/confinement-doctor-checks.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "step10-specs-0001",
+            "fromPath": "docs/specs/confinement-authority.md",
+            "toOwner": "docs/platform/agent-confinement/README.md",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-15"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "R7 header is maintained doctor navigation; candidate preserves the confinement proof/doctor scope; no runtime policy change.",
+      "normalizedReference": "docs/specs/confinement-authority.md",
+      "cutoverPatch": {
+        "old": "docs/specs/confinement-authority.md",
+        "new": "docs/platform/agent-confinement/spec.md#11-proof-và-definition-of-done",
+        "operation": "literal citation substitution; preserve surrounding behavior/quote; validate target before application"
+      }
+    },
+    {
+      "edgeId": "setup-024",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 458,
+      "columnStart": 24,
+      "columnEndExclusive": 108,
+      "pattern": "manual",
+      "matchedExpression": "options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json')",
+      "callSite": "  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');",
+      "context": [
+        {
+          "line": 456,
+          "text": " */"
+        },
+        {
+          "line": 457,
+          "text": "export function discoverKnownOwners(projectRoot, options = {}) {"
+        },
+        {
+          "line": 458,
+          "text": "  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');"
+        },
+        {
+          "line": 459,
+          "text": "  const owners = new Set(['core', 'platform']);"
+        },
+        {
+          "line": 460,
+          "text": ""
+        }
+      ],
+      "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "edgeKind": "default-root-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architecture-manifest.json",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/architecture-manifest.json",
+      "desiredAnchor": "file-block",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/instruction-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/instruction-registry.test.mjs (planned default owner/discovery parity)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0001",
+            "fromPath": "docs/architecture-manifest.json",
+            "toOwner": "docs/platform/contracts/architecture-manifest.json",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-025",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 463,
+      "columnStart": 35,
+      "columnEndExclusive": 72,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(manifestPath, 'utf8')",
+      "callSite": "      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));",
+      "context": [
+        {
+          "line": 461,
+          "text": "  if (fs.existsSync(manifestPath)) {"
+        },
+        {
+          "line": 462,
+          "text": "    try {"
+        },
+        {
+          "line": 463,
+          "text": "      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));"
+        },
+        {
+          "line": 464,
+          "text": "      if (Array.isArray(manifest.components)) {"
+        },
+        {
+          "line": 465,
+          "text": "        for (const comp of manifest.components) {"
+        }
+      ],
+      "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "edgeKind": "reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/architecture-manifest.json",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/architecture-manifest.json",
+      "desiredAnchor": "file-block",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/instruction-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/instruction-registry.test.mjs (planned malformed/missing manifest parity)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [
+          {
+            "aliasId": "root-authorities-draft-0001",
+            "fromPath": "docs/architecture-manifest.json",
+            "toOwner": "docs/platform/contracts/architecture-manifest.json",
+            "toAnchor": null,
+            "kind": "moved",
+            "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+            "immutableRefs": [],
+            "recordedAt": "2026-10-14"
+          }
+        ],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-026",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3912,
+      "columnStart": 20,
+      "columnEndExclusive": 61,
+      "pattern": "manual",
+      "matchedExpression": "path.join(root, 'docs/doc-registry.json')",
+      "callSite": "  const jsonPath = path.join(root, 'docs/doc-registry.json');",
+      "context": [
+        {
+          "line": 3910,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);"
+        },
+        {
+          "line": 3911,
+          "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 3912,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3913,
+          "text": "  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;"
+        },
+        {
+          "line": 3914,
+          "text": "  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "paired-projection-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-027",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3913,
+      "columnStart": 41,
+      "columnEndExclusive": 72,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(mdPath, 'utf8')",
+      "callSite": "  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;",
+      "context": [
+        {
+          "line": 3911,
+          "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 3912,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3913,
+          "text": "  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;"
+        },
+        {
+          "line": 3914,
+          "text": "  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;"
+        },
+        {
+          "line": 3915,
+          "text": ""
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-028",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3914,
+      "columnStart": 45,
+      "columnEndExclusive": 78,
+      "pattern": "manual",
+      "matchedExpression": "fs.readFileSync(jsonPath, 'utf8')",
+      "callSite": "  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;",
+      "context": [
+        {
+          "line": 3912,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3913,
+          "text": "  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;"
+        },
+        {
+          "line": 3914,
+          "text": "  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;"
+        },
+        {
+          "line": 3915,
+          "text": ""
+        },
+        {
+          "line": 3916,
+          "text": "  if (mdOk && jsonOk) {"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-029",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3943,
+      "columnStart": 20,
+      "columnEndExclusive": 61,
+      "pattern": "manual",
+      "matchedExpression": "path.join(root, 'docs/doc-registry.json')",
+      "callSite": "  const jsonPath = path.join(root, 'docs/doc-registry.json');",
+      "context": [
+        {
+          "line": 3941,
+          "text": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);"
+        },
+        {
+          "line": 3942,
+          "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+        },
+        {
+          "line": 3943,
+          "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+        },
+        {
+          "line": 3944,
+          "text": ""
+        },
+        {
+          "line": 3945,
+          "text": "  fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "paired-projection-binding",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.json",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-030",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3946,
+      "columnStart": 3,
+      "columnEndExclusive": 46,
+      "pattern": "manual",
+      "matchedExpression": "fs.writeFileSync(mdPath, mdContent, 'utf8')",
+      "callSite": "  fs.writeFileSync(mdPath, mdContent, 'utf8');",
+      "context": [
+        {
+          "line": 3944,
+          "text": ""
+        },
+        {
+          "line": 3945,
+          "text": "  fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        },
+        {
+          "line": 3946,
+          "text": "  fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        },
+        {
+          "line": 3947,
+          "text": "  fs.writeFileSync(jsonPath, jsonContent, 'utf8');"
+        },
+        {
+          "line": 3948,
+          "text": "  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.md",
+        "rootDocuments": [
+          {
+            "path": "docs/doc-registry.md",
+            "authorityStatus": "non-authority",
+            "fileClass": "generated",
+            "role": "Projection of end-user knowledge registry; does not own platform authority."
+          }
+        ],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.md",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.md",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-031",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3947,
+      "columnStart": 3,
+      "columnEndExclusive": 50,
+      "pattern": "manual",
+      "matchedExpression": "fs.writeFileSync(jsonPath, jsonContent, 'utf8')",
+      "callSite": "  fs.writeFileSync(jsonPath, jsonContent, 'utf8');",
+      "context": [
+        {
+          "line": 3945,
+          "text": "  fs.mkdirSync(path.dirname(mdPath), { recursive: true });"
+        },
+        {
+          "line": 3946,
+          "text": "  fs.writeFileSync(mdPath, mdContent, 'utf8');"
+        },
+        {
+          "line": 3947,
+          "text": "  fs.writeFileSync(jsonPath, jsonContent, 'utf8');"
+        },
+        {
+          "line": 3948,
+          "text": "  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };"
+        },
+        {
+          "line": 3949,
+          "text": "}"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "writer",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/doc-registry.json",
+        "rootDocuments": [],
+        "areas": [
+          {
+            "area": "End-user authoring, index, and knowledge registry",
+            "canonicalRoutes": [
+              "docs/specs/enduser-docs-authoring.md",
+              "docs/specs/enduser-docs-index.md"
+            ],
+            "currentRoutes": [
+              {
+                "scope": "authoring-guide-and-profile-rules",
+                "route": "docs/specs/enduser-docs-authoring.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+              },
+              {
+                "scope": "tag-and-metadata-index-spec",
+                "route": "docs/specs/enduser-docs-index.md",
+                "authorityStatus": "non-authority",
+                "role": "End-user tag and metadata index specification (user profile)"
+              },
+              {
+                "scope": "generated-registry-projection",
+                "route": "docs/doc-registry.md",
+                "authorityStatus": "non-authority",
+                "role": "Projection of end-user knowledge registry; does not own platform authority"
+              },
+              {
+                "scope": "knowledge-corpus",
+                "route": "docs/knowledge/**",
+                "authorityStatus": "non-authority",
+                "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+              }
+            ]
+          }
+        ],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": null
+      },
+      "desiredOwner": "docs/doc-registry.json",
+      "desiredAnchor": "document entry",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup-only; draft is not activated"
+      },
+      "writeDestination": {
+        "path": "docs/doc-registry.json",
+        "kind": "explicit path; no alias resolver in write call",
+        "activeAlias": false
+      },
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access."
+    },
+    {
+      "edgeId": "setup-032",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3969,
+      "columnStart": 5,
+      "columnEndExclusive": 43,
+      "pattern": "manual",
+      "matchedExpression": "for (const alias of doc.aliases || [])",
+      "callSite": "    for (const alias of doc.aliases || []) {",
+      "context": [
+        {
+          "line": 3967,
+          "text": "  const aliasOwners = new Map();"
+        },
+        {
+          "line": 3968,
+          "text": "  for (const doc of docs) {"
+        },
+        {
+          "line": 3969,
+          "text": "    for (const alias of doc.aliases || []) {"
+        },
+        {
+          "line": 3970,
+          "text": "      if (!aliasOwners.has(alias)) aliasOwners.set(alias, []);"
+        },
+        {
+          "line": 3971,
+          "text": "      aliasOwners.get(alias).push(doc.docId);"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "lookup-only-alias",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "doc.aliases[]",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "doc.aliases[]",
+      "desiredAnchor": "dynamic target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "No concrete aliases enumerated: separately authorized read-only export required.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; checks collisions/reachability; no alias file existence required"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-033",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 3974,
+      "columnStart": 3,
+      "columnEndExclusive": 74,
+      "pattern": "manual",
+      "matchedExpression": "const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]))",
+      "callSite": "  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));",
+      "context": [
+        {
+          "line": 3972,
+          "text": "    }"
+        },
+        {
+          "line": 3973,
+          "text": "  }"
+        },
+        {
+          "line": 3974,
+          "text": "  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));"
+        },
+        {
+          "line": 3975,
+          "text": "  const broken = [];"
+        },
+        {
+          "line": 3976,
+          "text": "  for (const [alias, owners] of aliasOwners) {"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "current-owner-collision-check",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "doc.currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "doc.currentPath",
+      "desiredAnchor": "dynamic target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Concrete document paths require authorized export; no state read.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "none in this IO call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-034",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4016,
+      "columnStart": 3,
+      "columnEndExclusive": 42,
+      "pattern": "manual",
+      "matchedExpression": "const docsDir = path.join(root, 'docs')",
+      "callSite": "  const docsDir = path.join(root, 'docs');",
+      "context": [
+        {
+          "line": 4014,
+          "text": "function checkDocNearDuplicate(cwd) {"
+        },
+        {
+          "line": 4015,
+          "text": "  const root = resolveMainCheckout(cwd) ?? cwd;"
+        },
+        {
+          "line": 4016,
+          "text": "  const docsDir = path.join(root, 'docs');"
+        },
+        {
+          "line": 4017,
+          "text": "  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };"
+        },
+        {
+          "line": 4018,
+          "text": "  const candidates = [];"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "recursive-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/**",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "docs/**",
+      "desiredAnchor": "dynamic target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Recursive frontmatter scan includes old/new roots; classification/parity after deletion remains Step 5.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "none in this IO call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-035",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4096,
+      "columnStart": 7,
+      "columnEndExclusive": 72,
+      "pattern": "manual",
+      "matchedExpression": "execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`]",
+      "callSite": "      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });",
+      "context": [
+        {
+          "line": 4094,
+          "text": "    if (!isLiveDocLifecycle(doc.docLifecycle)) continue;"
+        },
+        {
+          "line": 4095,
+          "text": "    try {"
+        },
+        {
+          "line": 4096,
+          "text": "      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });"
+        },
+        {
+          "line": 4097,
+          "text": "    } catch {"
+        },
+        {
+          "line": 4098,
+          "text": "      missing.push(`${doc.docId} (${doc.currentPath})`);"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "dynamic-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "doc.currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "doc.currentPath",
+      "desiredAnchor": "dynamic target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Exact target population depends on live registry; separately authorized read-only export required.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "none in this IO call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-036",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4128,
+      "columnStart": 7,
+      "columnEndExclusive": 55,
+      "pattern": "manual",
+      "matchedExpression": "const resolved = resolveDocPath(view, captureId)",
+      "callSite": "      const resolved = resolveDocPath(view, captureId);",
+      "context": [
+        {
+          "line": 4126,
+          "text": "      const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);"
+        },
+        {
+          "line": 4127,
+          "text": "      if (isOwnPath) continue;"
+        },
+        {
+          "line": 4128,
+          "text": "      const resolved = resolveDocPath(view, captureId);"
+        },
+        {
+          "line": 4129,
+          "text": "      const resolvesToSameDoc = resolved && !Array.isArray(resolved) && resolved.docId === doc.docId;"
+        },
+        {
+          "line": 4130,
+          "text": "      if (!resolvesToSameDoc) {"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "lookup-only-alias",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "doc.sourceCaptureIds[] -> resolveDocPath",
+        "rootDocuments": [],
+        "areas": [],
+        "switchboardDigest": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+        "fallback": "No explicit route for this path; preserve exact reference without inferring authority"
+      },
+      "desiredOwner": "doc.sourceCaptureIds[] -> resolveDocPath",
+      "desiredAnchor": "dynamic target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve implementation; require concrete-set export/parity before declaring cutover readiness",
+      "test": "test/setup/knowledge-doctor.test.mjs (planned)",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Concrete capture paths require authorized export; do not write to alias destination.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; checks collisions/reachability; no alias file existence required"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Trace from lexical binding to actual IO/default-root; read-only source inspection, no runtime/state access.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-037",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4174,
+      "columnStart": 25,
+      "columnEndExclusive": 117,
+      "pattern": "manual",
+      "matchedExpression": "path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json')",
+      "callSite": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');",
+      "context": [
+        {
+          "line": 4172,
+          "text": "  }"
+        },
+        {
+          "line": 4173,
+          "text": ""
+        },
+        {
+          "line": 4174,
+          "text": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+        },
+        {
+          "line": 4175,
+          "text": "  if (fs.existsSync(inventoryPath)) {"
+        },
+        {
+          "line": 4176,
+          "text": "    let inventory = [];"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "historical-inventory-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "docs/history/compound-learn-artifact-registry/reports/inventory-data.json",
+      "desiredAnchor": "explicit unchanged path",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "explicit path traced"
+    },
+    {
+      "edgeId": "setup-038",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/registrations.mjs",
+      "line": 4202,
+      "columnStart": 7,
+      "columnEndExclusive": 50,
+      "pattern": "manual",
+      "matchedExpression": "if (resolveDocPath(view, oldPath)) continue",
+      "callSite": "      if (resolveDocPath(view, oldPath)) continue; // migrated, still traceable via alias/currentPath",
+      "context": [
+        {
+          "line": 4200,
+          "text": "    for (const oldPath of sourceCounts.keys()) {"
+        },
+        {
+          "line": 4201,
+          "text": "      if (fs.existsSync(path.join(root, oldPath))) continue; // not migrated yet -- still where the inventory says"
+        },
+        {
+          "line": 4202,
+          "text": "      if (resolveDocPath(view, oldPath)) continue; // migrated, still traceable via alias/currentPath"
+        },
+        {
+          "line": 4203,
+          "text": "      lost.push(oldPath);"
+        },
+        {
+          "line": 4204,
+          "text": "    }"
+        }
+      ],
+      "fileDigest": "0d9ddd0195cade30ec11fc4b37096d9ca656b39602fc13d0b5f2067bf103ffb0",
+      "edgeKind": "lookup-only-alias",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "inventory oldPath -> registry currentPath",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "inventory oldPath -> registry currentPath",
+      "desiredAnchor": "dynamic concrete target set",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/registrations.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve existing currentPath/alias refusal semantics; concrete-set parity before cutover",
+      "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "Concrete inventory/registry population not read; separately authorized bounded export required.",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "lookup only; alias input explicitly refused for current-path mutation"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "call site traced; concrete target population unresolved"
+    },
+    {
+      "edgeId": "setup-039",
+      "surfaceClass": "setup-doctor",
+      "consumerPath": "src/setup/instruction-registry.mjs",
+      "line": 99,
+      "columnStart": 21,
+      "columnEndExclusive": 76,
+      "pattern": "manual",
+      "matchedExpression": "path.join(projectRoot, 'docs', 'decisions', 'index.md')",
+      "callSite": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');",
+      "context": [
+        {
+          "line": 97,
+          "text": ""
+        },
+        {
+          "line": 98,
+          "text": "function readDecisionIds(projectRoot, fgosDir = path.join(projectRoot, '.fgos')) {"
+        },
+        {
+          "line": 99,
+          "text": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');"
+        },
+        {
+          "line": 100,
+          "text": "  if (!fs.existsSync(indexPath)) return new Set();"
+        },
+        {
+          "line": 101,
+          "text": "  const content = fs.readFileSync(indexPath, 'utf8');"
+        }
+      ],
+      "fileDigest": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "edgeKind": "projection-reader",
+      "currentAuthorityRoute": {
+        "referenceAsWritten": "docs/decisions/index.md",
+        "rootDocuments": [],
+        "areas": [],
+        "fallback": "Caller/state-derived path; concrete target set unproven"
+      },
+      "desiredOwner": "docs/decisions/index.md",
+      "desiredAnchor": "explicit unchanged path",
+      "sourceVsRender": "source",
+      "sourcePath": "src/setup/instruction-registry.mjs",
+      "preCutoverAction": "preserve",
+      "cutoverAction": "preserve",
+      "test": "Existing CLI knowledge/gate/locked-decision and setup instruction/knowledge tests; exact dynamic target coverage requires bounded export",
+      "reviewer": "Lead-started A38 independent census reviewer; pending (0 reviewed)",
+      "parkedReason": "",
+      "aliasLookup": {
+        "activeTableEntries": 0,
+        "draftCandidates": [],
+        "use": "no alias resolution in this call"
+      },
+      "writeDestination": null,
+      "dispositionReason": "Supplementary source trace of documentation IO/metadata boundary, not a literal scanner hit.",
+      "resolution": "explicit path traced"
+    }
+  ],
+  "reviewStatus": "pending independent review"
+}
