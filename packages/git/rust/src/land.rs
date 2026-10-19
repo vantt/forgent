@@ -298,11 +298,21 @@ impl GitDriver {
         if let Some(p) = &req.footprint {
             fgos_write_scope::canonicalize_all(p).map_err(failure)?;
         }
-        let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
+        for file in &req.files {
+            let path = std::path::Path::new(&file.path);
+            if path.is_absolute()
+                || file.path.is_empty()
+                || path
+                    .components()
+                    .any(|c| !matches!(c, std::path::Component::Normal(_)))
+                || file.path.split('/').any(|s| s == ".git")
+            {
+                return Err(failure("invalid-land-file"));
+            }
+        }
+        let slot = LockScope::seeded(vec![]).map_err(failure)?;
         let mut p = params(repo);
         p.insert("ref".into(), slot_key(&req.destination));
-        slot.acquire("merge-slot", &p, Wait::Ms(0))
-            .map_err(failure)?;
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
@@ -325,6 +335,7 @@ impl GitDriver {
                 repo,
             )?);
             session.slot = LockScope::seeded(vec![]).map_err(failure)?;
+            replay_land_receipt(session.receipt.as_ref().unwrap())?;
             return Ok(session);
         }
         if wal.known_id(id).map_err(failure)? {
@@ -338,8 +349,13 @@ impl GitDriver {
             session.candidate = Some(payload.candidate.clone());
             session.receipt = Some(land_receipt(&chain, repo)?);
             session.slot = LockScope::seeded(vec![]).map_err(failure)?;
+            replay_land_receipt(session.receipt.as_ref().unwrap())?;
             return Ok(session);
         }
+        session
+            .slot
+            .acquire("merge-slot", &p, Wait::Ms(0))
+            .map_err(failure)?;
         if crate::refs::direct(self, repo, &destination)? != ExpectedTip::Oid(target.clone()) {
             return Err(crate::refs::stale("land-target-changed"));
         }
@@ -351,9 +367,40 @@ impl GitDriver {
                 &[],
             )?;
         }
+        let ancestor = self.land_call(
+            repo,
+            &session.slot,
+            &["merge-base", "--is-ancestor", &req.source, &req.target],
+            &[],
+        )?;
+        if ancestor.success {
+            return Err(failure("land-already-merged"));
+        }
+        if ancestor.code != Some(1) {
+            return Err(ancestor.error("land-ancestry-failed"));
+        }
         let land_binding =
             wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
                 .map_err(failure)?;
+        // The live destination slot proves no previous session can still publish.
+        // Close only this authority's pre-attempt chains; candidate evidence remains.
+        for prior in wal.active(100_000).map_err(failure)? {
+            if prior.last().operation_id != id
+                && prior.intent().authority_binding == land_binding
+                && matches!(&prior.intent().kind, OperationKind::Land(p) if p.request.destination == req.destination)
+                && matches!(
+                    prior.last().phase,
+                    Phase::Intent(_) | Phase::Prepared | Phase::LandVerified { .. }
+                )
+            {
+                if prior.intent().writer_identity != writer {
+                    return Err(recovery("land-abandoned-writer-mismatch"));
+                }
+                session.slot.validate().map_err(failure)?;
+                wal.append(&prior, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                    .map_err(failure)?;
+            }
+        }
         crate::refs::admission_land(
             &wal,
             id,
@@ -380,190 +427,198 @@ impl GitDriver {
             writer,
             &candidate_operation,
         )?;
-        let candidate_repo = match self.resolve_repo(&worktree.path, repo.trusted_main_root())? {
-            ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
-            _ => return Err(recovery("land-candidate-missing")),
-        };
-        // Worker allocation deliberately strips .fgos and marks its tracked
-        // entries skip-worktree. A Land candidate is an exact commit checkout:
-        // materialize those immutable target bytes before merge/verification.
-        let state = self.land_call(
-            &candidate_repo,
-            &session.slot,
-            &["ls-files", "-z", "--", ".fgos"],
-            &[],
-        )?;
-        if !state.success {
-            return Err(state.error("land-state-paths-unreadable"));
-        }
-        if !state.stdout.is_empty() {
+        let candidate_path = worktree.path.clone();
+        (|| {
+            let candidate_repo =
+                match self.resolve_repo(&worktree.path, repo.trusted_main_root())? {
+                    ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
+                    _ => return Err(recovery("land-candidate-missing")),
+                };
+            // Worker allocation deliberately strips .fgos and marks its tracked
+            // entries skip-worktree. A Land candidate is an exact commit checkout:
+            // materialize those immutable target bytes before merge/verification.
+            let state = self.land_call(
+                &candidate_repo,
+                &session.slot,
+                &["ls-files", "-z", "--", ".fgos"],
+                &[],
+            )?;
+            if !state.success {
+                return Err(state.error("land-state-paths-unreadable"));
+            }
+            if !state.stdout.is_empty() {
+                self.land_text(
+                    &candidate_repo,
+                    &session.slot,
+                    &["update-index", "--no-skip-worktree", "-z", "--stdin"],
+                    &state.stdout,
+                )?;
+                self.land_text(
+                    &candidate_repo,
+                    &session.slot,
+                    &[
+                        "--literal-pathspecs",
+                        "restore",
+                        "--source",
+                        &req.target,
+                        "--staged",
+                        "--worktree",
+                        "--pathspec-from-file=-",
+                        "--pathspec-file-nul",
+                    ],
+                    &state.stdout,
+                )?;
+            }
+            let merged = self.land_call(
+                &candidate_repo,
+                &session.slot,
+                &["merge", "--no-commit", "--no-ff", "--no-edit", &req.source],
+                &[],
+            );
+            self.refresh_checkout_facts(&candidate_repo)?;
+            let merged = merged?;
+            if !merged.success {
+                if candidate_repo.git_dir().join("MERGE_HEAD").exists() {
+                    self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                }
+                return Err(merged.error("land-conflict-aborted"));
+            }
+            // Consumer transformations are literal bytes; no business-state interpretation.
+            for file in &req.files {
+                let path = std::path::Path::new(&file.path);
+                let full = worktree.path.join(path);
+                // Refuse symlink ancestors/targets rather than writing outside the candidate.
+                let mut at = worktree.path.clone();
+                for part in path.components() {
+                    at.push(part);
+                    if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
+                        return Err(failure("land-file-symlink"));
+                    }
+                }
+                if let Some(bytes) = &file.bytes {
+                    if let Some(p) = full.parent() {
+                        std::fs::create_dir_all(p).map_err(failure)?;
+                    }
+                    std::fs::write(full, bytes).map_err(failure)?;
+                } else {
+                    match std::fs::remove_file(full) {
+                        Ok(()) => (),
+                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                        Err(e) => return Err(failure(e)),
+                    }
+                }
+                let input = format!("{}\0", file.path);
+                self.land_text(
+                    &candidate_repo,
+                    &session.slot,
+                    &[
+                        "--literal-pathspecs",
+                        "add",
+                        "-f",
+                        "-A",
+                        "--pathspec-from-file=-",
+                        "--pathspec-file-nul",
+                    ],
+                    input.as_bytes(),
+                )?;
+            }
+            let tree = self.land_text(&candidate_repo, &session.slot, &["write-tree"], &[])?;
+            let mut args = vec!["commit-tree", &tree, "-p", &req.target];
+            if !req.squash {
+                args.extend(["-p", &req.source]);
+            }
+            let candidate = self.land_text(
+                &candidate_repo,
+                &session.slot,
+                &args,
+                req.message.as_bytes(),
+            )?;
+            // Materialize the exact immutable candidate for consumer verification.
             self.land_text(
                 &candidate_repo,
                 &session.slot,
-                &["update-index", "--no-skip-worktree", "-z", "--stdin"],
-                &state.stdout,
+                &["update-ref", "--no-deref", "HEAD", &candidate, &req.target],
+                &[],
             )?;
-            self.land_text(
-                &candidate_repo,
-                &session.slot,
-                &[
-                    "--literal-pathspecs",
-                    "restore",
-                    "--source",
-                    &req.target,
-                    "--staged",
-                    "--worktree",
-                    "--pathspec-from-file=-",
-                    "--pathspec-file-nul",
-                ],
-                &state.stdout,
-            )?;
-        }
-        let merged = self.land_call(
-            &candidate_repo,
-            &session.slot,
-            &["merge", "--no-commit", "--no-ff", "--no-edit", &req.source],
-            &[],
-        );
-        self.refresh_checkout_facts(&candidate_repo)?;
-        let merged = merged?;
-        if !merged.success {
             if candidate_repo.git_dir().join("MERGE_HEAD").exists() {
-                self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                self.land_text(&candidate_repo, &session.slot, &["merge", "--quit"], &[])?;
             }
-            return Err(merged.error("land-conflict-aborted"));
-        }
-        // Consumer transformations are literal bytes; no business-state interpretation.
-        for file in &req.files {
-            let path = std::path::Path::new(&file.path);
-            if path.is_absolute()
-                || file.path.is_empty()
-                || path
-                    .components()
-                    .any(|c| !matches!(c, std::path::Component::Normal(_)))
-                || file.path.split('/').any(|s| s == ".git")
-            {
-                return Err(failure("invalid-land-file"));
+            let view = LandCandidate {
+                worktree: worktree.path,
+                source: req.source.clone(),
+                target: req.target.clone(),
+                candidate,
+                tree_digest: wal::canonical_digest(&tree).map_err(failure)?,
+                tree,
+            };
+            let mut resources = vec![req.destination.clone()];
+            resources.extend(checkout_resources(&candidate_repo)?);
+            crate::refs::admission_land(&wal, id, &resources, &land_binding)?;
+            let kind = OperationKind::Land(Box::new(wal::LandIntent {
+                request: req.clone(),
+                candidate: view.clone(),
+            }));
+            let binding =
+                wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
+                    .map_err(failure)?;
+            let intent = Intent {
+                request_digest: wal::canonical_digest(&(req, writer)).map_err(failure)?,
+                kind,
+                repo_identity: wal.repository_identity().into(),
+                resource_set: resources,
+                authority_binding: binding.clone(),
+                writer_identity: writer.into(),
+                object_format: repo.object_format(),
+                expected: Tip::Oid(req.target.clone()),
+                next: Tip::Oid(view.candidate.clone()),
+            };
+            let authority = Authority {
+                scope: &session.slot,
+                binding,
+            };
+            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+                Begin::Created(c) => c,
+                _ => return Err(recovery("land-recovery-required")),
+            };
+            filesystem.checkpoint("land-intent").map_err(failure)?;
+            let admin = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
+            for (suffix, oid) in [
+                ("", &view.candidate),
+                ("/source", &req.source),
+                ("/target", &req.target),
+            ] {
+                crate::refs::install_pin(
+                    self,
+                    repo,
+                    admin.handle("worktree-admin").unwrap(),
+                    &format!("{id}{suffix}"),
+                    &Oid::parse(oid, repo.object_format()).map_err(failure)?,
+                )?;
+                filesystem
+                    .checkpoint(match suffix {
+                        "" => "land-pin-candidate",
+                        "/source" => "land-pin-source",
+                        _ => "land-pin-target",
+                    })
+                    .map_err(failure)?;
             }
-            let full = worktree.path.join(path);
-            // Refuse symlink ancestors/targets rather than writing outside the candidate.
-            let mut at = worktree.path.clone();
-            for part in path.components() {
-                at.push(part);
-                if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
-                    return Err(failure("land-file-symlink"));
-                }
-            }
-            if let Some(bytes) = &file.bytes {
-                if let Some(p) = full.parent() {
-                    std::fs::create_dir_all(p).map_err(failure)?;
-                }
-                std::fs::write(full, bytes).map_err(failure)?;
-            } else {
-                match std::fs::remove_file(full) {
-                    Ok(()) => (),
-                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                    Err(e) => return Err(failure(e)),
-                }
-            }
-            let input = format!("{}\0", file.path);
-            self.land_text(
-                &candidate_repo,
-                &session.slot,
-                &[
-                    "--literal-pathspecs",
-                    "add",
-                    "-f",
-                    "-A",
-                    "--pathspec-from-file=-",
-                    "--pathspec-file-nul",
-                ],
-                input.as_bytes(),
-            )?;
-        }
-        let tree = self.land_text(&candidate_repo, &session.slot, &["write-tree"], &[])?;
-        let mut args = vec!["commit-tree", &tree, "-p", &req.target];
-        if !req.squash {
-            args.extend(["-p", &req.source]);
-        }
-        let candidate = self.land_text(
-            &candidate_repo,
-            &session.slot,
-            &args,
-            req.message.as_bytes(),
-        )?;
-        // Materialize the exact immutable candidate for consumer verification.
-        self.land_text(
-            &candidate_repo,
-            &session.slot,
-            &["update-ref", "--no-deref", "HEAD", &candidate, &req.target],
-            &[],
-        )?;
-        if candidate_repo.git_dir().join("MERGE_HEAD").exists() {
-            self.land_text(&candidate_repo, &session.slot, &["merge", "--quit"], &[])?;
-        }
-        let view = LandCandidate {
-            worktree: worktree.path,
-            source: req.source.clone(),
-            target: req.target.clone(),
-            candidate,
-            tree_digest: wal::canonical_digest(&tree).map_err(failure)?,
-            tree,
-        };
-        let mut resources = vec![req.destination.clone()];
-        resources.extend(checkout_resources(&candidate_repo)?);
-        crate::refs::admission_land(&wal, id, &resources, &land_binding)?;
-        let kind = OperationKind::Land(Box::new(wal::LandIntent {
-            request: req.clone(),
-            candidate: view.clone(),
-        }));
-        let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
-            .map_err(failure)?;
-        let intent = Intent {
-            request_digest: wal::canonical_digest(&(req, writer)).map_err(failure)?,
-            kind,
-            repo_identity: wal.repository_identity().into(),
-            resource_set: resources,
-            authority_binding: binding.clone(),
-            writer_identity: writer.into(),
-            object_format: repo.object_format(),
-            expected: Tip::Oid(req.target.clone()),
-            next: Tip::Oid(view.candidate.clone()),
-        };
-        let authority = Authority {
-            scope: &session.slot,
-            binding,
-        };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
-            Begin::Created(c) => c,
-            _ => return Err(recovery("land-recovery-required")),
-        };
-        filesystem.checkpoint("land-intent").map_err(failure)?;
-        let admin = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
-        for (suffix, oid) in [
-            ("", &view.candidate),
-            ("/source", &req.source),
-            ("/target", &req.target),
-        ] {
-            crate::refs::install_pin(
-                self,
-                repo,
-                admin.handle("worktree-admin").unwrap(),
-                &format!("{id}{suffix}"),
-                &Oid::parse(oid, repo.object_format()).map_err(failure)?,
-            )?;
-            filesystem
-                .checkpoint(match suffix {
-                    "" => "land-pin-candidate",
-                    "/source" => "land-pin-source",
-                    _ => "land-pin-target",
-                })
-                .map_err(failure)?;
-        }
-        wal.append(&chain, Phase::Prepared).map_err(failure)?;
-        drop(admin);
-        session.candidate = Some(view);
-        Ok(session)
+            wal.append(&chain, Phase::Prepared).map_err(failure)?;
+            drop(admin);
+            session.candidate = Some(view);
+            Ok(session)
+        })()
+        .map_err(|mut error: OperationError| {
+            let mut diagnostics = format!(
+                "Land candidate retained at {} (worktree operation {})\n",
+                candidate_path.display(),
+                candidate_operation
+            )
+            .into_bytes();
+            diagnostics.extend_from_slice(&error.stderr);
+            error.stderr = diagnostics;
+            error.stderr.truncate(64 * 1024);
+            error
+        })
     }
     pub fn publish_land(
         &self,
@@ -581,10 +636,16 @@ impl GitDriver {
         filesystem: &F,
     ) -> Result<Receipt> {
         if let Some(receipt) = &session.receipt {
+            replay_land_receipt(receipt)?;
             return Ok(receipt.clone());
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
+        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
+        let chain = wal.inspect(&session.id).map_err(failure)?;
+        if !matches!(chain.last().phase, Phase::Prepared) {
+            return Err(recovery("land-recovery-required"));
+        }
         let c = session
             .candidate
             .as_ref()
@@ -668,18 +729,13 @@ impl GitDriver {
         } else {
             (false, false)
         };
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        let chain = wal.inspect(&session.id).map_err(failure)?;
-        if !matches!(chain.last().phase, Phase::Prepared) {
-            return Err(recovery("land-recovery-required"));
-        }
         // Persist the opaque consumer evidence before the one-shot barrier.
         let chain = wal
             .append(
                 &chain,
                 Phase::LandVerified {
                     evidence: evidence.clone(),
-                    checkout: if main && !dirty && !store_collision {
+                    checkout: if main && !store_collision {
                         Some(self.land_checkout_proof(repo, &candidate_repo, &scope, c)?)
                     } else {
                         None
@@ -697,6 +753,7 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
+        let before = self.checkouts(repo)?;
         filesystem.checkpoint("land-before-cas").map_err(failure)?;
         let cas = self.land_call(
             repo,
@@ -714,7 +771,15 @@ impl GitDriver {
         )?;
         filesystem.checkpoint("land-after-cas").map_err(failure)?;
         let observed = crate::refs::direct(self, repo, &destination)?;
-        if !cas.success {
+        let lost = crate::refs::classify_ref_attempt(
+            cas,
+            &observed,
+            &ExpectedTip::Oid(Oid::parse(&c.target, repo.object_format()).map_err(failure)?),
+            &ExpectedTip::Oid(Oid::parse(&c.candidate, repo.object_format()).map_err(failure)?),
+            &before,
+            &self.checkouts(repo)?,
+        )?;
+        if lost {
             let terminal = wal
                 .append(
                     &chain,
@@ -739,7 +804,7 @@ impl GitDriver {
             return Err(recovery("land-ref-drift"));
         }
         let checkout = if main && store_collision {
-            "pending"
+            "pendingStoreCollision"
         } else if main {
             if self.land_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"], &[])?
                 != req.destination
@@ -749,7 +814,12 @@ impl GitDriver {
             filesystem
                 .checkpoint("land-before-read-tree")
                 .map_err(failure)?;
-            let out = self.land_call(repo, &scope, &["read-tree", "-m", "-u", "HEAD"], &[])?;
+            let out = self.land_call(
+                repo,
+                &scope,
+                &["read-tree", "-m", "-u", &c.target, &c.candidate],
+                &[],
+            )?;
             filesystem
                 .checkpoint("land-after-read-tree")
                 .map_err(failure)?;
@@ -804,6 +874,18 @@ fn land_receipt(chain: &wal::Chain, repo: &RepoHandle) -> Result<Receipt> {
         repo,
     )
 }
+fn replay_land_receipt(receipt: &Receipt) -> Result<()> {
+    if matches!(
+        receipt.local_effect.publication_state,
+        PublicationState::Unknown
+    ) {
+        let mut error = crate::refs::stale("land-cas-lost");
+        error.operation_id = Some(receipt.operation_id.clone());
+        error.receipt = Some(Box::new(receipt.clone()));
+        return Err(error);
+    }
+    Ok(())
+}
 fn land_outcome_receipt(
     id: &str,
     intent: &Intent,
@@ -841,7 +923,7 @@ fn land_outcome_receipt(
     };
     let checkout = match checkout.as_str() {
         "reconciled" => Checkout::Reconciled,
-        "pending" => Checkout::Pending,
+        "pending" | "pendingStoreCollision" => Checkout::Pending,
         "notApplicable" => Checkout::NotApplicable,
         _ => Checkout::RecoveryRequired,
     };
@@ -862,6 +944,8 @@ struct CheckoutProof {
     old: Vec<PathFingerprint>,
     next: Vec<PathFingerprint>,
     old_index_tree: String,
+    #[serde(default)]
+    next_index_digest: Option<String>,
     #[serde(default)]
     old_index: Option<PathFingerprint>,
 }
@@ -965,7 +1049,41 @@ impl GitDriver {
             .map(|p| p.to_vec())
             .collect();
         let old_index_tree = self.land_text(repo, scope, &["write-tree"], &[])?;
+        // Two-tree read-tree retains staged entries outside the changed paths.
+        // Capture that expected index explicitly, rather than assuming candidate tree equality.
+        let entries = |r: &RepoHandle| -> Result<BTreeMap<Vec<u8>, Vec<u8>>> {
+            let out = self.land_call(r, scope, &["ls-files", "--stage", "-z"], &[])?;
+            if !out.success {
+                return Err(out.error("land-index-entries-failed"));
+            }
+            out.stdout
+                .split(|b| *b == 0)
+                .filter(|e| !e.is_empty())
+                .map(|entry| {
+                    let tab = entry
+                        .iter()
+                        .position(|b| *b == b'\t')
+                        .ok_or_else(|| recovery("land-index-entry-invalid"))?;
+                    Ok((entry[tab + 1..].to_vec(), entry.to_vec()))
+                })
+                .collect()
+        };
+        let mut next_entries = entries(repo)?;
+        next_entries.retain(|path, _| !paths.iter().any(|changed| path == changed));
+        for (path, entry) in entries(candidate)? {
+            if paths.contains(&path) {
+                next_entries.insert(path, entry);
+            }
+        }
+        let next_entries: Vec<u8> = next_entries
+            .into_values()
+            .flat_map(|mut e| {
+                e.push(0);
+                e
+            })
+            .collect();
         let proof = CheckoutProof {
+            next_index_digest: Some(wal::canonical_digest(&next_entries).map_err(failure)?),
             old_index: Some(fingerprints(repo.git_dir(), &[b"index".to_vec()])?.remove(0)),
             old: fingerprints(repo.trusted_main_root(), &paths)?,
             next: fingerprints(
@@ -1191,7 +1309,19 @@ impl GitDriver {
                 return Err(recovery("land-checkout-fingerprints-invalid"));
             }
             let actual = fingerprints(repo.trusted_main_root(), &proof.paths)?;
-            if index == c.tree && actual == proof.next {
+            let next_index_matches = |driver: &GitDriver| -> Result<bool> {
+                if let Some(expected) = &proof.next_index_digest {
+                    let out =
+                        driver.land_call(repo, &scope, &["ls-files", "--stage", "-z"], &[])?;
+                    if !out.success {
+                        return Err(out.error("land-index-entries-failed"));
+                    }
+                    Ok(wal::canonical_digest(&out.stdout).map_err(failure)? == *expected)
+                } else {
+                    Ok(driver.land_text(repo, &scope, &["write-tree"], &[])? == c.tree)
+                }
+            };
+            if next_index_matches(self)? && actual == proof.next {
                 "reconciled"
             } else if index == proof.old_index_tree
                 && actual == proof.old
@@ -1200,9 +1330,14 @@ impl GitDriver {
             {
                 // Finish only an exactly captured old checkout. A native lock,
                 // mixed files or user edits never reach this command.
-                let out = self.land_call(repo, &scope, &["read-tree", "-m", "-u", "HEAD"], &[])?;
+                let out = self.land_call(
+                    repo,
+                    &scope,
+                    &["read-tree", "-m", "-u", &c.target, &c.candidate],
+                    &[],
+                )?;
                 if !out.success
-                    || self.land_text(repo, &scope, &["write-tree"], &[])? != c.tree
+                    || !next_index_matches(self)?
                     || fingerprints(repo.trusted_main_root(), &proof.paths)? != proof.next
                 {
                     return Err(recovery("land-checkout-recovery-required"));

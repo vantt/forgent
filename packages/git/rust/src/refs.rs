@@ -71,6 +71,34 @@ impl wal::PublicationAuthority for Authority<'_> {
         Ok(())
     }
 }
+fn checkout_facts(rows: &[(WorktreeFact, Option<RepoHandle>)]) -> Vec<(Vec<u8>, Option<RefName>)> {
+    rows.iter()
+        .map(|(f, _)| (f.path.clone(), f.branch.clone()))
+        .collect()
+}
+/// Shared post-attempt classification. Only a third-party tip is a CAS loss.
+pub(crate) fn classify_ref_attempt(
+    out: crate::driver::Output,
+    observed: &ExpectedTip,
+    old: &ExpectedTip,
+    next: &ExpectedTip,
+    before: &[(WorktreeFact, Option<RepoHandle>)],
+    after: &[(WorktreeFact, Option<RepoHandle>)],
+) -> Result<bool> {
+    if checkout_facts(before) != checkout_facts(after) {
+        return Err(recovery("checkout-switch-recovery-required"));
+    }
+    if !out.success {
+        if observed == old || observed == next {
+            return Err(out.error("ref-write-failed-recovery-required"));
+        }
+        return Ok(true);
+    }
+    if observed != next {
+        return Err(recovery("ref-read-back-recovery-required"));
+    }
+    Ok(false)
+}
 pub(crate) fn admission<F: wal::FileSystem>(
     wal: &Wal<F>,
     id: &str,
@@ -776,19 +804,7 @@ impl GitDriver {
                 self.publication_call(repo, admin, &args, &[], false, Duration::from_secs(30))?;
             filesystem.checkpoint("after-target-cas").map_err(failure)?;
             let observed = direct(self, repo, name)?;
-            let after = self.checkouts(repo)?;
-            let facts = |rows: &Vec<(WorktreeFact, Option<RepoHandle>)>| {
-                rows.iter()
-                    .map(|(f, _)| (f.path.clone(), f.branch.clone()))
-                    .collect::<Vec<_>>()
-            };
-            if facts(&before) != facts(&after) {
-                return Err(recovery("checkout-switch-recovery-required"));
-            }
-            if !out.success {
-                if observed == *old {
-                    return Err(out.error("ref-write-failed-recovery-required"));
-                }
+            if classify_ref_attempt(out, &observed, old, next, &before, &self.checkouts(repo)?)? {
                 let terminal = wal
                     .append(
                         &attempted,
@@ -799,9 +815,6 @@ impl GitDriver {
                     .map_err(failure)?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(stale("compare-and-swap-stale"));
-            }
-            if observed != *next {
-                return Err(recovery("ref-read-back-recovery-required"));
             }
             if let Some(target) = tree {
                 scope.validate().map_err(failure)?;
@@ -836,7 +849,9 @@ impl GitDriver {
                 }
             }
             let final_checkouts = self.checkouts(repo)?;
-            if facts(&before) != facts(&final_checkouts) || direct(self, repo, name)? != *next {
+            if checkout_facts(&before) != checkout_facts(&final_checkouts)
+                || direct(self, repo, name)? != *next
+            {
                 return Err(recovery("checkout-read-back-recovery-required"));
             }
             sync_refs(repo, name)?;

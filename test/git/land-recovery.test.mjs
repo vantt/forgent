@@ -70,10 +70,11 @@ test('a SIGKILL during consumer verification releases authority; Node recovery a
     const ready = once(child, 'message'); child.send({ options: f.options, loader: f.loader, request: f.request });
     const [message] = await ready; assert.equal(message.error, undefined);
     const exited = once(child, 'exit'); child.kill('SIGKILL'); const [, signal] = await exited; assert.equal(signal, 'SIGKILL');
+    const fresh = f.port(); const c = fresh.prepare({ operationId: 'after-kill', request: f.request }).candidate;
+
+    assert.equal(fresh.publish(evidence(c)).checkout, 'reconciled');
     const receipt = f.port().recover({ operationId: 'killed-verifier' }).receipt;
     assert.equal(receipt.localEffect.publicationState, 'notPublished');
-    const fresh = f.port(); const c = fresh.prepare({ operationId: 'after-kill', request: f.request }).candidate;
-    assert.equal(fresh.publish(evidence(c)).checkout, 'reconciled');
   } finally { if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL'); f.close(); }
 });
 

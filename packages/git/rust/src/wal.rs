@@ -790,7 +790,7 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             Phase::TargetAttempt { .. } | Phase::SyncState { .. } | Phase::SyncCommitAttempt { .. },
             Phase::Outcome(o),
         ) => match o {
-            Outcome::Land { checkout, .. } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
+            Outcome::Land { checkout, .. } => matches!(i.kind, OperationKind::Land(_)) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&checkout.as_str()),
             Outcome::Commit { observed, .. } => {
                 matches!(
                     i.kind,
@@ -1723,7 +1723,7 @@ fn valid_compact_outcome(o: &[String]) -> bool {
             || Oid::parse(s, ObjectFormat::Sha256).is_ok()
     };
     match o.first().map(String::as_str) {
-        Some("d") => (o.len() == 2 || (o.len() == 3 && ["true", "false"].contains(&o[2].as_str()))) && ["reconciled","pending","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
+        Some("d") => (o.len() == 2 || (o.len() == 3 && ["true", "false"].contains(&o[2].as_str()))) && ["reconciled","pending","pendingStoreCollision","notApplicable","recoveryRequired"].contains(&o[1].as_str()),
         Some("k") => o.len() == 3 && tip(&o[1]) && matches!(o[2].as_str(), "true" | "false"),
         Some("r") => o.len() == 2 && !o[1].is_empty(),
         Some("w") => o.len() == 2 && matches!(o[1].as_str(), "true" | "false"),

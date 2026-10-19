@@ -570,8 +570,8 @@ fn native_trace_controller() {
                 let cmd = fs::read(format!("/proc/{pid}/cmdline")).unwrap_or_default();
                 let args: Vec<_> = cmd.split(|b| *b == 0).collect();
                 let read_tree = args.contains(&b"read-tree".as_slice())
-                    && args.contains(&b"-u".as_slice())
-                    && args.contains(&b"HEAD".as_slice());
+                    && args.contains(&b"-m".as_slice())
+                    && args.contains(&b"-u".as_slice());
                 if read_tree {
                     let fd_path = if syscall == libc::SYS_openat || syscall == libc::SYS_open {
                         Some(regs.rax)

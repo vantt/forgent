@@ -1125,6 +1125,7 @@
                       "enum": [
                         "reconciled",
                         "pending",
+                        "pendingStoreCollision",
                         "notApplicable",
                         "recoveryRequired"
                       ]

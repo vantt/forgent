@@ -130,11 +130,54 @@ test('an ignored store collision publishes once with a pending checkout and pres
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{"incoming":true}'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'incoming non-event config'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
     fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), '.fgos/\n'); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), 'keep local config');
     const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'ignored-store', request: f.request }); assert.equal(p.publish(evidence(c)).checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, '.fgos/config.json'), 'utf8'), 'keep local config');
+    const walDir = path.join(f.repo, '.git/fgos/git/operations/ignored-store');
+    assert.match(fs.readFileSync(path.join(walDir, fs.readdirSync(walDir).filter(x => /^\d+\.json$/.test(x)).sort().at(-1)), 'utf8'), /pendingStoreCollision/);
   } finally { f.close(); }
 });
 test('a dirty file obstructing an incoming directory belongs to the clean gate', () => {
   const f = fixture(); try {
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'incoming-dir')); fs.writeFileSync(path.join(f.repo, 'incoming-dir/file'), 'incoming'); f.git('add', 'incoming-dir/file'); f.git('commit', '-qm', 'incoming directory'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk'); fs.writeFileSync(path.join(f.repo, 'incoming-dir'), 'keep obstructing bytes');
     assert.throws(() => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
+  } finally { f.close(); }
+});
+test('staged modification and addition outside the footprint survive in index and worktree', () => {
+  const f = fixture(); try {
+    fs.writeFileSync(path.join(f.repo, 'b'), 'staged b\n');
+    fs.writeFileSync(path.join(f.repo, 'newstaged'), 'staged new\n');
+    f.git('add', 'b', 'newstaged');
+    const before = f.git('diff', '--cached', '--', 'b', 'newstaged');
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'staged', request: f.request });
+    assert.equal(p.publish(evidence(c)).checkout, 'pending');
+    assert.equal(f.git('diff', '--cached', '--', 'b', 'newstaged'), before);
+    assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'staged b\n');
+    assert.equal(fs.readFileSync(path.join(f.repo, 'newstaged'), 'utf8'), 'staged new\n');
+  } finally { f.close(); }
+});
+test('staged overlap refuses before CAS', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'overlap', request: f.request });
+    fs.writeFileSync(path.join(f.repo, 'a'), 'local staged\n'); f.git('add', 'a');
+    assert.throws(() => p.publish(evidence(c)), /main-checkout-dirty-mid-merge/);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
+    assert.equal(f.git('show', ':a'), 'local staged');
+  } finally { f.close(); }
+});
+test('abandoned prepare never blocks a fresh identity and remains recoverable', () => {
+  const f = fixture(); try {
+    const first = f.port(); first.prepare({ operationId: 'abandoned', request: f.request }); first.close();
+    const second = f.port(); const { candidate: c } = second.prepare({ operationId: 'fresh', request: f.request });
+    assert.equal(second.publish(evidence(c)).checkout, 'reconciled'); second.close();
+    const records = fs.readdirSync(path.join(f.repo, '.git/fgos/git/operations/abandoned')).filter(x => /^\d+\.json$/.test(x)).sort();
+    assert.match(fs.readFileSync(path.join(f.repo, '.git/fgos/git/operations/abandoned', records.at(-1)), 'utf8'), /abandonedBeforeAttempt/);
+    assert.equal(f.port().recover({ operationId: 'abandoned' }).receipt.localEffect.publicationState, 'notPublished');
+  } finally { f.close(); }
+});
+test('terminal replay bypasses a busy destination slot', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'finished', request: f.request });
+    const receipt = p.publish(evidence(c)); p.close();
+    f.git('reset', '--hard', f.request.target);
+    f.port().prepare({ operationId: 'holding', request: f.request });
+    assert.deepEqual(f.port().prepare({ operationId: 'finished', request: f.request }).receipt, receipt);
   } finally { f.close(); }
 });
