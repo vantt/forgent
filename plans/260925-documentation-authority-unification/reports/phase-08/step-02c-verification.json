@@ -1,0 +1,648 @@
+{
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "timestamp": "2026-10-19T04:47:30.935921+00:00",
+  "status": "author checkpoint only; correction/expansion evidence and static maps inventory; class 3 traces/review and Step 2 remain open",
+  "mechanicalReplay": {
+    "exit": 0,
+    "result": {
+      "status": "pass",
+      "files": 1036,
+      "spans": 5427,
+      "externalURLs": 59,
+      "sourceScannerHitRows": 3864,
+      "corrections": 5,
+      "slice12AnchorChecks": 76,
+      "newMapsAnchorChecks": 2142,
+      "nativeEdges": 13136,
+      "owners": 291,
+      "bindings": 12579,
+      "reviewParts": 338,
+      "reviewEntries": 20030,
+      "trackedProtectedDiff": "empty except authorized progress prefix",
+      "manifests": "both unchanged",
+      "lightTests": 95,
+      "ratchet": "clean"
+    },
+    "command": "python3 /tmp/fgos-work/step02c-verify.py",
+    "portableReplay": "Extract the embedded step02c-verify.py into /tmp/fgos-work, and run the unchanged scan-consumers.py to /tmp/fgos-work/step02c-scanner.json before replay. It checks the source file/span/digest, row/part hashes, source/target passage hashes, native reconciliation and protected tracked diff; it does not re-run independent semantic judgments.",
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-mechanical-proof.log"
+  },
+  "scanner": {
+    "command": "python3 plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py > /tmp/fgos-work/step02c-scanner.json",
+    "scannerSha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac",
+    "stdoutSha256": "76aa159d432a77d61655e2f0164fefa4e851365413268490bc8be0300fa8a3d3",
+    "identicalToPriorSliceOutput": true,
+    "scannedFiles": 8852,
+    "hitFiles": 2489,
+    "selectedHitFiles": 574,
+    "selectedHitRows": 3864,
+    "lexicalOnly": true
+  },
+  "corrections": 5,
+  "slice12Expansion": {
+    "originalPatchRows": 74,
+    "effectivePatchRows": 74,
+    "originalPass": 53,
+    "effectivePass": 53,
+    "effectiveFailures": 21,
+    "allChecks": 76,
+    "preserveParityPendingRows": 20
+  },
+  "mapsCounts": {
+    "files": 1036,
+    "filesWithEdges": 606,
+    "zeroEdgeFiles": 430,
+    "edges": 5427,
+    "actions": {
+      "cutover-patch-only": 2142,
+      "preserve-pending-target": 675,
+      "preserve-pending-behavioral-proof": 647,
+      "preserve": 1963
+    },
+    "edgeKinds": {
+      "navigation-or-claim-citation": 2817,
+      "behavioral-prose-or-contract": 1036,
+      "external-project-or-history-reference": 99,
+      "scanner-prefix-false-positive": 43,
+      "provenance": 217,
+      "conserved-source-context": 1210,
+      "behavioral-consumer-L12-19": 5
+    },
+    "scannerHitFiles": 574,
+    "scannerHitRows": 3864,
+    "nativeEdges": 13136,
+    "nativeDynamicPatterns": 9,
+    "externalURLs": 59,
+    "parkedEdgeConditions": 3656,
+    "mechanicalTargetFailures": 104,
+    "migrationRelevantExternalURLs": 0
+  },
+  "newMapsExpansion": {
+    "originalPatchRows": 2142,
+    "effectivePatchRows": 2142,
+    "originalPass": 2038,
+    "effectivePass": 2038,
+    "effectiveFailures": 104,
+    "allChecks": 2142,
+    "preserveParityPendingRows": 0
+  },
+  "reviewCounts": {
+    "parts": 338,
+    "entries": 20030,
+    "payloadBytes": 56883948,
+    "maxPartBytes": 399340,
+    "maxPartEntries": 60,
+    "mandatoryEntries": 11197,
+    "populations": {
+      "correction": 5,
+      "slice12-anchor": 76,
+      "maps-edge": 5427,
+      "maps-file": 1036,
+      "external-link": 59,
+      "native-reconciliation": 13136,
+      "ledger-owner-join": 291
+    }
+  },
+  "reviewRequestBytes": 58235,
+  "lightTests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+    "exit": 0,
+    "passed": 95,
+    "failed": 0,
+    "skipped": 0,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-light-tests.log"
+  },
+  "ratchet": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+    "exit": 0,
+    "checkedLegacyFiles": 995,
+    "accountedEdits": 26,
+    "accountedNew": 1,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ratchet.log"
+  },
+  "protectedTrackedDiff": {
+    "command": "git diff --exit-code HEAD -- . :!plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "exit": 0,
+    "meaning": "Every tracked file except authorized progress prefix unchanged, including original slice artifacts, code/docs/consumers, frozen gates and both manifests. New artifacts are scoped separately.",
+    "priorPhase08Files": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/accounting-tests.log",
+        "sha256": "f2949aae7f271041ad4beef34852a385ea3e9840c0fde07db4165dd9e48daad4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+        "sha256": "dd7d3c58ae344377688b8006523ac2d95f1f8c3c6379465ef0c3fa9db95b753c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/check-b-exception-lanes.json",
+        "sha256": "d030c4305c2ab32679a9e088edd30a1d4ac3729ec0a35d92e80c681048ce34de"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json",
+        "sha256": "a9bf46c5f1b1f2896bf4afbd868f21d788526205b1920ea7452da749e32cb29d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md",
+        "sha256": "2aea368c10be658d627539ec00bf4629ee4ea08e4d755d3d6cab79532db47121"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/merge-accounting.json",
+        "sha256": "98a6e2cf48fd39a7b1384fe9ca8b58b7dc473c16232e59165406c7fb63fac862"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "sha256": "54914a5e93cf27b3e51d444bbd2a0cac3f8a7993ef0c4bc5d8da89436f3bafec"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/ratchet.log",
+        "sha256": "7f24024ce1407b4f28cae44306d4e5000910052f62f4be6c24d54ad30510ff44"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/recheck-revision-verification.json",
+        "sha256": "1d2ffe56354db979c0e1ceb3a5ac20473824bd2f7de7d96b5dfdb8b84ff90650"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck-02.md",
+        "sha256": "b6c250d82ca14bea22d7ad6048d8a5b8fc0628d08ccf7b864a3ba0e733890818"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan-recheck.md",
+        "sha256": "df172747b977a564958567b68d572ea41e34561fe0cb7cb0f4253d62a7a8515d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/red-team-p8-plan.md",
+        "sha256": "9183e3b42582304e36ec40a0d2ae23270c58eddc294565eb6f81d5feae7dca3a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/reproduction-blocker.json",
+        "sha256": "3c093c3b00a8064e4ef0617253ebbff805c7b85159cfbf85df6af9dd0dbec179"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-00-author-accounting-part-01.md",
+        "sha256": "9ed6f41af3e00d6d7585d1bfb2e8bb70ff98264a1607862cd98f61012046109f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-00-author-accounting-part-02.md",
+        "sha256": "22ab502c1fbe849704060e16813be9f90cd089becdbc27831a54101cc99e8665"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-00-author-accounting-part-03.md",
+        "sha256": "c9a204929e489db75e7a0e86174aebc4dfd3bb76672b4c542694d76aef66fb24"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-00-author-accounting-part-04.md",
+        "sha256": "313af43f7f1e9621779d099529603ee26c7403f4973b093c756cc04822d40073"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-01-pilot-b-01.md",
+        "sha256": "3d96831adb8739cf7a1591cf14643b8aad985af4b5761591056a0ac170520943"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-01.md",
+        "sha256": "a41fad2910f39dec2179dad425c02b729218e0a55cb3e013b3d5925720af899c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-02.md",
+        "sha256": "bb218d973071cd3728e31430f87108337ff339147d6791d5c1c6e35c5573d8c8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-03.md",
+        "sha256": "85b049b86d539d0135923c9708ce325562bec078508b4053a606ff1e731f9ee2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-04.md",
+        "sha256": "bf9b2a9a387f906c41d9fff682d3ecb17cfd336f096b6469c402f5686f7088b2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-05.md",
+        "sha256": "8c2c6b0b9c63caab4f8e1b7516f500290bf43c13fd8f00bdc66dcecaeeca2edd"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-06.md",
+        "sha256": "73863ecb4196ab91d41e749dbdf07252a3b4728e03ea0d9aa5429e16524108cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-07.md",
+        "sha256": "21fa734e0bda144beabc4d9be6d814acdd59f82b34faf4dbef3d59cb03057daa"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-08.md",
+        "sha256": "2c33f6fd2f2a28ada212ef72c071a0a6f9383f888af29fe5825921daf97087cf"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-02-merged-census-part-09.md",
+        "sha256": "32380ec551bedf7eaa8458261f9ef6d45f6e0acf664edd4c67961e1103881ce5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/revision-verification.json",
+        "sha256": "634603ba7d6b8e43c957dbe1b05890948142f72286fe838cb5932038f69679bd"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py",
+        "sha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-diagnostic-tests.log",
+        "sha256": "07c7f4244428e314f5a1c0fb3a6ec235dd783f5f6edf5d3b4b998e8130e93d82"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-diagnostics.json",
+        "sha256": "7a803fe270b39c21a109348de4a1150bfabb470d4b58ba56ba66291de8935c2b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-light-tests.log",
+        "sha256": "c9908b2713d5ce33c7fc19f3b732f0d87fe76364afb8545ce59c958f3d76f95d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-ratchet.log",
+        "sha256": "7f24024ce1407b4f28cae44306d4e5000910052f62f4be6c24d54ad30510ff44"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-rebindings.json",
+        "sha256": "919038992d0e399efe4d91ae7ec349a335a9c0727d750152577472b5daf42ada"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-01.json",
+        "sha256": "bacbdbf25849c675ff1ca7a216348bebbcf5c3437ca5b35d6f80d504485a59d6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-02.json",
+        "sha256": "7dcdd860c6a075417036cf1a23800108b1696bd22dc798d8a09190077e09d0fa"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-03.json",
+        "sha256": "2f4db02d60968c28723ca724a62dee4e6a10cb266dab14c661e4c8505d4397b3"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-part-04.json",
+        "sha256": "9241f8e741dee24abd5cabe54c306b76366b4b25d09827d003b8166b74dbca4d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-request.md",
+        "sha256": "48512402aecf43dcb460a6ca0425c9522b83d685b2de485ba6080afb94df81d6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-unaccounted-pairs.json",
+        "sha256": "56842f5f90bbab5f754ed641e5ac9c66d50158dc0380fbd03cd221c472e1a550"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-light-tests.log",
+        "sha256": "7f898410c636ec5c8e98dd8066d60d7acaca60e046dd239a2a763cba8216add1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-proposals.json",
+        "sha256": "8f3e7e5b1197cf8854eead8cd79e39c13b77ad1f8c7b9d60e636c094cb898046"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-ratchet.log",
+        "sha256": "7f24024ce1407b4f28cae44306d4e5000910052f62f4be6c24d54ad30510ff44"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-review-request.md",
+        "sha256": "b5844c7008567fbbf18b7dc620fa9166d5943aa58bb86c142ba853862348dffe"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-verification.json",
+        "sha256": "51becb83b2d1ec6fbd5d241010cbb670fa251589635d57044fe2c33633a7a0bc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-cli-help.json",
+        "sha256": "0725cc3cd412e032c2c4ed4383a93194f79a59b413f8a56838050219caa3cb86"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-history-plan.json",
+        "sha256": "9df33198cd92541a03e898a61cedd7c00d70ad05e3bd4fbe6659f4198a186ce6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-instructions.json",
+        "sha256": "dceafd6fe7ff4d9ca6d045a2f92850a321fb6a23ec688ed112e08153250bc187"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-setup-doctor.json",
+        "sha256": "789b78297b355003431f652eb5603559d8bc75fd6947af6ecc3f883338241796"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-skills-prompts.json",
+        "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census.md",
+        "sha256": "d98ac68c4e0cf64da61402387f77dcebd3cc7b014ae32a9e7911d8ce20d206c0"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-dynamic-unresolved.json",
+        "sha256": "3f7b71b8db9047803f801c77df24e0cb3c4c8f9a2f1b5bfb4862a9dd7e701ac6"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-evidence-consumers.json",
+        "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+        "sha256": "d593b434840d04d2a8d1fd44933e33dae196baefa933c1979e12717b13d16f68"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-light-tests.log",
+        "sha256": "e2d692a68c82a50fe6a7768a7c1a81ff0f4b147914e79dbd079321a2d4e4834e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-mechanical-proof.log",
+        "sha256": "949f734d4eabadad8c1c61503277e256ecb60f3e0a873fc5af76d12f47d74187"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-merge-rebindings.json",
+        "sha256": "cd0a60de013e801b2ab17807201cd48587638726cf9d04f763b53b6805e6d146"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ratchet.log",
+        "sha256": "7f24024ce1407b4f28cae44306d4e5000910052f62f4be6c24d54ad30510ff44"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-index.json",
+        "sha256": "694048f1d990787279dc7180db175cd4b0a0de3cea8941cad7cf40a952df1abb"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-01.json",
+        "sha256": "b4d2681cdcfa49745d3848c4f4ad8a1797472ddfb03ee81973ee0661b38b7aad"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-02.json",
+        "sha256": "e13d001d361a6d721b1def55a28ffbb0a2e72fbefbd426980a83ff16622d0620"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-03.json",
+        "sha256": "108d6ec2095467089bb9fdd6fe204dd5aa29474db4411fd97872fd0f0dba836d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-04.json",
+        "sha256": "8ed3fd633df196a1c23ebbf2f5d6c0008f02c4b162c33505d6c094d468b4c09c"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-05.json",
+        "sha256": "509828bec45306c0672dd88e7dbbe206a680f363a381a2321042d5e7844c9bf4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-06.json",
+        "sha256": "813f3f3d90eb8ad39dae12ad65ce6718ad8002602889c25941c99ee946264a9a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-07.json",
+        "sha256": "dae4581a5f7c0b76d0d58e09a78461e39ec4e1409008360b6037d4284670a3e8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-08.json",
+        "sha256": "ff882e42976ec572dde238b9ddfd7fe4c2cbc12f81f85eb3b8f40219dee11d96"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-part-09.json",
+        "sha256": "52d111558d3d0bfaaf1effe971136bf880653524d553f3c9c21aad2a7ccbd0f4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+        "sha256": "e480c1021d46fe6bccda2df91d29f8ce6ec32a1378a6ace8972af8c6b8e363d9"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json",
+        "sha256": "8712d45dc73b0221480812c0306e347dfaea86504a7df88c62e931e14ed805e1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-verification.json",
+        "sha256": "fbe22951c1f0a60f56ce4cb723373cb570b2ee2af4056e4acf5941ded39ec215"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-dynamic-unresolved.json",
+        "sha256": "ac7f5e377f7fb0ae12982e894a586bb6fbb6641e0adc8fad92648e4b2f0d033e"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-inventory-edges.json",
+        "sha256": "c236550e4f69dcda08151a567090319ad86f648948bc15734e171d92fc557c26"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-inventory-export.json",
+        "sha256": "88332bad214d324715abd9122ca94b8716fecaae7c5294b8a753be493e883e56"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-inventory-time.log",
+        "sha256": "cb8633d158abb569262d2a1a20c97500b0af5bca4fa6ab71518b81db3629cfae"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-ledger-owner-join.json",
+        "sha256": "baa608f796e14511204e9bb12554e3aecb5ffcdb1845837979787198a0612d33"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-light-tests.log",
+        "sha256": "fd02de5cffd4a193e23e9ceca2d2ab247c06f37ae4c9486a9bf65cb315c15674"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-mechanical-proof.log",
+        "sha256": "648546dc10e4238a5603d411d151d2b7e85b7b8d64af784b883ed6e7612de640"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-ratchet.log",
+        "sha256": "7f24024ce1407b4f28cae44306d4e5000910052f62f4be6c24d54ad30510ff44"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-index.json",
+        "sha256": "1e2eb157c489c51d25e5b3c200e2f021ef5f53a3d08bdfdd1394a6b7a93bf846"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-01.json",
+        "sha256": "c3528324d182bc15ec77919a3a628719d6aacd6ac567e6572113ee2e4a1825cc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-02.json",
+        "sha256": "b0cd4f325c21ab9f872d3078dc35949dab1238ce1ae2e9f19c9d621741b4c43b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-03.json",
+        "sha256": "77aa1462847b0445644ad132b1d56075d844a49a7ca965ec98ea32d2527a1e9f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-04.json",
+        "sha256": "3d4e09c931edd287008cfbb66bbb5bbe39f0acff46eac5eb1f6bf85cde7d1b4b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-05.json",
+        "sha256": "691c5fd57eb21ef5f6e4378b9d9939001624e8e32b0f43dd0fb3164a1032b6ca"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-06.json",
+        "sha256": "7f58d88f22fe0c617a86921d27a3b2da585b87b6cea4f4e0579ba80c8b71a3ea"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-07.json",
+        "sha256": "06e94e432a6dd5b367afb4fabdb0082b4397b67e74c1c729e3705c9884945ae2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-08.json",
+        "sha256": "57543b8e4dde4324ad9e2af4469037059ac4f7f12efe0a716acb101cda72ded2"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-09.json",
+        "sha256": "73e8718dd07a084a2a777be17ac8ae32bf49baf6d7c409934a3e912fe7b53842"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-10.json",
+        "sha256": "550391821c0697ab9a03f5e56ebb2c04754b1f2be9f7fa030fcdba8ad7699389"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-11.json",
+        "sha256": "55a8d40a9dd6c0886436175bd704ca0c9f1f7db4d8a3663787357e757b17fd77"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-12.json",
+        "sha256": "a45b091645c7b09c99b9377c0d65903759071698f2df9556212fce94c9965306"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-13.json",
+        "sha256": "64486ee1cce109a9b0a75c5b9443f3d4391a11eb6982296c0e8eb724cef2405a"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-14.json",
+        "sha256": "f342977db7ee71a1c2857b12b3c5939151d6787255d3036929bfa52e7e9ff69b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-15.json",
+        "sha256": "99226fc419205ff381ebb865fd416ff8d17da099da442816c7182b6d35093415"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-16.json",
+        "sha256": "fad21dc6c8c61d2839ee023dbaa2d3f2b8cc2b620f430747671fb9870fe77792"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-17.json",
+        "sha256": "63ca0e8c5d4266a27c6687c0f0413e552e68fa9090bff8929609a6f3149e8e4f"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-18.json",
+        "sha256": "30891d0ea244995ddcda518ca25ac54a001f8845b37244e3402f113798169c59"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-19.json",
+        "sha256": "2c0688375ef94e953f372ccfa67c2f3f8d07ec989c6867f2ad3a7e546d4c6c91"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-20.json",
+        "sha256": "30165cac523d228e4a3138e2a2b674aa3313d47184b6eb4a9d9975d7fe5a0c4b"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-21.json",
+        "sha256": "a77998edeb50cba8cd178ead308c9a2819b9aa722980ec0971fa906d99db7e14"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-part-22.json",
+        "sha256": "53838c8ab8af7415079d7c83a2e5d982b6238910e5576db3ee263d8e0decc163"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-request.md",
+        "sha256": "be46bb48444bcbdc75fdee4d154677f890ad202d10d06c420177267ab17385dc"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-scanner-reconciliation.json",
+        "sha256": "9bc3aa0047d7fbefd4ddfc1b40a244dbdecaf447930cb401233511c10ce49cc1"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-source-render-proof.json",
+        "sha256": "a6a5377a7074db0d7a5ae287ed41f31c4d473e2c6ee6840b778e7bef4e6da331"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-verification.json",
+        "sha256": "e58c168e06cd8ffdfeb07d9ee9e5dd43052e641effeaa8aa8384f4a32782bd34"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/verification.json",
+        "sha256": "758dc1b9d6886453cc0516be081424111fd107263c1afd1a11e822fc1de8d481"
+      }
+    ],
+    "manifests": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "sha256": "8a27f45403dfb499f99202121c72774825446ab1ac556b8b45291440b4af2d87",
+        "unchangedAgainstHEAD": true
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "sha256": "e8b4942c36eb0cad83512b44a7cfea2a047a02fc7c5e9933db76264272b5b325",
+        "unchangedAgainstHEAD": true
+      }
+    ]
+  },
+  "gitDiffCheck": {
+    "command": "git diff --check",
+    "exit": 0
+  },
+  "authorPostprocessing": [
+    "Applied five explicit L12-19 writer/check overrides and normalized enclosing path tokens without activating aliases.",
+    "Attached new-target check failures to proposed maps rows; populated incremental owner join from prior complete binding universe.",
+    "Unioned Markdown/bare http(s) URLs from the same selected files, preserving original spelling/location/digest; no remote fetch.",
+    "Bounded minified HTML context with full-line hashes/lengths and exact source columns; review parts hash the final rows."
+  ],
+  "scripts": [
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-corrections.py",
+      "sha256": "4b2fc6090f6cef7a51febd815dcf05c499f2057fa44fe6b2c1283431e94f90c9",
+      "source": "import json,hashlib,subprocess\nfrom pathlib import Path\nP=Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-08'\ndef sha(b):return hashlib.sha256(b).hexdigest()\ndef excerpt(p,a,b):return [{'line':i,'text':l} for i,l in enumerate(Path(p).read_text().splitlines(),1) if a<=i<=b]\ndef row(file,id):\n d=json.loads((R/file).read_text());e=next(e for e in d['entries'] if e.get('edgeId',e.get('id'))==id)\n return {'id':id,'supersedes':{'file':str(R/file),'rowId':id,'originalRowSha256':sha(json.dumps(e,sort_keys=True,ensure_ascii=False).encode())},'consumerPath':e.get('consumerPath',e.get('path')),'fileDigest':e['fileDigest'],'decision':'L12-19','reviewer':'Lead-started A38 independent reviewer; pending','preCutoverAction':'preserve bytes','mandatoryDeepRead':True}\nrows=[]\ne=row('step-02-census-cli-help.json','cli-005');target='docs/platform/runner/operations/h-51f5cd7279fd.md';anchor='phiên-checkout-đa-phiên-session-start-end-list-gc'\ne.update({'replacesFields':['desiredAnchor','cutoverPatch','test','dispositionReason'],'desiredOwner':target,'desiredAnchor':anchor,'cutoverAction':'exact-cutover-patch','cutoverPatch':{'old':'docs/specs/runner.md','new':target+'#'+anchor,'operation':'literal citation substitution only at Phase 9; preserve comment quote and behavior'},'sourceEvidence':excerpt(e['consumerPath'],3513,3518),'targetEvidence':{'fileDigest':sha(Path(target).read_bytes()),'api':'scripts/list-doc-anchors.mjs listAnchors/anchorExists (unchanged)','passage':excerpt(target,649,662),'claimTokens':['approve','return','worktree','session']},'dispositionReason':'The multi-session section states approve refuses a session worktree as structurally wrong for merge-into-main while return keeps its existing aheadCount + verify behavior. Previous session-nesting-only citation missed the quoted clause. No runtime change or parity claim.','test':'Unchanged anchor API and source/target excerpt replay; behavioral tests from cli-005 remain planned for Step 5.'});rows.append(e)\ne=row('step-02-census-setup-doctor.json','setup-001');e.update({'replacesFields':['desiredOwner','desiredAnchor','cutoverPatch','parkedReason','dispositionReason'],'desiredOwner':None,'desiredAnchor':None,'cutoverAction':'exact-cutover-patch','cutoverPatch':None,'parkedReason':'Missing verified target for the dependency-install no-op when .git is absent. Preserve current citation; no replacement is executable.','sourceEvidence':excerpt(e['consumerPath'],78,86),'searchEvidence':{'paths':['docs/platform/packaging-distribution/contracts/setup-doctor-registry.md','docs/platform/packaging-distribution/spec.md','docs/platform/packaging-distribution/history/distribution-vision.md'],'terms':['installed as a dependency','dependency install','no .git','no `.git`','no-op'],'rejectedTarget':'docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#4-legacy-setup-compatibility','reason':'Section 4 describes legacy setup compatibility; contributor-hooks-setup states manual setup / no automatic package-install hook, not the dependency/no-.git guard in this comment.'},'dispositionReason':'L12-19 fallback: park the missing-target patch while preserving the exact-cutover-patch disposition and current bytes. Step 3 must find a claim-matching target; do not use a generic compatibility heading.'});rows.append(e)\ne=row('step-02-evidence-consumers.json','evidence-195');e.update({'replacesFields':['lexicalBucket','preCutoverAction','cutoverAction','semanticReview'],'edgeKind':'frozen-gate-data','lexicalBucket':'frozen-gate-data','cutoverAction':'preserve frozen bytes; rows retire with the ratchet at Phase 9 under L12-9; never mirror navigation','dispositionReason':'Frozen ratchet baseline is checker input, not an evidence navigation surface. No path or digest rewrite in this census or Phase 8.'});rows.append(e)\nfor id,ranges in [('evidence-181',[(120,128),(418,425),(470,476)]),('evidence-182',[(155,165)])]:\n e=row('step-02-evidence-consumers.json',id);e.update({'replacesFields':['lexicalBucket','cutoverAction','semanticReview'],'edgeKind':'behavioral-consumer','lexicalBucket':'behavioral-consumer-Step-5','writeDestination':'docs/platform/agent-coordination/verification/<track>/ (explicit current destination; not an alias)','cutoverAction':'Step 5 parity-gated patch: move write destinations and test -s checks in lockstep with evidence payload move; preserve bytes until reviewed','sourceEvidence':sum((excerpt(e['consumerPath'],a,b) for a,b in ranges),[]),'parkedReason':'Step 5 must trace adoption/retired-engine status and payload/writer/check parity. If proven retired-only, record evidence before historical-preserve; not assumed here.','dispositionReason':'L12-19 behavioral classification: Create/Use verification-tree destinations and live file checks cannot be classified as mere mirror navigation.','step5Mandatory':True});rows.append(e)\n(R/'step-02c-slice1-corrections.json').write_text(json.dumps({'inputHEAD':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'scope':'Additive field-level supersession only; original slice-1 tables and review artifacts remain immutable. Unlisted fields are inherited; no disposition change for cli-005/setup-001.','entries':rows,'reviewStatus':'author corrections; independent re-review pending'},ensure_ascii=False,indent=2)+'\\n')\nprint('corrections',len(rows))\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-population.py",
+      "sha256": "6de4cf2065a1d64a5a6963a4e3b37a00e89f0a13b4e2c85d96d5e856ecba90dd",
+      "source": "import json,subprocess\nfrom pathlib import Path\nR=Path('plans/260925-documentation-authority-unification/reports/phase-08')\ntracked=subprocess.check_output(['git','ls-files','-z'],text=True).split('\\0');s=json.loads((R/'consumer-inventory.json').read_text());seed={e['path']:e['category'] for e in s['consumerFiles']}\nprior=set()\nfor f in ['step-02-census-instructions.json','step-02-census-skills-prompts.json']:\n for e in json.loads((R/f).read_text())['files']:\n  prior.add(e['path'] if isinstance(e,dict) else e)\ndef payload(p):\n a=p.split('/')\n return p.startswith(('docs/architect/','docs/platform/')) and 'verification' in a and len(a)-a.index('verification')-1>=2\nselected=[]\nfor p in tracked:\n if not p or p in prior or payload(p) or p.startswith('docs/history/'):continue\n if p.startswith('docs/') and p.endswith('.md') or seed.get(p)=='reading-maps-portals-and-docs' or p=='README.md':selected.append(p)\nPath('/tmp/fgos-work/step02c-population.json').write_text(json.dumps(selected));print('maps population',len(selected))\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-export.py",
+      "sha256": "2ae7326af38db9f478ec35f6f82e183d873bf8c528429bc8459dadb172472220",
+      "source": "import json,pathlib,hashlib,time,resource\nP=pathlib.Path('plans/260925-documentation-authority-unification'); R=P/'reports/phase-08'\nm=json.loads((P/'reports/doc-inventory.json').read_text()); start=time.monotonic(); total=hashlib.sha256(); count=0; seen=0; rows=[]; in_array=False; complete=False; buf=[]; parts=[]\nselected=set(json.loads(pathlib.Path('/tmp/fgos-work/step02c-population.json').read_text()))\ndef wanted(p):\n return p in selected\nfor part in m['parts']:\n h=hashlib.sha256(); size=0\n with (P/'reports'/part['path']).open('rb') as f:\n  for raw in f:\n   h.update(raw);total.update(raw);size+=len(raw);count+=len(raw)\n   if complete: continue\n   l=raw.decode()\n   if not in_array:\n    if l.rstrip()=='  \"consumerEdges\": [': in_array=True\n    continue\n   if l.rstrip()=='  ],': complete=True;continue\n   if l.startswith('    {'):buf=[l];continue\n   if buf:\n    buf.append(l)\n    if l.rstrip() in ['    },','    }']:\n     e=json.loads(''.join(buf).rstrip().rstrip(','));seen+=1\n     if wanted(e.get('path','')):rows.append(e)\n     buf=[]\n assert size==part['bytes'] and h.hexdigest()==part['sha256'],part['path']\n parts.append({'path':part['path'],'bytes':size,'sha256':h.hexdigest()})\nassert complete and not buf and count==m['totalBytes'] and total.hexdigest()==m['sha256']\nout=R/'step-02c-inventory-edges.json';out.write_text(json.dumps({'selection':'Consumer path in maps/portals/maintained prose population; includes unresolved-dynamic-pattern entries. Other classes deliberately excluded. Existing metadata only; no .fgos/state file opened.','inventoryCommit':'2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4','entries':rows},indent=2)+'\\n')\nreceipt={'command':'/usr/bin/time -v env -u CLAUDE_CODE_SESSION_ID python3 /tmp/fgos-work/step02c-export.py','method':'ordered line streaming; hash each part and full concat; JSON-decode one consumerEdge at a time; retain selected consumer paths only','manifest':str(P/'reports/doc-inventory.json'),'manifestSha256':hashlib.sha256((P/'reports/doc-inventory.json').read_bytes()).hexdigest(),'inputBytes':count,'inputSha256':total.hexdigest(),'verifiedParts':len(parts),'allConsumerEdges':seen,'selectedConsumerEdges':len(rows),'elapsedSeconds':round(time.monotonic()-start,3),'peakRSSKiB':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'output':str(out),'outputBytes':out.stat().st_size,'outputSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'parallelHeavyJobs':0,'parts':parts}\n(R/'step-02c-inventory-export.json').write_text(json.dumps(receipt,indent=2)+'\\n')\nprint(json.dumps({k:v for k,v in receipt.items() if k!='parts'},indent=2))\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-anchor.mjs",
+      "sha256": "0a7b2f294df866515bf6376bdcee5e38f5a32e493496beccae65ac75cb018ed9",
+      "source": "import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {pathToFileURL} from 'node:url';import {execFileSync} from 'node:child_process';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-08/';\nconst {listAnchors,anchorExists}=await import(pathToFileURL(path.join(root,'scripts/list-doc-anchors.mjs')));\nconst sha=x=>crypto.createHash('sha256').update(x).digest('hex');const read=p=>JSON.parse(fs.readFileSync(R+p,'utf8'));\nconst files=['step-02-census-cli-help.json','step-02-census-setup-doctor.json','step-02-census-instructions.json','step-02-census-skills-prompts.json'];\nconst corrections=new Map(read('step-02c-slice1-corrections.json').entries.map(e=>[e.id,e]));\nconst cache=new Map();function targetData(owner){if(!cache.has(owner)){const text=fs.readFileSync(owner,'utf8');cache.set(owner,{text,lines:text.split('\\n'),anchors:listAnchors(text),sha256:sha(text)});}return cache.get(owner);}\n// Paths/URLs are removed before token selection; common glue words do not count as claim tokens.\nconst stop=new Set('this that with from into when then than only must never every before after current source target file files docs path paths spec specs read write what which where unchanged candidate preserve canonical platform explicit section text line code note reference references see and the for are not per its has have will should they their there these using used use our you your one all through until same keeps keep describes describe states state'.split(' '));\nfunction tokens(statement){return [...new Set(statement.replace(/(?:https?:\\/\\/|(?:\\.{0,2}\\/)*[\\w.-]+\\/)[^\\s`<>\\])]+/gu,' ').normalize('NFC').toLowerCase().match(/[\\p{L}\\p{N}_]+(?:[-][\\p{L}\\p{N}_]+)*/gu)||[])].filter(t=>(t.length>=4||/^(?:l\\d+|rul\\d+)$/i.test(t))&&!stop.has(t)&&!/^\\d+$/.test(t));}\nfunction check(e,file,kind='original'){\n const proposed=e.cutoverPatch?.new;\n const desired=e.desiredAnchor;\n let owner=e.desiredOwner,anchor=null,fragmentMode='unresolved';\n if(typeof proposed==='string'&&/^docs\\/[^\\s<>]+$/.test(proposed)){const at=proposed.indexOf('#');owner=at<0?proposed:proposed.slice(0,at);anchor=at<0?null:proposed.slice(at+1);fragmentMode=anchor?'explicit-fragment':'document-entry';}\n else if(desired==='document entry'){fragmentMode='document-entry';}\n else if(typeof desired==='string'&&/^[\\p{L}\\p{N}][\\p{L}\\p{N}_-]+$/u.test(desired)){anchor=desired;fragmentMode='desired-anchor';}\n const statement=(e.context||e.sourceEvidence||[]).map(x=>x.text).join('\\n')||e.callSite||'';\n const claimTokens=(e.edgeId||e.id)==='setup-001'?['dependency','no-ops','.git']:tokens(statement);const out={id:e.edgeId||e.id,sourceTable:R+file,kind,consumerPath:e.consumerPath,line:e.line||null,cutoverAction:e.cutoverAction,proposedTarget:proposed||null,desiredOwner:e.desiredOwner,desiredAnchor:desired,checkedOwner:owner,checkedAnchor:anchor,fragmentMode,consumerStatement:statement,claimTokens,ownerExists:false,anchorExists:false,claimTokenMatched:false,failures:[],mandatoryDeepRead:false};\n if(!owner||!/^docs\\//.test(owner)||/[<>*\\s]/.test(owner)||!fs.existsSync(owner)||!fs.statSync(owner).isFile()){out.failures.push('missing-or-unresolved-owner');return finish(out);}\n out.ownerExists=true;const d=targetData(owner);out.targetFileDigest=d.sha256;\n if(fragmentMode==='unresolved'){out.failures.push('missing-or-unresolved-anchor');return finish(out);}\n let start=1,end=d.lines.length;const a=anchor&&d.anchors.find(a=>a.anchor===anchor||a.githubSlug===anchor);\n out.anchorExists=anchor?anchorExists(d.text,anchor):true;\n if(!out.anchorExists){out.failures.push('anchor-missing');return finish(out);}\n if(a){start=a.startLine;end=a.endLine;if(a.kind==='heading'){const level=d.lines[start-1].match(/^#+/)?.[0].length||6;const next=d.anchors.find(b=>b.kind==='heading'&&b.startLine>start&&(d.lines[b.startLine-1].match(/^#+/)?.[0].length||6)<=level);end=next?next.startLine-1:d.lines.length;}}\n const passage=d.lines.slice(start-1,end).join('\\n');const lowered=passage.normalize('NFC').toLowerCase();const matched=claimTokens.filter(t=>new RegExp('(?<![\\\\p{L}\\\\p{N}_])'+t.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+'(?![\\\\p{L}\\\\p{N}_])','u').test(lowered));\n out.passage={startLine:start,endLine:end,sha256:sha(passage),scope:a?.kind==='heading'?'heading through next equal/shallower heading':a?'exact conservation unit':'whole document (no fragment in proposed patch)'};out.matchedClaimTokens=matched;out.claimTokenMatched=matched.length>0;\n const hit=d.lines.findIndex((l,i)=>i>=start-1&&i<end&&matched.some(t=>l.normalize('NFC').toLowerCase().includes(t)));\n out.claimWitness=hit<0?[]:d.lines.slice(Math.max(start-1,hit-1),Math.min(end,hit+3)).map((text,j)=>({line:Math.max(start-1,hit-1)+j+1,text}));\n if(!out.claimTokenMatched)out.failures.push('no-consumer-claim-token-in-passage');return finish(out);\n}\nfunction finish(o){o.status=o.failures.length?'re-review':'mechanical-pass';o.mandatoryDeepRead=!!o.failures.length;return o;}\nconst entries=[],pending=[];for(const file of files){for(const e of read(file).entries){if(['exact-cutover-patch','cutover-patch-only'].includes(e.cutoverAction)){const out=check(e,file);const c=corrections.get(e.edgeId);if(c){out.supersededBy='step-02c-slice1-corrections.json#'+e.edgeId;out.effective=false;}else out.effective=true;entries.push(out);if(c){const eff=check({...e,...c,edgeId:e.edgeId,context:c.sourceEvidence},file,'correction-effective');eff.effective=true;entries.push(eff);}}else if(/cutover/.test(e.cutoverAction))pending.push({id:e.edgeId,sourceTable:R+file,consumerPath:e.consumerPath,cutoverAction:e.cutoverAction,desiredOwner:e.desiredOwner,desiredAnchor:e.desiredAnchor,reason:'Preserve/parity-pending IO row; no executable cutover patch or concrete target. Not silently counted as a verified anchor.'});}}\nconst counts={originalPatchRows:entries.filter(e=>e.kind==='original').length,effectivePatchRows:entries.filter(e=>e.effective).length,originalPass:entries.filter(e=>e.kind==='original'&&e.status==='mechanical-pass').length,effectivePass:entries.filter(e=>e.effective&&e.status==='mechanical-pass').length,effectiveFailures:entries.filter(e=>e.effective&&e.failures.length).length,allChecks:entries.length,preserveParityPendingRows:pending.length};\nconst apis=['scripts/list-doc-anchors.mjs','scripts/generate-doc-inventory.mjs'];\nconst report={inputHEAD:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),scope:'Every exact-cutover-patch/cutover-patch-only row across slices 1 and 2, including unresolved templates; plus a separate preserve/parity-pending annex. Both original and corrected cli-005/setup-001 checked. No target content/consumer edits.',method:'Unchanged listAnchors/anchorExists API; heading passages extend to next heading of equal/shallower depth, block anchors use exact unit. Fragment-free literal patches check whole document and explicitly report document-entry scope. Unicode lexical claim tokens come from five-line source context, removing paths/URLs and stopwords. Token match is only the requested mechanical floor, never semantic equivalence or parity acceptance.',apiPins:apis.map(p=>({path:p,sha256:sha(fs.readFileSync(p))})),counts,entries,preserveParityPending:pending,failuresForReReview:entries.filter(e=>e.failures.length).map(e=>({id:e.id,kind:e.kind,effective:e.effective,failures:e.failures})),limits:['Original evidence-consumer lexical triage rows do not specify cutover targets; their generic mirror-navigation text is not converted into executable patch specs. L12-19 corrections supersede the three named evidence rows.','All failures mandatory for fresh independent re-review; pre-existing unresolved/parked rows remain parked.','Token coincidence does not prove a quoted clause, writing destination, behavioral parity or authority status; Step 3 semantic and Step 5 parity review still apply.']};\nfs.writeFileSync(R+'step-02c-anchor-check.json',JSON.stringify(report,null,2)+'\\n');console.log(counts);console.log(report.failuresForReReview);\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-maps.py",
+      "sha256": "68af2addafc41e8bc245e3cc029c77811fb0fad37c340e3eb7cdfebb3b6bf632",
+      "source": "import json,re,hashlib,subprocess,posixpath,collections,os\nfrom pathlib import Path\nP=Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-08';head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nsha=lambda b:hashlib.sha256(b).hexdigest()\nload=lambda p:json.loads(Path(p).read_text())\nselected=load('/tmp/fgos-work/step02c-population.json');scan=load('/tmp/fgos-work/step02c-scanner.json');scanrows={e['path']:e for e in scan['files']};seed=load(R/'consumer-inventory.json');seedcats={e['path']:e['category'] for e in seed['consumerFiles']}\naliases=load(P/'reports/phase-06/draft-alias-merged-step10.json')['entries'];active=load(P/'alias-table.json')['entries'];aliasesBy=collections.defaultdict(list)\nfor a in aliases:aliasesBy[a['fromPath']].append(a)\nnative=load(R/'step-02c-inventory-edges.json')['entries'];nativeBy=collections.defaultdict(list)\nfor e in native:nativeBy[e['path']].append(e)\nroots=sorted(set(re.findall(r'docs/[\\w-]+\\.md',json.dumps(seed['patterns']))))\nlegacyRoot=re.compile(r'^docs/(?:specs(?:/|$)|architect(?:/|$)|ui-spec(?:/|$)|contracts(?:/|$))')\nrootFiles={'docs/README.md','docs/architecture-map.md','docs/backlog.md','docs/coexistence.md','docs/distribution-vision.md','docs/doc-governance.md','docs/doc-registry.md','docs/id-systems-audit.md','docs/io-contract.md','docs/operator-runbook-herdr-cockpit.md','docs/platform-foundations.md','docs/reading-map.md','docs/routing-handoff-contract.md','docs/work-item-lifecycle-vision.md'}\ndef relevant(p):return bool(legacyRoot.match(p.split('#')[0])) or p.split('#')[0] in rootFiles or '/agent-coordination/verification/' in p or p.startswith('docs/history/')\ndef normalize(p,ref):\n ref=ref.rstrip('.:')\n if ref.startswith('/docs/'):return ref[1:]\n if ref.startswith('docs/'):return ref\n if ref.startswith(('http:','https:')):return ref\n return posixpath.normpath(posixpath.join(posixpath.dirname(p),ref))\ndef enclosing(line,start,end):\n a=start;b=end\n bad=set(' \\t`\\\"\\'<>|)\\],;(')\n while a>0 and line[a-1] not in bad:a-=1\n while b<len(line) and line[b] not in bad:b+=1\n return line[a:b].rstrip('.:')\ndef snippet(lines,line,before=2,after=2):return [{'line':i+1,'text':lines[i]} for i in range(max(0,line-1-before),min(len(lines),line+after))]\nswitchboard=Path('docs/transitional-switchboard.md');switchsha=sha(switchboard.read_bytes());switchlines=switchboard.read_text().splitlines();routes=[]\nfor i,l in enumerate(switchlines,1):\n if l.startswith('|') and 'docs/' in l:routes.append({'line':i,'row':l,'paths':re.findall(r'`([^`]+)`',l)})\ndef route(ref):\n p=ref.split('#')[0];matches=[x['line'] for x in routes if p in x['paths']]\n return {'referenceAsWritten':ref,'switchboard':'docs/transitional-switchboard.md','switchboardDigest':switchsha,'matchedRouteLines':matches,'status':'explicit current route/delegation; see pinned rows' if matches else 'no exact route row; do not infer authority from candidate path'}\nentries=[];files=[];contexts={};alltargets={};external=[];unresolved=[]\nfor p in selected:\n data=Path(p).read_bytes()\n try:text=data.decode('utf-8')\n except UnicodeDecodeError:raise AssertionError(p)\n lines=text.splitlines();contexts[p]=lines;matches=[];seen=set();inFence=False;fence=None;fenced={};headers={}\n for i,l in enumerate(lines,1):\n  mark=re.match(r'^\\s*(`{3,}|~{3,})',l)\n  fenced[i]=bool(fence)\n  if mark:\n   m=mark.group(1);fence=None if fence and m[0]==fence[0] and len(m)>=len(fence) else fence or m;fenced[i]=True\n  if i<40:\n   m=re.match(r'^(Document type|Design status|Implementation|Canonical|Provenance|Purpose):\\s*(.*)',l)\n   if m and m.group(1) not in headers:headers[m.group(1)]=m.group(2)\n for h in scanrows.get(p,{}).get('hits',[]):\n  for ref in h['references']:\n   # Exact spans retain multiplicity. Scanner expressions are the authoritative lexical population.\n   line=h['line'];start=0\n   for m in re.finditer(re.escape(ref),lines[line-1]):\n    key=(line,m.start(),m.end(),h['pattern'])\n    if key not in seen:matches.append((line,m.start(),m.end(),h['pattern'],ref,normalize(p,enclosing(lines[line-1],m.start(),m.end())),'scanner'));seen.add(key)\n # Resolve local Markdown destinations, including bare sibling links that the lexical scanner cannot see.\n for i,l in enumerate(lines,1):\n  for m in re.finditer(r'\\[[^\\]]*\\]\\(([^\\s)]+)\\)',l):\n   raw=m.group(1)\n   if raw.startswith(('https://','http://')):\n    if True:external.append({'consumerPath':p,'line':i,'url':raw,'migrationRelevant':bool(re.search(r'(?:/|%2[fF])docs(?:/|%2[fF])(?:specs|architect|contracts|ui-spec)',raw)),'fileDigest':sha(data),'action':'preserve URL; remote content/branch ref not verified; explicit published-link ownership review before cutover','mandatoryDeepRead':True})\n    continue\n   if raw.startswith(('#','/','mailto:')):continue\n   norm=normalize(p,raw)\n   if relevant(norm) and not any(x[0]==i and x[1]<=m.start(1)<x[2] for x in matches):matches.append((i,m.start(1),m.end(1),'relative-link',raw,norm,'local Markdown resolution'))\n carrier=bool(re.search(r'candidate|source snapshot|conservation carrier',headers.get('Design status','')+' '+headers.get('Implementation','')+' '+headers.get('Canonical',''),re.I))\n fileids=[]\n for line,start,end,pattern,raw,norm,origin in sorted(matches):\n  id='maps-%05d'%(len(entries)+1);fileids.append(id);source=lines[line-1];context=snippet(lines,line);around='\\n'.join(x['text'] for x in context);base=norm.split('#')[0];exactDraft=aliasesBy.get(norm,[]);draft=exactDraft or aliasesBy.get(base,[])\n  compact=[{k:a.get(k) for k in ['aliasId','fromPath','toOwner','toAnchor','kind','evidenceRef']} for a in draft]\n  dests={(a.get('toOwner'),a.get('toAnchor')) for a in draft if a.get('toOwner')};desired,anchor=next(iter(dests)) if len(dests)==1 else (None,None)\n  provenance=bool(re.search(r'(?:source relationship|original source|retained.source|provenance:|source snapshot|source metadata|git (?:blob|witness)|supersedes:|superseded by:)',source,re.I))\n  externalConvention=pattern=='planning' or 'docs/history/' in norm\n  falseArchitect=norm.startswith('docs/architecture-manifest')\n  # A fenced command, prose writer/default-root prescription or contract data is behavioral until parity is proved.\n  io=bool(re.search(r'(?:write(?:s|r|rs)?|writ(?:ing|ten)|create|mkdir|test -s|readFile|writeFile|open\\(|include_str!|path\\.join|default.root|output|generatedBy|regenerate|ghi|đọc|tạo)\\b',around,re.I))\n  command=bool(fenced.get(line) and re.search(r'(?:node\\s|python\\s|cargo\\s|fgos\\s|test -s|cat\\s|mkdir\\s|readFile|writeFile|path\\.join)',around))\n  behavioral=io or command or not p.endswith('.md')\n  kind='behavioral-prose-or-contract' if behavioral else 'provenance' if provenance else 'conserved-source-context' if carrier else 'navigation-or-claim-citation'\n  action='preserve';park='';reason='';patch=None\n  if falseArchitect:\n   desired=base;anchor=None;reason='Scanner prefix docs/architect occurs inside stable architecture-manifest contract; preserve stable contract reference, not a legacy architect-root dependency.';kind='scanner-prefix-false-positive'\n  elif externalConvention:\n   desired=norm;anchor=None;reason='L12-10: external-project docs/history plan/CONTEXT/RESEARCH/DISCUSSION topology or historical lineage remains unchanged. No repository-specific plans/ replacement.';kind='external-project-or-history-reference'\n   if behavioral:park='Check the exact writer/read contract in Step 5; external-project topology remains unchanged.'\n  elif provenance:\n   reason='Explicit source/provenance relationship retains the original source/witness rather than turning candidate conservation into authority. No navigation substitution.'\n  elif carrier:\n   reason='Header explicitly marks candidate/source-snapshot conservation. Keep the cited source bytes/context; A47 current-truth/conservation and Step 3 decide any later active navigation, without treating carrier metadata as promotion.'\n   if behavioral:park='Candidate conserved command/writer example requires Step 5 current-truth/adoption/parity trace before any destination/check change.'\n  elif behavioral:\n   action='preserve-pending-behavioral-proof';park='Step 5: trace this exact command/reader/writer/default-root or data consumer; no path-only parity claim from prose. See source context and current route.';reason='Path is used in an operational/writer/read prescription or contract/generated data; do not substitute a navigation alias for an execution destination.'\n  elif desired and ('#' not in norm or exactDraft):\n   action='cutover-patch-only';new=desired+('#'+anchor if anchor else '')\n   patch={'old':raw,'new':new,'operation':'navigation proposal only; source-relative spelling must be computed by existing link pass at application','timing':'Phase 9; no consumer edit now','prerequisites':['Step 3 exact statement/target and current-authority approval','A47 changed-candidate conservation','if evidence: Step 6 digest/mode manifest and payload/check parity']}\n   reason='Unique draft lookup gives a candidate owner/anchor for this navigation occurrence. It is not activated, never a writer destination, and does not grant semantic/cutover acceptance.'\n   park='Step 3 must approve exact source/target passage correspondence; no author self-acceptance.'\n  else:\n   action='preserve-pending-target';park='No unique exact draft owner/anchor for this reference (or a nonliteral/glob/relative root); Step 3 must settle the concrete claim mapping. Preserve current spelling.';reason='Do not invent a generic owner or fallback alias. Static occurrence is accounted for; dependent rewrite remains parked.'\n  l1219role=None\n  if p=='docs/platform/agent-coordination/playbooks/coordination-operating-harness.md' and line in [125,421,474,475] or p=='docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md' and line==159:\n   l1219role='check/read destination (test -s)' if line in [474,475] else 'explicit Create/Use write destination'\n   behavioral=True;kind='behavioral-consumer-L12-19';action='preserve-pending-behavioral-proof';patch=None;desired=None;anchor=None\n   park='L12-19: Step 5 must trace adoption/retired-engine status and move the explicit writer destinations plus test -s checks in lockstep with payload relocation, after parity. Do not infer historical-only from the candidate header.'\n   reason='Named Lead override evidence-181/evidence-182: live writer/check prescription is behavioral even inside the candidate/conserved rollout. Static census preserves its current bytes and carries the Step 5 obligation.'\n  e={'edgeId':id,'surfaceClass':'maps-portals-maintained-prose-external-links','consumerPath':p,'line':line,'columnStart':start+1,'columnEndExclusive':end+1,'pattern':pattern,'matchedExpression':raw,'callSite':source,'context':context,'fileDigest':sha(data),'edgeKind':kind,'currentAuthorityRoute':route(norm),'desiredOwner':desired,'desiredAnchor':anchor if anchor else 'document entry' if desired else None,'sourceVsRender':'generated data/output' if not p.endswith('.md') or p in ['docs/backlog.md','docs/doc-registry.md'] else 'source or retained carrier (header below)','sourcePath':p,'headerEvidence':headers,'preCutoverAction':'preserve bytes','cutoverAction':action,'cutoverPatch':patch,'test':'Replay exact source span/digest; unchanged listAnchors/anchorExists for any concrete proposed fragment; Step 3 semantic review, Step 5 operational parity and Step 6 evidence manifest as applicable. No consumer execution in this census.','reviewer':'Lead-started A38 independent reviewer; pending (0 reviewed)','parkedReason':park,'aliasLookup':{'activeTableEntries':len(active),'draftCandidates':compact,'use':'lookup-only; draft is not activated or a writer destination'},'writeDestination':None,'writeDestinationEvidence':{'candidateReference':raw,'sourceContext':context,'status':'Writer/read wording nearby is triage only; do not infer that a cited spec path is itself the output. Step 5 must trace the explicit output and checks.'} if behavioral else None,'dispositionReason':reason,'normalizedReference':norm,'spanOrigin':origin,'fenced':bool(fenced.get(line)),'mandatoryDeepRead':behavioral or bool(park) or action=='cutover-patch-only'}\n  if l1219role:\n   e['leadOverride']={'decision':'L12-19','role':l1219role,'correctionRefs':['evidence-181','evidence-182']}\n   e['writeDestination']=source.strip() if 'write' in l1219role else None\n   e['mandatoryDeepRead']=True\n  entries.append(e)\n files.append({'path':p,'sha256':sha(data),'bytes':len(data),'seedCategory':seedcats.get(p),'currentScannerHits':len(scanrows.get(p,{}).get('hits',[])),'edgeIds':fileids,'nativeInventoryEdges':len(nativeBy[p]),'headerEvidence':headers,'zeroCurrentLexicalEdge':not fileids,'coverage':'Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.','sourceVsRender':'generated/contract data' if not p.endswith('.md') else 'source/retained source','mandatoryDeepRead':not p.endswith('.md') or p in ['README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md','docs/platform/README.md','docs/transitional-switchboard.md']})\nbyPath=collections.defaultdict(list)\nfor e in entries:byPath[e['consumerPath']].append(e)\nreconciled=[]\nfor n in native:\n p=n['path'];line=n.get('line',0);target=n.get('targetPath');candidates=byPath[p];exact=[e['edgeId'] for e in candidates if target and e['normalizedReference'].split('#')[0]==target.split('#')[0] and e['line']==line];same=[e['edgeId'] for e in candidates if e['line']==line]\n raw=n.get('rawTarget') or n.get('unresolvedDynamicPattern') or target or ''\n lines=contexts[p];source=lines[line-1] if 0<line<=len(lines) else ''\n # Historical inventory anchors are not reused as current source coordinates.\n current=bool(raw and raw in source)\n status='current lexical span join' if exact else 'current line accounted, inferred target is not a literal dependency' if same and current else 'stable nonmigration target; no legacy rewrite proposed' if target and not relevant(target) and current else 'native inferred/dynamic or drifted coordinate; exact source/target not established'\n mandatory=status.startswith('native') or bool(n.get('identityStatus')) or n.get('kind') in ['dynamic','executable-proof']\n e={'id':n['edgeId'],'inventoryEdge':n,'currentConsumerSha256':next(x['sha256'] for x in files if x['path']==p),'sourceLineAtOldCoordinate':source,'sourceContextRef':'Current full context is in census rows/file; old inventory line is not a proven current call site','censusEdgeIds':exact or same,'reconciliation':status,'currentExactRawTargetAtInventoryLine':current,'action':'preserve current consumer; no native identity or approved mapping inferred','mandatoryDeepRead':mandatory}\n reconciled.append(e)\n if mandatory:unresolved.append({'id':n['edgeId'],'consumerPath':p,'inventoryLine':line,'pattern':raw,'reason':status,'dependentWork':'Step 3 mapping / Step 5 behavioral parity only; no consumer rewrite readiness'})\ncounts={'files':len(files),'filesWithEdges':sum(bool(f['edgeIds']) for f in files),'zeroEdgeFiles':sum(not f['edgeIds'] for f in files),'edges':len(entries),'actions':dict(collections.Counter(e['cutoverAction'] for e in entries)),'edgeKinds':dict(collections.Counter(e['edgeKind'] for e in entries)),'scannerHitFiles':sum(p in scanrows for p in selected),'scannerHitRows':sum(len(scanrows.get(p,{}).get('hits',[])) for p in selected),'nativeEdges':len(native),'nativeDynamicPatterns':sum(e.get('identityStatus')=='unresolved-dynamic-pattern' for e in native),'externalURLs':len(external),'parkedEdgeConditions':sum(bool(e['parkedReason']) for e in entries)}\nobj={'inputHEAD':head,'scope':'Whole bounded static maps/portals/maintained-prose population: all tracked docs Markdown outside docs/history and immutable collection payloads, all seed maps/prose surfaces (including nine contract/projection/config data files), README; prior instruction/skill-owned files referenced instead of duplicated. Full static author coverage; NOT semantic acceptance or completed IO/parity. Historical doc/history/plans and immutable payload classes remain separate open work.','populationRules':{'historyExcluded':'docs/history/** (separate historical disposition workstream)','payloadExcluded':'docs/{architect,platform}/**/verification/<collection>/**, at least two segments after verification (policy §2); collection-level README/implementation-alignment included','priorOwnedFiles':'step-02-census-instructions.json and step-02-census-skills-prompts.json file maps, unchanged','seedMapsRetained':543,'additionalZeroAndMaintainedFiles':len(files)-543,'remoteValidation':'Only repository-stored external URLs inventoried. No remote page access or installed-package reachability proof.'},'counts':counts,'files':files,'entries':entries,'externalLinks':external,'switchboardRows':routes,'reviewStatus':'Author static coverage, independent semantic/behavioral review pending; census/Step 2 OPEN','actualTargetContentEdits':[],'actualN1Scope':[]}\n(R/'step-02c-census-maps-portals-prose.json').write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\\n')\n(R/'step-02c-inventory-reconciliation.json').write_text(json.dumps({'inputHEAD':head,'inventoryReceipt':'step-02c-inventory-export.json','scope':'Every exported native edge once. Inferred target/glob multiplicity is retained, never treated as exact dependency or absence proof. Old coordinates are shown with current context; non-joins remain explicitly unresolved.','entries':reconciled,'counts':dict(collections.Counter(e['reconciliation'] for e in reconciled))},ensure_ascii=False,indent=2)+'\\n')\n(R/'step-02c-dynamic-unresolved.json').write_text(json.dumps({'inputHEAD':head,'censusOpen':True,'entries':unresolved,'parkedCensusEdges':[{'id':e['edgeId'],'consumerPath':e['consumerPath'],'line':e['line'],'reason':e['parkedReason']} for e in entries if e['parkedReason']],'separateOpenClasses':['generators/projections/checkers beyond prior instruction/skill seams','tests/fixtures','runtime code/comments/gateway including gateway.rs:1187 and wrapped citations','historical docs/history/plans beyond prior subset; immutable payload provenance; live/ignored/external consumer export'],'limits':['No secrets/state/global/ignored reads','A native inferred edge or a current raw token is not proof of a real file-open, writer, or adoption','No static author row grants rewrite readiness or independent approval']},ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(counts,ensure_ascii=False,indent=2));print('reconciled',len(reconciled),collections.Counter(e['reconciliation'] for e in reconciled))\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-maps-anchor.mjs",
+      "sha256": "9f27caf26c8a348c63455d34f73f51baeb68c478b3e20f2f2422bf66d411fc3a",
+      "source": "import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {pathToFileURL} from 'node:url';import {execFileSync} from 'node:child_process';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-08/';\nconst {listAnchors,anchorExists}=await import(pathToFileURL(path.join(root,'scripts/list-doc-anchors.mjs')));\nconst sha=x=>crypto.createHash('sha256').update(x).digest('hex');const read=p=>JSON.parse(fs.readFileSync(R+p,'utf8'));\nconst files=['step-02c-census-maps-portals-prose.json'];\nconst corrections=new Map(read('step-02c-slice1-corrections.json').entries.map(e=>[e.id,e]));\nconst cache=new Map();function targetData(owner){if(!cache.has(owner)){const text=fs.readFileSync(owner,'utf8');cache.set(owner,{text,lines:text.split('\\n'),anchors:listAnchors(text),sha256:sha(text)});}return cache.get(owner);}\n// Paths/URLs are removed before token selection; common glue words do not count as claim tokens.\nconst stop=new Set('this that with from into when then than only must never every before after current source target file files docs path paths spec specs read write what which where unchanged candidate preserve canonical platform explicit section text line code note reference references see and the for are not per its has have will should they their there these using used use our you your one all through until same keeps keep describes describe states state'.split(' '));\nfunction tokens(statement){return [...new Set(statement.replace(/(?:https?:\\/\\/|(?:\\.{0,2}\\/)*[\\w.-]+\\/)[^\\s`<>\\])]+/gu,' ').normalize('NFC').toLowerCase().match(/[\\p{L}\\p{N}_]+(?:[-][\\p{L}\\p{N}_]+)*/gu)||[])].filter(t=>(t.length>=4||/^(?:l\\d+|rul\\d+)$/i.test(t))&&!stop.has(t)&&!/^\\d+$/.test(t));}\nfunction check(e,file,kind='original'){\n const proposed=e.cutoverPatch?.new;\n const desired=e.desiredAnchor;\n let owner=e.desiredOwner,anchor=null,fragmentMode='unresolved';\n if(typeof proposed==='string'&&/^docs\\/[^\\s<>]+$/.test(proposed)){const at=proposed.indexOf('#');owner=at<0?proposed:proposed.slice(0,at);anchor=at<0?null:proposed.slice(at+1);fragmentMode=anchor?'explicit-fragment':'document-entry';}\n else if(desired==='document entry'){fragmentMode='document-entry';}\n else if(typeof desired==='string'&&/^[\\p{L}\\p{N}][\\p{L}\\p{N}_-]+$/u.test(desired)){anchor=desired;fragmentMode='desired-anchor';}\n const statement=(e.context||e.sourceEvidence||[]).map(x=>x.text).join('\\n')||e.callSite||'';\n const claimTokens=(e.edgeId||e.id)==='setup-001'?['dependency','no-ops','.git']:tokens(statement);const out={id:e.edgeId||e.id,sourceTable:R+file,kind,consumerPath:e.consumerPath,line:e.line||null,cutoverAction:e.cutoverAction,proposedTarget:proposed||null,desiredOwner:e.desiredOwner,desiredAnchor:desired,checkedOwner:owner,checkedAnchor:anchor,fragmentMode,consumerStatement:statement,claimTokens,ownerExists:false,anchorExists:false,claimTokenMatched:false,failures:[],mandatoryDeepRead:false};\n if(!owner||!/^docs\\//.test(owner)||/[<>*\\s]/.test(owner)||!fs.existsSync(owner)||!fs.statSync(owner).isFile()){out.failures.push('missing-or-unresolved-owner');return finish(out);}\n out.ownerExists=true;const d=targetData(owner);out.targetFileDigest=d.sha256;\n if(fragmentMode==='unresolved'){out.failures.push('missing-or-unresolved-anchor');return finish(out);}\n let start=1,end=d.lines.length;const a=anchor&&d.anchors.find(a=>a.anchor===anchor||a.githubSlug===anchor);\n out.anchorExists=anchor?anchorExists(d.text,anchor):true;\n if(!out.anchorExists){out.failures.push('anchor-missing');return finish(out);}\n if(a){start=a.startLine;end=a.endLine;if(a.kind==='heading'){const level=d.lines[start-1].match(/^#+/)?.[0].length||6;const next=d.anchors.find(b=>b.kind==='heading'&&b.startLine>start&&(d.lines[b.startLine-1].match(/^#+/)?.[0].length||6)<=level);end=next?next.startLine-1:d.lines.length;}}\n const passage=d.lines.slice(start-1,end).join('\\n');const lowered=passage.normalize('NFC').toLowerCase();const matched=claimTokens.filter(t=>new RegExp('(?<![\\\\p{L}\\\\p{N}_])'+t.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+'(?![\\\\p{L}\\\\p{N}_])','u').test(lowered));\n out.passage={startLine:start,endLine:end,sha256:sha(passage),scope:a?.kind==='heading'?'heading through next equal/shallower heading':a?'exact conservation unit':'whole document (no fragment in proposed patch)'};out.matchedClaimTokens=matched;out.claimTokenMatched=matched.length>0;\n const hit=d.lines.findIndex((l,i)=>i>=start-1&&i<end&&matched.some(t=>l.normalize('NFC').toLowerCase().includes(t)));\n out.claimWitness=hit<0?[]:d.lines.slice(Math.max(start-1,hit-1),Math.min(end,hit+3)).map((text,j)=>({line:Math.max(start-1,hit-1)+j+1,text}));\n if(!out.claimTokenMatched)out.failures.push('no-consumer-claim-token-in-passage');return finish(out);\n}\nfunction finish(o){o.status=o.failures.length?'re-review':'mechanical-pass';o.mandatoryDeepRead=!!o.failures.length;return o;}\nconst entries=[],pending=[];for(const file of files){for(const e of read(file).entries){if(['exact-cutover-patch','cutover-patch-only'].includes(e.cutoverAction)){const out=check(e,file);const c=corrections.get(e.edgeId);if(c){out.supersededBy='step-02c-slice1-corrections.json#'+e.edgeId;out.effective=false;}else out.effective=true;entries.push(out);if(c){const eff=check({...e,...c,edgeId:e.edgeId,context:c.sourceEvidence},file,'correction-effective');eff.effective=true;entries.push(eff);}}else if(/cutover/.test(e.cutoverAction))pending.push({id:e.edgeId,sourceTable:R+file,consumerPath:e.consumerPath,cutoverAction:e.cutoverAction,desiredOwner:e.desiredOwner,desiredAnchor:e.desiredAnchor,reason:'Preserve/parity-pending IO row; no executable cutover patch or concrete target. Not silently counted as a verified anchor.'});}}\nconst counts={originalPatchRows:entries.filter(e=>e.kind==='original').length,effectivePatchRows:entries.filter(e=>e.effective).length,originalPass:entries.filter(e=>e.kind==='original'&&e.status==='mechanical-pass').length,effectivePass:entries.filter(e=>e.effective&&e.status==='mechanical-pass').length,effectiveFailures:entries.filter(e=>e.effective&&e.failures.length).length,allChecks:entries.length,preserveParityPendingRows:pending.length};\nconst apis=['scripts/list-doc-anchors.mjs','scripts/generate-doc-inventory.mjs'];\nconst report={inputHEAD:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),scope:'Every cutover-patch-only navigation proposal in the new maps/prose table, using the identical unchanged anchor API and lexical floor. No target/consumer edit or semantic acceptance.',method:'Unchanged listAnchors/anchorExists API; heading passages extend to next heading of equal/shallower depth, block anchors use exact unit. Fragment-free literal patches check whole document and explicitly report document-entry scope. Unicode lexical claim tokens come from five-line source context, removing paths/URLs and stopwords. Token match is only the requested mechanical floor, never semantic equivalence or parity acceptance.',apiPins:apis.map(p=>({path:p,sha256:sha(fs.readFileSync(p))})),counts,entries,preserveParityPending:pending,failuresForReReview:entries.filter(e=>e.failures.length).map(e=>({id:e.id,kind:e.kind,effective:e.effective,failures:e.failures})),limits:['Original evidence-consumer lexical triage rows do not specify cutover targets; their generic mirror-navigation text is not converted into executable patch specs. L12-19 corrections supersede the three named evidence rows.','All failures mandatory for fresh independent re-review; pre-existing unresolved/parked rows remain parked.','Token coincidence does not prove a quoted clause, writing destination, behavioral parity or authority status; Step 3 semantic and Step 5 parity review still apply.']};\nfs.writeFileSync(R+'step-02c-maps-anchor-check.json',JSON.stringify(report,null,2)+'\\n');console.log(counts);console.log(report.failuresForReReview);\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-bound-context.py",
+      "sha256": "81fcb45a5f62daec47da7c2226507e4e473c6b2d260390ec8a8a83cdc2cc3c1e",
+      "source": "import json,hashlib\nfrom pathlib import Path\nR=Path('plans/260925-documentation-authority-unification/reports/phase-08');p=R/'step-02c-census-maps-portals-prose.json';d=json.loads(p.read_text());sha=lambda s:hashlib.sha256(s.encode()).hexdigest();count=0\nfor e in d['entries']:\n w=e.get('writeDestinationEvidence')\n if w:\n  w.pop('sourceContext',None);w['sourceContextRef']={'consumerPath':e['consumerPath'],'line':e['line'],'field':'context'}\n if len(e['callSite'])>2000:\n  full=e['callSite'];start=max(0,e['columnStart']-501);end=min(len(full),e['columnEndExclusive']+499);e['callSiteFullLine']={'sha256':sha(full),'characters':len(full),'line':e['line'],'path':e['consumerPath']};e['callSiteExcerptStartColumn']=start+1;e['callSite']=full[start:end];count+=1\n for c in e['context']:\n  full=c['text']\n  if len(full)>2000:\n   start=max(0,e['columnStart']-501) if c['line']==e['line'] else 0;end=min(len(full),e['columnEndExclusive']+499) if c['line']==e['line'] else 500\n   c.update({'fullLineSha256':sha(full),'fullLineCharacters':len(full),'excerptStartColumn':start+1,'text':full[start:end]})\nd['longLineContextMethod']='Minified generated HTML uses exact full-line SHA-256/length and explicit excerpt start columns, retaining exact match columns in original line. Full immutable consumer file is the witness; no truncation is presented as a full line.';d['longLineEdges']=count;p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n');print('bounded minified-line edge contexts',count)\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-review.py",
+      "sha256": "f83fa442987b97befcedd7c2701ba2359437dc27d9a8be1e51cae3ef9339c981",
+      "source": "import json,hashlib,math\nfrom pathlib import Path\nR=Path('plans/260925-documentation-authority-unification/reports/phase-08');load=lambda n:json.loads((R/n).read_text());sha=lambda b:hashlib.sha256(b).hexdigest()\nm=load('step-02c-census-maps-portals-prose.json');a=load('step-02c-anchor-check.json');head=m['inputHEAD'];groups=[]\ndef add(kind,file,rows,idfn,mandatory):\n out=[]\n for e in rows:\n  reasons=mandatory(e);id=kind+':'+str(idfn(e));out.append({'reviewId':id,'kind':kind,'sourceTable':str(R/file),'sourceRowSha256':sha(json.dumps(e,sort_keys=True,ensure_ascii=False).encode()),'mandatoryDeepRead':bool(reasons),'mandatoryReasons':reasons,'payload':e})\n groups.append((kind,out))\nadd('correction','step-02c-slice1-corrections.json',load('step-02c-slice1-corrections.json')['entries'],lambda e:e['id'],lambda e:['L12-19 correction/reclassification; every row'])\nadd('slice12-anchor','step-02c-anchor-check.json',a['entries'],lambda e:e['id']+':'+e['kind'],lambda e:['anchor-check failure / unresolved owner or fragment'] if e['failures'] else ['superseded rework target: compare correction'] if e.get('supersededBy') else [])\nadd('maps-edge','step-02c-census-maps-portals-prose.json',m['entries'],lambda e:e['edgeId'],lambda e:['writer/behavioral/default-root/parked/cutover or failed target (read exact source and target, not triage wording)'] if e['mandatoryDeepRead'] else [])\nadd('maps-file','step-02c-census-maps-portals-prose.json',m['files'],lambda e:e['path'],lambda e:['root portal/map or contract/config/projection surface'] if e['mandatoryDeepRead'] else [])\nadd('external-link','step-02c-census-maps-portals-prose.json',m['externalLinks'],lambda e:e['consumerPath']+':'+str(e['line'])+':'+e['url'],lambda e:['published legacy-document URL'] if e['mandatoryDeepRead'] else [])\nadd('native-reconciliation','step-02c-inventory-reconciliation.json',load('step-02c-inventory-reconciliation.json')['entries'],lambda e:e['id'],lambda e:['dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity'] if e['mandatoryDeepRead'] else [])\nadd('ledger-owner-join','step-02c-ledger-owner-join.json',load('step-02c-ledger-owner-join.json')['entries'],lambda e:e['targetOwner'],lambda e:['owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit'] if e['consumerEdges'] else [])\nparts=[];partNo=0\nfor kind,rows in groups:\n batch=[]\n def encode(rows,num):return (json.dumps({'requestIdentity':'step-02c-census','inputHEAD':head,'part':num,'population':kind,'deepReadRule':'≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.','entries':rows},ensure_ascii=False,indent=2)+'\\n').encode()\n def flush():\n  global partNo,batch\n  if not batch:return\n  partNo+=1;data=encode(batch,partNo);assert len(data)<=400000 and len(batch)<=60\n  name='step-02c-review-part-%02d.json'%partNo;(R/name).write_bytes(data);mandatory=sum(e['mandatoryDeepRead'] for e in batch)\n  parts.append({'part':partNo,'file':str(R/name),'population':kind,'entries':len(batch),'bytes':len(data),'sha256':sha(data),'mandatoryDeepReads':mandatory,'homogeneousMinimumDeepReads':min(len(batch),max(10,math.ceil(len(batch)*.15))),'rule':'≥10 deep reads + every mandatory row (all when fewer than 10); mandatory adds to homogeneous minimum','reportName':'review-a38-step-02c-census-part-%02d.md'%partNo,'entryIds':[e['reviewId'] for e in batch]});batch=[]\n for e in rows:\n  if batch and (len(batch)>=60 or len(encode(batch+[e],partNo+1))>400000):flush()\n  assert len(encode([e],partNo+1))<=400000,e['reviewId']\n  batch.append(e)\n flush()\nindex={'requestIdentity':'step-02c-census','inputHEAD':head,'reviewStatus':'not dispatched; zero reviewed, zero accepted; reviewer elapsed 0; budget unassigned by Lead','counts':{'parts':len(parts),'entries':sum(p['entries'] for p in parts),'payloadBytes':sum(p['bytes'] for p in parts),'maxPartBytes':max(p['bytes'] for p in parts),'maxPartEntries':max(p['entries'] for p in parts),'mandatoryEntries':sum(p['mandatoryDeepReads'] for p in parts),'populations':{k:len(v) for k,v in groups}},'parts':parts}\n(R/'step-02c-review-index.json').write_text(json.dumps(index,ensure_ascii=False,indent=2)+'\\n')\ntext=f'''# Step 2c — corrections, anchor expansion and maps/prose static census review request\n\nONE new request. Input HEAD `{head}`. Prior slice-1/slice-2 census files, parts and requests remain byte-identical. This request claims **author static accounting only**. No semantic acceptance, consumer rewrite, Step 2 close, live export, projection materialization or production parity is claimed. Class 3 remains OPEN for its named operational/dynamic/current-coordinate traces and independent target review; classes 4–6 have not started.\n\n{len(parts)} bounded parts / {index['counts']['entries']:,} entries / {index['counts']['payloadBytes']:,} payload bytes; largest {index['counts']['maxPartBytes']:,} bytes; every part ≤60 entries and ≤400,000 bytes. Reviewer started **0**, accepted **0**, elapsed **0**, budget **unassigned**. Lead must size a fresh-context A38 review from this actual volume; this packet does not silently consume the old seed budget. No review dispatched by this author. >3% independent rework expands the affected set to full review after Lead resizing; no author approval carry.\n\nEvery part requires **≥10 deep reads + every mandatory row** (all rows when fewer than ten), plus at least 15% of homogeneous rows. Mandatory rows add to the homogeneous minimum. Mechanically cover 100% of rows. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory wherever present; read actual source/functions and cited target passages, not just a synopsis or lexical flag. No new runtime/gateway population is claimed here: gateway.rs:1187 and wrapped two-line comment citations remain mandatory for class 6 / Step 5, never silently counted as covered by this prose packet.\n\n## Specific decisions and checks\n\n- Read `owner-answers.md` A49, L12-7, L12-10 and L12-19, then Phase 8 Step 2/shared rules. Corrections are additive, field-level supersession: `cli-005` cites the actual multi-session approve/return passage; `setup-001` retains its disposition but has no executable replacement until a dependency/no-.git no-op target is verified; `evidence-195` preserves frozen ratchet bytes and retires with that gate; `evidence-181/182` stay behavioral, irrespective of candidate metadata. The five explicit maps writer/check rows carry the same Lead override. Historical-only disposition requires Step 5 evidence first.\n- Slice 1/2 expansion covers **74/74 patch rows**, plus two corrected-target checks (**76 receipts**): **{a['counts']['effectivePass']} effective mechanical passes / {a['counts']['effectiveFailures']} failures**; 20 preserve/parity-pending IO rows have a separate annex. Every missing/template owner and descriptive/unresolved anchor is a failure, not a zero-dependency pass. The unchanged `listAnchors/anchorExists` API and file hashes are pinned. A heading includes its body to the next equal/shallower heading; a block uses the exact unit; no-fragment proposals explicitly check document-entry scope. Claim-token matching removes paths/glue words, with dependency/no-ops/.git required for setup-001. Token overlap is only a mechanical floor and cannot replace quoted-clause, authority or parity judgment.\n- Maps/prose static population: **1,036 files / 5,427 edges**, including **430 zero-edge files**, all **543 seed maps surfaces**, nine non-Markdown contract/config/projection surfaces and all maintained/new Markdown in the declared rules. **59 repository-stored external URLs**, none naming a legacy documentation root; URL spellings are preserved and no remote reachability/content claim is made. Historical docs/history/plans beyond the prior subset and immutable collection payloads remain separate open populations. Source/carriage metadata does not establish active engine adoption or eliminate writer checks. Nearby IO vocabulary is triage, not proof that a cited spec path is itself a write destination.\n- Maps actions: **2,142 cutover navigation proposals / 1,963 preserve / 675 missing exact target / 647 behavioral-proof pending**. Proposals are lookup-only draft mappings, never an activated alias or a writer destination; old fragments without exact draft correspondence do not fall back to a bare owner. Relative sibling links supplement the original lexical scanner. All proposals still need Step 3 exact passage/current-authority approval and A47 carry; no consumer/source/target was edited. New-target mechanical expansion: **2,038 passes / 104 failures**; every failure is attached to the maps row and listed in `step-02c-maps-anchor-check.json`, mandatory for re-review. Do not call a word match semantic conservation.\n- One serial heavy job reused the prior incremental streaming method: every part and the concatenated 2,610,715,988-byte inventory hash verified; **13,136 native edges** retained, including **nine unresolved dynamic-pattern records**. Native inferred/glob multiplicity is not an actual literal dependency. Old line coordinates that do not establish a current source are explicitly parked; do not trust them as a call-site trace. Inspect the archived exact script, population and resource receipts. No full inventory load/regeneration, state or external installation read.\n- Every **291 ledger targetOwner / 12,579 bindings** remains in the incremental join, with all affected anchors and new reference/consumer ids. Empty joins are never no-dependency proof. Actual target edits/N1 scope are empty. Both reproduction manifests stay unchanged; the Lead performs separate L12-11 accounting after the real runner author commit, then committed-byte audits/tests. No guessed author commit, authority flip or Step 0 re-acceptance claim.\n\n## Parts\n\n| Part | Population | Entries | Bytes | Mandatory | Deep reads | Unique report |\n|---|---|---:|---:|---:|---|---|\n'''\nfor p in parts:text+=f\"| [{p['part']:02d}]({Path(p['file']).name}) | {p['population']} | {p['entries']} | {p['bytes']} | {p['mandatoryDeepReads']} | ≥10 + every mandatory row | `{p['reportName']}` |\\n\"\ntext+='''\n## Evidence and limits\n\nUse `step-02c-review-index.json` for exact part hashes/entry ids; re-read table rows using their recorded row SHA-256. Full source spans, context, current routes, aliases, targets, actions, test prerequisites and reviewers are in `step-02c-census-maps-portals-prose.json`; the native reconciliation retains every original edge once. `step-02c-dynamic-unresolved.json` names parked row-level conditions; `step-02c-ledger-owner-join.json` covers the complete prior owner universe. Original evidence-209–212 generic wording remains unchanged in the committed slice: L12-19 reads it as “change in lockstep with the checker”; apply that reading in Step 5. The duplicate gate-bypass CONTEXT edge remains a scanner quirk, not a second writer.\n\nAuthor verification and scripts are archived in `step-02c-verification.json`; light tests and ratchet logs are adjacent. Full suite, reproduction recipes and gateway cargo suite were not run here. No preview/service was started; the Lead can preview this long review packet in its authorized environment. No secrets/.fgos/ignored/global data, fgOS CLI, git write, consumer edit, checker/baseline/vocabulary/manifest change or independent-review dispatch occurred. Required atomic assignment outbox writes are the explicit brief exception.\n'''\n(R/'step-02c-review-request.md').write_text(text)\nprint(json.dumps(index['counts'],indent=2));print('requestBytes',(R/'step-02c-review-request.md').stat().st_size)\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-progress.py",
+      "sha256": "7bbf01cde2d098488ae36769fb5a18a56cc6d99b896d8ed6266dbb9f292f401c",
+      "source": "from pathlib import Path\nimport json\nR=Path('plans/260925-documentation-authority-unification/reports/phase-08');m=json.loads((R/'step-02c-census-maps-portals-prose.json').read_text());a=json.loads((R/'step-02c-anchor-check.json').read_text());idx=json.loads((R/'step-02c-review-index.json').read_text());ex=json.loads((R/'step-02c-inventory-export.json').read_text())\nprefix=f'''# Step 2c author checkpoint — L12-19 and maps/prose, 2026-10-19\n\nState: **corrections and anchor expansion authored; class 3 static population inventoried, class 3 still OPEN for named traces/review; Step 2 OPEN**. Input HEAD `{m['inputHEAD']}`. Slice 1 author `ce84b84e7` and slice 2 author `8606433d6` remain untouched, including every committed census/request/part. Lead's latest accounting is `c801778ac`; this worker does not rerun committed-byte acceptance or append manifests. This shared progress prefix is the authorized control update; earlier narratives below stay verbatim.\n\n- **Five additive L12-19 corrections:** `step-02c-slice1-corrections.json` supersedes only named fields/rows, never the original files. `cli-005` points to the actual multi-session checkout approve/return passage (649–662); `setup-001` keeps its exact-cutover-patch disposition but parks the missing dependency-install/no-.git no-op target, with no executable replacement. Frozen `evidence-195` preserves bytes and retires with the ratchet at Phase 9, never mirror navigation. `evidence-181/182` are behavioral writers/checks for Step 5; five corresponding maps rows carry the Lead override even inside candidate metadata. No historical-only assumption or consumer edit.\n- **Whole slice-1/2 anchor expansion:** **74 original patch rows / 76 checks including two corrected targets**; **53 effective mechanical passes / 21 effective failures**, plus a separate annex of **20 preserve/parity-pending IO rows**. Every concrete owner/fragment goes through unchanged `listAnchors/anchorExists`; missing/template/descriptive targets fail explicitly. Claim-token witnesses are recorded with passage scope/digest and API hashes; a token match does not establish semantic correspondence or behavioral parity. Every failure is listed for mandatory re-review in `step-02c-anchor-check.json`. Existing parked rows are not silently promoted.\n- **Class 3 static census authored: 1,036 files / 5,427 edges / 59 stored external URLs**, covering all **543 seed maps surfaces**, relative sibling links, maintained/new prose and **430 zero-edge files**. Nine contract/config/projection data surfaces are explicit behavioral triage, not inferred navigation. **2,142 cutover-only navigation proposals / 1,963 preserve / 675 missing exact target / 647 behavioral-proof pending**. Paths/fragments without exact correspondence park; aliases remain lookup-only drafts and never writing destinations. Source/provenance and candidate carriage are distinguished from promotion, and explicit L12-19 writer/check overrides win. New proposal checks: **2,038 mechanical passes / 104 failures**, all failures attached to rows and mandatory for re-review. Minified generated HTML has exact full-line hashes/lengths plus bounded excerpts and explicit source columns, not falsely complete truncated lines. External URLs remain unchanged; no remote validation claimed.\n- **Class 3 is not fully finished:** nearby IO vocabulary and a historical inventory coordinate are triage, not an actual open/write/default-root trace. **3,656 row-level semantic/operational conditions** and native non-joins are explicit. No active adoption/retired-engine, writer/check parity, published-package reachability, authority flip or independent semantic acceptance is claimed. Do not start class 4 until the class-3 author trace gaps are addressed; independent review/Step 3/Step 5 retain their own gates. This checkpoint intentionally does not label lexical enumeration as completed behavioral census.\n- **One heavy job, alone:** reused slice 2's ordered streaming method over **2,610,715,988 bytes / 125 parts**, verifying every part and full SHA-256, decoding edges individually. Exported **13,136 native edges**, including **nine unresolved dynamic-pattern records**; all reconcile once without dropping inferred/glob multiplicity. **{ex['elapsedSeconds']} s / max RSS {ex['peakRSSKiB']:,} KiB / exit 0**, no concurrent heavy job, full load or regeneration. Exact script, selection paths and resource log are archived in `step-02c-inventory-export.json` / `step-02c-inventory-time.log`. Old coordinates not proved current stay unresolved; stable-looking paths are never zero-dependency proof.\n- **Every ledger owner retained:** incremental join covers **291 owners / 12,579 bindings**, all affected anchors, new reference/consumer ids and explicit zero joins. Actual target content edits/N1 scope empty. No ledger binding, switchboard, draft alias or authority status changed.\n- **ONE new review request:** `step-02c-review-request.md` **{(R/'step-02c-review-request.md').stat().st_size:,} bytes**; **{idx['counts']['parts']} parts / {idx['counts']['entries']:,} entries / {idx['counts']['payloadBytes']:,} payload bytes**, each ≤60 entries/400,000 bytes (largest **{idx['counts']['maxPartBytes']:,}**), **{idx['counts']['mandatoryEntries']:,} mandatory entries**. Unique reports `review-a38-step-02c-census-part-NN.md`; each part says **≥10 deep reads + every mandatory row**, plus the homogeneous 15% minimum/all when fewer. Every writer, behavioral/runtime/gateway row if present, correction and anchor failure is mandatory. No runtime/gateway class is claimed covered here. **Started 0 / accepted 0 / reviewer elapsed 0 / budget unassigned**. The large native-inference/reconciliation population requires explicit Lead resizing from actual volume; it does not silently fit the earlier seed budget. No reviewer dispatched or self-acceptance.\n- **Proof:** portable read-only replay and script pins are in `step-02c-verification.json`. Unchanged light tests **95/95**, no failures/skips; ratchet clean (**995 / 26 accounted edits / one accounted new file**). Both manifests and all tracked protected files except this progress prefix remain unchanged; old slice artifacts and all consumers are preserved. No full suite, reproduction acceptance, gateway cargo suite/startup, fgOS CLI, git write, native/global sync, .fgos/secret/ignored/global read or consumer/code/docs/checker/test/baseline edit. Scratch only `/tmp/fgos-work/`; atomic assignment outbox is the explicit exception. No preview/service started; long-document preview remains with the Lead's authorized environment.\n\n**Completed in this round:** the five-row correction package and required slice-1/2 mechanical anchor expansion; class-3 static population/edge accounting and bounded review packet are authored. **Remaining:** finish class-3 operational/dynamic/current-coordinate traces and target correspondence; then (4) generators/projections/checkers, (5) tests/fixtures, (6) runtime code/comments/gateway, specifically `apps/fgos-gateway/src/gateway.rs:1187` and wrapped two-line evidence comments. Historical reports/plans beyond the prior subset, immutable payload provenance, CLI/setup live populations, ignored/external consumers and semantic/parity work remain open. No later-class partial table is called complete.\n\n**Next:** runner commits this bounded author checkpoint; Lead dispatches separate L12-11 accounting at the actual commit id, enumerating every new commit/path pair in both manifests, then clean committed-byte audits/checks/tests. Lead sizes this ONE request and re-reviews every correction/anchor failure while slice 2 continues under its existing custody. Resume class 3 before later classes; unproved semantic/live/parity rows park only dependent rewrites. No outside write scope requested, no guessed commit or gate waiver.\n\n## Earlier author checkpoints (preserved verbatim)\n\n'''\np=R/'progress.md';p.write_text(prefix+p.read_text())\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    },
+    {
+      "scratchPath": "/tmp/fgos-work/step02c-verify.py",
+      "sha256": "72cce31cb43da899e9a0fa97b60a5fa69135d5645590d748d631f3bef6c16d62",
+      "source": "import json,hashlib,subprocess,collections\nfrom pathlib import Path\nR=Path('plans/260925-documentation-authority-unification/reports/phase-08');sha=lambda b:hashlib.sha256(b).hexdigest();load=lambda p:json.loads(Path(p).read_text());m=load(R/'step-02c-census-maps-portals-prose.json');cache={}\nfor f in m['files']:\n b=Path(f['path']).read_bytes();assert sha(b)==f['sha256'],f['path'];cache[f['path']]=b.decode().splitlines()\nassert len(m['files'])==1036 and len(m['entries'])==5427 and len({e['edgeId'] for e in m['entries']})==5427\nfor e in m['entries']:\n lines=cache[e['consumerPath']];s=lines[e['line']-1];assert s[e['columnStart']-1:e['columnEndExclusive']-1]==e['matchedExpression'],e['edgeId']\n if 'callSiteFullLine' in e:\n  assert sha(s.encode())==e['callSiteFullLine']['sha256'];a=e['callSiteExcerptStartColumn']-1;assert s[a:a+len(e['callSite'])]==e['callSite']\n else:assert s==e['callSite'],e['edgeId']\n for c in e['context']:\n  actual=lines[c['line']-1]\n  if 'fullLineSha256' in c:\n   assert sha(actual.encode())==c['fullLineSha256'];a=c['excerptStartColumn']-1;assert actual[a:a+len(c['text'])]==c['text']\n  else:assert actual==c['text']\n if e.get('leadOverride'):assert e['cutoverAction']=='preserve-pending-behavioral-proof' and e['mandatoryDeepRead']\nassert sum(bool(e.get('leadOverride')) for e in m['entries'])==5\nassert dict(collections.Counter(e['cutoverAction'] for e in m['entries']))==m['counts']['actions']\nfor e in m['externalLinks']:assert e['url'] in cache[e['consumerPath']][e['line']-1]\nseed=load(R/'consumer-inventory.json');assert {e['path'] for e in seed['consumerFiles'] if e['category']=='reading-maps-portals-and-docs'}<=set(cache)\nscanned=load('/tmp/fgos-work/step02c-scanner.json') if Path('/tmp/fgos-work/step02c-scanner.json').exists() else None\nif scanned:\n got={(e['consumerPath'],e['line'],e['pattern']) for e in m['entries']};expected={(e['path'],h['line'],h['pattern']) for e in scanned['files'] if e['path'] in cache for h in e['hits']};assert expected<=got and len(expected)==3864\nfor file in ['step-02c-anchor-check.json','step-02c-maps-anchor-check.json']:\n d=load(R/file)\n for api in d['apiPins']:assert sha(Path(api['path']).read_bytes())==api['sha256']\n for e in d['entries']:\n  if e.get('targetFileDigest'):assert sha(Path(e['checkedOwner']).read_bytes())==e['targetFileDigest']\n  if e.get('passage'):\n   lines=Path(e['checkedOwner']).read_text().split('\\n');p=e['passage'];assert sha('\\n'.join(lines[p['startLine']-1:p['endLine']]).encode())==p['sha256']\nidx=load(R/'step-02c-review-index.json');seen=[];sourceHashes={};counts=collections.Counter()\nfor part in idx['parts']:\n b=Path(part['file']).read_bytes();assert sha(b)==part['sha256'] and len(b)==part['bytes'] and len(b)<=400000;d=json.loads(b);assert len(d['entries'])==part['entries']<=60\n for e in d['entries']:\n  h=sha(json.dumps(e['payload'],sort_keys=True,ensure_ascii=False).encode());assert h==e['sourceRowSha256']\n  if e['sourceTable'] not in sourceHashes:\n   src=load(e['sourceTable']);rows=src.get('entries',[])+src.get('files',[])+src.get('externalLinks',[]);sourceHashes[e['sourceTable']]={sha(json.dumps(x,sort_keys=True,ensure_ascii=False).encode()) for x in rows if isinstance(x,dict)}\n  assert h in sourceHashes[e['sourceTable']],e['reviewId'];seen.append(e['reviewId']);counts[e['kind']]+=1\nassert len(seen)==len(set(seen))==idx['counts']['entries']==20030 and len(idx['parts'])==338\nassert dict(counts)==idx['counts']['populations'];assert len(list(R.glob('step-02c-review-part-*.json')))==338\nn=load(R/'step-02c-inventory-edges.json')['entries'];r=load(R/'step-02c-inventory-reconciliation.json')['entries'];assert collections.Counter(e['edgeId'] for e in n)==collections.Counter(e['id'] for e in r) and len(n)==13136\nreceipt=load(R/'step-02c-inventory-export.json');assert sha((R/'step-02c-inventory-edges.json').read_bytes())==receipt['outputSha256'];assert receipt['verifiedParts']==125 and receipt['inputBytes']==2610715988;assert sha(receipt['scriptSource'].encode())==receipt['scriptSha256']\nj=load(R/'step-02c-ledger-owner-join.json');assert len(j['entries'])==291 and sum(e['bindingCount'] for e in j['entries'])==12579\ncorr=load(R/'step-02c-slice1-corrections.json')\nfor e in corr['entries']:\n src=load(e['supersedes']['file']);row=next(x for x in src['entries'] if x.get('edgeId',x.get('id'))==e['id']);assert sha(json.dumps(row,sort_keys=True,ensure_ascii=False).encode())==e['supersedes']['originalRowSha256'];assert sha(Path(e['consumerPath']).read_bytes())==e['fileDigest']\n# Read-only Git proof: the only tracked edit is the authorized progress prefix.\nsubprocess.run(['git','diff','--exit-code','HEAD','--','.',':!'+str(R/'progress.md')],check=True,stdout=subprocess.DEVNULL)\nsubprocess.run(['git','diff','--check'],check=True)\nfor name in ['step10-round5-reproduction.json','step10-sync4d-reproduction.json']:\n p=R.parent/'phase-06'/name;old=subprocess.check_output(['git','show','HEAD:'+str(p)]);assert old==p.read_bytes()\nassert 'ℹ pass 95' in (R/'step-02c-light-tests.log').read_text();assert 'clean (995 legacy files checked' in (R/'step-02c-ratchet.log').read_text()\nfor p in R.glob('step-02c*.json'):json.loads(p.read_text())\nprint(json.dumps({'status':'pass','files':1036,'spans':5427,'externalURLs':len(m['externalLinks']),'sourceScannerHitRows':3864,'corrections':5,'slice12AnchorChecks':76,'newMapsAnchorChecks':2142,'nativeEdges':13136,'owners':291,'bindings':12579,'reviewParts':338,'reviewEntries':20030,'trackedProtectedDiff':'empty except authorized progress prefix','manifests':'both unchanged','lightTests':95,'ratchet':'clean'},indent=2))\n",
+      "purpose": "Exact executed helper, archived for inspection. Author-generation helpers may rewrite new artifacts; only step02c-verify.py is the read-only replay."
+    }
+  ],
+  "limits": [
+    "Full npm suite, reproduction recipes, gateway cargo suite and service startup NOT run. Lead does separate committed-pair accounting and committed-byte acceptance after real author commit.",
+    "No independent reviewer dispatched or accepted; 338 parts/20,030 entries require explicit Lead sizing.",
+    "Class 3 has static coverage but remains OPEN for 3,656 named semantic/operational conditions and historical inventory non-joins. Classes 4–6 untouched.",
+    "No .fgos/secrets/local/global/ignored data read; no fgOS CLI, git write, consumer/target/code/checker/test/baseline/vocabulary/switchboard/manifest edits. Required atomic outbox is the brief exception."
+  ]
+}

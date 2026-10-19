@@ -1,0 +1,1585 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 116,
+  "population": "native-reconciliation",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "native-reconciliation:consumer_f2f53db4b4936bda137bcdec",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7fbf9f3b719035383a3a0305d8726190da7df1648c27d82bdde23134439e6bf9",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_f2f53db4b4936bda137bcdec",
+        "inventoryEdge": {
+          "edgeId": "consumer_f2f53db4b4936bda137bcdec",
+          "line": 262,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "kind": "executable-proof"
+        },
+        "currentConsumerSha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+        "sourceLineAtOldCoordinate": "- **Verification evidence discipline (\"proof not assertion\", decision 0004)** — AGENTS.md, bee-validating, bee-executing, bee-reviewing",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f3a2767127c9efc65aa22854",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1a3a6e17c5725ce01b8cdb4070a2f0630a8a70f871fddc19534482b643a764dc",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_f3a2767127c9efc65aa22854",
+        "inventoryEdge": {
+          "edgeId": "consumer_f3a2767127c9efc65aa22854",
+          "line": 264,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+        "sourceLineAtOldCoordinate": "- **Model tier resolution (`resolveTier`, extraction/generation/ceiling, decision 0016)** — bee-hive (via AGENTS.md rule 13), bee-swarming, bee-scribing, bee-compounding, bee-grooming, bee-xia",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bcd368118e31fd7eeb17ad5e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "db983ddc6f6a50a4a241fab0956eda0df2b01d569e55607a7baa2baf0fce32d2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_bcd368118e31fd7eeb17ad5e",
+        "inventoryEdge": {
+          "edgeId": "consumer_bcd368118e31fd7eeb17ad5e",
+          "line": 282,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+        "sourceLineAtOldCoordinate": "- All 16 files (AGENTS.md operating block + 15 SKILL.md files) were read successfully; nothing was unreadable.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ecac4d972ebab2c854c61631",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d5d3de74d97670dd54360c949a2064af103f603d1b0d15410369e95021249b42",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ecac4d972ebab2c854c61631",
+        "inventoryEdge": {
+          "edgeId": "consumer_ecac4d972ebab2c854c61631",
+          "line": 3,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+        "sourceLineAtOldCoordinate": "Mechanical inventory pass over the bee skill set (AGENTS.md operating block + 15",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2cafbd5964bfd749d82d1592",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "31a6e9a9a5ac0ffdaf37213f0544996383ed8e70e61f1bcc26918a8b2c093eba",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_2cafbd5964bfd749d82d1592",
+        "inventoryEdge": {
+          "edgeId": "consumer_2cafbd5964bfd749d82d1592",
+          "line": 38,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "04509f5c91681cb1aff506b3b3b975371bc10118a1f1deeb3ef3538c28c004fb",
+        "sourceLineAtOldCoordinate": "  - Priority Rules (hive law) 1-13 (SKILL.md:146-158) — near-duplicate of AGENTS.md critical rules but titled \"hive law\"",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_71001bddc43ce0d4a33a947f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5026bf151bf58ca672353f08ea4e92e7d0fc145e4a91746fe0f9ae8254109e3b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_71001bddc43ce0d4a33a947f",
+        "inventoryEdge": {
+          "edgeId": "consumer_71001bddc43ce0d4a33a947f",
+          "line": 237,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "glob"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Critical-patterns digest is exempt from D8** (l.31): mandatory in every lane, tiny included; already in the session preamble so it costs no extra read. \"D8 rescopes only the *additional* bootstrap reads, never the patterns digest.\" AGENTS.md startup step 6 still applies and is itself bundle-branched since f4-5.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7b6e53232763499c0f039992",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1fba52d8f57e1051abf014781e0962768e886aedfca833cbbb033911bbbd5c3d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7b6e53232763499c0f039992",
+        "inventoryEdge": {
+          "edgeId": "consumer_7b6e53232763499c0f039992",
+          "line": 69,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Docs lane full procedure** (l.143): announce one line (\"docs lane: writing X\"), write, run a format check when one exists (JSON parses, markdown lints), close by logging a decision/capture stub when the content encodes a settled outcome, or explicitly stating \"nothing settled\" — \"a docs-lane close with neither is not a close.\" No cells, gates, or reviewers. Write-guard allowlist named: `.bee/`, `docs/`, `plans/`, `AGENTS.md`; a target outside it will be blocked by the hook — fall back to the tiny fast path \"instead of fighting the guard\".",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_99012801963bd08b55bdcf4e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0998abfa3ae6293bcdf25c483a859aa2965bb0304388742e98eefc008f123c13",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_99012801963bd08b55bdcf4e",
+        "inventoryEdge": {
+          "edgeId": "consumer_99012801963bd08b55bdcf4e",
+          "line": 79,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Priority Rules restatement policy** (§ Priority Rules, l.168-170): \"The router restates only what it needs to route.\" Rules 2, 3, 4, 13 are stated in full in `AGENTS.md` (auto-loaded into every session) and kept here as one line each \"so no rule vanishes from the router without a trace.\"",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1eef7b58f29bec3b1c61197f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cf66eb38426edc9b309122236ac15fe0d6ba5ea6d6ef51a241aa06707b83b0ba",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1eef7b58f29bec3b1c61197f",
+        "inventoryEdge": {
+          "edgeId": "consumer_1eef7b58f29bec3b1c61197f",
+          "line": 81,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Hive law 2** (l.173): context budget always applies; at **~65%** write `.bee/HANDOFF.json` and pause. The number lives in hive; the principle in `AGENTS.md` critical rule 5.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_de31c9afcad979031a4936e6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "03b25adb72521528bbaafb205487823c65b6f52388ad316e869f33fba618f912",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_de31c9afcad979031a4936e6",
+        "inventoryEdge": {
+          "edgeId": "consumer_de31c9afcad979031a4936e6",
+          "line": 82,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Hive law 3** (l.174): `CONTEXT.md` is the source of truth; locked decisions are cited, never reinterpreted (`AGENTS.md` critical rule 6).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e40008724aed5fc283d566cd",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f60384a413f3f60eac3eb58d84216d7835c0a3f1f002d32e128ff47d719306fe",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e40008724aed5fc283d566cd",
+        "inventoryEdge": {
+          "edgeId": "consumer_e40008724aed5fc283d566cd",
+          "line": 83,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Hive law 4** (l.175): Gate 3 is the critical execution approval; no source-editing execution before it (`AGENTS.md` critical rule 1).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f8dcbe30ed4c10849765ceeb",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3da99be236561f00d9a44831c4e03ed99bcb29afedeaa32351bfc1747ca35612",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_f8dcbe30ed4c10849765ceeb",
+        "inventoryEdge": {
+          "edgeId": "consumer_f8dcbe30ed4c10849765ceeb",
+          "line": 92,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Hive law 13** (l.184, decision c2c46488): \"The hook is a safety net, not the authority.\" Hooks catch what you forget; their silence is never permission — \"an unblocked write is not an approved write\" (`AGENTS.md` critical rule 11).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2c89b0231cc8853f2c660314",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1e116ce0ea45685ead5def0ca2a13e1c1f209940d2603aa503263f57c9ab1e8e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_2c89b0231cc8853f2c660314",
+        "inventoryEdge": {
+          "edgeId": "consumer_2c89b0231cc8853f2c660314",
+          "line": 93,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Runtime files pointer** (§ Runtime Files, l.188): every runtime path bee owns — `.bee/` state files, `docs/history/`, the `docs/knowledge/` bundle and its compatibility surface — is listed under **Working files** in `AGENTS.md` (the fuller list of the two). `.bee/` tree incl. `capture-queue.jsonl` and `.inject-cache.json` in the reference's \"File Quick Reference\".",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ad818654d723f9cf91efab84",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ebbf1d32b0f54085d7aad7a4194f8aa75e110b1376c07ea0abbc4b54fec7c1ba",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ad818654d723f9cf91efab84",
+        "inventoryEdge": {
+          "edgeId": "consumer_ad818654d723f9cf91efab84",
+          "line": 94,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "glob"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Hook Response Protocol** (§, l.192): four block responses — privacy marker, intake block (terminal phase), Gate 3 block, reservation conflict — stated in full under **Guardrails** in `AGENTS.md`. In every case: do **not** retry the blocked action, and route the reason to the user or orchestrator. Read hooks as *reminders* of the law, never as the law itself.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9d95b0ff499355b8fd604046",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5a5d237e94f20233d57d7a53d028c31540e8b54b972a2e818561f13809fe6f2e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9d95b0ff499355b8fd604046",
+        "inventoryEdge": {
+          "edgeId": "consumer_9d95b0ff499355b8fd604046",
+          "line": 95,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Session-end decision nudge** (l.194): `bee decision review` nudge at session end → ask the user whether a durable decision/learning emerged; log via `bee.mjs decisions log` if yes. Noted as the router's own, not carried by `AGENTS.md` Guardrails.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1076d507ba96dde03a2d2e9a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "731b556cfcc6670577cadb01c05a9f6b48fa3a92e9f7948ad1e6972dcf04a01a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1076d507ba96dde03a2d2e9a",
+        "inventoryEdge": {
+          "edgeId": "consumer_1076d507ba96dde03a2d2e9a",
+          "line": 97,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-a.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c5c67cdbf031fab538ec090ed9c6536265e86a79e002fa2d8a3930638a39c005",
+        "sourceLineAtOldCoordinate": "- **Red flags, router-only** (§ Red Flags, l.202-204): the stop-and-re-route discipline lives inline in `AGENTS.md`'s **14 Critical rules** (each rule states its own violation, no separate flag list). Four belong to the router: a docs-only change routed through the full pipeline · a gate presented as a mechanical table with no plain-language layer · a gate question the user cannot restate in their own words · a bee command handed to the user to run instead of run by the agent.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8bddae67dafaa89d99d258d6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "425bd7c0bca19e7e155d8f25cfbb9ee896e8e97f945d9d5e819669530657b4ac",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_8bddae67dafaa89d99d258d6",
+        "inventoryEdge": {
+          "edgeId": "consumer_8bddae67dafaa89d99d258d6",
+          "line": 133,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "kind": "dynamic"
+        },
+        "currentConsumerSha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+        "sourceLineAtOldCoordinate": "- **Step 1 Initialize** (§1): read `AGENTS.md`; run `bee.mjs status --json`; read `docs/history/<feature>/CONTEXT.md`; read the cell via `cells show --id <id>`; use the parent-provided agent nickname as reservation identity.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8341a05d5f9850e341978065",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "71ff4adf49af1c2bea66f52d4ca7a281464f4599b90523144970bdb0f053cc21",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_8341a05d5f9850e341978065",
+        "inventoryEdge": {
+          "edgeId": "consumer_8341a05d5f9850e341978065",
+          "line": 144,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "kind": "executable-proof"
+        },
+        "currentConsumerSha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+        "sourceLineAtOldCoordinate": "- **CI-owned verify specifics** (line 67): no local baseline run before the first claim; worktree merge gates on `commands.test` (impacted over the staged merge) instead of the full chain; session finish likewise runs `commands.test`; the release flow runs the impacted suite locally then dispatches the CI full run (`gh workflow run CI --ref main`) right after the tag push, with red arriving back as a `verify-red` issue (`AGENTS.md`).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1523952b6b8af44c4b65246e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b9323ad0a0af1162f57b037e53a9451f6b3618b2abd1dd2a907a5e4134030ae8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1523952b6b8af44c4b65246e",
+        "inventoryEdge": {
+          "edgeId": "consumer_1523952b6b8af44c4b65246e",
+          "line": 182,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+        "sourceLineAtOldCoordinate": "- **Compaction** (§Compaction): at roughly **65%** context before a safe finish, write `.bee/HANDOFF.json` (cell, files, done, remaining, next_action), release reservations safe to release, return `[HANDOFF]`. After compaction reread `AGENTS.md`, `CONTEXT.md`, the cell, and active reservations before continuing.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_21220c83685ec68374e978d1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "62994b44b64586ebc3c26cf63c0f154075c89cbd33d58b5b73e63345f5c80384",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_21220c83685ec68374e978d1",
+        "inventoryEdge": {
+          "edgeId": "consumer_21220c83685ec68374e978d1",
+          "line": 281,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "kind": "dynamic"
+        },
+        "currentConsumerSha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+        "sourceLineAtOldCoordinate": "- **§9 scratch sweep (tree-hygiene D2)** (lines 107–113): feature close is one of the two moments D2 names for sweeping scratch (the other is session finish, per AGENTS.md). Run `node .bee/bin/bee.mjs tmp sweep --feature <feature>`. Clears the finished feature's scratch under `.bee/tmp/` and `.bee/spikes/` — both a `<feature>/` directory and the loose `<feature>-*` files agents write straight into the scratch root. \"It is the one documented override that sweeps a named feature's scratch even though compounding still treats it as 'current'.\" Same warn-never-block discipline as §8.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ca3505a789af2211884a5cac",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "08686f52608c360f5125df6607043d5c00ee67c8456516adca28cd9c99aad978",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_ca3505a789af2211884a5cac",
+        "inventoryEdge": {
+          "edgeId": "consumer_ca3505a789af2211884a5cac",
+          "line": 346,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-b.md",
+          "kind": "dynamic"
+        },
+        "currentConsumerSha256": "98b8c6afb863bf9aadb01995135f49261447f6f3d60ac574b27e49b53ebf07ff",
+        "sourceLineAtOldCoordinate": "- **Handoff** (§Handoff, line 204): record the decision and close the session — \"this closes the REVIEW, not the feature.\" Every feature in scope already went through its own execution → scribing → compounding close independently (§11.1); a review session is never a precondition for that chain, and closing one does not re-trigger it. For `standard`/`high-risk` scope, invoke `bee-briefing` in **walkthrough mode** to write `docs/history/<feature>/walkthrough.md` per feature in scope as an audit artifact. If a P1 fix inside the session settled new behavior worth documenting, that triggers `bee-scribing` under its own standing self-triggering rule (AGENTS.md rule 8) — \"because a decision settled, not as an automatic hop from this skill.\"",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_af80d73d425fb47ef67ba969",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e1c96ed1e60a86eca631c59f43bacfc847c1f74d393271cb31a5fd95ce85a2b7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_af80d73d425fb47ef67ba969",
+        "inventoryEdge": {
+          "edgeId": "consumer_af80d73d425fb47ef67ba969",
+          "line": 216,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "b70260067ae69bbdfd6d364090cd084951b33b05c31884c29929671e48cd11e0",
+        "sourceLineAtOldCoordinate": "- Purpose (frontmatter): build and pressure-test bee skills with the TDD-for-skills discipline; explicit non-use — project-specific AGENTS.md conventions or one-off instructions. `metadata.dependencies: []`.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5206ec16dc7f2c040383234d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1ff006b4b0f6963732f496eac09ec6b35f78b3e2fc40b5f80817ed33636f8990",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5206ec16dc7f2c040383234d",
+        "inventoryEdge": {
+          "edgeId": "consumer_5206ec16dc7f2c040383234d",
+          "line": 29,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-bee-inventory-2026-07-28-group-c.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "b70260067ae69bbdfd6d364090cd084951b33b05c31884c29929671e48cd11e0",
+        "sourceLineAtOldCoordinate": "- Hard scope boundary (§Scope): `.bee/`, `.claude/`, `.codex/`, the `AGENTS.md` bee block, and `.bee/bin/` vendored helpers are the **harness, not the project** — never kill/move candidates. Also out: `node_modules/`, build output, lockfiles, generated dirs.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_470fc260e76a085bc6637da7",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "342e9e76fe839ddd45673c831370e04a57d376e0d77f3d08f2e7582691c0fca7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_470fc260e76a085bc6637da7",
+        "inventoryEdge": {
+          "edgeId": "consumer_470fc260e76a085bc6637da7",
+          "line": 133,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `src/protocol/wire.rs`, `AGENTS.md` (Code Conventions section)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bc229c68054ab88c1e998ce4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1eedee8099dc33c4ffdfb3336e3245841408e36bdaf4f22fb5afc2901546e7d1",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_bc229c68054ab88c1e998ce4",
+        "inventoryEdge": {
+          "edgeId": "consumer_bc229c68054ab88c1e998ce4",
+          "line": 134,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Notable:** `src/protocol/wire.rs`: \"`pub const PROTOCOL_VERSION: u32 = 16;` ... Bumped when wire format changes incompatibly.\" AGENTS.md operationalizes this: \"Bump it only if the current source protocol is not already greater than the latest released protocol.\"",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_157e680b17d35c014fa0e718",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9774c44b9e80df044425e7920862bd650c71e7cfa42b30155ae556191dbec786",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_157e680b17d35c014fa0e718",
+        "inventoryEdge": {
+          "edgeId": "consumer_157e680b17d35c014fa0e718",
+          "line": 14,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "dynamic"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Notable:** `src/detect/mod.rs` states the module contract directly: \"Each pane's live bottom-of-buffer text is read periodically and matched against known agent output patterns to determine state.\" AGENTS.md requires manifest changes to be evidence-based: capture real screen state with `herdr agent read <pane> --source detection --format text` before writing rules, and never match \"whole-pane incidental text.\"",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_36c5e7a82aa804a9d317a50e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "43ad7cdc5cd1923a138c1b4237327072bef435f4551730d8b5353e4e670d2076",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_36c5e7a82aa804a9d317a50e",
+        "inventoryEdge": {
+          "edgeId": "consumer_36c5e7a82aa804a9d317a50e",
+          "line": 158,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Release Channels section), `scripts/preview.py`, `.github/workflows/preview.yml`, `docs/next/website/src/content/docs/windows-beta.mdx`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bd4ac9c1b631812ae09a533e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3fc3c624665ec1986aa4361e9f7966c83c0316e1689333b62b36a14ad9479a74",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_bd4ac9c1b631812ae09a533e",
+        "inventoryEdge": {
+          "edgeId": "consumer_bd4ac9c1b631812ae09a533e",
+          "line": 164,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `vendor/` (directory verified; exact files `vendor/libghostty-vt.vendor.json` and `vendor/libghostty-vt.patches.md` are named in `AGENTS.md` but were not directly readable in this environment due to local tool sandboxing), `scripts/vendor_libghostty_vt.py`, `scripts/test_vendor_libghostty_vt.py`, `Cargo.toml` (`[patch.crates-io] portable-pty = { path = \"vendor/portable-pty\" }`)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ac86ab29f162f584ac533401",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "fe7107fcfd46082c86712e2e1a15048723329c0783604e8a822bdf126d99cb27",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ac86ab29f162f584ac533401",
+        "inventoryEdge": {
+          "edgeId": "consumer_ac86ab29f162f584ac533401",
+          "line": 165,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Notable:** AGENTS.md states the exact discipline: \"When updating libghostty-vt, check every active patch... If the new upstream commit contains the fix, remove the local patch and index entry, then rerun the listed verification. If not, reapply the patch on top of the new vendored source.\" This turns vendor-patch rot into a mechanically checked invariant rather than tribal knowledge.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3b6524e8cbe297df5ea4c6c4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f3cea9a4e2457ff01b1f2e7bb2b0ecb8f77357af4c70264bed969228227e1191",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3b6524e8cbe297df5ea4c6c4",
+        "inventoryEdge": {
+          "edgeId": "consumer_3b6524e8cbe297df5ea4c6c4",
+          "line": 176,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Code Conventions), `src/integration/version.rs`, `src/integration/assets/` (e.g. `src/integration/assets/claude/herdr-agent-state.sh`)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8eff991ab4056c9b1edc374b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2d80e289baa248366a39915e9ac84f2e5727a98ea01bb012b39121831bc93145",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8eff991ab4056c9b1edc374b",
+        "inventoryEdge": {
+          "edgeId": "consumer_8eff991ab4056c9b1edc374b",
+          "line": 182,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `README.md`, `AGENTS.md` (Release Channels), `docs/next/website/src/content/docs/install.mdx`, `docs/next/website/src/content/docs/windows-beta.mdx`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_693d16b0c88965d7338fa382",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b211e6f2db687e0fc985e8c7ca491377602dd4eb82d617c9b49f19b1dd4cf5a8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_693d16b0c88965d7338fa382",
+        "inventoryEdge": {
+          "edgeId": "consumer_693d16b0c88965d7338fa382",
+          "line": 255,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Vendored libghostty-vt section), `scripts/test_vendor_libghostty_vt.py`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_be2490c8ef50d2acf8914de1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5af98d9f4675b9e0b350ab8ae0e8ca2a46c1ba3d944ab6873577b2f75c3e9e9d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_be2490c8ef50d2acf8914de1",
+        "inventoryEdge": {
+          "edgeId": "consumer_be2490c8ef50d2acf8914de1",
+          "line": 271,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `docs/next/website/src/content/docs/concepts.mdx`, `docs/next/website/src/content/docs/keyboard.mdx`, `AGENTS.md` (\"Herdr is a mouse-first TUI\")",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_34d49c3d45c4e964f8f9b0d1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2a6b923c21be09f48f6bea7793cdf22d8385448552e23182e52519f3b92ed68d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_34d49c3d45c4e964f8f9b0d1",
+        "inventoryEdge": {
+          "edgeId": "consumer_34d49c3d45c4e964f8f9b0d1",
+          "line": 307,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **What:** `AGENTS.md` (symlinked as `CLAUDE.md`) is explicitly divided into scope-tagged sections — Universal, Maintainer-only (gated on GitHub account `ogulcancelik`), Local-machine-only (gated on specific paths/env/SSH alias), External-contributor-guardrail (default for everyone else) — with an upfront rule telling any agent how to determine which sections apply to it.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7dfabfbbb1e49955e6ec1b1f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8645a7a977124ff961e0379dc3b2ca14b7216bfa2454c2d72f1e3b135f903a60",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7dfabfbbb1e49955e6ec1b1f",
+        "inventoryEdge": {
+          "edgeId": "consumer_7dfabfbbb1e49955e6ec1b1f",
+          "line": 308,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Scope and Audience section)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_42891f78cb16710d11d53677",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ccb4a722acff605e008539268f3712062be311bc369d1f209d08c23e240dad55",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_42891f78cb16710d11d53677",
+        "inventoryEdge": {
+          "edgeId": "consumer_42891f78cb16710d11d53677",
+          "line": 310,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Keywords:** scoped AGENTS.md, audience gating, maintainer vs contributor sections",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fe320f178eb33d7910e27290",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7d6b179d55320dee262b37d389bdddf88bde10979c3142fdbe0a778da3412cfb",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_fe320f178eb33d7910e27290",
+        "inventoryEdge": {
+          "edgeId": "consumer_fe320f178eb33d7910e27290",
+          "line": 348,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Notable:** This mirrors the \"screen detection is evidence-based\" principle from `AGENTS.md` at the tooling level — the project has dedicated scripts specifically so that terminal-quirk fixes and detection-manifest edits are backed by captured real evidence (TSV corpora) instead of speculative escape-sequence tables.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b55756a35ac25cb2a102caba",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "559a1f3b4c9dff1f7645829aaa64ee193e3aea3ac1d9d490fd97a5332eb3647e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_b55756a35ac25cb2a102caba",
+        "inventoryEdge": {
+          "edgeId": "consumer_b55756a35ac25cb2a102caba",
+          "line": 381,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Maintainer Workflow → Multi-agent isolation)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b65ed2f41d9022d89ac23c07",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "de7300f1ae35b4dd00d47f443ab09c791a44b9263a8743a8c025a5b0721081dd",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_b65ed2f41d9022d89ac23c07",
+        "inventoryEdge": {
+          "edgeId": "consumer_b65ed2f41d9022d89ac23c07",
+          "line": 387,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Docs section: \"Put local PRDs, planning notes, and exploratory specs under `.local/prd/`; `.local/` is ignored and locally controlled.\")",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7df77409aff9600092be8cd7",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c1b87b74c43a5f9950a77644d01176a36bd38d59239b001e86ae9212a27f1924",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7df77409aff9600092be8cd7",
+        "inventoryEdge": {
+          "edgeId": "consumer_7df77409aff9600092be8cd7",
+          "line": 393,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md` (Principles section), `src/app/mod.rs` (module doc comment restates the same split), `src/platform/` (`linux.rs`, `macos.rs`, `windows.rs`, `fallback.rs`, `mod.rs`)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fe6b647e6a63beca54f4f76e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ecfcccef7f0dfb16d621d4056295a5dc3559f339e2a805dec8b2cc42fe0da6f4",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_fe6b647e6a63beca54f4f76e",
+        "inventoryEdge": {
+          "edgeId": "consumer_fe6b647e6a63beca54f4f76e",
+          "line": 405,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "**Not read / inaccessible:** `vendor/` file contents (`vendor/libghostty-vt.vendor.json`, `vendor/libghostty-vt.patches.md`, `vendor/patches/libghostty-vt/`, `vendor/portable-pty/`) — a local `scout-block` hook denied both `Bash` and `Read` access to any path containing `vendor`, for both `ls`/`cat` and the `Read` tool. The `vendor-patch-lifecycle-discipline` and `vendored-native-dependency-with-tracked-patches` entries above are therefore sourced from `AGENTS.md`'s own description of that mechanism and from `Cargo.toml`'s `[patch.crates-io]` entry, not from directly reading the vendor files; the `vendor/` directory's existence was confirmed via the root `ls`. `.pi/` directory contents were not inspected (listed in root `ls` but not explored — likely local/private agent state, out of scope for an upstream-feature inventory). `website/` (Astro site source beyond the `docs/next` content mirror), `assets/`, and per-language translated `.mdx` files under `docs/next/website/src/content/docs/{ja,zh-cn}/` were not read.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d19d4244e060c9992cb3797c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a5643474987a592ecfb6d5ae8d3cbead5fa4ca43803e59adb13590e50bf92b50",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d19d4244e060c9992cb3797c",
+        "inventoryEdge": {
+          "edgeId": "consumer_d19d4244e060c9992cb3797c",
+          "line": 411,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "c1817cb98364d532944e0be8013a402b4c4bcc75785e590940d7e110c4f0f5bd",
+        "sourceLineAtOldCoordinate": "Concerns: `vendor/` directory contents were blocked by a local `scout-block` hook (pattern `vendor`) for both Bash and Read tools in this environment, so the two vendor-patch-tracking entries are sourced secondhand from AGENTS.md's description rather than direct file reads — worth a follow-up pass with vendor access allowed if that mechanism needs deeper inventory. Deep Rust implementation logic (function bodies) was intentionally not read per the doc-first/mechanical-inventory brief.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cb3bf7b4fffe03619a529401",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cef866bc2fd61e2d4ed671594dbd7f20e674eb1c8041de4f734ee98ad17ec184",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_cb3bf7b4fffe03619a529401",
+        "inventoryEdge": {
+          "edgeId": "consumer_cb3bf7b4fffe03619a529401",
+          "line": 68,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "222f8a3919f80ef3afd8db1004c0b966f52b4279bd71e6d47650e0d1a1f6a677",
+        "sourceLineAtOldCoordinate": "- **Notable:** kỷ luật \"công cụ KHÔNG tự tiện chạm cây của bạn\" đẩy thành invariant kiểm được (xem `sync-safety-blast-radius`). Đối chiếu AGENTS.md forgent A2/D4 (workshop ≠ ./repo, hook/git không cross boundary ngầm) — cùng gene \"tách quyền, không xâm lấn ngầm\". LoC 8x nhỏ hơn nhờ cắt scope là minh chứng \"less is more\" khi mục tiêu là lõi bền vững thay vì bề rộng tính năng.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_af4cc4c9df466c8807e751f3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "aec39afe52ee4263e5f4f9961218b5d22be21c32a8996debdf7324a8694347a6",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_af4cc4c9df466c8807e751f3",
+        "inventoryEdge": {
+          "edgeId": "consumer_af4cc4c9df466c8807e751f3",
+          "line": 125,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **What:** Mọi build/test chạy qua **rch** (remote compilation helper) với TMPDIR override cho ổn định CI; AGENTS.md quy định ast-grep cho biến-đổi-code an-toàn (AST) vs ripgrep cho tìm-text-thô-nhanh, và \"Morph Warp Grep\" cho tìm-code AI.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_22f58e70ce1bcc288a477bde",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "829fadc98d59599af0edd6eceef4c8a468fed3d41dd77e10974483f43a4cd3a5",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_22f58e70ce1bcc288a477bde",
+        "inventoryEdge": {
+          "edgeId": "consumer_22f58e70ce1bcc288a477bde",
+          "line": 126,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `build.rs`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e01ab1928a9d7c75016a6856",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a12212ed0dbeac8360116804c48fcde8a17a58048a229066482ec9363caa1045",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e01ab1928a9d7c75016a6856",
+        "inventoryEdge": {
+          "edgeId": "consumer_e01ab1928a9d7c75016a6856",
+          "line": 134,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **What:** AGENTS.md đặt luật cứng cho agent: **RULE 0 \"Fundamental Override Prerogative\"**, **RULE 1 \"NO FILE DELETION\"**, **\"Irreversible Git & Filesystem Actions — DO NOT EVER BREAK GLASS\"** (cấm thao tác không-hoàn-tác), chỉ dùng branch `main`, cấm sửa-code-bằng-script. Ở tầng code: lint `unsafe_code = forbid`; test đi bộ `src/` bắt version literal hard-code (bắt phải `env!(\"CARGO_PKG_VERSION\")`), allowlist agents.rs + viewer_assets.rs.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_27e803a2a7f5df1bf5d9af7c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c0cb0f8ad71ea84d37aa7ba4c6902e3be66670357a59402ee05b60892f66f4fe",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_27e803a2a7f5df1bf5d9af7c",
+        "inventoryEdge": {
+          "edgeId": "consumer_27e803a2a7f5df1bf5d9af7c",
+          "line": 135,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `src/lib.rs`, `Cargo.toml`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bbf1ce26d6f911855eb3c8e0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a2cf51d34ae0c18ba91ce0b0083a1716c2398be418e9be02a21253a26f87d302",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_bbf1ce26d6f911855eb3c8e0",
+        "inventoryEdge": {
+          "edgeId": "consumer_bbf1ce26d6f911855eb3c8e0",
+          "line": 186,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "fixture"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **What:** `src/analysis/` tổ chức 23 module theo **cây phụ-thuộc-ngược**: `graph.rs` (metric lõi) ở đáy, các module cao hơn (triage, forecast, drift, whatif, advanced) chỉ phụ thuộc xuống — mỗi module một trách-nhiệm rõ (mục \"Analysis Modules\" trong AGENTS.md liệt kê). Test đặt cạnh code qua `#[cfg(test)]`; fixture tổ chức theo scenario + scale.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_024b90eb23930fb4b717499a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8974c76df30655eea9f02c722174bc247a8519c862d3039dc6e43f5f4aaf37d3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_024b90eb23930fb4b717499a",
+        "inventoryEdge": {
+          "edgeId": "consumer_024b90eb23930fb4b717499a",
+          "line": 187,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **Where:** `PROPOSED_ARCHITECTURE.md`, `src/analysis/mod.rs`, `AGENTS.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3f51d60f0f5b4e1f9938bf99",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9564e41297808ebdf782c4bf3de15c13a862a416e98498832eec6f722f6ac3c5",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3f51d60f0f5b4e1f9938bf99",
+        "inventoryEdge": {
+          "edgeId": "consumer_3f51d60f0f5b4e1f9938bf99",
+          "line": 93,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **What:** Điều phối ĐA-AGENT qua **MCP Agent Mail** + `.agent-mail.yaml`: agent làm việc cùng-repo phối hợp qua kênh mail chuyên dụng (mục \"Same Repository Workflow\" trong AGENTS.md), phân biệt macro vs granular tool.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e6c373ea8ba7f9c084252335",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a2b5c571f5010c0e632767d5f68614abe5a2d316eead29b0c625eca1a86f12a9",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e6c373ea8ba7f9c084252335",
+        "inventoryEdge": {
+          "edgeId": "consumer_e6c373ea8ba7f9c084252335",
+          "line": 94,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads-viewer-rust.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "a0803c8e4866cc427a9ef03d84131c9c5a0fbb3ed381d46d881fedec67189462",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `.agent-mail.yaml`, `.agent-mail-project-id`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4e81292c16d6d5efccd1caef",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bcb129457f2b2934668767ca598a704f3ba5aa99472d9fdd36959523c29ed4f9",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4e81292c16d6d5efccd1caef",
+        "inventoryEdge": {
+          "edgeId": "consumer_4e81292c16d6d5efccd1caef",
+          "line": 19,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "557c950dd4eac874e2016f40b706a5c55d644b329631782ca4710a2dc7796f07",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `AGENT_INSTRUCTIONS.md`, `README.md`, `cmd/bd/main.go`, `cmd/bd/list_filter.go`, `internal/validation/template.go`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0a8aedc154c501c1a6977468",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "41e48309098977f3cbca88bb7e82d968240befd7fe953fee5a92d70f8f6093a7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0a8aedc154c501c1a6977468",
+        "inventoryEdge": {
+          "edgeId": "consumer_0a8aedc154c501c1a6977468",
+          "line": 76,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beads.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "557c950dd4eac874e2016f40b706a5c55d644b329631782ca4710a2dc7796f07",
+        "sourceLineAtOldCoordinate": "- **Where:** `README.md`, `AGENTS.md`, `docs/core-concepts/`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_dcfd98169094fed090130c16",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a0264052c96bb63296079203b3a56b565bb2937ec89f5c92e8a524df4cfb4760",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_dcfd98169094fed090130c16",
+        "inventoryEdge": {
+          "edgeId": "consumer_dcfd98169094fed090130c16",
+          "line": 1009,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "dynamic"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **What:** Statusline cộng token/cost của cả subagents (parse `<session>/subagents/*.jsonl`, dedupe theo message.id, bảng giá theo model, cache theo size+mtime, fail-open). Từ 55cf3a4 (statusline-ctx-threshold): statusline thêm segment **% context đã dùng** và tô màu theo ngưỡng — vàng tại 65% (mốc phải ghi `.bee/HANDOFF.json` theo AGENTS.md § Session finish), đỏ ≥90%; contract segment+màu specced trong `docs/specs/onboarding.md`.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-01405"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_83ab6df7f6ce9bff5d410db0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9560dd5417099766b93f91fe4247dfc16defac194ba905a953df994e8098e656",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_83ab6df7f6ce9bff5d410db0",
+        "inventoryEdge": {
+          "edgeId": "consumer_83ab6df7f6ce9bff5d410db0",
+          "line": 1023,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8cfdddb2617458bc780b432a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "88d314a68ec09bff62416c5f495742f3ac29c3908a1fd78230ec0a0fa63dc929",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8cfdddb2617458bc780b432a",
+        "inventoryEdge": {
+          "edgeId": "consumer_8cfdddb2617458bc780b432a",
+          "line": 1029,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `.claude/skills/bee-swarming/SKILL.md`, `.claude/skills/bee-executing/SKILL.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_514997ca656b941f088a0709",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "40fe19397ce74c159fc327fbbaaa859205062d060157f9bdf207c20458d155ee",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_514997ca656b941f088a0709",
+        "inventoryEdge": {
+          "edgeId": "consumer_514997ca656b941f088a0709",
+          "line": 1068,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **What:** Nội dung bee trong file của host (AGENTS.md, .gitignore) nằm giữa marker BEE:START/END; mọi byte ngoài marker giữ nguyên tuyệt đối; dòng \"giống marker\" không bị coi là marker.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_6a532fc9a3bd7cbc7a43aad7",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "49f6d67931dbec78a974a428fa5442708f6838b504ed15096e93df8ee7de3e56",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_6a532fc9a3bd7cbc7a43aad7",
+        "inventoryEdge": {
+          "edgeId": "consumer_6a532fc9a3bd7cbc7a43aad7",
+          "line": 110,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **Where:** `.claude/skills/bee-hive/SKILL.md`, `AGENTS.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1571b18f71000c8f5407ba72",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bb492a544b7c3ddcf5d94c93a1757322763c59ac10b258a66360a20c9ece8573",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1571b18f71000c8f5407ba72",
+        "inventoryEdge": {
+          "edgeId": "consumer_1571b18f71000c8f5407ba72",
+          "line": 1129,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_86fca1580718995b3e72a443",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7f3e68ffbe73ee541510f1b868b62195c41688ffb2ff0221331e60084f328574",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_86fca1580718995b3e72a443",
+        "inventoryEdge": {
+          "edgeId": "consumer_86fca1580718995b3e72a443",
+          "line": 1135,
+          "targetPath": "AGENTS.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "- **Where:** `AGENTS.md`, `.claude/skills/bee-scribing/SKILL.md`, `.claude/skills/bee-grooming/SKILL.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    }
+  ]
+}

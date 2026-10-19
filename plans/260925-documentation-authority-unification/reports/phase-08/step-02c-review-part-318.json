@@ -1,0 +1,1749 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 318,
+  "population": "native-reconciliation",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "native-reconciliation:consumer_a6cf16d311766420aa91cebf",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3f82861519115bac0732a330a5213bba055f41fa25fd479c4d10ab56d7b269aa",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a6cf16d311766420aa91cebf",
+        "inventoryEdge": {
+          "edgeId": "consumer_a6cf16d311766420aa91cebf",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03028"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_634ead4c675c001ad3e59c5a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3bc9d58e434ba85ce3d3682ac82e7d1a1cc2bf0bb594be210d9ee51f41124142",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_634ead4c675c001ad3e59c5a",
+        "inventoryEdge": {
+          "edgeId": "consumer_634ead4c675c001ad3e59c5a",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03029"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ebdb1290c2505a88e2d43d48",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cd7b59e2c6da210a822999bddbe80e9f1a7d5b6293e92a1f8ebb32426963125d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ebdb1290c2505a88e2d43d48",
+        "inventoryEdge": {
+          "edgeId": "consumer_ebdb1290c2505a88e2d43d48",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03030"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c81600e2fde4244fca5e9a96",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "830baecafc527fde1c0d30a382c35e9b2c58df15f2aeea534823b6b03422b6af",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c81600e2fde4244fca5e9a96",
+        "inventoryEdge": {
+          "edgeId": "consumer_c81600e2fde4244fca5e9a96",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03032"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_04b621517155c48310a705c7",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f48ae5abd26a394ace4862705bc94f6bab6abeeb7616900d3e96189ab4c4b834",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_04b621517155c48310a705c7",
+        "inventoryEdge": {
+          "edgeId": "consumer_04b621517155c48310a705c7",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03033"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1902a2be18cc57de299c2fa1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "42879dd7ee6681612285f1721ac9e0fff36a37466e585f8e90cfbe94ad044a9e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1902a2be18cc57de299c2fa1",
+        "inventoryEdge": {
+          "edgeId": "consumer_1902a2be18cc57de299c2fa1",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03034"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0e179268668f53e47db28c92",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "913252e808f36e5aeaba93f0cc2f86117ed8561d6506df8185b5edbbac487a37",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0e179268668f53e47db28c92",
+        "inventoryEdge": {
+          "edgeId": "consumer_0e179268668f53e47db28c92",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03036"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_69a9a38b43cff66e1f3ffc6e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e6217248a278b15220b55d6d28e7245d90c766993fa33d018e09a8266182f27c",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_69a9a38b43cff66e1f3ffc6e",
+        "inventoryEdge": {
+          "edgeId": "consumer_69a9a38b43cff66e1f3ffc6e",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03037"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f9c5225f2e590bf01c418e1f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9550e5b2bc516552c0c9ae1e0b7d5f0079675372322525caec3c8c5efa5752bb",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_f9c5225f2e590bf01c418e1f",
+        "inventoryEdge": {
+          "edgeId": "consumer_f9c5225f2e590bf01c418e1f",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03038"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_70153af8057f828d12f9ab4b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0e907829a8917b2a13f8c8903a41dffa00b135d149581528324a0b00895611bb",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_70153af8057f828d12f9ab4b",
+        "inventoryEdge": {
+          "edgeId": "consumer_70153af8057f828d12f9ab4b",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03040"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9cd0464f467f45e823e6cc9b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4c8d157f04469341a7a962ac9d32eef733c35e340d3dabceacb8ee679b68d0c8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9cd0464f467f45e823e6cc9b",
+        "inventoryEdge": {
+          "edgeId": "consumer_9cd0464f467f45e823e6cc9b",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03041"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a4c41c234cb347c52462eb67",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a33cd05cd9483ce6b74da2848943127934f68871158d616003ced2fbda8335a0",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a4c41c234cb347c52462eb67",
+        "inventoryEdge": {
+          "edgeId": "consumer_a4c41c234cb347c52462eb67",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03042"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1025567712264ad47bf0a7f9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "92e0e7e4ac02598ad05cca7b1420cfd1cbe13f83496c7a10842f146b5b7531c8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1025567712264ad47bf0a7f9",
+        "inventoryEdge": {
+          "edgeId": "consumer_1025567712264ad47bf0a7f9",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03044"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e07bba933273604566b54f67",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0233dfef38ea70a43a76e469b214bc3e0cbb008144af95d54997eb1af1eca91a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e07bba933273604566b54f67",
+        "inventoryEdge": {
+          "edgeId": "consumer_e07bba933273604566b54f67",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03045"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fa805a8fba074250b0b7ee81",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "73ff0baf1201b5d7372a4cbe6bd442f13399e6191d7daad4ddf5d3db32cfe713",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_fa805a8fba074250b0b7ee81",
+        "inventoryEdge": {
+          "edgeId": "consumer_fa805a8fba074250b0b7ee81",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03046"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d51facbf586e99cc09da646a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "06a439305e6bd850ba60651bd8107802354c6dceb696aff70b668cd66946d4b2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d51facbf586e99cc09da646a",
+        "inventoryEdge": {
+          "edgeId": "consumer_d51facbf586e99cc09da646a",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03048"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b9c02bcc8027dfb4ec62b935",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "503b6930bdc4792e75030100c0e28ad024e7346c88cec71a845d5fe598dfb947",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_b9c02bcc8027dfb4ec62b935",
+        "inventoryEdge": {
+          "edgeId": "consumer_b9c02bcc8027dfb4ec62b935",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03049"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d168a0c8a65359603eb1f24f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1a749ca162f95a4f255f71ff36e24c3e64fe04860b7398c1acc0560fa3273747",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d168a0c8a65359603eb1f24f",
+        "inventoryEdge": {
+          "edgeId": "consumer_d168a0c8a65359603eb1f24f",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03050"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_15bf607009ca5937509f734e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "58d729efbf46ec36e467971d8489f9465203cb89f443d5acda46ce972c039769",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_15bf607009ca5937509f734e",
+        "inventoryEdge": {
+          "edgeId": "consumer_15bf607009ca5937509f734e",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03052"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f8853c5ec377faf6acc000c4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1b174b50fc98301ed8e10f9428e522f80a3b42c985b4f0bed809ac39fdbc7dd8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_f8853c5ec377faf6acc000c4",
+        "inventoryEdge": {
+          "edgeId": "consumer_f8853c5ec377faf6acc000c4",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03053"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_72d84845b1a32d9eb1b7cb9b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cc8879755c0e2667c7491fcba9968f74327dc95526adb3ab94116dfd81edf25b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_72d84845b1a32d9eb1b7cb9b",
+        "inventoryEdge": {
+          "edgeId": "consumer_72d84845b1a32d9eb1b7cb9b",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03054"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2e016af2ad612fcaa0587e9d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "05687d4e702a65246da02b0293fd8cfaaf4a2f3b8fc428a4d82b828bebf2e7df",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_2e016af2ad612fcaa0587e9d",
+        "inventoryEdge": {
+          "edgeId": "consumer_2e016af2ad612fcaa0587e9d",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03057"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_91eddca0f27ad9fac0571779",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "029c9e81c9341b6056fc0cfb66c3e86761d51cc9c166c0e49cc166025962b499",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_91eddca0f27ad9fac0571779",
+        "inventoryEdge": {
+          "edgeId": "consumer_91eddca0f27ad9fac0571779",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03058"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1ec8b3155ddce0c22b740d12",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8201b8c943c8bb3d66a8d95cb9ee922cc12d15d4816b4f043fe1c11ff8eb19fa",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1ec8b3155ddce0c22b740d12",
+        "inventoryEdge": {
+          "edgeId": "consumer_1ec8b3155ddce0c22b740d12",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03059"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_eb31a2d3cddfa4f8485b06b1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3092cf927cceca2b9b1a35ba1c0cdca1db68abb0fc75c647d5bf2c7a47e69018",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_eb31a2d3cddfa4f8485b06b1",
+        "inventoryEdge": {
+          "edgeId": "consumer_eb31a2d3cddfa4f8485b06b1",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03061"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c74c4c3b264c2cacdee532df",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3e3fb95660c2acfb056864644c723bcf5a230448245701840f95833da9a846a2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c74c4c3b264c2cacdee532df",
+        "inventoryEdge": {
+          "edgeId": "consumer_c74c4c3b264c2cacdee532df",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03062"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_716237420602742a53963a13",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1986add529c397d4feefa5c66a81982c24361afa30e377a14e55c8300bf373bf",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_716237420602742a53963a13",
+        "inventoryEdge": {
+          "edgeId": "consumer_716237420602742a53963a13",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03063"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_94268f1f4cd6ef036abc8105",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "adca8bf8c8378506977eca5f1dd6c886180dd256a83f2225bb8cc3c2b4dba53c",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_94268f1f4cd6ef036abc8105",
+        "inventoryEdge": {
+          "edgeId": "consumer_94268f1f4cd6ef036abc8105",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03071"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5f64cd680504428cedcf6142",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cfe651ba78dc63accfa9bbce2c13e34d4f2f9408376d3abd223485ad65488c59",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5f64cd680504428cedcf6142",
+        "inventoryEdge": {
+          "edgeId": "consumer_5f64cd680504428cedcf6142",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03072"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ef3001a58fd34d723179a62a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0c6f9c842ea59dfea59ff5ab2da8adfaf1348e7bf61ec303ea2f255f061b14b0",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ef3001a58fd34d723179a62a",
+        "inventoryEdge": {
+          "edgeId": "consumer_ef3001a58fd34d723179a62a",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03073"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3ce7ddf151ca7f3cd9101bcd",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bd7ed00a8f546ae27c846f759d4f1bea86caf10ec5891f9a78c70b5035588f63",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3ce7ddf151ca7f3cd9101bcd",
+        "inventoryEdge": {
+          "edgeId": "consumer_3ce7ddf151ca7f3cd9101bcd",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03081"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_acc2855adfb64f5fd57ae3a8",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7b3b14486a9eff4dd9f419602a87743dcf6eb4682335fe765fbf752d20740754",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_acc2855adfb64f5fd57ae3a8",
+        "inventoryEdge": {
+          "edgeId": "consumer_acc2855adfb64f5fd57ae3a8",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03082"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9f013e0170b16bc74beb17d3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f9c72dd2e91a3ef278657200d2c224ebb4bb8c00592bbe735b47802d1268466b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9f013e0170b16bc74beb17d3",
+        "inventoryEdge": {
+          "edgeId": "consumer_9f013e0170b16bc74beb17d3",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03083"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0d96df667432c734cbd40fbe",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "61af123f0ed0e08455650c3f52374979006c0d244a48825869c015feaced161f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0d96df667432c734cbd40fbe",
+        "inventoryEdge": {
+          "edgeId": "consumer_0d96df667432c734cbd40fbe",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03089"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c6504c80f17ae767b77834bc",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "25122ec17bbf951e80c3c5e7145c7d1af8a119b19b3f651ad43d172d99244205",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c6504c80f17ae767b77834bc",
+        "inventoryEdge": {
+          "edgeId": "consumer_c6504c80f17ae767b77834bc",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03090"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3f1d368f7e6a773f16a1ddeb",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2bdac4d522f07cb8486f51d378b8d4a04f97f2a1a67e69cb9bc1d2d8ed8df501",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3f1d368f7e6a773f16a1ddeb",
+        "inventoryEdge": {
+          "edgeId": "consumer_3f1d368f7e6a773f16a1ddeb",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03091"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5abffd71e0dcd565f6906c96",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "936b1a2fd46572ca83b8854155e2a01f517bf6b16b906c5c81576b70bcaccf7b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5abffd71e0dcd565f6906c96",
+        "inventoryEdge": {
+          "edgeId": "consumer_5abffd71e0dcd565f6906c96",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03093"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_46f50744fdca2962dbfde4f3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cafc4be3b9349c10a67d183b16fc12d2be683f15e6ee486c8e401cc3f6acade2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_46f50744fdca2962dbfde4f3",
+        "inventoryEdge": {
+          "edgeId": "consumer_46f50744fdca2962dbfde4f3",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03094"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4126c2eceb7d93d53a53f796",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0fa80670f17200196912b85ca31be6c15dcf648ac9a0a0dbf78f43164403e8c7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4126c2eceb7d93d53a53f796",
+        "inventoryEdge": {
+          "edgeId": "consumer_4126c2eceb7d93d53a53f796",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03095"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3efafe4f32c3ad1757d51aad",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "289534c2eee8f992241362bfb51723ac4b2078d56b1ddcc7453d9db7bf292d6d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3efafe4f32c3ad1757d51aad",
+        "inventoryEdge": {
+          "edgeId": "consumer_3efafe4f32c3ad1757d51aad",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03100"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c9b4914e4692d7760e5abab1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ad0fccc4a4915f19135915ea87825c15a29a04e5d250c5d8731f141d1d592372",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c9b4914e4692d7760e5abab1",
+        "inventoryEdge": {
+          "edgeId": "consumer_c9b4914e4692d7760e5abab1",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03101"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4b8df05e90f17a2ac894077a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "89a2c94bcde55e0e872b8885b55625bd8bc5327d4b2731d716570e06a4beb6f2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4b8df05e90f17a2ac894077a",
+        "inventoryEdge": {
+          "edgeId": "consumer_4b8df05e90f17a2ac894077a",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03102"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1902c21028ccf1721a9cc9e5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c4eab246ff9716a6cd7d7e6d892e6d5944a6f3ac6977f8b297a5c68ff18272af",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1902c21028ccf1721a9cc9e5",
+        "inventoryEdge": {
+          "edgeId": "consumer_1902c21028ccf1721a9cc9e5",
+          "line": 44,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03103"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7143cfc10e78d63e2b177575",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4380a3daa990819f3e542b3cb438feaa85a1b2b2d25e3445bf7cd47551586238",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7143cfc10e78d63e2b177575",
+        "inventoryEdge": {
+          "edgeId": "consumer_7143cfc10e78d63e2b177575",
+          "line": 47,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+        "sourceLineAtOldCoordinate": "Superseded by: Runtime ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03104"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2cb934c28673f39c195eacc6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "db5a8948c1015c31928c4491a26da0069d69ea58c0313f5b475d3e4215e9b102",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_2cb934c28673f39c195eacc6",
+        "inventoryEdge": {
+          "edgeId": "consumer_2cb934c28673f39c195eacc6",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03130"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_519fe447779f0e8a7e002fa9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5c10d3d8dea3d0e5fd91d184a3deeaabed0e07a8fb2bfd807f029462ac538d0a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_519fe447779f0e8a7e002fa9",
+        "inventoryEdge": {
+          "edgeId": "consumer_519fe447779f0e8a7e002fa9",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03131"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_81cc829c2ec56b92e1d35b40",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "fc2209c2248d282f8c5f6b4591bae80e88bb1515d4c8bb6687de843a036281a3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_81cc829c2ec56b92e1d35b40",
+        "inventoryEdge": {
+          "edgeId": "consumer_81cc829c2ec56b92e1d35b40",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03132"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_6dd79fb8cf353b787a6a5286",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ae622423b52bccc911ed4555c5c717d105bae3b1ccdf51d2e23cdc936ac43636",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_6dd79fb8cf353b787a6a5286",
+        "inventoryEdge": {
+          "edgeId": "consumer_6dd79fb8cf353b787a6a5286",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03135"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9973129bd681a90fa16f488b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a2de4b871a9f587caff9b5f8ff6f9aafc544180bb7b1dbc33b61e99a989a618e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9973129bd681a90fa16f488b",
+        "inventoryEdge": {
+          "edgeId": "consumer_9973129bd681a90fa16f488b",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03136"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_15789d78b4781671661dce1e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7db37d177775c464addb514542a21a08cca090830ea10499998169ece17bc113",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_15789d78b4781671661dce1e",
+        "inventoryEdge": {
+          "edgeId": "consumer_15789d78b4781671661dce1e",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03137"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_17fec079a4b8de2879c59116",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ab5b2f58f4ed7510d87a5058de0f54ecb534a1c7cbdb4b9be68a8a33fb1d2996",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_17fec079a4b8de2879c59116",
+        "inventoryEdge": {
+          "edgeId": "consumer_17fec079a4b8de2879c59116",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03139"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cf4b3153d8de7e617be98ecc",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0cd66eef935efcccb28216c629935c34c734c1aef1d78d94bd5dcebf6583a8bd",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_cf4b3153d8de7e617be98ecc",
+        "inventoryEdge": {
+          "edgeId": "consumer_cf4b3153d8de7e617be98ecc",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03140"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a7924cb225adffb78e3124ec",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "75c11bde7b79b7429d8b7153071848f732eaa50cf0c7e957627163217defd82f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a7924cb225adffb78e3124ec",
+        "inventoryEdge": {
+          "edgeId": "consumer_a7924cb225adffb78e3124ec",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03141"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e2749f4f4ae2b2adb4f442aa",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5bf525d0c0c2eac4bf51c93f6d1f52c8e18c5ebf44e40e0e40fdbd005ff8789e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e2749f4f4ae2b2adb4f442aa",
+        "inventoryEdge": {
+          "edgeId": "consumer_e2749f4f4ae2b2adb4f442aa",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03143"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_931fb714273fe0c603b9fe23",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f160302ed8b4aa8c99dc4f03ecc49c21ae523724a1e6ccb944e4f76fdb8ad9bc",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_931fb714273fe0c603b9fe23",
+        "inventoryEdge": {
+          "edgeId": "consumer_931fb714273fe0c603b9fe23",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03144"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d602cb4bd4b36ab9ced07134",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ee604711836cb3add44f2258bd98ec01b3323b82a2688d9055d3cd884d62ce38",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d602cb4bd4b36ab9ced07134",
+        "inventoryEdge": {
+          "edgeId": "consumer_d602cb4bd4b36ab9ced07134",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03145"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_578cc21aeac4dd549b1d2fa1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2f80594fa694f8430febd2d41b3082da1c672e4b3e0d7e8177c5d07ffe0310fd",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_578cc21aeac4dd549b1d2fa1",
+        "inventoryEdge": {
+          "edgeId": "consumer_578cc21aeac4dd549b1d2fa1",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03157"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4a07f2b6151077c3cbfda44a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ac8775505b906a8f7fd2ee98103bc4eb79b3ca04397b646d580e44a035af4829",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4a07f2b6151077c3cbfda44a",
+        "inventoryEdge": {
+          "edgeId": "consumer_4a07f2b6151077c3cbfda44a",
+          "line": 19,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+        "sourceLineAtOldCoordinate": "Superseded by: Current execution ownership in docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03158"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8f54803a36303ec9004383d2",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c326a1c5df58d858e7a26a623150de30165ad95bb94202140e6c8bfb369aee63",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8f54803a36303ec9004383d2",
+        "inventoryEdge": {
+          "edgeId": "consumer_8f54803a36303ec9004383d2",
+          "line": 23,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+        "sourceLineAtOldCoordinate": "The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03159"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cfc0e8c43e34c37ca1d930f5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "cd8bc58d1d8379eeb2160df77b6c572d6784264452fd9616f9fee22b4de3a7bf",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_cfc0e8c43e34c37ca1d930f5",
+        "inventoryEdge": {
+          "edgeId": "consumer_cfc0e8c43e34c37ca1d930f5",
+          "line": 17,
+          "targetPath": "docs/specs/runner.md",
+          "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/specs/runner.md"
+        },
+        "currentConsumerSha256": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+        "sourceLineAtOldCoordinate": "- docs/specs/runner.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-03179"
+        ],
+        "reconciliation": "current lexical span join",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    }
+  ]
+}

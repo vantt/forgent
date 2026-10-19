@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "files": 1036,
+  "spans": 5427,
+  "externalURLs": 59,
+  "sourceScannerHitRows": 3864,
+  "corrections": 5,
+  "slice12AnchorChecks": 76,
+  "newMapsAnchorChecks": 2142,
+  "nativeEdges": 13136,
+  "owners": 291,
+  "bindings": 12579,
+  "reviewParts": 338,
+  "reviewEntries": 20030,
+  "trackedProtectedDiff": "empty except authorized progress prefix",
+  "manifests": "both unchanged",
+  "lightTests": 95,
+  "ratchet": "clean"
+}

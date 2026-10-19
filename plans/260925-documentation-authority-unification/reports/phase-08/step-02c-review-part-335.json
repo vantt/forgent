@@ -1,0 +1,1990 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 335,
+  "population": "ledger-owner-join",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "d9639c9a65f95b448d41c2245807ce5fd26f9311e85b660ce4232d5e9449e9ef",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 34,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02945",
+          "maps-02946",
+          "maps-02947",
+          "maps-02948",
+          "maps-02949"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "20c8264284400e6a3b9192a393240d36de9cdf199476ebbab4c7ad4fb8fea039",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 14,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02950",
+          "maps-02951",
+          "maps-02952",
+          "maps-02953",
+          "maps-02954",
+          "maps-02955",
+          "maps-02956"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "24cb0d71c4631f7b9cdd88836d41b83349bb40f993bd4ff8cb1db04cdb226531",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 3,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02957",
+          "maps-02958",
+          "maps-02959",
+          "maps-02960",
+          "maps-02961",
+          "maps-02962"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "52878f48e42b75836fd2f4cd3682e1338044ac69db2b1aa54888f40e923f3430",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 10,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02963",
+          "maps-02964",
+          "maps-02965",
+          "maps-02966",
+          "maps-02967",
+          "maps-02968",
+          "maps-02969"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "6f0e098907ffd6757047e68c6595f6083fe58f40ac79d048dea8aa8e19557209",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 49,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02970",
+          "maps-02971",
+          "maps-02972",
+          "maps-02973",
+          "maps-02974",
+          "maps-02975",
+          "maps-02976",
+          "maps-02977",
+          "maps-02978"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "21d247dee6b386030ca1dc11701cc0ea12659007890bfb8a86441a4d0653507e",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 31,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02979",
+          "maps-02980",
+          "maps-02981",
+          "maps-02982",
+          "maps-02983",
+          "maps-02984",
+          "maps-02985"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "be32982f5d25c4962f15139228b5d888abc544bb6dea4947500ce920119b1924",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 9,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02986",
+          "maps-02987",
+          "maps-02988",
+          "maps-02989"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "55075047aca56c23d38c84a5ef2ccf826777273b14b49b7b6ddabf2f7f4800ff",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 21,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-02990",
+          "maps-02991",
+          "maps-02992",
+          "maps-02993"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "6020b5f8d543dc93cc2cf569eb3a49b9104e4e006a89cb3c6df1c6c31e440667",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 14,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [
+          "maps-02908"
+        ],
+        "consumerEdges": [
+          "maps-02994",
+          "maps-02995",
+          "maps-02996",
+          "maps-02997",
+          "maps-02998"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "1abd2d44b7845995b9df27ce1baafa32b2429ea3ea9b303027c59cbf3588da0a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 33,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [
+          "maps-02907",
+          "maps-02920",
+          "maps-02932",
+          "maps-02933",
+          "maps-02967",
+          "maps-02978",
+          "maps-03056",
+          "maps-03314",
+          "maps-03355",
+          "maps-03366"
+        ],
+        "consumerEdges": [
+          "maps-02999",
+          "maps-03000",
+          "maps-03001",
+          "maps-03002"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "e5e08f157231a675fdbf8e6e923240e2cc947949eb29184201547a36cbe3d639",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 228,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [
+          "maps-02917",
+          "maps-02968",
+          "maps-02984",
+          "maps-03067",
+          "maps-03069",
+          "maps-03161",
+          "maps-03232",
+          "maps-03244",
+          "maps-03285",
+          "maps-03287",
+          "maps-03293",
+          "maps-03458"
+        ],
+        "consumerEdges": [
+          "maps-03003",
+          "maps-03004",
+          "maps-03005",
+          "maps-03006",
+          "maps-03007",
+          "maps-03008",
+          "maps-03009",
+          "maps-03010",
+          "maps-03011",
+          "maps-03012",
+          "maps-03013",
+          "maps-03014",
+          "maps-03015",
+          "maps-03016"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "e407b0af96bce094ddacd1b8d81588c58b5af3cda26d0e69d1d243845f08e193",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 142,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [
+          "maps-02918",
+          "maps-02930",
+          "maps-02934",
+          "maps-02949",
+          "maps-02954",
+          "maps-02956",
+          "maps-02969",
+          "maps-02985",
+          "maps-03078",
+          "maps-03079",
+          "maps-03080",
+          "maps-03162",
+          "maps-03233",
+          "maps-03243",
+          "maps-03286",
+          "maps-03288",
+          "maps-03457"
+        ],
+        "consumerEdges": [
+          "maps-03017",
+          "maps-03018",
+          "maps-03019",
+          "maps-03020",
+          "maps-03021",
+          "maps-03022",
+          "maps-03023",
+          "maps-03024",
+          "maps-03025",
+          "maps-03026",
+          "maps-03027"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "f85e74ad6e7c5063261f9ec89b50847dcbf7ed5ecc521b784dd80def6972b830",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 39,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [
+          "maps-02919",
+          "maps-02931",
+          "maps-02955",
+          "maps-03077",
+          "maps-03313",
+          "maps-03347"
+        ],
+        "consumerEdges": [
+          "maps-03028",
+          "maps-03029",
+          "maps-03030",
+          "maps-03031"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "dc88768b8ffe5d56f04a2f46d6bbb67fb93c3fe44b40c5f1a544e254942fe1b6",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 2,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03032",
+          "maps-03033",
+          "maps-03034",
+          "maps-03035"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "2c14b0a7bcd6af88949c40b29988109a50b72ebb41868ecc45016c858fc8dde9",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 12,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03036",
+          "maps-03037",
+          "maps-03038",
+          "maps-03039"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "bb1d5088af459fc162dc68564cf766837b4408453d87621fc52371c15a5e52e6",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 2,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03040",
+          "maps-03041",
+          "maps-03042",
+          "maps-03043"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "5d13db1c0fa8ae2a8041dd8d65e4d78347e67f12a8dcc750935c26ef95732540",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 4,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03044",
+          "maps-03045",
+          "maps-03046",
+          "maps-03047"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "31f956061134d987367ab557b79a78ffc6e0a58d7b881e3e0497e43320f7d87b",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 2,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03048",
+          "maps-03049",
+          "maps-03050",
+          "maps-03051"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "313a780344f8687fcc87e2e5d094df52bc5ca933c07bf302446f5fe44a6ff250",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 12,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03052",
+          "maps-03053",
+          "maps-03054",
+          "maps-03055",
+          "maps-03056"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "18be375f040c25a5eeb76dc9518cb09a2972ec60871fcaf4006eb5a2416eb9f2",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 4,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03057",
+          "maps-03058",
+          "maps-03059",
+          "maps-03060"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "fe6b7362a7bd5672fad95dbb0f5874a5e6677eeef9d3e0bc3d5d7fc36d310f94",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 26,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03061",
+          "maps-03062",
+          "maps-03063",
+          "maps-03064",
+          "maps-03065",
+          "maps-03066",
+          "maps-03067",
+          "maps-03068",
+          "maps-03069",
+          "maps-03070"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "c08bc427776ff3585c503c27205e1b068ab8361744875ff981ae4154e075b320",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 22,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03071",
+          "maps-03072",
+          "maps-03073",
+          "maps-03074",
+          "maps-03075",
+          "maps-03076",
+          "maps-03077",
+          "maps-03078",
+          "maps-03079",
+          "maps-03080"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "f70e2400f7528fc379936b2977867f6c388dcde161ea4d831b507e67695bb5e9",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 22,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03081",
+          "maps-03082",
+          "maps-03083",
+          "maps-03084",
+          "maps-03085",
+          "maps-03086",
+          "maps-03087",
+          "maps-03088"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "e1f3553194cdd533f7e4839502a1a8e53fb8763f4a547b9227e5dd8804e47ce0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 8,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03089",
+          "maps-03090",
+          "maps-03091",
+          "maps-03092"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "b2e22158d02d3f1356ce6b85197e15fe439f27c65fc28a01f8c7a6d73be40c3e",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 7,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03093",
+          "maps-03094",
+          "maps-03095",
+          "maps-03096",
+          "maps-03097",
+          "maps-03098",
+          "maps-03099"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "e34d89393131bb13cac3dc8639f5ac464fbafcec7d2a4aa645f65fed9a694449",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 86,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03100",
+          "maps-03101",
+          "maps-03102",
+          "maps-03103",
+          "maps-03104",
+          "maps-03105",
+          "maps-03106",
+          "maps-03107",
+          "maps-03108",
+          "maps-03109",
+          "maps-03110",
+          "maps-03111",
+          "maps-03112",
+          "maps-03113",
+          "maps-03114",
+          "maps-03115",
+          "maps-03116",
+          "maps-03117",
+          "maps-03118",
+          "maps-03119",
+          "maps-03120",
+          "maps-03121",
+          "maps-03122",
+          "maps-03123",
+          "maps-03124"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "e4df9aec923b43cdffaa1e60eb1ce4354f8c57b6dc07a435cdf3c3994d531b82",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 6,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03125",
+          "maps-03126",
+          "maps-03127",
+          "maps-03128",
+          "maps-03129"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "56cdea4498e3a6ad34996dde615d9bec75307da4bc7ae0f8076f813f63cc109c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 11,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03130",
+          "maps-03131",
+          "maps-03132",
+          "maps-03133",
+          "maps-03134"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "0f980b64083d51abea0cf38f649ef553be81d37560d118fa6b23d701791aee5d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 15,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03135",
+          "maps-03136",
+          "maps-03137",
+          "maps-03138"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "5b9e366cea53be133596f607ad64df5c9e84e5db83bb706ff7bc32706d512c29",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 28,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03139",
+          "maps-03140",
+          "maps-03141",
+          "maps-03142"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "acb362958d7bb9818f77d26a853dd2889bd78f99da5765a8a8ed0d0f0bcbd331",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 6,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03143",
+          "maps-03144",
+          "maps-03145",
+          "maps-03146",
+          "maps-03147",
+          "maps-03148",
+          "maps-03149",
+          "maps-03150",
+          "maps-03151",
+          "maps-03152",
+          "maps-03153",
+          "maps-03154",
+          "maps-03155",
+          "maps-03156"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "ba7ff9d15c690a8bfc06fbb2b4aee86cdc24d7376a0968f77628b37c63f59998",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 82,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03157",
+          "maps-03158",
+          "maps-03159",
+          "maps-03160",
+          "maps-03161",
+          "maps-03162",
+          "maps-03163",
+          "maps-03164",
+          "maps-03165",
+          "maps-03166",
+          "maps-03167",
+          "maps-03168",
+          "maps-03169",
+          "maps-03170",
+          "maps-03171",
+          "maps-03172",
+          "maps-03173",
+          "maps-03174",
+          "maps-03175",
+          "maps-03176",
+          "maps-03177",
+          "maps-03178"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "8d86535f1a70f0045148ebb8a210f44eb019a64288890090eec3d9592062e9c0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+        "allAffectedAnchors": [
+          "literal-snapshot",
+          "upstream-source-the-advisory-coordinator-prompt-2026-10-14",
+          "upstream-source-unheaded-block-11-2026-10-14"
+        ],
+        "bindingCount": 52,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03179",
+          "maps-03180",
+          "maps-03181",
+          "maps-03182",
+          "maps-03183",
+          "maps-03184",
+          "maps-03185",
+          "maps-03186",
+          "maps-03187",
+          "maps-03188",
+          "maps-03189",
+          "maps-03190"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "a73315f705098f4adf136eba8e1904fbe413383e10257428811d9e631304456e",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 8,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03191",
+          "maps-03192",
+          "maps-03193",
+          "maps-03194",
+          "maps-03195",
+          "maps-03196",
+          "maps-03197",
+          "maps-03198",
+          "maps-03199",
+          "maps-03200",
+          "maps-03201",
+          "maps-03202",
+          "maps-03203"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "9b774559440bcf38fef1361803da1398729bf1033cac60d0062394b9d46961b9",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 28,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03204",
+          "maps-03205",
+          "maps-03206",
+          "maps-03207",
+          "maps-03208",
+          "maps-03209",
+          "maps-03210",
+          "maps-03211",
+          "maps-03212",
+          "maps-03213",
+          "maps-03214",
+          "maps-03215",
+          "maps-03216",
+          "maps-03217",
+          "maps-03218",
+          "maps-03219",
+          "maps-03220",
+          "maps-03221",
+          "maps-03222",
+          "maps-03223",
+          "maps-03224",
+          "maps-03225",
+          "maps-03226"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "0e7f858895bd3ab6f95f51f509b3811d0565eeb61267a6b68cbf86e7947f48dc",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 8,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03227",
+          "maps-03228",
+          "maps-03229",
+          "maps-03230",
+          "maps-03231",
+          "maps-03232",
+          "maps-03233",
+          "maps-03234",
+          "maps-03235",
+          "maps-03236",
+          "maps-03237",
+          "maps-03238"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "117afaa558a9d03adba1f6aa3dfd046fc73c8c1720a58b5571e9ab436421545a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 252,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03239",
+          "maps-03240",
+          "maps-03241",
+          "maps-03242",
+          "maps-03243",
+          "maps-03244"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "8c20fc60532a1423f76c54758a376345c211310a6b7f314f3bd4fadab1ad51a1",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 17,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03245",
+          "maps-03246",
+          "maps-03247",
+          "maps-03248",
+          "maps-03249",
+          "maps-03250",
+          "maps-03251",
+          "maps-03252",
+          "maps-03253",
+          "maps-03254",
+          "maps-03255",
+          "maps-03256",
+          "maps-03257",
+          "maps-03258",
+          "maps-03259",
+          "maps-03260",
+          "maps-03261",
+          "maps-03262",
+          "maps-03263",
+          "maps-03264",
+          "maps-03265",
+          "maps-03266",
+          "maps-03267",
+          "maps-03268",
+          "maps-03269"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "2130ee0552b254e60ab7435a0326c4558f4a79c8f6434f850d47023e9987b461",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 17,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03270",
+          "maps-03271",
+          "maps-03272",
+          "maps-03273",
+          "maps-03274"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "9fc4b4a69bf2956faf80a9479d49906d2dbade49c974861862f53dda42c434bc",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 394,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03275",
+          "maps-03276",
+          "maps-03277",
+          "maps-03278"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "28abbd4cd245d8234280708cadc8fa8c13dc526f3f0db2d50a13f37ace601ce7",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 642,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03279",
+          "maps-03280",
+          "maps-03281",
+          "maps-03282",
+          "maps-03283",
+          "maps-03284",
+          "maps-03285",
+          "maps-03286",
+          "maps-03287",
+          "maps-03288",
+          "maps-03289",
+          "maps-03290",
+          "maps-03291",
+          "maps-03292",
+          "maps-03293",
+          "maps-03294",
+          "maps-03295",
+          "maps-03296"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "676ab3d8395528265ff9a2325bf5eeff5c4f4075236183abf8ee7e6ee569b7af",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 24,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03297",
+          "maps-03298",
+          "maps-03299",
+          "maps-03300"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "bbd7e3c4cdffe0388543020b2e89e30872bfebbb7aa99a7aa094dfc6bde4fbc8",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 16,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03301",
+          "maps-03302",
+          "maps-03303",
+          "maps-03304",
+          "maps-03305",
+          "maps-03306",
+          "maps-03307",
+          "maps-03308"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "442b5ddd8af00c6bd7673a6f8f021d1545838c955a87622fcc7ee13b054ecbdb",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 16,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03309",
+          "maps-03310",
+          "maps-03311",
+          "maps-03312",
+          "maps-03313",
+          "maps-03314"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "da167ccbf9bbde96acf4813c5fb2540ace5cc567fb875a7be93a6f56df84e93b",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 590,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03315",
+          "maps-03316",
+          "maps-03317",
+          "maps-03318",
+          "maps-03319",
+          "maps-03320",
+          "maps-03321",
+          "maps-03322",
+          "maps-03323",
+          "maps-03324",
+          "maps-03325",
+          "maps-03326",
+          "maps-03327",
+          "maps-03328",
+          "maps-03329"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "288e7b39932d587930df24b828a223928e0fe22018687cfbb024687f10d4bb62",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 258,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03330",
+          "maps-03331",
+          "maps-03332",
+          "maps-03333",
+          "maps-03334",
+          "maps-03335",
+          "maps-03336",
+          "maps-03337",
+          "maps-03338",
+          "maps-03339",
+          "maps-03340",
+          "maps-03341",
+          "maps-03342"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "dbcaa1f50d159bccd8f6578b86fa44c4b39e9d992fc1a53d15fe75962322d314",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 144,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03343",
+          "maps-03344",
+          "maps-03345",
+          "maps-03346",
+          "maps-03347",
+          "maps-03348",
+          "maps-03349",
+          "maps-03350"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "0a9f22fe0c1b4bd7aaa6b01c087cbbdfd2b7aa757e8e7a7b791223a052d11e7d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 202,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03351",
+          "maps-03352",
+          "maps-03353",
+          "maps-03354",
+          "maps-03355",
+          "maps-03356",
+          "maps-03357",
+          "maps-03358",
+          "maps-03359",
+          "maps-03360",
+          "maps-03361"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "95a8ae7fbdd28f5a245f34ea05cae4c88df1f52121ed471111246412197349b5",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 144,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03362",
+          "maps-03363",
+          "maps-03364",
+          "maps-03365",
+          "maps-03366",
+          "maps-03367",
+          "maps-03368"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "0498871c72772ef18e5ba1156af349fb387b1bd4a4c78d33a7cff6549c825669",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 134,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03369",
+          "maps-03370",
+          "maps-03371",
+          "maps-03372"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "7393ef08cf55637ab2418a78494d3f5a134689347883fd826990f3801e1a93cc",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 92,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03373",
+          "maps-03374",
+          "maps-03375",
+          "maps-03376",
+          "maps-03377"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "b5664b2d9b09991302afd38220a13a23e5314edf5c8ae02b254dd9efabedf1d5",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 6,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03393",
+          "maps-03394",
+          "maps-03395",
+          "maps-03396",
+          "maps-03397",
+          "maps-03398",
+          "maps-03399"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "9edfcfa2002fa0ea01a0d5bbd149d99ec215e6f54f5de4b2d07324c38477e992",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 7,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03400",
+          "maps-03401",
+          "maps-03402",
+          "maps-03403",
+          "maps-03404",
+          "maps-03405",
+          "maps-03406",
+          "maps-03407",
+          "maps-03408",
+          "maps-03409",
+          "maps-03410",
+          "maps-03411",
+          "maps-03412",
+          "maps-03413",
+          "maps-03414",
+          "maps-03415",
+          "maps-03416",
+          "maps-03417",
+          "maps-03418",
+          "maps-03419",
+          "maps-03420",
+          "maps-03421",
+          "maps-03422",
+          "maps-03423",
+          "maps-03424",
+          "maps-03425",
+          "maps-03426",
+          "maps-03427"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "aeb340119f584de2a91d1f3fa2c16242a09f5f54bc4d375b0ed718e6e6eb7cec",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 6,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03428",
+          "maps-03429",
+          "maps-03430",
+          "maps-03431",
+          "maps-03432",
+          "maps-03433"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "b79a308d59c710bd79a1a62a694b856f0a2afa1cc73e3a16bac6e90949f9ac6c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 46,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03434",
+          "maps-03435",
+          "maps-03436",
+          "maps-03437",
+          "maps-03438",
+          "maps-03439",
+          "maps-03440",
+          "maps-03441",
+          "maps-03442",
+          "maps-03443",
+          "maps-03444",
+          "maps-03445",
+          "maps-03446",
+          "maps-03447",
+          "maps-03448"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "35f9631cbbc2c150280b39ebe7e5ea441cc1a4757275597339905e6d2ee4a43d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 4,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03449",
+          "maps-03450",
+          "maps-03451",
+          "maps-03452"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "2eee3abec278ab0689fe9fbbd25664ba3fa9bb25c8ae9f486f60634f4e601cbd",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 104,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03453",
+          "maps-03454",
+          "maps-03455",
+          "maps-03456",
+          "maps-03457",
+          "maps-03458",
+          "maps-03459"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "0022525ca996f36d7090c4ff70246d24e2f791d5c6f79f90593e68acd9d20c36",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 24,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03460",
+          "maps-03461",
+          "maps-03462",
+          "maps-03463"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "c777325e6bde11459ef868c3cb360de7120de9f6e529047d80d81476541b1f20",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 20,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03464",
+          "maps-03465",
+          "maps-03466",
+          "maps-03467",
+          "maps-03468"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    },
+    {
+      "reviewId": "ledger-owner-join:docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "kind": "ledger-owner-join",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-ledger-owner-join.json",
+      "sourceRowSha256": "8e521d1bc3a2aee36c46a2a3201d3c9f2b1c80095eac68565efe9608405b0b68",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "owner includes newly inventoried behavioral/changed-candidate surface; confirm no actual target edit"
+      ],
+      "payload": {
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+        "allAffectedAnchors": [
+          "literal-snapshot"
+        ],
+        "bindingCount": 2,
+        "priorBindingIndex": "step-02b-ledger-owner-join.json",
+        "referenceEdges": [],
+        "consumerEdges": [
+          "maps-03469",
+          "maps-03470",
+          "maps-03471",
+          "maps-03472",
+          "maps-03473",
+          "maps-03474",
+          "maps-03475",
+          "maps-03476",
+          "maps-03477",
+          "maps-03478",
+          "maps-03479",
+          "maps-03480",
+          "maps-03481",
+          "maps-03482",
+          "maps-03483",
+          "maps-03484",
+          "maps-03485",
+          "maps-03486",
+          "maps-03487",
+          "maps-03488",
+          "maps-03489",
+          "maps-03490",
+          "maps-03491",
+          "maps-03492",
+          "maps-03493",
+          "maps-03494",
+          "maps-03495",
+          "maps-03496",
+          "maps-03497",
+          "maps-03498",
+          "maps-03499",
+          "maps-03500",
+          "maps-03501",
+          "maps-03502",
+          "maps-03503",
+          "maps-03504",
+          "maps-03505",
+          "maps-03506",
+          "maps-03507"
+        ],
+        "N1ScopeNow": "none; no target content edit",
+        "whenEdited": "Carry/rebind actual changed target units in same author batch under L12-3, then L12-11 separate committed-pair accounting. Never infer no-dependency from zero joins."
+      }
+    }
+  ]
+}

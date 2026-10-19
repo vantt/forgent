@@ -1,0 +1,445 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 113,
+  "population": "maps-file",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "maps-file:docs/ui-spec/30-states-and-errors.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "7288552c57171d725b66eb0c09b42dbbd296e69a2529499f13d321d0fb32acb0",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/30-states-and-errors.md",
+        "sha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+        "bytes": 2313,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05382"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/components/C01-item-card.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "93505f86220eaa528e0538cfc04591fca443c2373c4ab92f2e688dd72d2a81eb",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/components/C01-item-card.md",
+        "sha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+        "bytes": 2392,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 2,
+        "edgeIds": [
+          "maps-05383",
+          "maps-05384"
+        ],
+        "nativeInventoryEdges": 2,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "750824365662b2e57a9163303a1bc3e48c3ba864045ebe76f4dc7c2e24cb2d0d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "sha256": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+        "bytes": 2647,
+        "seedCategory": null,
+        "currentScannerHits": 0,
+        "edgeIds": [],
+        "nativeInventoryEdges": 0,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": true,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/flows/F02-approve-a-merge.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "92a26df9a40561d32b2a39727dc295ebe5bc29d77dd8f0e2cc697167a57be623",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "sha256": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+        "bytes": 2293,
+        "seedCategory": null,
+        "currentScannerHits": 0,
+        "edgeIds": [],
+        "nativeInventoryEdges": 0,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": true,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/generated/coverage-report.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "bc111d847b560df516959983f141fb9e3c6ca4e72f726baeec71dbf7dd10e08b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "sha256": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+        "bytes": 571,
+        "seedCategory": null,
+        "currentScannerHits": 0,
+        "edgeIds": [],
+        "nativeInventoryEdges": 0,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": true,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/generated/wireframe-v2.html",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "bbd8302035ae1fe50878ad3d5b25f1f84a27d59ee943445c656bded520eafebb",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "root portal/map or contract/config/projection surface"
+      ],
+      "payload": {
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "sha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+        "bytes": 631319,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 10,
+        "edgeIds": [
+          "maps-05385",
+          "maps-05386",
+          "maps-05387",
+          "maps-05388",
+          "maps-05389",
+          "maps-05390",
+          "maps-05391",
+          "maps-05392",
+          "maps-05393",
+          "maps-05394",
+          "maps-05395",
+          "maps-05396",
+          "maps-05397",
+          "maps-05398",
+          "maps-05399",
+          "maps-05400",
+          "maps-05401",
+          "maps-05402",
+          "maps-05403",
+          "maps-05404",
+          "maps-05405",
+          "maps-05406",
+          "maps-05407",
+          "maps-05408",
+          "maps-05409",
+          "maps-05410",
+          "maps-05411",
+          "maps-05412",
+          "maps-05413",
+          "maps-05414",
+          "maps-05415",
+          "maps-05416"
+        ],
+        "nativeInventoryEdges": 0,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "generated/contract data",
+        "mandatoryDeepRead": true,
+        "externalLinkCount": 5
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/modals/M01-answer-question.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "3381f4a7ab93f8b74d67fad5653840bbe884d28b1a87715ca1410e856cbe8b48",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/modals/M01-answer-question.md",
+        "sha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+        "bytes": 3963,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05417"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/modals/M02-approve-merge.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "cea8fae5e62341cacf2822db49911c4d5924dc4b993161b6c1525cd5e78fce9b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/modals/M02-approve-merge.md",
+        "sha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+        "bytes": 3802,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05418"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/modals/M03-add-edit-item.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "25992a624df3510112c348b98ad39ad2afe19b8a8986ce9d4bde8697198c1bc5",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+        "sha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+        "bytes": 3587,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05419"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/screens/S01-sign-in.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "a11cec3e64168de977a157df6abeea9a7af1eaab7108357e1ee0f1977e6897d2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/screens/S01-sign-in.md",
+        "sha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+        "bytes": 3401,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05420"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/screens/S02-taskboard.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "80b273a10350e5d078615171ecd35f0873c2281fe41160a3fea2cebc36084bdd",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/screens/S02-taskboard.md",
+        "sha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+        "bytes": 11488,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05421"
+        ],
+        "nativeInventoryEdges": 2,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/screens/S03-task-detail.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "70f5b139b23cf86519995d2e1fb6e184a4ce6dafa012a3d57ec75ec88230029a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/screens/S03-task-detail.md",
+        "sha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+        "bytes": 11428,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 2,
+        "edgeIds": [
+          "maps-05422",
+          "maps-05423"
+        ],
+        "nativeInventoryEdges": 2,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "79e51c168f925f5fc59e1f79c5487a7b0357b2577e1171a5d4d880e9dfc16136",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "sha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+        "bytes": 4732,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05424"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/ui-spec/spec.config.yaml",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "05de101ae6df9534a3f61b31c34ce9ab35390b191ec7037ea1a98c5fff10aaac",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "root portal/map or contract/config/projection surface"
+      ],
+      "payload": {
+        "path": "docs/ui-spec/spec.config.yaml",
+        "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "bytes": 509,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 1,
+        "edgeIds": [
+          "maps-05425"
+        ],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "generated/contract data",
+        "mandatoryDeepRead": true,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/user/README.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "4ed51b215b993fff9f140becc8c3d85a70c941c7a4bf157e29e8c6bdbb259766",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/user/README.md",
+        "sha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+        "bytes": 1136,
+        "seedCategory": "reading-maps-portals-and-docs",
+        "currentScannerHits": 2,
+        "edgeIds": [
+          "maps-05426",
+          "maps-05427"
+        ],
+        "nativeInventoryEdges": 3,
+        "headerEvidence": {
+          "Document type": "User docs portal",
+          "Purpose": "Route user-facing documentation by reader need",
+          "Design status": "Accepted",
+          "Implementation": "Partial",
+          "Provenance": "Promoted from documentation-system redesign"
+        },
+        "zeroCurrentLexicalEdge": false,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    },
+    {
+      "reviewId": "maps-file:docs/work-item-lifecycle-vision.md",
+      "kind": "maps-file",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-census-maps-portals-prose.json",
+      "sourceRowSha256": "5f33891896fdcaea0a08872e8e0fe81855efef806c7a0a9bc22f2da89bcedb27",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "path": "docs/work-item-lifecycle-vision.md",
+        "sha256": "d4267552c03638faa76d826ba5f47677a7ee683e23f50e933d1705bb78b6cf08",
+        "bytes": 6935,
+        "seedCategory": null,
+        "currentScannerHits": 0,
+        "edgeIds": [],
+        "nativeInventoryEdges": 1,
+        "headerEvidence": {},
+        "zeroCurrentLexicalEdge": true,
+        "coverage": "Every scanner match plus legacy/evidence/history local Markdown destination resolved relative to its consumer; full file read for digest/metadata/fence/command context. Native inferred/dynamic edges reconciled separately; semantic and IO parity not certified.",
+        "sourceVsRender": "source/retained source",
+        "mandatoryDeepRead": false,
+        "externalLinkCount": 0
+      }
+    }
+  ]
+}

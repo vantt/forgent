@@ -1,0 +1,432 @@
+{
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "scope": "Additive field-level supersession only; original slice-1 tables and review artifacts remain immutable. Unlisted fields are inherited; no disposition change for cli-005/setup-001.",
+  "entries": [
+    {
+      "id": "cli-005",
+      "supersedes": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-cli-help.json",
+        "rowId": "cli-005",
+        "originalRowSha256": "900453f8e624df3a19ad24dcc9e6d1a5d7bfaae4aee58fb8b112aedea5a2d9e8"
+      },
+      "consumerPath": "bin/fgos.mjs",
+      "fileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+      "decision": "L12-19",
+      "reviewer": "Lead-started A38 independent reviewer; pending",
+      "preCutoverAction": "preserve bytes",
+      "mandatoryDeepRead": true,
+      "replacesFields": [
+        "desiredAnchor",
+        "cutoverPatch",
+        "test",
+        "dispositionReason"
+      ],
+      "desiredOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "desiredAnchor": "phiên-checkout-đa-phiên-session-start-end-list-gc",
+      "cutoverAction": "exact-cutover-patch",
+      "cutoverPatch": {
+        "old": "docs/specs/runner.md",
+        "new": "docs/platform/runner/operations/h-51f5cd7279fd.md#phiên-checkout-đa-phiên-session-start-end-list-gc",
+        "operation": "literal citation substitution only at Phase 9; preserve comment quote and behavior"
+      },
+      "sourceEvidence": [
+        {
+          "line": 3513,
+          "text": "      // A REGISTERED session worktree (`fgos session start`) is deliberately"
+        },
+        {
+          "line": 3514,
+          "text": "      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a"
+        },
+        {
+          "line": 3515,
+          "text": "      // registered session (docs/specs/runner.md: \"a session worktree is"
+        },
+        {
+          "line": 3516,
+          "text": "      // structurally the wrong place for a merge-into-main to happen\"),"
+        },
+        {
+          "line": 3517,
+          "text": "      // `return`'s own progress check (aheadCount + verify) is spike-proven"
+        },
+        {
+          "line": 3518,
+          "text": "      // correct from inside a session worktree and is documented there as"
+        }
+      ],
+      "targetEvidence": {
+        "fileDigest": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+        "api": "scripts/list-doc-anchors.mjs listAnchors/anchorExists (unchanged)",
+        "passage": [
+          {
+            "line": 649,
+            "text": "### Phiên checkout đa-phiên — session start / end / list / gc"
+          },
+          {
+            "line": 650,
+            "text": ""
+          },
+          {
+            "line": 651,
+            "text": "Một **phiên** (session) là chỗ làm việc cô lập, TÙY CHỌN, gắn với đúng một"
+          },
+          {
+            "line": 652,
+            "text": "việc: mỗi phiên có một git worktree riêng cho cây nguồn git-tracked, trong khi"
+          },
+          {
+            "line": 653,
+            "text": "kho `.fgos/` (nhật ký sự kiện đã commit + view + logs) vẫn là MỘT chỗ vật lý"
+          },
+          {
+            "line": 654,
+            "text": "duy nhất chia sẻ cho mọi phiên và cây chính. Sinh ra để nhiều phiên `fgos`"
+          },
+          {
+            "line": 655,
+            "text": "chạy đồng thời trên cùng một checkout không còn thấy thay đổi chưa-commit của"
+          },
+          {
+            "line": 656,
+            "text": "nhau qua phép kiểm cây-sạch (approve/return). Epic 1 dựng vòng đời worktree +"
+          },
+          {
+            "line": 657,
+            "text": "sổ đăng ký. Epic 2 nối verb `approve` vào sổ đăng ký ở dạng CHẶN, KHÔNG phải"
+          },
+          {
+            "line": 658,
+            "text": "thích ứng: `approve` chạy TỪ TRONG một worktree phiên bị TỪ CHỐI sạch (xem"
+          },
+          {
+            "line": 659,
+            "text": "\"Bảo vệ approve khỏi lồng phiên\" dưới) — vì một worktree phiên về cấu trúc là"
+          },
+          {
+            "line": 660,
+            "text": "chỗ SAI để một merge-vào-main xảy ra. `return` KHÔNG cần đổi: phép kiểm tiến-độ"
+          },
+          {
+            "line": 661,
+            "text": "của nó (`aheadCount` + `verify`) vốn đã đúng khi chạy từ trong worktree phiên"
+          },
+          {
+            "line": 662,
+            "text": "(spike-proven), nên chạy `return` từ trong phiên vẫn hành xử y hệt mọi chỗ khác."
+          }
+        ],
+        "claimTokens": [
+          "approve",
+          "return",
+          "worktree",
+          "session"
+        ]
+      },
+      "dispositionReason": "The multi-session section states approve refuses a session worktree as structurally wrong for merge-into-main while return keeps its existing aheadCount + verify behavior. Previous session-nesting-only citation missed the quoted clause. No runtime change or parity claim.",
+      "test": "Unchanged anchor API and source/target excerpt replay; behavioral tests from cli-005 remain planned for Step 5."
+    },
+    {
+      "id": "setup-001",
+      "supersedes": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census-setup-doctor.json",
+        "rowId": "setup-001",
+        "originalRowSha256": "6d35db2a00ef2f24344b73b889faad84e85b3fa04cc65e13bfd6f8aab7d49ea7"
+      },
+      "consumerPath": "src/setup/git-hooks.mjs",
+      "fileDigest": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "decision": "L12-19",
+      "reviewer": "Lead-started A38 independent reviewer; pending",
+      "preCutoverAction": "preserve bytes",
+      "mandatoryDeepRead": true,
+      "replacesFields": [
+        "desiredOwner",
+        "desiredAnchor",
+        "cutoverPatch",
+        "parkedReason",
+        "dispositionReason"
+      ],
+      "desiredOwner": null,
+      "desiredAnchor": null,
+      "cutoverAction": "exact-cutover-patch",
+      "cutoverPatch": null,
+      "parkedReason": "Missing verified target for the dependency-install no-op when .git is absent. Preserve current citation; no replacement is executable.",
+      "sourceEvidence": [
+        {
+          "line": 78,
+          "text": " * (never the bare relative string -- see the module-level comment above"
+        },
+        {
+          "line": 79,
+          "text": " * `resolveRepoRoot` for why: a relative value resolves per-worktree, not"
+        },
+        {
+          "line": 80,
+          "text": " * to this root, once `.githooks/` is a tracked, versioned directory), if"
+        },
+        {
+          "line": 81,
+          "text": " * (and only if) a `.git` entry exists there (a directory for a plain"
+        },
+        {
+          "line": 82,
+          "text": " * clone, a file for a linked worktree -- existsSync is true for both). Idempotent: safe"
+        },
+        {
+          "line": 83,
+          "text": " * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos"
+        },
+        {
+          "line": 84,
+          "text": " * setup`). No-ops silently when installed as a dependency (no `.git`"
+        },
+        {
+          "line": 85,
+          "text": " * retained, per docs/specs/distribution.md) -- never throws."
+        },
+        {
+          "line": 86,
+          "text": " *"
+        }
+      ],
+      "searchEvidence": {
+        "paths": [
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/platform/packaging-distribution/spec.md",
+          "docs/platform/packaging-distribution/history/distribution-vision.md"
+        ],
+        "terms": [
+          "installed as a dependency",
+          "dependency install",
+          "no .git",
+          "no `.git`",
+          "no-op"
+        ],
+        "rejectedTarget": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#4-legacy-setup-compatibility",
+        "reason": "Section 4 describes legacy setup compatibility; contributor-hooks-setup states manual setup / no automatic package-install hook, not the dependency/no-.git guard in this comment."
+      },
+      "dispositionReason": "L12-19 fallback: park the missing-target patch while preserving the exact-cutover-patch disposition and current bytes. Step 3 must find a claim-matching target; do not use a generic compatibility heading."
+    },
+    {
+      "id": "evidence-195",
+      "supersedes": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-evidence-consumers.json",
+        "rowId": "evidence-195",
+        "originalRowSha256": "7e9edf36dd447f8089b66be37376d4743f0eb60e06b02f5d911cd787dbe19699"
+      },
+      "consumerPath": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "fileDigest": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "decision": "L12-19",
+      "reviewer": "Lead-started A38 independent reviewer; pending",
+      "preCutoverAction": "preserve bytes",
+      "mandatoryDeepRead": true,
+      "replacesFields": [
+        "lexicalBucket",
+        "preCutoverAction",
+        "cutoverAction",
+        "semanticReview"
+      ],
+      "edgeKind": "frozen-gate-data",
+      "lexicalBucket": "frozen-gate-data",
+      "cutoverAction": "preserve frozen bytes; rows retire with the ratchet at Phase 9 under L12-9; never mirror navigation",
+      "dispositionReason": "Frozen ratchet baseline is checker input, not an evidence navigation surface. No path or digest rewrite in this census or Phase 8."
+    },
+    {
+      "id": "evidence-181",
+      "supersedes": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-evidence-consumers.json",
+        "rowId": "evidence-181",
+        "originalRowSha256": "3a690136c18f41a8ef95da501b07e5667286a3e9ad9b40831b8402865ace7a88"
+      },
+      "consumerPath": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "fileDigest": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+      "decision": "L12-19",
+      "reviewer": "Lead-started A38 independent reviewer; pending",
+      "preCutoverAction": "preserve bytes",
+      "mandatoryDeepRead": true,
+      "replacesFields": [
+        "lexicalBucket",
+        "cutoverAction",
+        "semanticReview"
+      ],
+      "edgeKind": "behavioral-consumer",
+      "lexicalBucket": "behavioral-consumer-Step-5",
+      "writeDestination": "docs/platform/agent-coordination/verification/<track>/ (explicit current destination; not an alias)",
+      "cutoverAction": "Step 5 parity-gated patch: move write destinations and test -s checks in lockstep with evidence payload move; preserve bytes until reviewed",
+      "sourceEvidence": [
+        {
+          "line": 120,
+          "text": "## 5. Trace File Layout"
+        },
+        {
+          "line": 121,
+          "text": ""
+        },
+        {
+          "line": 122,
+          "text": "Create:"
+        },
+        {
+          "line": 123,
+          "text": ""
+        },
+        {
+          "line": 124,
+          "text": "```txt"
+        },
+        {
+          "line": 125,
+          "text": "docs/platform/agent-coordination/verification/<track>/"
+        },
+        {
+          "line": 126,
+          "text": "  index.md"
+        },
+        {
+          "line": 127,
+          "text": "  current-cell.md"
+        },
+        {
+          "line": 128,
+          "text": "  harness-cell-01-trace-harness.md"
+        },
+        {
+          "line": 418,
+          "text": "1. Define a proof artifact path convention, such as:"
+        },
+        {
+          "line": 419,
+          "text": ""
+        },
+        {
+          "line": 420,
+          "text": "   ```txt"
+        },
+        {
+          "line": 421,
+          "text": "   docs/platform/agent-coordination/verification/<track>/proofs/<cell-id>/"
+        },
+        {
+          "line": 422,
+          "text": "   ```"
+        },
+        {
+          "line": 423,
+          "text": ""
+        },
+        {
+          "line": 424,
+          "text": "2. Define required live proof fields:"
+        },
+        {
+          "line": 425,
+          "text": "   - command;"
+        },
+        {
+          "line": 470,
+          "text": ""
+        },
+        {
+          "line": 471,
+          "text": "Suggested manual checks:"
+        },
+        {
+          "line": 472,
+          "text": ""
+        },
+        {
+          "line": 473,
+          "text": "```bash"
+        },
+        {
+          "line": 474,
+          "text": "test -s docs/platform/agent-coordination/verification/<selected-track>/index.md"
+        },
+        {
+          "line": 475,
+          "text": "test -s docs/platform/agent-coordination/verification/<selected-track>/current-cell.md"
+        },
+        {
+          "line": 476,
+          "text": "```"
+        }
+      ],
+      "parkedReason": "Step 5 must trace adoption/retired-engine status and payload/writer/check parity. If proven retired-only, record evidence before historical-preserve; not assumed here.",
+      "dispositionReason": "L12-19 behavioral classification: Create/Use verification-tree destinations and live file checks cannot be classified as mere mirror navigation.",
+      "step5Mandatory": true
+    },
+    {
+      "id": "evidence-182",
+      "supersedes": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-evidence-consumers.json",
+        "rowId": "evidence-182",
+        "originalRowSha256": "311272da9a3acc0d9d122deff773ee2c1a3a9057362b0f4695a97744fc85c6bb"
+      },
+      "consumerPath": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "fileDigest": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+      "decision": "L12-19",
+      "reviewer": "Lead-started A38 independent reviewer; pending",
+      "preCutoverAction": "preserve bytes",
+      "mandatoryDeepRead": true,
+      "replacesFields": [
+        "lexicalBucket",
+        "cutoverAction",
+        "semanticReview"
+      ],
+      "edgeKind": "behavioral-consumer",
+      "lexicalBucket": "behavioral-consumer-Step-5",
+      "writeDestination": "docs/platform/agent-coordination/verification/<track>/ (explicit current destination; not an alias)",
+      "cutoverAction": "Step 5 parity-gated patch: move write destinations and test -s checks in lockstep with evidence payload move; preserve bytes until reviewed",
+      "sourceEvidence": [
+        {
+          "line": 155,
+          "text": "PERSISTENT STATE"
+        },
+        {
+          "line": 156,
+          "text": ""
+        },
+        {
+          "line": 157,
+          "text": "Use:"
+        },
+        {
+          "line": 158,
+          "text": ""
+        },
+        {
+          "line": 159,
+          "text": "<REPO_ROOT>/docs/platform/agent-coordination/verification/<TRACK>/"
+        },
+        {
+          "line": 160,
+          "text": "  index.md"
+        },
+        {
+          "line": 161,
+          "text": "  current-cell.md"
+        },
+        {
+          "line": 162,
+          "text": "  <cell-id>.md"
+        },
+        {
+          "line": 163,
+          "text": "  proofs/<cell-id>/"
+        },
+        {
+          "line": 164,
+          "text": ""
+        },
+        {
+          "line": 165,
+          "text": "index.md is the compact track status board."
+        }
+      ],
+      "parkedReason": "Step 5 must trace adoption/retired-engine status and payload/writer/check parity. If proven retired-only, record evidence before historical-preserve; not assumed here.",
+      "dispositionReason": "L12-19 behavioral classification: Create/Use verification-tree destinations and live file checks cannot be classified as mere mirror navigation.",
+      "step5Mandatory": true
+    }
+  ],
+  "reviewStatus": "author corrections; independent re-review pending"
+}

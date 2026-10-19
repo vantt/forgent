@@ -1,0 +1,1665 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 248,
+  "population": "native-reconciliation",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "native-reconciliation:consumer_7fbaaf32a6fdb177aabb9934",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0fd2bdb2ed8e6538607334fefc020ff94cd4f4fdceade16af5c3f7e35d9edf16",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7fbaaf32a6fdb177aabb9934",
+        "inventoryEdge": {
+          "edgeId": "consumer_7fbaaf32a6fdb177aabb9934",
+          "line": 1893,
+          "targetPath": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-merge-loop-recurses-into-loop-not-ck-loop` (provisional): `docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_817e849705c099a7960d06ff",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "da84fa1e2774a0d6988990c71660e6f88b95d7dcf9fc66def2dd7d5df33b296b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_817e849705c099a7960d06ff",
+        "inventoryEdge": {
+          "edgeId": "consumer_817e849705c099a7960d06ff",
+          "line": 2381,
+          "targetPath": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_12ed09776fd236da9d5569fc",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0ba256dfa5b601bd1ac304aa66f3674458c4afacc2c5ba7fe1310b7bb8571180",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_12ed09776fd236da9d5569fc",
+        "inventoryEdge": {
+          "edgeId": "consumer_12ed09776fd236da9d5569fc",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_980c4eca9d2b3948c3d75c1d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dbba5506046675f216f988af55cdbda273b7431a6d86c8396b27307d2d4ac131",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_980c4eca9d2b3948c3d75c1d",
+        "inventoryEdge": {
+          "edgeId": "consumer_980c4eca9d2b3948c3d75c1d",
+          "line": 10128,
+          "targetPath": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_88ce38e6c090841eeaf25ed9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "58469ea5e972980e2c663107b62d587a48fa3a0cb3c1d210382b59d5105e45dc",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_88ce38e6c090841eeaf25ed9",
+        "inventoryEdge": {
+          "edgeId": "consumer_88ce38e6c090841eeaf25ed9",
+          "line": 1909,
+          "targetPath": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-merge-next-auto-syncs-blockedonsync-roots` (provisional): `docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_babb16076c4649d7ff6cde4f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bdf79bd8a621d3a1bbe0e90145a3790af9167f5dd6d81a8abeb534fefd55824b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_babb16076c4649d7ff6cde4f",
+        "inventoryEdge": {
+          "edgeId": "consumer_babb16076c4649d7ff6cde4f",
+          "line": 2392,
+          "targetPath": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0b53a0af5f3fab63557c44ae",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "548ba7f11e81da041bb471dc4a99b0966d4ee9222032e5f99f706004e76a740c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_0b53a0af5f3fab63557c44ae",
+        "inventoryEdge": {
+          "edgeId": "consumer_0b53a0af5f3fab63557c44ae",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8863382af1c08aea41cf753c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7bcc4dbc369e6e97ade05f5bd9563e7c46a9a28721d8af3085cc0a72fedb22b6",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8863382af1c08aea41cf753c",
+        "inventoryEdge": {
+          "edgeId": "consumer_8863382af1c08aea41cf753c",
+          "line": 9737,
+          "targetPath": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_79a414f735d3505af98c36f9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "29cc7b3267785f763c706a1c587300a893b70b5c942b6563f4b1fe9280136ade",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_79a414f735d3505af98c36f9",
+        "inventoryEdge": {
+          "edgeId": "consumer_79a414f735d3505af98c36f9",
+          "line": 1727,
+          "targetPath": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-fgos-merge-now-refuses-outside-the-main-checkout` (provisional): `docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_48c1fb46d0c71caba47b98e5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "aca8494230580e3599e83f69cdeca475f93b4b77c3c0bfba599579bfea66254f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_48c1fb46d0c71caba47b98e5",
+        "inventoryEdge": {
+          "edgeId": "consumer_48c1fb46d0c71caba47b98e5",
+          "line": 2403,
+          "targetPath": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bedda5bce5eeea5b24e83001",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3cfa75f95016a7027aa4636dac37edd64f2716647dfc5c60c69a654f74c210d0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_bedda5bce5eeea5b24e83001",
+        "inventoryEdge": {
+          "edgeId": "consumer_bedda5bce5eeea5b24e83001",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fc14d1ae9702cdf18c13e488",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8ff17430861068d6dbaa298c786dd9d989c4c60cff0343360cfc88b10c91b8de",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_fc14d1ae9702cdf18c13e488",
+        "inventoryEdge": {
+          "edgeId": "consumer_fc14d1ae9702cdf18c13e488",
+          "line": 10162,
+          "targetPath": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4c7941e9c309129effe3e524",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "67421fe80f1f39b8773fd87a7706a3aa7f9cdaca9a6d11102b1085f58a59435c",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4c7941e9c309129effe3e524",
+        "inventoryEdge": {
+          "edgeId": "consumer_4c7941e9c309129effe3e524",
+          "line": 1925,
+          "targetPath": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline` (provisional): `docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_43e7c65b88836e1e2a57692c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0a981ea423a65d02d33e660811c3e2b0f7b711432a7d36a2ecf95950c3547cad",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_43e7c65b88836e1e2a57692c",
+        "inventoryEdge": {
+          "edgeId": "consumer_43e7c65b88836e1e2a57692c",
+          "line": 2414,
+          "targetPath": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_65f8c5d554f18737ff65a1a5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e4fc3914c0897ef78c4e3ca87aff2ac32e8e296d07545b8caef3106dc5ace957",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_65f8c5d554f18737ff65a1a5",
+        "inventoryEdge": {
+          "edgeId": "consumer_65f8c5d554f18737ff65a1a5",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_aca313678de6b184eb78ffe1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9bacd9e4963d69fc4acc3a877ff39f3578792d3892c42bbf641172fb7558f186",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_aca313678de6b184eb78ffe1",
+        "inventoryEdge": {
+          "edgeId": "consumer_aca313678de6b184eb78ffe1",
+          "line": 10298,
+          "targetPath": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0aed47fc03ac8e3d5ff45e75",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b8d9d34c3bf7424f710d9ce317635b8f34e604892464572d77532fe70aeeb2ac",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0aed47fc03ac8e3d5ff45e75",
+        "inventoryEdge": {
+          "edgeId": "consumer_0aed47fc03ac8e3d5ff45e75",
+          "line": 1987,
+          "targetPath": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human` (provisional): `docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7a3f4bfd363aec3f1579edc6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d11833c5fd193043bbfefcc9f12014e6645a8a6a0b4e546346b0cf07711f3f22",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7a3f4bfd363aec3f1579edc6",
+        "inventoryEdge": {
+          "edgeId": "consumer_7a3f4bfd363aec3f1579edc6",
+          "line": 2425,
+          "targetPath": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a7eea528961de85f5300ed4c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1af315f0d8f66020704493c40185dd6846a79753e153fd61af63ba334f92b297",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_a7eea528961de85f5300ed4c",
+        "inventoryEdge": {
+          "edgeId": "consumer_a7eea528961de85f5300ed4c",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0bc7a94e430c278adca690fa",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0c80a56ba03993b64b30674cb9bae54a6f6d90be26130642b803de91579021ae",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0bc7a94e430c278adca690fa",
+        "inventoryEdge": {
+          "edgeId": "consumer_0bc7a94e430c278adca690fa",
+          "line": 9771,
+          "targetPath": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4dd6cd12622b6eb065e9e114",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2400803b9596122a86db912abff155967f395247b8c77e295608f244686c5bf1",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4dd6cd12622b6eb065e9e114",
+        "inventoryEdge": {
+          "edgeId": "consumer_4dd6cd12622b6eb065e9e114",
+          "line": 1743,
+          "targetPath": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard` (provisional): `docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_428b0a74f3bfc5f5b2eee713",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4621363541abf29612e72fbcefce4b5dd26b654cec0b4bb18dcf4474153933c3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_428b0a74f3bfc5f5b2eee713",
+        "inventoryEdge": {
+          "edgeId": "consumer_428b0a74f3bfc5f5b2eee713",
+          "line": 2436,
+          "targetPath": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_136ed640d721d41856740573",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "6ee874e7cab206896d03e897c0babf0cf9fa17c37acd1983f4a000db339b6e9d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_136ed640d721d41856740573",
+        "inventoryEdge": {
+          "edgeId": "consumer_136ed640d721d41856740573",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d951edd2f89225df7179d84a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e93a0a8012b4e27233b61d74d6463fecddee1e0b6bf5e9e0e9c33666638be2d5",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_d951edd2f89225df7179d84a",
+        "inventoryEdge": {
+          "edgeId": "consumer_d951edd2f89225df7179d84a",
+          "line": 10979,
+          "targetPath": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "path": "docs/doc-registry.json",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f140fd6e874cfd59d5250a20",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "35370d5e708169751af56bdbe52bda138a9176ec29059b24212f03c751149e3c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_f140fd6e874cfd59d5250a20",
+        "inventoryEdge": {
+          "edgeId": "consumer_f140fd6e874cfd59d5250a20",
+          "line": 2302,
+          "targetPath": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "path": "docs/doc-registry.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate` (provisional): `docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7e34de6210a25724f35d6f91",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e1611b99248ba7b011a2067aabb4b90119e33132b7070acea046d59ffe139ad0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_7e34de6210a25724f35d6f91",
+        "inventoryEdge": {
+          "edgeId": "consumer_7e34de6210a25724f35d6f91",
+          "line": 2447,
+          "targetPath": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2c48d268d3cbf71bf6262b74",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1372567e5525253a3e4dad24b4ca84603f85cb80f44ce7fd7b591cf8a58b7cbd",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_2c48d268d3cbf71bf6262b74",
+        "inventoryEdge": {
+          "edgeId": "consumer_2c48d268d3cbf71bf6262b74",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d0f8fb0c04a5b83566951a31",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5f8a0f9a4df907d437f056431e4c6b66a4ff6f4bdea611ece168fe8eeea7e818",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d0f8fb0c04a5b83566951a31",
+        "inventoryEdge": {
+          "edgeId": "consumer_d0f8fb0c04a5b83566951a31",
+          "line": 8661,
+          "targetPath": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_491e8a64517907d28ec45015",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "61ba846958b0dccda7a3691941cc609f1fdaf4c58eb08e18955cc416d6220c21",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_491e8a64517907d28ec45015",
+        "inventoryEdge": {
+          "edgeId": "consumer_491e8a64517907d28ec45015",
+          "line": 1242,
+          "targetPath": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md` (provisional): `docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1a1b2eea892bddeb504e492b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f44f06a8ac1ab5856bac84278ef5c87f141bb740a39505018d87ad380ce4ccb5",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1a1b2eea892bddeb504e492b",
+        "inventoryEdge": {
+          "edgeId": "consumer_1a1b2eea892bddeb504e492b",
+          "line": 2458,
+          "targetPath": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3987f18aed70003cdd25bf5f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7028313a630e3de9f0883654af48b0559b9850ae1917a728ef511580b0e94686",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_3987f18aed70003cdd25bf5f",
+        "inventoryEdge": {
+          "edgeId": "consumer_3987f18aed70003cdd25bf5f",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4de7aeaaf671d066b9d306ba",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "292eb2d9edcde38edb51b441dddb566341940ac2ee71a5fbf06b63dc4181f1a4",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4de7aeaaf671d066b9d306ba",
+        "inventoryEdge": {
+          "edgeId": "consumer_4de7aeaaf671d066b9d306ba",
+          "line": 10315,
+          "targetPath": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_6282627297849d31fb7d388d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a9940e46e72ed8a15e3a16f445c1d3de13cd4ef7cfe53684137efe952b5b7915",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_6282627297849d31fb7d388d",
+        "inventoryEdge": {
+          "edgeId": "consumer_6282627297849d31fb7d388d",
+          "line": 1995,
+          "targetPath": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one` (provisional): `docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cbadfd5b52f6a643c0285775",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "96a75909e0a3fb15a6cde26456c73ce68c061ba70c346313ed3a29d133906327",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_cbadfd5b52f6a643c0285775",
+        "inventoryEdge": {
+          "edgeId": "consumer_cbadfd5b52f6a643c0285775",
+          "line": 2470,
+          "targetPath": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f1b7c21135aa9dccf0cd071e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1a7a3abe62bd6d77fd6aabe5c2ceea66462b288778c0db217c88076102ffea98",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_f1b7c21135aa9dccf0cd071e",
+        "inventoryEdge": {
+          "edgeId": "consumer_f1b7c21135aa9dccf0cd071e",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e0a9aabe88bb7db71aed23d0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3555b96d6e82eb46291f797f6b97ad6147f7b3d5c1746930b902c71dd424925b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e0a9aabe88bb7db71aed23d0",
+        "inventoryEdge": {
+          "edgeId": "consumer_e0a9aabe88bb7db71aed23d0",
+          "line": 8643,
+          "targetPath": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0f1eb81141b2071f2776dd16",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f1a1e085fe5c976a741fab714ceb0aa30f44c20a7a01991b81efacc15a63846b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0f1eb81141b2071f2776dd16",
+        "inventoryEdge": {
+          "edgeId": "consumer_0f1eb81141b2071f2776dd16",
+          "line": 1234,
+          "targetPath": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner` (provisional): `docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c76bd684ca656c2fc799934f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "73678c08bb7a1a3dac19cfbeef710bb9dc07e20d8cba453a6296f19e456b8205",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c76bd684ca656c2fc799934f",
+        "inventoryEdge": {
+          "edgeId": "consumer_c76bd684ca656c2fc799934f",
+          "line": 2481,
+          "targetPath": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4c444a96c1586b6c0e12737d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "30f77906fdbd92e2fb4c3fe77ca4bfe52881f058a6f99b87d1182053be7f3d14",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_4c444a96c1586b6c0e12737d",
+        "inventoryEdge": {
+          "edgeId": "consumer_4c444a96c1586b6c0e12737d",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_01a257aec4265ab5b10370f0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f80f40a982bc2118ebf4ed68da5c0d09a3a2f5707bf37d45f281609d3584460b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_01a257aec4265ab5b10370f0",
+        "inventoryEdge": {
+          "edgeId": "consumer_01a257aec4265ab5b10370f0",
+          "line": 9924,
+          "targetPath": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_801b1faa679d1d039283a00e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d2122304253bac2eda6df4e36c4b2d87ff6c6dffd80cb2210e297c5e4a431775",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_801b1faa679d1d039283a00e",
+        "inventoryEdge": {
+          "edgeId": "consumer_801b1faa679d1d039283a00e",
+          "line": 1814,
+          "targetPath": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it` (provisional): `docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_705c0c74957d462727ad2b85",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "44fd057bda0b23a79afe1062875a8c4c2d61b929c4e8bbf5070477b9e1ea480a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_705c0c74957d462727ad2b85",
+        "inventoryEdge": {
+          "edgeId": "consumer_705c0c74957d462727ad2b85",
+          "line": 2493,
+          "targetPath": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_450fb260a242d2bd62b84f48",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "553e6f27515e9ff298d037568e65254a2ddbf712f7139572224539077d8e16d5",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_450fb260a242d2bd62b84f48",
+        "inventoryEdge": {
+          "edgeId": "consumer_450fb260a242d2bd62b84f48",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_19594cc0c24315f287249cac",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4684a3b3c9024f20520ce46eeea2578000c3e6dc5961d2f62cffed31a2b3eba1",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_19594cc0c24315f287249cac",
+        "inventoryEdge": {
+          "edgeId": "consumer_19594cc0c24315f287249cac",
+          "line": 9822,
+          "targetPath": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9c693d647b5b57858bee57a6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9ca4c3bdcf31e0916733cbd14f065769f091b1eca5bc98cf28fb03139daac334",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9c693d647b5b57858bee57a6",
+        "inventoryEdge": {
+          "edgeId": "consumer_9c693d647b5b57858bee57a6",
+          "line": 1767,
+          "targetPath": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-fgos-retired-the-fgos-runner-json-legacy-config-fallback` (provisional): `docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_17c6604b3ee00658e377cdd1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0f2bc6d042e53968636689eb55004df484a81e17832673ab92ff5eaedca3f033",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_17c6604b3ee00658e377cdd1",
+        "inventoryEdge": {
+          "edgeId": "consumer_17c6604b3ee00658e377cdd1",
+          "line": 2504,
+          "targetPath": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bc1f39d1048813ea5eec136d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "667bc0fe6dab40af4badba722932439806d9b0ee0c5c1f1391ca11511e07348c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_bc1f39d1048813ea5eec136d",
+        "inventoryEdge": {
+          "edgeId": "consumer_bc1f39d1048813ea5eec136d",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c7d86047929611888d74d360",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "333fca9a13572be8a21d11758897937267bc16a25e9b72ee0898d815c80e7f16",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c7d86047929611888d74d360",
+        "inventoryEdge": {
+          "edgeId": "consumer_c7d86047929611888d74d360",
+          "line": 7887,
+          "targetPath": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_558368172b63d09207d2da19",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "6f25f90736dde93da1390be160abeceb4758c38dea83429658000f21b22498ec",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_558368172b63d09207d2da19",
+        "inventoryEdge": {
+          "edgeId": "consumer_558368172b63d09207d2da19",
+          "line": 906,
+          "targetPath": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `fgos-retro-loop-and-the-restored-compound-verb` (provisional): `docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_33fc999dbdbcf5c61dc61c88",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "eabca50740d3f476a67094b705a5f45a8082c6507f7d181f7bd2b0de6daa3a5f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_33fc999dbdbcf5c61dc61c88",
+        "inventoryEdge": {
+          "edgeId": "consumer_33fc999dbdbcf5c61dc61c88",
+          "line": 2515,
+          "targetPath": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5266449ae13ec377a8f2722e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3b3c19bad0b2089f1fefd1c6c2275db48bee6d0247456cdec2ba0e36c518c526",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_5266449ae13ec377a8f2722e",
+        "inventoryEdge": {
+          "edgeId": "consumer_5266449ae13ec377a8f2722e",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_027fdcee0e17a4883da4170d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c74f83fed44989cb9c2b9f845b3bef0685ed0d700beeab16835a36426f6450de",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_027fdcee0e17a4883da4170d",
+        "inventoryEdge": {
+          "edgeId": "consumer_027fdcee0e17a4883da4170d",
+          "line": 10536,
+          "targetPath": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_22c3558fe90bac5b7e0d73b0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "85cbaf43548eb0f895909a022da56ed707419f86c5a83696448b22a5b138216b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_22c3558fe90bac5b7e0d73b0",
+        "inventoryEdge": {
+          "edgeId": "consumer_22c3558fe90bac5b7e0d73b0",
+          "line": 2096,
+          "targetPath": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-retro-next-shrank-to-a-launcher` (provisional): `docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_81234cb04a8adcbb8247a526",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "485942a007f29ba1a6ba10ab08dc31fc592983ea898e969547c6f18d1a2bfedf",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_81234cb04a8adcbb8247a526",
+        "inventoryEdge": {
+          "edgeId": "consumer_81234cb04a8adcbb8247a526",
+          "line": 2527,
+          "targetPath": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ec36eef7924853ae06029e5f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dd1b6c4194f3ebf88cd4a042feefdf2b278f10e2010f9b6c8a2cf03ec73f523f",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_ec36eef7924853ae06029e5f",
+        "inventoryEdge": {
+          "edgeId": "consumer_ec36eef7924853ae06029e5f",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ee03de11a489366ab43e5f2a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a2f5f2735e5e13395bb6416026a807e3c554e7f19aeb33e2c5ae048027ed48d9",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ee03de11a489366ab43e5f2a",
+        "inventoryEdge": {
+          "edgeId": "consumer_ee03de11a489366ab43e5f2a",
+          "line": 9839,
+          "targetPath": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0205112aac178d10a096bb3f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "aad3c43820ae12d7b29724ca61630a01618f66d85b615826c12f7a2ec788840f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0205112aac178d10a096bb3f",
+        "inventoryEdge": {
+          "edgeId": "consumer_0205112aac178d10a096bb3f",
+          "line": 1775,
+          "targetPath": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+          "path": "docs/doc-registry.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md"
+        },
+        "currentConsumerSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+        "sourceLineAtOldCoordinate": "  - `why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs` (provisional): `docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_6bb2e367c98e059601c8d6ab",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "688c341ce3feb97306a76331778c828fd9dfe3f931e793a1d131aea2cc519a80",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_6bb2e367c98e059601c8d6ab",
+        "inventoryEdge": {
+          "edgeId": "consumer_6bb2e367c98e059601c8d6ab",
+          "line": 2538,
+          "targetPath": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+          "path": "docs/enduser-docs-index.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md"
+        },
+        "currentConsumerSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+        "sourceLineAtOldCoordinate": "    \"docPath\": \"docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9b08fea32e74f5b6b22e1e02",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "052f5138cf84e910cf3e5575d1bda294c359871ff76f39ac9876b93b719ef95c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_9b08fea32e74f5b6b22e1e02",
+        "inventoryEdge": {
+          "edgeId": "consumer_9b08fea32e74f5b6b22e1e02",
+          "line": 445,
+          "targetPath": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+          "path": "docs/explanation/compound-learn-artifact-registry.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/knowledge/**/*.md"
+        },
+        "currentConsumerSha256": "b499b845cd7da025c8c6661e2d852b611887b4bda4c340ac87e4737d42f65a40",
+        "sourceLineAtOldCoordinate": "(registry-independent enumeration via a `docs/knowledge/**/*.md` scan",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_256843d08b84a2966ce55b6f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7b79be3d0673edb80dffdd354909a0d4737d8ae68f903bf95abaed5080a911ef",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_256843d08b84a2966ce55b6f",
+        "inventoryEdge": {
+          "edgeId": "consumer_256843d08b84a2966ce55b6f",
+          "line": 7761,
+          "targetPath": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+          "path": "docs/doc-registry.json",
+          "kind": "literal",
+          "resolvedTarget": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md"
+        },
+        "currentConsumerSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+        "sourceLineAtOldCoordinate": "      \"currentPath\": \"docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md\",",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    }
+  ]
+}

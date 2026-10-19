@@ -1,0 +1,1784 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 282,
+  "population": "native-reconciliation",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "native-reconciliation:consumer_778b390cfcbf5841974e18b5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d56fca4130af05fec48d04deabdacea627e77314b944ca442e5c2ff43e7e24cc",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_778b390cfcbf5841974e18b5",
+        "inventoryEdge": {
+          "edgeId": "consumer_778b390cfcbf5841974e18b5",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ea50ab0216dd9a944b53264d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bb9b98037228e1fb9949428e3a70dfb994d9a5d0c8f8d95020e4b2c7ed37483e",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ea50ab0216dd9a944b53264d",
+        "inventoryEdge": {
+          "edgeId": "consumer_ea50ab0216dd9a944b53264d",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bf1f95d235157ab386bdfe25",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "86990e61354960a766f843665b37ea728b7854b538dc670ce44ce7b5e254e2cf",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_bf1f95d235157ab386bdfe25",
+        "inventoryEdge": {
+          "edgeId": "consumer_bf1f95d235157ab386bdfe25",
+          "line": 38,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/implementation-alignment.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+        "sourceLineAtOldCoordinate": "Contracts here are target normative boundaries unless marked `legacy-current`. Do not treat them as implemented without proof from [../verification/implementation-alignment.md](../verification/implementation-alignment.md).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2e6da1e3e6a4c599436b4e7b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9dc67a6c850bf46eeed031627ad1f82f542bab3681668823b18e8020afb5079b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_2e6da1e3e6a4c599436b4e7b",
+        "inventoryEdge": {
+          "edgeId": "consumer_2e6da1e3e6a4c599436b4e7b",
+          "line": 45,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "kind": "literal",
+          "rawTarget": "../verification/implementation-alignment.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "0d83c8d9b228d20578073982749a5d1a9a83d695007ef9927f78e9fd5d065617",
+        "sourceLineAtOldCoordinate": "| alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_6a44418e99c76c7985f91659",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "95e4a87569dd39224bb8a3ea07afc7924949a9e4f2e3382b6a9173938518cf86",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_6a44418e99c76c7985f91659",
+        "inventoryEdge": {
+          "edgeId": "consumer_6a44418e99c76c7985f91659",
+          "line": 15,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/decisions/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_92bcfcea4479b3ef72e468b5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "81833802e584b613d3cc7a484bea19718199aa35effb3f288b1d43019505a3fe",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_92bcfcea4479b3ef72e468b5",
+        "inventoryEdge": {
+          "edgeId": "consumer_92bcfcea4479b3ef72e468b5",
+          "line": 30,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/decisions/README.md",
+          "kind": "literal",
+          "rawTarget": "../verification/implementation-alignment.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+        "sourceLineAtOldCoordinate": "Accepted direction that already exists in the legacy sources is preserved in [../intent-preservation-ledger.md](../intent-preservation-ledger.md), explained as target intent in [../vision.md](../vision.md), and checked against implementation in [../verification/implementation-alignment.md](../verification/implementation-alignment.md). Those files keep the migration safe, but future settled decisions should be written here as explicit decision records when the area needs an ADR-style artifact.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a5e598b328661710a509001b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dcd9e3a7627e757a2dbb4ef8fc0e5dca3152e97cb226bfdda1758583e8250114",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a5e598b328661710a509001b",
+        "inventoryEdge": {
+          "edgeId": "consumer_a5e598b328661710a509001b",
+          "line": 51,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/decisions/README.md",
+          "kind": "literal",
+          "rawTarget": "../verification/implementation-alignment.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "f9c61bff1d4eb68373a99de76522ffafb033f93736022bb8d26c3cdb0a7b1ada",
+        "sourceLineAtOldCoordinate": "| implementation alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_bb4f8844c4494c85c47ae713",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "049b969e042e6b3360894c41da1d67ec98936603011c1d4f6f46a7694aa7bc03",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_bb4f8844c4494c85c47ae713",
+        "inventoryEdge": {
+          "edgeId": "consumer_bb4f8844c4494c85c47ae713",
+          "line": 24,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "kind": "literal",
+          "rawTarget": "../verification/implementation-alignment.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+        "sourceLineAtOldCoordinate": "| [host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) | Main architecture / kernel contract | `legacy-current source` until redirected | `split` | [vision.md](../vision.md), [architecture/invocation-kernel.md](../architecture/invocation-kernel.md), [architecture/host-use-cases.md](../architecture/host-use-cases.md), [architecture/provider-routing.md](../architecture/provider-routing.md), [contracts/](../contracts/README.md), [verification/implementation-alignment.md](../verification/implementation-alignment.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04252",
+          "maps-04253"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_faad360f3a3819f75c7c8b93",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dba84c0340dafae0b84e9c6ad86fed093ecf75d076cceda9c2ce57b89976e906",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_faad360f3a3819f75c7c8b93",
+        "inventoryEdge": {
+          "edgeId": "consumer_faad360f3a3819f75c7c8b93",
+          "line": 14,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8b1bf09bc59275a4b314303f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0c720360fe0e7e4451ebc025e201da05500641e087761a60cf082ba6216ede09",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8b1bf09bc59275a4b314303f",
+        "inventoryEdge": {
+          "edgeId": "consumer_8b1bf09bc59275a4b314303f",
+          "line": 31,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ab68d6ccd0cd30372977de0a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "111c7cef9e35605a66752dfa54eed75e1780d0f3c2e460a710e1b50e38f8f5c3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ab68d6ccd0cd30372977de0a",
+        "inventoryEdge": {
+          "edgeId": "consumer_ab68d6ccd0cd30372977de0a",
+          "line": 16,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a519e6cf726c15cee23f1ff0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "35e2dc7de69a01e412d780f3171d72f29bb9214e5127c638a82cd5a271a8f5c5",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a519e6cf726c15cee23f1ff0",
+        "inventoryEdge": {
+          "edgeId": "consumer_a519e6cf726c15cee23f1ff0",
+          "line": 14,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/spec.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8faf9cd8c21f4ee4392cdbc1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "747d6814898a064acf83163a8f52c31ea7364e984629187021217b771f2de3b3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8faf9cd8c21f4ee4392cdbc1",
+        "inventoryEdge": {
+          "edgeId": "consumer_8faf9cd8c21f4ee4392cdbc1",
+          "line": 12,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/verification/README.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "195ac902e325e8391ba2988de36025649158c77f2483f5307cf6d3813a0fb9ba",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_371801f9dfcbf7848f0ba7ae",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2da9845530a1369fd18fa8ef45b548fbd14a8eb36f26e73df5b905c410042945",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_371801f9dfcbf7848f0ba7ae",
+        "inventoryEdge": {
+          "edgeId": "consumer_371801f9dfcbf7848f0ba7ae",
+          "line": 14,
+          "targetPath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/implementation-alignment.md"
+        },
+        "currentConsumerSha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1ea4a3d6ad3291182af140b9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "480ddbcddc007a33ba586f9198011fb7fef0fafea9da733b7078018d4036845d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_1ea4a3d6ad3291182af140b9",
+        "inventoryEdge": {
+          "edgeId": "consumer_1ea4a3d6ad3291182af140b9",
+          "line": 34,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "kind": "executable-proof",
+          "rawTarget": "../../platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "sourceLineAtOldCoordinate": "[verification/r1-rust-host-proof.md](../../platform/host-invocation-routing/verification/r1-rust-host-proof.md),",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e777215b4c76bafaedcf1312",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a539d8f3f97da4ddfc6865c4dcde2d899052baa6c76409b97299b66e78453c08",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_e777215b4c76bafaedcf1312",
+        "inventoryEdge": {
+          "edgeId": "consumer_e777215b4c76bafaedcf1312",
+          "line": 24,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "kind": "executable-proof",
+          "rawTarget": "../../platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "6ec5a5afad77acdf0dacf5523ae8a5b452e2ff5bd92015830c7526ebcee3e41a",
+        "sourceLineAtOldCoordinate": "[verification/r1-rust-host-proof.md](../../platform/host-invocation-routing/verification/r1-rust-host-proof.md),",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_909ab855753e13dc9e7dea7e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a36f4a57d9ef200f8c17cfe18b4b771ca687423e15d65aa954c8b2fe77d5fe56",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_909ab855753e13dc9e7dea7e",
+        "inventoryEdge": {
+          "edgeId": "consumer_909ab855753e13dc9e7dea7e",
+          "line": 451,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+        "sourceLineAtOldCoordinate": "| `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b3a6e7a8c8d8a600ad322212",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1c322607dfea5e37a488da5f48047db28fcf3afeb4886c523f80b1929050efac",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_b3a6e7a8c8d8a600ad322212",
+        "inventoryEdge": {
+          "edgeId": "consumer_b3a6e7a8c8d8a600ad322212",
+          "line": 45,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "389412c0eca0db5c2acd67a6d54ad368d05e44ed4075ef131f00e48cd008785b",
+        "sourceLineAtOldCoordinate": "| Legacy CLI routes bypass the kernel. | `implemented preview` | [legacy-cli-transition.md](legacy-cli-transition.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Current route matrix still has 70 `legacy-cli` selectors; keep bypass behavior until each selector migrates. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e0a79a486c26b697fe9cfc58",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "acf80250d19cc1b64610d10d46240a4d49d272aa573a9a64184e53410a477bc7",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_e0a79a486c26b697fe9cfc58",
+        "inventoryEdge": {
+          "edgeId": "consumer_e0a79a486c26b697fe9cfc58",
+          "line": 42,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+        "sourceLineAtOldCoordinate": "| `legacy-cli` route bypasses `InvocationService`. | `implemented preview` | [source transition §1](../../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep until each selector migrates from `legacy-cli` to `native`. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04162"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7e1bba86367dd61527d87b21",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3783f18b7c65acb983059124abafcc223726171b103f3bab10fb2547fbd8bb9b",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_7e1bba86367dd61527d87b21",
+        "inventoryEdge": {
+          "edgeId": "consumer_7e1bba86367dd61527d87b21",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_20994f457a24af8889f9f9ad",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "881a6f79508de09baf83f9672c195fecdc2000e88079e88e383f569a38108018",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_20994f457a24af8889f9f9ad",
+        "inventoryEdge": {
+          "edgeId": "consumer_20994f457a24af8889f9f9ad",
+          "line": 45,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+        "sourceLineAtOldCoordinate": "| Rust host first is selected. | `implemented preview` | [source migration §2](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Preview Rust host exists and is the installed/default preview entry. Stable/default graduation remains a release-owner decision. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04180"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_9113b78c37111321cd645ca5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "df18af3ee7a10d800f4cfce3771f5493ff7209de342b2b1d36c9439e4a174e44",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_9113b78c37111321cd645ca5",
+        "inventoryEdge": {
+          "edgeId": "consumer_9113b78c37111321cd645ca5",
+          "line": 56,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+        "sourceLineAtOldCoordinate": "| R1 proof | [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_76370b841c2784f44600a2ee",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3947d399f9aab2580f24e357e6399b798c58bcb7c879e1e8d0d6194cf16b06a0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_76370b841c2784f44600a2ee",
+        "inventoryEdge": {
+          "edgeId": "consumer_76370b841c2784f44600a2ee",
+          "line": 88,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+        "sourceLineAtOldCoordinate": "[verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md),",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_aa404d76ee0d98730d139c4f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b1ba01b5605d584174d018a5baa9e92bad9a1991852ae55d6e9a1d0aac66bb2a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_aa404d76ee0d98730d139c4f",
+        "inventoryEdge": {
+          "edgeId": "consumer_aa404d76ee0d98730d139c4f",
+          "line": 12,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ff3713ab9df81e362b58f7b8",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "49d123ec4d4ff3e1dff4bb717260d0ed41da3803684f45cdb0b00721f8a597cf",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_ff3713ab9df81e362b58f7b8",
+        "inventoryEdge": {
+          "edgeId": "consumer_ff3713ab9df81e362b58f7b8",
+          "line": 47,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "| R1 Rust host code path exists. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/lib.rs](../../../../packages/host-runtime/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Route migration remains partial: 70 selectors still use the manifest-owned legacy CLI lane. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ba0f539aa55c2e549fc88527",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8f5d572d48a4e0dfac8a594e8851304a0cf49b83049f84283dba7e853c9fa345",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_ba0f539aa55c2e549fc88527",
+        "inventoryEdge": {
+          "edgeId": "consumer_ba0f539aa55c2e549fc88527",
+          "line": 56,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "| R1 proof | [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cc4a4fe91c92c55e607c8e67",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e9f6c4bde9bc1b46bd488ed665138a85c11ef97db1453e4b7d5c54608a0e30dc",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_cc4a4fe91c92c55e607c8e67",
+        "inventoryEdge": {
+          "edgeId": "consumer_cc4a4fe91c92c55e607c8e67",
+          "line": 53,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+        "sourceLineAtOldCoordinate": "| `legacy-cli` preserves provider-owned argv. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Full compatibility-vector cleanup remains future, but manifest-owned legacy CLI lane is proven for preview. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_dd7b82bc6861e6a592807df0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ab7ae6e86f166005dddd8a9af1b37841f35ff7c52bfbccc8cb1a2f65d0724ceb",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_dd7b82bc6861e6a592807df0",
+        "inventoryEdge": {
+          "edgeId": "consumer_dd7b82bc6861e6a592807df0",
+          "line": 50,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+        "sourceLineAtOldCoordinate": "| Release manifest locates payload. | `implemented preview` | [release manifest contract](../../packaging-distribution/contracts/release-manifest.md), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep manifest-owned legacy payload resolution until zero legacy routes and removal gates pass. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d6225fd353170b1232b25c7f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b6e5000e5e9ddcbb2d6a0af2b72ca46c00055d589e569b862bc91c3a5bb740de",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_d6225fd353170b1232b25c7f",
+        "inventoryEdge": {
+          "edgeId": "consumer_d6225fd353170b1232b25c7f",
+          "line": 37,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+        "sourceLineAtOldCoordinate": "| First native operation is `distribution.build.show`. | `implemented preview` | [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | Proven for CLI `version` and remote `GET /v1/runtime`; stable/default graduation remains release-owner decision. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a16bb3e927dadd20d4df63ea",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4547cb2fae44522ae7fc5b5150e9ad221b3b758f9bbffd6b29a0de822052b6aa",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_a16bb3e927dadd20d4df63ea",
+        "inventoryEdge": {
+          "edgeId": "consumer_a16bb3e927dadd20d4df63ea",
+          "line": 49,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a",
+        "sourceLineAtOldCoordinate": "| Legacy CLI bytes are not wrapped twice. | `implemented preview` | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs) | Compatibility vectors still protect future repairs, but preview legacy lane avoids double wrapping. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4886d3f7cafa6a7111c29154",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b9682a516e71b4cef1a6a94e3eb2b1c75a2cb69872826d533539c9faf415809f",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_4886d3f7cafa6a7111c29154",
+        "inventoryEdge": {
+          "edgeId": "consumer_4886d3f7cafa6a7111c29154",
+          "line": 27,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+        "sourceLineAtOldCoordinate": "| [node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) | Selected migration direction | `legacy-current source` until redirected | `split` | [architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md), [architecture/release-boundaries.md](../architecture/release-boundaries.md), [verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [history/host-invocation-baseline.md](host-invocation-baseline.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04260"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0789b28ddeacc2d6fefa3ad4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c2c7255906f3bcbe354726ffc182cae063b81b47c728f77adc1010bce32b3332",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_0789b28ddeacc2d6fefa3ad4",
+        "inventoryEdge": {
+          "edgeId": "consumer_0789b28ddeacc2d6fefa3ad4",
+          "line": 28,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r1-rust-host-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+        "sourceLineAtOldCoordinate": "| [rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) | Execution plan | `legacy-current source` until redirected | `split` and `deferred` for open decisions | [architecture/release-boundaries.md](../architecture/release-boundaries.md), [verification/compatibility-harness.md](../verification/compatibility-harness.md), [verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md), [verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04261"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ca33013df2736998955253ae",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "298e0ccbb0a8ad845076f473f19cf7ac1a4f4a6b2ec07e06a2e2db6a6242aa3a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ca33013df2736998955253ae",
+        "inventoryEdge": {
+          "edgeId": "consumer_ca33013df2736998955253ae",
+          "line": 58,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+          "kind": "fixture",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md"
+        },
+        "currentConsumerSha256": "15f5f3db04b2e759d3d17b82a02ecd87f48c7b0c7d87e1963a6947f0c4f35a44",
+        "sourceLineAtOldCoordinate": "| Workspace local `fgos` can enter the Rust host through activation. | implemented preview | `test/rust-host/fgctl-init.test.mjs`, `scripts/ci-external-consumer.sh`, `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md`, `docs/platform/packaging-distribution/verification/install-and-release-proof.md` | Public preview posture is settled: external installs default `fgos` through the Rust host, public docs may state Rust host is the default installed runtime, and proof covers local fixture plus external-consumer asset flow where `version --runtime-json` reports `host: \"rust\"` and the activated `artifactDigest`. Stable/default release posture remains a separate release-owner decision. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d3718b2efa93c126c56ac11a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "146ea5fe0ace9aca6ba0cf627ab28dea4a253a35ae91019fe1096d65b3597c7a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_d3718b2efa93c126c56ac11a",
+        "inventoryEdge": {
+          "edgeId": "consumer_d3718b2efa93c126c56ac11a",
+          "line": 25,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "kind": "executable-proof",
+          "rawTarget": "../../platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "6ec5a5afad77acdf0dacf5523ae8a5b452e2ff5bd92015830c7526ebcee3e41a",
+        "sourceLineAtOldCoordinate": "[verification/r2-external-process-proof.md](../../platform/host-invocation-routing/verification/r2-external-process-proof.md),",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_96a6fb97268c0923b76ad820",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "22c7ff8354fe75236c8d93620402a08a9402a4c2d3f351dc4726fbd767545376",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_96a6fb97268c0923b76ad820",
+        "inventoryEdge": {
+          "edgeId": "consumer_96a6fb97268c0923b76ad820",
+          "line": 452,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+        "sourceLineAtOldCoordinate": "| `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_db719816141c339a9e215ce2",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ffa125f68d23dcbc22bfb4a8bbdb1fd6566de97fcb763f198ba0db2a1ebeb9c4",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_db719816141c339a9e215ce2",
+        "inventoryEdge": {
+          "edgeId": "consumer_db719816141c339a9e215ce2",
+          "line": 14,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_77cdccc7645f7e02904ed019",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "73ac63af4daf5ace50755e698beb8d5dc45a9c4b95678406d523180a35c73e95",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_77cdccc7645f7e02904ed019",
+        "inventoryEdge": {
+          "edgeId": "consumer_77cdccc7645f7e02904ed019",
+          "line": 41,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "sourceLineAtOldCoordinate": "| Process protocol framing is length-prefixed JSON-RPC over stdio. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance tests closed 2026-09-15. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04135"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_01f947dbf8f597a6815c3d95",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a53bd4d0f819dc134276b7140d948e441da1cbba8cb10c7d5228ecad0f704bb4",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_01f947dbf8f597a6815c3d95",
+        "inventoryEdge": {
+          "edgeId": "consumer_01f947dbf8f597a6815c3d95",
+          "line": 42,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "sourceLineAtOldCoordinate": "| Static manifest discovery does not execute provider code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 discovery proof closed 2026-09-15. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04136"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5178c70de279b3c7b7a151cf",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "60c4676537d2e8d014bfab92189d06c69acd168947db26ffb49a5d88b1fc0778",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_5178c70de279b3c7b7a151cf",
+        "inventoryEdge": {
+          "edgeId": "consumer_5178c70de279b3c7b7a151cf",
+          "line": 43,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "sourceLineAtOldCoordinate": "| Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | Still future ecosystem decision -- unaffected by R2 closing. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e2a89b10030c5210824e27fa",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "8a594b87d087ffead3e79a13f4b9c56fadc734452266f50f8400ec100c4007b2",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_e2a89b10030c5210824e27fa",
+        "inventoryEdge": {
+          "edgeId": "consumer_e2a89b10030c5210824e27fa",
+          "line": 51,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "sourceLineAtOldCoordinate": "| R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e7e4108736f41ac8e4f8de17",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "005b163052e0d2d57f468bf41ede73dfee4bc2eb3201a607b8d804c870992c6d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_e7e4108736f41ac8e4f8de17",
+        "inventoryEdge": {
+          "edgeId": "consumer_e7e4108736f41ac8e4f8de17",
+          "line": 50,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+        "sourceLineAtOldCoordinate": "| Router is pure and fail-closed. | `current partial` | [old architecture §6](../spec.md#6-router-pure-and-invocationservice-pipeline), [../../../../packages/host-runtime/rust/src/operation_provider_router.rs](../../../../packages/host-runtime/rust/src/operation_provider_router.rs), [../../../../packages/host-runtime/rust/tests/module_graph.rs](../../../../packages/host-runtime/rust/tests/module_graph.rs), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P5 proved duplicate, reserved-namespace, and incompatible-contract refusal for external providers through the real `ExternalProcessLinker` (closed 2026-09-15). Denied-host/denied-capability tests for external providers remain future work. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_39cb4e9dfe7703f454e6cc2b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "19871396ba21fd0ea15c5759787a46321abcf939f1156b01e4b1cf80eda00ec2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_39cb4e9dfe7703f454e6cc2b",
+        "inventoryEdge": {
+          "edgeId": "consumer_39cb4e9dfe7703f454e6cc2b",
+          "line": 51,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "kind": "fixture",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+        "sourceLineAtOldCoordinate": "| Provider manifest never grants authority. | `implemented preview` | [external provider protocol §5](external-provider-protocol.md#5-namespace-rules), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P5 caught and deleted a synthetic-admission fallback that would have let a provider's own descriptor metadata fabricate an authority policy id; the merged code has no such path -- `fixture.echo.echo` is admitted only through an authored `OperationDescriptor` and the real `CallerAdmission` gate, same as any operation. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a0015317298f0cffbcd9f503",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0788209134885b95f882c0b18a66236bc2bc864294a4ee88dbe14ec2c1500bf0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_a0015317298f0cffbcd9f503",
+        "inventoryEdge": {
+          "edgeId": "consumer_a0015317298f0cffbcd9f503",
+          "line": 52,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+        "sourceLineAtOldCoordinate": "| Config cannot replace built-in provider. | `current partial` | [old architecture §7](../spec.md#7-authority-two-stage), [../../../../packages/host-runtime/rust/src/authority_gate.rs](../../../../packages/host-runtime/rust/src/authority_gate.rs), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P5 proved `distribution.build.show`/`work.gate-bypass.show` cannot be claimed by an external manifest (`LinkerError::ReservedNamespace`). Declared-replacement resolution at `select()` time (`registry.rs`'s known R1 gap) remains unimplemented for both built-in and external providers. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_31d967ae196da46a89475223",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "90809b66eed9d1c8ce006fd9b6c024dda13dc312c607376eb35ec8b75b342f6d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_31d967ae196da46a89475223",
+        "inventoryEdge": {
+          "edgeId": "consumer_31d967ae196da46a89475223",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5f9a229dce2bcaf64f0407ff",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "040c8b61e271b1dee4992b93139ffa6a50a07a8379ccfd59630b95828a03b88a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5f9a229dce2bcaf64f0407ff",
+        "inventoryEdge": {
+          "edgeId": "consumer_5f9a229dce2bcaf64f0407ff",
+          "line": 32,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "fixture",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "| R2 | External process preview: framed protocol, supervision, fixture conformance, static manifest validation. `implemented preview`, closed 2026-09-15 -- see [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md). Derived cache by fingerprint stayed in-memory only (R2-P2's own scope decision); persisted cache/lock is future work. | Core replacement, signatures/marketplace, WASM. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c0a6278cdec4fb29916bdc15",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "39bac3005a6111a64ef6453cf0d28c6e9559e5a4a6b6bce4d732917016dc22ed",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_c0a6278cdec4fb29916bdc15",
+        "inventoryEdge": {
+          "edgeId": "consumer_c0a6278cdec4fb29916bdc15",
+          "line": 49,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "| R2 and R3 do not delay R1 installed-entry flip. | `confirmed` | [source plan §1](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md)#6, [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | Every R2 merge re-ran and passed the full R1 proof (`cargo test -p fgos-host-runtime -p fgos --quiet`, `node --test test/rust-host/command-routes.test.mjs`) with `apps/fgos` composition-root wiring untouched. R3 is a separate implemented-preview gateway peer proof for `GET /v1/runtime`; it does not change the R1 installed-entry flip. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04204"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8aa7b880c2c5c362e5cebfb3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0901a58b8eb7b65bf556ad1c070e9acee1f4656ca51516af9476e77ae5272554",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_8aa7b880c2c5c362e5cebfb3",
+        "inventoryEdge": {
+          "edgeId": "consumer_8aa7b880c2c5c362e5cebfb3",
+          "line": 57,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+        "sourceLineAtOldCoordinate": "| R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b8c815f0ddc32bc0b42f6e32",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "884deca0e2c4c53ed02f210c229a79b448c544da8370f645dbb0d9fd7f132e5a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_b8c815f0ddc32bc0b42f6e32",
+        "inventoryEdge": {
+          "edgeId": "consumer_b8c815f0ddc32bc0b42f6e32",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7d402aeb473d3029fe410053",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1068eb893b8eadbcafcc2a1f0bdbbdec4a181e3702a9b0ee02dd07a3b6a8b2c7",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_7d402aeb473d3029fe410053",
+        "inventoryEdge": {
+          "edgeId": "consumer_7d402aeb473d3029fe410053",
+          "line": 44,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+        "sourceLineAtOldCoordinate": "| Component protocol is distinct from public host protocols. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance proof closed 2026-09-15. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04215"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cb6fac604842381f90a88ac8",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e0d12f55e7b89257d5dd59554dd296ebc340247f6da65fd203749a6c649cc6a6",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_cb6fac604842381f90a88ac8",
+        "inventoryEdge": {
+          "edgeId": "consumer_cb6fac604842381f90a88ac8",
+          "line": 53,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+        "sourceLineAtOldCoordinate": "| R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c61d0a82d2a3165b33fa98cd",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0a46fa87fd711063463f5a9b5aebb436f4a06e1eea8729b5de4e08876af2bdb7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_c61d0a82d2a3165b33fa98cd",
+        "inventoryEdge": {
+          "edgeId": "consumer_c61d0a82d2a3165b33fa98cd",
+          "line": 42,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+          "kind": "fixture",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+        "sourceLineAtOldCoordinate": "| Static discovery does not execute code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 manifest fixture closed 2026-09-15. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04228"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_35c3cb0eeabcca966e64ccc2",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2737b9f448251533773196a3c068ef5b4e979558958273b7b16aaf6a8e50e571",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_35c3cb0eeabcca966e64ccc2",
+        "inventoryEdge": {
+          "edgeId": "consumer_35c3cb0eeabcca966e64ccc2",
+          "line": 43,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+        "sourceLineAtOldCoordinate": "| Registry is derived rebuildable state. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P2 linker proof closed 2026-09-15 (in-memory only; persisted cache/lock by fingerprint remains future work). |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04229"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_84ad16e9adea5c03c6372a96",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ff15de2cc5f8f6c56e731c0fe8a5e290a4d008cbea458f3e80ec9625e448f306",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_84ad16e9adea5c03c6372a96",
+        "inventoryEdge": {
+          "edgeId": "consumer_84ad16e9adea5c03c6372a96",
+          "line": 51,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+        "sourceLineAtOldCoordinate": "| R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b6bfa87eb6edf344497fc1d3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "64f958c08f93e69241bec0cb6c292360f64e3177ee9c385c265a85a9ad39f784",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_b6bfa87eb6edf344497fc1d3",
+        "inventoryEdge": {
+          "edgeId": "consumer_b6bfa87eb6edf344497fc1d3",
+          "line": 41,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+        "sourceLineAtOldCoordinate": "| Providers receive least-privilege grant. | `current partial` | [provider routing](../architecture/provider-routing.md), [../../../../packages/host-runtime/rust/src/authority_gate.rs](../../../../packages/host-runtime/rust/src/authority_gate.rs), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2 proved external process providers go through the same admission/grant path; replacement-resolution policy remains partial. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_746186bb69ef90b3fec9f920",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "bcca6d6e18442cb261b32330c4f3a3ff9bf4726765667f00d2e841ad39d04b1c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_746186bb69ef90b3fec9f920",
+        "inventoryEdge": {
+          "edgeId": "consumer_746186bb69ef90b3fec9f920",
+          "line": 25,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+        "sourceLineAtOldCoordinate": "| [external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md) | External provider / plugin protocol | `legacy-current source` until redirected | `split` | [architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md), [contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md), [contracts/component-protocol.md](../contracts/component-protocol.md), [verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04254",
+          "maps-04255",
+          "maps-04256"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_528f1c1c1effcf548335d6ea",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "327da5cf13cc6a2605069c6c6bee585dabe045a1d87792dfa3dd018a6457f29f",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_528f1c1c1effcf548335d6ea",
+        "inventoryEdge": {
+          "edgeId": "consumer_528f1c1c1effcf548335d6ea",
+          "line": 28,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "kind": "executable-proof",
+          "rawTarget": "../verification/r2-external-process-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+        "sourceLineAtOldCoordinate": "| [rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) | Execution plan | `legacy-current source` until redirected | `split` and `deferred` for open decisions | [architecture/release-boundaries.md](../architecture/release-boundaries.md), [verification/compatibility-harness.md](../verification/compatibility-harness.md), [verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md), [verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [
+          "maps-04261"
+        ],
+        "reconciliation": "current line accounted, inferred target is not a literal dependency",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8910c0662d438611f1956b75",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "87514df46d746703125db3f11ef200a5d6645cfbbe6eec0bafd20b6dec8e3306",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_8910c0662d438611f1956b75",
+        "inventoryEdge": {
+          "edgeId": "consumer_8910c0662d438611f1956b75",
+          "line": 14,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+        },
+        "currentConsumerSha256": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_2c68f2fce85ba6aa8ab557ee",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4159c8c6b72a55c92604e36728b1a91138c982d4d73d7e6c186e0e9ca26f410c",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_2c68f2fce85ba6aa8ab557ee",
+        "inventoryEdge": {
+          "edgeId": "consumer_2c68f2fce85ba6aa8ab557ee",
+          "line": 26,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+          "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "kind": "executable-proof",
+          "rawTarget": "../../platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md"
+        },
+        "currentConsumerSha256": "6ec5a5afad77acdf0dacf5523ae8a5b452e2ff5bd92015830c7526ebcee3e41a",
+        "sourceLineAtOldCoordinate": "and [verification/r3-remote-peer-proof.md](../../platform/host-invocation-routing/verification/r3-remote-peer-proof.md).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1fe1d8afcec2ee95ff1e74ca",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0fdf186e0442dad2da3aaed5e1766c94cbf16aca4542b7ad7b5c58181cac89e1",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_1fe1d8afcec2ee95ff1e74ca",
+        "inventoryEdge": {
+          "edgeId": "consumer_1fe1d8afcec2ee95ff1e74ca",
+          "line": 453,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+          "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md"
+        },
+        "currentConsumerSha256": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+        "sourceLineAtOldCoordinate": "| `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c91bf64364477ce6eba0a162",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "061d3b5247875c57b137a726bd4276cd844263467ffe5efa39137095667ef97d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_c91bf64364477ce6eba0a162",
+        "inventoryEdge": {
+          "edgeId": "consumer_c91bf64364477ce6eba0a162",
+          "line": 13,
+          "targetPath": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+          "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+          "kind": "executable-proof",
+          "resolvedTarget": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md"
+        },
+        "currentConsumerSha256": "e736adcf550e767e87fe080adb6791b2dd1931f84b2d2078f761f1869882fc84",
+        "sourceLineAtOldCoordinate": "- docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    }
+  ]
+}

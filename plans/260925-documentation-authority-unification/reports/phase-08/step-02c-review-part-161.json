@@ -1,0 +1,1697 @@
+{
+  "requestIdentity": "step-02c-census",
+  "inputHEAD": "c801778ac48e78dae45b67a58b7484e87bfcd4a5",
+  "part": 161,
+  "population": "native-reconciliation",
+  "deepReadRule": "≥10 deep reads + every mandatory row; homogeneous minimum 15%; all entries when fewer than 10. Every writer, behavioral/runtime, gateway, correction and anchor-check failure is mandatory if present. Mechanical coverage is 100%.",
+  "entries": [
+    {
+      "reviewId": "native-reconciliation:consumer_9ce32d50d72c0db83646adf9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7d8810ff3fc96ccdbd3a0888d449bdd2f6c7016471438d11a11e7ae81aabf792",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_9ce32d50d72c0db83646adf9",
+        "inventoryEdge": {
+          "edgeId": "consumer_9ce32d50d72c0db83646adf9",
+          "line": 157,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/platform/distillery/spec.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/porting-log.md"
+        },
+        "currentConsumerSha256": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+        "sourceLineAtOldCoordinate": "- Human-readable log: `docs/distillery/porting-log.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_f2ee252211deb888e273ecbd",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "16fb8b17bab59ba3e2985bf4e44a933e94a73b18d5179f4c078fe8a85bb823c2",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_f2ee252211deb888e273ecbd",
+        "inventoryEdge": {
+          "edgeId": "consumer_f2ee252211deb888e273ecbd",
+          "line": 1080,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/**"
+        },
+        "currentConsumerSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+        "sourceLineAtOldCoordinate": "  Rust khác hẳn), `docs/distillery/**` (trích verbatim upstream),",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_67dae69d76b7e75459637e5f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5cac9c571164084de7e240977c511610e8b4c63d032fbd7695dacfb796a64f37",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_67dae69d76b7e75459637e5f",
+        "inventoryEdge": {
+          "edgeId": "consumer_67dae69d76b7e75459637e5f",
+          "line": 785,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/**"
+        },
+        "currentConsumerSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+        "sourceLineAtOldCoordinate": "trait mở/focus terminal pane, dùng từ đúng, giữ nguyên), `docs/distillery/**`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_0e13f50ceca70db3c78f5305",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "474dba7e46528e2e89cbe925ee48f06538a497a478d51dc1af6f39d1a1075907",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_0e13f50ceca70db3c78f5305",
+        "inventoryEdge": {
+          "edgeId": "consumer_0e13f50ceca70db3c78f5305",
+          "line": 135,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/specs/distillery.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/porting-log.md"
+        },
+        "currentConsumerSha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+        "sourceLineAtOldCoordinate": "- Human-readable log: `docs/distillery/porting-log.md`",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_41bceab334717f68e3053941",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "60d1958019d15b8bd8d7ee7e1ebdecb2d590a75b8d6ff5859e05978f417beaea",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_41bceab334717f68e3053941",
+        "inventoryEdge": {
+          "edgeId": "consumer_41bceab334717f68e3053941",
+          "line": 2375,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/specs/runner.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/**"
+        },
+        "currentConsumerSha256": "309ff79f0b766aaefb501590982a00c4cd28f8dab3ff82159224201af78211c8",
+        "sourceLineAtOldCoordinate": "",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_314a03d7783e8551d60526e4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a2fc578c9eec9a46a6fe18a5b941d987aced0a8e0e8a21a0522897e6d27f15f0",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_314a03d7783e8551d60526e4",
+        "inventoryEdge": {
+          "edgeId": "consumer_314a03d7783e8551d60526e4",
+          "line": 2670,
+          "targetPath": "docs/distillery/porting-log.md",
+          "path": "docs/specs/runner.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/**"
+        },
+        "currentConsumerSha256": "309ff79f0b766aaefb501590982a00c4cd28f8dab3ff82159224201af78211c8",
+        "sourceLineAtOldCoordinate": "",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8961069c2eae1591cf0095df",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "41d2d7216f7cbb22da0343817fadd4559c00ce213c11c29116c5abd704798d4f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8961069c2eae1591cf0095df",
+        "inventoryEdge": {
+          "edgeId": "consumer_8961069c2eae1591cf0095df",
+          "line": 39,
+          "targetPath": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md",
+          "path": "docs/distillery/sources/beehive.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/reports/distill-bee-inventory-2026-07-18.md"
+        },
+        "currentConsumerSha256": "544a84bf984a49d7986fcfa01bb4bf7c7a4ac97cc8a056d34b2fa03db915b274",
+        "sourceLineAtOldCoordinate": "> plus the original `docs/distillery/reports/distill-bee-inventory-2026-07-18.md`.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_88fda7b9a77d24089f97268a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "fe6a16d139d29b9d4760642f54bf228da3563a24b9f3470cc02fed6e2998ed2f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_88fda7b9a77d24089f97268a",
+        "inventoryEdge": {
+          "edgeId": "consumer_88fda7b9a77d24089f97268a",
+          "line": 598,
+          "targetPath": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "path": "docs/distillery/deep-dives/how-to-use-herdr.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md"
+        },
+        "currentConsumerSha256": "95d1591943f5448d7338f60bfe7c8433466bbe5b97490629a762f79be0978715",
+        "sourceLineAtOldCoordinate": "**Skimmed, not fully read**: `src/api/schema/*.rs` individual files (agents.rs, common.rs, events.rs, integrations.rs, panes.rs, plugins.rs, response.rs, server.rs, session.rs, tabs.rs, tests.rs, workspaces.rs, worktrees.rs) — relied on the mdx docs (which are doc-comment-derived) plus targeted greps rather than reading every struct definition; `src/detect/mod.rs` and `src/agent_resume.rs` doc-comment headers only, not the full detection/resume implementation; `docs/distillery/reports/distill-herdr-inventory-2026-07-15.md` and `docs/distillery/sources/herdr.md` (pre-existing inventory) for orientation only.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e2b5dad25809b73a56f28806",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c83aa5866fc211a80d273a5ec8b096668bc423d2c52021170182854432f2da03",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e2b5dad25809b73a56f28806",
+        "inventoryEdge": {
+          "edgeId": "consumer_e2b5dad25809b73a56f28806",
+          "line": 13,
+          "targetPath": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+          "path": "docs/distillery/sources/herdr.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md"
+        },
+        "currentConsumerSha256": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
+        "sourceLineAtOldCoordinate": "> Extracted from HEAD `a0678a3` on 2026-07-15. Clone: `upstreams/herdr`. Full inventory report: `docs/distillery/reports/distill-herdr-inventory-2026-07-15.md`.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_71b9e1d21e37238466bd1fa3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7e5ca53e016e5e6eac808895318f99d95d564f0bb4122c8beabf52756a778ecf",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_71b9e1d21e37238466bd1fa3",
+        "inventoryEdge": {
+          "edgeId": "consumer_71b9e1d21e37238466bd1fa3",
+          "line": 123,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "glob",
+          "rawTarget": "../sources/beads-rust.md#scheduler-swarm-planning",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Bài học đắt của bd @777d24b: thứ tự lấy việc từng là *arbitrary* — giờ là **hợp đồng tường minh** `(priority ASC, created_at ASC, id ASC)` = FIFO trong cùng priority-tier, **pin trong protocol test** (`r2Less`), cùng thứ tự cho cả query-path lẫn claim-path. Ý nghĩa: không đói việc cũ, hai agent nhìn cùng hàng đợi thấy cùng thứ tự. br cùng kết luận: `br scheduler` output versioned `br.scheduler.v1` + **tie-break tất định ghi thẳng trong contract** + fallback policy \"preserve conservative ordering when evidence ties\" ([scheduler-swarm-planning](../sources/beads-rust.md#scheduler-swarm-planning)). Hai sibling độc lập cùng rút ra: **ordering không thành hợp đồng test-được thì multi-agent sẽ dẫm nhau ngầm.**",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4baf89db03a064399f125b3c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "6069894e8f08ec7754e681794768ca31770e62d14b56bf269f6a636576c8e293",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4baf89db03a064399f125b3c",
+        "inventoryEdge": {
+          "edgeId": "consumer_4baf89db03a064399f125b3c",
+          "line": 142,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#scheduler-swarm-planning",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "3. **Năng lực chịu tải** — br một mình một chiếu: **swarm capacity-planning report** (`br.swarm-capacity-report.v1`) phát \"agent bands\" green/yellow/red từ số đo thật (count/sync-status/doctor) + guidance fallback cho laptop/VM nhỏ; kèm runbook tuning lock-timeout theo profile (probe 1000ms / default / bulk 60000ms) ([scheduler-swarm-planning](../sources/beads-rust.md#scheduler-swarm-planning)). Xếp việc không chỉ là \"việc nào trước\" mà còn \"host này chịu được mấy agent\" — mảnh thực dụng cho fleet không người trông.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e106ed81ec194840068eeb2d",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "5e1fd5d53348841f02cc16d8c88e175992d4e890eaa6a56f65cb06e197eed1b8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e106ed81ec194840068eeb2d",
+        "inventoryEdge": {
+          "edgeId": "consumer_e106ed81ec194840068eeb2d",
+          "line": 173,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#two-tier-locking-app-backoff",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- br: hai primitive lock **khác ngữ nghĩa** — `.write.lock` blocking exclusive (serialize mọi mutation, timeout 30s) vs `.sync.lock` advisory try-and-yield; trên nữa là retry `BEGIN IMMEDIATE` 8 lần **exponential backoff + ±25% jitter** (tắt busy-wait native vì hot-spin 100% CPU) — chống thundering herd khi swarm tranh cùng store; mid-mutation DB hỏng → rebuild từ JSONL rồi chạy lại closure ([two-tier-locking-app-backoff](../sources/beads-rust.md#two-tier-locking-app-backoff)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5c349f0ca5f546a7a751dbb9",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "c56cbb6eb452789eeff950af77f7cff6dbac79e50e1c19802796ef340f28b152",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_5c349f0ca5f546a7a751dbb9",
+        "inventoryEdge": {
+          "edgeId": "consumer_5c349f0ca5f546a7a751dbb9",
+          "line": 176,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "executable-proof",
+          "rawTarget": "../sources/beads-rust.md#coordination-evidence-classifier",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "br `coordination status` là **bộ phân loại bằng-chứng thuần đọc**: ngưỡng stale/abandoned theo *loại chủ* (swarm-agent 120'/480', human 1440'/4320' — người được chờ lâu hơn máy); nguyên tắc lõi *\"Missing Agent Mail data is explicit evidence, not proof of abandonment\"*; **không bao giờ auto-reclaim** — emit envelope `br.coordination.v1` với `reclaim_allowed_by_policy` + `suggested_commands`, và lệnh đầu tiên của mọi reclaim luôn là **audit comment**; incident chuẩn hóa append vào `.beads/interactions.jsonl` với `snapshot_hash` — flight recorder content-addressed ([coordination-evidence-classifier](../sources/beads-rust.md#coordination-evidence-classifier)). Tách *phân loại* (pure, no I/O) khỏi *hành động* (human-gated) là mảnh advisory mà mọi hệ claim cơ học (kể cả beehive) còn thiếu.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_afe3dd2d3812617634f3efb4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "df95b11837f74461477a9ec48d96f98f95c31c1a32fdd90fd773e610c9982cfc",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_afe3dd2d3812617634f3efb4",
+        "inventoryEdge": {
+          "edgeId": "consumer_afe3dd2d3812617634f3efb4",
+          "line": 189,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#cross-project-routing",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Và xuyên-repo: bd chọn **federation thật** (Dolt remotes, SyncOrchestrator, sovereignty tiers) — đồng bộ dữ liệu; br chọn **routing thuần địa chỉ** (`routes.jsonl` prefix→path, acquire lock của workspace đích, \"never runs git, never network\") — dispatch không đồng bộ ([federation-topologies](../sources/beads.md#federation-topologies), [cross-project-routing](../sources/beads-rust.md#cross-project-routing)). Cùng nhu cầu multi-project, hai mức cam kết rất khác nhau về độ xâm lấn.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4bcd1d9fc129b722aa95f1e6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "f9d703f4c8fd992ae2435e1e703d968750f33ee9df874ad96769ddbb90da9ac3",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4bcd1d9fc129b722aa95f1e6",
+        "inventoryEdge": {
+          "edgeId": "consumer_4bcd1d9fc129b722aa95f1e6",
+          "line": 33,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#workspace-health-contract",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "br fork bd tại kiến trúc PRE-pivot rồi **từ chối đi theo**: SQLite (`.beads/beads.db`, gitignored) là primary/working store; **JSONL (`.beads/issues.jsonl`, git-tracked) là \"authoritative interchange copy\"**; thêm base-snapshot `.beads/beads.base.jsonl` để 3-way merge phân biệt được sửa-DB với sửa-JSONL; derived state (dirty flags, blocked cache, export hash) rebuild được và **không bao giờ được cao hơn primary** ([sqlite-jsonl-classic-truth](../sources/beads-rust.md#sqlite-jsonl-classic-truth)). Ở lại không phải là đứng yên: br bọc lõi classic bằng health contract 4 mức ([workspace-health-contract](../sources/beads-rust.md#workspace-health-contract)), sync-safety chứng-minh-được-blast-radius (§7), và `.br_history/` — snapshot JSONL timestamped tự động mỗi export, rotate, `history list/diff/restore/prune` — **time-travel cấp workspace không nhờ git** ([br-only-cli-additions](../sources/beads-rust.md#br-only-cli-additions)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fa05e0550430a60d8987368b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "0ac6a303812ed47f653000c58f03db64f864ea11a328b21d126d9b4e92212fd6",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_fa05e0550430a60d8987368b",
+        "inventoryEdge": {
+          "edgeId": "consumer_fa05e0550430a60d8987368b",
+          "line": 88,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#workflow-gates-policy",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "br giữ issue model v14 (interop với bd classic) nhưng thêm: **gate khai báo trong `.beads/policy.yaml`** keyed theo transition `\"from -> to\"`, enforce tại chokepoint close/transition; cả **luật ready cũng config được** (`workflow.status_groups.ready`) — luật thành dữ liệu per-project thay vì hardcode ([workflow-gates-policy](../sources/beads-rust.md#workflow-gates-policy)). Ergonomics tạo/sửa hàng loạt: bulk update field bất kỳ, saved queries, changelog theo issue type ([br-only-cli-additions](../sources/beads-rust.md#br-only-cli-additions)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_8b6f7dba05922b6862f6635a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "979133280bf6e005fa2e339f89c42a4e1398b808d5fae14a2ff3fd006c62afc4",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_8b6f7dba05922b6862f6635a",
+        "inventoryEdge": {
+          "edgeId": "consumer_8b6f7dba05922b6862f6635a",
+          "line": 144,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-schema-and-io-contracts.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-rust.md#agent-first-cli-contract-hardened",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "0939f1910803cbad6e05d4a1390cf89d9face4e22fa5d0f7fad8bdfcd165c405",
+        "sourceLineAtOldCoordinate": "3. **br — hợp đồng cứng + tự-mô-tả 3 tầng**: stdout=data / stderr=diagnostics là LUẬT, exit-code taxonomy **đóng, 9 mã** (\"parse the stream that matches the exit code\" — branch được TRƯỚC khi parse JSON); `br capabilities` (contract metadata máy-đọc) → `br schema` (JSON Schema per shape) → `br robot-docs guide` (prose ≤80 dòng); output schema versioned (`br.coordination.v1`) kèm tie-break tất định ghi trong contract; TOON format có `--stats` **đo** token savings thay vì khẳng định ([beads-rust:agent-first-cli-contract-hardened](../sources/beads-rust.md#agent-first-cli-contract-hardened)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5f8c58bff46c375d9099019f",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "6e97d1a288fb9dd0e3e0150784c466df75acfe95d79ced441d4fb58b3fc65f43",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5f8c58bff46c375d9099019f",
+        "inventoryEdge": {
+          "edgeId": "consumer_5f8c58bff46c375d9099019f",
+          "line": 50,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-schema-and-io-contracts.md",
+          "kind": "fixture",
+          "rawTarget": "../sources/beads-rust.md#no-id-pinning-lint",
+          "resolvedTarget": "docs/distillery/sources/beads-rust.md"
+        },
+        "currentConsumerSha256": "0939f1910803cbad6e05d4a1390cf89d9face4e22fa5d0f7fad8bdfcd165c405",
+        "sourceLineAtOldCoordinate": "- **br** giữ nguyên + thêm kỷ luật test: meta-lint `no_id_pinning` FAIL CI nếu test nào assert giá trị ID sinh ra (hash đổi theo fixture/hash-fn → test giòn); escape hatch `// invariant: <reason>` ([beads-rust:no-id-pinning-lint](../sources/beads-rust.md#no-id-pinning-lint)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_832535869857f6def51b74c1",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d1d61d10eddedb15e8ddbed8be14da33b3058b7c07cb11d87480e72ad25dd710",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_832535869857f6def51b74c1",
+        "inventoryEdge": {
+          "edgeId": "consumer_832535869857f6def51b74c1",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a3f701f1eac54eee391eddb3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "18bb41b3e4b3a8d3a281da19485fdf18b97b6caaac846ad61dd35ed47ab92fe6",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_a3f701f1eac54eee391eddb3",
+        "inventoryEdge": {
+          "edgeId": "consumer_a3f701f1eac54eee391eddb3",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/beads-rust.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_5787799523220c796f608133",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "fa6b8defe11411ab09bd5f4d1c900f1765fc8281eb192860e3660811219f039a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_5787799523220c796f608133",
+        "inventoryEdge": {
+          "edgeId": "consumer_5787799523220c796f608133",
+          "line": 98,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/backlog.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+        "sourceLineAtOldCoordinate": "- [STR43] Work-graph metrics surface (D f176c18a, dưới stance RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)): một verb đọc-thuần trả metrics graph CƠ HỌC fold từ event log — unblock-set transitive, critical path/depth, connected-components (mấy mũi song song độc lập), chuỗi kẹt/stale-blocked — qua envelope; consumer KÉP: khóa sort tương lai của picker (STR7, vẫn tra bảng — không phạm RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)) + digest cho planner-brain (STR8, LLM hết phải đếm cạnh). Chất liệu distillery ĐÃ ĐÀO, tham khảo bắt buộc khi planning: bvr transparent-triage 8 thành phần giải trình được + greedy-submodular top-k-unblock + what-if + connected-components=parallel-tracks (`docs/distillery/sources/beads-viewer-rust.md` xưởng); beads 10-loại dependency + unified cycle detection (`docs/distillery/sources/beads.md`); graph-drift 6 trục làm health gate; five-tier eligibility stack (`docs/distillery/deep-dives/work-item-management.md` §4 — fgOS đang tier 1-2, STR43+STR7+STR8 leo tier 3-4) — done",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_211cb1da2b0e00ad542b1010",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "db01314b06513a6be23bc6167be22e19c823607a0ffe2cdbf90f0fe0e0686706",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_211cb1da2b0e00ad542b1010",
+        "inventoryEdge": {
+          "edgeId": "consumer_211cb1da2b0e00ad542b1010",
+          "line": 103,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#transparent-triage-scoring",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Impact score 8 thành phần minh bạch**: PageRank 0.22 + Betweenness 0.20 + BlockerRatio 0.13 + PriorityBoost 0.10 + TimeToImpact 0.10 + Urgency 0.10 + Risk 0.10 (đảo dấu — thấp = tốt) + Staleness 0.05 (cap 90 ngày); trọng số chuẩn hóa tổng = 1.0; **5 preset** (Default, GraphHeavy, PriorityFirst, QuickWins, RiskAverse) chỉnh trọng số rồi renormalize. Mỗi khuyến nghị trả về **từng thành phần điểm** — không blackbox ([transparent-triage-scoring](../sources/beads-viewer-rust.md#transparent-triage-scoring)). Cấu trúc đồ thị chiếm 42% (PageRank + Betweenness), tín hiệu vận hành 58%.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_1a35b917b2f826f5b593456c",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "851ed1e2ec3ed137f0c55c1f24f57433d8e5556774a71622ac6f99ca66130bb2",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_1a35b917b2f826f5b593456c",
+        "inventoryEdge": {
+          "edgeId": "consumer_1a35b917b2f826f5b593456c",
+          "line": 104,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#suggestion-feedback-loop",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Suggestion engine có kỷ luật**: 5 tín hiệu (duplicate Jaccard ≥0.7, missing dep, label mapping, cycle warning, stale >90d + PageRank thấp), ngưỡng confidence tường minh, **cap 20–50/loại** — không xả danh sách vô hạn; người accept/dismiss → tín hiệu tự-chỉnh ([suggestion-feedback-loop](../sources/beads-viewer-rust.md#suggestion-feedback-loop)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_a869530eec5218b12b138996",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "691ccdf7ebdbdae9687d9e79fed878f82431f202fafb10dcd1cab3b03b890462",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_a869530eec5218b12b138996",
+        "inventoryEdge": {
+          "edgeId": "consumer_a869530eec5218b12b138996",
+          "line": 105,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#graph-drift-detection",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Drift detection**: so đồ thị hiện tại với baseline snapshot trên 6 chiều; **cycle mới = CRITICAL**; blocked +≥5 → WARNING; actionable giảm ≥30% → WARNING — sức khỏe backlog thành gate đo được với exit code có nghĩa ([graph-drift-detection](../sources/beads-viewer-rust.md#graph-drift-detection)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e962ee0f1340887189b70ec3",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "af078d7c095ea593fd9bc12d25cb3c9a0c7a90e3d496a8e464ead27aebf91d8b",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_e962ee0f1340887189b70ec3",
+        "inventoryEdge": {
+          "edgeId": "consumer_e962ee0f1340887189b70ec3",
+          "line": 129,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "glob",
+          "rawTarget": "../sources/beads-viewer-rust.md#greedy-topk-unblock-and-whatif",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Cũng chỉ bvr: **greedy submodular top-k** — mỗi bước chọn issue mở khóa nhiều nhất các downstream *chưa* được mở bởi các lựa chọn trước (marginal, không double-count); **what-if** mô phỏng hoàn thành X → direct unblocks, transitive unblocks (delta actionable), ngày tiết kiệm, cycle bị phá; `plan.rs` phân rã open issues thành **connected component = track song song** ([greedy-topk-unblock-and-whatif](../sources/beads-viewer-rust.md#greedy-topk-unblock-and-whatif)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_aefafd292b526476d26a9cbf",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "06ddc12cbff4ed7373b2d66ae07ac02eb03572a71589131f52d55c83ccb3856d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_aefafd292b526476d26a9cbf",
+        "inventoryEdge": {
+          "edgeId": "consumer_aefafd292b526476d26a9cbf",
+          "line": 144,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#forecast-eta-pipeline",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Thời gian hóa lịch: bvr **forecast ETA** = median lịch sử × hệ số phức tạp (loại × độ sâu × độ dài mô tả) × velocity-per-label (30 ngày trượt, **lấy label chậm nhất — bi quan có chủ đích**) + ngày chờ blocker, kèm biên tin cậy; economics tính estimate coverage, throughput window, burn rate ([forecast-eta-pipeline](../sources/beads-viewer-rust.md#forecast-eta-pipeline)) — \"khi nào xong / tốn bao nhiêu\" dựng từ chính đồ thị việc, không cần tool PM ngoài.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3e95d200ac16b46c4fc5222b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "aaa4fe4a901a283bf96589ad72567a5ab459100d3ae89564365c137a12b159d0",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_3e95d200ac16b46c4fc5222b",
+        "inventoryEdge": {
+          "edgeId": "consumer_3e95d200ac16b46c4fc5222b",
+          "line": 180,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#robot-mode-envelope",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- bd/bvr: agent **cấm đường interactive** — `--json` bắt buộc, `bvr` trần mở TUI là block session; bvr thêm `data_hash` để agent poll rẻ ([agent-first-cli-contract](../sources/beads.md#agent-first-cli-contract), [robot-mode-envelope](../sources/beads-viewer-rust.md#robot-mode-envelope)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_78db25fb4afd32833173f243",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "288139c8e5243cd3145d0351e83b96bc59d1b546d84aae9bb0bc6494b9b0f8e4",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_78db25fb4afd32833173f243",
+        "inventoryEdge": {
+          "edgeId": "consumer_78db25fb4afd32833173f243",
+          "line": 187,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#mcp-agent-mail-coordination",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "4. **Message-passing** — bvr: MCP Agent Mail giữa agent cùng repo ([mcp-agent-mail-coordination](../sources/beads-viewer-rust.md#mcp-agent-mail-coordination)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b64568f5758bf21a5ece9fa6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "e0b3294df73f567225bb06ef56a316900e5d7baa51b0da434e125e8d4a8943c1",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_b64568f5758bf21a5ece9fa6",
+        "inventoryEdge": {
+          "edgeId": "consumer_b64568f5758bf21a5ece9fa6",
+          "line": 36,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads-viewer-rust.md#robot-mode-envelope",
+          "resolvedTarget": "docs/distillery/sources/beads-viewer-rust.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "bvr đọc đồ thị của beads và trả lời \"dữ liệu đổi chưa\" bằng `data_hash` trong robot envelope (SHA256 của trạng thái issue ổn định) — consumer không cần diff, chỉ so hash ([robot-mode-envelope](../sources/beads-viewer-rust.md#robot-mode-envelope)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_61c3d6d6364da95dc0bcd0db",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a63c7c67a64d9c2af51a5e5c3b3f7430e8c598b3f42c004a2bb2266858717007",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_61c3d6d6364da95dc0bcd0db",
+        "inventoryEdge": {
+          "edgeId": "consumer_61c3d6d6364da95dc0bcd0db",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_c018bc610dffe4692494ac5e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "49119b72e70636f53f364ff2264eefd220900bb4d45ac2dfed22dc5af55b8f38",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_c018bc610dffe4692494ac5e",
+        "inventoryEdge": {
+          "edgeId": "consumer_c018bc610dffe4692494ac5e",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/beads-viewer-rust.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cbe9987bcb654972f266504b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "df7ca0ba3cd1c9d98c9920f58f7f66f1c14adbaa7d6ae58066ab3df7086a09f8",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_cbe9987bcb654972f266504b",
+        "inventoryEdge": {
+          "edgeId": "consumer_cbe9987bcb654972f266504b",
+          "line": 98,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/backlog.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+        "sourceLineAtOldCoordinate": "- [STR43] Work-graph metrics surface (D f176c18a, dưới stance RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)): một verb đọc-thuần trả metrics graph CƠ HỌC fold từ event log — unblock-set transitive, critical path/depth, connected-components (mấy mũi song song độc lập), chuỗi kẹt/stale-blocked — qua envelope; consumer KÉP: khóa sort tương lai của picker (STR7, vẫn tra bảng — không phạm RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)) + digest cho planner-brain (STR8, LLM hết phải đếm cạnh). Chất liệu distillery ĐÃ ĐÀO, tham khảo bắt buộc khi planning: bvr transparent-triage 8 thành phần giải trình được + greedy-submodular top-k-unblock + what-if + connected-components=parallel-tracks (`docs/distillery/sources/beads-viewer-rust.md` xưởng); beads 10-loại dependency + unified cycle detection (`docs/distillery/sources/beads.md`); graph-drift 6 trục làm health gate; five-tier eligibility stack (`docs/distillery/deep-dives/work-item-management.md` §4 — fgOS đang tier 1-2, STR43+STR7+STR8 leo tier 3-4) — done",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_72744f80ee847d9803799d53",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "78295c99eeb8d35db699741ac6293a68a8a8d2a2264f64d3cae2b00db3cef46d",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_72744f80ee847d9803799d53",
+        "inventoryEdge": {
+          "edgeId": "consumer_72744f80ee847d9803799d53",
+          "line": 119,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#ready-work-ten-dep-types",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- bd: `bd ready` = issue open + không blocker mở nào, trên 4 loại blocking dep; cycle detection phủ **đồ thị hợp nhất** blocks + parent-child + conditional (chu trình xuyên phân cấp trước vô hình, nay bắt được) ([ready-work-ten-dep-types](../sources/beads.md#ready-work-ten-dep-types)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_56689e09f4b65e37e871adfe",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "273d8a3e80b7e840a9221bfa467764ba6759c4e27b696796ce3274cc86552186",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_56689e09f4b65e37e871adfe",
+        "inventoryEdge": {
+          "edgeId": "consumer_56689e09f4b65e37e871adfe",
+          "line": 154,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#formula-molecule-lifecycle",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Plan không phải document mà là **template thực thi được**: formula (TOML: steps, variables, deps) instantiate thành molecule — tập bead thật trong đồ thị, chạy đến đâu thấy đến đó bằng chính `bd ready`; xong thì squash/burn (compaction có chủ đích) ([formula-molecule-lifecycle](../sources/beads.md#formula-molecule-lifecycle)). Gate-bead cho phép plan chứa điểm-chờ-sự-kiện (PR merged, CI xong, người duyệt) như node hạng nhất — plan bất đồng bộ tự nhiên.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_525f4111f898ac2db55105e5",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ffedd2af8627c4a202ef836070213ebc36796b9be47bde5d696e77ff8a88eb57",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_525f4111f898ac2db55105e5",
+        "inventoryEdge": {
+          "edgeId": "consumer_525f4111f898ac2db55105e5",
+          "line": 167,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#multiagent-routing-and-slots",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- bd: danh tính agent lấy từ **môi trường** (git config `beads.role`, SSH heuristic) thay vì khai báo trong prompt — chống giả mạo rẻ; agent signing để execution trail audit được; contributor namespace isolation (ID prefix riêng) ([multiagent-routing-and-slots](../sources/beads.md#multiagent-routing-and-slots)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_81b79012d14b10b572af2c72",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "798d6bc22a67ba6479bc1040d503b9d1a6359e9ceaebc2834c039924d78da7af",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_81b79012d14b10b572af2c72",
+        "inventoryEdge": {
+          "edgeId": "consumer_81b79012d14b10b572af2c72",
+          "line": 180,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#agent-first-cli-contract",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- bd/bvr: agent **cấm đường interactive** — `--json` bắt buộc, `bvr` trần mở TUI là block session; bvr thêm `data_hash` để agent poll rẻ ([agent-first-cli-contract](../sources/beads.md#agent-first-cli-contract), [robot-mode-envelope](../sources/beads-viewer-rust.md#robot-mode-envelope)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4892034a551571d4b8437ed4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "33df596b7ce70700d2e4d91486415da90b62bf41f5d1c1741c0e963f741da38a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_4892034a551571d4b8437ed4",
+        "inventoryEdge": {
+          "edgeId": "consumer_4892034a551571d4b8437ed4",
+          "line": 181,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#close-last-touched",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- Ergonomics phiên: bd `close` không cần id — marker \"last-touched\" là ngữ cảnh ngầm của session ([close-last-touched](../sources/beads.md#close-last-touched)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d1530c8daf066a0ec9d1ec50",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dc1d64e2ed67327dd968c270a26ab25ff1b1306a7703c2131b03a0d6e86e36d9",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d1530c8daf066a0ec9d1ec50",
+        "inventoryEdge": {
+          "edgeId": "consumer_d1530c8daf066a0ec9d1ec50",
+          "line": 189,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#federation-topologies",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Và xuyên-repo: bd chọn **federation thật** (Dolt remotes, SyncOrchestrator, sovereignty tiers) — đồng bộ dữ liệu; br chọn **routing thuần địa chỉ** (`routes.jsonl` prefix→path, acquire lock của workspace đích, \"never runs git, never network\") — dispatch không đồng bộ ([federation-topologies](../sources/beads.md#federation-topologies), [cross-project-routing](../sources/beads-rust.md#cross-project-routing)). Cùng nhu cầu multi-project, hai mức cam kết rất khác nhau về độ xâm lấn.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ae3f1e018b1cbecb8bafb77e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "ede6bc87a5a380ed387902716f5716287522d764d4a5378a1ca0cb3dc6cfc45f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_ae3f1e018b1cbecb8bafb77e",
+        "inventoryEdge": {
+          "edgeId": "consumer_ae3f1e018b1cbecb8bafb77e",
+          "line": 30,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#dolt-as-versioned-truth",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Pivot lớn @303e263: **Dolt SQL** (`.beads/dolt/`, gitignored) là canonical source; `issues.jsonl` chỉ còn interchange/export. Concurrency chuyển từ branch-per-worker sang **all-on-main + transaction discipline**, 3-phase commit, sync qua `bd dolt push/pull` — Dolt native, không nhờ git ([dolt-as-versioned-truth](../sources/beads.md#dolt-as-versioned-truth)). Đánh đổi tường minh: **mất git-diffable trong repo**, được multi-writer + history/branch/merge cấp DB.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d28eebb97a245c5b8ad51144",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "1cc0f60fb182965be1bae524fc37a4f97f1f2dd0b144faa63e8580b5e0e4be40",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d28eebb97a245c5b8ad51144",
+        "inventoryEdge": {
+          "edgeId": "consumer_d28eebb97a245c5b8ad51144",
+          "line": 80,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#ready-work-ten-dep-types",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "Issue là node đồ thị với **10 loại dependency chia hai lớp**: 4 blocking (`blocks`, `parent-child`, `conditional-blocks`, `waits-for`) quyết định ready-set, 6 non-blocking (`related`, `discovered-from`, `caused-by`, `validates`, `supersedes`, `duplicates`) chở **tri thức** mà không nghẹt điều phối ([ready-work-ten-dep-types](../sources/beads.md#ready-work-ten-dep-types)). Ba hệ quả kiến trúc đẹp:",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_92b6f592d9cb5e435c5426bf",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4af05a9b2d212e5129fcbd814dbc5aa336eb25539436f12e0410e145ac494e09",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_92b6f592d9cb5e435c5426bf",
+        "inventoryEdge": {
+          "edgeId": "consumer_92b6f592d9cb5e435c5426bf",
+          "line": 81,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#formula-molecule-lifecycle",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Workflow cũng là issues**: formula (định nghĩa TOML) instantiate thành molecule = tập bead thật trong đồ thị; workflow đang chạy không phải state riêng, query bằng cùng công cụ với task thường ([formula-molecule-lifecycle](../sources/beads.md#formula-molecule-lifecycle)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_de1b931b36632f9e19c55b14",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "a89be2101d3f1b4d0928c10d1466d7f5c4a627389b7cded98a7e14a176b2e100",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_de1b931b36632f9e19c55b14",
+        "inventoryEdge": {
+          "edgeId": "consumer_de1b931b36632f9e19c55b14",
+          "line": 82,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#gate-beads-event-driven",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Gate cũng là issue type** (`gh:pr`, `gh:run`, `timer`, `bead`, `human`) — điểm-chờ vật hóa thành node; message/event/role cũng là bead ([gate-beads-event-driven](../sources/beads.md#gate-beads-event-driven)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_b8488c60f51fe1e8c4afe199",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "77252c2e8421648e322441ed82b98b359139861f86d30f9377ab46d00c14579a",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_b8488c60f51fe1e8c4afe199",
+        "inventoryEdge": {
+          "edgeId": "consumer_b8488c60f51fe1e8c4afe199",
+          "line": 83,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#discovered-from-lineage",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "- **Lineage là edge**: việc lòi ra giữa chừng ghi bằng `discovered-from` — \"làm A lòi ra B\" là dữ liệu topology query được, không phải ghi chú tự do ([discovered-from-lineage](../sources/beads.md#discovered-from-lineage)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_dc98203b7a793fdb2ddc5ef8",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "40aa80dddb1a94a0bf38422ad8fa68d1c1823c4f6b2d424fe3e8bde0fd2fe8ad",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_dc98203b7a793fdb2ddc5ef8",
+        "inventoryEdge": {
+          "edgeId": "consumer_dc98203b7a793fdb2ddc5ef8",
+          "line": 85,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-management.md",
+          "kind": "literal",
+          "rawTarget": "../sources/beads.md#hash-id-adaptive-length",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "7beaf04b0546f4dafdf8c025537c5d32ea88174df9a2c7ca3cbb71f294486280",
+        "sourceLineAtOldCoordinate": "ID là hash SHA256→base36 cắt **thích ứng** (3–8 ký tự, vượt 25% xác suất va chạm thì tự dài ra) — nhiều agent tạo ID song song không cần điều phối trung tâm ([hash-id-adaptive-length](../sources/beads.md#hash-id-adaptive-length)).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_7b75cdb9e8a5387929d1da4b",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "470ec74d8bbf3c5907b3a7f4f0dcccc53b49f726b40b2838c201b52aee5d73c4",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_7b75cdb9e8a5387929d1da4b",
+        "inventoryEdge": {
+          "edgeId": "consumer_7b75cdb9e8a5387929d1da4b",
+          "line": 120,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/distillery/deep-dives/work-item-schema-and-io-contracts.md",
+          "kind": "glob",
+          "rawTarget": "../sources/beads.md#metadata-set-always-string",
+          "resolvedTarget": "docs/distillery/sources/beads.md"
+        },
+        "currentConsumerSha256": "0939f1910803cbad6e05d4a1390cf89d9face4e22fa5d0f7fad8bdfcd165c405",
+        "sourceLineAtOldCoordinate": "**bd**: `Metadata json.RawMessage` — JSON tự do validated-well-formed, chỗ thoát cho mọi thứ chưa có field. Nhưng bài học đắt nằm ở [beads:metadata-set-always-string](../sources/beads.md#metadata-set-always-string): `--set-metadata key=value` từng suy `\"1\"` → integer, phá round-trip cho consumer chờ string — sửa thành **luôn-string, kiểu tường minh qua `--metadata-json` riêng** (breaking, chấp nhận). **Luật rút ra cho mọi biên CLI của fgOS: không suy-diễn-kiểu ngầm ở biên; mặc định string, kiểu là opt-in tường minh.** br còn thêm mảnh khoan dung: coerce `\"metadata\":\"\"` (legacy bẩn) → `None` lúc deserialize thay vì error — *đọc khoan dung, ghi chặt*.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_63c246e6d08111e628036ec4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "03e00c5e33dd983ba8632e4a2664293325922e88534c2dc88159d36c7f621583",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_63c246e6d08111e628036ec4",
+        "inventoryEdge": {
+          "edgeId": "consumer_63c246e6d08111e628036ec4",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_cacfc2dba56a0404d0a148c7",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "56e2095d4206aa1a547d8a0052376b8d761b5297b03ee0b24ec2e39a4065f462",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_cacfc2dba56a0404d0a148c7",
+        "inventoryEdge": {
+          "edgeId": "consumer_cacfc2dba56a0404d0a148c7",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/beads.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_d8f17fd7b2d4b05bd78ff53e",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "2420e62c7d1891192f902a9da06589e3c579a9fd0afd07df391e0187d84d119f",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_d8f17fd7b2d4b05bd78ff53e",
+        "inventoryEdge": {
+          "edgeId": "consumer_d8f17fd7b2d4b05bd78ff53e",
+          "line": 523,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beehive.md"
+        },
+        "currentConsumerSha256": "9c45a9383a65bd4ee40738dfb6c7de39549e4d5efe079525e8e20dfd55b2c4ec",
+        "sourceLineAtOldCoordinate": "- `docs/distillery/sources/beehive.md`: ghi rõ snapshot stale 2026-07-23, upstream live tại `thanhsmind/beegog` v2.33.2, các area `bee-herding`/`human-mailbox`/`hook-runtime` cần re-distill (task riêng).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_47d32a25615e945f47588b74",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "aed43ae8fbd4e64514b7892224df62fa92844fcf4cd78b250cd1c3a897752de7",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_47d32a25615e945f47588b74",
+        "inventoryEdge": {
+          "edgeId": "consumer_47d32a25615e945f47588b74",
+          "line": 17,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beehive.md"
+        },
+        "currentConsumerSha256": "791dff01958326399c04dd402fdf43f63a93b5359e5fdddac4d2f45be197a7ad",
+        "sourceLineAtOldCoordinate": "\"beehive\" project (`docs/distillery/sources/beehive.md`, entry",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_398ca731445916c7b6dcb434",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "9c506e07f65ba6623247c3b9e4927b9aa805cfe78f4072c4b256cb9734bf48eb",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_398ca731445916c7b6dcb434",
+        "inventoryEdge": {
+          "edgeId": "consumer_398ca731445916c7b6dcb434",
+          "line": 25,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/explanation/dispatch-execute-concurrency-guard.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beehive.md"
+        },
+        "currentConsumerSha256": "558331b692a0a996fc75c8b266a1182c40f60d6fc90f2327233944bd6af64118",
+        "sourceLineAtOldCoordinate": "(`docs/distillery/sources/beehive.md`): `prepareDispatch`'s",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_4829656c4a556aaba11e5a72",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "dc63412b52f1272224ca53be7dc89222a548a5effbac93393a60e234d1ec1c42",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_4829656c4a556aaba11e5a72",
+        "inventoryEdge": {
+          "edgeId": "consumer_4829656c4a556aaba11e5a72",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_04dfda67e0eeeaee26f814f0",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "288045494a282d3ada914bc3c458092e39e57e2ada65df62aa84696d65849716",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_04dfda67e0eeeaee26f814f0",
+        "inventoryEdge": {
+          "edgeId": "consumer_04dfda67e0eeeaee26f814f0",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_68a12390fea782b0c6686763",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "33fe312b41d9443ebeb23d9c036ea1c8d5e61891237f9b96ec3ca215768fe237",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_68a12390fea782b0c6686763",
+        "inventoryEdge": {
+          "edgeId": "consumer_68a12390fea782b0c6686763",
+          "line": 547,
+          "targetPath": "docs/distillery/sources/beehive.md",
+          "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+          "kind": "literal",
+          "resolvedTarget": "docs/distillery/sources/beehive.md"
+        },
+        "currentConsumerSha256": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+        "sourceLineAtOldCoordinate": "- `docs/distillery/sources/beehive.md`: ghi rõ snapshot stale 2026-07-23, upstream live tại `thanhsmind/beegog` v2.33.2, các area `bee-herding`/`human-mailbox`/`hook-runtime` cần re-distill (task riêng).",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_ad49137a522a883d4b03547a",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4152d676ed1b7508d0d2ecbdc7dbde47bfd0ebe039d194ef7e02ef1d782e051d",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_ad49137a522a883d4b03547a",
+        "inventoryEdge": {
+          "edgeId": "consumer_ad49137a522a883d4b03547a",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/claudekit-engineer.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_273968087de7261f4ebe9fc4",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "edc6b3d2b8285ba07d656370ddca24f54976d69eadf89658db9ce3b3627b340a",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_273968087de7261f4ebe9fc4",
+        "inventoryEdge": {
+          "edgeId": "consumer_273968087de7261f4ebe9fc4",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/claudekit-engineer.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_e7b1eb1473c0534dbeb51ca6",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "3c5887e5debb25f9a1b818941145890caff08977cb0a18b15da1abac9b7bc8c3",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_e7b1eb1473c0534dbeb51ca6",
+        "inventoryEdge": {
+          "edgeId": "consumer_e7b1eb1473c0534dbeb51ca6",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/compound-engineering-plugin.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_60f21f07798fe6441ac8f7ee",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "b36f8e0fd1ac1a0f9f4e55fa13ab651b8910db4b72a320ec8bff3f549ad8023f",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_60f21f07798fe6441ac8f7ee",
+        "inventoryEdge": {
+          "edgeId": "consumer_60f21f07798fe6441ac8f7ee",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/compound-engineering-plugin.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_3a4f69c3cccfbfae52e41292",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "d68e9c2fd1a4ecd356ef4f3929c4f8b4e05d367e965a65d0d116f41b82a2cd53",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_3a4f69c3cccfbfae52e41292",
+        "inventoryEdge": {
+          "edgeId": "consumer_3a4f69c3cccfbfae52e41292",
+          "line": 37,
+          "targetPath": "docs/distillery/sources/council-of-high-intelligence.md",
+          "path": "docs/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "4c02c9e1f0679fc17e0894a7225642680776e2412b2c343c70943c3ac74c5e67",
+        "sourceLineAtOldCoordinate": "  đâu\"; luôn phản ánh hiện tại. (vd: `docs/distillery/sources/*.md`, state.json)",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_fbdc4eb3e4cdedd876006873",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "7634fe664e9ac1212cd01662c1ba3e001608109495c76563362d3007675565c9",
+      "mandatoryDeepRead": true,
+      "mandatoryReasons": [
+        "dynamic/executable-proof/unestablished historical coordinate: trace actual current source, preserve inferred multiplicity"
+      ],
+      "payload": {
+        "id": "consumer_fbdc4eb3e4cdedd876006873",
+        "inventoryEdge": {
+          "edgeId": "consumer_fbdc4eb3e4cdedd876006873",
+          "line": 121,
+          "targetPath": "docs/distillery/sources/council-of-high-intelligence.md",
+          "path": "docs/platform/platform-foundations.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/*.md"
+        },
+        "currentConsumerSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+        "sourceLineAtOldCoordinate": "- **State** — overwrite theo reality, tổ chức theo *area*, trả lời \"đang ở",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "native inferred/dynamic or drifted coordinate; exact source/target not established",
+        "currentExactRawTargetAtInventoryLine": false,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": true
+      }
+    },
+    {
+      "reviewId": "native-reconciliation:consumer_09656d10eb3e8029e15435be",
+      "kind": "native-reconciliation",
+      "sourceTable": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-inventory-reconciliation.json",
+      "sourceRowSha256": "4a1902efb36f40b34e9e1dc47e4913c49e4cc91ce0dd570108f20bcdd778fdba",
+      "mandatoryDeepRead": false,
+      "mandatoryReasons": [],
+      "payload": {
+        "id": "consumer_09656d10eb3e8029e15435be",
+        "inventoryEdge": {
+          "edgeId": "consumer_09656d10eb3e8029e15435be",
+          "line": 598,
+          "targetPath": "docs/distillery/sources/herdr.md",
+          "path": "docs/distillery/deep-dives/how-to-use-herdr.md",
+          "kind": "glob",
+          "resolvedTarget": "docs/distillery/sources/herdr.md"
+        },
+        "currentConsumerSha256": "95d1591943f5448d7338f60bfe7c8433466bbe5b97490629a762f79be0978715",
+        "sourceLineAtOldCoordinate": "**Skimmed, not fully read**: `src/api/schema/*.rs` individual files (agents.rs, common.rs, events.rs, integrations.rs, panes.rs, plugins.rs, response.rs, server.rs, session.rs, tabs.rs, tests.rs, workspaces.rs, worktrees.rs) — relied on the mdx docs (which are doc-comment-derived) plus targeted greps rather than reading every struct definition; `src/detect/mod.rs` and `src/agent_resume.rs` doc-comment headers only, not the full detection/resume implementation; `docs/distillery/reports/distill-herdr-inventory-2026-07-15.md` and `docs/distillery/sources/herdr.md` (pre-existing inventory) for orientation only.",
+        "sourceContextRef": "Current full context is in census rows/file; old inventory line is not a proven current call site",
+        "censusEdgeIds": [],
+        "reconciliation": "stable nonmigration target; no legacy rewrite proposed",
+        "currentExactRawTargetAtInventoryLine": true,
+        "action": "preserve current consumer; no native identity or approved mapping inferred",
+        "mandatoryDeepRead": false
+      }
+    }
+  ]
+}
