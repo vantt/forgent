@@ -26,7 +26,7 @@ const {
   activatedHolderLockRelease,
   MAX_KILL_WAIT_MS,
 } = await import('../../src/setup/holder-lock-checks.mjs');
-const { checkStopped, ownPidChain, fenceStatus } = await import('../../src/holder-lock/fences.mjs');
+const { checkStopped, ownPidChain, fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
 const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
 const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
 
@@ -381,6 +381,10 @@ test('lock-fences sees the missing fences, and the fix places them only under an
 
 test('a payload registry without the Rust callers\' locks fences only the locks it owns, leaving the paths an older fgctl still uses', () => {
   const root = workspace('fences-owners');
+  // Establish the machine-wide fence independently of earlier tests.
+  const preconditionRoot = workspace('fences-owners-precondition');
+  assert.equal(placeFences({ fgosDir: path.join(preconditionRoot, '.fgos'), workspaceRoot: preconditionRoot,
+    providerRuntimeDir: path.join(scratch, 'fences-owners-precondition'), owners: ['4.4'] }).ok, true);
   const providerRuntimeDir = path.join(scratch, 'fences-owners-provider-capacity');
   activate(root, { withRegistry: true });
   const activation = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), 'utf8'));
@@ -398,7 +402,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
   assert.equal(fixed.changed, true, fixed.message);
   assert.match(fixed.message, /^placed 10 fence\(s\)/);
   const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir });
-  // The install tombstone is machine-wide and an earlier test already placed it under the shared state root.
+  // The explicit precondition above placed the machine-wide install tombstone.
   assert.deepEqual(status.missing.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
   assert.deepEqual(status.controllerMissing.map((file) => path.relative(path.join(root, '.fgos'), file)), [path.join('locks', 'activation.lock')], 'the controller fence stays with fgctl');
   assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), {

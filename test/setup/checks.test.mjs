@@ -831,7 +831,7 @@ test('decision-index-stale check FAILS when the index is missing but state.decis
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
-test('decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix\'s result)', () => {
+test('decision-index-stale check and fix preserve committed decisions absent from the local store', () => {
   const tmp = mkTemp('fgos-decision-index-fix-');
   const populatedFgosDir = path.join(tmp, '.fgos');
   initStore(populatedFgosDir);
@@ -852,7 +852,7 @@ test('decision-index-stale fix reports a graceful skip (changed:false, no throw)
     result = fixById('decision-index-stale').fix(tmp);
   });
   assert.equal(result.changed, false);
-  assert.match(result.message, /skipped/);
+  assert.equal(checkById('decision-index-stale').check(tmp).passed, true);
 
   const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
   assert.equal(after, before, 'the real index must survive the refused fix untouched');
