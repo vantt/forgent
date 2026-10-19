@@ -116,6 +116,11 @@ After close, one read of `/proc/locks` supplies positive evidence: a FLOCK recor
 
 A positive tagged record, blocked probe or any uncertainty enters the full tagged descriptor scan. Holders of this inode whose FLOCK record stamps this process are signalled by an identity captured before scanning their descriptors and pinned again at signal time, except direct children (pre-exec copies: waited, never killed). A live own handle, or a positive record of a later acquirer, proves the old EX description gone by exclusivity and spares that acquirer and its borrowers. Recheck own handles before each signal; no kcmp is necessary once the own-handle proof holds. An empty scan alone does not prove release across an in-flight fork: repeat table/probe/scan until positively proven or `killWaitMs` passes, returning `lock-release-stuck` with killed count and remaining pids. A dropped handle runs the same settle; `release` returns its outcome. Descriptor transfer to a pre-existing process is found at release, not borrow return: such a recipient runs until release, at most the length of the hold. Shared handles close directly. The Node facade's unknown-history `lock-fd --drain-child` keeps reading every process.
 
+
+### Node handover trust boundary (2026-10-19 review)
+
+The opaque addon handover protects acquired handles from request-data forgery; it is not an isolation boundary against arbitrary code already executing inside the Node process. The first-caller registration capability is per Node worker thread. Code that loads the native addon before the trusted facade can consume that capability and deny facade startup (fail closed). A hostile module or worker thread therefore requires process isolation; possession of request data, a path or an fd number never grants a holder handle. Native borrowed copies remain close-only and are drained before the facade borrow guard releases.
+
 ## 6. Kinds
 
 | Kind | Mechanism | Used for |
@@ -201,6 +206,8 @@ Plan and decisions: [plan 4.4b](../../../plans/261017-1256-windows-lockfileex-dr
 ## 9. Node facade and `LockScope`
 
 `src/holder-lock/` is the Node facade. A caller never sees an fd.
+
+The synchronous native bridge (2026-10-19) uses the existing private descriptions WeakMap and borrow counter, with no parallel description registry. `LockHandle` construction requires acquisition's private token. Only `src/git/native.mjs` imports `native-handover.mjs`; the loader retains the addon's first-caller registration capability. Minted, typed N-API Externals are consumed once, duplicate the acquired description with CLOEXEC, and are closed before the borrow guard ends (including validation failure). A released, forged or numeric handle confers no authority; `release()` refuses while the bridge borrows it. The Rust FFI admission method is unsafe because its caller must prove acquired-description provenance: the three-condition kernel test alone cannot distinguish a never-locked description (§19). Windows native handover refuses with `git-lock-handover-unsupported`; the helper-owned transport is not exported as a descriptor.
 
 - `acquireSync(scope, name, params, {waitMs})` and `acquire(...)` (async: `--try` repeated on a timer, so the runner loop never blocks its event loop). The facade opens the lock file `O_RDWR | O_CREAT`, runs `fgos internal lock-fd` with the fd in `stdio` slot 3, checks the inode after acquire, and passes `--kill-wait-ms` from `lock.predecessorKillWaitMs` (read through the same config reader `fgos setup` uses). `acquireSync` waits with `spawnSync` and `killSignal: SIGKILL`: when it returns the helper is dead and reaped, the fd is closed, and the result is not-acquired unless the stdout line says `acquired`. There is no hung state.
 - `handle.release()` closes the fd; idempotent; never `LOCK_UN`.

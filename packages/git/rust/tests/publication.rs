@@ -1293,8 +1293,36 @@ fn linear_history_walk_batches_commit_reads() {
     assert_eq!(page.commits.len(), 1024);
 }
 
+fn write_historical_chain(repo: &RepoHandle, chain: &wal::Chain) {
+    let mut previous = serde_json::Value::Null;
+    for (n, record) in chain.records().iter().enumerate() {
+        let mut value = serde_json::to_value(record).unwrap();
+        if n == 0 {
+            for kind in ["RemoteFetch", "RemotePush"] {
+                if let Some(fields) = value["phase"]["data"]["kind"]
+                    .get_mut(kind)
+                    .and_then(serde_json::Value::as_object_mut)
+                {
+                    fields.remove("targets");
+                }
+            }
+        }
+        value["previousDigest"] = previous;
+        value.as_object_mut().unwrap().remove("digest");
+        let digest = wal::canonical_digest(&value).unwrap();
+        value["digest"] = digest.clone().into();
+        previous = digest.into();
+        let file = repo
+            .common_dir()
+            .join("fgos/git/operations")
+            .join(&record.operation_id)
+            .join(format!("{n:08}.json"));
+        fs::write(file, serde_json::to_vec(&value).unwrap()).unwrap();
+    }
+}
+
 #[test]
-fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority() {
+fn historical_transfer_wal_digests_and_pre_attempt_recovery_remain_compatible() {
     struct RecordFixture;
     impl wal::PublicationAuthority for RecordFixture {
         fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
@@ -1324,10 +1352,12 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
         wal::OperationKind::RemoteFetch {
             url: "/unused".into(),
             refspecs: vec!["refs/fgos/events/*".into()],
+            targets: vec![],
         },
         wal::OperationKind::RemotePush {
             url: "/unused".into(),
             refspecs: vec![reference().as_str().into()],
+            targets: vec![],
         },
     ]
     .into_iter()
@@ -1343,10 +1373,75 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
                 wal::Begin::Created(c) => c,
                 _ => panic!(),
             };
-            if prepared {
-                wal.append(&chain, Phase::Prepared).unwrap();
-            }
+            let chain = if prepared {
+                wal.append(&chain, Phase::Prepared).unwrap()
+            } else {
+                chain
+            };
+            // Write historical bytes, hashing the old JSON shape directly rather
+            // than reserializing a new Record. Also rebind the second record.
+            write_historical_chain(&repo, &chain);
+            assert_eq!(
+                wal.inspect(&id).unwrap().records().len(),
+                if prepared { 2 } else { 1 }
+            );
+            let scan = wal.scan(100).unwrap();
+            assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
         }
+    }
+    // Rule 4: an attempted historical transfer is observed, never resent.
+    // Rules 4a/4b/4c must not turn it into a superseded CAS, abandoned CAS,
+    // or configuration approval. The unreachable URL makes replay observable.
+    for (n, kind) in [
+        wal::OperationKind::RemoteFetch {
+            url: "/never-contact".into(),
+            refspecs: vec!["refs/fgos/events/*".into()],
+            targets: vec![],
+        },
+        wal::OperationKind::RemotePush {
+            url: "/never-contact".into(),
+            refspecs: vec![reference().as_str().into()],
+            targets: vec![],
+        },
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let id = format!("historical-attempt-{n}");
+        let mut intent = seed.clone();
+        intent.kind = kind;
+        intent.request_digest = wal::canonical_digest(&id).unwrap();
+        let chain = match wal.begin(&id, intent, &RecordFixture).unwrap() {
+            wal::Begin::Created(c) => c,
+            _ => panic!(),
+        };
+        let chain = wal.append(&chain, Phase::Prepared).unwrap();
+        let chain = wal
+            .append(
+                &chain,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: chain.intent().expected.clone(),
+                    next: chain.intent().next.clone(),
+                },
+            )
+            .unwrap();
+        write_historical_chain(&repo, &chain);
+        assert_eq!(wal.inspect(&id).unwrap().records().len(), 3);
+        assert!(wal
+            .scan(100)
+            .unwrap()
+            .entries
+            .iter()
+            .all(|e| e.error.is_none()));
+        assert!(matches!(
+            port.recover(&repo, &id).unwrap().remote,
+            Remote::Unknown
+        ));
+        assert!(matches!(
+            port.recover(&repo, &id).unwrap().remote,
+            Remote::Unknown
+        ));
     }
     port.compare_and_swap(
         &repo,
@@ -1357,7 +1452,16 @@ fn prepared_cas_and_pre_attempt_transfers_are_abandoned_under_the_same_authority
     )
     .unwrap();
     assert!(wal.active(100).unwrap().is_empty());
-    assert_eq!(wal.scan(100).unwrap().unresolved, 0);
+    let scan = wal.scan(100).unwrap();
+    assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
+    assert_eq!(scan.unresolved, 0);
+    for n in 0..3 {
+        for prepared in [false, true] {
+            let id = format!("pre-attempt-{n}-{prepared}");
+            let error = port.recover(&repo, &id).unwrap_err();
+            assert!(error.cause.contains("abandoned-before-attempt"), "{error:?}");
+        }
+    }
 }
 
 #[test]
@@ -1704,10 +1808,7 @@ fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
     git(&root, &["config", "unrelated.keep", "value"]);
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
-    let maps = vec![
-        "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".into(),
-        "+refs/fgos/legacy:refs/fgos/remotes/origin/legacy".into(),
-    ];
+    let maps = publication_fetch_mappings("origin").unwrap();
     driver
         .ensure_fetch_mapping(&repo, "origin", &maps, "mapping-first")
         .unwrap();
@@ -2070,4 +2171,85 @@ fn recreated_loose_object_gets_directory_durability_again() {
     fs::remove_file(repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..])).unwrap();
     assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
     assert!(syncs.0.load(Ordering::SeqCst) >= 2);
+}
+
+#[test]
+fn ordinary_fetch_and_pull_survive_absent_legacy_and_repair_exact_mapping() {
+    let t = Temp::new();
+    let remote = t.0.join("remote.git");
+    init(&remote, "sha1", "files");
+    let root = t.0.join("checkout");
+    git(
+        &t.0,
+        &["clone", remote.to_str().unwrap(), root.to_str().unwrap()],
+    );
+    git(
+        &root,
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "initial",
+        ],
+    );
+    git(&root, &["push", "-u", "origin", "HEAD"]);
+    git(&root, &["remote", "rename", "origin", "upstream"]);
+    git(&root, &["config", "unrelated.keep", "preserved"]);
+    let old = "+refs/fgos/legacy:refs/fgos/remotes/upstream/legacy";
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    let failed = Command::new("git")
+        .arg("-C")
+        .arg(&root)
+        .arg("fetch")
+        .output()
+        .unwrap();
+    assert!(!failed.status.success());
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let maps = publication_fetch_mappings("upstream").unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-exact")
+        .unwrap();
+    let config = git(&root, &["config", "--get-all", "remote.upstream.fetch"]);
+    assert!(!String::from_utf8_lossy(&config).lines().any(|r| r == old));
+    assert_eq!(git(&root, &["config", "unrelated.keep"]), b"preserved\n");
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    let head = String::from_utf8(git(&root, &["rev-parse", "HEAD"])).unwrap();
+    git(&remote, &["update-ref", "refs/fgos/legacy", head.trim()]);
+    git(&root, &["fetch"]);
+    git(&root, &["pull", "--ff-only"]);
+    assert_eq!(
+        git(&root, &["rev-parse", "refs/fgos/remotes/upstream/legacy"]),
+        head.as_bytes()
+    );
+    assert_eq!(
+        driver
+            .fetch_mapping_provenance(&repo, "upstream")
+            .unwrap()
+            .unwrap()
+            .refspecs,
+        maps
+    );
+    // Both forms installed is still a broken configuration: remove the exact
+    // form even when the desired wildcard was already present.
+    git(&root, &["config", "--add", "remote.upstream.fetch", old]);
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-both")
+        .unwrap();
+    assert!(!String::from_utf8_lossy(&git(
+        &root,
+        &["config", "--get-all", "remote.upstream.fetch"]
+    ))
+    .lines()
+    .any(|r| r == old));
+    let bytes = fs::read(repo.common_dir().join("config")).unwrap();
+    driver
+        .ensure_fetch_mapping(&repo, "upstream", &maps, "repair-idempotent")
+        .unwrap();
+    assert_eq!(fs::read(repo.common_dir().join("config")).unwrap(), bytes);
 }

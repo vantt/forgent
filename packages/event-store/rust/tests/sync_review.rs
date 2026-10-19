@@ -333,3 +333,26 @@ fn outside_merge_before_first_append_cannot_be_laundered_by_reconciliation() {
         original
     );
 }
+
+#[test]
+fn unpublished_summary_rejects_mismatched_layout_before_opening_its_lock() {
+    let w = World::new();
+    let a = w.clone("a", "machine-aa");
+    let b = w.clone("b", "machine-bb");
+    // If the lock path is touched first, this directory produces an I/O error.
+    std::fs::create_dir(b.layout.seal_lock()).unwrap();
+    let error = fgos_event_store::sync::guarded_unpublished_summary(
+        &a.driver,
+        &a.repo,
+        fgos_event_store::sync::SyncRequest {
+            layout: &b.layout,
+            machine: &a.machine,
+            remote: "origin",
+            no_push: true,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+        },
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("repository/layout mismatch"));
+}

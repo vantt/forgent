@@ -1,22 +1,12 @@
 //! Mirror configuration is owned and journaled by Git, never by the store.
 use crate::{
-    errors::{invalid, Error, ErrorCode},
+    errors::{Error, ErrorCode},
     seal::operation_id,
     walk::git_error,
 };
 use fgos_git::{Inspect, RepoHandle, RepositoryConfig};
 pub fn mappings(remote: &str) -> Result<Vec<String>, Error> {
-    if remote.is_empty()
-        || !remote
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-    {
-        return Err(invalid("invalid remote name"));
-    }
-    Ok(vec![
-        format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
-        format!("+refs/fgos/legacy:refs/fgos/remotes/{remote}/legacy"),
-    ])
+    fgos_git::publication_fetch_mappings(remote).map_err(git_error)
 }
 pub fn ensure_refspecs(
     git: &impl RepositoryConfig,

@@ -23,7 +23,8 @@
     "LICENSE",
     "docs/how-to",
     "docs/explanation",
-    "docs/enduser-docs-index.json"
+    "docs/enduser-docs-index.json",
+    "packages/event-store/contracts"
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",

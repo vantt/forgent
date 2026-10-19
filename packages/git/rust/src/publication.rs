@@ -1464,8 +1464,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let bytes = self.call(repo, &["remote", "get-url", "--", remote], &[])?;
         let url = text(&bytes)?.trim_end_matches('\n');
         if url != grant.pinned_url
-            || url.contains(['\n', '\r', '\0'])
-            || url.contains('@')
+            || crate::remote::url_has_credentials_or_controls(url)
             || url.starts_with('-')
         {
             return Err(err("remote-url-not-pinned-or-credentials-present"));
@@ -1491,8 +1490,6 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             "core.sshCommand=ssh -oBatchMode=yes".into(),
             "-c".into(),
             "core.askPass=".into(),
-            "-c".into(),
-            "credential.helper=".into(),
         ];
         argv.extend_from_slice(args);
         self.raw(
@@ -1600,9 +1597,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         if refspecs.is_empty() || refspecs.len() > 2 {
             return Err(err("invalid-publication-fetch-mapping"));
         }
-        let events = format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*");
-        let legacy = format!("+refs/fgos/legacy:refs/fgos/remotes/{remote}/legacy");
-        if refspecs.iter().any(|r| r != &events && r != &legacy) {
+        let allowed = crate::publication_fetch_mappings(remote)?;
+        if refspecs.iter().any(|r| !allowed.contains(r)) {
             return Err(err("fetch-destination-not-granted"));
         }
         let advertised = self.remote_call(
@@ -1628,12 +1624,12 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             let oid = Oid::parse(oid, repo.object_format())
                 .map_err(|_| err("remote-object-format-mismatch"))?;
             RefName::parse(source).map_err(|_| err("invalid-remote-ref"))?;
-            let target = if source.starts_with("refs/fgos/events/") && refspecs.contains(&events) {
+            let target = if source.starts_with("refs/fgos/events/") && refspecs.iter().any(|r| r.starts_with("+refs/fgos/events/")) {
                 format!(
                     "refs/fgos/remotes/{remote}/events/{}",
                     &source["refs/fgos/events/".len()..]
                 )
-            } else if source == "refs/fgos/legacy" && refspecs.contains(&legacy) {
+            } else if source == "refs/fgos/legacy" && refspecs.iter().any(|r| r.starts_with("+refs/fgos/legacy*:")) {
                 format!("refs/fgos/remotes/{remote}/legacy")
             } else {
                 continue;
@@ -1650,6 +1646,12 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             wal::OperationKind::RemoteFetch {
                 url: url.clone(),
                 refspecs: refspecs.to_vec(),
+                targets: mappings
+                    .iter()
+                    .map(|(name, next, old)| {
+                        (name.clone(), tip(old), wal::Tip::Oid(next.as_str().into()))
+                    })
+                    .collect(),
             },
             resources,
         )?;
@@ -1727,11 +1729,43 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let local = &refs[0].0;
         // transfer_intent reads the local ref (refusing a symbolic one).
         let spec = format!("{}:{}", local.as_str(), refs[0].1.as_str());
+        let advertised = self.remote_call(
+            repo,
+            &scheme,
+            &[
+                "ls-remote".into(),
+                "--refs".into(),
+                "--".into(),
+                url.clone(),
+                refs[0].1.as_str().into(),
+            ],
+        )?;
+        if !advertised.success {
+            return Err(advertised.error("remote-advertisement-failed"));
+        }
+        let mut remote_old = ExpectedTip::Absent;
+        for line in text(&advertised.stdout)?.lines() {
+            let (oid, name) = line
+                .split_once('\t')
+                .ok_or_else(|| err("invalid-remote-advertisement"))?;
+            if name != refs[0].1.as_str() {
+                return Err(err("unexpected-remote-ref"));
+            }
+            remote_old = ExpectedTip::Oid(
+                Oid::parse(oid, repo.object_format()).map_err(|_| err("invalid-remote-oid"))?,
+            );
+        }
+
         let (id, intent) = self.transfer_intent(
             repo,
             wal::OperationKind::RemotePush {
                 url: url.clone(),
                 refspecs: vec![spec.clone()],
+                targets: vec![(
+                    local.as_str().into(),
+                    tip(&remote_old),
+                    tip(&self.ref_tip(repo, local.as_str())?),
+                )],
             },
             vec![local.as_str().into()],
         )?;
@@ -1744,6 +1778,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 &scheme,
                 &[
                     "push".into(),
+                    "--atomic".into(),
                     "--porcelain".into(),
                     "--no-verify".into(),
                     "--recurse-submodules=no".into(),
