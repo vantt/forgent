@@ -86,7 +86,7 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
   if (!activity) return refuse([{ code: 'unknown-activity', rule: 'guide', condition: `the guide has no activity "${proposal.activity}"` }]);
 
   const violations = [];
-  const add = (code, rule, condition) => violations.push({ code, rule, condition });
+  const add = (code, rule, condition, milestone) => violations.push({ code, rule, condition, ...(milestone ? { milestone } : {}) });
   const writes = canonicalizeWrites(proposal.writes ?? []);
   const writing = writes.length > 0;
 
@@ -98,9 +98,9 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
   for (const id of activity.entry) {
     const m = projection.milestones[id];
     if (m?.state === 'achieved') continue;
-    if (m?.state === 'stale') add('entry-milestone-stale', 'milestone-reached', `milestone "${id}" was reached for another version of its subject (${m.reason ?? 'the subject changed'}); reach it again`);
-    else if (m?.state === 'blocked') add('entry-milestone-blocked', 'milestone-reached', `milestone "${id}" waits for an answer: ${m.question}`);
-    else add('entry-milestone-unmet', 'milestone-reached', `milestone "${id}" is not reached`);
+    if (m?.state === 'stale') add('entry-milestone-stale', 'milestone-reached', `milestone "${id}" was reached for another version of its subject (${m.reason ?? 'the subject changed'}); reach it again`, id);
+    else if (m?.state === 'blocked') add('entry-milestone-blocked', 'milestone-reached', `milestone "${id}" waits for an answer: ${m.question}`, id);
+    else add('entry-milestone-unmet', 'milestone-reached', `milestone "${id}" is not reached`, id);
   }
 
   // The guide's MUST rows, each by the one check it names.
@@ -109,23 +109,23 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
     switch (row.guard) {
       case 'milestone-reached':
         if (writing && !activity.produces.includes(row.subject) && milestone?.state !== 'achieved') {
-          add('milestone-not-reached', row.id, `rule "${row.id}": milestone "${row.subject}" must be reached (now ${milestone?.state ?? 'unknown'}) before a writing activity`);
+          add('milestone-not-reached', row.id, `rule "${row.id}": milestone "${row.subject}" must be reached (now ${milestone?.state ?? 'unknown'}) before a writing activity`, row.subject);
         }
         break;
       case 'human-consent':
         if (writing && isDownstream(guide, activity, row.subject)) {
           if (milestone?.state === 'stale' && milestone.reason === 'current-digest-unknown') {
-            add('consent-subject-unknown', row.id, `rule "${row.id}": what "${row.subject}" approved cannot be read now, so the approval cannot be compared`);
+            add('consent-subject-unknown', row.id, `rule "${row.id}": what "${row.subject}" approved cannot be read now, so the approval cannot be compared`, row.subject);
           } else if (milestone?.state === 'stale') {
-            add('consent-stale', row.id, `rule "${row.id}": the approval of "${row.subject}" was for another version (approved ${milestone.prior}, now ${milestone.current}); it needs a new approval`);
+            add('consent-stale', row.id, `rule "${row.id}": the approval of "${row.subject}" was for another version (approved ${milestone.prior}, now ${milestone.current}); it needs a new approval`, row.subject);
           } else if (milestone?.state !== 'achieved' || milestone.consent !== true) {
-            add('consent-missing', row.id, `rule "${row.id}": "${row.subject}" has no approval from a gate answer; nothing a worker wrote counts`);
+            add('consent-missing', row.id, `rule "${row.id}": "${row.subject}" has no approval from a gate answer; nothing a worker wrote counts`, row.subject);
           }
         }
         break;
       case 'verify-receipt':
         if (!activity.entry.includes(row.subject) && isDownstream(guide, activity, row.subject) && milestone?.state !== 'achieved') {
-          add(milestone?.state === 'stale' ? 'receipt-stale' : 'receipt-missing', row.id, `rule "${row.id}": "${row.subject}" needs a verify receipt for its current subject (now ${milestone?.state ?? 'unknown'})`);
+          add(milestone?.state === 'stale' ? 'receipt-stale' : 'receipt-missing', row.id, `rule "${row.id}": "${row.subject}" needs a verify receipt for its current subject (now ${milestone?.state ?? 'unknown'})`, row.subject);
         }
         break;
       case 'independence-blind':

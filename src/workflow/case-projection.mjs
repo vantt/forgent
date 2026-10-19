@@ -228,3 +228,20 @@ export function projectCase(events, { currentDigests = {} } = {}) {
     closable: { ok: closureReasons.length === 0, reasons: closureReasons },
   };
 }
+
+/**
+ * The receipts a Unit run's own results back, by named evaluators only: the harness's verify round and
+ * a checker's verdict. What a worker wrote about itself is never read here.
+ */
+export function receiptsFromResults({ unitRunId, results = [], milestone = null, subjectDigest = null }) {
+  const receipts = [];
+  for (const result of results) {
+    const role = String(result?.role ?? '');
+    if (/^verif(y|ier)$/.test(role) && result.outcome === 'pass') {
+      receipts.push({ kind: 'verify', evaluator: 'harness-verify', passed: true, unitRunId, role, milestone, subjectDigest });
+    } else if (/^(reviewer|red-team|checker)/.test(role) && ['pass', 'findings'].includes(result.outcome)) {
+      receipts.push({ kind: 'verdict', evaluator: 'reviewer-verdict', passed: result.outcome === 'pass', unitRunId, role, milestone, subjectDigest });
+    }
+  }
+  return receipts;
+}

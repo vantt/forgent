@@ -36,11 +36,10 @@ function casesWithBindings(root) {
   const cases = [];
   const unreadable = [];
   for (const name of fs.readdirSync(runsDir)) {
-    const file = path.join(runsDir, name, 'events.jsonl');
-    if (name.startsWith('.') || !fs.existsSync(file)) continue;
-    if (!fs.readFileSync(file, 'utf8').includes('"type":"binding"')) continue;
+    if (name.startsWith('.') || !fs.statSync(path.join(runsDir, name)).isDirectory()) continue;
     try {
-      cases.push({ caseId: name, events: readWorkflowEvents({ repoRoot: root, workflowRunId: name }) });
+      const events = readWorkflowEvents({ repoRoot: root, workflowRunId: name });
+      if (events.some((e) => e.type === 'binding')) cases.push({ caseId: name, events });
     } catch (err) {
       unreadable.push(`${name}: ${err.message}`);
     }

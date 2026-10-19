@@ -2307,6 +2307,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
+          // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.
+          frame: flags.frame === undefined ? undefined : Object.fromEntries(requireField(flags.frame, '--frame requires key=value pairs, e.g. dispatches=3,rigorFloor=high').split(',').map((pair) => {
+            const [key, ...value] = pair.split('=');
+            return [key.trim(), value.join('=').trim()];
+          })),
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
@@ -2336,6 +2341,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
+      }
+      if (sub === 'close') {
+        const { closeWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
+        return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
       }
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');

@@ -507,7 +507,7 @@ async function holdAdvanceInChild(tmp, id) {
   return { child, exited };
 }
 
-test('a run already being advanced by a live process refuses a second advance and records nothing', async () => {
+test('a run already being advanced by a live process refuses a second advance; an answer is kept for the live proposer and the ledger is left to it', async () => {
   const tmp = setupTestRepo();
   const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
   const id = parked.workflowRunId;
@@ -520,15 +520,24 @@ test('a run already being advanced by a live process refuses a second advance an
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
   assert.throws(() => resumeWorkflowDetached(id, opts), new RegExp(`already being advanced by process ${process.pid}`));
-  assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
   await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
-  await assert.rejects(answerWorkflow(id, answer), /already being advanced/);
-  assert.equal(eventCount(), before, 'a refused advance must not record the gate answer');
-  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'a refused advance leaves the holder lock alone');
+  assert.equal(eventCount(), before, 'a refused resume records nothing');
+
+  // An answer never writes the ledger itself: it is kept as a file and the live holder records it.
+  const kept = answerWorkflowDetached(id, answer);
+  assert.equal(kept.recorded, true);
+  assert.equal(kept.appliedBy, 'live proposer');
+  assert.equal(kept.detached, undefined, 'no second process is started');
+  assert.equal(eventCount(), before, 'the answer reached no ledger line while a holder lives');
+  await assert.rejects(answerWorkflow(id, answer), (err) => err.code === 'gate-already-answered', 'a second answer to the same gate is refused by name');
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'the holder lock is left alone');
   held.release();
 
-  const state = await answerWorkflow(id, answer);
+  // The next holder of advance folds the kept answer in before it acts on anything.
+  const state = await resumeWorkflow(id, opts);
   assert.equal(state.status, 'completed');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).map((e) => e.type);
+  assert.ok(types.indexOf('gate.answer') < types.lastIndexOf('step.complete'), 'gate.answer is on the ledger before the step it releases completes');
   assert.equal(probe('advance', advanceParams(tmp, id)).result, 'free');
 });
 
@@ -540,7 +549,7 @@ test('an advance holder killed right after it took the lock does not block the n
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, repoRoot: tmp, cwd: tmp };
 
   const { child, exited } = await holdAdvanceInChild(tmp, id);
-  await assert.rejects(answerWorkflow(id, answer), new RegExp(`already being advanced by process ${child.pid}`));
+  await assert.rejects(resumeWorkflow(id, { repoRoot: tmp, cwd: tmp }), new RegExp(`already being advanced by process ${child.pid}`));
   child.kill('SIGKILL');
   await exited;
 

@@ -44,8 +44,10 @@ test('a gate answer is one round file made once; a second answer to an answered 
   assert.equal(fs.readFileSync(answerFile(run), 'utf8'), text, 'the answered file did not change');
 
   // Consumed by the next holder of advance, once.
-  const drained = withHold(run, (hold) => [drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }), drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold })]);
-  assert.deepEqual(drained.map((d) => d.answers), [1, 0]);
+  // Taking advance is the drain, and draining again changes nothing.
+  const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
+  assert.equal(drained.answers, 0);
+  assert.equal(eventsOf(run).filter((e) => e.type === 'gate.answer').length, 1);
   const event = eventsOf(run).find((e) => e.type === 'gate.answer');
   assert.deepEqual([event.payload.stepId, event.payload.approved, event.payload.subjectDigest, event.payload.occurrence, event.payload.round], ['ok', true, 'sha256:copy', 1, 1]);
   assert.throws(() => answer(run), (err) => err.code === 'gate-already-answered', 'still refused once consumed');

@@ -10,6 +10,8 @@ import { createAdvanceHold, recoverWorkflowLedgerTail } from './store.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
 
 export const PROGRESS_LINE_LIMIT = 300;
+// Set by the detached child that advances a case, so only it prints progress to its log.
+export const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
 
 // The advance lock is a kernel mutex on `<runDir>/locks/advance.lock` (src/holder-lock): the kernel
 // lets one process advance a run at a time and releases it the moment that process dies, so a holder
